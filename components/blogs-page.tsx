@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { EnhancedSidebar } from "./enhanced-sidebar";
 import { DashboardHeader } from "./dashboard-header";
@@ -29,91 +29,96 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import axiosInstance from "@/lib/axiosInstance";
 
-// Sample blog posts data with image URLs
-const blogPosts = [
-  {
-    id: 1,
-    title: "أحدث اتجاهات التصميم الداخلي لعام 2023",
-    excerpt:
-      "استكشف أحدث اتجاهات التصميم الداخلي التي ستهيمن على المنازل والمساحات التجارية في عام 2023.",
-    date: "15 يوليو 2023",
-    author: "سارة أحمد",
-    status: "منشور",
-    views: 1245,
-    comments: 23,
-    category: "تصميم داخلي",
-    image: "/placeholder.svg?height=200&width=350",
-  },
-  {
-    id: 2,
-    title: "كيفية اختيار الألوان المناسبة لمنزلك",
-    excerpt:
-      "دليل شامل لاختيار مخططات الألوان المثالية لكل غرفة في منزلك، مع نصائح من خبراء التصميم.",
-    date: "3 يونيو 2023",
-    author: "محمد علي",
-    status: "منشور",
-    views: 987,
-    comments: 15,
-    category: "نصائح التصميم",
-    image: "/placeholder.svg?height=200&width=350",
-  },
-  {
-    id: 3,
-    title: "تحويل مساحة صغيرة إلى منزل مريح",
-    excerpt:
-      "نصائح وحيل عملية لتحويل الشقق والمنازل الصغيرة إلى مساحات معيشة مريحة وعملية وجميلة.",
-    date: "22 مايو 2023",
-    author: "ليلى حسن",
-    status: "مسودة",
-    views: 0,
-    comments: 0,
-    category: "مساحات صغيرة",
-    image: "/placeholder.svg?height=200&width=350",
-  },
-  {
-    id: 4,
-    title: "أفضل 10 نباتات منزلية لتنقية الهواء",
-    excerpt:
-      "قائمة بأفضل النباتات المنزلية التي لا تحسن جمال منزلك فحسب، بل تساعد أيضًا في تنقية الهواء.",
-    date: "10 أبريل 2023",
-    author: "أحمد محمود",
-    status: "منشور",
-    views: 2156,
-    comments: 42,
-    category: "نباتات منزلية",
-    image: "/placeholder.svg?height=200&width=350",
-  },
-  {
-    id: 5,
-    title: "دليل التجديد بميزانية محدودة",
-    excerpt: "كيفية تجديد منزلك بأقل تكلفة ممكنة مع الحفاظ على الجودة والجمال.",
-    date: "28 مارس 2023",
-    author: "سارة أحمد",
-    status: "مجدول",
-    views: 0,
-    comments: 0,
-    category: "تجديد",
-    image: "/placeholder.svg?height=200&width=350",
-  },
-  {
-    id: 6,
-    title: "تصميم غرفة المعيشة المثالية",
-    excerpt:
-      "خطوات لتصميم غرفة معيشة مريحة وأنيقة تناسب احتياجاتك وأسلوب حياتك.",
-    date: "15 فبراير 2023",
-    author: "خالد عمر",
-    status: "منشور",
-    views: 1823,
-    comments: 37,
-    category: "تصميم داخلي",
-    image: "/placeholder.svg?height=200&width=350",
-  },
-];
+// تعريف الواجهات (Interfaces) للمدونة
+interface Author {
+  id: number;
+  name: string;
+}
 
-export default function BlogsPage() {
-  const [activeTab, setActiveTab] = useState("blog");
+export interface IBlogPost {
+  id: number;
+  title: string;
+  excerpt: string;
+  featured_image: string;
+  category: string;
+  status: string;
+  tags: string[];
+  published_at: string;
+  views: number;
+  comments: number;
+  featured: boolean;
+  author: Author;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IPagination {
+  total: number;
+  per_page: number;
+  current_page: number;
+  last_page: number;
+  from: number;
+  to: number;
+}
+
+interface BlogApiResponse {
+  status: string;
+  data: {
+    posts: IBlogPost[];
+    pagination: IPagination;
+  };
+}
+
+// دالة لتحويل التاريخ إلى تنسيق عربي مبسط
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("ar-EG", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};
+
+// دالة التحقق مما إذا كانت الصورة صالحة بناءً على امتداد الملف
+const getImageUrl = (url: string): string => {
+  const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+  if (url && validExtensions.some((ext) => url.toLowerCase().endsWith(ext))) {
+    return url;
+  }
+  return "/placeholder.svg"; // صورة بديلة في حال عدم صلاحية URL الصورة
+};
+
+export default function BlogsPage(): JSX.Element {
+  const [activeTab, setActiveTab] = useState<string>("blog");
   const router = useRouter();
+  const [posts, setPosts] = useState<IBlogPost[]>([]);
+  const [pagination, setPagination] = useState<IPagination | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // جلب بيانات المدونة من الـ API
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get<BlogApiResponse>("https://taearif.com/api/blogs");
+        console.log("Fetched posts:", response.data);
+        setPosts(response.data.data.posts);
+        setPagination(response.data.data.pagination);
+      } catch (err: any) {
+        console.error("Error fetching blogs:", err);
+        setError(err.message || "حدث خطأ أثناء جلب بيانات المدونة");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
@@ -138,106 +143,151 @@ export default function BlogsPage() {
               </Button>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {blogPosts.map((post) => (
-                <Card key={post.id} className="overflow-hidden flex flex-col">
-                  <div className="aspect-video w-full overflow-hidden">
-                    <img
-                      src={post.image || "/placeholder.svg"}
-                      alt={post.title}
-                      className="h-full w-full object-cover transition-all hover:scale-105"
-                    />
+            {loading ? (
+              // عرض Skeleton Loading أثناء تحميل البيانات
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="rounded-md border p-6 animate-pulse">
+                    <div className="aspect-video w-full bg-gray-300 rounded" />
+                    <div className="mt-4 space-y-2">
+                      <div className="h-5 w-3/4 bg-gray-300 rounded" />
+                      <div className="h-4 w-full bg-gray-300 rounded" />
+                      <div className="h-4 w-5/6 bg-gray-300 rounded" />
+                    </div>
                   </div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg line-clamp-1">
-                          {post.title}
-                        </CardTitle>
-                        <CardDescription className="mt-1 line-clamp-2">
-                          {post.excerpt}
-                        </CardDescription>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-red-500 text-center">{error}</div>
+            ) : (
+              <>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {posts.map((post) => (
+                    <Card key={post.id} className="overflow-hidden flex flex-col">
+                      <div className="aspect-video w-full overflow-hidden">
+                        <img
+                          src={getImageUrl(post.featured_image)}
+                          alt={post.title}
+                          className="h-full w-full object-cover transition-all hover:scale-105"
+                        />
                       </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">القائمة</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="gap-2">
-                            <Edit className="h-4 w-4" />
-                            <span>تعديل</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2">
-                            <Eye className="h-4 w-4" />
-                            <span>معاينة</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2 text-destructive">
-                            <Trash className="h-4 w-4" />
-                            <span>حذف</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pb-2 flex-grow">
-                    <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-                      <span>الكاتب: {post.author}</span>
-                      <span>•</span>
-                      <span>التاريخ: {post.date}</span>
-                      <span>•</span>
-                      <span>التصنيف: {post.category}</span>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-between pt-2">
-                    <div className="flex gap-2">
-                      <Badge
-                        variant={
-                          post.status === "منشور"
-                            ? "default"
-                            : post.status === "مسودة"
-                              ? "outline"
-                              : "secondary"
-                        }
-                      >
-                        {post.status}
-                      </Badge>
-                    </div>
-                    <div className="flex gap-4 text-sm text-muted-foreground">
-                      <span>{post.views} مشاهدة</span>
-                      <span>{post.comments} تعليق</span>
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-lg line-clamp-1">
+                              {post.title}
+                            </CardTitle>
+                            <CardDescription className="mt-1 line-clamp-2">
+                              {post.excerpt}
+                            </CardDescription>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">القائمة</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem className="gap-2">
+                                <Edit className="h-4 w-4" />
+                                <span>تعديل</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2">
+                                <Eye className="h-4 w-4" />
+                                <span>معاينة</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2 text-destructive">
+                                <Trash className="h-4 w-4" />
+                                <span>حذف</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pb-2 flex-grow">
+                        <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                          <span>الكاتب: {post.author.name}</span>
+                          <span>•</span>
+                          <span>التاريخ: {formatDate(post.published_at)}</span>
+                          <span>•</span>
+                          <span>التصنيف: {post.category}</span>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex justify-between pt-2">
+                        <div className="flex gap-2">
+                          <Badge
+                            variant={
+                              post.status === "published"
+                                ? "default"
+                                : post.status === "draft"
+                                ? "outline"
+                                : "secondary"
+                            }
+                          >
+                            {post.status === "published"
+                              ? "منشور"
+                              : post.status === "draft"
+                              ? "مسودة"
+                              : post.status}
+                          </Badge>
+                        </div>
+                        <div className="flex gap-4 text-sm text-muted-foreground">
+                          <span>{post.views} مشاهدة</span>
+                          <span>{post.comments} تعليق</span>
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
 
-            <Pagination className="mt-6">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious href="#" />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#" isActive>
-                    1
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">2</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">3</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext href="#" />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+                {pagination && (
+                  <Pagination className="mt-6">
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious href="#" />
+                      </PaginationItem>
+                      {Array.from({ length: pagination.last_page }).map((_, idx) => (
+                        <PaginationItem key={idx}>
+                          <PaginationLink
+                            href="#"
+                            isActive={pagination.current_page === idx + 1}
+                          >
+                            {idx + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      <PaginationItem>
+                        <PaginationNext href="#" />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                )}
+              </>
+            )}
           </div>
         </main>
       </div>
     </div>
+  );
+}
+
+function SearchIcon(props: React.SVGProps<SVGSVGElement>): JSX.Element {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
   );
 }
