@@ -16,7 +16,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import LoadingComp from "@/components/LoadingComp";
+import { Skeleton } from "@/components/ui/skeleton"; 
 
 export function MostVisitedPagesTable() {
   const [pagesData, setPagesData] = useState([]);
@@ -42,8 +42,52 @@ export function MostVisitedPagesTable() {
     fetchMostVisitedPages();
   }, []);
 
-  if (loading) return <LoadingComp />;
-  if (error) return <div className="text-red-500 text-center">{error}</div>;
+  if (loading || error) {
+    return (
+      <Card>
+        {/* هيكل التحميل للعنوان */}
+        <CardHeader>
+          <Skeleton className="h-6 w-24 mb-2" />
+          <Skeleton className="h-4 w-40" />
+        </CardHeader>
+        
+        {/* هيكل التحميل للجدول */}
+        <CardContent>
+          <div className="rounded-md border">
+            <Table>
+              {/* هيكل رأس الجدول */}
+              <TableHeader>
+                <TableRow>
+                  {[...Array(6)].map((_, i) => (
+                    <TableHead key={i}>
+                      <Skeleton className="h-4 w-full" />
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              
+              {/* هيكل بيانات الجدول */}
+              <TableBody>
+                {[...Array(5)].map((_, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    {[...Array(6)].map((_, cellIndex) => (
+                      <TableCell key={cellIndex}>
+                        <Skeleton
+                          className={`h-4 ${
+                            cellIndex === 0 ? "w-32" : "w-16"
+                          }`}
+                        />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

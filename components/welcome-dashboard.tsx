@@ -1,8 +1,6 @@
 "use client";
-
-import { useState, useEffect } from "react";
-import type React from "react";
-import axiosInstance from "@/lib/axiosInstance";
+import { useEffect } from "react";
+import useStore from "@/context/Store"; // استيراد useStore
 import {
   ArrowRight,
   FileText,
@@ -47,114 +45,41 @@ import MostVisitedPagesTable from "@/components/MostVisitedPagesTable";
 import RecentActivity from "@/components/recent-activity";
 import SetupProgressCard from "@/components/SetupProgressCard";
 
-
 export function WelcomeDashboard() {
-  const [setupProgress, setSetupProgress] = useState(60);
-  const [dashboardSummary, setDashboardSummary] = useState(null);
-  const [dashboardDevice, setDashboardDevice] = useState([
-    {
-       "color" : "#4285F4",
-       "name" : "جاري التحميل",
-       "value" : 35
+  const {
+    homepage: {
+      dashboardDevice,
+      isDashboardDeviceUpdated,
+      fetchDashboardDevice,
+      dashboardSummary,
+      isDashboardSummaryUpdated,
+      fetchDashboardSummary,
+      trafficSources,
+      isTrafficSourcesUpdated,
+      fetchTrafficSources,
     },
-    {
-       "color" : "#34A853",
-       "name" : "جاري التحميل",
-       "value" : 25
-    },
-    {
-       "color" : "#A142F4",
-       "name" : "جاري التحميل",
-       "value" : 20
-    },
-    {
-       "color" : "#F4B400",
-       "name" : "جاري التحميل",
-       "value" : 15
-    },
-    {
-       "color" : "#6B7280",
-       "name" : "جاري التحميل",
-       "value" : 5
-    }
- ]);
-  const [trafficSources, setTrafficSources] = useState([
-    {
-       "color" : "#4285F4",
-       "name" : "جاري التحميل",
-       "value" : 35
-    },
-    {
-       "color" : "#34A853",
-       "name" : "جاري التحميل",
-       "value" : 25
-    },
-    {
-       "color" : "#A142F4",
-       "name" : "جاري التحميل",
-       "value" : 20
-    },
-    {
-       "color" : "#F4B400",
-       "name" : "جاري التحميل",
-       "value" : 15
-    },
-    {
-       "color" : "#6B7280",
-       "name" : "جاري التحميل",
-       "value" : 5
-    }
- ]);
-  const [error, setError] = useState(null);
-  const [selectedTimeRange, setSelectedTimeRange] = useState("30");
+    loading,
+  } = useStore();
 
-  const fetchDashboardSummary = async () => {
-    try {
-      const response = await axiosInstance.get(
-        "https://taearif.com/api/dashboard/summary",
-      );
-      console.log("Dashboard summary:", response.data);
-      setDashboardSummary(response.data); // تحديث الحالة بالبيانات المسترجعة
-    } catch (error) {
-      console.error("Error fetching dashboard summary:", error);
-      setError(error.message || "حدث خطأ أثناء جلب ملخص اللوحة");
-    }
-  };
-
-
-  const fetchDashboardDevices = async () => {
-    try {
-      const response = await axiosInstance.get(
-        "https://taearif.com/api/dashboard/devices",
-      );
-      console.log("Dashboard devices:", response.data);
-      setDashboardDevice(response.data.devices); // تحديث الحالة بالبيانات المسترجعة
-    } catch (error) {
-      console.error("Error fetching dashboard devices:", error);
-      setError(error.message || "حدث خطأ أثناء جلب اجهزة اللوحة");
-    }
-  };
-
-  const fetchTrafficsources= async () => {
-    try {
-      const response = await axiosInstance.get(
-        "https://taearif.com/api/dashboard/traffic-sources",
-      );
-      console.log("Dashboard traffic-sources:", response.data);
-      setTrafficSources(response.data.sources); // تحديث الحالة بالبيانات المسترجعة
-    } catch (error) {
-      console.error("Error fetching dashboard traffic-sources:", error);
-      setError(error.message || "حدث خطأ أثناء جلب اجهزة اللوحة");
-    }
-  };
-  
-  
-  
+  // جلب البيانات إذا لم تكن قد تم جلبها بعد
   useEffect(() => {
-    fetchDashboardSummary();
-    fetchDashboardDevices();
-    fetchTrafficsources();
-  }, []);
+    if (!isDashboardDeviceUpdated) {
+      fetchDashboardDevice();
+    }
+    if (!isDashboardSummaryUpdated) {
+      fetchDashboardSummary();
+    }
+    if (!isTrafficSourcesUpdated) {
+      fetchTrafficSources();
+    }
+  }, [
+    isDashboardDeviceUpdated,
+    isDashboardSummaryUpdated,
+    isTrafficSourcesUpdated,
+    fetchDashboardDevice,
+    fetchDashboardSummary,
+    fetchTrafficSources,
+  ]);
 
   return (
     <div className="space-y-6">
@@ -171,24 +96,23 @@ export function WelcomeDashboard() {
             <CardTitle className="text-sm font-medium">الزيارات</CardTitle>
           </CardHeader>
           <CardContent>
-              <div className="text-2xl font-bold">
-                {dashboardSummary?.visits.toLocaleString() || 0}
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                <span
-                  className={
-                    dashboardSummary?.visits_change > 0
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }
-                >
-                  {dashboardSummary?.visits_change > 0 ? "↑" : "↓"}{" "}
-                  {Math.abs(dashboardSummary?.visits_change)  || 0}%
-                </span>{" "}
-                من الشهر الماضي
-              </p>
-            </CardContent>
+            <div className="text-2xl font-bold">
+              {dashboardSummary?.visits.toLocaleString() || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              <span
+                className={
+                  dashboardSummary?.visits_change > 0
+                    ? "text-green-500"
+                    : "text-red-500"
+                }
+              >
+                {dashboardSummary?.visits_change > 0 ? "↑" : "↓"}{" "}
+                {Math.abs(dashboardSummary?.visits_change) || 0}%
+              </span>{" "}
+              من الشهر الماضي
+            </p>
+          </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
@@ -197,22 +121,22 @@ export function WelcomeDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-          <div className="text-2xl font-bold">
-                  {dashboardSummary?.page_views.toLocaleString()  || 0}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  <span
-                    className={
-                      dashboardSummary?.page_views_change > 0
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }
-                  >
-                    {dashboardSummary?.page_views_change > 0 ? "↑" : "↓"}{" "}
-                    {Math.abs(dashboardSummary?.page_views_change)  || 0}%
-                  </span>{" "}
-                  من الشهر الماضي
-                </p>
+            <div className="text-2xl font-bold">
+              {dashboardSummary?.page_views.toLocaleString() || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              <span
+                className={
+                  dashboardSummary?.page_views_change > 0
+                    ? "text-green-500"
+                    : "text-red-500"
+                }
+              >
+                {dashboardSummary?.page_views_change > 0 ? "↑" : "↓"}{" "}
+                {Math.abs(dashboardSummary?.page_views_change) || 0}%
+              </span>{" "}
+              من الشهر الماضي
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -220,22 +144,22 @@ export function WelcomeDashboard() {
             <CardTitle className="text-sm font-medium">متوسط الوقت</CardTitle>
           </CardHeader>
           <CardContent>
-                <div className="text-2xl font-bold">
-                  {dashboardSummary?.average_time  || 0}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  <span
-                    className={
-                      dashboardSummary?.average_time_change > 0
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }
-                  >
-                    {dashboardSummary?.average_time_change > 0 ? "↑" : "↓"}{" "}
-                    {Math.abs(dashboardSummary?.average_time_change)  || 0}%
-                  </span>{" "}
-                  من الشهر الماضي
-                </p>
+            <div className="text-2xl font-bold">
+              {dashboardSummary?.average_time || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              <span
+                className={
+                  dashboardSummary?.average_time_change > 0
+                    ? "text-green-500"
+                    : "text-red-500"
+                }
+              >
+                {dashboardSummary?.average_time_change > 0 ? "↑" : "↓"}{" "}
+                {Math.abs(dashboardSummary?.average_time_change) || 0}%
+              </span>{" "}
+              من الشهر الماضي
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -243,39 +167,36 @@ export function WelcomeDashboard() {
             <CardTitle className="text-sm font-medium">معدل الارتداد</CardTitle>
           </CardHeader>
           <CardContent>
-              <div className="text-2xl font-bold">
-                {dashboardSummary?.bounce_rate.toFixed(2)  || 0} %
-              </div>
-              <p className="text-xs text-muted-foreground">
-                <span
-                  className={
-                    dashboardSummary?.bounce_rate_change > 0
-                      ? "text-red-500"
-                      : "text-green-500"
-                  }
-                >
-                  {dashboardSummary?.bounce_rate_change > 0 ? "↑" : "↓"}{" "}
-                  {Math.abs(dashboardSummary?.bounce_rate_change)  || 0}%
-                </span>{" "}
-                من الشهر الماضي
-              </p>
-            </CardContent>
+            <div className="text-2xl font-bold">
+              {dashboardSummary?.bounce_rate.toFixed(2) || 0} %
+            </div>
+            <p className="text-xs text-muted-foreground">
+              <span
+                className={
+                  dashboardSummary?.bounce_rate_change > 0
+                    ? "text-red-500"
+                    : "text-green-500"
+                }
+              >
+                {dashboardSummary?.bounce_rate_change > 0 ? "↑" : "↓"}{" "}
+                {Math.abs(dashboardSummary?.bounce_rate_change) || 0}%
+              </span>{" "}
+              من الشهر الماضي
+            </p>
+          </CardContent>
         </Card>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        {/* نظرة عامة على الزيارات */}
-        <Card className="col-span-4">
-  <CardHeader>
-    <CardTitle>نظرة عامة على الزيارات</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <VisitorChart 
-    />
-  </CardContent>
-</Card>
 
-        {/* تقدم الإعداد */}
-      <SetupProgressCard/>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>نظرة عامة على الزيارات</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <VisitorChart />
+          </CardContent>
+        </Card>
+        <SetupProgressCard />
       </div>
 
       <Tabs defaultValue="content" className="website-content">
@@ -308,20 +229,7 @@ export function WelcomeDashboard() {
                           `${(percent * 100).toFixed(0)}%`
                         }
                       >
-                        {[
-                          {
-                            name: "الهاتف المحمول",
-                            value: 55,
-                            color: "#4285F4",
-                          },
-                          { name: "الحاسوب", value: 25, color: "#34A853" },
-                          {
-                            name: "الجهاز اللوحي",
-                            value: 15,
-                            color: "#A142F4",
-                          },
-                          { name: "أخرى", value: 5, color: "#6B7280" },
-                        ].map((entry, index) => (
+                        {dashboardDevice.map((entry, index) => (
                           <Cell
                             key={`cell-${index}`}
                             fill={entry.color}
@@ -380,21 +288,7 @@ export function WelcomeDashboard() {
                           `${(percent * 100).toFixed(0)}%`
                         }
                       >
-                        {[
-                          { name: "البحث العضوي", value: 45, color: "#4285F4" },
-                          {
-                            name: "الروابط المباشرة",
-                            value: 25,
-                            color: "#34A853",
-                          },
-                          {
-                            name: "وسائل التواصل",
-                            value: 15,
-                            color: "#A142F4",
-                          },
-                          { name: "الإعلانات", value: 10, color: "#F4B400" },
-                          { name: "أخرى", value: 5, color: "#6B7280" },
-                        ].map((entry, index) => (
+                        {trafficSources.map((entry, index) => (
                           <Cell
                             key={`cell-${index}`}
                             fill={entry.color}
@@ -431,11 +325,10 @@ export function WelcomeDashboard() {
             </Card>
           </div>
 
-          {/* Most Visited Pages Table */}
-          <MostVisitedPagesTable/>
+          <MostVisitedPagesTable />
         </TabsContent>
         <TabsContent value="activity">
-<RecentActivity/>
+          <RecentActivity />
         </TabsContent>
       </Tabs>
     </div>

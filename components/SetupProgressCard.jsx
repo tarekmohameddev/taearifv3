@@ -1,37 +1,60 @@
 "use client";
-import { useState, useEffect } from "react";
-import axiosInstance from "@/lib/axiosInstance";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { useEffect } from "react";
+import useStore from "@/context/Store";
+import { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Check } from "lucide-react";
-import LoadingComp from "@/components/LoadingComp";
+import { Skeleton } from "@/components/ui/skeleton"; // استيراد Skeleton
 
 export function SetupProgressCard() {
-  const [setupProgressData, setSetupProgressData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // دالة جلب البيانات من API
-  const fetchSetupProgress = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await axiosInstance.get("https://taearif.com/api/dashboard/setup-progress");
-      setSetupProgressData(response.data);
-    } catch (err) {
-      console.error("Error fetching setup-progress data:", err);
-      setError(err.message || "حدث خطأ أثناء جلب البيانات");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    homepage: {
+      setupProgressData,
+      isSetupProgressDataUpdated,
+      fetchSetupProgressData,
+    },
+    loading,
+  } = useStore();
 
   useEffect(() => {
-    fetchSetupProgress();
-  }, []);
+    if (!isSetupProgressDataUpdated) {
+      fetchSetupProgressData();
+    }
+  }, [isSetupProgressDataUpdated, fetchSetupProgressData]);
 
-  if (error) return <div className="text-red-500 text-center">{error}</div>;
+  if (loading || !setupProgressData) {
+    return (
+      <Card className="col-span-3">
+        <CardHeader>
+          <Skeleton className="h-6 w-24 mb-2" />
+          <Skeleton className="h-4 w-40" />
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-2 w-full" />
+          </div>
+          <div className="space-y-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Skeleton className="h-6 w-6 rounded-full" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            ))}
+          </div>
+          <Skeleton className="h-8 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
 
   return (
     <Card className="col-span-3">
@@ -41,9 +64,7 @@ export function SetupProgressCard() {
           أكمل إعداد موقعك للحصول على أفضل النتائج
         </CardDescription>
       </CardHeader>
-      <CardContent className={`${loading? "min-h-[150px] flex justify-center items-center":"space-y-5"}`}>
-{loading? <LoadingComp/>: (
-    <>
+      <CardContent className="space-y-5">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">اكتمال الإعداد</span>
@@ -75,8 +96,6 @@ export function SetupProgressCard() {
           <span>متابعة الإعداد</span>
           <ArrowRight className="h-3.5 w-3.5 mr-0 ml-1" />
         </Button>
-        </>
-      )}
       </CardContent>
     </Card>
   );

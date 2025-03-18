@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   AreaChart,
@@ -11,80 +11,30 @@ import {
   ResponsiveContainer,
   Area,
 } from "recharts";
-import axiosInstance from "@/lib/axiosInstance";
-import LoadingComp from "@/components/LoadingComp";
+import useStore from "@/context/Store"; // استيراد useStore
 
 function VisitorChart() {
-  // حالة الفترة الزمنية المختارة
-  const [timeRange, setTimeRange] = useState("30");
-  // حالة بيانات الزوار المسترجعة من API
-  const [visitorData, setVisitorData] = useState([
-    {
-       "date" : "1 يناير",
-       "uniqueVisitors" : 0,
-       "visits" : 0
+  // الوصول إلى الحالات والدوال من قسم homepage في Store.js
+  const {
+    homepage: {
+      visitorData,
+      selectedTimeRange,
+      fetchVisitorData,
+      setSelectedTimeRange,
     },
-    {
-       "date" : "5 يناير",
-       "uniqueVisitors" : 0,
-       "visits" : 0
-    },
-    {
-       "date" : "10 يناير",
-       "uniqueVisitors" : 0,
-       "visits" : 0
-    },
-    {
-       "date" : "15 يناير",
-       "uniqueVisitors" : 0,
-       "visits" : 0
-    },
-    {
-       "date" : "20 يناير",
-       "uniqueVisitors" : 0,
-       "visits" : 0
-    },
-    {
-       "date" : "25 يناير",
-       "uniqueVisitors" : 0,
-       "visits" : 0
-    },
-    {
-       "date" : "30 يناير",
-       "uniqueVisitors" : 0,
-       "visits" : 0
-    }
- ]);
-  // حالة التحميل وخطأ الاستدعاء
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+    loading,
+  } = useStore();
 
-  // دالة جلب بيانات الزوار بناءً على الفترة الزمنية المحددة
-  const fetchDashboardvisitors = async (value) => {
-    try {
-      setLoading(true);
-      setError("");
-      console.log("value:", value);
-
-      const response = await axiosInstance.get(
-        "https://taearif.com/api/dashboard/visitors",
-        { time_range: value } 
-      );
-      console.log("Dashboard visitors:", response.data);
-      // نفترض أن البيانات تحت المفتاح visitor_data في الاستجابة
-      setVisitorData(response.data.visitor_data);
-    } catch (err) {
-      console.error("Error fetching dashboard visitors:", err);
-      setError(err.message || "حدث خطأ أثناء جلب بيانات الزوار");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // استدعاء الدالة عند تغيير الفترة الزمنية
+  // جلب البيانات إذا كانت فارغة للفترة الزمنية المختارة
   useEffect(() => {
-    fetchDashboardvisitors(timeRange);
-  }, [timeRange]);
+    const dataForSelectedRange = visitorData[selectedTimeRange];
+    if (!dataForSelectedRange || dataForSelectedRange.length === 0) {
+      fetchVisitorData(selectedTimeRange);
+    }
+  }, [selectedTimeRange, visitorData, fetchVisitorData]);
+
+  // البيانات التي سيتم عرضها في الرسم البياني
+  const chartData = visitorData[selectedTimeRange] || [];
 
   return (
     <div className="w-full">
@@ -95,24 +45,27 @@ function VisitorChart() {
           { label: "30 يوم", value: "30" },
           { label: "3 أشهر", value: "90" },
           { label: "سنة", value: "365" },
-        ].map((range) => (
+        ].map((range) => {
+          console.log("selectedTimeRange",selectedTimeRange)
+          console.log("range.value", range.value)
+          return(
           <Button
             key={range.value}
-            variant={timeRange === range.value ? "default" : "outline"}
+            variant={selectedTimeRange == range.value ? "default" : "outline"}
             size="sm"
-            onClick={() => setTimeRange(range.value)}
+            onClick={() => setSelectedTimeRange(range.value)}
             className="text-sm"
           >
             {range.label}
           </Button>
-        ))}
+        )})}
       </div>
 
-      {/* عرض حالة التحميل أو الخطأ أو الرسم البياني */}
+      {/* عرض حالة التحميل أو الرسم البياني */}
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
-              data={visitorData}
+              data={chartData}
               margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} />

@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -27,7 +26,7 @@ export function LoginPage() {
     password: "",
     rememberMe: false,
   });
-  const { login, errorLogin, IsLoading } = useAuthStore();
+  const { login, errorLogin, IsLoading, userData } = useAuthStore();
   const [errors, setErrors] = useState({
     email: "",
     password: "",
@@ -80,7 +79,17 @@ export function LoginPage() {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
-        router.push("/");
+        // التحقق من أن userData تحتوي على بيانات فعلية
+        console.log("userData", userData);
+        if (userData.email) {
+        console.log("userData2", userData);
+          router.push("/");
+        } else {
+          setErrors((prev) => ({
+            ...prev,
+            general: "فشل في جلب بيانات المستخدم",
+          }));
+        }
       } else {
         // تحديث الخطأ العام فقط
         setErrors((prev) => ({
@@ -91,7 +100,7 @@ export function LoginPage() {
     } catch (error) {
       setErrors((prev) => ({
         ...prev,
-        general: error.message + "11" || "حدث خطأ أثناء الاتصال بالخادم",
+        general: error.message || "حدث خطأ أثناء الاتصال بالخادم",
       }));
     } finally {
       setIsLoading(false);

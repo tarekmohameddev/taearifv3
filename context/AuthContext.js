@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import { serialize as serializeCookie } from "cookie";
 
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set,get) => ({
   UserIslogged: false,
   IsLoading: true,
+  IsDone: false,
   error: null,
   errorLogin: null,
   errorLoginATserver: null,
@@ -15,8 +16,11 @@ const useAuthStore = create((set) => ({
     last_name: null,
   },
 
+  // ! --------------fetch User Data
   fetchUserData: async () => {
     set({ IsLoading: true, error: null });
+    if(get().IsDone === true) return
+    set({ IsDone: true, error: null });
     try {
       const userInfoResponse = await fetch("/api/user/getUserInfo");
 
@@ -47,7 +51,7 @@ const useAuthStore = create((set) => ({
         },
         body: JSON.stringify({ email, password }),
       });
-
+  
       // إذا كانت الاستجابة غير ناجحة
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -55,18 +59,23 @@ const useAuthStore = create((set) => ({
         set({ errorLogin: errorMsg });
         return { success: false, error: errorMsg };
       }
-
+  
       const data = await response.json();
-
+      console.log("data", data);
+  
       // إذا كانت الاستجابة ناجحة لكن العملية لم تتم بنجاح
       if (!data.success) {
         const errorMsg = data.error || "فشل تسجيل الدخول";
         set({ errorLogin: errorMsg });
         return { success: false, error: errorMsg };
       }
-
+  
       // في حال نجاح تسجيل الدخول
-      const { password: _, ...safeUserData } = data.user;
+      const { password: _, ...userWithoutPassword } = data.user;
+      const safeUserData = {
+        ...userWithoutPassword,
+        token: data.UserToken, // إضافة UserToken كـ token
+      };
       set({ UserIslogged: true, userData: safeUserData });
       return { success: true };
     } catch (error) {
@@ -79,6 +88,9 @@ const useAuthStore = create((set) => ({
     }
   },
 
+
+  
+  // ! --------------logout
   logout: async () => {
     try {
       // تعديل URL استدعاء API لتسجيل الخروج إلى المسار الصحيح
@@ -89,6 +101,7 @@ const useAuthStore = create((set) => ({
         set({ UserIslogged: false, userData: null });
         window.location.href = "/login";
       } else {
+        
         console.error("فشل تسجيل الخروج");
       }
     } catch (error) {
