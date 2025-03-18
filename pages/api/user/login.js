@@ -47,7 +47,7 @@ export default async function handler(req, res) {
         const authCookie = serialize("authToken", token1, cookieOptions);
         res.setHeader("Set-Cookie", authCookie);
 
-        return res.status(200).json({ success: true, user , UserToken});
+        return res.status(200).json({ success: true, user, UserToken });
       } else {
         console.error("External API returned non-200 status:", response.status);
         return res

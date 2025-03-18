@@ -5,12 +5,7 @@ import { useRouter } from "next/navigation";
 import { EnhancedSidebar } from "./enhanced-sidebar";
 import { DashboardHeader } from "./dashboard-header";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -80,7 +75,9 @@ export default function AddBlogPage(): JSX.Element {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axiosInstance.get("https://taearif.com/api/blog-categories");
+        const response = await axiosInstance.get(
+          "https://taearif.com/api/blog-categories",
+        );
         // نفترض أن الاستجابة تكون بالشكل { status: "success", data: { categories: [...] } }
         setCategories(response.data.data.categories);
       } catch (error: any) {
@@ -91,7 +88,7 @@ export default function AddBlogPage(): JSX.Element {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -107,7 +104,7 @@ export default function AddBlogPage(): JSX.Element {
       // في التطبيق الحقيقي يتم رفع الصور للسيرفر
       const newImages = Array.from(files).map(
         (_, index) =>
-          `/placeholder.svg?height=200&width=350&text=صورة+${selectedImages.length + index + 1}`
+          `/placeholder.svg?height=200&width=350&text=صورة+${selectedImages.length + index + 1}`,
       );
       setSelectedImages([...selectedImages, ...newImages]);
     }
@@ -129,9 +126,7 @@ export default function AddBlogPage(): JSX.Element {
       content: formData.content,
       category: formData.category,
       status: formData.status,
-      tags: formData.tags
-        ? formData.tags.split(",").map((t) => t.trim())
-        : [],
+      tags: formData.tags ? formData.tags.split(",").map((t) => t.trim()) : [],
       seo_title: formData.seoTitle,
       seo_description: formData.seoDescription,
       featured_image: selectedImages[0] || "",
@@ -318,7 +313,8 @@ export default function AddBlogPage(): JSX.Element {
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          يمكنك إضافة حتى 4 صور. الصورة الأولى ستكون الصورة الرئيسية للمقال.
+                          يمكنك إضافة حتى 4 صور. الصورة الأولى ستكون الصورة
+                          الرئيسية للمقال.
                         </p>
                       </div>
                     </CardContent>
@@ -410,7 +406,7 @@ export default function AddBlogPage(): JSX.Element {
                                 variant="outline"
                                 className={cn(
                                   "w-full justify-start text-right font-normal",
-                                  !date && "text-muted-foreground"
+                                  !date && "text-muted-foreground",
                                 )}
                               >
                                 <CalendarIcon className="ml-2 h-4 w-4" />
@@ -419,7 +415,10 @@ export default function AddBlogPage(): JSX.Element {
                                   : "اختر تاريخًا"}
                               </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
+                            <PopoverContent
+                              className="w-auto p-0"
+                              align="start"
+                            >
                               <Calendar
                                 mode="single"
                                 selected={date}

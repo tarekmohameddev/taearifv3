@@ -13,7 +13,13 @@ import {
 import { EnhancedSidebar } from "@/components/enhanced-sidebar";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Building2,
@@ -42,7 +48,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 
 export function ContentManagementPage() {
@@ -85,7 +97,9 @@ export function ContentManagementPage() {
   const fetchSections = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get("https://taearif.com/api/content/sections");
+      const response = await axiosInstance.get(
+        "https://taearif.com/api/content/sections",
+      );
       // نتوقع أن تكون الاستجابة بالشكل { data: { availableIcons: [...], sections: [...] } }
       console.log("Response data:", response.data.data);
       setSections(response.data.data.sections);
@@ -125,7 +139,7 @@ export function ContentManagementPage() {
           };
         }
         return section;
-      })
+      }),
     );
   };
 
@@ -232,7 +246,10 @@ export function ContentManagementPage() {
                   </SelectContent>
                 </Select>
 
-                <Dialog open={newSectionDialogOpen} onOpenChange={setNewSectionDialogOpen}>
+                <Dialog
+                  open={newSectionDialogOpen}
+                  onOpenChange={setNewSectionDialogOpen}
+                >
                   <DialogTrigger asChild>
                     <Button onClick={() => setNewSectionDialogOpen(true)}>
                       <Plus className="h-4 w-4 ml-1" />
@@ -242,7 +259,9 @@ export function ContentManagementPage() {
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>إضافة قسم جديد</DialogTitle>
-                      <DialogDescription>أضف قسمًا مخصصًا جديدًا إلى موقعك</DialogDescription>
+                      <DialogDescription>
+                        أضف قسمًا مخصصًا جديدًا إلى موقعك
+                      </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid gap-2">
@@ -260,12 +279,17 @@ export function ContentManagementPage() {
                           id="description"
                           placeholder="وصف مختصر لمحتوى القسم وهدفه"
                           value={newSectionDescription}
-                          onChange={(e) => setNewSectionDescription(e.target.value)}
+                          onChange={(e) =>
+                            setNewSectionDescription(e.target.value)
+                          }
                         />
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="icon">أيقونة القسم</Label>
-                        <Select value={newSectionIcon} onValueChange={setNewSectionIcon}>
+                        <Select
+                          value={newSectionIcon}
+                          onValueChange={setNewSectionIcon}
+                        >
                           <SelectTrigger id="icon">
                             <SelectValue placeholder="اختر أيقونة" />
                           </SelectTrigger>
@@ -282,14 +306,16 @@ export function ContentManagementPage() {
                                     </SelectItem>
                                   );
                                 })
-                              : Object.entries(availableIcons).map(([name, Icon]) => (
-                                  <SelectItem key={name} value={name}>
-                                    <div className="flex items-center gap-2">
-                                      <Icon className="h-4 w-4" />
-                                      <span>{name}</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
+                              : Object.entries(availableIcons).map(
+                                  ([name, Icon]) => (
+                                    <SelectItem key={name} value={name}>
+                                      <div className="flex items-center gap-2">
+                                        <Icon className="h-4 w-4" />
+                                        <span>{name}</span>
+                                      </div>
+                                    </SelectItem>
+                                  ),
+                                )}
                           </SelectContent>
                         </Select>
                       </div>
@@ -299,12 +325,19 @@ export function ContentManagementPage() {
                           <Label htmlFor="status" className="text-sm">
                             نشط
                           </Label>
-                          <Switch id="status" checked={newSectionStatus} onCheckedChange={setNewSectionStatus} />
+                          <Switch
+                            id="status"
+                            checked={newSectionStatus}
+                            onCheckedChange={setNewSectionStatus}
+                          />
                         </div>
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => setNewSectionDialogOpen(false)}>
+                      <Button
+                        variant="outline"
+                        onClick={() => setNewSectionDialogOpen(false)}
+                      >
                         إلغاء
                       </Button>
                       <Button onClick={handleAddNewSection}>إضافة القسم</Button>
@@ -319,7 +352,10 @@ export function ContentManagementPage() {
             // Skeleton Loading بنفس شكل الأقسام
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="rounded-md border p-6 animate-pulse">
+                <div
+                  key={index}
+                  className="rounded-md border p-6 animate-pulse"
+                >
                   <div className="flex items-center mb-4">
                     <div className="h-5 w-5 bg-gray-300 rounded-full" />
                     <div className="ml-4 h-5 w-1/2 bg-gray-300 rounded" />
@@ -359,12 +395,15 @@ export function ContentManagementPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredSections.map((section) => {
                 // تحويل قيمة icon من نص إلى مكون
-                const IconComponent = availableIcons[section.icon] || availableIcons["FileText"];
+                const IconComponent =
+                  availableIcons[section.icon] || availableIcons["FileText"];
                 return (
                   <Link href={section.path} key={section.id}>
                     <Card
                       className={`h-full cursor-pointer transition-all hover:shadow-md ${
-                        section.status === "inactive" ? "opacity-70 border-dashed" : ""
+                        section.status === "inactive"
+                          ? "opacity-70 border-dashed"
+                          : ""
                       }`}
                     >
                       <CardHeader className="flex flex-row items-start justify-between p-6">
@@ -388,12 +427,17 @@ export function ContentManagementPage() {
                               </Badge>
                             )}
                           </CardTitle>
-                          <CardDescription>{section.description}</CardDescription>
+                          <CardDescription>
+                            {section.description}
+                          </CardDescription>
                         </div>
                       </CardHeader>
                       <CardContent className="px-6 pb-6">
                         {section.count !== undefined && (
-                          <Badge variant="secondary" className={`mb-4 ${section.badge?.color}`}>
+                          <Badge
+                            variant="secondary"
+                            className={`mb-4 ${section.badge?.color}`}
+                          >
                             {section.count} {section.badge?.label}
                           </Badge>
                         )}
@@ -427,7 +471,9 @@ export function ContentManagementPage() {
                   <Plus className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="mb-1 font-medium">إضافة قسم مخصص</h3>
-                <p className="text-sm text-muted-foreground">إنشاء قسم مخصص جديد لموقعك</p>
+                <p className="text-sm text-muted-foreground">
+                  إنشاء قسم مخصص جديد لموقعك
+                </p>
               </Card>
             </div>
           )}

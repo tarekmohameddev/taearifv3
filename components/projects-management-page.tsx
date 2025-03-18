@@ -113,7 +113,7 @@ export function ProjectsManagementPage() {
       try {
         setLoading(true);
         const response = await axiosInstance.get<IProjectsApiResponse>(
-          "https://taearif.com/api/projects"
+          "https://taearif.com/api/projects",
         );
         setProjects(response.data.data.projects);
         setPagination(response.data.data.pagination);
@@ -160,7 +160,9 @@ export function ProjectsManagementPage() {
             {/* Header and Controls */}
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">إدارة المشاريع</h1>
+                <h1 className="text-2xl font-bold tracking-tight">
+                  إدارة المشاريع
+                </h1>
                 <p className="text-muted-foreground">
                   إضافة وإدارة مشاريع التطوير العقاري لموقعك الإلكتروني
                 </p>
@@ -184,11 +186,20 @@ export function ProjectsManagementPage() {
                   <List className="h-4 w-4" />
                   <span className="sr-only">عرض القائمة</span>
                 </Button>
-                <Button variant="outline" className="gap-1" onClick={() => { /* Open filter dialog */ }}>
+                <Button
+                  variant="outline"
+                  className="gap-1"
+                  onClick={() => {
+                    /* Open filter dialog */
+                  }}
+                >
                   <Filter className="h-4 w-4" />
                   تصفية
                 </Button>
-                <Button className="gap-1" onClick={() => router.push("/projects/add")}>
+                <Button
+                  className="gap-1"
+                  onClick={() => router.push("/projects/add")}
+                >
                   <Plus className="h-4 w-4" />
                   إضافة مشروع
                 </Button>
@@ -210,21 +221,21 @@ export function ProjectsManagementPage() {
                 {loading
                   ? renderSkeletons()
                   : renderProjectCards(
-                      projects.filter((project) => project.status === 1)
+                      projects.filter((project) => project.status === 1),
                     )}
               </TabsContent>
               <TabsContent value="0" className="mt-4">
                 {loading
                   ? renderSkeletons()
                   : renderProjectCards(
-                      projects.filter((project) => project.status === 0)
+                      projects.filter((project) => project.status === 0),
                     )}
               </TabsContent>
               <TabsContent value="featured" className="mt-4">
                 {loading
                   ? renderSkeletons()
                   : renderProjectCards(
-                      projects.filter((project) => project.featured === 1)
+                      projects.filter((project) => project.featured === 1),
                     )}
               </TabsContent>
             </Tabs>
@@ -232,7 +243,8 @@ export function ProjectsManagementPage() {
             {pagination && (
               <div className="mt-6">
                 <span className="text-sm text-muted-foreground">
-                  Showing {pagination.from} to {pagination.to} of {pagination.total} projects
+                  Showing {pagination.from} to {pagination.to} of{" "}
+                  {pagination.total} projects
                 </span>
                 {/* يمكنك إضافة Pagination component هنا إذا لزم الأمر */}
               </div>
@@ -262,7 +274,9 @@ function ProjectCard({ project }: { project: IProject }) {
         )}
         <div
           className={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-medium ${
-            project.status === 1 ? "bg-green-500 text-white" : "bg-amber-500 text-white"
+            project.status === 1
+              ? "bg-green-500 text-white"
+              : "bg-amber-500 text-white"
           }`}
         >
           {project.status === 1 ? "منشور" : "مسودة"}
@@ -271,7 +285,9 @@ function ProjectCard({ project }: { project: IProject }) {
       <CardHeader className="p-4">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="whitespace-nowrap mb-2">{project.contents?.[0]?.title}</CardTitle>
+            <CardTitle className="whitespace-nowrap mb-2">
+              {project.contents?.[0]?.title}
+            </CardTitle>
             <CardDescription className="flex items-center gap-1">
               <MapPin className="h-3 w-3  " /> {project.contents?.[0]?.address}
             </CardDescription>
@@ -336,7 +352,8 @@ function ProjectCard({ project }: { project: IProject }) {
           <div className="flex flex-col">
             <span className="text-muted-foreground">المطور</span>
             <span className="font-medium flex items-center gap-1">
-              <Building2 className="h-3 w-3" /> {project.developer.split(" ")[0]}
+              <Building2 className="h-3 w-3" />{" "}
+              {project.developer.split(" ")[0]}
             </span>
           </div>
         </div>
@@ -374,7 +391,9 @@ function ProjectListItem({ project }: { project: IProject }) {
           )}
           <div
             className={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-medium ${
-              project.status === 1 ? "bg-green-500 text-white" : "bg-amber-500 text-white"
+              project.status === 1
+                ? "bg-green-500 text-white"
+                : "bg-amber-500 text-white"
             }`}
           >
             {project.status === 1 ? "منشور" : "مسودة"}
@@ -385,7 +404,8 @@ function ProjectListItem({ project }: { project: IProject }) {
             <div>
               <h3 className="font-semibold">{project.contents?.[0]?.title}</h3>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
-                <MapPin className="h-3 w-3 mt-10" /> {project.contents?.[0]?.address}
+                <MapPin className="h-3 w-3 mt-10" />{" "}
+                {project.contents?.[0]?.address}
               </p>
             </div>
             <div className="text-lg font-semibold">{project.price}</div>

@@ -1,12 +1,12 @@
 "use client";
 import { useEffect } from "react";
 import useStore from "@/context/Store";
-import { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription, 
-  CardContent 
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -55,7 +55,6 @@ export function SetupProgressCard() {
     );
   }
 
-
   return (
     <Card className="col-span-3">
       <CardHeader>
@@ -64,11 +63,13 @@ export function SetupProgressCard() {
           أكمل إعداد موقعك للحصول على أفضل النتائج
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-5">
+      <CardContent className="space-y-5 gap-5">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">اكتمال الإعداد</span>
-            <span className="text-sm font-medium">{setupProgressData.progress_percentage}%</span>
+            <span className="text-sm font-medium">
+              {setupProgressData.progress_percentage}%
+            </span>
           </div>
           <Progress value={setupProgressData.progress_percentage} />
         </div>

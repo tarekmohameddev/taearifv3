@@ -27,9 +27,13 @@ const SkeletonLoader = () => {
   );
 };
 
-
 export function RecentActivity() {
-  const { recentActivityData, isRecentActivityUpdated, fetchRecentActivityData,loading } = useStore();
+  const {
+    recentActivityData,
+    isRecentActivityUpdated,
+    fetchRecentActivityData,
+    loading,
+  } = useStore();
 
   useEffect(() => {
     if (!isRecentActivityUpdated) {
@@ -48,7 +52,10 @@ export function RecentActivity() {
           <SkeletonLoader />
         ) : (
           recentActivityData.activities?.map((item, index) => (
-            <div key={index} className="flex items-center gap-4 rounded-lg border p-3">
+            <div
+              key={index}
+              className="flex items-center gap-4 rounded-lg border p-3"
+            >
               <div className="rounded-full bg-primary/10 p-2">
                 <item.icon className="h-4 w-4 text-primary" />
               </div>

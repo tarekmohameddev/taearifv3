@@ -94,7 +94,9 @@ export default function AddProjectPage(): JSX.Element {
     amenities: "",
   });
 
-  const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(null);
+  const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(
+    null,
+  );
   const [planImages, setPlanImages] = useState<ProjectImage[]>([]);
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -105,7 +107,7 @@ export default function AddProjectPage(): JSX.Element {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
     setNewProject((prev) => ({
@@ -196,7 +198,9 @@ export default function AddProjectPage(): JSX.Element {
           setPlanImages((prev) => [
             ...prev,
             {
-              id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+              id:
+                Date.now().toString() +
+                Math.random().toString(36).substring(2, 9),
               file,
               url: event.target.result.toString(),
             },
@@ -217,7 +221,9 @@ export default function AddProjectPage(): JSX.Element {
           setGalleryImages((prev) => [
             ...prev,
             {
-              id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+              id:
+                Date.now().toString() +
+                Math.random().toString(36).substring(2, 9),
               file,
               url: event.target.result.toString(),
             },
@@ -276,7 +282,9 @@ export default function AddProjectPage(): JSX.Element {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSaveProject = async (status: "منشور" | "مسودة" | "Pre-construction") => {
+  const handleSaveProject = async (
+    status: "منشور" | "مسودة" | "Pre-construction",
+  ) => {
     if (!validateForm()) {
       return;
     }
@@ -432,7 +440,9 @@ export default function AddProjectPage(): JSX.Element {
                       <SelectContent>
                         <SelectItem value="منشور">منشور</SelectItem>
                         <SelectItem value="مسودة">مسودة</SelectItem>
-                        <SelectItem value="Pre-construction">Pre-construction</SelectItem>
+                        <SelectItem value="Pre-construction">
+                          Pre-construction
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     {formErrors.status && (
@@ -448,7 +458,9 @@ export default function AddProjectPage(): JSX.Element {
                       placeholder="2025"
                       value={newProject.completionDate}
                       onChange={handleInputChange}
-                      className={formErrors.completionDate ? "border-red-500" : ""}
+                      className={
+                        formErrors.completionDate ? "border-red-500" : ""
+                      }
                     />
                     {formErrors.completionDate && (
                       <p className="text-xs text-red-500">
@@ -618,7 +630,8 @@ export default function AddProjectPage(): JSX.Element {
                       </div>
                     </Button>
                     <p className="text-sm text-muted-foreground">
-                      يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو 5 ميجابايت.
+                      يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو
+                      5 ميجابايت.
                     </p>
                     {formErrors.thumbnail && (
                       <p className="text-xs text-red-500">
@@ -687,7 +700,8 @@ export default function AddProjectPage(): JSX.Element {
                     onChange={handlePlansUpload}
                   />
                   <p className="text-sm text-muted-foreground">
-                    يمكنك رفع مخططات بصيغة JPG أو PNG. الحد الأقصى لعدد المخططات هو 10.
+                    يمكنك رفع مخططات بصيغة JPG أو PNG. الحد الأقصى لعدد المخططات
+                    هو 10.
                   </p>
                 </div>
               </CardContent>
@@ -750,7 +764,8 @@ export default function AddProjectPage(): JSX.Element {
                     onChange={handleGalleryUpload}
                   />
                   <p className="text-sm text-muted-foreground">
-                    يمكنك رفع صور بصيغة JPG أو PNG. الحد الأقصى لعدد الصور هو 20.
+                    يمكنك رفع صور بصيغة JPG أو PNG. الحد الأقصى لعدد الصور هو
+                    20.
                   </p>
                 </div>
               </CardContent>
@@ -787,4 +802,3 @@ export default function AddProjectPage(): JSX.Element {
     </div>
   );
 }
-

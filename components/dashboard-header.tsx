@@ -50,6 +50,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
   // ! محتاج شغل لسة
   const handleLogout = async () => {
     try {
+      console.log("userData1 on dashboard-header", userData);
       await useAuthStore.getState().logout(); // استخدام دالة الـ Store
     } catch (error) {
       console.error(error);

@@ -9,9 +9,9 @@ const useStore = create((set) => ({
   // قسم خاص بـ homepage
   homepage: {
     visitorData: {
-      7: [],   // بيانات الزوار لـ 7 أيام
-      30: [],  // بيانات الزوار لـ 30 يومًا
-      90: [],  // بيانات الزوار لـ 3 أشهر
+      7: [], // بيانات الزوار لـ 7 أيام
+      30: [], // بيانات الزوار لـ 30 يومًا
+      90: [], // بيانات الزوار لـ 3 أشهر
       365: [], // بيانات الزوار لـ سنة
     },
     selectedTimeRange: "7", // الفترة الزمنية المختارة حاليًا (افتراضيًا 7 أيام)
@@ -36,7 +36,7 @@ const useStore = create((set) => ({
           "https://taearif.com/api/dashboard/visitors",
           {
             params: { time_range: timeRange },
-          }
+          },
         );
         set((state) => ({
           homepage: {
@@ -75,7 +75,7 @@ const useStore = create((set) => ({
       set({ loading: true });
       try {
         const response = await axiosInstance.get(
-          "https://taearif.com/api/dashboard/devices"
+          "https://taearif.com/api/dashboard/devices",
         );
         set((state) => ({
           homepage: {
@@ -106,7 +106,7 @@ const useStore = create((set) => ({
       set({ loading: true });
       try {
         const response = await axiosInstance.get(
-          "https://taearif.com/api/dashboard/summary"
+          "https://taearif.com/api/dashboard/summary",
         );
         set((state) => ({
           homepage: {
@@ -137,7 +137,7 @@ const useStore = create((set) => ({
       set({ loading: true });
       try {
         const response = await axiosInstance.get(
-          "https://taearif.com/api/dashboard/traffic-sources"
+          "https://taearif.com/api/dashboard/traffic-sources",
         );
         set((state) => ({
           homepage: {
@@ -168,7 +168,7 @@ const useStore = create((set) => ({
       set({ loading: true });
       try {
         const response = await axiosInstance.get(
-          "https://taearif.com/api/dashboard/setup-progress"
+          "https://taearif.com/api/dashboard/setup-progress",
         );
         set((state) => ({
           homepage: {
@@ -193,7 +193,7 @@ const useStore = create((set) => ({
     set({ loading: true });
     try {
       const response = await axiosInstance.get(
-        "https://taearif.com/api/dashboard/recent-activity"
+        "https://taearif.com/api/dashboard/recent-activity",
       );
       set({ recentActivityData: response.data, isRecentActivityUpdated: true });
     } catch (error) {

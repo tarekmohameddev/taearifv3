@@ -101,15 +101,19 @@ export function PropertiesManagementPage() {
       try {
         setLoading(true);
         const response = await axiosInstance.get(
-          "https://taearif.com/api/properties"
+          "https://taearif.com/api/properties",
         );
-        setProperties(response.data.data.properties.map((property: any) => ({
-          ...property,
-          thumbnail: property.featured_image,
-          listingType: property.type === "residential" ? "للبيع" : "للإيجار",
-          status: property.status === 1 ? "منشور" : "مسودة",
-          lastUpdated: new Date(property.updated_at).toLocaleDateString('ar-AE')
-        })));
+        setProperties(
+          response.data.data.properties.map((property: any) => ({
+            ...property,
+            thumbnail: property.featured_image,
+            listingType: property.type === "residential" ? "للبيع" : "للإيجار",
+            status: property.status === 1 ? "منشور" : "مسودة",
+            lastUpdated: new Date(property.updated_at).toLocaleDateString(
+              "ar-AE",
+            ),
+          })),
+        );
       } catch (err: any) {
         console.error("Error fetching properties:", err);
         setError(err.message || "حدث خطأ أثناء جلب بيانات العقارات");
@@ -330,7 +334,9 @@ export function PropertiesManagementPage() {
                         <PropertyCard
                           key={property.id}
                           property={property}
-                          isFavorite={favorites.includes(property.id.toString())}
+                          isFavorite={favorites.includes(
+                            property.id.toString(),
+                          )}
                           onToggleFavorite={(id) => toggleFavorite(id)}
                         />
                       ))}
@@ -341,7 +347,9 @@ export function PropertiesManagementPage() {
                         <PropertyListItem
                           key={property.id}
                           property={property}
-                          isFavorite={favorites.includes(property.id.toString())}
+                          isFavorite={favorites.includes(
+                            property.id.toString(),
+                          )}
                           onToggleFavorite={(id) => toggleFavorite(id)}
                         />
                       ))}
@@ -357,7 +365,9 @@ export function PropertiesManagementPage() {
                           <PropertyCard
                             key={property.id}
                             property={property}
-                            isFavorite={favorites.includes(property.id.toString())}
+                            isFavorite={favorites.includes(
+                              property.id.toString(),
+                            )}
                             onToggleFavorite={(id) => toggleFavorite(id)}
                           />
                         ))}
@@ -370,7 +380,9 @@ export function PropertiesManagementPage() {
                           <PropertyListItem
                             key={property.id}
                             property={property}
-                            isFavorite={favorites.includes(property.id.toString())}
+                            isFavorite={favorites.includes(
+                              property.id.toString(),
+                            )}
                             onToggleFavorite={(id) => toggleFavorite(id)}
                           />
                         ))}
@@ -381,12 +393,16 @@ export function PropertiesManagementPage() {
                   {viewMode === "grid" ? (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       {properties
-                        .filter((property) => property.listingType === "للإيجار")
+                        .filter(
+                          (property) => property.listingType === "للإيجار",
+                        )
                         .map((property) => (
                           <PropertyCard
                             key={property.id}
                             property={property}
-                            isFavorite={favorites.includes(property.id.toString())}
+                            isFavorite={favorites.includes(
+                              property.id.toString(),
+                            )}
                             onToggleFavorite={(id) => toggleFavorite(id)}
                           />
                         ))}
@@ -394,12 +410,16 @@ export function PropertiesManagementPage() {
                   ) : (
                     <div className="space-y-4">
                       {properties
-                        .filter((property) => property.listingType === "للإيجار")
+                        .filter(
+                          (property) => property.listingType === "للإيجار",
+                        )
                         .map((property) => (
                           <PropertyListItem
                             key={property.id}
                             property={property}
-                            isFavorite={favorites.includes(property.id.toString())}
+                            isFavorite={favorites.includes(
+                              property.id.toString(),
+                            )}
                             onToggleFavorite={(id) => toggleFavorite(id)}
                           />
                         ))}
@@ -415,7 +435,9 @@ export function PropertiesManagementPage() {
                           <PropertyCard
                             key={property.id}
                             property={property}
-                            isFavorite={favorites.includes(property.id.toString())}
+                            isFavorite={favorites.includes(
+                              property.id.toString(),
+                            )}
                             onToggleFavorite={(id) => toggleFavorite(id)}
                           />
                         ))}
@@ -428,7 +450,9 @@ export function PropertiesManagementPage() {
                           <PropertyListItem
                             key={property.id}
                             property={property}
-                            isFavorite={favorites.includes(property.id.toString())}
+                            isFavorite={favorites.includes(
+                              property.id.toString(),
+                            )}
                             onToggleFavorite={(id) => toggleFavorite(id)}
                           />
                         ))}
@@ -444,7 +468,9 @@ export function PropertiesManagementPage() {
                           <PropertyCard
                             key={property.id}
                             property={property}
-                            isFavorite={favorites.includes(property.id.toString())}
+                            isFavorite={favorites.includes(
+                              property.id.toString(),
+                            )}
                             onToggleFavorite={(id) => toggleFavorite(id)}
                           />
                         ))}
@@ -457,7 +483,9 @@ export function PropertiesManagementPage() {
                           <PropertyListItem
                             key={property.id}
                             property={property}
-                            isFavorite={favorites.includes(property.id.toString())}
+                            isFavorite={favorites.includes(
+                              property.id.toString(),
+                            )}
                             onToggleFavorite={(id) => toggleFavorite(id)}
                           />
                         ))}
@@ -473,7 +501,9 @@ export function PropertiesManagementPage() {
                           <PropertyCard
                             key={property.id}
                             property={property}
-                            isFavorite={favorites.includes(property.id.toString())}
+                            isFavorite={favorites.includes(
+                              property.id.toString(),
+                            )}
                             onToggleFavorite={(id) => toggleFavorite(id)}
                           />
                         ))}
@@ -486,7 +516,9 @@ export function PropertiesManagementPage() {
                           <PropertyListItem
                             key={property.id}
                             property={property}
-                            isFavorite={favorites.includes(property.id.toString())}
+                            isFavorite={favorites.includes(
+                              property.id.toString(),
+                            )}
                             onToggleFavorite={(id) => toggleFavorite(id)}
                           />
                         ))}
@@ -552,7 +584,9 @@ function PropertyCard({
       <CardHeader className="p-4">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="whitespace-nowrap">{property.title}</CardTitle>
+            <CardTitle className="whitespace-nowrap">
+              {property.title}
+            </CardTitle>
             <CardDescription className="flex items-center gap-1">
               <MapPin className="h-3 w-3" /> {property.address}
             </CardDescription>

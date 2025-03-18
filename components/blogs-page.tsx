@@ -105,7 +105,9 @@ export default function BlogsPage(): JSX.Element {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get<BlogApiResponse>("https://taearif.com/api/blogs");
+        const response = await axiosInstance.get<BlogApiResponse>(
+          "https://taearif.com/api/blogs",
+        );
         console.log("Fetched posts:", response.data);
         setPosts(response.data.data.posts);
         setPagination(response.data.data.pagination);
@@ -147,7 +149,10 @@ export default function BlogsPage(): JSX.Element {
               // عرض Skeleton Loading أثناء تحميل البيانات
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className="rounded-md border p-6 animate-pulse">
+                  <div
+                    key={index}
+                    className="rounded-md border p-6 animate-pulse"
+                  >
                     <div className="aspect-video w-full bg-gray-300 rounded" />
                     <div className="mt-4 space-y-2">
                       <div className="h-5 w-3/4 bg-gray-300 rounded" />
@@ -163,7 +168,10 @@ export default function BlogsPage(): JSX.Element {
               <>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {posts.map((post) => (
-                    <Card key={post.id} className="overflow-hidden flex flex-col">
+                    <Card
+                      key={post.id}
+                      className="overflow-hidden flex flex-col"
+                    >
                       <div className="aspect-video w-full overflow-hidden">
                         <img
                           src={getImageUrl(post.featured_image)}
@@ -221,15 +229,15 @@ export default function BlogsPage(): JSX.Element {
                               post.status === "published"
                                 ? "default"
                                 : post.status === "draft"
-                                ? "outline"
-                                : "secondary"
+                                  ? "outline"
+                                  : "secondary"
                             }
                           >
                             {post.status === "published"
                               ? "منشور"
                               : post.status === "draft"
-                              ? "مسودة"
-                              : post.status}
+                                ? "مسودة"
+                                : post.status}
                           </Badge>
                         </div>
                         <div className="flex gap-4 text-sm text-muted-foreground">
@@ -247,16 +255,18 @@ export default function BlogsPage(): JSX.Element {
                       <PaginationItem>
                         <PaginationPrevious href="#" />
                       </PaginationItem>
-                      {Array.from({ length: pagination.last_page }).map((_, idx) => (
-                        <PaginationItem key={idx}>
-                          <PaginationLink
-                            href="#"
-                            isActive={pagination.current_page === idx + 1}
-                          >
-                            {idx + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
+                      {Array.from({ length: pagination.last_page }).map(
+                        (_, idx) => (
+                          <PaginationItem key={idx}>
+                            <PaginationLink
+                              href="#"
+                              isActive={pagination.current_page === idx + 1}
+                            >
+                              {idx + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ),
+                      )}
                       <PaginationItem>
                         <PaginationNext href="#" />
                       </PaginationItem>

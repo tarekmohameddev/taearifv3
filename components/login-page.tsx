@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
@@ -61,7 +61,12 @@ export function LoginPage() {
     }));
   };
 
-  // Handle form submission
+  useEffect(() => {
+    if (userData.email) {
+      router.push("/");
+    }
+  }, [userData, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -78,29 +83,21 @@ export function LoginPage() {
     setIsLoading(true);
     try {
       const result = await login(formData.email, formData.password);
-      if (result.success) {
-        // التحقق من أن userData تحتوي على بيانات فعلية
-        console.log("userData", userData);
-        if (userData.email) {
-        console.log("userData2", userData);
-          router.push("/");
-        } else {
-          setErrors((prev) => ({
-            ...prev,
-            general: "فشل في جلب بيانات المستخدم",
-          }));
-        }
-      } else {
-        // تحديث الخطأ العام فقط
+      if (!result.success) {
         setErrors((prev) => ({
           ...prev,
           general: result.error || "فشل تسجيل الدخول",
         }));
       }
+      // لا نحتاج إلى التحقق من userData هنا، لأن useEffect سيتولى التوجيه
     } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "حدث خطأ أثناء الاتصال بالخادم";
       setErrors((prev) => ({
         ...prev,
-        general: error.message || "حدث خطأ أثناء الاتصال بالخادم",
+        general: errorMessage,
       }));
     } finally {
       setIsLoading(false);

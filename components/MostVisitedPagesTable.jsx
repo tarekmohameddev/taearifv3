@@ -16,7 +16,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton"; 
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function MostVisitedPagesTable() {
   const [pagesData, setPagesData] = useState([]);
@@ -28,7 +28,9 @@ export function MostVisitedPagesTable() {
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosInstance.get("https://taearif.com/api/dashboard/most-visited-pages");
+      const response = await axiosInstance.get(
+        "https://taearif.com/api/dashboard/most-visited-pages",
+      );
       setPagesData(response.data.pages);
     } catch (err) {
       console.error("Error fetching most visited pages:", err);
@@ -50,7 +52,7 @@ export function MostVisitedPagesTable() {
           <Skeleton className="h-6 w-24 mb-2" />
           <Skeleton className="h-4 w-40" />
         </CardHeader>
-        
+
         {/* هيكل التحميل للجدول */}
         <CardContent>
           <div className="rounded-md border">
@@ -65,7 +67,7 @@ export function MostVisitedPagesTable() {
                   ))}
                 </TableRow>
               </TableHeader>
-              
+
               {/* هيكل بيانات الجدول */}
               <TableBody>
                 {[...Array(5)].map((_, rowIndex) => (
@@ -73,9 +75,7 @@ export function MostVisitedPagesTable() {
                     {[...Array(6)].map((_, cellIndex) => (
                       <TableCell key={cellIndex}>
                         <Skeleton
-                          className={`h-4 ${
-                            cellIndex === 0 ? "w-32" : "w-16"
-                          }`}
+                          className={`h-4 ${cellIndex === 0 ? "w-32" : "w-16"}`}
                         />
                       </TableCell>
                     ))}

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { serialize as serializeCookie } from "cookie";
 
-const useAuthStore = create((set,get) => ({
+const useAuthStore = create((set, get) => ({
   UserIslogged: false,
   IsLoading: true,
   IsDone: false,
@@ -19,7 +19,7 @@ const useAuthStore = create((set,get) => ({
   // ! --------------fetch User Data
   fetchUserData: async () => {
     set({ IsLoading: true, error: null });
-    if(get().IsDone === true) return
+    if (get().IsDone === true) return;
     set({ IsDone: true, error: null });
     try {
       const userInfoResponse = await fetch("/api/user/getUserInfo");
@@ -51,7 +51,7 @@ const useAuthStore = create((set,get) => ({
         },
         body: JSON.stringify({ email, password }),
       });
-  
+
       // إذا كانت الاستجابة غير ناجحة
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -59,17 +59,16 @@ const useAuthStore = create((set,get) => ({
         set({ errorLogin: errorMsg });
         return { success: false, error: errorMsg };
       }
-  
+
       const data = await response.json();
-      console.log("data", data);
-  
+
       // إذا كانت الاستجابة ناجحة لكن العملية لم تتم بنجاح
       if (!data.success) {
         const errorMsg = data.error || "فشل تسجيل الدخول";
         set({ errorLogin: errorMsg });
         return { success: false, error: errorMsg };
       }
-  
+
       // في حال نجاح تسجيل الدخول
       const { password: _, ...userWithoutPassword } = data.user;
       const safeUserData = {
@@ -88,20 +87,23 @@ const useAuthStore = create((set,get) => ({
     }
   },
 
-
-  
   // ! --------------logout
   logout: async () => {
     try {
+      console.log("userData2 on AuthContext", get().userData);
       // تعديل URL استدعاء API لتسجيل الخروج إلى المسار الصحيح
       const response = await fetch("/api/user/logout", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: get().userData.token }),
       });
+      
       if (response.ok) {
         set({ UserIslogged: false, userData: null });
         window.location.href = "/login";
       } else {
-        
         console.error("فشل تسجيل الخروج");
       }
     } catch (error) {
