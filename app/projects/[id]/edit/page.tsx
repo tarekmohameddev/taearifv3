@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { uploadSingleFile } from '@/utils/uploadSingle';
-import { uploadMultipleFiles } from '@/utils/uploadMultiple';
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+
 import {
   ArrowRight,
   Building2,
@@ -75,6 +74,9 @@ interface INewProject {
 
 export default function AddProjectPage(): JSX.Element {
   const router = useRouter();
+  const { id } = useParams();
+  const [originalData, setOriginalData] = useState(null); // لحفظ النسخة الأصلية من البيانات
+  const [amenitiesNAMES, setAmenitiesNAMES] = useState(""); // لحفظ النسخة الأصلية من البيانات
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const plansInputRef = useRef<HTMLInputElement>(null);
@@ -92,7 +94,7 @@ export default function AddProjectPage(): JSX.Element {
     "featured": false,
     "latitude": 0, // افتراضي (دبي)
     "longitude": 0, // افتراضي (دبي)
-    "amenities": "", // سيتم تحويله إلى مصفوفة
+    "amenities": [], // سيتم تحويله إلى مصفوفة
     "minPrice": "", // إضافة الحد الأدنى للسعر
     "maxPrice": "", // إضافة الحد الأقصى للسعر
   });
@@ -109,6 +111,87 @@ export default function AddProjectPage(): JSX.Element {
 
 
   useEffect(() => {
+    const fetchProjectData = async () => {
+      try {
+      const response = await axiosInstance.get(`https://taearif.com/api/projects/${id}`);
+        const projectData = response.data.data.project;
+        
+      
+      if (projectData && Array.isArray(projectData.contents) && projectData.contents.length > 0) {
+
+        
+        
+        console.log("projectData.amenities",projectData.amenities)
+        setNewProject({
+          id: projectData.id,
+          name: projectData.contents[0].title,
+          location: projectData.contents[0].address,
+          price: `${projectData.price_range}`,
+          status: projectData.complete_status,
+          completionDate: projectData.completion_date.split('T')[0],
+          units: projectData.units,
+          developer: projectData.developer,
+          description: projectData.contents[0].description,
+          featured: projectData.featured,
+          latitude: projectData.latitude,
+          longitude: projectData.longitude,
+          amenities: projectData.amenities,
+          minPrice: projectData.min_price,
+          maxPrice: projectData.max_price,
+        });
+        
+        let amenitiesArray;
+        if (typeof newProject.amenities === "string") {
+          try {
+            amenitiesArray = JSON.parse(newProject.amenities);
+          } catch (error) {
+            console.error("خطأ في تحويل JSON:", error);
+            amenitiesArray = [];
+          }
+        } 
+        else if (Array.isArray(newProject.amenities)) {
+          amenitiesArray = newProject.amenities;
+        } 
+        else {
+          amenitiesArray = [];
+        }
+        const amenitiesNames = amenitiesArray.map(amenity => amenity.name.trim());
+        setAmenitiesNAMES(amenitiesNames)
+        setTimeout(()=> {
+  
+          console.log("amenitiesNAMES",amenitiesNAMES)
+        }, 300)
+      } else {
+          console.error("البيانات غير مكتملة: خاصية contents مفقودة أو فارغة");
+        }
+        
+        
+
+        setThumbnailImage({
+            id: 'existing-thumbnail',
+            url: projectData.featured_image,
+            file: new File([], 'thumbnail.jpg') // ملف وهمي للتمثيل
+          });
+          
+          setGalleryImages(projectData.gallery_images.map(img => ({
+            id: `existing-${img}`,
+            url: img,
+            file: new File([], img.split('/').pop() || 'image.jpg')
+          })));
+
+        setOriginalData(projectData);
+      } catch (error) {
+        console.error('Failed to fetch project data:', error);
+        // router.push('/projects');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProjectData();
+  }, [id]);
+
+  useEffect(() => {
     setMapLoaded(true);
   }, []);
 
@@ -116,11 +199,15 @@ export default function AddProjectPage(): JSX.Element {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
-    setNewProject((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
-
+  
+    if (id === "amenities") {
+      setAmenitiesNAMES(value);
+    } else {
+      setNewProject((prev) => ({
+        ...prev,
+        [id]: value,
+      }));
+    }
     if (formErrors[id]) {
       setFormErrors((prev) => {
         const updated = { ...prev };
@@ -129,6 +216,7 @@ export default function AddProjectPage(): JSX.Element {
       });
     }
   };
+  
 
   const handleCoordinateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -153,7 +241,6 @@ export default function AddProjectPage(): JSX.Element {
       ...prev,
       [id]: value,
     }));
-
     if (formErrors[id]) {
       setFormErrors((prev) => {
         const updated = { ...prev };
@@ -287,57 +374,13 @@ export default function AddProjectPage(): JSX.Element {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
-  const handleSaveProject = async (status: "منشور" | "مسودة" | "Pre-construction") => {
-    if (!validateForm()) {
-      return;
-    }
+  const handleUpdateProject = async (status: "منشور" | "مسودة" | "Pre-construction") => {
+    if (!validateForm()) return;
     setIsLoading(true);
+
     try {
-  console.log(`--------------22222222222222222222222222222`)
-  // رفع الصورة الرئيسية (featured_image)
-      let featuredImageUrl = "";
-      if (thumbnailImage) {
-        const uploadResult = await uploadSingleFile(thumbnailImage.file, 'project');
-        featuredImageUrl = uploadResult.url; // استخراج الـ url من الاستجابة
-      }
-  
-  console.log(`--------------11111111111111111111111111111`)
-      // رفع صور المخططات (floorplan_images)
-      let floorplanUrls = [];
-      if (planImages.length > 0) {
-        const files = planImages.map(image => image.file);
-        const uploadResults = await uploadMultipleFiles(files, 'project');
-      
-        // التحقق من صحة الاستجابة
-        if (uploadResults && Array.isArray(uploadResults)) {
-          floorplanUrls = uploadResults.map(file => file.url);
-          console.log("floorplanUrls", floorplanUrls);
-        } else {
-          console.error("Error: uploadResults is not an array", uploadResults);
-        }
-      }
-      
-  console.log(`11111111111111111111111111111`)
-      // رفع صور المعرض (gallery_images)
-      let galleryUrls = [];
-      if (galleryImages.length > 0) {
-        const files = galleryImages.map(image => image.file);
-        const uploadResults = await uploadMultipleFiles(files, 'project');
-      
-        console.log("uploadResults2", uploadResults); // تحقق من الاستجابة
-      
-        // التأكد من أن uploadResults ليس undefined أو null
-        if (uploadResults && Array.isArray(uploadResults)) {
-          galleryUrls = uploadResults.map(file => file.url); // استخراج الروابط
-          console.log("galleryUrls", galleryUrls);
-        } else {
-          console.error("Error: uploadResults does not contain files array", uploadResults);
-        }
-      }
-      
-  console.log(`222222222222222222222222222222`)
-      // تحويل حقل السعر إلى قيم min و max
+  // تحويل حقل السعر إلى قيم min و max
+      // مثال: إذا كان المستخدم يُدخل "50000-200000" أو قيمة واحدة
       let minPrice = 0;
       let maxPrice = 0;
       if (newProject.price.includes("-")) {
@@ -348,23 +391,23 @@ export default function AddProjectPage(): JSX.Element {
         minPrice = parseFloat(newProject.price) || 0;
         maxPrice = minPrice;
       }
-  
-  console.log(`333333333333333333333333333333333333`)
       const formattedDate = new Date(newProject.completionDate).toISOString().split('T')[0];
-  
 
-  console.log(`444444444444444444444444444444`)
-      // إعداد بيانات المشروع مع الروابط المستخرجة
+
+      console.log("newProject.amenities", newProject.amenities);
+      
+
+
       const projectData = {
-        "featured_image": featuredImageUrl,
+        "featured_image": thumbnailImage ? "thumbnailImage.url" : "",
         "min_price": minPrice,
         "max_price": maxPrice,
         "latitude": newProject.latitude,
         "longitude": newProject.longitude,
         "featured": newProject.featured,
-        "complete_status": status === "منشور" ? "In Progress" : status,
+        "complete_status": status === "منشور" ? "In Progress" : status, 
         "units": Number(newProject.units),
-        "completion_date": formattedDate,
+        "completion_date": formattedDate, 
         "developer": newProject.developer,
         "published": status === "منشور",
         "contents": [
@@ -385,8 +428,16 @@ export default function AddProjectPage(): JSX.Element {
             "meta_description": "شقق فاخرة في دبي بإطلالة على البحر ومرافق متميزة."
           }
         ],
-        "gallery_images": galleryUrls,
-        "floorplan_images": floorplanUrls,
+        "gallery_images": [
+          "https://taearifdev.com/storage/properties/67c826264b928.jpg",
+          "https://taearifdev.com/storage/properties/67c826264b928.jpg",
+          "https://taearifdev.com/storage/properties/67c826264b928.jpg"
+        ],
+        "floorplan_images": [
+          "https://taearifdev.com/storage/properties/67c826264b928.jpg",
+          "https://taearifdev.com/storage/properties/67c826264b928.jpg",
+          "https://taearifdev.com/storage/properties/67c826264b928.jpg"
+        ],
         "specifications": [
           { "key": "Bedrooms", "label": "Number of Bedrooms", "value": "3" },
           { "key": "Bathrooms", "label": "Number of Bathrooms", "value": "2" },
@@ -412,39 +463,44 @@ export default function AddProjectPage(): JSX.Element {
             "unit": "قدم مربع"
           }
         ],
-        "amenities": newProject.amenities
-          ? newProject.amenities.split(",").map((amenity) => amenity.trim())
-          : []
+        "amenities": amenitiesNAMES.split(',')
       };
-  
-  console.log(`555555555555555555555`)
-      const response = await axiosInstance.post("https://taearif.com/api/projects", projectData);
-      console.log(`6666666666666666666666`)
-  
+      
+
+      const response = await axiosInstance.post(`https://taearif.com/api/projects/${id}`, projectData);
+      
       const currentState = useStore.getState();
-  console.log(`7777777777777777777777`)
-      const createdProject = response.data.data.user_project;
-  console.log(`888888888888888888888`)
-      const updatedProjects = [createdProject, ...currentState.homepage.projectsManagement.projects];
-  console.log(`999999999999999`)
+      const updatedProjects = currentState.homepage.projectsManagement.projects.map(proj => 
+        proj.id === id ? { ...proj, ...response.data.data } : proj
+      );
+
       setProjectsManagement({
         projects: updatedProjects,
-        pagination: {
-          ...currentState.homepage.projectsManagement.pagination,
-          total: (currentState.homepage.projectsManagement.pagination?.total || 0) + 1
-
-        }
+        pagination: currentState.homepage.projectsManagement.pagination
       });
-  
-  console.log(`10 10  10 10 1 0 1 0 1 0 1 0 1 0 1 0 1 0 `)
+
       router.push("/projects");
-    } catch (error: any) {
-      console.error("Error saving project:", error);
+    } catch (error) {
+      console.error('Update failed:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
+if (isLoading) {
+  return (
+    <div className="flex min-h-screen flex-col" dir="rtl">
+      <DashboardHeader />
+      <div className="flex flex-1 justify-center items-center">
+        <p>جاري تحميل بيانات المشروع...</p>
+      </div>
+    </div>
+  );
+}
+if (!id) {
+    router.push('/projects');
+    return null;
+  }
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
       <DashboardHeader />
@@ -471,16 +527,16 @@ export default function AddProjectPage(): JSX.Element {
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => handleSaveProject("مسودة")}
+                  onClick={() => handleUpdateProject("مسودة")}
                   disabled={isLoading}
                 >
                   حفظ كمسودة
                 </Button>
                 <Button
-                  onClick={() => handleSaveProject("منشور")}
+                  onClick={() => handleUpdateProject("منشور")}
                   disabled={isLoading}
                 >
-                  {isLoading ? "جاري الحفظ..." : "نشر المشروع"}
+                  {isLoading ? "جاري الحفظ..." : "تعديل المشروع"}
                 </Button>
               </div>
             </div>
@@ -524,7 +580,7 @@ export default function AddProjectPage(): JSX.Element {
                     )}
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="price">السعر الابتدائي</Label>
+                    <Label htmlFor="price">نطاق السعر</Label>
                     <Input
                       id="price"
                       placeholder="من $750,000"
@@ -608,11 +664,12 @@ export default function AddProjectPage(): JSX.Element {
                   <div className="grid gap-2">
                     <Label htmlFor="amenities">المرافق (افصلها بفواصل)</Label>
                     <Input
-                      id="amenities"
-                      placeholder="حمام سباحة, نادي رياضي, حديقة على السطح"
-                      value={newProject.amenities}
-                      onChange={handleInputChange}
-                    />
+  id="amenities"
+  placeholder="حمام سباحة, نادي رياضي, حديقة على السطح"
+  value={amenitiesNAMES}
+  onChange={handleInputChange}
+/>
+
                   </div>
                   <div className="flex items-center space-x-2 h-10">
                     <Switch
@@ -904,16 +961,16 @@ export default function AddProjectPage(): JSX.Element {
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
-                    onClick={() => handleSaveProject("مسودة")}
+                    onClick={() => handleUpdateProject("مسودة")}
                     disabled={isLoading}
                   >
                     حفظ كمسودة
                   </Button>
                   <Button
-                    onClick={() => handleSaveProject("منشور")}
+                    onClick={() => handleUpdateProject("منشور")}
                     disabled={isLoading}
                   >
-                    {isLoading ? "جاري الحفظ..." : "نشر المشروع"}
+                    {isLoading ? "جاري الحفظ..." : "تعديل المشروع"}
                   </Button>
                 </div>
               </CardFooter>

@@ -258,6 +258,7 @@ export function ProjectsManagementPage() {
 }
 
 function ProjectCard({ project }: { project: IProject }) {
+  const router = useRouter();
   return (
     <Card className="overflow-hidden">
       <div className="relative">
@@ -301,7 +302,8 @@ function ProjectCard({ project }: { project: IProject }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem  onClick={() => router.push("/projects/"+project.id+"/edit")}
+              >
                 <Edit className="mr-2 h-4 w-4" />
                 تعديل
               </DropdownMenuItem>
