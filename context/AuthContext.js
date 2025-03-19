@@ -99,7 +99,7 @@ const useAuthStore = create((set, get) => ({
         },
         body: JSON.stringify({ token: get().userData.token }),
       });
-      
+
       if (response.ok) {
         set({ UserIslogged: false, userData: null });
         window.location.href = "/login";

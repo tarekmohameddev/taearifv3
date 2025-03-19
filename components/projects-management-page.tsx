@@ -36,8 +36,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { EnhancedSidebar } from "@/components/enhanced-sidebar";
 import axiosInstance from "@/lib/axiosInstance";
+import useStore from "@/context/Store";
 
-// تعريف الواجهات بناءً على API response
 export interface IProject {
   id: number;
   name: string;
@@ -101,31 +101,33 @@ function SkeletonProjectCard() {
 
 export function ProjectsManagementPage() {
   const router = useRouter();
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [projects, setProjects] = useState<IProject[]>([]);
-  const [pagination, setPagination] = useState<IPagination | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState([500000, 2000000]);
+  const {
+    homepage: {
+      projectsManagement: {
+        viewMode,
+        projects,
+        pagination,
+        loading,
+        error,
+        isInitialized
+      },
+      setProjectsManagement,
+      fetchProjects,
+    },
+  } = useStore();
 
+  // تحديث وضع العرض
+  const setViewMode = (mode: "grid" | "list") => {
+    setProjectsManagement({ viewMode: mode });
+  };
+
+  // جلب البيانات عند التحميل الأولي
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        const response = await axiosInstance.get<IProjectsApiResponse>(
-          "https://taearif.com/api/projects",
-        );
-        setProjects(response.data.data.projects);
-        setPagination(response.data.data.pagination);
-      } catch (err: any) {
-        console.error("Error fetching projects:", err);
-        setError(err.message || "حدث خطأ أثناء جلب بيانات المشاريع");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjects();
-  }, []);
+    if (!isInitialized) {
+      fetchProjects();
+    }
+  }, [fetchProjects, isInitialized]);
+
 
   const renderSkeletons = () => (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -135,7 +137,7 @@ export function ProjectsManagementPage() {
     </div>
   );
 
-  const renderProjectCards = (projectsToRender: IProject[]) =>
+  const renderProjectCards = (projectsToRender: IProject[]) => 
     viewMode === "grid" ? (
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {projectsToRender.map((project) => (
@@ -241,14 +243,13 @@ export function ProjectsManagementPage() {
             </Tabs>
 
             {pagination && (
-              <div className="mt-6">
-                <span className="text-sm text-muted-foreground">
-                  Showing {pagination.from} to {pagination.to} of{" "}
-                  {pagination.total} projects
-                </span>
-                {/* يمكنك إضافة Pagination component هنا إذا لزم الأمر */}
-              </div>
-            )}
+        <div className="mt-6">
+          <span className="text-sm text-muted-foreground">
+            Showing {pagination.from} to {pagination.to} of{" "}
+            {pagination.total} projects
+          </span>
+        </div>
+      )}
           </div>
         </main>
       </div>

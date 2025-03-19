@@ -56,24 +56,59 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import useStore from "@/context/Store"; // أضف هذا الاستيراد
+
+
 
 export function ContentManagementPage() {
-  // حالات الواجهة
-  const [newSectionDialogOpen, setNewSectionDialogOpen] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("all"); // "all", "active", "inactive"
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sections, setSections] = useState([]);
-  const [apiAvailableIcons, setApiAvailableIcons] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true); // حالة التحميل
+  const { contentManagement, fetchContentSections, setContentManagement } = useStore();
+  const {
+    newSectionDialogOpen,
+    statusFilter,
+    searchQuery,
+    sections,
+    apiAvailableIcons,
+    error,
+    loading,
+    newSectionName,
+    newSectionDescription,
+    newSectionStatus,
+    newSectionIcon,
+  } = contentManagement;
+  
 
-  // حالات النموذج الخاص بإضافة قسم جديد
-  const [newSectionName, setNewSectionName] = useState("");
-  const [newSectionDescription, setNewSectionDescription] = useState("");
-  const [newSectionStatus, setNewSectionStatus] = useState(true);
-  const [newSectionIcon, setNewSectionIcon] = useState("FileText");
+  const setNewSectionDialogOpen = (value) => {
+    setContentManagement({ newSectionDialogOpen: value });
+  };
 
-  // كائن تحويل اسم الأيقونة إلى مكون من مكتبة lucide-react
+  const setStatusFilter = (value) => {
+    setContentManagement({ statusFilter: value });
+  };
+
+  const setSearchQuery = (value) => {
+    setContentManagement({ searchQuery: value });
+  };
+
+  const setNewSectionName = (value) => {
+    setContentManagement({ newSectionName: value });
+  };
+
+  const setNewSectionDescription = (value) => {
+    setContentManagement({ newSectionDescription: value });
+  };
+
+  const setNewSectionStatus = (value) => {
+    setContentManagement({ newSectionStatus: value });
+  };
+
+  const setNewSectionIcon = (value) => {
+    setContentManagement({ newSectionIcon: value });
+  };
+  useEffect(() => {
+    if (sections.length === 0) {
+      fetchContentSections();
+    }
+  }, [sections, fetchContentSections]);
   const availableIcons = {
     FileText: FileText,
     Briefcase: Briefcase,
@@ -93,57 +128,7 @@ export function ContentManagementPage() {
     Settings2: Settings2,
   };
 
-  // جلب البيانات من API
-  const fetchSections = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosInstance.get(
-        "https://taearif.com/api/content/sections",
-      );
-      // نتوقع أن تكون الاستجابة بالشكل { data: { availableIcons: [...], sections: [...] } }
-      console.log("Response data:", response.data.data);
-      setSections(response.data.data.sections);
-      setApiAvailableIcons(response.data.data.availableIcons);
-    } catch (error) {
-      console.error("Error fetching sections:", error);
-      setError(error.message || "حدث خطأ أثناء جلب البيانات");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSections();
-  }, []);
-
-  // ترشيح الأقسام حسب الحالة ونص البحث
-  const filteredSections = sections.filter((section) => {
-    if (statusFilter !== "all" && section.status !== statusFilter) return false;
-    if (
-      searchQuery &&
-      !section.title.includes(searchQuery) &&
-      !section.description.includes(searchQuery)
-    )
-      return false;
-    return true;
-  });
-
-  // دالة لتبديل حالة القسم
-  const toggleSectionStatus = (id) => {
-    setSections(
-      sections.map((section) => {
-        if (section.id === id) {
-          return {
-            ...section,
-            status: section.status === "active" ? "inactive" : "active",
-          };
-        }
-        return section;
-      }),
-    );
-  };
-
-  // دالة إضافة قسم جديد
+  // تعديل دالة handleAddNewSection
   const handleAddNewSection = () => {
     if (!newSectionName.trim()) {
       toast({
@@ -153,6 +138,20 @@ export function ContentManagementPage() {
       });
       return;
     }
+
+    // ... بقية الكود كما هو مع استبدال setSections بـ:
+    setContentManagement({
+      sections: [
+        ...sections,
+        // الكائن الجديد هنا
+      ],
+      newSectionName: "",
+      newSectionDescription: "",
+      newSectionStatus: true,
+      newSectionIcon: "FileText",
+      newSectionDialogOpen: false,
+    });
+  };
 
     // إنشاء معرف فريد للقسم
     const newId = newSectionName
@@ -179,43 +178,14 @@ export function ContentManagementPage() {
     ];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
-    // إنشاء القسم الجديد
-    const newSection = {
-      id: newId,
-      title: newSectionName,
-      description: newSectionDescription || "قسم مخصص",
-      icon: availableIcons[newSectionIcon],
-      path: `/content/${newId}`,
-      status: newSectionStatus ? "active" : "inactive",
-      count: 0,
-      lastUpdate: new Date().toISOString(),
-      lastUpdateFormatted: "تم التحديث الآن",
-      badge: {
-        label: "العناصر",
-        color: randomColor,
-      },
-    };
 
-    setSections([...sections, newSection]);
-    setNewSectionName("");
-    setNewSectionDescription("");
-    setNewSectionStatus(true);
-    setNewSectionIcon("FileText");
-    setNewSectionDialogOpen(false);
-
-    toast({
-      title: "تم إضافة القسم بنجاح",
-      description: `تم إضافة قسم "${newSectionName}" بنجاح`,
-    });
-  };
-
-  return (
-    <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1">
-        <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
-        <main className="flex-1 p-6">
-          <div className="mb-8">
+    return (
+      <div className="flex min-h-screen flex-col">
+        <DashboardHeader />
+        <div className="flex flex-1">
+          <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
+          <main className="flex-1 p-6">
+                      <div className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold">إدارة المحتوى</h1>
@@ -347,160 +317,157 @@ export function ContentManagementPage() {
               </div>
             </div>
           </div>
-
-          {loading ? (
-            // Skeleton Loading بنفس شكل الأقسام
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="rounded-md border p-6 animate-pulse"
-                >
-                  <div className="flex items-center mb-4">
-                    <div className="h-5 w-5 bg-gray-300 rounded-full" />
-                    <div className="ml-4 h-5 w-1/2 bg-gray-300 rounded" />
+            {/* على سبيل المثال، عند عرض الأقسام، استخدم المتغيرات المستخرجة من contentManagement */}
+            {loading ? (
+              // عرض تحميل skeleton
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="rounded-md border p-6 animate-pulse"
+                  >
+                    <div className="flex items-center mb-4">
+                      <div className="h-5 w-5 bg-gray-300 rounded-full" />
+                      <div className="ml-4 h-5 w-1/2 bg-gray-300 rounded" />
+                    </div>
+                    <div className="mb-2">
+                      <div className="h-4 w-full bg-gray-300 rounded" />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-4 w-3/4 bg-gray-300 rounded" />
+                      <div className="h-4 w-1/2 bg-gray-300 rounded" />
+                    </div>
                   </div>
-                  <div className="mb-2">
-                    <div className="h-4 w-full bg-gray-300 rounded" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-4 w-3/4 bg-gray-300 rounded" />
-                    <div className="h-4 w-1/2 bg-gray-300 rounded" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : error ? (
-            <div className="text-red-500 text-center">{error}</div>
-          ) : filteredSections.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-8 text-center">
-              <div className="rounded-full bg-muted p-3 mb-4">
-                <Filter className="h-6 w-6 text-muted-foreground" />
+                ))}
               </div>
-              <h3 className="text-lg font-medium mb-1">لا توجد أقسام مطابقة</h3>
-              <p className="text-muted-foreground mb-4">
-                لم يتم العثور على أقسام تطابق معايير التصفية الحالية
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setStatusFilter("all");
-                  setSearchQuery("");
-                }}
-              >
-                عرض جميع الأقسام
-              </Button>
-            </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredSections.map((section) => {
-                // تحويل قيمة icon من نص إلى مكون
-                const IconComponent =
-                  availableIcons[section.icon] || availableIcons["FileText"];
-                return (
-                  <Link href={section.path} key={section.id}>
-                    <Card
-                      className={`h-full cursor-pointer transition-all hover:shadow-md ${
-                        section.status === "inactive"
-                          ? "opacity-70 border-dashed"
-                          : ""
-                      }`}
-                    >
-                      <CardHeader className="flex flex-row items-start justify-between p-6">
-                        <div className="flex flex-col gap-1">
-                          <CardTitle className="flex items-center gap-2 text-lg">
-                            <IconComponent className="h-5 w-5 text-muted-foreground" />
-                            {section.title}
-                            {section.status === "active" ? (
-                              <Badge
-                                variant="outline"
-                                className="bg-green-50 text-green-700 border-green-200 ml-2"
-                              >
-                                نشط
-                              </Badge>
-                            ) : (
-                              <Badge
-                                variant="outline"
-                                className="bg-gray-50 text-gray-700 border-gray-200 ml-2"
-                              >
-                                غير نشط
-                              </Badge>
-                            )}
-                          </CardTitle>
-                          <CardDescription>
-                            {section.description}
-                          </CardDescription>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="px-6 pb-6">
-                        {section.count !== undefined && (
-                          <Badge
-                            variant="secondary"
-                            className={`mb-4 ${section.badge?.color}`}
-                          >
-                            {section.count} {section.badge?.label}
-                          </Badge>
-                        )}
-                        {section.info && (
-                          <div className="space-y-2 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                              <Globe className="h-4 w-4" />
-                              <span>{section.info.website}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MessageSquare className="h-4 w-4" />
-                              <span>{section.info.email}</span>
-                            </div>
-                          </div>
-                        )}
-                        <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4" />
-                          <span>{section.lastUpdateFormatted}</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                );
-              })}
-
-              <Card
-                className="flex h-full cursor-pointer flex-col items-center justify-center border-dashed p-6 text-center transition-colors hover:bg-muted/50"
-                onClick={() => setNewSectionDialogOpen(true)}
-              >
-                <div className="mb-4 rounded-full bg-primary/10 p-3">
-                  <Plus className="h-6 w-6 text-primary" />
+            ) : error ? (
+              <div className="text-red-500 text-center">{error}</div>
+            ) : sections.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-8 text-center">
+                <div className="rounded-full bg-muted p-3 mb-4">
+                  <Filter className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <h3 className="mb-1 font-medium">إضافة قسم مخصص</h3>
-                <p className="text-sm text-muted-foreground">
-                  إنشاء قسم مخصص جديد لموقعك
+                <h3 className="text-lg font-medium mb-1">لا توجد أقسام مطابقة</h3>
+                <p className="text-muted-foreground mb-4">
+                  لم يتم العثور على أقسام تطابق معايير التصفية الحالية
                 </p>
-              </Card>
-            </div>
-          )}
-        </main>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    // يمكن هنا استدعاء دوال لتصفية الحالة من المخزن
+                  }}
+                >
+                  عرض جميع الأقسام
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {sections.map((section) => {
+                  const IconComponent =
+                    availableIcons[section.icon] || availableIcons["FileText"];
+                  return (
+                    <Link href={section.path} key={section.id}>
+                      <Card
+                        className={`h-full cursor-pointer transition-all hover:shadow-md ${
+                          section.status === "inactive"
+                            ? "opacity-70 border-dashed"
+                            : ""
+                        }`}
+                      >
+                        <CardHeader className="flex flex-row items-start justify-between p-6">
+                          <div className="flex flex-col gap-1">
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                              <IconComponent className="h-5 w-5 text-muted-foreground" />
+                              {section.title}
+                              {section.status === "active" ? (
+                                <Badge
+                                  variant="outline"
+                                  className="bg-green-50 text-green-700 border-green-200 ml-2"
+                                >
+                                  نشط
+                                </Badge>
+                              ) : (
+                                <Badge
+                                  variant="outline"
+                                  className="bg-gray-50 text-gray-700 border-gray-200 ml-2"
+                                >
+                                  غير نشط
+                                </Badge>
+                              )}
+                            </CardTitle>
+                            <CardDescription>
+                              {section.description}
+                            </CardDescription>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="px-6 pb-6">
+                          {section.count !== undefined && (
+                            <Badge
+                              variant="secondary"
+                              className={`mb-4 ${section.badge?.color}`}
+                            >
+                              {section.count} {section.badge?.label}
+                            </Badge>
+                          )}
+                          {section.info && (
+                            <div className="space-y-2 text-sm text-muted-foreground">
+                              <div className="flex items-center gap-2">
+                                <Globe className="h-4 w-4" />
+                                <span>{section.info.website}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <MessageSquare className="h-4 w-4" />
+                                <span>{section.info.email}</span>
+                              </div>
+                            </div>
+                          )}
+                          <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="h-4 w-4" />
+                            <span>{section.lastUpdateFormatted}</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  );
+                })}
+                <Card
+                  className="flex h-full cursor-pointer flex-col items-center justify-center border-dashed p-6 text-center transition-colors hover:bg-muted/50"
+                  onClick={() => setNewSectionDialogOpen(true)}
+                >
+                  <div className="mb-4 rounded-full bg-primary/10 p-3">
+                    <Plus className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="mb-1 font-medium">إضافة قسم مخصص</h3>
+                  <p className="text-sm text-muted-foreground">
+                    إنشاء قسم مخصص جديد لموقعك
+                  </p>
+                </Card>
+              </div>
+            )}
+          </main>
+        </div>
       </div>
-    </div>
-  );
-}
-
-function SearchIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
-  );
-}
-
-export default ContentManagementPage;
+    );
+  }
+  
+  function SearchIcon(props) {
+    return (
+      <svg
+        {...props}
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+    );
+  }
+  
+  export default ContentManagementPage;

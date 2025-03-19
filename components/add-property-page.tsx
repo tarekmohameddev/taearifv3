@@ -30,6 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { EnhancedSidebar } from "@/components/enhanced-sidebar";
 import dynamic from "next/dynamic";
+import axiosInstance from "@/lib/axiosInstance";
 
 // Dynamically import the MapComponent to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import("@/components/map-component"), {
@@ -137,17 +138,48 @@ export default function AddPropertyPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (publish: boolean) => {
+  const handleSubmit = async (publish: boolean) => {
     if (validateForm()) {
-      // In a real app, this would send data to an API
-      console.log("Submitting property data:", {
-        ...formData,
-        status: publish ? "published" : "draft",
-        images,
-      });
+      try {
+        // تحضير البيانات وفقًا لصيغة API
+        const requestData = {
+          title: formData.title,
+          address: formData.address,
+          price: Number(formData.price),
+          type: formData.type,
+          beds: Number(formData.bedrooms),
+          bath: Number(formData.bathrooms),
+          size: Number(formData.size),
+          features: formData.features.split("، ").filter((f) => f), // تقسيم الميزات
+          status: publish ? 1 : 0, // 1 للمنشور، 0 للمسودة
+          featured_image: images.thumbnail[0], // الصورة الرئيسية الأولى
+          gallery: images.gallery, // معرض الصور
+          description: formData.description,
+          latitude: Number(formData.latitude),
+          longitude: Number(formData.longitude),
+          featured: formData.featured,
+          area: Number(formData.size), // افتراض أن area نفس size إذا لم تكن موجودة
+          city_id: 1, // أضف مصدر هذه البيانات من النموذج أو اجعلها اختيارية
+          category_id: 1, // نفس الملاحظة أعلاه
+        };
 
-      // Navigate back to properties list
-      router.push("/properties");
+        // إرسال الطلب إلى API
+        const response = await axiosInstance.post("/properties", requestData);
+
+        // عند النجاح
+        console.log("Property created:", response.data);
+        router.push("/properties");
+      } catch (error) {
+        // معالجة الأخطاء
+        if (error.response) {
+          console.error("API Error:", error.response.data);
+          // عرض رسالة خطأ من API للعميل
+          alert(`فشل الإنشاء: ${error.response.data.message}`);
+        } else {
+          console.error("Network Error:", error.message);
+          alert("حدث خطأ في الاتصال بالشبكة");
+        }
+      }
     }
   };
 

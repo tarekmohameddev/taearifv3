@@ -59,6 +59,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { EnhancedSidebar } from "@/components/enhanced-sidebar";
 import axiosInstance from "@/lib/axiosInstance";
+import useStore from "@/context/Store"; // استيراد useStore
 
 // مكون SkeletonPropertyCard لعرض بطاقة تحميل تحاكي شكل بطاقة العقار
 function SkeletonPropertyCard() {
@@ -89,49 +90,46 @@ function SkeletonPropertyCard() {
 }
 
 export function PropertiesManagementPage() {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [priceRange, setPriceRange] = useState([200000, 1000000]);
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [properties, setProperties] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    homepage: {
+      propertiesManagement: {
+        viewMode,
+        priceRange,
+        favorites,
+        properties,
+        loading,
+        error,
+      },
+      setPropertiesManagement,
+      fetchProperties,
+    },
+  } = useStore();
 
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        setLoading(true);
-        const response = await axiosInstance.get(
-          "https://taearif.com/api/properties",
-        );
-        setProperties(
-          response.data.data.properties.map((property: any) => ({
-            ...property,
-            thumbnail: property.featured_image,
-            listingType: property.type === "residential" ? "للبيع" : "للإيجار",
-            status: property.status === 1 ? "منشور" : "مسودة",
-            lastUpdated: new Date(property.updated_at).toLocaleDateString(
-              "ar-AE",
-            ),
-          })),
-        );
-      } catch (err: any) {
-        console.error("Error fetching properties:", err);
-        setError(err.message || "حدث خطأ أثناء جلب بيانات العقارات");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperties();
-  }, []);
-
-  const toggleFavorite = (id: string) => {
-    if (favorites.includes(id)) {
-      setFavorites(favorites.filter((item) => item !== id));
-    } else {
-      setFavorites([...favorites, id]);
-    }
+  // تحديث وضع العرض
+  const setViewMode = (mode: "grid" | "list") => {
+    setPropertiesManagement({ viewMode: mode });
   };
+
+  // دالة تغيير نطاق السعر
+  const handlePriceRangeChange = (newRange: number[]) => {
+    setPropertiesManagement({ priceRange: newRange });
+  };
+
+  // دالة تبديل المفضلة
+  const toggleFavorite = (id: string) => {
+    const newFavorites = favorites.includes(id)
+      ? favorites.filter((item) => item !== id)
+      : [...favorites, id];
+    setPropertiesManagement({ favorites: newFavorites });
+  };
+
+  // جلب البيانات عند التحميل الأولي
+  useEffect(() => {
+    if (!properties.length && !loading) {
+      fetchProperties();
+    }
+  }, [fetchProperties, properties.length, loading]);
+
 
   const renderSkeletons = () => (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -253,7 +251,7 @@ export function PropertiesManagementPage() {
                           max={2000000}
                           min={0}
                           step={10000}
-                          onValueChange={setPriceRange}
+                          onValueChange={handlePriceRangeChange} // تم التعديل هنا
                           className="py-4"
                         />
                       </div>
@@ -337,7 +335,7 @@ export function PropertiesManagementPage() {
                           isFavorite={favorites.includes(
                             property.id.toString(),
                           )}
-                          onToggleFavorite={(id) => toggleFavorite(id)}
+                          onToggleFavorite={toggleFavorite}
                         />
                       ))}
                     </div>
@@ -350,7 +348,7 @@ export function PropertiesManagementPage() {
                           isFavorite={favorites.includes(
                             property.id.toString(),
                           )}
-                          onToggleFavorite={(id) => toggleFavorite(id)}
+                          onToggleFavorite={toggleFavorite} // تم التعديل هنا
                         />
                       ))}
                     </div>

@@ -16,6 +16,152 @@ const useStore = create((set) => ({
     },
     selectedTimeRange: "7", // الفترة الزمنية المختارة حاليًا (افتراضيًا 7 أيام)
 
+    // ! ---------------------------------------------------------------------
+    // قسم إدارة العقارات الجديد
+    propertiesManagement: {
+      viewMode: "grid",
+      priceRange: [200000, 1000000],
+      favorites: [],
+      properties: [],
+      loading: false,
+      error: null,
+      isInitialized: false,
+    },
+
+    // دوال إدارة العقارات
+    setPropertiesManagement: (newState) =>
+      set((state) => ({
+        homepage: {
+          ...state.homepage,
+          propertiesManagement: {
+            ...state.homepage.propertiesManagement,
+            ...newState,
+          },
+        },
+      })),
+
+    fetchProperties: async () => {
+      set((state) => ({
+        homepage: {
+          ...state.homepage,
+          propertiesManagement: {
+            ...state.homepage.propertiesManagement,
+            loading: true,
+            error: null,
+          },
+        },
+      }));
+
+      try {
+        const response = await axiosInstance.get(
+          "https://taearif.com/api/properties",
+        );
+
+        const mappedProperties = response.data.data.properties.map(
+          (property) => ({
+            ...property,
+            thumbnail: property.featured_image,
+            listingType: property.type === "residential" ? "للبيع" : "للإيجار",
+            status: property.status === 1 ? "منشور" : "مسودة",
+            lastUpdated: new Date(property.updated_at).toLocaleDateString(
+              "ar-AE",
+            ),
+          }),
+        );
+
+        set((state) => ({
+          homepage: {
+            ...state.homepage,
+            propertiesManagement: {
+              ...state.homepage.propertiesManagement,
+              properties: mappedProperties,
+              loading: false,
+              isInitialized: true,
+            },
+          },
+        }));
+      } catch (error) {
+        set((state) => ({
+          homepage: {
+            ...state.homepage,
+            propertiesManagement: {
+              ...state.homepage.propertiesManagement,
+              error: error.message || "حدث خطأ أثناء جلب بيانات العقارات",
+              loading: false,
+              isInitialized: true,
+            },
+          },
+        }));
+      }
+    },
+    // ! ---------------------------------------------------------------------
+    // ! ---------------------------------------------------------------------
+  // قسم إدارة المشاريع
+  projectsManagement: {
+    viewMode: "grid",
+    projects: [],
+    pagination: null,
+    loading: true,
+    error: null,
+    isInitialized: false,
+  },
+
+  // دوال إدارة المشاريع
+  setProjectsManagement: (newState) =>
+    set((state) => ({
+      homepage: {
+        ...state.homepage,
+        projectsManagement: {
+          ...state.homepage.projectsManagement,
+          ...newState,
+        },
+      },
+    })),
+
+  fetchProjects: async () => {
+    set((state) => ({
+      homepage: {
+        ...state.homepage,
+        projectsManagement: {
+          ...state.homepage.projectsManagement,
+          loading: true,
+          error: null,
+        },
+      },
+    }));
+    
+    try {
+      const response = await axiosInstance.get(
+        "https://taearif.com/api/projects"
+      );
+      
+      set((state) => ({
+        homepage: {
+          ...state.homepage,
+          projectsManagement: {
+            ...state.homepage.projectsManagement,
+            projects: response.data.data.projects,
+            pagination: response.data.data.pagination,
+            loading: false,
+            isInitialized: true,
+          },
+        },
+      }));
+    } catch (error) {
+      set((state) => ({
+        homepage: {
+          ...state.homepage,
+          projectsManagement: {
+            ...state.homepage.projectsManagement,
+            error: error.message || "حدث خطأ أثناء جلب بيانات المشاريع",
+            loading: false,
+            isInitialized: true,
+          },
+        },
+      }));
+    }
+  },
+    // ! ---------------------------------------------------------------------
     // دالة لتحديث بيانات الزوار لفترة زمنية معينة
     setVisitorData: (timeRange, data) =>
       set((state) => ({
@@ -202,6 +348,65 @@ const useStore = create((set) => ({
       set({ loading: false });
     }
   },
+
+
+
+
+
+
+  
+  contentManagement: {
+    newSectionDialogOpen: false,
+    statusFilter: "all", // القيم الممكنة: "all", "active", "inactive"
+    searchQuery: "",
+    sections: [],
+    apiAvailableIcons: [],
+    error: null,
+    loading: true, // حالة التحميل
+    newSectionName: "",
+    newSectionDescription: "",
+    newSectionStatus: true,
+    newSectionIcon: "FileText",
+  },
+
+  // دالة لجلب بيانات الأقسام من الـ API
+  fetchContentSections: async () => {
+    // تفعيل حالة التحميل وتصفير الخطأ قبل الطلب
+    set((state) => ({
+      contentManagement: {
+        ...state.contentManagement,
+        loading: true,
+        error: null,
+      },
+    }));
+    try {
+      const response = await axiosInstance.get("https://taearif.com/api/content/sections");
+      // نفترض أن الاستجابة تأتي بالشكل { data: { availableIcons: [...], sections: [...] } }
+      set((state) => ({
+        contentManagement: {
+          ...state.contentManagement,
+          sections: response.data.data.sections,
+          apiAvailableIcons: response.data.data.availableIcons,
+          loading: false,
+        },
+      }));
+    } catch (error) {
+      set((state) => ({
+        contentManagement: {
+          ...state.contentManagement,
+          error: error.message || "حدث خطأ أثناء جلب البيانات",
+          loading: false,
+        },
+      }));
+    }
+  },
+  setContentManagement: (updates) =>
+    set((state) => ({
+      contentManagement: {
+        ...state.contentManagement,
+        ...updates,
+      },
+    })),
 }));
 
 export default useStore;

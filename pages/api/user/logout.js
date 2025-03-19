@@ -4,17 +4,21 @@ import { serialize } from "cookie";
 import axiosInstance from "@/lib/axiosInstance";
 
 export default async function handler(req, res) {
-    if (req.method === "POST") {
+  if (req.method === "POST") {
     try {
       const httpsAgent = new https.Agent({
-        rejectUnauthorized: process.env.NODE_ENV === 'development' ? false : true
+        rejectUnauthorized:
+          process.env.NODE_ENV === "development" ? false : true,
       });
       await axios.post("https://taearif.com/api/logout", null, {
         headers: { Authorization: `Bearer ${req.body.token}` },
-        httpsAgent: httpsAgent
+        httpsAgent: httpsAgent,
       });
     } catch (error) {
-      console.error("An error occurred while sending the logout request to the external API:", error);
+      console.error(
+        "An error occurred while sending the logout request to the external API:",
+        error,
+      );
     }
 
     const cookies = [

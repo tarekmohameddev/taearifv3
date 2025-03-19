@@ -29,7 +29,6 @@ export function SetupProgressCard() {
     }
   }, [isSetupProgressDataUpdated, fetchSetupProgressData]);
 
-  
   if (!isSetupProgressDataUpdated) {
     return (
       <Card className="col-span-3">
