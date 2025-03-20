@@ -1,8 +1,8 @@
 "use client";
 
-import type React from "react";
-
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { uploadSingleFile } from '@/utils/uploadSingle';
+import { uploadMultipleFiles } from '@/utils/uploadMultiple';
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,13 @@ const MapComponent = dynamic(() => import("@/components/map-component"), {
   ),
 });
 
+// تعريف نوع صورة العقار
+type PropertyImage = {
+  id: string;
+  file: File;
+  url: string;
+};
+
 export default function AddPropertyPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -61,25 +68,19 @@ export default function AddPropertyPage() {
     longitude: 55.2708,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [images, setImages] = useState<{
-    thumbnail: string[];
-    gallery: string[];
-    floorPlans: string[];
-  }>({
-    thumbnail: [],
-    gallery: [],
-    floorPlans: [],
-  });
+  const [thumbnailImage, setThumbnailImage] = useState<PropertyImage | null>(null);
+  const [galleryImages, setGalleryImages] = useState<PropertyImage[]>([]);
+  const [floorPlanImages, setFloorPlanImages] = useState<PropertyImage[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false); // إضافة حالة التحميل
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const floorPlanInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-
-    // Clear error when field is edited
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -101,28 +102,89 @@ export default function AddPropertyPage() {
     }));
   };
 
-  const handleImageUpload = (type: "thumbnail" | "gallery" | "floorPlans") => {
-    // Simulate image upload - in a real app, this would handle file selection and upload
-    const newImage = `/placeholder.svg?height=300&width=500&text=Image${Math.floor(Math.random() * 1000)}`;
-    setImages((prev) => ({
-      ...prev,
-      [type]: [...prev[type], newImage],
-    }));
+  const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target && event.target.result) {
+        setThumbnailImage({
+          id: Date.now().toString(),
+          file,
+          url: event.target.result.toString(),
+        });
+        if (errors.thumbnail) {
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.thumbnail;
+            return newErrors;
+          });
+        }
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
-  const removeImage = (
-    type: "thumbnail" | "gallery" | "floorPlans",
-    index: number,
-  ) => {
-    setImages((prev) => ({
-      ...prev,
-      [type]: prev[type].filter((_, i) => i !== index),
-    }));
+  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target && event.target.result) {
+          setGalleryImages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+              file,
+              url: event.target.result.toString(),
+            },
+          ]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFloorPlanUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target && event.target.result) {
+          setFloorPlanImages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+              file,
+              url: event.target.result.toString(),
+            },
+          ]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeThumbnail = () => {
+    setThumbnailImage(null);
+    if (thumbnailInputRef.current) {
+      thumbnailInputRef.current.value = "";
+    }
+  };
+
+  const removeGalleryImage = (id: string) => {
+    setGalleryImages((prev) => prev.filter((image) => image.id !== id));
+  };
+
+  const removeFloorPlanImage = (id: string) => {
+    setFloorPlanImages((prev) => prev.filter((image) => image.id !== id));
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-
     if (!formData.title) newErrors.title = "عنوان العقار مطلوب";
     if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
     if (!formData.price) newErrors.price = "السعر مطلوب";
@@ -131,55 +193,87 @@ export default function AddPropertyPage() {
     if (!formData.bedrooms) newErrors.bedrooms = "عدد غرف النوم مطلوب";
     if (!formData.bathrooms) newErrors.bathrooms = "عدد الحمامات مطلوب";
     if (!formData.size) newErrors.size = "مساحة العقار مطلوبة";
-    if (images.thumbnail.length === 0)
-      newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
-
+    if (!thumbnailImage) newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (publish: boolean) => {
-    if (validateForm()) {
-      try {
-        // تحضير البيانات وفقًا لصيغة API
-        const requestData = {
-          title: formData.title,
-          address: formData.address,
-          price: Number(formData.price),
-          type: formData.type,
-          beds: Number(formData.bedrooms),
-          bath: Number(formData.bathrooms),
-          size: Number(formData.size),
-          features: formData.features.split("، ").filter((f) => f), // تقسيم الميزات
-          status: publish ? 1 : 0, // 1 للمنشور، 0 للمسودة
-          featured_image: images.thumbnail[0], // الصورة الرئيسية الأولى
-          gallery: images.gallery, // معرض الصور
-          description: formData.description,
-          latitude: Number(formData.latitude),
-          longitude: Number(formData.longitude),
-          featured: formData.featured,
-          area: Number(formData.size), // افتراض أن area نفس size إذا لم تكن موجودة
-          city_id: 1, // أضف مصدر هذه البيانات من النموذج أو اجعلها اختيارية
-          category_id: 1, // نفس الملاحظة أعلاه
-        };
+    if (!validateForm()) {
+      return;
+    }
+    setIsLoading(true);
+    try {
+      // رفع الصورة الرئيسية
+      let featuredImageUrl = "";
+      if (thumbnailImage) {
+        const uploadResult = await uploadSingleFile(thumbnailImage.file, 'properties');
+        featuredImageUrl = uploadResult.url; // استخراج الرابط من الاستجابة
+      }
 
-        // إرسال الطلب إلى API
-        const response = await axiosInstance.post("/properties", requestData);
-
-        // عند النجاح
-        console.log("Property created:", response.data);
-        router.push("/properties");
-      } catch (error) {
-        // معالجة الأخطاء
-        if (error.response) {
-          console.error("API Error:", error.response.data);
-          // عرض رسالة خطأ من API للعميل
-          alert(`فشل الإنشاء: ${error.response.data.message}`);
+      // رفع صور المعرض
+      let galleryUrls: string[] = [];
+      if (galleryImages.length > 0) {
+        const files = galleryImages.map(image => image.file);
+        const uploadResults = await uploadMultipleFiles(files, 'properties');
+        if (uploadResults && Array.isArray(uploadResults)) {
+          galleryUrls = uploadResults.map(file => file.url); // استخراج الروابط
         } else {
-          console.error("Network Error:", error.message);
-          alert("حدث خطأ في الاتصال بالشبكة");
+          console.error("Error: uploadResults is not an array", uploadResults);
+          throw new Error("فشل في رفع صور المعرض");
         }
       }
+
+      // رفع مخططات الطوابق
+      let floorPlanningUrls: string[] = [];
+      if (floorPlanImages.length > 0) {
+        const files = floorPlanImages.map(image => image.file);
+        const uploadResults = await uploadMultipleFiles(files, 'properties');
+        if (uploadResults && Array.isArray(uploadResults)) {
+          floorPlanningUrls = uploadResults.map(file => file.url); // استخراج الروابط
+        } else {
+          console.error("Error: uploadResults is not an array", uploadResults);
+          throw new Error("فشل في رفع مخططات الطوابق");
+        }
+      }
+
+      // إعداد البيانات وفقًا لصيغة API
+      const requestData = {
+        title: formData.title,
+        address: formData.address,
+        price: Number(formData.price),
+        type: formData.type,
+        beds: Number(formData.bedrooms),
+        bath: Number(formData.bathrooms),
+        size: Number(formData.size),
+        features: formData.features.split("، ").filter((f) => f),
+        status: publish ? 1 : 0,
+        featured_image: featuredImageUrl,
+        floor_planning_image: floorPlanningUrls,
+        gallery: galleryUrls,
+        description: formData.description,
+        latitude: Number(formData.latitude),
+        longitude: Number(formData.longitude),
+        featured: formData.featured,
+        area: Number(formData.size),
+        city_id: 1,
+        category_id: 1,
+      };
+
+      // إرسال الطلب إلى API
+      const response = await axiosInstance.post("https://taearif.com/api/properties", requestData);
+
+      console.log("Property created:", response.data);
+      router.push("/properties");
+    } catch (error: any) {
+      console.error("Error saving property:", error);
+      if (error.response) {
+        alert(`فشل الإنشاء: ${error.response.data.message || "خطأ في الخادم"}`);
+      } else {
+        alert("حدث خطأ في الاتصال بالشبكة");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -204,10 +298,19 @@ export default function AddPropertyPage() {
                 </h1>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => handleSubmit(false)}>
-                  حفظ كمسودة
+                <Button
+                  variant="outline"
+                  onClick={() => handleSubmit(false)}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "جاري الحفظ..." : "حفظ كمسودة"}
                 </Button>
-                <Button onClick={() => handleSubmit(true)}>نشر العقار</Button>
+                <Button
+                  onClick={() => handleSubmit(true)}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "جاري النشر..." : "نشر العقار"}
+                </Button>
               </div>
             </div>
 
@@ -520,13 +623,10 @@ export default function AddPropertyPage() {
                     <TabsContent value="thumbnail">
                       <div className="space-y-4">
                         <div className="flex flex-wrap gap-4">
-                          {images.thumbnail.map((image, index) => (
-                            <div
-                              key={index}
-                              className="relative h-40 w-40 overflow-hidden rounded-md border"
-                            >
+                          {thumbnailImage && (
+                            <div className="relative h-40 w-40 overflow-hidden rounded-md border">
                               <img
-                                src={image || "/placeholder.svg"}
+                                src={thumbnailImage.url}
                                 alt="Property thumbnail"
                                 className="h-full w-full object-cover"
                               />
@@ -534,20 +634,26 @@ export default function AddPropertyPage() {
                                 variant="destructive"
                                 size="icon"
                                 className="absolute right-1 top-1 h-6 w-6"
-                                onClick={() => removeImage("thumbnail", index)}
+                                onClick={removeThumbnail}
                               >
                                 <X className="h-3 w-3" />
                               </Button>
                             </div>
-                          ))}
+                          )}
                           <Button
                             variant="outline"
                             className="flex h-40 w-40 flex-col items-center justify-center gap-2 border-dashed"
-                            onClick={() => handleImageUpload("thumbnail")}
+                            onClick={() => thumbnailInputRef.current?.click()}
                           >
                             <Upload className="h-6 w-6" />
                             <span>تحميل صورة</span>
                           </Button>
+                          <input
+                            type="file"
+                            ref={thumbnailInputRef}
+                            className="hidden"
+                            onChange={handleThumbnailUpload}
+                          />
                         </div>
                         {errors.thumbnail && (
                           <p className="text-sm text-red-500">
@@ -564,13 +670,13 @@ export default function AddPropertyPage() {
                     <TabsContent value="gallery">
                       <div className="space-y-4">
                         <div className="flex flex-wrap gap-4">
-                          {images.gallery.map((image, index) => (
+                          {galleryImages.map((image, index) => (
                             <div
                               key={index}
                               className="relative h-40 w-40 overflow-hidden rounded-md border"
                             >
                               <img
-                                src={image || "/placeholder.svg"}
+                                src={image.url}
                                 alt="Property gallery"
                                 className="h-full w-full object-cover"
                               />
@@ -578,7 +684,7 @@ export default function AddPropertyPage() {
                                 variant="destructive"
                                 size="icon"
                                 className="absolute right-1 top-1 h-6 w-6"
-                                onClick={() => removeImage("gallery", index)}
+                                onClick={() => removeGalleryImage(image.id)}
                               >
                                 <X className="h-3 w-3" />
                               </Button>
@@ -587,11 +693,18 @@ export default function AddPropertyPage() {
                           <Button
                             variant="outline"
                             className="flex h-40 w-40 flex-col items-center justify-center gap-2 border-dashed"
-                            onClick={() => handleImageUpload("gallery")}
+                            onClick={() => galleryInputRef.current?.click()}
                           >
                             <Upload className="h-6 w-6" />
                             <span>تحميل صورة</span>
                           </Button>
+                          <input
+                            type="file"
+                            multiple
+                            ref={galleryInputRef}
+                            className="hidden"
+                            onChange={handleGalleryUpload}
+                          />
                         </div>
                         <p className="text-sm text-muted-foreground">
                           قم بتحميل صور متعددة لإظهار مختلف جوانب العقار. يمكنك
@@ -603,13 +716,13 @@ export default function AddPropertyPage() {
                     <TabsContent value="floorPlans">
                       <div className="space-y-4">
                         <div className="flex flex-wrap gap-4">
-                          {images.floorPlans.map((image, index) => (
+                          {floorPlanImages.map((image, index) => (
                             <div
                               key={index}
                               className="relative h-40 w-40 overflow-hidden rounded-md border"
                             >
                               <img
-                                src={image || "/placeholder.svg"}
+                                src={image.url}
                                 alt="Floor plan"
                                 className="h-full w-full object-cover"
                               />
@@ -617,7 +730,7 @@ export default function AddPropertyPage() {
                                 variant="destructive"
                                 size="icon"
                                 className="absolute right-1 top-1 h-6 w-6"
-                                onClick={() => removeImage("floorPlans", index)}
+                                onClick={() => removeFloorPlanImage(image.id)}
                               >
                                 <X className="h-3 w-3" />
                               </Button>
@@ -626,11 +739,18 @@ export default function AddPropertyPage() {
                           <Button
                             variant="outline"
                             className="flex h-40 w-40 flex-col items-center justify-center gap-2 border-dashed"
-                            onClick={() => handleImageUpload("floorPlans")}
+                            onClick={() => floorPlanInputRef.current?.click()}
                           >
                             <Upload className="h-6 w-6" />
                             <span>تحميل مخطط</span>
                           </Button>
+                          <input
+                            type="file"
+                            multiple
+                            ref={floorPlanInputRef}
+                            className="hidden"
+                            onChange={handleFloorPlanUpload}
+                          />
                         </div>
                         <p className="text-sm text-muted-foreground">
                           قم بتحميل مخططات الطوابق لمساعدة العملاء على فهم تخطيط
@@ -644,6 +764,7 @@ export default function AddPropertyPage() {
                   <Button
                     variant="outline"
                     onClick={() => router.push("/properties")}
+                    disabled={isLoading}
                   >
                     إلغاء
                   </Button>
@@ -651,11 +772,15 @@ export default function AddPropertyPage() {
                     <Button
                       variant="outline"
                       onClick={() => handleSubmit(false)}
+                      disabled={isLoading}
                     >
-                      حفظ كمسودة
+                      {isLoading ? "جاري الحفظ..." : "حفظ كمسودة"}
                     </Button>
-                    <Button onClick={() => handleSubmit(true)}>
-                      نشر العقار
+                    <Button
+                      onClick={() => handleSubmit(true)}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "جاري النشر..." : "نشر العقار"}
                     </Button>
                   </div>
                 </CardFooter>

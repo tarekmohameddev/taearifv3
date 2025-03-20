@@ -264,7 +264,7 @@ function ProjectCard({ project }: { project: IProject }) {
       <div className="relative">
         <div className="aspect-[16/9] w-full overflow-hidden">
           <img
-            src={project.thumbnail || "/placeholder.svg"}
+            src={project.featured_image || "/placeholder.svg"}
             alt={project.contents?.[0]?.title}
             className="h-full w-full object-cover transition-all hover:scale-105"
           />

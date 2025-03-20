@@ -294,7 +294,6 @@ export default function AddProjectPage(): JSX.Element {
     }
     setIsLoading(true);
     try {
-  console.log(`--------------22222222222222222222222222222`)
   // رفع الصورة الرئيسية (featured_image)
       let featuredImageUrl = "";
       if (thumbnailImage) {
@@ -302,7 +301,6 @@ export default function AddProjectPage(): JSX.Element {
         featuredImageUrl = uploadResult.url; // استخراج الـ url من الاستجابة
       }
   
-  console.log(`--------------11111111111111111111111111111`)
       // رفع صور المخططات (floorplan_images)
       let floorplanUrls = [];
       if (planImages.length > 0) {
@@ -318,8 +316,6 @@ export default function AddProjectPage(): JSX.Element {
         }
       }
       
-  console.log(`11111111111111111111111111111`)
-      // رفع صور المعرض (gallery_images)
       let galleryUrls = [];
       if (galleryImages.length > 0) {
         const files = galleryImages.map(image => image.file);
@@ -336,8 +332,6 @@ export default function AddProjectPage(): JSX.Element {
         }
       }
       
-  console.log(`222222222222222222222222222222`)
-      // تحويل حقل السعر إلى قيم min و max
       let minPrice = 0;
       let maxPrice = 0;
       if (newProject.price.includes("-")) {
@@ -349,11 +343,9 @@ export default function AddProjectPage(): JSX.Element {
         maxPrice = minPrice;
       }
   
-  console.log(`333333333333333333333333333333333333`)
       const formattedDate = new Date(newProject.completionDate).toISOString().split('T')[0];
   
 
-  console.log(`444444444444444444444444444444`)
       // إعداد بيانات المشروع مع الروابط المستخرجة
       const projectData = {
         "featured_image": featuredImageUrl,
@@ -417,16 +409,11 @@ export default function AddProjectPage(): JSX.Element {
           : []
       };
   
-  console.log(`555555555555555555555`)
       const response = await axiosInstance.post("https://taearif.com/api/projects", projectData);
-      console.log(`6666666666666666666666`)
   
       const currentState = useStore.getState();
-  console.log(`7777777777777777777777`)
       const createdProject = response.data.data.user_project;
-  console.log(`888888888888888888888`)
       const updatedProjects = [createdProject, ...currentState.homepage.projectsManagement.projects];
-  console.log(`999999999999999`)
       setProjectsManagement({
         projects: updatedProjects,
         pagination: {
@@ -436,7 +423,6 @@ export default function AddProjectPage(): JSX.Element {
         }
       });
   
-  console.log(`10 10  10 10 1 0 1 0 1 0 1 0 1 0 1 0 1 0 `)
       router.push("/projects");
     } catch (error: any) {
       console.error("Error saving project:", error);
