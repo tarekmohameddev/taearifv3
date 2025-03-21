@@ -239,10 +239,36 @@ export function RegisterPage() {
   
         console.log("✅ Registration response:", response.data);
   
+        const { user, token: UserToken } = response.data;
+  
+        // إرسال بيانات المستخدم والتوكن إلى /api/user/setAuth
+        const setAuthResponse = await fetch("/api/user/setAuth", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user, UserToken }),
+        });
+  
+        if (!setAuthResponse.ok) {
+          const errorData = await setAuthResponse.json().catch(() => ({}));
+          const errorMsg = errorData.error || "فشل في تعيين التوكن";
+          console.error("❌ Error setting auth:", errorMsg);
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            api: errorMsg,
+          }));
+          return;
+        }
+  
+        console.log("✅ Auth token set successfully");
+  
         setFormSubmitted(true);
-        setTimeout(() => {
+        setTimeout(()=>{
+
           router.push("/");
-        }, 2000);
+        },200)
+  
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const errorMessage = error.response?.data?.message || error.message;
@@ -254,11 +280,11 @@ export function RegisterPage() {
               ...prevErrors,
               api: "هذا البريد الإلكتروني مسجل بالفعل",
             }));
-          }else{
+          } else {
             setErrors((prevErrors) => ({
               ...prevErrors,
               api: `${errorMessage}`,
-            }))
+            }));
           }
         } else {
           console.error("❌ Unexpected error:", error);

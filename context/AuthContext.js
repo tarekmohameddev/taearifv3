@@ -44,7 +44,8 @@ const useAuthStore = create((set, get) => ({
   login: async (email, password) => {
     set({ IsLoading: true, errorLogin: null, errorLoginATserver: null });
     try {
-      const response = await fetch("/api/user/login", {
+      // الطلب المباشر إلى API الخارجي
+      const externalResponse = await fetch("https://taearif.com/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,33 +53,52 @@ const useAuthStore = create((set, get) => ({
         body: JSON.stringify({ email, password }),
       });
 
-      // إذا كانت الاستجابة غير ناجحة
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMsg = errorData.error || "فشل تسجيل الدخول";
+      if (!externalResponse.ok) {
+        const errorData = await externalResponse.json().catch(() => ({}));
+        let errorMsg = errorData.message || "فشل تسجيل الدخول";
+        if(errorMsg == "Invalid credentials"){
+         errorMsg = "البريد الإلكتروني أو كلمة المرور غير صحيحة."
+      }
         set({ errorLogin: errorMsg });
         return { success: false, error: errorMsg };
       }
 
-      const data = await response.json();
+      const { user, token: UserToken } = await externalResponse.json();
 
-      // إذا كانت الاستجابة ناجحة لكن العملية لم تتم بنجاح
+      // إرسال البيانات إلى المسار الجديد لإنشاء JWT وتعيين الكوكيز
+      const setAuthResponse = await fetch("/api/user/setAuth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user, UserToken }),
+      });
+
+      if (!setAuthResponse.ok) {
+        const errorData = await setAuthResponse.json().catch(() => ({}));
+        const errorMsg = errorData.error || "فشل في تعيين التوكن";
+        set({ errorLogin: errorMsg });
+        return { success: false, error: errorMsg };
+      }
+
+      const data = await setAuthResponse.json();
       if (!data.success) {
-        const errorMsg = data.error || "فشل تسجيل الدخول";
+        const errorMsg = data.error || "فشل في تعيين التوكن";
         set({ errorLogin: errorMsg });
         return { success: false, error: errorMsg };
       }
 
-      // في حال نجاح تسجيل الدخول
-      const { password: _, ...userWithoutPassword } = data.user;
+      // تحديث حالة المستخدم بعد النجاح
       const safeUserData = {
-        ...userWithoutPassword,
-        token: data.UserToken, // إضافة UserToken كـ token
+        email: user.email,
+        token: UserToken,
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name,
       };
       set({ UserIslogged: true, userData: safeUserData });
       return { success: true };
     } catch (error) {
-      // في حال حدوث خطأ أثناء الاتصال بالخادم
       const errorMsg = "حدث خطأ أثناء الاتصال بالخادم";
       set({ errorLoginATserver: errorMsg });
       return { success: false, error: errorMsg };
