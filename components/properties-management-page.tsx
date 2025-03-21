@@ -29,6 +29,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -61,7 +62,8 @@ import { EnhancedSidebar } from "@/components/enhanced-sidebar";
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store"; // استيراد useStore
 
-// مكون SkeletonPropertyCard لعرض بطاقة تحميل تحاكي شكل بطاقة العقار
+
+// مكون SkeletonPropertyCard (لن يتغير شكله)
 function SkeletonPropertyCard() {
   return (
     <Card className="overflow-hidden animate-pulse">
@@ -90,20 +92,20 @@ function SkeletonPropertyCard() {
 }
 
 export function PropertiesManagementPage() {
+  const router = useRouter();
   const {
-    propertiesManagement: {
+    propertiesManagement: {       
       viewMode,
       priceRange,
       favorites,
       properties,
       loading,
       error,
-    },
-    setPropertiesManagement,
+      isInitialized },
+      setPropertiesManagement,
     fetchProperties,
   } = useStore();
 
-  // تحديث وضع العرض
   const setViewMode = (mode: "grid" | "list") => {
     setPropertiesManagement({ viewMode: mode });
   };
@@ -123,10 +125,10 @@ export function PropertiesManagementPage() {
 
   // جلب البيانات عند التحميل الأولي
   useEffect(() => {
-    if (!properties.length && !loading) {
+    if (!isInitialized && !loading) {
       fetchProperties();
     }
-  }, [fetchProperties, properties.length, loading]);
+  }, [fetchProperties, isInitialized, loading]);
 
   const renderSkeletons = () => (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -134,8 +136,7 @@ export function PropertiesManagementPage() {
         <SkeletonPropertyCard key={idx} />
       ))}
     </div>
-  );
-
+  ); 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
       <DashboardHeader />
@@ -300,7 +301,7 @@ export function PropertiesManagementPage() {
                 </Dialog>
                 <Button
                   className="gap-1"
-                  onClick={() => (window.location.href = "/properties/add")}
+                  onClick={() => (router.push("/properties/add"))}
                 >
                   <Plus className="h-4 w-4" />
                   إضافة عقار
@@ -639,19 +640,19 @@ function PropertyCard({
           <div className="flex flex-col">
             <span className="text-muted-foreground">الأسرة</span>
             <span className="font-medium flex items-center gap-1">
-              <Bed className="h-3 w-3" /> {property.bedrooms}
+              <Bed className="h-3 w-3" /> {property.beds}
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground">الحمامات</span>
             <span className="font-medium flex items-center gap-1">
-              <Bath className="h-3 w-3" /> {property.bathrooms}
+              <Bath className="h-3 w-3" /> {property.bath}
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground">حجم</span>
             <span className="font-medium flex items-center gap-1">
-              <Ruler className="h-3 w-3" /> {property.size} ft²
+              <Ruler className="h-3 w-3" /> {property.area} ft²
             </span>
           </div>
         </div>
@@ -818,3 +819,4 @@ function PropertyListItem({
     </Card>
   );
 }
+

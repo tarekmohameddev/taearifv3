@@ -20,30 +20,32 @@ module.exports = (set) => ({
     })),
 
   fetchProperties: async () => {
-    set((state) => ({
-      propertiesManagement: {
-        ...state.propertiesManagement,
-        loading: true,
-        error: null,
-      },
-    }));
+    // إذا كانت البيانات تم جلبها بالفعل، لا داعي للطلب مرة أخرى
+    set((state) => {
+      if (state.propertiesManagement.isInitialized) return {};
+      return {
+        propertiesManagement: {
+          ...state.propertiesManagement,
+          loading: true,
+          error: null,
+        },
+      };
+    });
 
     try {
       const response = await axiosInstance.get(
-        "https://taearif.com/api/properties",
+        "https://taearif.com/api/properties"
       );
 
-      const mappedProperties = response.data.data.properties.map(
-        (property) => ({
-          ...property,
-          thumbnail: property.featured_image,
-          listingType: property.type === "residential" ? "للبيع" : "للإيجار",
-          status: property.status === 1 ? "منشور" : "مسودة",
-          lastUpdated: new Date(property.updated_at).toLocaleDateString(
-            "ar-AE",
-          ),
-        }),
-      );
+      const propertiesList = response.data.data.properties || [];
+      const mappedProperties = propertiesList.map((property) => ({
+        ...property,
+        thumbnail: property.featured_image,
+        listingType:
+          property.type === "residential" ? "للبيع" : "للإيجار",
+        status: property.status === 1 ? "منشور" : "مسودة",
+        lastUpdated: new Date(property.updated_at).toLocaleDateString("ar-AE"),
+      }));
 
       set((state) => ({
         propertiesManagement: {

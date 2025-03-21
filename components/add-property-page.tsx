@@ -1,0 +1,911 @@
+"use client";
+
+import React, { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import {
+  ChevronLeft,
+  Upload,
+  X,
+  Loader2,
+  ImageIcon,
+  Plus,
+  MapPin,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { EnhancedSidebar } from "@/components/enhanced-sidebar";
+import { toast } from "@/hooks/use-toast";
+import dynamic from "next/dynamic";
+import axiosInstance from "@/lib/axiosInstance";
+import { uploadSingleFile } from "@/utils/uploadSingle";
+import { uploadMultipleFiles } from "@/utils/uploadMultiple";
+
+// Dynamically import the MapComponent to avoid SSR issues with Leaflet
+const MapComponent = dynamic(() => import("@/components/map-component"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[400px] w-full flex items-center justify-center bg-muted rounded-md">
+      <div className="flex flex-col items-center gap-2">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">جاري تحميل الخريطة...</p>
+      </div>
+    </div>
+  ),
+});
+
+export default function AddPropertyPage() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    address: "",
+    price: "",
+    type: "",
+    listingType: "",
+    bedrooms: "",
+    bathrooms: "",
+    size: "",
+    features: "",
+    status: "draft",
+    featured: false,
+    latitude: 25.2048, // Default latitude (Dubai)
+    longitude: 55.2708, // Default longitude (Dubai)
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [images, setImages] = useState<{
+    thumbnail: File | null;
+    gallery: File[];
+    floorPlans: File[];
+  }>({
+    thumbnail: null,
+    gallery: [],
+    floorPlans: [],
+  });
+  const [previews, setPreviews] = useState<{
+    thumbnail: string | null;
+    gallery: string[];
+    floorPlans: string[];
+  }>({
+    thumbnail: null,
+    gallery: [],
+    floorPlans: [],
+  });
+  const [uploading, setUploading] = useState(false);
+
+  // Refs for file inputs
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const floorPlansInputRef = useRef<HTMLInputElement>(null);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error when field is edited
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleSwitchChange = (name: string, checked: boolean) => {
+    setFormData((prev) => ({ ...prev, [name]: checked }));
+  };
+
+  const handleMapPositionChange = (lat: number, lng: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng,
+    }));
+  };
+
+  const triggerFileInput = (type: "thumbnail" | "gallery" | "floorPlans") => {
+    if (type === "thumbnail" && thumbnailInputRef.current) {
+      thumbnailInputRef.current.click();
+    } else if (type === "gallery" && galleryInputRef.current) {
+      galleryInputRef.current.click();
+    } else if (type === "floorPlans" && floorPlansInputRef.current) {
+      floorPlansInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "thumbnail" | "gallery" | "floorPlans",
+  ) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    if (type === "thumbnail") {
+      const file = files[0];
+      if (!file.type.startsWith("image/")) {
+        toast({
+          title: "خطأ في تحميل الملف",
+          description: "يرجى تحميل ملفات صور فقط (JPG, PNG, GIF)",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "الملف كبير جدًا",
+          description: "يجب أن يكون حجم الملف أقل من 5 ميجابايت",
+          variant: "destructive",
+        });
+        return;
+      }
+      setImages((prev) => ({ ...prev, thumbnail: file }));
+      setPreviews((prev) => ({
+        ...prev,
+        thumbnail: URL.createObjectURL(file),
+      }));
+    } else {
+      const validFiles = Array.from(files).filter((file) => {
+        if (!file.type.startsWith("image/")) {
+          toast({
+            title: "خطأ في تحميل الملف",
+            description: "يرجى تحميل ملفات صور فقط (JPG, PNG, GIF)",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: "الملف كبير جدًا",
+            description: "يجب أن يكون حجم الملف أقل من 5 ميجابايت",
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+      });
+      setImages((prev) => ({
+        ...prev,
+        [type]: [...prev[type], ...validFiles],
+      }));
+      setPreviews((prev) => ({
+        ...prev,
+        [type]: [
+          ...prev[type],
+          ...validFiles.map((file) => URL.createObjectURL(file)),
+        ],
+      }));
+    }
+
+    e.target.value = ""; // إعادة تعيين حقل الإدخال
+  };
+
+  const removeImage = (
+    type: "thumbnail" | "gallery" | "floorPlans",
+    index?: number,
+  ) => {
+    if (type === "thumbnail") {
+      setImages((prev) => ({ ...prev, thumbnail: null }));
+      setPreviews((prev) => ({ ...prev, thumbnail: null }));
+    } else {
+      setImages((prev) => ({
+        ...prev,
+        [type]: prev[type].filter((_, i) => i !== index),
+      }));
+      setPreviews((prev) => ({
+        ...prev,
+        [type]: prev[type].filter((_, i) => i !== index),
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.title) newErrors.title = "عنوان العقار مطلوب";
+    if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
+    if (!formData.price) newErrors.price = "السعر مطلوب";
+    if (!formData.type) newErrors.type = "نوع العقار مطلوب";
+    if (!formData.listingType) newErrors.listingType = "نوع القائمة مطلوب";
+    if (!formData.bedrooms) newErrors.bedrooms = "عدد غرف النوم مطلوب";
+    if (!formData.bathrooms) newErrors.bathrooms = "عدد الحمامات مطلوب";
+    if (!formData.size) newErrors.size = "مساحة العقار مطلوبة";
+    if (!images.thumbnail)
+      newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (publish: boolean) => {
+    if (validateForm()) {
+      setIsLoading(true)
+      setUploading(true);
+      toast({
+        title: "جاري حفظ العقار",
+        description: "يرجى الانتظار...",
+      });
+
+      try {
+        let thumbnailUrl: string | null = null;
+        let galleryUrls: string[] = [];
+        let floorPlansUrls: string[] = [];
+
+        // رفع الصورة الرئيسية
+        if (images.thumbnail) {
+          const uploadedFile = await uploadSingleFile(
+            images.thumbnail,
+            "property",
+          );
+          thumbnailUrl = uploadedFile.url;
+        }
+
+        // رفع صور المعرض
+        if (images.gallery.length > 0) {
+          const uploadedFiles = await uploadMultipleFiles(
+            images.gallery,
+            "property",
+          );
+          galleryUrls = uploadedFiles.map((f) => f.url);
+        }
+
+        // رفع مخططات الطوابق
+        if (images.floorPlans.length > 0) {
+          const uploadedFiles = await uploadMultipleFiles(
+            images.floorPlans,
+            "property",
+          );
+          floorPlansUrls = uploadedFiles.map((f) => f.url);
+        }
+
+        // إعداد بيانات العقار
+        const propertyData = {
+          title: formData.title,
+          address: formData.address,
+          price: formData.price,
+          type: formData.type,
+          beds: parseInt(formData.bedrooms),
+          bath: parseInt(formData.bathrooms),
+          size: parseInt(formData.size),
+          features: formData.features.split(",").map((f) => f.trim()),
+          status: publish ? 1 : 0,
+          featured_image: thumbnailUrl,
+          floor_planning_image: floorPlansUrls,
+          gallery: galleryUrls,
+          description: formData.description,
+          latitude: formData.latitude,
+          longitude: formData.longitude,
+          featured: formData.featured,
+          area: parseInt(formData.size),
+          city_id: 1, // يمكن تعديلها حسب الحاجة
+          category_id: 1, // يمكن تعديلها حسب الحاجة
+        };
+
+        // إرسال بيانات العقار إلى الـ API
+        await axiosInstance.post(
+          "https://taearif.com/api/properties",
+          propertyData,
+        );
+
+        toast({
+          title: publish ? "تم نشر العقار بنجاح" : "تم حفظ العقار كمسودة",
+          description: "تمت معالجة العقار بنجاح.",
+        });
+        setIsLoading(false)
+
+        router.push("/properties");
+      } catch (error) {
+        console.error("Error submitting property:", error);
+        setIsLoading(false)
+        toast({
+          title: "خطأ في حفظ العقار",
+          description: "حدث خطأ أثناء حفظ العقار. يرجى المحاولة مرة أخرى.",
+          variant: "destructive",
+        });
+      } finally {
+        setUploading(false);
+        setIsLoading(false)
+      }
+    } else {
+      toast({
+        title: "خطأ في النموذج",
+        description: "يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col" dir="rtl">
+      <DashboardHeader />
+      <div className="flex flex-1 flex-col md:flex-row">
+        <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
+        <main className="flex-1 p-4 md:p-6">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => router.push("/properties")}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <h1 className="text-2xl font-bold tracking-tight">
+                  إضافة عقار جديد
+                </h1>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => handleSubmit(false)}>
+                  حفظ كمسودة
+                </Button>
+                <Button onClick={() => handleSubmit(true)}>نشر العقار</Button>
+              </div>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>معلومات العقار الأساسية</CardTitle>
+                  <CardDescription>
+                    أدخل المعلومات الأساسية للعقار
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">عنوان العقار</Label>
+                    <Input
+                      id="title"
+                      name="title"
+                      placeholder="شقة حديثة مع إطلالة على المدينة"
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      className={errors.title ? "border-red-500" : ""}
+                    />
+                    {errors.title && (
+                      <p className="text-sm text-red-500">{errors.title}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description">وصف العقار</Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      placeholder="شقة جميلة مع تشطيبات حديثة وإطلالات رائعة على المدينة"
+                      rows={4}
+                      value={formData.description}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="address">العنوان</Label>
+                    <Input
+                      id="address"
+                      name="address"
+                      placeholder="123 شارع الرئيسي، دبي، الإمارات العربية المتحدة"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      className={errors.address ? "border-red-500" : ""}
+                    />
+                    {errors.address && (
+                      <p className="text-sm text-red-500">{errors.address}</p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="price">السعر</Label>
+                      <Input
+                        id="price"
+                        name="price"
+                        type="number"
+                        placeholder="750000"
+                        value={formData.price}
+                        onChange={handleInputChange}
+                        className={errors.price ? "border-red-500" : ""}
+                      />
+                      {errors.price && (
+                        <p className="text-sm text-red-500">{errors.price}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="listingType">نوع القائمة</Label>
+                      <Select
+                        name="listingType"
+                        value={formData.listingType}
+                        onValueChange={(value) =>
+                          handleInputChange({
+                            target: { name: "listingType", value },
+                          } as any)
+                        }
+                      >
+                        <SelectTrigger
+                          id="listingType"
+                          className={errors.listingType ? "border-red-500" : ""}
+                        >
+                          <SelectValue placeholder="اختر النوع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="للبيع">للبيع</SelectItem>
+                          <SelectItem value="للإيجار">للإيجار</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.listingType && (
+                        <p className="text-sm text-red-500">
+                          {errors.listingType}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="type">نوع العقار</Label>
+                      <Select
+                        name="type"
+                        value={formData.type}
+                        onValueChange={(value) =>
+                          handleInputChange({
+                            target: { name: "type", value },
+                          } as any)
+                        }
+                      >
+                        <SelectTrigger
+                          id="type"
+                          className={errors.type ? "border-red-500" : ""}
+                        >
+                          <SelectValue placeholder="اختر النوع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="فيلا">فيلا</SelectItem>
+                          <SelectItem value="شقة">شقة</SelectItem>
+                          <SelectItem value="تاون هاوس">تاون هاوس</SelectItem>
+                          <SelectItem value="استوديو">استوديو</SelectItem>
+                          <SelectItem value="بنتهاوس">بنتهاوس</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.type && (
+                        <p className="text-sm text-red-500">{errors.type}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="status">الحالة</Label>
+                      <RadioGroup
+                        defaultValue="draft"
+                        className="flex gap-4"
+                        onValueChange={(value) =>
+                          handleInputChange({
+                            target: { name: "status", value },
+                          } as any)
+                        }
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="draft" id="draft" />
+                          <Label htmlFor="draft" className="mr-2">
+                            مسودة
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="published" id="published" />
+                          <Label htmlFor="published" className="mr-2">
+                            منشور
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>تفاصيل العقار</CardTitle>
+                  <CardDescription>أدخل مواصفات وميزات العقار</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="bedrooms">غرف النوم</Label>
+                      <Input
+                        id="bedrooms"
+                        name="bedrooms"
+                        type="number"
+                        placeholder="2"
+                        value={formData.bedrooms}
+                        onChange={handleInputChange}
+                        className={errors.bedrooms ? "border-red-500" : ""}
+                      />
+                      {errors.bedrooms && (
+                        <p className="text-sm text-red-500">
+                          {errors.bedrooms}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="bathrooms">الحمامات</Label>
+                      <Input
+                        id="bathrooms"
+                        name="bathrooms"
+                        type="number"
+                        placeholder="2"
+                        value={formData.bathrooms}
+                        onChange={handleInputChange}
+                        className={errors.bathrooms ? "border-red-500" : ""}
+                      />
+                      {errors.bathrooms && (
+                        <p className="text-sm text-red-500">
+                          {errors.bathrooms}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="size">المساحة (قدم مربع)</Label>
+                      <Input
+                        id="size"
+                        name="size"
+                        type="number"
+                        placeholder="1200"
+                        value={formData.size}
+                        onChange={handleInputChange}
+                        className={errors.size ? "border-red-500" : ""}
+                      />
+                      {errors.size && (
+                        <p className="text-sm text-red-500">{errors.size}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="features">الميزات (مفصولة بفواصل)</Label>
+                    <Input
+                      id="features"
+                      name="features"
+                      placeholder="شرفة، أرضيات خشبية، أجهزة منزلية حديثة"
+                      value={formData.features}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2 pt-4">
+                    <Switch
+                      id="featured"
+                      checked={formData.featured}
+                      onCheckedChange={(checked) =>
+                        handleSwitchChange("featured", checked)
+                      }
+                    />
+                    <Label htmlFor="featured" className="mr-2">
+                      عرض هذا العقار في الصفحة الرئيسية
+                    </Label>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Map Location Section */}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>موقع العقار</CardTitle>
+                  <CardDescription>حدد موقع العقار على الخريطة</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="w-full md:w-2/3">
+                      <div className="border rounded-md h-[400px] overflow-hidden">
+                        <MapComponent
+                          latitude={formData.latitude}
+                          longitude={formData.longitude}
+                          onPositionChange={handleMapPositionChange}
+                          showSearch={true}
+                        />
+                      </div>
+                    </div>
+                    <div className="w-full md:w-1/3 space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <Label htmlFor="latitude">خط العرض</Label>
+                        </div>
+                        <Input
+                          id="latitude"
+                          name="latitude"
+                          type="number"
+                          step="0.000001"
+                          value={formData.latitude}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <Label htmlFor="longitude">خط الطول</Label>
+                        </div>
+                        <Input
+                          id="longitude"
+                          name="longitude"
+                          type="number"
+                          step="0.000001"
+                          value={formData.longitude}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div className="bg-muted p-4 rounded-md">
+                        <h4 className="text-sm font-medium mb-2">تعليمات:</h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>• انقر على الخريطة لتحديد موقع العقار</li>
+                          <li>• اسحب العلامة لضبط الموقع بدقة</li>
+                          <li>• استخدم شريط البحث للعثور على موقع محدد</li>
+                          <li>• يمكنك أيضًا إدخال الإحداثيات يدويًا</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Thumbnail Image Upload */}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>صورة العقار الرئيسية</CardTitle>
+                  <CardDescription>
+                    قم بتحميل صورة رئيسية تمثل العقار
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col md:flex-row items-center gap-6">
+                    <div className="border rounded-md p-2 flex-1 w-full">
+                      <div className="flex items-center justify-center h-48 bg-muted rounded-md relative">
+                        {previews.thumbnail ? (
+                          <>
+                            <img
+                              src={previews.thumbnail}
+                              alt="Property thumbnail"
+                              className="h-full w-full object-cover rounded-md"
+                            />
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-2 right-2 h-8 w-8"
+                              onClick={() => removeImage("thumbnail")}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </>
+                        ) : (
+                          <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-4 w-full md:w-1/3">
+                      <input
+                        ref={thumbnailInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleFileChange(e, "thumbnail")}
+                      />
+                      <Button
+                        variant="outline"
+                        className="h-12 w-full"
+                        onClick={() => triggerFileInput("thumbnail")}
+                        disabled={uploading.thumbnail}
+                      >
+                        <div className="flex items-center gap-2">
+                          {uploading.thumbnail ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <Upload className="h-5 w-5" />
+                          )}
+                          <span>رفع صورة</span>
+                        </div>
+                      </Button>
+                      <p className="text-sm text-muted-foreground">
+                        يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف
+                        هو 5 ميجابايت.
+                      </p>
+                      {errors.thumbnail && (
+                        <p className="text-xs text-red-500">
+                          {errors.thumbnail}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Property Gallery Upload */}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>معرض صور العقار</CardTitle>
+                  <CardDescription>
+                    قم بتحميل صور متعددة لعرض تفاصيل العقار
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {previews.gallery.map((preview, index) => (
+                        <div
+                          key={index}
+                          className="border rounded-md p-2 relative"
+                        >
+                          <div className="h-40 bg-muted rounded-md overflow-hidden">
+                            <img
+                              src={preview}
+                              alt={`Gallery image ${index + 1}`}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-4 right-4 h-6 w-6"
+                            onClick={() => removeImage("gallery", index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                          <p className="text-xs text-center mt-2 truncate">
+                            صورة {index + 1}
+                          </p>
+                        </div>
+                      ))}
+                      <div
+                        className="border rounded-md p-2 h-[11rem] flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => triggerFileInput("gallery")}
+                      >
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                          {uploading.gallery ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          إضافة صورة
+                        </p>
+                      </div>
+                    </div>
+                    <input
+                      ref={galleryInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => handleFileChange(e, "gallery")}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      يمكنك رفع صور بصيغة JPG أو PNG. الحد الأقصى لعدد الصور هو
+                      10.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Floor Plans Upload */}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>مخططات الطوابق</CardTitle>
+                  <CardDescription>
+                    قم بتحميل مخططات الطوابق والتصاميم الهندسية للعقار
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {previews.floorPlans.map((preview, index) => (
+                        <div
+                          key={index}
+                          className="border rounded-md p-2 relative"
+                        >
+                          <div className="h-40 bg-muted rounded-md overflow-hidden">
+                            <img
+                              src={preview}
+                              alt={`Floor plan ${index + 1}`}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-4 right-4 h-6 w-6"
+                            onClick={() => removeImage("floorPlans", index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                          <p className="text-xs text-center mt-2 truncate">
+                            مخطط {index + 1}
+                          </p>
+                        </div>
+                      ))}
+                      <div
+                        className="border rounded-md p-2 h-[11rem] flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => triggerFileInput("floorPlans")}
+                      >
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                          {uploading.floorPlans ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <Plus className="h-5 w-5 text-muted-foreground" />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          إضافة مخطط
+                        </p>
+                      </div>
+                    </div>
+                    <input
+                      ref={floorPlansInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => handleFileChange(e, "floorPlans")}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      يمكنك رفع مخططات بصيغة JPG أو PNG. الحد الأقصى لعدد
+                      المخططات هو 5.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Final Card with Submit Buttons */}
+              <Card className="md:col-span-2">
+                <CardFooter className="flex justify-between border-t p-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push("/properties")}
+                  >
+                    إلغاء
+                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleSubmit(false)}
+                    >
+                      حفظ كمسودة
+                    </Button>
+                    <Button onClick={() => handleSubmit(true)}
+                  disabled={isLoading}
+                  >
+                    {isLoading ? "جاري الحفظ..." : "نشر العقار"}
+                    </Button>
+                  </div>
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
