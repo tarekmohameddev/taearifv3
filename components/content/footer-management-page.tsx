@@ -1,5 +1,5 @@
 "use client";
-
+import CustomTitle from '@/components/CustomTitle';
 import { EnhancedSidebar } from "@/components/enhanced-sidebar";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,7 @@ export function FooterManagementPage() {
   const [footerData, setFooterData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const fetchFooterData = async () => {
@@ -240,27 +241,30 @@ export function FooterManagementPage() {
     });
   };
 
-  const saveChanges = async () => {
-    try {
-      const response = await axiosInstance.put(
-        "https://taearif.com/api/content/footer",
-        footerData,
-      );
+const saveChanges = async () => {
+  setIsSaving(true); // تعيين isSaving إلى true عند البدء
+  try {
+    const response = await axiosInstance.put(
+      "https://taearif.com/api/content/footer",
+      footerData,
+    );
 
-      if (response.data.status === "success") {
-        toast({
-          title: "تم الحفظ بنجاح",
-          description: "تم حفظ التغييرات بنجاح",
-        });
-      }
-    } catch (err) {
+    if (response.data.status === "success") {
       toast({
-        variant: "destructive",
-        title: "خطأ",
-        description: "فشل في حفظ التغييرات",
+        title: "تم الحفظ بنجاح",
+        description: "تم حفظ التغييرات بنجاح",
       });
     }
-  };
+  } catch (err) {
+    toast({
+      variant: "destructive",
+      title: "خطأ",
+      description: "فشل في حفظ التغييرات",
+    });
+  } finally {
+    setIsSaving(false); // إعادة isSaving إلى false بعد الانتهاء
+  }
+};
 
   if (isLoading) {
     return (
@@ -302,6 +306,7 @@ export function FooterManagementPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
+          <CustomTitle title="تذييل الصفحة" />
       <DashboardHeader />
       <div className="flex flex-1">
         <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
@@ -325,10 +330,19 @@ export function FooterManagementPage() {
                   تخصيص تذييل موقعك ومعلومات الاتصال
                 </p>
               </div>
-              <Button onClick={saveChanges}>
-                <Save className="ml-2 h-4 w-4" />
-                حفظ التغييرات
-              </Button>
+              <Button onClick={saveChanges} disabled={isSaving}>
+  {isSaving ? (
+    <>
+      <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+      جاري الحفظ
+    </>
+  ) : (
+    <>
+      <Save className="ml-2 h-4 w-4" />
+      حفظ التغييرات
+    </>
+  )}
+</Button>
             </div>
           </div>
 

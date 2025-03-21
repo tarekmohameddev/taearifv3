@@ -74,6 +74,7 @@ export function RegisterPage() {
     subdomain: "",
     password: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -199,13 +200,13 @@ export function RegisterPage() {
   };
 
   // Handle previous step
-  const handlePrevStep = () => {
-    setCurrentStep((prev) => prev - 1);
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
+    // منع إرسال الطلب مرة أخرى أثناء المعالجة
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     // التحقق من صحة الحقول
     const newErrors: Errors = {
       email: validateEmail(formData.email),
@@ -214,9 +215,9 @@ export function RegisterPage() {
       password: validatePassword(formData.password),
     };
     setErrors(newErrors);
-  
+
     const hasErrors = Object.values(newErrors).some((error) => error !== "");
-  
+
     if (!hasErrors) {
       try {
         const link = "https://taearif.com/api/register";
@@ -226,21 +227,21 @@ export function RegisterPage() {
           phone: formData.phone,
           username: formData.subdomain,
         };
-  
+
         console.log("🚀 Sending registration request...");
-  
+
         const response = await axios.post(link, payload, {
           headers: { "Content-Type": "application/json" },
         });
-  
+
         if (response.status < 200 || response.status >= 300) {
           throw new Error(response.data.message || "فشل تسجيل الدخول");
         }
-  
+
         console.log("✅ Registration response:", response.data);
-  
+
         const { user, token: UserToken } = response.data;
-  
+
         // إرسال بيانات المستخدم والتوكن إلى /api/user/setAuth
         const setAuthResponse = await fetch("/api/user/setAuth", {
           method: "POST",
@@ -249,7 +250,7 @@ export function RegisterPage() {
           },
           body: JSON.stringify({ user, UserToken }),
         });
-  
+
         if (!setAuthResponse.ok) {
           const errorData = await setAuthResponse.json().catch(() => ({}));
           const errorMsg = errorData.error || "فشل في تعيين التوكن";
@@ -260,20 +261,20 @@ export function RegisterPage() {
           }));
           return;
         }
-  
-        console.log("✅ Auth token set successfully");
-  
-        setFormSubmitted(true);
-        setTimeout(()=>{
 
-          router.push("/");
-        },200)
-  
+        console.log("✅ Auth token set successfully");
+        if (setAuthResponse.ok) {
+          setFormSubmitted(true);
+          setTimeout(() => {
+            router.push("/");
+          }, 2000);
+        }
+
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const errorMessage = error.response?.data?.message || error.message;
           console.error("❌ Axios error:", errorMessage);
-  
+
           // تحقق مما إذا كانت الرسالة تتعلق بالبريد الإلكتروني
           if (errorMessage.includes("The email has already been taken")) {
             setErrors((prevErrors) => ({
@@ -289,8 +290,17 @@ export function RegisterPage() {
         } else {
           console.error("❌ Unexpected error:", error);
         }
+      } finally {
+        setIsSubmitting(false);
       }
+    } else {
+      setIsSubmitting(false);
     }
+  };
+  
+  // Handle previous step
+  const handlePrevStep = () => {
+    setCurrentStep((prev) => prev - 1);
   };
   
 

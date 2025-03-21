@@ -30,14 +30,17 @@ const useAuthStore = create((set, get) => ({
 
       const userData = await userInfoResponse.json();
       set({ UserIslogged: true, userData });
-    } catch (error) {
+    set({ IsDone: false, error: null });
+  } catch (error) {
       set({
         error: error.message || "خطأ في جلب بيانات المستخدم",
         UserIslogged: false,
       });
-    } finally {
+    set({ IsDone: false, error: null });
+  } finally {
       set({ IsLoading: false });
-    }
+    set({ IsDone: false, error: null });
+  }
   },
 
   // ! --------------login
