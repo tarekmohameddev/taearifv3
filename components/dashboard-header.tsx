@@ -213,57 +213,35 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
         </Link>
 
         <div className="hidden md:flex items-center gap-1 mr-6">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/">لوحة التحكم</Link>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>الذهاب إلى لوحة التحكم</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/editor">المحرر</Link>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>تعديل تصميم موقعك</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/content">المحتوى</Link>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>إدارة محتوى موقعك</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+        <TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button variant="ghost" size="sm" asChild>
+        <Link href="https://taearif.com/blog">عن تعاريف</Link>
+      </Button>
+    </TooltipTrigger>
+    <TooltipContent>
+      <p>محتوى دقيق، واضح، جذاب</p>
+    </TooltipContent>
+  </Tooltip>
+</TooltipProvider>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/settings">الإعدادات</Link>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>تكوين إعدادات موقعك</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+<TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button variant="ghost" size="sm" asChild>
+        <Link href="https://taearif.com/about">المدونة</Link>
+      </Button>
+    </TooltipTrigger>
+    <TooltipContent>
+      <p>مقالات ملهمة، تقنية، مبتكرة</p>
+    </TooltipContent>
+  </Tooltip>
+</TooltipProvider>
+
+
         </div>
 
         {children}
