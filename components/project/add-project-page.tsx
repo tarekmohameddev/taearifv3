@@ -75,6 +75,7 @@ export default function AddProjectPage(): JSX.Element {
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const plansInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [newProject, setNewProject] = useState({
     id: "",
     name: "",
@@ -275,6 +276,9 @@ export default function AddProjectPage(): JSX.Element {
     if (!thumbnailImage) {
       errors.thumbnail = "صورة المشروع الرئيسية مطلوبة";
     }
+    if (!newProject.location.trim()) {
+      errors.units = "عدد الوحدات مطلوبة";
+    }
     if (isNaN(newProject.latitude) || isNaN(newProject.longitude)) {
       errors.coordinates = "إحداثيات الموقع غير صحيحة";
     }
@@ -286,8 +290,11 @@ export default function AddProjectPage(): JSX.Element {
     status: "منشور" | "مسودة" | "Pre-construction",
   ) => {
     if (!validateForm()) {
+      setSubmitError("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
+
       return;
     }
+    setSubmitError(null); // إعادة تعيين رسالة الخطأ عند كل محاولة
     setIsLoading(true);
     try {
       // رفع الصورة الرئيسية (featured_image)
@@ -437,6 +444,7 @@ export default function AddProjectPage(): JSX.Element {
 
       router.push("/projects");
     } catch (error: any) {
+      setSubmitError("حدث خطأ أثناء حفظ العقار. يرجى المحاولة مرة أخرى.");
       console.error("Error saving project:", error);
     } finally {
       setIsLoading(false);
@@ -466,20 +474,25 @@ export default function AddProjectPage(): JSX.Element {
                   إضافة مشروع جديد
                 </h1>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => handleSaveProject("مسودة")}
-                  disabled={isLoading}
-                >
-                  حفظ كمسودة
-                </Button>
-                <Button
-                  onClick={() => handleSaveProject("منشور")}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "جاري الحفظ..." : "نشر المشروع"}
-                </Button>
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSaveProject("مسودة")}
+                    disabled={isLoading}
+                  >
+                    حفظ كمسودة
+                  </Button>
+                  <Button
+                    onClick={() => handleSaveProject("منشور")}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "جاري الحفظ..." : "نشر المشروع"}
+                  </Button>
+                </div>
+                {submitError && (
+                  <div className="text-red-500 text-sm mt-2">{submitError}</div>
+                )}
               </div>
             </div>
 
@@ -545,27 +558,29 @@ export default function AddProjectPage(): JSX.Element {
                     />
                   </div>
                   <div className="grid gap-2">
-  <Label htmlFor="status">الحالة</Label>
-  <Select
-    onValueChange={(value) => handleSelectChange("status", value)}
-  >
-    <SelectTrigger
-      id="status"
-      className={formErrors.status ? "border-red-500" : ""}
-    >
-      <SelectValue placeholder="اختر الحالة" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="قيد الإنشاء">قيد الإنشاء</SelectItem>
-      <SelectItem value="منتهي">منتهي</SelectItem>
-    </SelectContent>
-  </Select>
-  {formErrors.status && (
-    <p className="text-xs text-red-500">
-      {formErrors.status}
-    </p>
-  )}
-</div>
+                    <Label htmlFor="status">الحالة</Label>
+                    <Select
+                      onValueChange={(value) =>
+                        handleSelectChange("status", value)
+                      }
+                    >
+                      <SelectTrigger
+                        id="status"
+                        className={formErrors.status ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder="اختر الحالة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="قيد الإنشاء">قيد الإنشاء</SelectItem>
+                        <SelectItem value="منتهي">منتهي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {formErrors.status && (
+                      <p className="text-xs text-red-500">
+                        {formErrors.status}
+                      </p>
+                    )}
+                  </div>
                   <div className="grid gap-2">
                     <Label htmlFor="completionDate">تاريخ الإنجاز</Label>
                     <Input
@@ -894,20 +909,27 @@ export default function AddProjectPage(): JSX.Element {
                 >
                   إلغاء
                 </Button>
+                <div className="flex flex-col items-end gap-2">
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleSaveProject("مسودة")}
-                    disabled={isLoading}
-                  >
-                    حفظ كمسودة
-                  </Button>
-                  <Button
-                    onClick={() => handleSaveProject("منشور")}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "جاري الحفظ..." : "نشر المشروع"}
-                  </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleSaveProject("مسودة")}
+                      disabled={isLoading}
+                    >
+                      حفظ كمسودة
+                    </Button>
+                    <Button
+                      onClick={() => handleSaveProject("منشور")}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "جاري الحفظ..." : "نشر المشروع"}
+                    </Button>
+                  </div>
+                  {submitError && (
+                    <div className="text-red-500 text-sm mt-2">
+                      {submitError}
+                    </div>
+                  )}
                 </div>
               </CardFooter>
             </Card>

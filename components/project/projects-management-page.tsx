@@ -128,7 +128,7 @@ export function ProjectsManagementPage() {
       console.error("حدث خطأ أثناء الحذف:", error);
     }
   };
-  
+
   // جلب البيانات عند التحميل الأولي
   useEffect(() => {
     if (!isInitialized) {
@@ -266,7 +266,7 @@ export function ProjectsManagementPage() {
 
 function ProjectCard({ project }: { project: IProject }) {
   const router = useRouter();
-    const handleDelete = async (id) => {
+  const handleDelete = async (id) => {
     try {
       const response = await axiosInstance.delete(`/projects/${id}`);
       console.log("تم حذف المشروع بنجاح");
@@ -343,7 +343,10 @@ function ProjectCard({ project }: { project: IProject }) {
                   إلغاء النشر
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem className="text-destructive focus:text-destructive"       onClick={() => handleDelete(project.id)}>
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onClick={() => handleDelete(project.id)}
+              >
                 <Trash2 className="mr-2 h-4 w-4" />
                 حذف
               </DropdownMenuItem>
@@ -454,7 +457,11 @@ function ProjectListItem({ project }: { project: IProject }) {
               <span>{project.developer}</span>
             </div>
             <div className="ml-auto flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => router.push("/projects/" + project.id + "/edit")}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push("/projects/" + project.id + "/edit")}
+              >
                 <Edit className="mr-1 h-3.5 w-3.5" />
                 تعديل
               </Button>
@@ -484,13 +491,13 @@ function ProjectListItem({ project }: { project: IProject }) {
                       إلغاء النشر
                     </DropdownMenuItem>
                   )}
-    <DropdownMenuItem
-      className="text-destructive focus:text-destructive"
-      onClick={() => handleDelete(project.id)}
-    >
-      <Trash2 className="mr-2 h-4 w-4" />
-      حذف
-    </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onClick={() => handleDelete(project.id)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    حذف
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

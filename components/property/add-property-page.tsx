@@ -230,7 +230,8 @@ export default function AddPropertyPage() {
     if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
     if (!formData.price) newErrors.price = "السعر مطلوب";
     if (!formData.type) newErrors.type = "نوع العقار مطلوب";
-    if (!formData.transactionType) newErrors.transactionType = "نوع القائمة مطلوب";
+    if (!formData.transactionType)
+      newErrors.transactionType = "نوع القائمة مطلوب";
     if (!formData.bedrooms) newErrors.bedrooms = "عدد غرف النوم مطلوب";
     if (!formData.bathrooms) newErrors.bathrooms = "عدد الحمامات مطلوب";
     if (!formData.size) newErrors.size = "مساحة العقار مطلوبة";
@@ -243,7 +244,7 @@ export default function AddPropertyPage() {
 
   const handleSubmit = async (publish: boolean) => {
     setSubmitError(null); // إعادة تعيين رسالة الخطأ عند كل محاولة
-  
+
     if (validateForm()) {
       setIsLoading(true);
       setUploading(true);
@@ -251,30 +252,39 @@ export default function AddPropertyPage() {
         title: "جاري حفظ العقار",
         description: "يرجى الانتظار...",
       });
-  
+
       try {
         let thumbnailUrl: string | null = null;
         let galleryUrls: string[] = [];
         let floorPlansUrls: string[] = [];
-  
+
         // رفع الصورة الرئيسية
         if (images.thumbnail) {
-          const uploadedFile = await uploadSingleFile(images.thumbnail, "property");
+          const uploadedFile = await uploadSingleFile(
+            images.thumbnail,
+            "property",
+          );
           thumbnailUrl = uploadedFile.url;
         }
-  
+
         // رفع صور المعرض
         if (images.gallery.length > 0) {
-          const uploadedFiles = await uploadMultipleFiles(images.gallery, "property");
+          const uploadedFiles = await uploadMultipleFiles(
+            images.gallery,
+            "property",
+          );
           galleryUrls = uploadedFiles.map((f) => f.url);
         }
-  
+
         // رفع مخططات الطوابق
         if (images.floorPlans.length > 0) {
-          const uploadedFiles = await uploadMultipleFiles(images.floorPlans, "property");
+          const uploadedFiles = await uploadMultipleFiles(
+            images.floorPlans,
+            "property",
+          );
           floorPlansUrls = uploadedFiles.map((f) => f.url);
         }
-  
+
         // إعداد بيانات العقار
         const propertyData = {
           title: formData.title,
@@ -298,18 +308,18 @@ export default function AddPropertyPage() {
           city_id: 1,
           category_id: 1,
         };
-  
+
         // إرسال بيانات العقار إلى الـ API
         let response = await axiosInstance.post(
           "https://taearif.com/api/properties",
-          propertyData
+          propertyData,
         );
-  
+
         toast({
           title: publish ? "تم نشر العقار بنجاح" : "تم حفظ العقار كمسودة",
           description: "تمت معالجة العقار بنجاح.",
         });
-  
+
         const currentState = useStore.getState();
         const createdProject = response.data.data.property;
         createdProject.status = createdProject.status === 1 ? "منشور" : "مسودة";
@@ -320,7 +330,7 @@ export default function AddPropertyPage() {
         setPropertiesManagement({
           properties: updatedProperties,
         });
-  
+
         router.push("/properties");
       } catch (error) {
         console.error("Error submitting property:", error);
@@ -341,26 +351,36 @@ export default function AddPropertyPage() {
         <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
-          <div className="flex items-center justify-between">
-  <div className="flex items-center gap-2">
-    <Button variant="outline" size="icon" onClick={() => router.push("/properties")}>
-      <ChevronLeft className="h-4 w-4" />
-    </Button>
-    <h1 className="text-2xl font-bold tracking-tight">إضافة عقار جديد</h1>
-  </div>
-  <div className="flex flex-col items-end gap-2">
-    <div className="flex gap-2">
-      <Button variant="outline" onClick={() => handleSubmit(false)}>حفظ كمسودة</Button>
-      <Button onClick={() => handleSubmit(true)} disabled={isLoading}>
-        {isLoading ? "جاري الحفظ..." : "نشر العقار"}
-      </Button>
-    </div>
-    {submitError && (
-      <div className="text-red-500 text-sm mt-2">{submitError}</div>
-    )}
-  </div>
-</div>
-            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => router.push("/properties")}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <h1 className="text-2xl font-bold tracking-tight">
+                  إضافة عقار جديد
+                </h1>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => handleSubmit(false)}>
+                    حفظ كمسودة
+                  </Button>
+                  <Button
+                    onClick={() => handleSubmit(true)}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "جاري الحفظ..." : "نشر العقار"}
+                  </Button>
+                </div>
+                {submitError && (
+                  <div className="text-red-500 text-sm mt-2">{submitError}</div>
+                )}
+              </div>
+            </div>
 
             <div className="grid gap-6 md:grid-cols-2">
               <Card>
@@ -443,7 +463,9 @@ export default function AddPropertyPage() {
                       >
                         <SelectTrigger
                           id="transactionType"
-                          className={errors.transactionType ? "border-red-500" : ""}
+                          className={
+                            errors.transactionType ? "border-red-500" : ""
+                          }
                         >
                           <SelectValue placeholder="اختر النوع" />
                         </SelectTrigger>
@@ -875,41 +897,40 @@ export default function AddPropertyPage() {
 
               {/* Final Card with Submit Buttons */}
               <Card className="md:col-span-2">
-  <CardFooter className="flex flex-col items-end border-t p-6 space-y-4">
-    <div className="w-full">
-      <div className="flex justify-between w-full">
-        <Button
-          variant="outline"
-          onClick={() => router.push("/properties")}
-        >
-          إلغاء
-        </Button>
-  <div className="flex flex-col items-end gap-2">
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => handleSubmit(false)}
-          >
-            حفظ كمسودة
-          </Button>
-          <Button
-            onClick={() => handleSubmit(true)}
-            disabled={isLoading}
-          >
-            {isLoading ? "جاري الحفظ..." : "نشر العقار"}
-          </Button>
-        </div>
-        {submitError && (
-      <div className="text-red-500 text-sm mt-2">{submitError}</div>
-    )}
-        </div>
-      </div>
-    </div>
-  </CardFooter>
-</Card>
-
-
-
+                <CardFooter className="flex flex-col items-end border-t p-6 space-y-4">
+                  <div className="w-full">
+                    <div className="flex justify-between w-full">
+                      <Button
+                        variant="outline"
+                        onClick={() => router.push("/properties")}
+                      >
+                        إلغاء
+                      </Button>
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => handleSubmit(false)}
+                          >
+                            حفظ كمسودة
+                          </Button>
+                          <Button
+                            onClick={() => handleSubmit(true)}
+                            disabled={isLoading}
+                          >
+                            {isLoading ? "جاري الحفظ..." : "نشر العقار"}
+                          </Button>
+                        </div>
+                        {submitError && (
+                          <div className="text-red-500 text-sm mt-2">
+                            {submitError}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardFooter>
+              </Card>
             </div>
           </div>
         </main>

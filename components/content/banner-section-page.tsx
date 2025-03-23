@@ -53,7 +53,9 @@ export function BannerSectionPage() {
   const [bannerType, setBannerType] = useState("static");
   const [bannerData, setBannerData] = useState<BannerSettings | null>(null);
   const staticFileInputRef = useRef(null);
-  const [staticBannerImage, setStaticBannerImage] = useState<string | null>(null);
+  const [staticBannerImage, setStaticBannerImage] = useState<string | null>(
+    null,
+  );
   const [staticBannerFile, setStaticBannerFile] = useState<File | null>(null); // حالة جديدة للملف
   const [sliders, setSliders] = useState<
     Array<{
@@ -77,7 +79,7 @@ export function BannerSectionPage() {
         setBannerData(data);
         setBannerType(data.banner_type);
         setStaticBannerImage(data.static?.image || null); // تعيين الصورة الثابتة
-  
+
         if (data.slider?.slides) {
           const formattedSlides = data.slider.slides.map((slide) => ({
             id: slide.id,
@@ -100,29 +102,27 @@ export function BannerSectionPage() {
         });
       }
     };
-  
+
     fetchBannerData();
   }, []);
-
-
-
-
-
 
   const handleSave = async () => {
     setIsLoading(true);
     try {
       // تحديد URL الافتراضي للبanner الثابت
-      let staticImageUrl = bannerData?.static?.image || '';
-  
+      let staticImageUrl = bannerData?.static?.image || "";
+
       // رفع صورة البanner الثابت إذا كانت موجودة
       if (bannerType === "static" && staticBannerFile) {
-        const uploadResult = await uploadSingleFile(staticBannerFile, "content");
+        const uploadResult = await uploadSingleFile(
+          staticBannerFile,
+          "content",
+        );
         staticImageUrl = uploadResult.url; // استرداد الـ URL من استجابة الرفع
       } else if (bannerType === "static" && staticBannerImage === null) {
         staticImageUrl = ""; // إذا تم حذف الصورة
       }
-  
+
       // رفع صور الشرائح إذا كانت موجودة
       const updatedSlides = await Promise.all(
         sliders.map(async (slide) => {
@@ -133,9 +133,9 @@ export function BannerSectionPage() {
             return { ...slide, image: "" }; // إذا تم حذف الصورة
           }
           return slide; // الاحتفاظ بالـ URL الموجود إذا لم يكن هناك ملف جديد
-        })
+        }),
       );
-  
+
       // إعداد formData بالقيم المحدثة
       const formData = {
         banner_type: bannerType,
@@ -150,7 +150,8 @@ export function BannerSectionPage() {
           buttonUrl: bannerData?.static?.buttonUrl || "",
           buttonStyle: bannerData?.static?.buttonStyle || "primary",
           textAlignment: bannerData?.static?.textAlignment || "center",
-          overlayColor: bannerData?.static?.overlayColor || "rgba(0, 0, 0, 0.5)",
+          overlayColor:
+            bannerData?.static?.overlayColor || "rgba(0, 0, 0, 0.5)",
           textColor: bannerData?.static?.textColor || "#ffffff",
         },
         slider: {
@@ -173,7 +174,8 @@ export function BannerSectionPage() {
           showArrows: bannerData?.slider?.showArrows || false,
           showDots: bannerData?.slider?.showDots || false,
           animation: bannerData?.slider?.animation || "fade",
-          overlayColor: bannerData?.slider?.overlayColor || "rgba(0, 0, 0, 0.6)",
+          overlayColor:
+            bannerData?.slider?.overlayColor || "rgba(0, 0, 0, 0.6)",
           textColor: bannerData?.slider?.textColor || "#ffffff",
         },
         common: {
@@ -184,7 +186,7 @@ export function BannerSectionPage() {
           fullWidth: true,
         },
       };
-  
+
       // إرسال البيانات إلى API
       await axiosInstance.post("/content/banner", formData);
       toast({
@@ -204,7 +206,9 @@ export function BannerSectionPage() {
 
   const addNewSlide = () => {
     const newId =
-      sliders.length > 0 ? String(Math.max(...sliders.map((s) => Number(s.id))) + 1) : "1";
+      sliders.length > 0
+        ? String(Math.max(...sliders.map((s) => Number(s.id))) + 1)
+        : "1";
     setSliders([
       ...sliders,
       {
@@ -250,9 +254,13 @@ export function BannerSectionPage() {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setSliders(sliders.map(slide =>
-          slide.id === id ? { ...slide, image: e.target.result, file } : slide
-        ));
+        setSliders(
+          sliders.map((slide) =>
+            slide.id === id
+              ? { ...slide, image: e.target.result, file }
+              : slide,
+          ),
+        );
       };
       reader.readAsDataURL(file);
     }
@@ -267,9 +275,11 @@ export function BannerSectionPage() {
   };
 
   const removeSlideImage = (id) => {
-    setSliders(sliders.map(slide =>
-      slide.id === id ? { ...slide, image: null, file: null } : slide
-    ));
+    setSliders(
+      sliders.map((slide) =>
+        slide.id === id ? { ...slide, image: null, file: null } : slide,
+      ),
+    );
     const fileInput = document.getElementById(`slide-image-input-${id}`);
     if (fileInput) {
       fileInput.value = "";
@@ -464,15 +474,15 @@ export function BannerSectionPage() {
                     <Switch
                       id="show-cta"
                       checked={bannerData?.static?.showButton || false}
-                      onCheckedChange={(checked) =>{
-                        console.log(checked)
+                      onCheckedChange={(checked) => {
+                        console.log(checked);
                         setBannerData((prev) => ({
                           ...prev!,
                           static: {
                             ...prev!.static,
                             showButton: checked,
-                          }
-                          }))
+                          },
+                        }));
                       }}
                     />
                   </div>
@@ -661,10 +671,9 @@ export function BannerSectionPage() {
                             <Switch
                               id={`slide-show-button-${slide.id}`}
                               checked={slide.hasButton}
-                              onCheckedChange={(checked) =>{
-
-                                updateSlide(slide.id, "hasButton", checked)}
-                              }
+                              onCheckedChange={(checked) => {
+                                updateSlide(slide.id, "hasButton", checked);
+                              }}
                             />
                           </div>
                           {slide.hasButton && (
@@ -728,15 +737,15 @@ export function BannerSectionPage() {
                       <Switch
                         id="auto-play"
                         checked={bannerData?.slider?.autoplay || false}
-                        onCheckedChange={(checked) =>{
+                        onCheckedChange={(checked) => {
                           setBannerData((prev) => ({
                             ...prev!,
                             slider: {
                               ...prev!.slider,
                               autoplay: checked,
                             },
-                          }))}
-                        }
+                          }));
+                        }}
                       />
                     </div>
                     <div>

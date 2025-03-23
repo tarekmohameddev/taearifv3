@@ -67,7 +67,7 @@ export default function EditPropertyPage() {
     transactionType: "",
     bedrooms: "",
     bathrooms: "",
-    size: "",
+    area: "",
     features: "",
     status: "draft",
     featured: false,
@@ -94,7 +94,7 @@ export default function EditPropertyPage() {
     floorPlans: [],
   });
   const [uploading, setUploading] = useState(false);
-
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const floorPlansInputRef = useRef<HTMLInputElement>(null);
@@ -114,7 +114,7 @@ export default function EditPropertyPage() {
           transactionType: property.transactionType || "",
           bedrooms: property.beds?.toString() || "",
           bathrooms: property.bath?.toString() || "",
-          size: property.size?.toString() || "",
+          area: property.area?.toString() || "",
           features: property.features?.join(", ") || "",
           status: property.status === 1 ? "published" : "draft",
           featured: property.featured || false,
@@ -130,7 +130,8 @@ export default function EditPropertyPage() {
         console.error("Error fetching property:", error);
         toast({
           title: "خطأ في جلب بيانات العقار",
-          description: "حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى.",
+          description:
+            "حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى.",
           variant: "destructive",
         });
       }
@@ -267,10 +268,11 @@ export default function EditPropertyPage() {
     if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
     if (!formData.price) newErrors.price = "السعر مطلوب";
     if (!formData.type) newErrors.type = "نوع العقار مطلوب";
-    if (!formData.transactionType) newErrors.transactionType = "نوع القائمة مطلوب";
+    if (!formData.transactionType)
+      newErrors.transactionType = "نوع القائمة مطلوب";
     if (!formData.bedrooms) newErrors.bedrooms = "عدد غرف النوم مطلوب";
     if (!formData.bathrooms) newErrors.bathrooms = "عدد الحمامات مطلوب";
-    if (!formData.size) newErrors.size = "مساحة العقار مطلوبة";
+    if (!formData.area) newErrors.area = "مساحة العقار مطلوبة";
     if (!images.thumbnail)
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
 
@@ -280,6 +282,7 @@ export default function EditPropertyPage() {
 
   const handleSubmit = async (publish: boolean) => {
     if (validateForm()) {
+      setSubmitError(null); // إعادة تعيين رسالة الخطأ عند كل محاولة
       setIsLoading(true);
       setUploading(true);
       toast({
@@ -323,42 +326,50 @@ export default function EditPropertyPage() {
           type: formData.type,
           beds: parseInt(formData.bedrooms),
           bath: parseInt(formData.bathrooms),
-          size: parseInt(formData.size),
+          area: parseInt(formData.area),
           features: formData.features.split(",").map((f) => f.trim()),
           status: publish ? 1 : 0,
           featured_image: thumbnailUrl || previews.thumbnail,
-          floor_planning_image: floorPlansUrls.length > 0 ? floorPlansUrls : previews.floorPlans,
+          floor_planning_image:
+            floorPlansUrls.length > 0 ? floorPlansUrls : previews.floorPlans,
           gallery: galleryUrls.length > 0 ? galleryUrls : previews.gallery,
           description: formData.description,
           latitude: formData.latitude,
           longitude: formData.longitude,
           featured: formData.featured,
-          area: parseInt(formData.size),
           city_id: 1,
           category_id: 1,
         };
 
         // تعديل العقار باستخدام PUT بدلاً من POST
-        const response = await axiosInstance.post(`/properties/${id}`, propertyData);
+        const response = await axiosInstance.post(
+          `/properties/${id}`,
+          propertyData,
+        );
 
         toast({
-          title: publish ? "تم تحديث ونشر العقار بنجاح" : "تم حفظ التغييرات كمسودة",
+          title: publish
+            ? "تم تحديث ونشر العقار بنجاح"
+            : "تم حفظ التغييرات كمسودة",
           description: "تمت معالجة التغييرات بنجاح.",
         });
         setIsLoading(false);
 
         const currentState = useStore.getState();
         const updatedProperty = response.data.data.property;
-        updatedProperty.status = updatedProperty.status === 1 ? "منشور" : "مسودة";
-        const updatedProperties = currentState.propertiesManagement.properties.map((prop) =>
-          prop.id === updatedProperty.id ? updatedProperty : prop
-        );
+        updatedProperty.status =
+          updatedProperty.status === 1 ? "منشور" : "مسودة";
+        const updatedProperties =
+          currentState.propertiesManagement.properties.map((prop) =>
+            prop.id === updatedProperty.id ? updatedProperty : prop,
+          );
         setPropertiesManagement({
           properties: updatedProperties,
         });
 
         router.push("/properties");
       } catch (error) {
+        setSubmitError("حدث خطأ أثناء حفظ العقار. يرجى المحاولة مرة أخرى.");
         console.error("Error updating property:", error);
         setIsLoading(false);
         toast({
@@ -371,6 +382,7 @@ export default function EditPropertyPage() {
         setIsLoading(false);
       }
     } else {
+      setSubmitError("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
       toast({
         title: "خطأ في النموذج",
         description: "يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.",
@@ -399,13 +411,18 @@ export default function EditPropertyPage() {
                   تعديل العقار
                 </h1>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => handleSubmit(false)}>
-                  حفظ التغييرات كمسودة
-                </Button>
-                <Button onClick={() => handleSubmit(true)}>
-                  حفظ ونشر التغييرات
-                </Button>
+              <div className="flex gap-2 flex-col">
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => handleSubmit(false)}>
+                    حفظ التغييرات كمسودة
+                  </Button>
+                  <Button onClick={() => handleSubmit(true)}>
+                    حفظ ونشر التغييرات
+                  </Button>
+                </div>
+                {submitError && (
+                  <div className="text-red-500 text-sm mt-2">{submitError}</div>
+                )}
               </div>
             </div>
 
@@ -490,7 +507,9 @@ export default function EditPropertyPage() {
                       >
                         <SelectTrigger
                           id="transactionType"
-                          className={errors.transactionType ? "border-red-500" : ""}
+                          className={
+                            errors.transactionType ? "border-red-500" : ""
+                          }
                         >
                           <SelectValue placeholder="اختر النوع" />
                         </SelectTrigger>
@@ -617,11 +636,11 @@ export default function EditPropertyPage() {
                         name="size"
                         type="number"
                         placeholder="1200"
-                        value={formData.aria}
+                        value={formData.area}
                         onChange={handleInputChange}
-                        className={errors.size ? "border-red-500" : ""}
+                        className={errors.area ? "border-red-500" : ""}
                       />
-                      {errors.size && (
+                      {errors.area && (
                         <p className="text-sm text-red-500">{errors.size}</p>
                       )}
                     </div>
@@ -924,19 +943,26 @@ export default function EditPropertyPage() {
                   >
                     إلغاء
                   </Button>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => handleSubmit(false)}
-                    >
-                      حفظ التغييرات كمسودة
-                    </Button>
-                    <Button
-                      onClick={() => handleSubmit(true)}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "جاري الحفظ..." : "حفظ ونشر التغييرات"}
-                    </Button>
+                  <div className="flex gap-2 flex-col">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleSubmit(false)}
+                      >
+                        حفظ التغييرات كمسودة
+                      </Button>
+                      <Button
+                        onClick={() => handleSubmit(true)}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "جاري الحفظ..." : "حفظ ونشر التغييرات"}
+                      </Button>
+                    </div>
+                    {submitError && (
+                      <div className="text-red-500 text-sm mt-2">
+                        {submitError}
+                      </div>
+                    )}
                   </div>
                 </CardFooter>
               </Card>

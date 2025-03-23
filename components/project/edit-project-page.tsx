@@ -36,7 +36,9 @@ import { DashboardHeader } from "@/components/dashboard-header";
 import { EnhancedSidebar } from "@/components/enhanced-sidebar";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
-import useStore from "@/context/Store"; // أضف هذا الاستيراد
+import useStore from "@/context/Store"; 
+import { uploadSingleFile } from "@/utils/uploadSingle";
+import { uploadMultipleFiles } from "@/utils/uploadMultiple";
 
 // Dynamically import the Map component to avoid SSR issues
 const MapComponent = dynamic(() => import("@/components/map-component"), {
@@ -78,7 +80,7 @@ export default function AddProjectPage(): JSX.Element {
   const router = useRouter();
   const { id } = useParams();
   const [originalData, setOriginalData] = useState(null); // لحفظ النسخة الأصلية من البيانات
-  const [amenitiesNAMES, setAmenitiesNAMES] = useState(""); // لحفظ النسخة الأصلية من البيانات
+  let [amenitiesNAMES, setAmenitiesNAMES] = useState(""); // لحفظ النسخة الأصلية من البيانات
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const plansInputRef = useRef<HTMLInputElement>(null);
@@ -100,7 +102,7 @@ export default function AddProjectPage(): JSX.Element {
     minPrice: "", // إضافة الحد الأدنى للسعر
     maxPrice: "", // إضافة الحد الأقصى للسعر
   });
-
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(
     null,
   );
@@ -374,17 +376,22 @@ export default function AddProjectPage(): JSX.Element {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
+  // ! handle update
   const handleUpdateProject = async (
     status: "منشور" | "مسودة" | "Pre-construction",
   ) => {
-    if (!validateForm()) return;
+    if (!validateForm())
+      return setSubmitError("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
     setIsLoading(true);
-
+    setSubmitError(null); // إعادة تعيين رسالة الخطأ عند كل محاولة
+console.log(`1111111111111111111111111111111111111`)
     try {
+console.log(`22222222222222222222222222222222`)
       // تحويل حقل السعر إلى قيم min و max
       // مثال: إذا كان المستخدم يُدخل "50000-200000" أو قيمة واحدة
       let minPrice = 0;
       let maxPrice = 0;
+console.log(`3333333333333333333333333333333`)
       if (newProject.price.includes("-")) {
         const [min, max] = newProject.price
           .split("-")
@@ -395,20 +402,78 @@ export default function AddProjectPage(): JSX.Element {
         minPrice = parseFloat(newProject.price) || 0;
         maxPrice = minPrice;
       }
+console.log(`44444444444444444444444444444444444`)
       const formattedDate = new Date(newProject.completion_date)
         .toISOString()
         .split("T")[0];
 
-      console.log("newProject.amenities", newProject.amenities);
+        console.log(`5555555555555555555555555`)
+
+
+
+// في دالة handleUpdateProject:
+let featuredImageUrl = "";
+if (thumbnailImage) {
+  console.log("thumbnailImage",thumbnailImage)
+  // تحقق من أن الرابط لا يبدأ بـ "https://taearif.com/"
+  if (!thumbnailImage.url.startsWith("https://taearif.com/")) {
+    const uploadResult = await uploadSingleFile(
+      thumbnailImage.file, // استخدم ملف الصورة الفعلي
+      "project",
+    );
+    featuredImageUrl = uploadResult.url;
+  } else {
+    // إذا كان الرابط موجودًا مسبقًا على السيرفر، استخدمه مباشرة
+    featuredImageUrl = thumbnailImage.url;
+  }
+}
+
+    // رفع صور المخططات (floorplan_images)
+    let floorplanUrls = [];
+    if (planImages.length > 0) {
+      const files = planImages.map((image) => image.file);
+      const uploadResults = await uploadMultipleFiles(files, "project");
+
+      // التحقق من صحة الاستجابة
+      if (uploadResults && Array.isArray(uploadResults)) {
+        floorplanUrls = uploadResults.map((file) => file.url);
+        console.log("floorplanUrls", floorplanUrls);
+      } else {
+        console.error("Error: uploadResults is not an array", uploadResults);
+      }
+    }
+
+    let galleryUrls = [];
+    if (galleryImages.length > 0) {
+      const files = galleryImages.map((image) => image.file);
+      const uploadResults = await uploadMultipleFiles(files, "project");
+
+      console.log("uploadResults2", uploadResults); // تحقق من الاستجابة
+
+      if (uploadResults && Array.isArray(uploadResults)) {
+        galleryUrls = uploadResults.map((file) => file.url); // استخراج الروابط
+        console.log("galleryUrls", galleryUrls);
+      } else {
+        console.error(
+          "Error: uploadResults does not contain files array",
+          uploadResults,
+        );
+      }
+    }
+// تحويل إلى مصفوفة سواء كان نصًا أو مصفوفة فارغة
+const amenitiesArray = typeof amenitiesNAMES === 'string' 
+  ? amenitiesNAMES.split(",").map(item => item.trim()) 
+  : [];
 
       const projectData = {
-        featured_image: thumbnailImage ? "thumbnailImage.url" : "",
+        featured_image: thumbnailImage ? thumbnailImage.url : "",
         min_price: minPrice,
         max_price: maxPrice,
         latitude: newProject.latitude,
         longitude: newProject.longitude,
         featured: newProject.featured,
-        complete_status: status === "منشور" ? "In Progress" : status,
+        complete_status: newProject.status === "قيد الإنشاء" ? "in progress" : "completed",
+        status: newProject.status === "قيد الإنشاء" ? "in progress" : "completed",
         units: Number(newProject.units),
         completion_date: formattedDate,
         developer: newProject.developer,
@@ -433,16 +498,8 @@ export default function AddProjectPage(): JSX.Element {
               "شقق فاخرة في دبي بإطلالة على البحر ومرافق متميزة.",
           },
         ],
-        gallery_images: [
-          "https://taearifdev.com/storage/properties/67c826264b928.jpg",
-          "https://taearifdev.com/storage/properties/67c826264b928.jpg",
-          "https://taearifdev.com/storage/properties/67c826264b928.jpg",
-        ],
-        floorplan_images: [
-          "https://taearifdev.com/storage/properties/67c826264b928.jpg",
-          "https://taearifdev.com/storage/properties/67c826264b928.jpg",
-          "https://taearifdev.com/storage/properties/67c826264b928.jpg",
-        ],
+        gallery_images: galleryUrls,
+        floorplan_images: floorplanUrls,
         specifications: [
           { key: "Bedrooms", label: "Number of Bedrooms", value: "3" },
           { key: "Bathrooms", label: "Number of Bathrooms", value: "2" },
@@ -468,27 +525,33 @@ export default function AddProjectPage(): JSX.Element {
             unit: "قدم مربع",
           },
         ],
-        amenities: amenitiesNAMES.split(","),
+        amenities: amenitiesArray,
       };
+      console.log(`77777777777777777777`)
 
       const response = await axiosInstance.post(
         `https://taearif.com/api/projects/${id}`,
         projectData,
       );
 
+console.log(`8888888888888888888888888`)
       const currentState = useStore.getState();
+console.log(`99999999999999999999`)
       const updatedProjects =
-        currentState.homepage.projectsManagement.projects.map((proj) =>
+        currentState.projectsManagement.projects.map((proj) =>
           proj.id === id ? { ...proj, ...response.data.data } : proj,
         );
 
+console.log(`10 10 10 10 10 10 10`)
       setProjectsManagement({
         projects: updatedProjects,
-        pagination: currentState.homepage.projectsManagement.pagination,
+        pagination: currentState.projectsManagement.pagination,
       });
+      console.log(`11 11 11 11 11 11 11 11 11 11 11 11 11 11`)
 
       router.push("/projects");
     } catch (error) {
+      setSubmitError("حدث خطأ أثناء حفظ العقار. يرجى المحاولة مرة أخرى.");
       console.error("Update failed:", error);
     } finally {
       setIsLoading(false);
@@ -532,7 +595,8 @@ export default function AddProjectPage(): JSX.Element {
                   إضافة مشروع جديد
                 </h1>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex gap-2">
                 <Button
                   variant="outline"
                   onClick={() => handleUpdateProject("مسودة")}
@@ -546,6 +610,10 @@ export default function AddProjectPage(): JSX.Element {
                 >
                   {isLoading ? "جاري الحفظ..." : "تعديل المشروع"}
                 </Button>
+              </div>
+              {submitError && (
+                    <div className="text-red-500 text-sm mt-2">{submitError}</div>
+    )}
               </div>
             </div>
 
@@ -611,27 +679,29 @@ export default function AddProjectPage(): JSX.Element {
                     />
                   </div>
                   <div className="grid gap-2">
-  <Label htmlFor="status">الحالة</Label>
-  <Select
-    onValueChange={(value) => handleSelectChange("status", value)}
-  >
-    <SelectTrigger
-      id="status"
-      className={formErrors.status ? "border-red-500" : ""}
-    >
-      <SelectValue placeholder="اختر الحالة" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="قيد الإنشاء">قيد الإنشاء</SelectItem>
-      <SelectItem value="منتهي">منتهي</SelectItem>
-    </SelectContent>
-  </Select>
-  {formErrors.status && (
-    <p className="text-xs text-red-500">
-      {formErrors.status}
-    </p>
-  )}
-</div>
+                    <Label htmlFor="status">الحالة</Label>
+                    <Select
+                      onValueChange={(value) =>
+                        handleSelectChange("status", value)
+                      }
+                    >
+                      <SelectTrigger
+                        id="status"
+                        className={formErrors.status ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder="اختر الحالة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="قيد الإنشاء">قيد الإنشاء</SelectItem>
+                        <SelectItem value="منتهي">منتهي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {formErrors.status && (
+                      <p className="text-xs text-red-500">
+                        {formErrors.status}
+                      </p>
+                    )}
+                  </div>
                   <div className="grid gap-2">
                     <Label htmlFor="completion_date">تاريخ الإنجاز</Label>
                     <Input
@@ -960,20 +1030,27 @@ export default function AddProjectPage(): JSX.Element {
                 >
                   إلغاء
                 </Button>
+                <div className="flex flex-col items-end gap-2">
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleUpdateProject("مسودة")}
-                    disabled={isLoading}
-                  >
-                    حفظ كمسودة
-                  </Button>
-                  <Button
-                    onClick={() => handleUpdateProject("منشور")}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "جاري الحفظ..." : "تعديل المشروع"}
-                  </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleUpdateProject("مسودة")}
+                      disabled={isLoading}
+                    >
+                      حفظ كمسودة
+                    </Button>
+                    <Button
+                      onClick={() => handleUpdateProject("منشور")}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "جاري الحفظ..." : "تعديل المشروع"}
+                    </Button>
+                  </div>
+                  {submitError && (
+                    <div className="text-red-500 text-sm mt-2">
+                      {submitError}
+                    </div>
+                  )}
                 </div>
               </CardFooter>
             </Card>
