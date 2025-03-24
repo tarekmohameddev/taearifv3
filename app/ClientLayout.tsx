@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import useAuthStore from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
+import axiosInstance from "@/lib/axiosInstance";
 
 export default function ClientLayout({
   children,
@@ -14,7 +15,23 @@ export default function ClientLayout({
   const fetchUserData = useAuthStore((state) => state.fetchUserData);
   const UserIslogged = useAuthStore((state) => state.UserIslogged);
   const IsLoading = useAuthStore((state) => state.IsLoading);
+  const onboardingCompleted = useAuthStore((state) => state.onboarding_completed);
+  const userData = useAuthStore((state) => state.userData);
+  const setUserData = useAuthStore((state) => state.setUserData);
+  const setUserIsLogged = useAuthStore((state) => state.setUserIsLogged);
+  const setIsLoading = useAuthStore((state) => state.setIsLoading);
+  const { setOnboardingCompleted } = useAuthStore();
 
+//   setUserData({
+//     email: userData.email,
+//     token: userData.token,
+//     username: userData.username,
+//     first_name: userData.first_name,
+//     last_name: userData.last_name,
+//     onboarding_completed: userData.onboarding_completed || false,
+//   });
+        // setUserIsLogged(true);
+// 
   useEffect(() => {
     setIsMounted(true);
     fetchUserData();
@@ -26,7 +43,45 @@ export default function ClientLayout({
     }
   }, [isMounted, IsLoading, UserIslogged, router]);
 
-  if (pathname !== "/login" && pathname !== "/register") {
+  
+
+  useEffect(() => {
+    async function fetchUser() {
+      if (isMounted && !IsLoading && UserIslogged && !onboardingCompleted) {
+        console.log({
+          "isMounted": isMounted,
+          "!IsLoading": !IsLoading,
+          "UserIslogged": UserIslogged,
+          "onboardingCompleted": onboardingCompleted,
+          "userData": userData
+        });
+        
+        let hey
+        if(!onboardingCompleted){
+        try {
+        const response = await axiosInstance.get("/user");
+        let hey = response.data.onboarding_completed
+        console.log("hey",hey)
+        setOnboardingCompleted(hey);
+        if(hey === false){
+        router.push("/onboarding");
+
+        }
+      } catch(error) {
+        hey = error
+        router.push("/onboarding");
+      }
+    }
+
+      }
+    }
+  
+    fetchUser();
+  }, [isMounted, IsLoading, UserIslogged, router, onboardingCompleted]);
+  
+
+
+  if (pathname !== "/login" && pathname !== "/register" && pathname !== "/onboarding") {
     if (!UserIslogged) {
       return <></>;
     }

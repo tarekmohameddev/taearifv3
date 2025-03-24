@@ -8,6 +8,7 @@ const useAuthStore = create((set, get) => ({
   error: null,
   errorLogin: null,
   errorLoginATserver: null,
+  onboarding_completed: false,
   userData: {
     email: null,
     token: null,
@@ -29,7 +30,13 @@ const useAuthStore = create((set, get) => ({
       }
 
       const userData = await userInfoResponse.json();
-      set({ UserIslogged: true, userData });
+      set({
+        UserIslogged: true,
+        userData: {
+          ...userData,
+          onboarding_completed: userData.onboarding_completed || false, // جلب القيمة من API إن وجدت
+        },
+      });
       set({ IsDone: false, error: null });
     } catch (error) {
       set({
@@ -47,7 +54,6 @@ const useAuthStore = create((set, get) => ({
   login: async (email, password) => {
     set({ IsLoading: true, errorLogin: null, errorLoginATserver: null });
     try {
-      // الطلب المباشر إلى API الخارجي
       const externalResponse = await fetch("https://taearif.com/api/login", {
         method: "POST",
         headers: {
@@ -94,6 +100,7 @@ const useAuthStore = create((set, get) => ({
         username: user.username,
         first_name: user.first_name,
         last_name: user.last_name,
+        onboarding_completed: user.onboarding_completed || false, // إضافة onboarding_completed
       };
       set({ UserIslogged: true, userData: safeUserData });
       return { success: true };
@@ -109,8 +116,6 @@ const useAuthStore = create((set, get) => ({
   // ! --------------logout
   logout: async () => {
     try {
-      console.log("userData2 on AuthContext", get().userData);
-      // تعديل URL استدعاء API لتسجيل الخروج إلى المسار الصحيح
       const response = await fetch("/api/user/logout", {
         method: "POST",
         headers: {
@@ -130,7 +135,13 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
+  // ! --------------set Onboarding Completed
+  setOnboardingCompleted: (boolean) => set({ onboarding_completed: boolean }),
   setErrorLogin: (error) => set({ errorLogin: error }),
+  setUserData: (data) => set({ userData: data }),
+  setUserIsLogged: (isLogged) => set({ UserIslogged: isLogged }),
+  setIsLoading: (loading) => set({ IsLoading: loading }),
+  setHasAttemptedLogin: (attempted) => set({ hasAttemptedLogin: attempted }),
 }));
 
 export default useAuthStore;
