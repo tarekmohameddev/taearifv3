@@ -200,11 +200,11 @@ const handleFaviconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
       setCurrentStep(currentStep + 1)
       window.scrollTo(0, 0)
     } else {
+      setErrors("");
+      setIsLoading("")
+      setWhereError("")
       completeOnboarding()
     }
-    setErrors("");
-  setIsLoading("")
-  setWhereError("")
   }
 
   const prevStep = () => {
@@ -225,12 +225,10 @@ const handleFaviconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       let logoUrl = null;
       if (websiteData.logoFile) {
-        console.log(`1`)
 
         try {
           const logoResponse = await uploadSingleFile(websiteData.logoFile, "logo");
           logoUrl = logoResponse.url; 
-          console.log("logoResponse",logoResponse)
         } catch (error) {
           setErrors(error.response.data.message)
           setWhereError("Logo")
@@ -266,19 +264,17 @@ const handleFaviconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
   
       const response = await axiosInstance.post("/onboarding", onboardingData);
   
-      console.log("Onboarding completed:", response.data);
       toast({
         title: "تم إكمال إعداد موقعك بنجاح!",
         description: "سيتم توجيهك إلى لوحة التحكم",
       });
       setOnboardingCompleted(true);
+      setIsLoading(false);
       setTimeout(() => {
         router.push("/");
       }, 2000);
-      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      console.error("Error completing onboarding:", error);
       toast({
         title: "حدث خطأ أثناء إكمال الإعداد",
         description: "يرجى المحاولة مرة أخرى",
@@ -840,7 +836,11 @@ const handleFaviconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
       className="flex items-center gap-1"
       disabled={isLoading}
     >
-      {isLoading ? "جاري الحفظ" : "الانتقال إلى لوحة التحكم"}
+    {isLoading 
+  ? (errors ? "حل الخطأ أولاً" : "جاري الحفظ")
+  : (errors ? "حل الخطأ أولاً" : "الانتقال إلى لوحة التحكم")
+}
+
     </Button>
   )}
   {errors && (

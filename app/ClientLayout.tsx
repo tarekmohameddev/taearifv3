@@ -48,20 +48,11 @@ export default function ClientLayout({
   useEffect(() => {
     async function fetchUser() {
       if (isMounted && !IsLoading && UserIslogged && !onboardingCompleted) {
-        console.log({
-          "isMounted": isMounted,
-          "!IsLoading": !IsLoading,
-          "UserIslogged": UserIslogged,
-          "onboardingCompleted": onboardingCompleted,
-          "userData": userData
-        });
-        
         let hey
         if(!onboardingCompleted){
         try {
         const response = await axiosInstance.get("/user");
         let hey = response.data.onboarding_completed
-        console.log("hey",hey)
         setOnboardingCompleted(hey);
         if(hey === false){
         router.push("/onboarding");
