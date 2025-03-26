@@ -81,7 +81,7 @@ export default function MenuManagementPage() {
     isSticky: true,
     isTransparent: false,
   });
-
+  const [isLoaded, setIsLoaded] = useState(false);
   const [newMenuItem, setNewMenuItem] = useState({
     label: "",
     url: "",
@@ -93,6 +93,7 @@ export default function MenuManagementPage() {
   });
   const [editingItem, setEditingItem] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState<{ label?: string; url?: string }>({});
 
   useEffect(() => {
 console.log("menuItems",menuItems)
@@ -162,8 +163,20 @@ console.log("editingItem",editingItem)
   };
 
   const handleAddMenuItem = () => {
-    if (newMenuItem.label.trim() === "" || newMenuItem.url.trim() === "") {
-      toast.error("يرجى ملء جميع الحقول المطلوبة");
+    const errors: { label?: string; url?: string } = {};
+
+    if (newMenuItem.label.trim() === "") {
+      errors.label = "يرجى ملء عنوان الرابط";
+      toast.error("يرجى ملء عنوان الرابط");
+    }
+
+    if (newMenuItem.url.trim() === "") {
+      errors.url = "يرجى ملء الرابط";
+      toast.error("يرجى ملء الرابط");
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
@@ -185,6 +198,8 @@ console.log("editingItem",editingItem)
       showOnMobile: true,
       showOnDesktop: true,
     });
+
+    setFormErrors({});
   };
 
   // حذف عنصر من القائمة
@@ -197,24 +212,24 @@ console.log("editingItem",editingItem)
     toast.success("تم حذف عنصر القائمة بنجاح");
   };
 
-  // جلب البيانات عند تحميل الصفحة
   useEffect(() => {
+    if (isLoaded) return; // توقف إذا تم التحميل مسبقاً
+    setIsLoaded(true); 
+    
     const fetchData = async () => {
       const loadingToast = toast.loading("جاري تحميل بيانات القائمة...");
       try {
         const response = await axiosInstance.get("/content/menu");
         setMenuItems(response.data.data.menuItems);
         setSettings(response.data.data.settings);
-        toast.success("تم تحميل بيانات القائمة بنجاح", { id: loadingToast });
+        toast.success("تم التحميل بنجاح", { id: loadingToast });
       } catch (error) {
-        toast.error("فشل في تحميل بيانات القائمة", { id: loadingToast });
+        toast.error("فشل في التحميل", { id: loadingToast });
       }
     };
+  
     fetchData();
-  }, []);
-
-
-
+  }, [isLoaded]);
 
   const handleToggleActive = (id) => {
     setMenuItems(
@@ -586,6 +601,7 @@ console.log("editingItem",editingItem)
                               label: e.target.value,
                             })
                           }
+                          className={formErrors.label ? "border-red-500" : ""}
                         />
                       </div>
 
@@ -601,6 +617,7 @@ console.log("editingItem",editingItem)
                               url: e.target.value,
                             })
                           }
+                          className={formErrors.url ? "border-red-500" : ""}
                         />
                       </div>
 
