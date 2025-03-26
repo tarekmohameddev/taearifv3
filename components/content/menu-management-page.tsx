@@ -1,9 +1,9 @@
 "use client";
 
-import { useState,useEffect  } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -11,8 +11,6 @@ import {
   Plus,
   Save,
   Trash2,
-  MoveUp,
-  MoveDown,
   ExternalLink,
   LinkIcon,
   Menu,
@@ -37,12 +35,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import axiosInstance from "@/lib/axiosInstance";
-import toast from 'react-hot-toast';
-
-
-
-
-
+import toast from "react-hot-toast";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface MenuItem {
   id: number;
@@ -57,26 +64,20 @@ interface MenuItem {
 }
 
 interface MenuSettings {
-  menuPosition: 'top' | 'left' | 'right';
-  menuStyle: 'buttons' | 'underline' | 'minimal';
-  mobileMenuType: 'hamburger' | 'sidebar' | 'fullscreen';
+  menuPosition: "top" | "left" | "right";
+  menuStyle: "buttons" | "underline" | "minimal";
+  mobileMenuType: "hamburger" | "sidebar" | "fullscreen";
   isSticky: boolean;
   isTransparent: boolean;
 }
-
-
-
-
-
-
 
 export default function MenuManagementPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [settings, setSettings] = useState<MenuSettings>({
-    menuPosition: 'top',
-    menuStyle: 'buttons',
-    mobileMenuType: 'hamburger',
+    menuPosition: "top",
+    menuStyle: "buttons",
+    mobileMenuType: "hamburger",
     isSticky: true,
     isTransparent: false,
   });
@@ -93,39 +94,79 @@ export default function MenuManagementPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  
-  
   useEffect(() => {
-    console.log(`settings`,settings)
-    
-  }, [settings]);
+console.log("menuItems",menuItems)
+console.log("editingItem",editingItem)
+  }, [menuItems,editingItem]);
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10, 
+      },
+    })
+  );
 
-  
-  
-  
-  
-  
-  
-  const topLevelItems = menuItems
-    .filter((item) => item.parentId === null)
-    .sort((a, b) => a.order - b.order);
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
 
-  // Get child items for a parent
+    if (active.id !== over.id) {
+      const activeItem = menuItems.find((item) => item.id === active.id);
+      const overItem = menuItems.find((item) => item.id === over.id);
+
+      if (activeItem.parentId === overItem.parentId) {
+        const itemsInSameLevel = menuItems
+          .filter((item) => item.parentId === activeItem.parentId)
+          .sort((a, b) => a.order - b.order);
+
+        const oldIndex = itemsInSameLevel.findIndex(
+          (item) => item.id === active.id
+        );
+        const newIndex = itemsInSameLevel.findIndex(
+          (item) => item.id === over.id
+        );
+
+        const updatedItems = arrayMove(itemsInSameLevel, oldIndex, newIndex).map(
+          (item, index) => ({
+            ...item,
+            order: index + 1,
+          })
+        );
+
+        setMenuItems((prevItems) => {
+          const otherItems = prevItems.filter(
+            (item) => item.parentId !== activeItem.parentId
+          );
+          return [...otherItems, ...updatedItems].sort(
+            (a, b) => a.order - b.order
+          );
+        });
+
+        toast.success("تم تحريك العنصر بنجاح");
+      }
+    }
+  };
+
+  const topLevelItems = useMemo(
+    () =>
+      menuItems
+        .filter((item) => item.parentId === null)
+        .sort((a, b) => a.order - b.order),
+    [menuItems]
+  );
+
   const getChildItems = (parentId) => {
     return menuItems
       .filter((item) => item.parentId === parentId)
       .sort((a, b) => a.order - b.order);
   };
 
-  // Add new menu item
   const handleAddMenuItem = () => {
-    if (newMenuItem.label.trim() === "" || newMenuItem.url.trim() === ""){
+    if (newMenuItem.label.trim() === "" || newMenuItem.url.trim() === "") {
       toast.error("يرجى ملء جميع الحقول المطلوبة");
-      console.log("error")
-      console.log("newMenuItem",newMenuItem)
       return;
     }
-    
+
     const newItem = {
       ...newMenuItem,
       id: Date.now(),
@@ -146,19 +187,22 @@ export default function MenuManagementPage() {
     });
   };
 
+  // حذف عنصر من القائمة
   const handleRemoveMenuItem = (id: number) => {
-    const itemsToDelete = [id, ...menuItems.filter(item => item.parentId === id).map(item => item.id)];
-    setMenuItems(menuItems.filter(item => !itemsToDelete.includes(item.id)));
+    const itemsToDelete = [
+      id,
+      ...menuItems.filter((item) => item.parentId === id).map((item) => item.id),
+    ];
+    setMenuItems(menuItems.filter((item) => !itemsToDelete.includes(item.id)));
     toast.success("تم حذف عنصر القائمة بنجاح");
   };
 
-
-
+  // جلب البيانات عند تحميل الصفحة
   useEffect(() => {
     const fetchData = async () => {
       const loadingToast = toast.loading("جاري تحميل بيانات القائمة...");
       try {
-        const response = await axiosInstance.get('/content/menu');
+        const response = await axiosInstance.get("/content/menu");
         setMenuItems(response.data.data.menuItems);
         setSettings(response.data.data.settings);
         toast.success("تم تحميل بيانات القائمة بنجاح", { id: loadingToast });
@@ -170,57 +214,13 @@ export default function MenuManagementPage() {
   }, []);
 
 
-  const handleMoveItemUp = (id) => {
-    const item = menuItems.find((item) => item.id === id);
-    const itemsInSameLevel = menuItems
-      .filter((i) => i.parentId === item.parentId)
-      .sort((a, b) => a.order - b.order);
-    const index = itemsInSameLevel.findIndex((i) => i.id === id);
 
-    if (index <= 0) return;
-
-    const updatedItems = [...menuItems];
-    const currentItem = updatedItems.find((i) => i.id === id);
-    const prevItem = updatedItems.find(
-      (i) => i.id === itemsInSameLevel[index - 1].id,
-    );
-
-    const tempOrder = currentItem.order;
-    currentItem.order = prevItem.order;
-    prevItem.order = tempOrder;
-
-    setMenuItems(updatedItems);
-    toast.success("تم تحريك العنصر للأعلى");
-  };
-
-  const handleMoveItemDown = (id) => {
-    const item = menuItems.find((item) => item.id === id);
-    const itemsInSameLevel = menuItems
-      .filter((i) => i.parentId === item.parentId)
-      .sort((a, b) => a.order - b.order);
-    const index = itemsInSameLevel.findIndex((i) => i.id === id);
-
-    if (index >= itemsInSameLevel.length - 1) return;
-
-    const updatedItems = [...menuItems];
-    const currentItem = updatedItems.find((i) => i.id === id);
-    const nextItem = updatedItems.find(
-      (i) => i.id === itemsInSameLevel[index + 1].id,
-    );
-
-    const tempOrder = currentItem.order;
-    currentItem.order = nextItem.order;
-    nextItem.order = tempOrder;
-
-    setMenuItems(updatedItems);
-    toast.success("تم تحريك العنصر للأسفل");
-  };
 
   const handleToggleActive = (id) => {
     setMenuItems(
       menuItems.map((item) =>
-        item.id === id ? { ...item, isActive: !item.isActive } : item,
-      ),
+        item.id === id ? { ...item, isActive: !item.isActive } : item
+      )
     );
     toast.success("تم تغيير حالة العنصر");
   };
@@ -228,8 +228,8 @@ export default function MenuManagementPage() {
   const handleToggleMobile = (id) => {
     setMenuItems(
       menuItems.map((item) =>
-        item.id === id ? { ...item, showOnMobile: !item.showOnMobile } : item,
-      ),
+        item.id === id ? { ...item, showOnMobile: !item.showOnMobile } : item
+      )
     );
     toast.success("تم تغيير إعدادات عرض الجوال");
   };
@@ -237,8 +237,8 @@ export default function MenuManagementPage() {
   const handleToggleDesktop = (id) => {
     setMenuItems(
       menuItems.map((item) =>
-        item.id === id ? { ...item, showOnDesktop: !item.showOnDesktop } : item,
-      ),
+        item.id === id ? { ...item, showOnDesktop: !item.showOnDesktop } : item
+      )
     );
     toast.success("تم تغيير إعدادات عرض سطح المكتب");
   };
@@ -253,8 +253,8 @@ export default function MenuManagementPage() {
 
     setMenuItems(
       menuItems.map((item) =>
-        item.id === editingItem.id ? editingItem : item,
-      ),
+        item.id === editingItem.id ? editingItem : item
+      )
     );
 
     setIsEditDialogOpen(false);
@@ -265,29 +265,43 @@ export default function MenuManagementPage() {
   const handleSave = async () => {
     setIsLoading(true);
     const loadingToast = toast.loading("جاري حفظ التغييرات...");
-    
+
     try {
-      const parentItems = menuItems.filter(item => item.parentId === null).sort((a, b) => a.order - b.order);
-      const updatedItems = menuItems.map(item => {
+      const parentItems = menuItems
+        .filter((item) => item.parentId === null)
+        .sort((a, b) => a.order - b.order);
+      const updatedItems = menuItems.map((item) => {
         if (item.parentId === null) {
-          const index = parentItems.findIndex(parent => parent.id === item.id);
+          const index = parentItems.findIndex(
+            (parent) => parent.id === item.id
+          );
           return { ...item, order: index + 1 };
         }
         return item;
       });
 
-      const parentIds = [...new Set(updatedItems.filter(item => item.parentId !== null).map(item => item.parentId))];
-      parentIds.forEach(parentId => {
-        const children = updatedItems.filter(item => item.parentId === parentId).sort((a, b) => a.order - b.order);
+      const parentIds = [
+        ...new Set(
+          updatedItems
+            .filter((item) => item.parentId !== null)
+            .map((item) => item.parentId)
+        ),
+      ];
+      parentIds.forEach((parentId) => {
+        const children = updatedItems
+          .filter((item) => item.parentId === parentId)
+          .sort((a, b) => a.order - b.order);
         children.forEach((child, index) => {
-          const childIndex = updatedItems.findIndex(item => item.id === child.id);
+          const childIndex = updatedItems.findIndex(
+            (item) => item.id === child.id
+          );
           if (childIndex !== -1) {
             updatedItems[childIndex].order = index + 1;
           }
         });
       });
 
-      await axiosInstance.put('/content/menu', {
+      await axiosInstance.put("/content/menu", {
         menuItems: updatedItems,
         settings: settings,
       });
@@ -300,17 +314,48 @@ export default function MenuManagementPage() {
     }
   };
 
+  const SortableCard = ({ item, children }) => {
+    const { attributes, listeners, setNodeRef, transform, transition } =
+      useSortable({ id: item.id });
+  
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+  
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners} 
+        className="cursor-grab" 
+      >
+        <Card className="mb-3">
+          <CardContent className="p-4">
+            <div className="flex items-center">
+              {children}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  // عرض عنصر القائمة
   const renderMenuItem = (item) => {
     const children = getChildItems(item.id);
-
+  
     return (
-      <div key={item.id} className="border rounded-lg mb-3">
-        <div className="p-4">
+      <SortableCard key={item.id} item={item}>
+        <div className="flex-1">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <div className="flex items-center">
                 <span
-                  className={`font-medium ${!item.isActive ? "text-muted-foreground" : ""}`}
+                  className={`font-medium ${
+                    !item.isActive ? "text-muted-foreground" : ""
+                  }`}
                 >
                   {item.label}
                 </span>
@@ -323,7 +368,7 @@ export default function MenuManagementPage() {
                 {item.url}
               </div>
             </div>
-
+  
             <div className="flex items-center gap-2">
               <div className="flex flex-col items-end mr-4">
                 <div className="flex items-center mb-1">
@@ -332,44 +377,38 @@ export default function MenuManagementPage() {
                     checked={item.isActive}
                     onCheckedChange={() => handleToggleActive(item.id)}
                     size="sm"
+                    onPointerDown={(e) => e.stopPropagation()} // منع بدء السحب
                   />
                 </div>
                 <div className="flex gap-2">
                   <span
-                    className={`text-xs px-1.5 py-0.5 rounded ${item.showOnMobile ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+                    className={`text-xs px-1.5 py-0.5 rounded ${
+                      item.showOnMobile
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
                   >
                     جوال
                   </span>
                   <span
-                    className={`text-xs px-1.5 py-0.5 rounded ${item.showOnDesktop ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
+                    className={`text-xs px-1.5 py-0.5 rounded ${
+                      item.showOnDesktop
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
                   >
                     سطح المكتب
                   </span>
                 </div>
               </div>
-
+  
               <div className="flex">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleMoveItemUp(item.id)}
-                  className="h-8 w-8"
-                >
-                  <MoveUp className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleMoveItemDown(item.id)}
-                  className="h-8 w-8"
-                >
-                  <MoveDown className="h-4 w-4" />
-                </Button>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => handleEditItem(item)}
                   className="h-8 w-8"
+                  onPointerDown={(e) => e.stopPropagation()} // منع بدء السحب
                 >
                   <Menu className="h-4 w-4" />
                 </Button>
@@ -378,111 +417,117 @@ export default function MenuManagementPage() {
                   size="icon"
                   onClick={() => handleRemoveMenuItem(item.id)}
                   className="h-8 w-8"
+                  onPointerDown={(e) => e.stopPropagation()} // منع بدء السحب
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           </div>
-        </div>
-
-        {children.length > 0 && (
-          <div className="border-t px-4 py-2 bg-muted/20">
-            <div className="text-xs font-medium mb-2">العناصر الفرعية:</div>
-            <div className="pr-4 border-r-2 border-muted">
-              {children.map((child) => (
-                <div
-                  key={child.id}
-                  className="border rounded-lg mb-2 bg-background"
+  
+          {children.length > 0 && (
+            <div className="border-t px-4 py-2 bg-muted/20 mt-2">
+              <div className="text-xs font-medium mb-2">العناصر الفرعية:</div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={children.map((child) => child.id)}
+                  strategy={verticalListSortingStrategy}
                 >
-                  <div className="p-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center">
-                          <span
-                            className={`font-medium ${!child.isActive ? "text-muted-foreground" : ""}`}
-                          >
-                            {child.label}
-                          </span>
-                          {child.isExternal && (
-                            <ExternalLink className="h-3 w-3 mr-1 text-muted-foreground" />
-                          )}
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1 flex items-center">
-                          <LinkIcon className="h-3 w-3 ml-1" />
-                          {child.url}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <div className="flex flex-col items-end mr-4">
-                          <div className="flex items-center mb-1">
-                            <span className="text-xs ml-2">نشط</span>
-                            <Switch
-                              checked={child.isActive}
-                              onCheckedChange={() =>
-                                handleToggleActive(child.id)
-                              }
-                              size="sm"
-                            />
+                  <div className="pr-4 border-r-2 border-muted">
+                    {children.map((child) => (
+                      <SortableCard key={child.id} item={child}>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center">
+                                <span
+                                  className={`font-medium ${
+                                    !child.isActive ? "text-muted-foreground" : ""
+                                  }`}
+                                >
+                                  {child.label}
+                                </span>
+                                {child.isExternal && (
+                                  <ExternalLink className="h-3 w-3 mr-1 text-muted-foreground" />
+                                )}
+                              </div>
+                              <div className="text-sm text-muted-foreground mt-1 flex items-center">
+                                <LinkIcon className="h-3 w-3 ml-1" />
+                                {child.url}
+                              </div>
+                            </div>
+  
+                            <div className="flex items-center gap-2">
+                              <div className="flex flex-col items-end mr-4">
+                                <div className="flex items-center mb-1">
+                                  <span className="text-xs ml-2">نشط</span>
+                                  <Switch
+                                    checked={child.isActive}
+                                    onCheckedChange={() =>
+                                      handleToggleActive(child.id)
+                                    }
+                                    size="sm"
+                                    onPointerDown={(e) => e.stopPropagation()} // منع بدء السحب
+                                  />
+                                </div>
+                                <div className="flex gap-2">
+                                  <span
+                                    className={`text-xs px-1.5 py-0.5 rounded ${
+                                      child.showOnMobile
+                                        ? "bg-green-100 text-green-800"
+                                        : "bg-gray-100 text-gray-800"
+                                    }`}
+                                  >
+                                    جوال
+                                  </span>
+                                  <span
+                                    className={`text-xs px-1.5 py-0.5 rounded ${
+                                      child.showOnDesktop
+                                        ? "bg-blue-100 text-blue-800"
+                                        : "bg-gray-100 text-gray-800"
+                                    }`}
+                                  >
+                                    سطح المكتب
+                                  </span>
+                                </div>
+                              </div>
+  
+                              <div className="flex">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleEditItem(child)}
+                                  className="h-8 w-8"
+                                  onPointerDown={(e) => e.stopPropagation()} // منع بدء السحب
+                                >
+                                  <Menu className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="icon"
+                                  onClick={() => handleRemoveMenuItem(child.id)}
+                                  className="h-8 w-8"
+                                  onPointerDown={(e) => e.stopPropagation()} // منع بدء السحب
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex gap-2">
-                            <span
-                              className={`text-xs px-1.5 py-0.5 rounded ${child.showOnMobile ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
-                            >
-                              جوال
-                            </span>
-                            <span
-                              className={`text-xs px-1.5 py-0.5 rounded ${child.showOnDesktop ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
-                            >
-                              سطح المكتب
-                            </span>
-                          </div>
                         </div>
-
-                        <div className="flex">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleMoveItemUp(child.id)}
-                            className="h-8 w-8"
-                          >
-                            <MoveUp className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleMoveItemDown(child.id)}
-                            className="h-8 w-8"
-                          >
-                            <MoveDown className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEditItem(child)}
-                            className="h-8 w-8"
-                          >
-                            <Menu className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            onClick={() => handleRemoveMenuItem(child.id)}
-                            className="h-8 w-8"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
+                      </SortableCard>
+                    ))}
                   </div>
-                </div>
-              ))}
+                </SortableContext>
+              </DndContext>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </SortableCard>
     );
   };
 
@@ -526,10 +571,7 @@ export default function MenuManagementPage() {
 
             <TabsContent value="menu" className="space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>إضافة عنصر جديد للقائمة</CardTitle>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="space-y-2">
@@ -671,106 +713,128 @@ export default function MenuManagementPage() {
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle>عناصر القائمة</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {topLevelItems.map(renderMenuItem)}
-                  </div>
+                <CardContent className="pt-6">
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={topLevelItems.map((item) => item.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-2">
+                        {topLevelItems.map(renderMenuItem)}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
                 </CardContent>
               </Card>
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>إعدادات القائمة</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="menu-position">موضع القائمة</Label>
-                <Select
-                  value={settings.menuPosition}
-                  onValueChange={(value: any) => setSettings({ ...settings, menuPosition: value })}
-                >
-                  <SelectTrigger id="menu-position">
-                    <SelectValue placeholder="اختر موضع القائمة" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="top">أعلى الصفحة</SelectItem>
-                    <SelectItem value="left">يسار الصفحة</SelectItem>
-                    <SelectItem value="right">يمين الصفحة</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="menu-position">موضع القائمة</Label>
+                        <Select
+                          value={settings.menuPosition}
+                          onValueChange={(value: any) =>
+                            setSettings({ ...settings, menuPosition: value })
+                          }
+                        >
+                          <SelectTrigger id="menu-position">
+                            <SelectValue placeholder="اختر موضع القائمة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="top">أعلى الصفحة</SelectItem>
+                            <SelectItem value="left">يسار الصفحة</SelectItem>
+                            <SelectItem value="right">يمين الصفحة</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="menu-style">نمط القائمة</Label>
-                <Select
-                  value={settings.menuStyle}
-                  onValueChange={(value: any) => setSettings({ ...settings, menuStyle: value })}
-                >
-                  <SelectTrigger id="menu-style">
-                    <SelectValue placeholder="اختر نمط القائمة" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="default">قياسي</SelectItem>
-                    <SelectItem value="buttons">أزرار</SelectItem>
-                    <SelectItem value="underline">خط تحتي</SelectItem>
-                    <SelectItem value="minimal">بسيط</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="menu-style">نمط القائمة</Label>
+                        <Select
+                          value={settings.menuStyle}
+                          onValueChange={(value: any) =>
+                            setSettings({ ...settings, menuStyle: value })
+                          }
+                        >
+                          <SelectTrigger id="menu-style">
+                            <SelectValue placeholder="اختر نمط القائمة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="default">قياسي</SelectItem>
+                            <SelectItem value="buttons">أزرار</SelectItem>
+                            <SelectItem value="underline">خط تحتي</SelectItem>
+                            <SelectItem value="minimal">بسيط</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="mobile-menu-type">نوع قائمة الجوال</Label>
-                <Select
-                  value={settings.mobileMenuType}
-                  onValueChange={(value: any) => setSettings({ ...settings, mobileMenuType: value })}
-                >
-                  <SelectTrigger id="mobile-menu-type">
-                    <SelectValue placeholder="اختر نوع قائمة الجوال" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hamburger">قائمة همبرغر</SelectItem>
-                    <SelectItem value="sidebar">قائمة منسدلة</SelectItem>
-                    <SelectItem value="fullscreen">ملء الشاشة</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="mobile-menu-type">
+                          نوع قائمة الجوال
+                        </Label>
+                        <Select
+                          value={settings.mobileMenuType}
+                          onValueChange={(value: any) =>
+                            setSettings({ ...settings, mobileMenuType: value })
+                          }
+                        >
+                          <SelectTrigger id="mobile-menu-type">
+                            <SelectValue placeholder="اختر نوع قائمة الجوال" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hamburger">
+                              قائمة همبرغر
+                            </SelectItem>
+                            <SelectItem value="sidebar">
+                              قائمة منسدلة
+                            </SelectItem>
+                            <SelectItem value="fullscreen">
+                              ملء الشاشة
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-              <div className="flex items-center justify-between">
-                <Label htmlFor="sticky-menu">قائمة ثابتة عند التمرير</Label>
-                <Switch
-                  id="sticky-menu"
-                  checked={settings.isSticky}
-                  onCheckedChange={(checked) => setSettings({ ...settings, isSticky: checked })}
-                />
-              </div>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="sticky-menu">
+                          قائمة ثابتة عند التمرير
+                        </Label>
+                        <Switch
+                          id="sticky-menu"
+                          checked={settings.isSticky}
+                          onCheckedChange={(checked) =>
+                            setSettings({ ...settings, isSticky: checked })
+                          }
+                        />
+                      </div>
 
-              <div className="flex items-center justify-between">
-                <Label htmlFor="transparent-menu">قائمة شفافة</Label>
-                <Switch
-                  id="transparent-menu"
-                  checked={settings.isTransparent}
-                  onCheckedChange={(checked) => setSettings({ ...settings, isTransparent: checked })}
-                />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="transparent-menu">قائمة شفافة</Label>
+                        <Switch
+                          id="transparent-menu"
+                          checked={settings.isTransparent}
+                          onCheckedChange={(checked) =>
+                            setSettings({ ...settings, isTransparent: checked })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle>نصائح لتحسين قائمة التنقل</CardTitle>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <ul className="list-disc pr-5 space-y-2 text-sm">
                     <li>استخدم عناوين واضحة وموجزة للروابط</li>
                     <li>حافظ على عدد العناصر الرئيسية بين 5-7 عناصر</li>
@@ -787,7 +851,7 @@ export default function MenuManagementPage() {
         </main>
       </div>
 
-      {/* Edit Dialog */}
+      {/* نافذة تعديل العنصر */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
