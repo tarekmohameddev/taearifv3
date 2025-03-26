@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect  } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,103 +36,51 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import axiosInstance from "@/lib/axiosInstance";
+import toast from 'react-hot-toast';
+
+
+
+
+
+
+interface MenuItem {
+  id: number;
+  label: string;
+  url: string;
+  isExternal: boolean;
+  isActive: boolean;
+  order: number;
+  parentId: number | null;
+  showOnMobile: boolean;
+  showOnDesktop: boolean;
+}
+
+interface MenuSettings {
+  menuPosition: 'top' | 'left' | 'right';
+  menuStyle: 'buttons' | 'underline' | 'minimal';
+  mobileMenuType: 'hamburger' | 'sidebar' | 'fullscreen';
+  isSticky: boolean;
+  isTransparent: boolean;
+}
+
+
+
+
+
+
 
 export default function MenuManagementPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [settings, setSettings] = useState<MenuSettings>({
+    menuPosition: 'top',
+    menuStyle: 'buttons',
+    mobileMenuType: 'hamburger',
+    isSticky: true,
+    isTransparent: false,
+  });
 
-  // Menu items state
-  const [menuItems, setMenuItems] = useState([
-    {
-      id: 1,
-      label: "الرئيسية",
-      url: "/",
-      isExternal: false,
-      isActive: true,
-      order: 1,
-      parentId: null,
-      showOnMobile: true,
-      showOnDesktop: true,
-    },
-    {
-      id: 2,
-      label: "من نحن",
-      url: "/about",
-      isExternal: false,
-      isActive: true,
-      order: 2,
-      parentId: null,
-      showOnMobile: true,
-      showOnDesktop: true,
-    },
-    {
-      id: 3,
-      label: "خدماتنا",
-      url: "/services",
-      isExternal: false,
-      isActive: true,
-      order: 3,
-      parentId: null,
-      showOnMobile: true,
-      showOnDesktop: true,
-    },
-    {
-      id: 4,
-      label: "المشاريع",
-      url: "/projects",
-      isExternal: false,
-      isActive: true,
-      order: 4,
-      parentId: null,
-      showOnMobile: true,
-      showOnDesktop: true,
-    },
-    {
-      id: 5,
-      label: "المدونة",
-      url: "/blog",
-      isExternal: false,
-      isActive: true,
-      order: 5,
-      parentId: null,
-      showOnMobile: true,
-      showOnDesktop: true,
-    },
-    {
-      id: 6,
-      label: "اتصل بنا",
-      url: "/contact",
-      isExternal: false,
-      isActive: true,
-      order: 6,
-      parentId: null,
-      showOnMobile: true,
-      showOnDesktop: true,
-    },
-    {
-      id: 7,
-      label: "مشاريع سكنية",
-      url: "/projects/residential",
-      isExternal: false,
-      isActive: true,
-      order: 1,
-      parentId: 4,
-      showOnMobile: true,
-      showOnDesktop: true,
-    },
-    {
-      id: 8,
-      label: "مشاريع تجارية",
-      url: "/projects/commercial",
-      isExternal: false,
-      isActive: true,
-      order: 2,
-      parentId: 4,
-      showOnMobile: true,
-      showOnDesktop: true,
-    },
-  ]);
-
-  // New menu item state
   const [newMenuItem, setNewMenuItem] = useState({
     label: "",
     url: "",
@@ -142,12 +90,22 @@ export default function MenuManagementPage() {
     showOnMobile: true,
     showOnDesktop: true,
   });
-
-  // Edit menu item state
   const [editingItem, setEditingItem] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  // Get top-level menu items
+  
+  
+  useEffect(() => {
+    console.log(`settings`,settings)
+    
+  }, [settings]);
+
+  
+  
+  
+  
+  
+  
   const topLevelItems = menuItems
     .filter((item) => item.parentId === null)
     .sort((a, b) => a.order - b.order);
@@ -161,9 +119,13 @@ export default function MenuManagementPage() {
 
   // Add new menu item
   const handleAddMenuItem = () => {
-    if (newMenuItem.label.trim() === "" || newMenuItem.url.trim() === "")
+    if (newMenuItem.label.trim() === "" || newMenuItem.url.trim() === ""){
+      toast.error("يرجى ملء جميع الحقول المطلوبة");
+      console.log("error")
+      console.log("newMenuItem",newMenuItem)
       return;
-
+    }
+    
     const newItem = {
       ...newMenuItem,
       id: Date.now(),
@@ -171,8 +133,8 @@ export default function MenuManagementPage() {
     };
 
     setMenuItems([...menuItems, newItem]);
+    toast.success("تمت إضافة عنصر القائمة بنجاح");
 
-    // Reset form
     setNewMenuItem({
       label: "",
       url: "",
@@ -184,22 +146,30 @@ export default function MenuManagementPage() {
     });
   };
 
-  // Remove menu item
-  const handleRemoveMenuItem = (id) => {
-    // Check if item has children
-    const hasChildren = menuItems.some((item) => item.parentId === id);
-
-    if (hasChildren) {
-      alert(
-        "لا يمكن حذف هذا العنصر لأنه يحتوي على عناصر فرعية. يرجى حذف العناصر الفرعية أولاً.",
-      );
-      return;
-    }
-
-    setMenuItems(menuItems.filter((item) => item.id !== id));
+  const handleRemoveMenuItem = (id: number) => {
+    const itemsToDelete = [id, ...menuItems.filter(item => item.parentId === id).map(item => item.id)];
+    setMenuItems(menuItems.filter(item => !itemsToDelete.includes(item.id)));
+    toast.success("تم حذف عنصر القائمة بنجاح");
   };
 
-  // Move item up in order
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const loadingToast = toast.loading("جاري تحميل بيانات القائمة...");
+      try {
+        const response = await axiosInstance.get('/content/menu');
+        setMenuItems(response.data.data.menuItems);
+        setSettings(response.data.data.settings);
+        toast.success("تم تحميل بيانات القائمة بنجاح", { id: loadingToast });
+      } catch (error) {
+        toast.error("فشل في تحميل بيانات القائمة", { id: loadingToast });
+      }
+    };
+    fetchData();
+  }, []);
+
+
   const handleMoveItemUp = (id) => {
     const item = menuItems.find((item) => item.id === id);
     const itemsInSameLevel = menuItems
@@ -215,15 +185,14 @@ export default function MenuManagementPage() {
       (i) => i.id === itemsInSameLevel[index - 1].id,
     );
 
-    // Swap orders
     const tempOrder = currentItem.order;
     currentItem.order = prevItem.order;
     prevItem.order = tempOrder;
 
     setMenuItems(updatedItems);
+    toast.success("تم تحريك العنصر للأعلى");
   };
 
-  // Move item down in order
   const handleMoveItemDown = (id) => {
     const item = menuItems.find((item) => item.id === id);
     const itemsInSameLevel = menuItems
@@ -239,48 +208,46 @@ export default function MenuManagementPage() {
       (i) => i.id === itemsInSameLevel[index + 1].id,
     );
 
-    // Swap orders
     const tempOrder = currentItem.order;
     currentItem.order = nextItem.order;
     nextItem.order = tempOrder;
 
     setMenuItems(updatedItems);
+    toast.success("تم تحريك العنصر للأسفل");
   };
 
-  // Toggle item active status
   const handleToggleActive = (id) => {
     setMenuItems(
       menuItems.map((item) =>
         item.id === id ? { ...item, isActive: !item.isActive } : item,
       ),
     );
+    toast.success("تم تغيير حالة العنصر");
   };
 
-  // Toggle mobile visibility
   const handleToggleMobile = (id) => {
     setMenuItems(
       menuItems.map((item) =>
         item.id === id ? { ...item, showOnMobile: !item.showOnMobile } : item,
       ),
     );
+    toast.success("تم تغيير إعدادات عرض الجوال");
   };
 
-  // Toggle desktop visibility
   const handleToggleDesktop = (id) => {
     setMenuItems(
       menuItems.map((item) =>
         item.id === id ? { ...item, showOnDesktop: !item.showOnDesktop } : item,
       ),
     );
+    toast.success("تم تغيير إعدادات عرض سطح المكتب");
   };
 
-  // Open edit dialog
   const handleEditItem = (item) => {
     setEditingItem({ ...item });
     setIsEditDialogOpen(true);
   };
 
-  // Save edited item
   const handleSaveEdit = () => {
     if (!editingItem) return;
 
@@ -292,19 +259,47 @@ export default function MenuManagementPage() {
 
     setIsEditDialogOpen(false);
     setEditingItem(null);
+    toast.success("تم حفظ التغييرات بنجاح");
   };
 
-  // Save all changes
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    const loadingToast = toast.loading("جاري حفظ التغييرات...");
+    
+    try {
+      const parentItems = menuItems.filter(item => item.parentId === null).sort((a, b) => a.order - b.order);
+      const updatedItems = menuItems.map(item => {
+        if (item.parentId === null) {
+          const index = parentItems.findIndex(parent => parent.id === item.id);
+          return { ...item, order: index + 1 };
+        }
+        return item;
+      });
+
+      const parentIds = [...new Set(updatedItems.filter(item => item.parentId !== null).map(item => item.parentId))];
+      parentIds.forEach(parentId => {
+        const children = updatedItems.filter(item => item.parentId === parentId).sort((a, b) => a.order - b.order);
+        children.forEach((child, index) => {
+          const childIndex = updatedItems.findIndex(item => item.id === child.id);
+          if (childIndex !== -1) {
+            updatedItems[childIndex].order = index + 1;
+          }
+        });
+      });
+
+      await axiosInstance.put('/content/menu', {
+        menuItems: updatedItems,
+        settings: settings,
+      });
+
+      toast.success("تم حفظ التغييرات بنجاح", { id: loadingToast });
+    } catch (error) {
+      toast.error("فشل في حفظ التغييرات", { id: loadingToast });
+    } finally {
       setIsLoading(false);
-      alert("تم حفظ قائمة التنقل بنجاح!");
-    }, 1000);
+    }
   };
 
-  // Render menu item with its children
   const renderMenuItem = (item) => {
     const children = getChildItems(item.id);
 
@@ -688,81 +683,88 @@ export default function MenuManagementPage() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>إعدادات القائمة</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="menu-position">موضع القائمة</Label>
-                        <Select defaultValue="top">
-                          <SelectTrigger id="menu-position">
-                            <SelectValue placeholder="اختر موضع القائمة" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="top">أعلى الصفحة</SelectItem>
-                            <SelectItem value="left">يسار الصفحة</SelectItem>
-                            <SelectItem value="right">يمين الصفحة</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>إعدادات القائمة</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="menu-position">موضع القائمة</Label>
+                <Select
+                  value={settings.menuPosition}
+                  onValueChange={(value: any) => setSettings({ ...settings, menuPosition: value })}
+                >
+                  <SelectTrigger id="menu-position">
+                    <SelectValue placeholder="اختر موضع القائمة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="top">أعلى الصفحة</SelectItem>
+                    <SelectItem value="left">يسار الصفحة</SelectItem>
+                    <SelectItem value="right">يمين الصفحة</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="menu-style">نمط القائمة</Label>
-                        <Select defaultValue="standard">
-                          <SelectTrigger id="menu-style">
-                            <SelectValue placeholder="اختر نمط القائمة" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="standard">قياسي</SelectItem>
-                            <SelectItem value="buttons">أزرار</SelectItem>
-                            <SelectItem value="underline">خط تحتي</SelectItem>
-                            <SelectItem value="minimal">بسيط</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+              <div className="space-y-2">
+                <Label htmlFor="menu-style">نمط القائمة</Label>
+                <Select
+                  value={settings.menuStyle}
+                  onValueChange={(value: any) => setSettings({ ...settings, menuStyle: value })}
+                >
+                  <SelectTrigger id="menu-style">
+                    <SelectValue placeholder="اختر نمط القائمة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">قياسي</SelectItem>
+                    <SelectItem value="buttons">أزرار</SelectItem>
+                    <SelectItem value="underline">خط تحتي</SelectItem>
+                    <SelectItem value="minimal">بسيط</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="mobile-menu-type">
-                          نوع قائمة الجوال
-                        </Label>
-                        <Select defaultValue="hamburger">
-                          <SelectTrigger id="mobile-menu-type">
-                            <SelectValue placeholder="اختر نوع قائمة الجوال" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="hamburger">
-                              قائمة همبرغر
-                            </SelectItem>
-                            <SelectItem value="dropdown">
-                              قائمة منسدلة
-                            </SelectItem>
-                            <SelectItem value="fullscreen">
-                              ملء الشاشة
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="mobile-menu-type">نوع قائمة الجوال</Label>
+                <Select
+                  value={settings.mobileMenuType}
+                  onValueChange={(value: any) => setSettings({ ...settings, mobileMenuType: value })}
+                >
+                  <SelectTrigger id="mobile-menu-type">
+                    <SelectValue placeholder="اختر نوع قائمة الجوال" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hamburger">قائمة همبرغر</SelectItem>
+                    <SelectItem value="sidebar">قائمة منسدلة</SelectItem>
+                    <SelectItem value="fullscreen">ملء الشاشة</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="sticky-menu">
-                          قائمة ثابتة عند التمرير
-                        </Label>
-                        <Switch id="sticky-menu" defaultChecked={true} />
-                      </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="sticky-menu">قائمة ثابتة عند التمرير</Label>
+                <Switch
+                  id="sticky-menu"
+                  checked={settings.isSticky}
+                  onCheckedChange={(checked) => setSettings({ ...settings, isSticky: checked })}
+                />
+              </div>
 
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="transparent-menu">قائمة شفافة</Label>
-                        <Switch id="transparent-menu" defaultChecked={false} />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="transparent-menu">قائمة شفافة</Label>
+                <Switch
+                  id="transparent-menu"
+                  checked={settings.isTransparent}
+                  onCheckedChange={(checked) => setSettings({ ...settings, isTransparent: checked })}
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
               <Card>
                 <CardHeader>
