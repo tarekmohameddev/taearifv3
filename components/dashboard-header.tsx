@@ -217,7 +217,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="https://taearif.com/blog">عن تعاريف</Link>
+                  <Link href="https://taearif.com/about">عن تعاريف</Link>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -230,7 +230,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="https://taearif.com/about">المدونة</Link>
+                  <Link href="https://taearif.com/blog">المدونة</Link>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>

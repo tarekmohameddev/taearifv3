@@ -353,8 +353,10 @@ export default function AddPropertyPage() {
               </div>
               <div className="flex flex-col items-end gap-2">
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => handleSubmit(false)}>
-                    حفظ كمسودة
+                  <Button variant="outline" onClick={() => handleSubmit(false)}
+                        disabled={isLoading}>
+                  
+                    {isLoading ? "جاري الحفظ..." : "حفظ كمسودة"}
                   </Button>
                   <Button
                     onClick={() => handleSubmit(true)}
@@ -909,8 +911,10 @@ export default function AddPropertyPage() {
                           <Button
                             variant="outline"
                             onClick={() => handleSubmit(false)}
-                          >
-                            حفظ كمسودة
+                            disabled={isLoading}
+                            >
+                            {isLoading ? "جاري الحفظ..." : "حفظ كمسودة"}
+
                           </Button>
                           <Button
                             onClick={() => handleSubmit(true)}

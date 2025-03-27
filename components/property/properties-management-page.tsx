@@ -273,7 +273,7 @@ export function PropertiesManagementPage() {
                           </Select>
                         </div>
                         <div className="grid gap-2">
-                          <Label htmlFor="bathrooms">الحمامات</Label>
+                          <Label htmlFor="bathrooms">حمام</Label>
                           <Select>
                             <SelectTrigger id="bathrooms">
                               <SelectValue placeholder="Any" />
@@ -289,7 +289,7 @@ export function PropertiesManagementPage() {
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="size">
-                            الحد الأدنى للحجم (قدم مربع)
+                            الحد الأدنى للمساحة (قدم مربع)
                           </Label>
                           <Input id="size" type="number" placeholder="Any" />
                         </div>
@@ -358,7 +358,7 @@ export function PropertiesManagementPage() {
                   {viewMode === "grid" ? (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       {properties
-                        .filter((property) => property.transaction_type === "للبيع")
+                        .filter((property) => property.transaction_type === "sale")
                         .map((property) => (
                           <PropertyCard
                             key={property.id}
@@ -373,7 +373,7 @@ export function PropertiesManagementPage() {
                   ) : (
                     <div className="space-y-4">
                       {properties
-                        .filter((property) => property.transaction_type === "للبيع")
+                        .filter((property) => property.transaction_type === "sale")
                         .map((property) => (
                           <PropertyListItem
                             key={property.id}
@@ -560,8 +560,8 @@ function PropertyCard({
           />
         </div>
         {property.featured && (
-          <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
-            Featured
+            <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
+            مميز
           </div>
         )}
         <div
@@ -576,7 +576,7 @@ function PropertyCard({
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-2 bottom-2 rounded-full bg-background/80 hover:bg-background"
+          className="absolute left-2 bottom-2 rounded-full bg-background/80 hover:bg-background"
           onClick={() => onToggleFavorite(property.id)}
         >
           <Heart
@@ -586,23 +586,23 @@ function PropertyCard({
         </Button>
       </div>
       <CardHeader className="p-4">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-row-reverse items-start justify-between">
           <div>
             <CardTitle className="whitespace-nowrap">
               {property.title || property.contents[0].title}
             </CardTitle>
-            <CardDescription className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" /> {property.address || property.contents[0].address }
+            <CardDescription className="text-sm text-muted-foreground flex flex-row-reverse items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              {property.address || property.contents[0].address}
             </CardDescription>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="-mr-2">
+              <Button variant="ghost" size="icon" className="-ml-2">
                 <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">More options</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="start">
               <DropdownMenuItem
                 onClick={() =>
                   router.push("/properties/" + property.id + "/edit")
@@ -643,28 +643,46 @@ function PropertyCard({
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
-        <div className="text-lg font-semibold">
-          {property.transaction_type === "للبيع"
-            ? `$${property.price.toLocaleString()}`
-            : `$${property.price.toLocaleString()}/شهر`}
+      <div className="text-lg font-semibold flex flex-row-reverse gap-1">
+          {property.transaction_type === "sale" ? (
+            <>
+              <span>بسعر {property.price.toLocaleString()}</span>
+              <img 
+                src="/Saudi_Riyal_Symbol.svg" 
+                alt="ريال سعودي"
+                className="w-5 h-5 filter brightness-0 contrast-100"
+              />
+            </>
+          ) : (
+            <>
+              <span>/شهر</span>
+              <span>بسعر {property.price.toLocaleString()}</span>
+              <img 
+                src="/Saudi_Riyal_Symbol.svg" 
+                alt="ريال سعودي"
+                className="w-5 h-5 filter brightness-0 contrast-100"
+              />
+            </>
+          )}
         </div>
-        <div className="grid grid-cols-3 gap-2 text-sm">
-          <div className="flex flex-col">
-            <span className="text-muted-foreground">الأسرة</span>
-            <span className="font-medium flex items-center gap-1">
-              <Bed className="h-3 w-3" /> {property.beds}
+        <div className="grid grid-cols-3 gap-2 text-sm ">
+          <div className="flex flex-col items-end">
+            <span className="text-muted-foreground">غرفة</span>
+            <span className="font-medium flex flex-row-reverse items-center gap-1">
+              <Bed className="h-3 w-3" />
+              {property.beds}
             </span>
           </div>
-          <div className="flex flex-col">
-            <span className="text-muted-foreground">الحمامات</span>
-            <span className="font-medium flex items-center gap-1">
-              <Bath className="h-3 w-3" /> {property.bath}
+          <div className="flex flex-col items-end">
+            <span className="text-muted-foreground">حمام</span>
+            <span className="font-medium flex flex-row-reverse items-center gap-1">
+            <Bath className="h-3 w-3" /> {property.bath}
             </span>
           </div>
-          <div className="flex flex-col">
-            <span className="text-muted-foreground">حجم</span>
-            <span className="font-medium flex items-center gap-1">
-              <Ruler className="h-3 w-3" /> {property.area} ft²
+          <div className="flex flex-col items-end">
+            <span className="text-muted-foreground">مساحة</span>
+            <span className="font-medium flex flex-row-reverse items-center gap-1">
+            <Ruler className="h-3 w-3" /> {property.area || property.size} m²
             </span>
           </div>
         </div>
@@ -685,13 +703,13 @@ function PropertyCard({
           )}
         </div>
       </CardContent>
-      <CardFooter className="flex gap-2 p-4 pt-0">
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full gap-1"
-          onClick={() => router.push("/properties/" + property.id + "/edit")}
-        >
+      <CardFooter className="flex flex-row-reverse gap-2 p-4 pt-0">
+      <Button
+            variant="outline"
+            size="sm"
+            className="w-full gap-1"
+            onClick={() => router.push("/properties/" + property.id + "/edit")}
+          >
           <Edit className="h-3.5 w-3.5" />
           تعديل
         </Button>
@@ -711,7 +729,7 @@ function PropertyListItem({
 }: PropertyCardProps) {
   return (
     <Card>
-      <div className="flex flex-col sm:flex-row">
+      <div className="flex flex-col sm:flex-row-reverse">
         <div className="relative sm:w-1/3 md:w-1/4">
           <div className="aspect-[16/9] sm:aspect-auto sm:h-full w-full overflow-hidden">
             <img
@@ -726,7 +744,7 @@ function PropertyListItem({
           </div>
           {property.featured && (
             <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
-              Featured
+              مميز
             </div>
           )}
           <div
@@ -741,7 +759,7 @@ function PropertyListItem({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 bottom-2 rounded-full bg-background/80 hover:bg-background"
+            className="absolute left-2 bottom-2 rounded-full bg-background/80 hover:bg-background"
             onClick={() => onToggleFavorite(property.id)}
           >
             <Heart
@@ -751,35 +769,52 @@ function PropertyListItem({
           </Button>
         </div>
         <div className="flex flex-1 flex-col p-4">
-          <div className="flex items-start justify-between">
+          <div className="flex flex-row-reverse items-start justify-between">
             <div>
               <h3 className="font-semibold">{property.title || property.contents[0].title}</h3>
-              <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <p className="text-sm text-muted-foreground flex flex-row-reverse items-center gap-1">
                 <MapPin className="h-3 w-3" /> {property.address || property.contents[0].address }
               </p>
             </div>
             <div className="text-lg font-semibold">
-              {property.transaction_type === "للبيع"
-                ? `$${property.price.toLocaleString()}`
-                : `$${property.price.toLocaleString()}/شهر`}
+            {property.transaction_type === "sale" ? (
+      <div className="flex items-center gap-1">
+<img 
+  src="/Saudi_Riyal_Symbol.svg" 
+  alt="ريال سعودي"
+  className="w-5 h-5 filter brightness-0 contrast-100"
+/>
+        <span>بسعر {property.price.toLocaleString()}</span>
+      </div>
+    ) : (
+      <div className="flex items-center gap-1">
+<img 
+  src="/Saudi_Riyal_Symbol.svg" 
+  alt="ريال سعودي"
+  className="w-5 h-5 filter brightness-0 contrast-100"
+/>
+        <span>بسعر {property.price.toLocaleString()}</span>
+        <span>/شهر</span>
+      </div>
+    )}
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">
-            <div className="flex items-center gap-1">
+            <div className="flex flex-row-reverse items-center gap-1">
               <Building className="h-4 w-4 text-muted-foreground" />
               <span>{property.type}</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex flex-row-reverse items-center gap-1">
               <Bed className="h-4 w-4 text-muted-foreground" />
-              <span>{property.bedrooms} Beds</span>
+              <span>{property.beds} غرفة</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex flex-row-reverse items-center gap-1">
               <Bath className="h-4 w-4 text-muted-foreground" />
-              <span>{property.bathrooms} Baths</span>
+              <span>{property.bath} حمام</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex flex-row-reverse items-center gap-1">
               <Ruler className="h-4 w-4 text-muted-foreground" />
-              <span>{property.size} ft²</span>
+              <span>{property.size || property.area} م² </span>
             </div>
           </div>
           <div className="mt-2 flex flex-wrap gap-1">
@@ -795,11 +830,11 @@ function PropertyListItem({
           <div className="mt-auto pt-4 flex gap-2 justify-end">
             <Button variant="outline" size="sm">
               <Edit className="mr-1 h-3.5 w-3.5" />
-              Edit
+              تعديل
             </Button>
             <Button variant="secondary" size="sm">
               <ExternalLink className="mr-1 h-3.5 w-3.5" />
-              Preview
+              معاينة
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
