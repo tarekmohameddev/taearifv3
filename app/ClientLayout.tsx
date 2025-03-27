@@ -48,25 +48,20 @@ export default function ClientLayout({
   useEffect(() => {
     async function fetchUser() {
       if (isMounted && !IsLoading && UserIslogged && !onboardingCompleted) {
-        let hey
-        if(!onboardingCompleted){
-        try {
-        const response = await axiosInstance.get("/user");
-        let hey = response.data.onboarding_completed
-        setOnboardingCompleted(hey);
-        if(hey === false){
-        router.push("/onboarding");
-
+        if (router.asPath !== "/onboarding") {
+          try {
+            const response = await axiosInstance.get("/user");
+            const completed = response.data.onboarding_completed;
+            setOnboardingCompleted(completed);
+            if (completed === false) {
+              router.push("/onboarding");
+            }
+          } catch (error) {
+            router.push("/onboarding");
+          }
         }
-      } catch(error) {
-        hey = error
-        router.push("/onboarding");
       }
     }
-
-      }
-    }
-  
     fetchUser();
   }, [isMounted, IsLoading, UserIslogged, router, onboardingCompleted]);
   
@@ -77,6 +72,9 @@ export default function ClientLayout({
       return <></>;
     }
   }
-
+  if (pathname == "/login" && pathname == "/register" && pathname == "/onboarding") {
+    if (UserIslogged) {
+    }
+  }
   return <>{children}</>;
 }

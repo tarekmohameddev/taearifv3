@@ -25,7 +25,7 @@ module.exports = (set) => ({
     try {
       const response = await axiosInstance.get(
         "https://taearif.com/api/dashboard/visitors",
-        { params: { time_range: timeRange } },
+        { time_range: timeRange },
       );
       set((state) => ({
         homepage: {

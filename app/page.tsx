@@ -2,10 +2,18 @@ import { WelcomeDashboard } from "@/components/welcome-dashboard";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { EnhancedSidebar } from "@/components/enhanced-sidebar";
 import { GuidedTour } from "@/components/guided-tour";
+
 export const metadata = {
   title: "Taearif Dashboard",
 };
+
 export default function Page() {
+
+  
+  
+  
+  
+  
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader />

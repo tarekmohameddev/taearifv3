@@ -64,7 +64,7 @@ export default function EditPropertyPage() {
     address: "",
     price: "",
     type: "",
-    transactionType: "",
+    transaction_type: "",
     bedrooms: "",
     bathrooms: "",
     area: "",
@@ -111,7 +111,7 @@ export default function EditPropertyPage() {
           address: property.address || "",
           price: property.price || "",
           type: property.type || "",
-          transactionType: property.transactionType || "",
+          transaction_type: property.transaction_type || "",
           bedrooms: property.beds?.toString() || "",
           bathrooms: property.bath?.toString() || "",
           area: property.area?.toString() || "",
@@ -245,16 +245,20 @@ export default function EditPropertyPage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.title) newErrors.title = "عنوان العقار مطلوب";
+    if (!formData.description) newErrors.description = "وصف العقار مطلوب";
     if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
     if (!formData.price) newErrors.price = "السعر مطلوب";
     if (!formData.type) newErrors.type = "نوع العقار مطلوب";
-    if (!formData.transactionType)
-      newErrors.transactionType = "نوع القائمة مطلوب";
+    if (!formData.transaction_type)
+      newErrors.transaction_type = "نوع القائمة مطلوب";
     if (!formData.bedrooms) newErrors.bedrooms = "عدد غرف النوم مطلوب";
     if (!formData.bathrooms) newErrors.bathrooms = "عدد الحمامات مطلوب";
     if (!formData.area) newErrors.area = "مساحة العقار مطلوبة";
-    if (!images.thumbnail)
+    if (!formData.features) newErrors.features = "ميزات العقار مطلوبة";
+    if (!previews.thumbnail && !images.thumbnail)
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
+    if (previews.gallery.length === 0 && images.gallery.length === 0)
+      newErrors.gallery = "يجب إضافة صورة واحدة على الأقل في معرض الصور";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -461,20 +465,20 @@ export default function EditPropertyPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="transactionType">نوع القائمة</Label>
+                      <Label htmlFor="transaction_type">نوع القائمة</Label>
                       <Select
-                        name="transactionType"
-                        value={formData.transactionType}
+                        name="transaction_type"
+                        value={formData.transaction_type}
                         onValueChange={(value) =>
                           handleInputChange({
-                            target: { name: "transactionType", value },
+                            target: { name: "transaction_type", value },
                           } as any)
                         }
                       >
                         <SelectTrigger
-                          id="transactionType"
+                          id="transaction_type"
                           className={
-                            errors.transactionType ? "border-red-500" : ""
+                            errors.transaction_type ? "border-red-500" : ""
                           }
                         >
                           <SelectValue placeholder="اختر النوع" />
@@ -484,9 +488,9 @@ export default function EditPropertyPage() {
                           <SelectItem value="للإيجار">للإيجار</SelectItem>
                         </SelectContent>
                       </Select>
-                      {errors.transactionType && (
+                      {errors.transaction_type && (
                         <p className="text-sm text-red-500">
-                          {errors.transactionType}
+                          {errors.transaction_type}
                         </p>
                       )}
                     </div>

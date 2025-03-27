@@ -277,12 +277,20 @@ export default function AddProjectPage(): JSX.Element {
     if (!thumbnailImage) {
       errors.thumbnail = "صورة المشروع الرئيسية مطلوبة";
     }
-    if (!newProject.location.trim()) {
-      errors.units = "عدد الوحدات مطلوبة";
+    if (!newProject.units) {
+      errors.units = "عدد الوحدات مطلوب";
     }
     if (isNaN(newProject.latitude) || isNaN(newProject.longitude)) {
       errors.coordinates = "إحداثيات الموقع غير صحيحة";
     }
+    // إضافة التحقق من معرض الصور ومخططات المشروع
+    if (galleryImages.length === 0) {
+      errors.galleryImages = "معرض صور المشروع مطلوب";
+    }
+    if (planImages.length === 0) {
+      errors.planImages = "مخططات المشروع مطلوبة";
+    }
+  
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -328,6 +336,7 @@ export default function AddProjectPage(): JSX.Element {
         }
       }
   
+      console.log("111111111111111111111111111111111111")
       let minPrice = 0;
       let maxPrice = 0;
       if (newProject.price.includes("-")) {
@@ -341,13 +350,16 @@ export default function AddProjectPage(): JSX.Element {
         maxPrice = minPrice;
       }
   
-      const formattedDate = new Date(newProject.completionDate)
-        .toISOString()
-        .split("T")[0];
+      console.log("2222222222222222222222222")
+      const formattedDate = newProject.completionDate
+        ? new Date(newProject.completionDate).toISOString().split("T")[0]
+        : "";
   
-      // إعداد بيانات المشروع مع استخدام path بدلاً من url
+      const publishedValue = status === "منشور" ? 1 : 0;
+      console.log("3333333333333333333333333333333333")
+  
       const projectData = {
-        featured_image: featuredImagePath, // استخدام path
+        featured_image: featuredImagePath,
         min_price: minPrice,
         max_price: maxPrice,
         latitude: newProject.latitude,
@@ -357,7 +369,7 @@ export default function AddProjectPage(): JSX.Element {
         units: Number(newProject.units),
         completion_date: formattedDate,
         developer: newProject.developer,
-        published: status === "منشور",
+        published: publishedValue,
         contents: [
           {
             language_id: 1,
@@ -376,8 +388,8 @@ export default function AddProjectPage(): JSX.Element {
             meta_description: "شقق فاخرة في دبي بإطلالة على البحر ومرافق متميزة.",
           },
         ],
-        gallery_images: galleryPaths, // استخدام paths
-        floorplan_images: floorplanPaths, // استخدام paths
+        gallery_images: galleryPaths,
+        floorplan_images: floorplanPaths,
         specifications: [
           { key: "Bedrooms", label: "Number of Bedrooms", value: "3" },
           { key: "Bathrooms", label: "Number of Bathrooms", value: "2" },
@@ -412,13 +424,17 @@ export default function AddProjectPage(): JSX.Element {
         "https://taearif.com/api/projects",
         projectData
       );
+      console.log("44444444444444444444444444444444444")
   
+      console.log("response.data", response.data);
       const currentState = useStore.getState();
-      const createdProject = response.data.data.user_project;
+      const createdProject = response.data.user_project;
+      console.log("createdProject", createdProject);
       const updatedProjects = [
         createdProject,
         ...currentState.projectsManagement.projects,
       ];
+      console.log("5555555555555555555555555555555")
       setProjectsManagement({
         projects: updatedProjects,
         pagination: {
@@ -426,6 +442,7 @@ export default function AddProjectPage(): JSX.Element {
           total: (currentState.projectsManagement.pagination?.total || 0) + 1,
         },
       });
+      console.log("66666666666666666666666666666666666")
   
       router.push("/projects");
     } catch (error: any) {
@@ -435,6 +452,7 @@ export default function AddProjectPage(): JSX.Element {
       setIsLoading(false);
     }
   };
+  
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
       <DashboardHeader />
@@ -748,7 +766,7 @@ export default function AddProjectPage(): JSX.Element {
                       5 ميجابايت.
                     </p>
                     {formErrors.thumbnail && (
-                      <p className="text-xs text-red-500">
+                      <p className="text-sm text-red-500">
                         {formErrors.thumbnail}
                       </p>
                     )}
@@ -759,131 +777,125 @@ export default function AddProjectPage(): JSX.Element {
 
             {/* Project Plans Upload */}
             <Card>
-              <CardHeader>
-                <CardTitle>مخططات المشروع</CardTitle>
-                <CardDescription>
-                  قم بتحميل مخططات الطوابق والتصاميم الهندسية للمشروع
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {planImages.map((image) => (
-                      <div
-                        key={image.id}
-                        className="border rounded-md p-2 relative"
-                      >
-                        <div className="h-40 bg-muted rounded-md overflow-hidden">
-                          <img
-                            src={image.url || "/placeholder.svg"}
-                            alt="Project plan"
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-4 right-4 h-6 w-6"
-                          onClick={() => removePlanImage(image.id)}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                        <p className="text-xs text-center mt-2 truncate">
-                          {image.file.name}
-                        </p>
-                      </div>
-                    ))}
-                    <div
-                      className="border rounded-md p-2 h-[11rem] flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
-                      onClick={() => plansInputRef.current?.click()}
-                    >
-                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                        <Plus className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        إضافة مخطط
-                      </p>
-                    </div>
-                  </div>
-                  <input
-                    ref={plansInputRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={handlePlansUpload}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    يمكنك رفع مخططات بصيغة JPG أو PNG. الحد الأقصى لعدد المخططات
-                    هو 10.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+  <CardHeader>
+    <CardTitle>مخططات المشروع</CardTitle>
+    <CardDescription>
+      قم بتحميل مخططات الطوابق والتصاميم الهندسية للمشروع
+    </CardDescription>
+  </CardHeader>
+  <CardContent>
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {planImages.map((image) => (
+          <div key={image.id} className="border rounded-md p-2 relative">
+            <div className="h-40 bg-muted rounded-md overflow-hidden">
+              <img
+                src={image.url || "/placeholder.svg"}
+                alt="Project plan"
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <Button
+              variant="destructive"
+              size="icon"
+              className="absolute top-4 right-4 h-6 w-6"
+              onClick={() => removePlanImage(image.id)}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+            <p className="text-xs text-center mt-2 truncate">
+              {image.file.name}
+            </p>
+          </div>
+        ))}
+        <div
+          className="border rounded-md p-2 h-[11rem] flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
+          onClick={() => plansInputRef.current?.click()}
+        >
+          <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+            <Plus className="h-5 w-5 text-muted-foreground" />
+          </div>
+          <p className="text-sm text-muted-foreground">إضافة مخطط</p>
+        </div>
+      </div>
+      <input
+        ref={plansInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={handlePlansUpload}
+      />
+      <p className="text-sm text-muted-foreground">
+        يمكنك رفع مخططات بصيغة JPG أو PNG. الحد الأقصى لعدد المخططات هو 10.
+      </p>
+      {formErrors.planImages && (
+        <p className="text-sm text-red-500">{formErrors.planImages}</p>
+      )}
+    </div>
+  </CardContent>
+</Card>
 
             {/* Project Gallery Upload */}
             <Card>
-              <CardHeader>
-                <CardTitle>معرض صور المشروع</CardTitle>
-                <CardDescription>
-                  قم بتحميل صور متعددة لعرض تفاصيل المشروع
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {galleryImages.map((image) => (
-                      <div
-                        key={image.id}
-                        className="border rounded-md p-2 relative"
-                      >
-                        <div className="h-40 bg-muted rounded-md overflow-hidden">
-                          <img
-                            src={image.url || "/placeholder.svg"}
-                            alt="Gallery image"
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-4 right-4 h-6 w-6"
-                          onClick={() => removeGalleryImage(image.id)}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                        <p className="text-xs text-center mt-2 truncate">
-                          {image.file.name}
-                        </p>
-                      </div>
-                    ))}
-                    <div
-                      className="border rounded-md p-2 h-[11rem] flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
-                      onClick={() => galleryInputRef.current?.click()}
-                    >
-                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                        <ImageIcon className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        إضافة صورة
-                      </p>
-                    </div>
-                  </div>
-                  <input
-                    ref={galleryInputRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={handleGalleryUpload}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    يمكنك رفع صور بصيغة JPG أو PNG. الحد الأقصى لعدد الصور هو
-                    20.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+  <CardHeader>
+    <CardTitle>معرض صور المشروع</CardTitle>
+    <CardDescription>
+      قم بتحميل صور متعددة لعرض تفاصيل المشروع
+    </CardDescription>
+  </CardHeader>
+  <CardContent>
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {galleryImages.map((image) => (
+          <div key={image.id} className="border rounded-md p-2 relative">
+            <div className="h-40 bg-muted rounded-md overflow-hidden">
+              <img
+                src={image.url || "/placeholder.svg"}
+                alt="Gallery image"
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <Button
+              variant="destructive"
+              size="icon"
+              className="absolute top-4 right-4 h-6 w-6"
+              onClick={() => removeGalleryImage(image.id)}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+            <p className="text-xs text-center mt-2 truncate">
+              {image.file.name}
+            </p>
+          </div>
+        ))}
+        <div
+          className="border rounded-md p-2 h-[11rem] flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
+          onClick={() => galleryInputRef.current?.click()}
+        >
+          <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+            <ImageIcon className="h-5 w-5 text-muted-foreground" />
+          </div>
+          <p className="text-sm text-muted-foreground">إضافة صورة</p>
+        </div>
+      </div>
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={handleGalleryUpload}
+      />
+      <p className="text-sm text-muted-foreground">
+        يمكنك رفع صور بصيغة JPG أو PNG. الحد الأقصى لعدد الصور هو 20.
+      </p>
+      {formErrors.galleryImages && (
+        <p className="text-sm text-red-500">{formErrors.galleryImages}</p>
+      )}
+    </div>
+  </CardContent>
+</Card>
 
             <Card>
               <CardFooter className="flex justify-between border-t p-6">

@@ -86,7 +86,7 @@ export default function AddProjectPage(): JSX.Element {
     name: "",
     location: "",
     price: "", 
-    status: "",
+    complete_status: "",
     completion_date: "", 
     units: 0,
     developer: "",
@@ -126,7 +126,7 @@ export default function AddProjectPage(): JSX.Element {
             name: projectData.contents[0].title,
             location: projectData.contents[0].address,
             price: `${projectData.price_range}`,
-            status: projectData.complete_status,
+            complete_status: projectData.complete_status,
             completion_date: projectData.completion_date.split("T")[0],
             units: projectData.units,
             developer: projectData.developer,
@@ -347,7 +347,7 @@ export default function AddProjectPage(): JSX.Element {
     if (!newProject.price.trim()) {
       errors.price = "السعر مطلوب";
     }
-    if (!newProject.status) {
+    if (!newProject.complete_status) {
       errors.status = "الحالة مطلوبة";
     }
     if (!newProject.completion_date.trim()) {
@@ -442,14 +442,14 @@ const amenitiesArray = typeof amenitiesNAMES === 'string'
   : [];
 
       const projectData = {
-        featured_image: thumbnailImage ? thumbnailImage.url : "",
+        featured_image: thumbnailImage.url,
         min_price: minPrice,
         max_price: maxPrice,
         latitude: newProject.latitude,
         longitude: newProject.longitude,
         featured: newProject.featured,
         complete_status: newProject.status === "قيد الإنشاء" ? "in progress" : "completed",
-        status: newProject.status === "قيد الإنشاء" ? "in progress" : "completed",
+        complete_status: newProject.complete_status === "قيد الإنشاء" ? "in progress" : "completed",
         units: Number(newProject.units),
         completion_date: formattedDate,
         developer: newProject.developer,
@@ -564,7 +564,7 @@ const amenitiesArray = typeof amenitiesNAMES === 'string'
                   <span className="sr-only">العودة</span>
                 </Button>
                 <h1 className="text-2xl font-bold tracking-tight">
-                  إضافة مشروع جديد
+                تعديل المشروع
                 </h1>
               </div>
               <div className="flex flex-col items-end gap-2">
@@ -651,10 +651,10 @@ const amenitiesArray = typeof amenitiesNAMES === 'string'
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="status">الحالة</Label>
+                    <Label htmlFor="complete_status">الحالة</Label>
                     <Select
                       onValueChange={(value) =>
-                        handleSelectChange("status", value)
+                        handleSelectChange("complete_status", value)
                       }
                     >
                       <SelectTrigger

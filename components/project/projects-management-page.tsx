@@ -230,14 +230,14 @@ export function ProjectsManagementPage() {
                 {loading
                   ? renderSkeletons()
                   : renderProjectCards(
-                      projects.filter((project) => project.status === 1),
+                      projects.filter((project) => project.published === true),
                     )}
               </TabsContent>
               <TabsContent value="0" className="mt-4">
                 {loading
                   ? renderSkeletons()
                   : renderProjectCards(
-                      projects.filter((project) => project.status === 0),
+                      projects.filter((project) => project.published === false),
                     )}
               </TabsContent>
               <TabsContent value="featured" className="mt-4">
@@ -292,12 +292,12 @@ function ProjectCard({ project }: { project: IProject }) {
         )}
         <div
           className={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-medium ${
-            project.status === 1
+            project.published === true
               ? "bg-green-500 text-white"
               : "bg-amber-500 text-white"
           }`}
         >
-          {project.status === 1 ? "منشور" : "مسودة"}
+          {project.published === true ? "منشور" : "مسودة"}
         </div>
       </div>
       <CardHeader className="p-4">
@@ -332,7 +332,7 @@ function ProjectCard({ project }: { project: IProject }) {
                 <Copy className="mr-2 h-4 w-4" />
                 نسخ
               </DropdownMenuItem>
-              {project.status === 0 ? (
+              {project.published === false ? (
                 <DropdownMenuItem>
                   <ExternalLink className="mr-2 h-4 w-4" />
                   نشر
@@ -421,12 +421,12 @@ function ProjectListItem({ project }: { project: IProject }) {
           )}
           <div
             className={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-medium ${
-              project.status === 1
+              project.published === true
                 ? "bg-green-500 text-white"
                 : "bg-amber-500 text-white"
             }`}
           >
-            {project.status === 1 ? "منشور" : "مسودة"}
+            {project.published === true ? "منشور" : "مسودة"}
           </div>
         </div>
         <div className="flex flex-1 flex-col p-4">
@@ -480,7 +480,7 @@ function ProjectListItem({ project }: { project: IProject }) {
                     <Copy className="mr-2 h-4 w-4" />
                     نسخ
                   </DropdownMenuItem>
-                  {project.status === 0 ? (
+                  {project.published === false ? (
                     <DropdownMenuItem>
                       <ExternalLink className="mr-2 h-4 w-4" />
                       نشر

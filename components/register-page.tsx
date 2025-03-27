@@ -278,8 +278,8 @@ export function RegisterPage() {
           });
           setFormSubmitted(true);
           setTimeout(() => {
-            router.push("/");
-          }, 2000);
+            router.push("/onboarding");
+          }, 1500);
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {

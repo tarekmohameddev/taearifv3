@@ -358,7 +358,7 @@ export function PropertiesManagementPage() {
                   {viewMode === "grid" ? (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       {properties
-                        .filter((property) => property.listingType === "للبيع")
+                        .filter((property) => property.transaction_type === "للبيع")
                         .map((property) => (
                           <PropertyCard
                             key={property.id}
@@ -373,7 +373,7 @@ export function PropertiesManagementPage() {
                   ) : (
                     <div className="space-y-4">
                       {properties
-                        .filter((property) => property.listingType === "للبيع")
+                        .filter((property) => property.transaction_type === "للبيع")
                         .map((property) => (
                           <PropertyListItem
                             key={property.id}
@@ -392,7 +392,7 @@ export function PropertiesManagementPage() {
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       {properties
                         .filter(
-                          (property) => property.listingType === "للإيجار",
+                          (property) => property.transaction_type === "للإيجار",
                         )
                         .map((property) => (
                           <PropertyCard
@@ -409,7 +409,7 @@ export function PropertiesManagementPage() {
                     <div className="space-y-4">
                       {properties
                         .filter(
-                          (property) => property.listingType === "للإيجار",
+                          (property) => property.transaction_type === "للإيجار",
                         )
                         .map((property) => (
                           <PropertyListItem
@@ -555,7 +555,7 @@ function PropertyCard({
               property.featured_image ||
               "/placeholder.svg"
             }
-            alt={property.title}
+            alt={property.title || property.contents[0].title}
             className="h-full w-full object-cover transition-all hover:scale-105"
           />
         </div>
@@ -589,10 +589,10 @@ function PropertyCard({
         <div className="flex items-start justify-between">
           <div>
             <CardTitle className="whitespace-nowrap">
-              {property.title}
+              {property.title || property.contents[0].title}
             </CardTitle>
             <CardDescription className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" /> {property.address}
+              <MapPin className="h-3 w-3" /> {property.address || property.contents[0].address }
             </CardDescription>
           </div>
           <DropdownMenu>
@@ -644,7 +644,7 @@ function PropertyCard({
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
         <div className="text-lg font-semibold">
-          {property.listingType === "للبيع"
+          {property.transaction_type === "للبيع"
             ? `$${property.price.toLocaleString()}`
             : `$${property.price.toLocaleString()}/شهر`}
         </div>
@@ -669,8 +669,7 @@ function PropertyCard({
           </div>
         </div>
         <div className="flex flex-wrap gap-1 pt-2">
-          {property.features
-            .slice(0, 3)
+          {property.features?.slice(0, 3)
             .map((feature: string, index: number) => (
               <span
                 key={index}
@@ -679,9 +678,9 @@ function PropertyCard({
                 {feature}
               </span>
             ))}
-          {property.features.length > 3 && (
+          {property.features?.length > 3 && (
             <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
-              +{property.features.length - 3} more
+              +{property.features?.length - 3} more
             </span>
           )}
         </div>
@@ -721,7 +720,7 @@ function PropertyListItem({
                 property.featured_image ||
                 "/placeholder.svg"
               }
-              alt={property.title}
+              alt={property.title || property.contents[0].title}
               className="h-full w-full object-cover"
             />
           </div>
@@ -754,13 +753,13 @@ function PropertyListItem({
         <div className="flex flex-1 flex-col p-4">
           <div className="flex items-start justify-between">
             <div>
-              <h3 className="font-semibold">{property.title}</h3>
+              <h3 className="font-semibold">{property.title || property.contents[0].title}</h3>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
-                <MapPin className="h-3 w-3" /> {property.address}
+                <MapPin className="h-3 w-3" /> {property.address || property.contents[0].address }
               </p>
             </div>
             <div className="text-lg font-semibold">
-              {property.listingType === "للبيع"
+              {property.transaction_type === "للبيع"
                 ? `$${property.price.toLocaleString()}`
                 : `$${property.price.toLocaleString()}/شهر`}
             </div>

@@ -64,7 +64,7 @@ export default function AddPropertyPage() {
     address: "",
     price: "",
     type: "",
-    transactionType: "",
+    transaction_type: "",
     bedrooms: "",
     bathrooms: "",
     size: "",
@@ -214,13 +214,18 @@ export default function AddPropertyPage() {
     if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
     if (!formData.price) newErrors.price = "السعر مطلوب";
     if (!formData.type) newErrors.type = "نوع العقار مطلوب";
-    if (!formData.transactionType)
-      newErrors.transactionType = "نوع القائمة مطلوب";
+    if (!formData.transaction_type)
+      newErrors.transaction_type = "نوع القائمة مطلوب";
     if (!formData.bedrooms) newErrors.bedrooms = "عدد غرف النوم مطلوب";
     if (!formData.bathrooms) newErrors.bathrooms = "عدد الحمامات مطلوب";
     if (!formData.size) newErrors.size = "مساحة العقار مطلوبة";
+    if (!formData.features) newErrors.features = "الميزات مطلوبة";
     if (!images.thumbnail)
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
+    if (!images.gallery.length)
+      newErrors.gallery = "يجب تحميل صورة واحدة على الأقل في معرض الصور";
+    if (formData.description.length < 15)
+      newErrors.description = "يجب أن يكون الوصف 15 حرفًا على الأقل";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -234,12 +239,14 @@ export default function AddPropertyPage() {
     if (validateForm()) {
       setIsLoading(true);
       setUploading(true);
+      console.log("111111111111111111111111")
   
       try {
         let thumbnailPath: string | null = null;
         let galleryPaths: string[] = [];
         let floorPlansPaths: string[] = [];
   
+  console.log("2222222222222222222222222")
         if (images.thumbnail) {
           const uploadedFile = await uploadSingleFile(images.thumbnail, "property");
           thumbnailPath = uploadedFile.path.replace("https://taearif.com", "");
@@ -249,6 +256,7 @@ export default function AddPropertyPage() {
           }));
         }
   
+  console.log("33333333333333333333333333333333333")
         if (images.gallery.length > 0) {
           const uploadedFiles = await uploadMultipleFiles(images.gallery, "property");
           galleryPaths = uploadedFiles.map((f) => f.path.replace("https://taearif.com", ""));
@@ -258,6 +266,7 @@ export default function AddPropertyPage() {
           }));
         }
   
+  console.log("444444444444444444444444444")
         // معالجة مخططات الطوابق (floorPlans)
         if (images.floorPlans.length > 0) {
           const uploadedFiles = await uploadMultipleFiles(images.floorPlans, "property");
@@ -267,7 +276,7 @@ export default function AddPropertyPage() {
             floorPlans: uploadedFiles.map((f) => f.url.replace("https://taearif.com", "")),
           }));
         }
-  
+  console.log("5555555555555555555555555555")
         // إعداد بيانات العقار للإرسال إلى الـ API
         const propertyData = {
           title: formData.title,
@@ -278,7 +287,7 @@ export default function AddPropertyPage() {
           bath: parseInt(formData.bathrooms),
           size: parseInt(formData.size),
           features: formData.features.split(",").map((f) => f.trim()),
-          transactionType: formData.transactionType,
+          transaction_type: formData.transaction_type,
           status: publish ? 1 : 0,
           featured_image: thumbnailPath,
           floor_planning_image: floorPlansPaths,
@@ -291,14 +300,16 @@ export default function AddPropertyPage() {
           city_id: 1,
           category_id: 1,
         };
+        console.log("66666666666666666666666666666666666")
   
         // إرسال البيانات إلى الـ API
         let response = await axiosInstance.post("https://taearif.com/api/properties", propertyData);
         toast.success("تم نشر العقار بنجاح");
+        console.log("777777777777777777777777777777")
   
         // تحديث حالة التطبيق
         const currentState = useStore.getState();
-        const createdProject = response.data.data.property;
+        const createdProject = response.data.user_property;
         createdProject.status = createdProject.status === 1 ? "منشور" : "مسودة";
         const updatedProperties = [createdProject, ...currentState.propertiesManagement.properties];
         setPropertiesManagement({
@@ -391,7 +402,11 @@ export default function AddPropertyPage() {
                       rows={4}
                       value={formData.description}
                       onChange={handleInputChange}
+                      className={errors.description ? "border-red-500" : ""}
                     />
+                    {errors.description && (
+                      <p className="text-sm text-red-500">{errors.description}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -427,32 +442,32 @@ export default function AddPropertyPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="transactionType">نوع القائمة</Label>
+                      <Label htmlFor="transaction_type">نوع القائمة</Label>
                       <Select
-                        name="transactionType"
-                        value={formData.transactionType}
+                        name="transaction_type"
+                        value={formData.transaction_type}
                         onValueChange={(value) =>
                           handleInputChange({
-                            target: { name: "transactionType", value },
+                            target: { name: "transaction_type", value },
                           } as any)
                         }
                       >
                         <SelectTrigger
-                          id="transactionType"
+                          id="transaction_type"
                           className={
-                            errors.transactionType ? "border-red-500" : ""
+                            errors.transaction_type ? "border-red-500" : ""
                           }
                         >
                           <SelectValue placeholder="اختر النوع" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="للبيع">للبيع</SelectItem>
-                          <SelectItem value="للإيجار">للإيجار</SelectItem>
+                          <SelectItem value="sale">للبيع</SelectItem>
+                          <SelectItem value="rent">للإيجار</SelectItem>
                         </SelectContent>
                       </Select>
-                      {errors.transactionType && (
+                      {errors.transaction_type && (
                         <p className="text-sm text-red-500">
-                          {errors.transactionType}
+                          {errors.transaction_type}
                         </p>
                       )}
                     </div>
@@ -586,7 +601,11 @@ export default function AddPropertyPage() {
                       placeholder="شرفة، أرضيات خشبية، أجهزة منزلية حديثة"
                       value={formData.features}
                       onChange={handleInputChange}
+                      className={errors.features ? "border-red-500" : ""}
                     />
+                    {errors.features && (
+                      <p className="text-sm text-red-500">{errors.features}</p>
+                    )}
                   </div>
 
                   <div className="flex items-center space-x-2 pt-4">
@@ -795,6 +814,9 @@ export default function AddPropertyPage() {
                       className="hidden"
                       onChange={(e) => handleFileChange(e, "gallery")}
                     />
+                    {errors.gallery && (
+                      <p className="text-red-500 text-sm">{errors.gallery}</p>
+                    )}
                     <p className="text-sm text-muted-foreground">
                       يمكنك رفع صور بصيغة JPG أو PNG. الحد الأقصى لعدد الصور هو
                       10.

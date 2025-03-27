@@ -22,6 +22,7 @@ export default async function handler(req, res) {
           username: user.username,
           first_name: user.first_name,
           last_name: user.last_name,
+          onboarding_completed: user.onboarding_completed === true,
         },
         process.env.SECRET_KEY,
         { expiresIn: "30d" },
@@ -46,6 +47,7 @@ export default async function handler(req, res) {
           username: user.username,
           first_name: user.first_name,
           last_name: user.last_name,
+          onboarding_completed: user.onboarding_completed || false,
         },
       });
     } catch (error) {

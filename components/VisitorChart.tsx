@@ -28,12 +28,12 @@ function VisitorChart() {
   // جلب البيانات إذا كانت فارغة للفترة الزمنية المختارة
   useEffect(() => {
     const dataForSelectedRange = visitorData[selectedTimeRange];
-    if (!dataForSelectedRange || dataForSelectedRange.length === 0) {
+    console.log("dataForSelectedRange", dataForSelectedRange);
+    if (!dataForSelectedRange) { 
       fetchVisitorData(selectedTimeRange);
     }
   }, [selectedTimeRange, visitorData, fetchVisitorData]);
 
-  // البيانات التي سيتم عرضها في الرسم البياني
   const chartData = visitorData[selectedTimeRange] || [];
 
   return (

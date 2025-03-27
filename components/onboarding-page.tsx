@@ -1,6 +1,6 @@
 "use client"
 import useAuthStore from "@/context/AuthContext";
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { uploadSingleFile } from "@/utils/uploadSingle";
@@ -85,57 +85,67 @@ const OnboardingPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const faviconInputRef = useRef<HTMLInputElement>(null)
 
-const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setWhereError("")
-  setErrors("")
-  setIsLoading("")
-  if (e.target.files && e.target.files[0]) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
+  // الحصول على قيمة onboarding_completed من Zustand
+  const onboarding_completed = useAuthStore((state) => state.onboarding_completed);
+  
+  // إذا كانت onboarding مفعلة (أي اكتملت)، يتم نقلك إلى الصفحة الرئيسية
+  useEffect(() => {
+    if (onboarding_completed) {
+      router.push("/");
+    }
+  }, [onboarding_completed, router]);
 
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        setWebsiteData({
-          ...websiteData,
-          logo: event.target.result as string, // للمعاينة
-          logoFile: file, // الملف الأصلي
-        });
-        toast.success("تم رفع الشعار بنجاح");
-      }
-    };
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWhereError("")
+    setErrors("")
+    setIsLoading("")
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
 
-    reader.readAsDataURL(file);
-  }
-};
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setWebsiteData({
+            ...websiteData,
+            logo: event.target.result as string, // للمعاينة
+            logoFile: file, // الملف الأصلي
+          });
+          toast.success("تم رفع الشعار بنجاح");
+        }
+      };
 
-const handleFaviconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setWhereError("")
-  setIsLoading("")
-  setErrors("")
-  if (e.target.files && e.target.files[0]) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
+      reader.readAsDataURL(file);
+    }
+  };
 
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        setWebsiteData({
-          ...websiteData,
-          favicon: event.target.result as string, // للمعاينة
-          faviconFile: file, // الملف الأصلي
-        });
-        toast.success("تم رفع أيقونة الموقع بنجاح");
+  const handleFaviconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWhereError("")
+    setIsLoading("")
+    setErrors("")
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
 
-      }
-    };
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setWebsiteData({
+            ...websiteData,
+            favicon: event.target.result as string, // للمعاينة
+            faviconFile: file, // الملف الأصلي
+          });
+          toast.success("تم رفع أيقونة الموقع بنجاح");
 
-    reader.readAsDataURL(file);
-  }
-};
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
 
   const useLogoAsFavicon = () => {
     setWhereError("")
-  setIsLoading("")
-  setErrors("")
+    setIsLoading("")
+    setErrors("")
     if (websiteData.logo && websiteData.logoFile) {
       setWebsiteData({
         ...websiteData,
