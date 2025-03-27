@@ -107,6 +107,7 @@ export function SettingsPage() {
   const [themes, setThemes] = useState([]);
   const [hasFormatError, setHasFormatError] = useState(false);
   const [isLoadingDomains, setIsLoadingDomains] = useState(true);
+  const [isLoadingThemes, setIsLoadingThemes] = useState(true);
 
   
   useEffect(() => {
@@ -126,21 +127,24 @@ export function SettingsPage() {
   }, []);
   
 
-  useEffect(() => {
-    const fetchThemes = async () => {
-      try {
-        const response = await axiosInstance.get('/settings/theme');
-        setThemes(response.data.themes);
-      } catch (error) {
-        console.error('Error fetching themes:', error);
-        toast.error('فشل في تحميل السمات');
-      }
-    };
-    
-    if (activeTab === 'themes') {
-      fetchThemes();
+useEffect(() => {
+  const fetchThemes = async () => {
+    try {
+      setIsLoadingThemes(true);
+      const response = await axiosInstance.get('/settings/theme');
+      setThemes(response.data.themes);
+    } catch (error) {
+      console.error('Error fetching themes:', error);
+      toast.error('فشل في تحميل السمات');
+    } finally {
+      setIsLoadingThemes(false);
     }
-  }, [activeTab]);
+  };
+  
+  if (activeTab === 'themes') {
+    fetchThemes();
+  }
+}, [activeTab]);
   
   useEffect(() => {
     console.log("domains",domains)
@@ -931,11 +935,31 @@ const handleVerifyDomain = async (domainId) => {
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {themes.map((theme) => (
-  <Card
-    key={theme.id}
-    className={`overflow-hidden ${theme.active ? "border-primary border-2" : ""}`}
-  >
+  {isLoadingThemes ? (
+    [1, 2, 3, 4].map((i) => (
+      <Card key={i} className="overflow-hidden">
+        <Skeleton className="aspect-video w-full rounded-none" />
+        <CardHeader className="pb-2">
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        </CardHeader>
+        <CardContent className="pb-2">
+          <Skeleton className="h-6 w-24" />
+        </CardContent>
+        <CardFooter>
+          <Skeleton className="h-9 w-full" />
+        </CardFooter>
+      </Card>
+    ))
+  ) : (
+    themes.map((theme) => (
+      <Card
+        key={theme.id}
+        className={`overflow-hidden ${theme.active ? "border-primary border-2" : ""}`}
+      >
                       <div className="aspect-video w-full overflow-hidden">
                         <img
                           src={theme.thumbnail || "/placeholder.svg"}
@@ -989,7 +1013,7 @@ const handleVerifyDomain = async (domainId) => {
       )}
     </CardFooter>
                     </Card>
-                  ))}
+                  )))}
 
 
                 </div>
