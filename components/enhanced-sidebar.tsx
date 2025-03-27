@@ -114,13 +114,13 @@ export function EnhancedSidebar({
     //   icon: Package,
     //   path: "/apps",
     // },
-    // {
-    //   id: "settings",
-    //   label: "إعدادات الموقع",
-    //   description: "تكوين موقعك",
-    //   icon: Settings,
-    //   path: "/settings",
-    // },
+    {
+      id: "settings",
+      label: "إعدادات الموقع",
+      description: "تكوين موقعك",
+      icon: Settings,
+      path: "/settings",
+    },
   ];
 
   // Determine active tab from pathname

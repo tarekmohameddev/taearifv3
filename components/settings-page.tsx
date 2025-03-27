@@ -1,8 +1,7 @@
 "use client";
 
 import { DialogTrigger } from "@/components/ui/dialog";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AlertCircle,
   ExternalLink,
@@ -70,6 +69,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import axiosInstance from '@/lib/axiosInstance';
+import { Skeleton } from "@/components/ui/skeleton";
+
+
+
+
+
+
+const domainsHelp = {
+  title: "إدارة النطاقات",
+  description: "تعرف على كيفية ربط وإدارة النطاقات المخصصة لموقعك.",
+  links: [
+    { title: "كيفية ربط نطاق مخصص", href: "#", type: "article" },
+    { title: "فهم إعدادات DNS", href: "#", type: "video" },
+    { title: "استكشاف مشكلات النطاق وإصلاحها", href: "#", type: "article" },
+  ],
+};
+
+
+
 
 export function SettingsPage() {
   const [isAddDomainOpen, setIsAddDomainOpen] = useState(false);
@@ -79,25 +98,168 @@ export function SettingsPage() {
   const [activeTab, setActiveTab] = useState("domains");
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [domains, setDomains] = useState([]); // البداية بمصفوفة فارغة لأننا سنجلب البيانات من الـ API
+  const [dnsInstructions, setDnsInstructions] = useState([]);
+  const [verifyingDomains, setVerifyingDomains] = useState({});
+  const [deleteDomainId, setDeleteDomainId] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [themes, setThemes] = useState([]);
+  const [hasFormatError, setHasFormatError] = useState(false);
+  const [isLoadingDomains, setIsLoadingDomains] = useState(true);
 
-  const [domains, setDomains] = useState([
-    {
-      id: "1",
-      name: "mywebsite.com",
-      status: "active",
-      primary: true,
-      ssl: true,
-      addedDate: "2023-10-15",
-    },
-    {
-      id: "2",
-      name: "my-brand.com",
-      status: "pending",
-      primary: false,
-      ssl: false,
-      addedDate: "2023-11-20",
-    },
-  ]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoadingDomains(true);
+        const response = await axiosInstance.get('/settings/domain');
+        setDomains(response.data.domains);
+        setDnsInstructions(response.data.dnsInstructions);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoadingDomains(false);
+      }
+    };
+    fetchData();
+  }, []);
+  
+
+  useEffect(() => {
+    const fetchThemes = async () => {
+      try {
+        const response = await axiosInstance.get('/settings/theme');
+        setThemes(response.data.themes);
+      } catch (error) {
+        console.error('Error fetching themes:', error);
+        toast.error('فشل في تحميل السمات');
+      }
+    };
+    
+    if (activeTab === 'themes') {
+      fetchThemes();
+    }
+  }, [activeTab]);
+  
+  useEffect(() => {
+    console.log("domains",domains)
+  }, [domains]);
+
+  
+  const handleAddDomain = async () => {
+    // التحقق من البادئات الممنوعة أولاً
+    if (
+      newDomain.startsWith("www.") ||
+      newDomain.startsWith("http:") ||
+      newDomain.startsWith("https:")
+    ) {
+      toast.error("لا يجب كتابة www أو http:// في بداية النطاق");
+      setErrorMessage("تنسيق النطاق غير صالح - أزل www أو http://");
+      setHasFormatError(true);
+      return;
+    }
+  
+    if (!newDomain) {
+      toast.error("اسم النطاق مطلوب");
+      setErrorMessage("اسم النطاق مطلوب");
+      return;
+    }
+  
+    const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+    if (!domainRegex.test(newDomain)) {
+      toast.error("تنسيق النطاق غير صالح");
+      setErrorMessage("تنسيق النطاق غير صالح");
+      setHasFormatError(true);
+      return;
+    }
+
+
+
+  const loadingToast = toast.loading("جاري إضافة النطاق...");
+  try {
+    const response = await axiosInstance.post('/settings/domain', { custom_name: newDomain });
+    const addedDomain = response.data.data;
+    addedDomain.status = "pending"
+    setDomains([...domains, addedDomain]);
+    setNewDomain("");
+    setIsAddDomainOpen(false);
+    setSetupProgress(Math.min(setupProgress + 20, 100));
+    toast.dismiss(loadingToast);
+    toast.success("تمت إضافة النطاق بنجاح");
+    setErrorMessage(""); // تصفير رسالة الخطأ عند النجاح
+  } catch (error) {
+    console.error('Error adding domain:', error);
+    toast.dismiss(loadingToast);
+    
+    // التحقق من وجود رسالة خطأ من الـ API واستخدامها
+    const errorMessage = error.response?.data?.message || "حدث خطأ أثناء إضافة النطاق";
+    toast.error(errorMessage);
+    setErrorMessage(errorMessage); // تخزين رسالة الخطأ لعرضها أسفل الزر
+  }
+};
+  
+  
+  
+  
+const handleVerifyDomain = async (domainId) => {
+  setVerifyingDomains(prev => ({ ...prev, [domainId]: true }));
+  const loadingToast = toast.loading("جاري التحقق من النطاق...");
+  try {
+    const response = await axiosInstance.post('/settings/domain/verify', { id: domainId });
+    const verifiedDomain = response.data.data;
+    setDomains(domains.map((domain) => domain.id === domainId ? verifiedDomain : domain));
+    setSetupProgress(Math.min(setupProgress + 20, 100));
+    toast.dismiss(loadingToast);
+    toast.success("تم التحقق من النطاق بنجاح");
+  } catch (error) {
+    console.error('Error verifying domain:', error);
+    toast.dismiss(loadingToast);
+    toast.error("حدث خطأ أثناء التحقق من النطاق");
+  } finally {
+    setVerifyingDomains(prev => ({ ...prev, [domainId]: false }));
+  }
+};
+
+  // تعيين نطاق رئيسي باستخدام PATCH API
+  const handleSetPrimaryDomain = async (domainId) => {
+    const loadingToast = toast.loading("جاري تحديث النطاق الرئيسي...");
+    try {
+      await axiosInstance.post('/settings/domain/set-primary', { id: domainId });
+      setDomains(domains.map((domain) => ({
+        ...domain,
+        primary: domain.id === domainId,
+      })));
+      toast.dismiss(loadingToast);
+      toast.success("تم تحديث النطاق الرئيسي بنجاح");
+    } catch (error) {
+      console.error('Error setting primary domain:', error);
+      toast.dismiss(loadingToast);
+      toast.error("حدث خطأ أثناء تحديث النطاق الرئيسي");
+    }
+  };
+
+  
+  
+
+  const handleDeleteDomain = async () => {
+    if (!deleteDomainId) return;
+  
+    const loadingToast = toast.loading("جاري حذف النطاق...");
+    try {
+      await axiosInstance.delete(`/settings/domain/${deleteDomainId}`);
+      setDomains(domains.filter((domain) => domain.id !== deleteDomainId));
+      toast.dismiss(loadingToast);
+      toast.success("تم حذف النطاق بنجاح");
+    } catch (error) {
+      console.error('Error deleting domain:', error);
+      toast.dismiss(loadingToast);
+      toast.error("حدث خطأ أثناء حذف النطاق");
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setDeleteDomainId(null);
+    }
+  };
 
   const [subscriptionPlans, setSubscriptionPlans] = useState([
     {
@@ -144,166 +306,39 @@ export function SettingsPage() {
     },
   ]);
 
-  const [themes, setThemes] = useState([
-    {
-      id: "modern",
-      name: "عصري وأنيق",
-      description: "تصميم عصري مع تأثيرات حركة سلسة",
-      thumbnail: "/placeholder.svg?height=120&width=240",
-      category: "business",
-      active: true,
-      popular: true,
-    },
-    {
-      id: "minimal",
-      name: "بسيط وأنيق",
-      description: "تصميم بسيط مع تركيز على المحتوى",
-      thumbnail: "/placeholder.svg?height=120&width=240",
-      category: "portfolio",
-      active: false,
-    },
-    {
-      id: "bold",
-      name: "جريء وملفت",
-      description: "تصميم جريء مع ألوان نابضة بالحياة",
-      thumbnail: "/placeholder.svg?height=120&width=240",
-      category: "business",
-      active: false,
-    },
-    {
-      id: "elegant",
-      name: "أنيق وفاخر",
-      description: "تصميم أنيق مع لمسات فاخرة",
-      thumbnail: "/placeholder.svg?height=120&width=240",
-      category: "restaurant",
-      active: false,
-    },
-  ]);
-
-  const handleAddDomain = () => {
-    if (!newDomain) {
-      toast.error( "اسم النطاق مطلوب");
-      return;
-    }
-
-    // Validate domain format
-    const domainRegex =
-      /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
-    if (!domainRegex.test(newDomain)) {
-      toast.error("تنسيق النطاق غير صالح");
-      return;
-    }
-
-    const newId = (domains.length + 1).toString();
-    const domainToAdd = {
-      id: newId,
-      name: newDomain,
-      status: "pending",
-      primary: domains.length === 0, // First domain is primary by default
-      ssl: false,
-      addedDate: new Date().toISOString().split("T")[0],
-    };
-
-    setDomains([...domains, domainToAdd]);
-    setNewDomain("");
-    setIsAddDomainOpen(false);
-    setSetupProgress(Math.min(setupProgress + 20, 100));
-
-    toast.success("تمت إضافة النطاق بنجاح");
-  };
-
-  const handleVerifyDomain = (domainId: string) => {
-    setIsVerifyingDomain(true);
-
-    // Simulate verification process
-    setTimeout(() => {
-      setDomains(
-        domains.map((domain) =>
-          domain.id === domainId
-            ? { ...domain, status: "active", ssl: true }
-            : domain,
-        ),
-      );
-      setIsVerifyingDomain(false);
-      setSetupProgress(Math.min(setupProgress + 20, 100));
-
-    toast.success("تمت إضافة النطاق بنجاح");
-
-    }, 2000);
-  };
-
-  const handleSetPrimaryDomain = (domainId: string) => {
-    setDomains(
-      domains.map((domain) => ({
-        ...domain,
-        primary: domain.id === domainId,
-      })),
-    );
-
-    toast.success("تم تحديث النطاق الرئيسي");
-  };
-
-  const handleDeleteDomain = (domainId: string) => {
-    setDomains(domains.filter((domain) => domain.id !== domainId));
-    toast.success("تمت إزالة النطاق");
-  };
-
-  const handleActivateTheme = (themeId: string) => {
-    setThemes(
-      themes.map((theme) => ({
+  const handleActivateTheme = async (themeId) => {
+    try {
+      await axiosInstance.post('/settings/theme/set-active', {
+        theme_id: themeId
+      });
+      
+      setThemes(themes.map((theme) => ({
         ...theme,
-        active: theme.id === themeId,
-      })),
-    );
-
-    toast.success("تم تنشيط السمة");
+        active: theme.id === themeId
+      })));
+      
+      toast.success("تم تنشيط السمة بنجاح");
+    } catch (error) {
+      console.error('Error activating theme:', error);
+      toast.error("حدث خطأ أثناء تنشيط السمة");
+    }
   };
 
-  const handleSubscriptionChange = (planId: string) => {
-    setSubscriptionPlans(
-      subscriptionPlans.map((plan) => ({
-        ...plan,
-        current: plan.id === planId,
-      })),
-    );
-
-    toast.success("تم تغيير الاشتراك");
+  const handleSubscriptionChange = (planId) => {
+    setSubscriptionPlans(subscriptionPlans.map((plan) => ({
+      ...plan,
+      current: plan.id === planId,
+    })));
+    toast.success("تم تغيير الاشتراك بنجاح");
   };
 
-  // Contextual help for domains tab
-  const domainsHelp = {
-    title: "إدارة النطاقات",
-    description: "تعرف على كيفية ربط وإدارة النطاقات المخصصة لموقعك.",
-    links: [
-      {
-        title: "كيفية ربط نطاق مخصص",
-        href: "#",
-        type: "article" as const,
-      },
-      {
-        title: "فهم إعدادات DNS",
-        href: "#",
-        type: "video" as const,
-      },
-      {
-        title: "استكشاف مشكلات النطاق وإصلاحها",
-        href: "#",
-        type: "article" as const,
-      },
-    ],
-  };
 
   const filteredDomains = domains.filter((domain) => {
     if (statusFilter !== "all") {
       if (statusFilter === "active" && domain.status !== "active") return false;
-      if (statusFilter === "pending" && domain.status !== "pending")
-        return false;
+      if (statusFilter === "pending" && domain.status !== "pending") return false;
     }
-
-    if (searchQuery && !domain.name.includes(searchQuery)) {
-      return false;
-    }
-
+    if (searchQuery && !domain.custom_name.includes(searchQuery)) return false;
     return true;
   });
 
@@ -341,18 +376,6 @@ export function SettingsPage() {
                 <p className="text-muted-foreground">
                   إدارة إعدادات حسابك وتفضيلات موقعك
                 </p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Progress value={setupProgress} className="w-[180px]" />
-                  <span className="text-sm text-muted-foreground">
-                    {setupProgress}% مكتمل
-                  </span>
-                </div>
-                <Button className="gap-1 w-full md:w-auto">
-                  <Save className="h-4 w-4" />
-                  حفظ جميع التغييرات
-                </Button>
               </div>
             </div>
 
@@ -431,6 +454,9 @@ export function SettingsPage() {
                           إضافة نطاق
                         </Button>
                       </DialogTrigger>
+{/* {errorMessage && (
+  <p style={{ color: 'red', marginTop: '5px' }}>{errorMessage}</p>
+)} */}
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>إضافة نطاق مخصص</DialogTitle>
@@ -443,15 +469,33 @@ export function SettingsPage() {
                           <div className="grid gap-2">
                             <Label htmlFor="domain-name">اسم النطاق</Label>
                             <Input
-                              id="domain-name"
-                              placeholder="example.com"
-                              value={newDomain}
-                              onChange={(e) => setNewDomain(e.target.value)}
-                            />
-                            <p className="text-sm text-muted-foreground">
+  id="domain-name"
+  placeholder="example.com"
+  value={newDomain}
+  onChange={(e) => {
+    const value = e.target.value;
+    setNewDomain(value);
+    
+    // إعادة تعيين حالة الخطأ عند التغيير
+    setHasFormatError(false);
+    setErrorMessage("");
+    
+    // التحقق الفوري عند الكتابة
+    if (
+      value.startsWith("www.") ||
+      value.startsWith("http://") ||
+      value.startsWith("https://")
+    ) {
+      setHasFormatError(true);
+      setErrorMessage("لا تستخدم www أو http://");
+    }
+  }}
+/>
+
+<p className={`text-sm ${hasFormatError ? 'text-destructive' : 'text-muted-foreground'}`}>
                               أدخل نطاقك بدون www أو http://
                             </p>
-                          </div>
+                          </div>  
                         </div>
                         <DialogFooter>
                           <Button
@@ -467,7 +511,31 @@ export function SettingsPage() {
                   </div>
                 </div>
 
-                {filteredDomains.length === 0 ? (
+                {isLoadingDomains ? (
+  <div className="grid gap-4 md:grid-cols-2">
+    {[1, 2, 3 , 4].map((i) => (
+      <Card key={i}>
+        <CardHeader className="flex flex-row items-start justify-between p-6">
+          <div className="space-y-2 flex-1">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+          <Skeleton className="h-8 w-20" />
+        </CardHeader>
+        <CardContent className="px-6 pb-2">
+          <div className="flex justify-between mb-4">
+            <Skeleton className="h-5 w-16" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </CardContent>
+        <CardFooter className="px-6 pb-6 pt-2 flex gap-2">
+          <Skeleton className="h-9 w-32" />
+          <Skeleton className="h-9 w-20" />
+        </CardFooter>
+      </Card>
+    ))}
+  </div>
+) : filteredDomains.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-8 text-center">
                     <div className="rounded-full bg-muted p-3 mb-4">
                       <Globe className="h-6 w-6 text-muted-foreground" />
@@ -499,7 +567,7 @@ export function SettingsPage() {
                           <div className="flex flex-col gap-1">
                             <CardTitle className="flex items-center gap-2 text-lg">
                               <Globe className="h-5 w-5 text-muted-foreground" />
-                              {domain.name}
+                              {domain.custom_name}
                               {domain.primary && (
                                 <Badge
                                   variant="outline"
@@ -571,12 +639,12 @@ export function SettingsPage() {
                         <CardFooter className="px-6 pb-6 pt-2 flex justify-between">
                           {domain.status === "pending" ? (
                             <Button
-                              variant="default"
-                              size="sm"
-                              onClick={() => handleVerifyDomain(domain.id)}
-                              disabled={isVerifyingDomain}
-                            >
-                              {isVerifyingDomain ? (
+  variant="default"
+  size="sm"
+  onClick={() => handleVerifyDomain(domain.id)}
+  disabled={verifyingDomains[domain.id]}
+>
+{verifyingDomains[domain.id] ? (
                                 <>
                                   <RefreshCw className="h-3.5 w-3.5 ml-1 animate-spin" />
                                   جاري التحقق...
@@ -601,16 +669,19 @@ export function SettingsPage() {
                               النطاق الرئيسي
                             </Button>
                           )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => handleDeleteDomain(domain.id)}
-                            disabled={domain.primary}
-                          >
-                            <Trash2 className="h-3.5 w-3.5 ml-1" />
-                            حذف
-                          </Button>
+<Button
+  variant="ghost"
+  size="sm"
+  className="text-destructive hover:text-destructive"
+  onClick={() => {
+    setDeleteDomainId(domain.id);
+    setIsDeleteDialogOpen(true);
+  }}
+  disabled={domain.primary}
+>
+  <Trash2 className="h-3.5 w-3.5 ml-1" />
+  حذف
+</Button>
                         </CardFooter>
                       </Card>
                     ))}
@@ -627,54 +698,47 @@ export function SettingsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Accordion type="single" collapsible className="w-full">
-                      <AccordionItem value="item-1">
-                        <AccordionTrigger>
-                          كيفية إعداد سجلات DNS الخاصة بك
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground">
-                              لربط نطاقك، ستحتاج إلى تحديث سجلات DNS الخاصة بك
-                              لدى مسجل النطاق (الشركة التي اشتريت منها نطاقك).
-                              أضف السجلات التالية:
-                            </p>
-                            <div className="rounded-lg border overflow-hidden">
-                              <div className="grid grid-cols-12 gap-4 p-3 bg-muted/50 text-sm font-medium">
-                                <div className="col-span-2">النوع</div>
-                                <div className="col-span-3">الاسم</div>
-                                <div className="col-span-5">القيمة</div>
-                                <div className="col-span-2">TTL</div>
-                              </div>
-                              <div className="grid grid-cols-12 gap-4 p-3 border-t">
-                                <div className="col-span-2 font-medium">A</div>
-                                <div className="col-span-3">@</div>
-                                <div className="col-span-5 font-mono text-sm">
-                                  76.76.21.21
-                                </div>
-                                <div className="col-span-2">3600</div>
-                              </div>
-                              <div className="grid grid-cols-12 gap-4 p-3 border-t">
-                                <div className="col-span-2 font-medium">
-                                  CNAME
-                                </div>
-                                <div className="col-span-3">www</div>
-                                <div className="col-span-5 font-mono text-sm">
-                                  your-site.vercel.app
-                                </div>
-                                <div className="col-span-2">3600</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center p-3 rounded-lg bg-blue-50 text-blue-800">
-                              <AlertCircle className="h-5 w-5 ml-2 flex-shrink-0" />
-                              <p className="text-sm">
-                                قد تستغرق تغييرات DNS ما يصل إلى 48 ساعة
+                  <Accordion 
+  type="single" 
+  defaultValue="item-1" // يتم فتحه تلقائيًا عند التحميل
+  collapsible // يسمح بالإغلاق عند النقر على العنوان
+  className="w-full"
+>
+<AccordionItem value="item-1">
+    <AccordionTrigger>
+      كيفية إعداد سجلات DNS الخاصة بك
+    </AccordionTrigger>
+    <AccordionContent>
+  <div className="space-y-4">
+    <p className="text-sm text-muted-foreground">
+      {dnsInstructions.description || "لربط نطاقك، ستحتاج إلى تحديث سجلات DNS الخاصة بك لدى مسجل النطاق."}
+    </p>
+    <div className="rounded-lg border overflow-hidden">
+      <div className="grid grid-cols-12 gap-4 p-3 bg-muted/50 text-sm font-medium">
+        <div className="col-span-2">النوع</div>
+        <div className="col-span-3">الاسم</div>
+        <div className="col-span-5">القيمة</div>
+        <div className="col-span-2">TTL</div>
+      </div>
+      {dnsInstructions.records?.map((record, index) => (
+        <div key={index} className="grid grid-cols-12 gap-4 p-3 border-t">
+          <div className="col-span-2 font-medium">{record.type}</div>
+          <div className="col-span-3">{record.name}</div>
+          <div className="col-span-5 font-mono text-sm">{record.value}</div>
+          <div className="col-span-2">{record.ttl}</div>
+        </div>
+      ))}
+    </div>
+    <div className="flex items-center p-3 rounded-lg bg-blue-50 text-blue-800">
+      <AlertCircle className="h-5 w-5 ml-2 flex-shrink-0" />
+      <p className="text-sm">
+        {dnsInstructions.note || `                                قد تستغرق تغييرات DNS ما يصل إلى 48 ساعة
                                 للانتشار عالميًا. هذا يعني أن نطاقك قد لا يعمل
-                                مباشرة بعد إجراء هذه التغييرات.
-                              </p>
-                            </div>
-                          </div>
-                        </AccordionContent>
+                                مباشرة بعد إجراء هذه التغييرات.`}
+      </p>
+    </div>
+  </div>
+</AccordionContent>
                       </AccordionItem>
                     </Accordion>
                   </CardContent>
@@ -867,11 +931,11 @@ export function SettingsPage() {
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {themes.map((theme) => (
-                    <Card
-                      key={theme.id}
-                      className={`overflow-hidden ${theme.active ? "border-primary border-2" : ""}`}
-                    >
+                {themes.map((theme) => (
+  <Card
+    key={theme.id}
+    className={`overflow-hidden ${theme.active ? "border-primary border-2" : ""}`}
+  >
                       <div className="aspect-video w-full overflow-hidden">
                         <img
                           src={theme.thumbnail || "/placeholder.svg"}
@@ -908,75 +972,50 @@ export function SettingsPage() {
                         </Badge>
                       </CardContent>
                       <CardFooter>
-                        {theme.active ? (
-                          <Button variant="outline" className="w-full" disabled>
-                            <Check className="h-4 w-4 ml-1" />
-                            السمة النشطة
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="default"
-                            className="w-full"
-                            onClick={() => handleActivateTheme(theme.id)}
-                          >
-                            <Sparkles className="h-4 w-4 ml-1" />
-                            تنشيط السمة
-                          </Button>
-                        )}
-                      </CardFooter>
+      {theme.active ? (
+        <Button variant="outline" className="w-full" disabled>
+          <Check className="h-4 w-4 ml-1" />
+          السمة النشطة
+        </Button>
+      ) : (
+        <Button
+          variant="default"
+          className="w-full"
+          onClick={() => handleActivateTheme(theme.id)}
+        >
+          <Sparkles className="h-4 w-4 ml-1" />
+          تنشيط السمة
+        </Button>
+      )}
+    </CardFooter>
                     </Card>
                   ))}
-                </div>
 
-                <Card className="mt-4">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Zap className="h-5 w-5" />
-                      تخصيص متقدم
-                    </CardTitle>
-                    <CardDescription>
-                      خيارات تخصيص متقدمة لسمة موقعك
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center p-3 rounded-lg bg-blue-50 text-blue-800">
-                        <AlertCircle className="h-5 w-5 ml-2 flex-shrink-0" />
-                        <p className="text-sm">
-                          يمكنك تخصيص السمة الحالية باستخدام محرر CSS المتقدم أو
-                          استيراد سمة مخصصة.
-                        </p>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                        <Button
-                          variant="outline"
-                          className="h-auto py-6 flex flex-col"
-                        >
-                          <PaintBucket className="h-8 w-8 mb-2" />
-                          <span className="font-medium">محرر CSS المتقدم</span>
-                          <span className="text-sm text-muted-foreground mt-1">
-                            تعديل CSS مباشرة
-                          </span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="h-auto py-6 flex flex-col"
-                        >
-                          <Download className="h-8 w-8 mb-2" />
-                          <span className="font-medium">استيراد سمة مخصصة</span>
-                          <span className="text-sm text-muted-foreground mt-1">
-                            رفع ملف سمة مخصص
-                          </span>
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+
+                </div>
               </TabsContent>
             </Tabs>
           </div>
         </main>
       </div>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+<DialogContent>
+        <DialogHeader>
+          <DialogTitle>تأكيد الحذف</DialogTitle>
+          <DialogDescription>
+            هل أنت متأكد من رغبتك في حذف هذا النطاق؟ لا يمكن التراجع عن هذا الإجراء.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            إلغاء
+          </Button>
+          <Button variant="destructive" onClick={handleDeleteDomain}>
+            تأكيد الحذف
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+</Dialog>
     </div>
   );
 }

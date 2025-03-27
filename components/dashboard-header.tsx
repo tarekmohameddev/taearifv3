@@ -163,13 +163,13 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                       //   icon: Package,
                       //   path: "/apps",
                       // },
-                      // {
-                      //   id: "settings",
-                      //   label: "إعدادات الموقع",
-                      //   description: "تكوين موقعك",
-                      //   icon: Settings,
-                      //   path: "/settings",
-                      // },
+                      {
+                        id: "settings",
+                        label: "إعدادات الموقع",
+                        description: "تكوين موقعك",
+                        icon: Settings,
+                        path: "/settings",
+                      },
                     ].map((item) => (
                       <Button
                         key={item.id}
