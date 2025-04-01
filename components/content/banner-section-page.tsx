@@ -16,6 +16,8 @@ import toast from 'react-hot-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
+
+
 interface BannerSettings {
   banner_type: string;
   static: {
