@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   Area,
 } from "recharts";
-import useStore from "@/context/Store"; 
+import useStore from "@/context/Store";
 
 function VisitorChart() {
   const {
@@ -35,7 +35,7 @@ function VisitorChart() {
 
   return (
     <div className="w-full">
-      {/* أزرار تحديد الفترة الزمنية */} 
+      {/* أزرار تحديد الفترة الزمنية */}
       <div className="mb-4 flex gap-2">
         {[
           { label: "7 أيام", value: "7" },

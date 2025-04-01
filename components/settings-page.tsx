@@ -46,7 +46,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import {
   Accordion,
   AccordionContent,
@@ -69,13 +69,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import axiosInstance from '@/lib/axiosInstance';
+import axiosInstance from "@/lib/axiosInstance";
 import { Skeleton } from "@/components/ui/skeleton";
-
-
-
-
-
 
 const domainsHelp = {
   title: "إدارة النطاقات",
@@ -86,9 +81,6 @@ const domainsHelp = {
     { title: "استكشاف مشكلات النطاق وإصلاحها", href: "#", type: "article" },
   ],
 };
-
-
-
 
 export function SettingsPage() {
   const [isAddDomainOpen, setIsAddDomainOpen] = useState(false);
@@ -109,48 +101,45 @@ export function SettingsPage() {
   const [isLoadingDomains, setIsLoadingDomains] = useState(true);
   const [isLoadingThemes, setIsLoadingThemes] = useState(true);
 
-  
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoadingDomains(true);
-        const response = await axiosInstance.get('/settings/domain');
+        const response = await axiosInstance.get("/settings/domain");
         setDomains(response.data.domains);
         setDnsInstructions(response.data.dnsInstructions);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setIsLoadingDomains(false);
       }
     };
     fetchData();
   }, []);
-  
 
-useEffect(() => {
-  const fetchThemes = async () => {
-    try {
-      setIsLoadingThemes(true);
-      const response = await axiosInstance.get('/settings/theme');
-      setThemes(response.data.themes);
-    } catch (error) {
-      console.error('Error fetching themes:', error);
-      toast.error('فشل في تحميل السمات');
-    } finally {
-      setIsLoadingThemes(false);
-    }
-  };
-  
-  if (activeTab === 'themes') {
-    fetchThemes();
-  }
-}, [activeTab]);
-  
   useEffect(() => {
-    console.log("domains",domains)
+    const fetchThemes = async () => {
+      try {
+        setIsLoadingThemes(true);
+        const response = await axiosInstance.get("/settings/theme");
+        setThemes(response.data.themes);
+      } catch (error) {
+        console.error("Error fetching themes:", error);
+        toast.error("فشل في تحميل السمات");
+      } finally {
+        setIsLoadingThemes(false);
+      }
+    };
+
+    if (activeTab === "themes") {
+      fetchThemes();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    console.log("domains", domains);
   }, [domains]);
 
-  
   const handleAddDomain = async () => {
     // التحقق من البادئات الممنوعة أولاً
     if (
@@ -163,14 +152,15 @@ useEffect(() => {
       setHasFormatError(true);
       return;
     }
-  
+
     if (!newDomain) {
       toast.error("اسم النطاق مطلوب");
       setErrorMessage("اسم النطاق مطلوب");
       return;
     }
-  
-    const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
+    const domainRegex =
+      /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
     if (!domainRegex.test(newDomain)) {
       toast.error("تنسيق النطاق غير صالح");
       setErrorMessage("تنسيق النطاق غير صالح");
@@ -178,77 +168,82 @@ useEffect(() => {
       return;
     }
 
+    const loadingToast = toast.loading("جاري إضافة النطاق...");
+    try {
+      const response = await axiosInstance.post("/settings/domain", {
+        custom_name: newDomain,
+      });
+      const addedDomain = response.data.data;
+      addedDomain.status = "pending";
+      setDomains([...domains, addedDomain]);
+      setNewDomain("");
+      setIsAddDomainOpen(false);
+      setSetupProgress(Math.min(setupProgress + 20, 100));
+      toast.dismiss(loadingToast);
+      toast.success("تمت إضافة النطاق بنجاح");
+      setErrorMessage(""); // تصفير رسالة الخطأ عند النجاح
+    } catch (error) {
+      console.error("Error adding domain:", error);
+      toast.dismiss(loadingToast);
 
+      // التحقق من وجود رسالة خطأ من الـ API واستخدامها
+      const errorMessage =
+        error.response?.data?.message || "حدث خطأ أثناء إضافة النطاق";
+      toast.error(errorMessage);
+      setErrorMessage(errorMessage); // تخزين رسالة الخطأ لعرضها أسفل الزر
+    }
+  };
 
-  const loadingToast = toast.loading("جاري إضافة النطاق...");
-  try {
-    const response = await axiosInstance.post('/settings/domain', { custom_name: newDomain });
-    const addedDomain = response.data.data;
-    addedDomain.status = "pending"
-    setDomains([...domains, addedDomain]);
-    setNewDomain("");
-    setIsAddDomainOpen(false);
-    setSetupProgress(Math.min(setupProgress + 20, 100));
-    toast.dismiss(loadingToast);
-    toast.success("تمت إضافة النطاق بنجاح");
-    setErrorMessage(""); // تصفير رسالة الخطأ عند النجاح
-  } catch (error) {
-    console.error('Error adding domain:', error);
-    toast.dismiss(loadingToast);
-    
-    // التحقق من وجود رسالة خطأ من الـ API واستخدامها
-    const errorMessage = error.response?.data?.message || "حدث خطأ أثناء إضافة النطاق";
-    toast.error(errorMessage);
-    setErrorMessage(errorMessage); // تخزين رسالة الخطأ لعرضها أسفل الزر
-  }
-};
-  
-  
-  
-  
-const handleVerifyDomain = async (domainId) => {
-  setVerifyingDomains(prev => ({ ...prev, [domainId]: true }));
-  const loadingToast = toast.loading("جاري التحقق من النطاق...");
-  try {
-    const response = await axiosInstance.post('/settings/domain/verify', { id: domainId });
-    const verifiedDomain = response.data.data;
-    setDomains(domains.map((domain) => domain.id === domainId ? verifiedDomain : domain));
-    setSetupProgress(Math.min(setupProgress + 20, 100));
-    toast.dismiss(loadingToast);
-    toast.success("تم التحقق من النطاق بنجاح");
-  } catch (error) {
-    console.error('Error verifying domain:', error);
-    toast.dismiss(loadingToast);
-    toast.error("حدث خطأ أثناء التحقق من النطاق");
-  } finally {
-    setVerifyingDomains(prev => ({ ...prev, [domainId]: false }));
-  }
-};
+  const handleVerifyDomain = async (domainId) => {
+    setVerifyingDomains((prev) => ({ ...prev, [domainId]: true }));
+    const loadingToast = toast.loading("جاري التحقق من النطاق...");
+    try {
+      const response = await axiosInstance.post("/settings/domain/verify", {
+        id: domainId,
+      });
+      const verifiedDomain = response.data.data;
+      setDomains(
+        domains.map((domain) =>
+          domain.id === domainId ? verifiedDomain : domain,
+        ),
+      );
+      setSetupProgress(Math.min(setupProgress + 20, 100));
+      toast.dismiss(loadingToast);
+      toast.success("تم التحقق من النطاق بنجاح");
+    } catch (error) {
+      console.error("Error verifying domain:", error);
+      toast.dismiss(loadingToast);
+      toast.error("حدث خطأ أثناء التحقق من النطاق");
+    } finally {
+      setVerifyingDomains((prev) => ({ ...prev, [domainId]: false }));
+    }
+  };
 
   // تعيين نطاق رئيسي باستخدام PATCH API
   const handleSetPrimaryDomain = async (domainId) => {
     const loadingToast = toast.loading("جاري تحديث النطاق الرئيسي...");
     try {
-      await axiosInstance.post('/settings/domain/set-primary', { id: domainId });
-      setDomains(domains.map((domain) => ({
-        ...domain,
-        primary: domain.id === domainId,
-      })));
+      await axiosInstance.post("/settings/domain/set-primary", {
+        id: domainId,
+      });
+      setDomains(
+        domains.map((domain) => ({
+          ...domain,
+          primary: domain.id === domainId,
+        })),
+      );
       toast.dismiss(loadingToast);
       toast.success("تم تحديث النطاق الرئيسي بنجاح");
     } catch (error) {
-      console.error('Error setting primary domain:', error);
+      console.error("Error setting primary domain:", error);
       toast.dismiss(loadingToast);
       toast.error("حدث خطأ أثناء تحديث النطاق الرئيسي");
     }
   };
 
-  
-  
-
   const handleDeleteDomain = async () => {
     if (!deleteDomainId) return;
-  
+
     const loadingToast = toast.loading("جاري حذف النطاق...");
     try {
       await axiosInstance.delete(`/settings/domain/${deleteDomainId}`);
@@ -256,7 +251,7 @@ const handleVerifyDomain = async (domainId) => {
       toast.dismiss(loadingToast);
       toast.success("تم حذف النطاق بنجاح");
     } catch (error) {
-      console.error('Error deleting domain:', error);
+      console.error("Error deleting domain:", error);
       toast.dismiss(loadingToast);
       toast.error("حدث خطأ أثناء حذف النطاق");
     } finally {
@@ -312,35 +307,39 @@ const handleVerifyDomain = async (domainId) => {
 
   const handleActivateTheme = async (themeId) => {
     try {
-      await axiosInstance.post('/settings/theme/set-active', {
-        theme_id: themeId
+      await axiosInstance.post("/settings/theme/set-active", {
+        theme_id: themeId,
       });
-      
-      setThemes(themes.map((theme) => ({
-        ...theme,
-        active: theme.id === themeId
-      })));
-      
+
+      setThemes(
+        themes.map((theme) => ({
+          ...theme,
+          active: theme.id === themeId,
+        })),
+      );
+
       toast.success("تم تنشيط السمة بنجاح");
     } catch (error) {
-      console.error('Error activating theme:', error);
+      console.error("Error activating theme:", error);
       toast.error("حدث خطأ أثناء تنشيط السمة");
     }
   };
 
   const handleSubscriptionChange = (planId) => {
-    setSubscriptionPlans(subscriptionPlans.map((plan) => ({
-      ...plan,
-      current: plan.id === planId,
-    })));
+    setSubscriptionPlans(
+      subscriptionPlans.map((plan) => ({
+        ...plan,
+        current: plan.id === planId,
+      })),
+    );
     toast.success("تم تغيير الاشتراك بنجاح");
   };
-
 
   const filteredDomains = domains.filter((domain) => {
     if (statusFilter !== "all") {
       if (statusFilter === "active" && domain.status !== "active") return false;
-      if (statusFilter === "pending" && domain.status !== "pending") return false;
+      if (statusFilter === "pending" && domain.status !== "pending")
+        return false;
     }
     if (searchQuery && !domain.custom_name.includes(searchQuery)) return false;
     return true;
@@ -458,7 +457,7 @@ const handleVerifyDomain = async (domainId) => {
                           إضافة نطاق
                         </Button>
                       </DialogTrigger>
-{/* {errorMessage && (
+                      {/* {errorMessage && (
   <p style={{ color: 'red', marginTop: '5px' }}>{errorMessage}</p>
 )} */}
                       <DialogContent>
@@ -473,33 +472,35 @@ const handleVerifyDomain = async (domainId) => {
                           <div className="grid gap-2">
                             <Label htmlFor="domain-name">اسم النطاق</Label>
                             <Input
-  id="domain-name"
-  placeholder="example.com"
-  value={newDomain}
-  onChange={(e) => {
-    const value = e.target.value;
-    setNewDomain(value);
-    
-    // إعادة تعيين حالة الخطأ عند التغيير
-    setHasFormatError(false);
-    setErrorMessage("");
-    
-    // التحقق الفوري عند الكتابة
-    if (
-      value.startsWith("www.") ||
-      value.startsWith("http://") ||
-      value.startsWith("https://")
-    ) {
-      setHasFormatError(true);
-      setErrorMessage("لا تستخدم www أو http://");
-    }
-  }}
-/>
+                              id="domain-name"
+                              placeholder="example.com"
+                              value={newDomain}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setNewDomain(value);
 
-<p className={`text-sm ${hasFormatError ? 'text-destructive' : 'text-muted-foreground'}`}>
+                                // إعادة تعيين حالة الخطأ عند التغيير
+                                setHasFormatError(false);
+                                setErrorMessage("");
+
+                                // التحقق الفوري عند الكتابة
+                                if (
+                                  value.startsWith("www.") ||
+                                  value.startsWith("http://") ||
+                                  value.startsWith("https://")
+                                ) {
+                                  setHasFormatError(true);
+                                  setErrorMessage("لا تستخدم www أو http://");
+                                }
+                              }}
+                            />
+
+                            <p
+                              className={`text-sm ${hasFormatError ? "text-destructive" : "text-muted-foreground"}`}
+                            >
                               أدخل نطاقك بدون www أو http://
                             </p>
-                          </div>  
+                          </div>
                         </div>
                         <DialogFooter>
                           <Button
@@ -516,30 +517,30 @@ const handleVerifyDomain = async (domainId) => {
                 </div>
 
                 {isLoadingDomains ? (
-  <div className="grid gap-4 md:grid-cols-2">
-    {[1, 2, 3 , 4].map((i) => (
-      <Card key={i}>
-        <CardHeader className="flex flex-row items-start justify-between p-6">
-          <div className="space-y-2 flex-1">
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-          </div>
-          <Skeleton className="h-8 w-20" />
-        </CardHeader>
-        <CardContent className="px-6 pb-2">
-          <div className="flex justify-between mb-4">
-            <Skeleton className="h-5 w-16" />
-            <Skeleton className="h-4 w-32" />
-          </div>
-        </CardContent>
-        <CardFooter className="px-6 pb-6 pt-2 flex gap-2">
-          <Skeleton className="h-9 w-32" />
-          <Skeleton className="h-9 w-20" />
-        </CardFooter>
-      </Card>
-    ))}
-  </div>
-) : filteredDomains.length === 0 ? (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <Card key={i}>
+                        <CardHeader className="flex flex-row items-start justify-between p-6">
+                          <div className="space-y-2 flex-1">
+                            <Skeleton className="h-6 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                          </div>
+                          <Skeleton className="h-8 w-20" />
+                        </CardHeader>
+                        <CardContent className="px-6 pb-2">
+                          <div className="flex justify-between mb-4">
+                            <Skeleton className="h-5 w-16" />
+                            <Skeleton className="h-4 w-32" />
+                          </div>
+                        </CardContent>
+                        <CardFooter className="px-6 pb-6 pt-2 flex gap-2">
+                          <Skeleton className="h-9 w-32" />
+                          <Skeleton className="h-9 w-20" />
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                ) : filteredDomains.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-8 text-center">
                     <div className="rounded-full bg-muted p-3 mb-4">
                       <Globe className="h-6 w-6 text-muted-foreground" />
@@ -643,12 +644,12 @@ const handleVerifyDomain = async (domainId) => {
                         <CardFooter className="px-6 pb-6 pt-2 flex justify-between">
                           {domain.status === "pending" ? (
                             <Button
-  variant="default"
-  size="sm"
-  onClick={() => handleVerifyDomain(domain.id)}
-  disabled={verifyingDomains[domain.id]}
->
-{verifyingDomains[domain.id] ? (
+                              variant="default"
+                              size="sm"
+                              onClick={() => handleVerifyDomain(domain.id)}
+                              disabled={verifyingDomains[domain.id]}
+                            >
+                              {verifyingDomains[domain.id] ? (
                                 <>
                                   <RefreshCw className="h-3.5 w-3.5 ml-1 animate-spin" />
                                   جاري التحقق...
@@ -673,19 +674,19 @@ const handleVerifyDomain = async (domainId) => {
                               النطاق الرئيسي
                             </Button>
                           )}
-<Button
-  variant="ghost"
-  size="sm"
-  className="text-destructive hover:text-destructive"
-  onClick={() => {
-    setDeleteDomainId(domain.id);
-    setIsDeleteDialogOpen(true);
-  }}
-  disabled={domain.primary}
->
-  <Trash2 className="h-3.5 w-3.5 ml-1" />
-  حذف
-</Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => {
+                              setDeleteDomainId(domain.id);
+                              setIsDeleteDialogOpen(true);
+                            }}
+                            disabled={domain.primary}
+                          >
+                            <Trash2 className="h-3.5 w-3.5 ml-1" />
+                            حذف
+                          </Button>
                         </CardFooter>
                       </Card>
                     ))}
@@ -702,47 +703,58 @@ const handleVerifyDomain = async (domainId) => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                  <Accordion 
-  type="single" 
-  defaultValue="item-1" // يتم فتحه تلقائيًا عند التحميل
-  collapsible // يسمح بالإغلاق عند النقر على العنوان
-  className="w-full"
->
-<AccordionItem value="item-1">
-    <AccordionTrigger>
-      كيفية إعداد سجلات DNS الخاصة بك
-    </AccordionTrigger>
-    <AccordionContent>
-  <div className="space-y-4">
-    <p className="text-sm text-muted-foreground">
-      {dnsInstructions.description || "لربط نطاقك، ستحتاج إلى تحديث سجلات DNS الخاصة بك لدى مسجل النطاق."}
-    </p>
-    <div className="rounded-lg border overflow-hidden">
-      <div className="grid grid-cols-12 gap-4 p-3 bg-muted/50 text-sm font-medium">
-        <div className="col-span-2">النوع</div>
-        <div className="col-span-3">الاسم</div>
-        <div className="col-span-5">القيمة</div>
-        <div className="col-span-2">TTL</div>
-      </div>
-      {dnsInstructions.records?.map((record, index) => (
-        <div key={index} className="grid grid-cols-12 gap-4 p-3 border-t">
-          <div className="col-span-2 font-medium">{record.type}</div>
-          <div className="col-span-3">{record.name}</div>
-          <div className="col-span-5 font-mono text-sm">{record.value}</div>
-          <div className="col-span-2">{record.ttl}</div>
-        </div>
-      ))}
-    </div>
-    <div className="flex items-center p-3 rounded-lg bg-blue-50 text-blue-800">
-      <AlertCircle className="h-5 w-5 ml-2 flex-shrink-0" />
-      <p className="text-sm">
-        {dnsInstructions.note || `                                قد تستغرق تغييرات DNS ما يصل إلى 48 ساعة
+                    <Accordion
+                      type="single"
+                      defaultValue="item-1" // يتم فتحه تلقائيًا عند التحميل
+                      collapsible // يسمح بالإغلاق عند النقر على العنوان
+                      className="w-full"
+                    >
+                      <AccordionItem value="item-1">
+                        <AccordionTrigger>
+                          كيفية إعداد سجلات DNS الخاصة بك
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-4">
+                            <p className="text-sm text-muted-foreground">
+                              {dnsInstructions.description ||
+                                "لربط نطاقك، ستحتاج إلى تحديث سجلات DNS الخاصة بك لدى مسجل النطاق."}
+                            </p>
+                            <div className="rounded-lg border overflow-hidden">
+                              <div className="grid grid-cols-12 gap-4 p-3 bg-muted/50 text-sm font-medium">
+                                <div className="col-span-2">النوع</div>
+                                <div className="col-span-3">الاسم</div>
+                                <div className="col-span-5">القيمة</div>
+                                <div className="col-span-2">TTL</div>
+                              </div>
+                              {dnsInstructions.records?.map((record, index) => (
+                                <div
+                                  key={index}
+                                  className="grid grid-cols-12 gap-4 p-3 border-t"
+                                >
+                                  <div className="col-span-2 font-medium">
+                                    {record.type}
+                                  </div>
+                                  <div className="col-span-3">
+                                    {record.name}
+                                  </div>
+                                  <div className="col-span-5 font-mono text-sm">
+                                    {record.value}
+                                  </div>
+                                  <div className="col-span-2">{record.ttl}</div>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="flex items-center p-3 rounded-lg bg-blue-50 text-blue-800">
+                              <AlertCircle className="h-5 w-5 ml-2 flex-shrink-0" />
+                              <p className="text-sm">
+                                {dnsInstructions.note ||
+                                  `                                قد تستغرق تغييرات DNS ما يصل إلى 48 ساعة
                                 للانتشار عالميًا. هذا يعني أن نطاقك قد لا يعمل
                                 مباشرة بعد إجراء هذه التغييرات.`}
-      </p>
-    </div>
-  </div>
-</AccordionContent>
+                              </p>
+                            </div>
+                          </div>
+                        </AccordionContent>
                       </AccordionItem>
                     </Accordion>
                   </CardContent>
@@ -935,87 +947,91 @@ const handleVerifyDomain = async (domainId) => {
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-  {isLoadingThemes ? (
-    [1, 2, 3, 4].map((i) => (
-      <Card key={i} className="overflow-hidden">
-        <Skeleton className="aspect-video w-full rounded-none" />
-        <CardHeader className="pb-2">
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-1/2" />
-          </div>
-        </CardHeader>
-        <CardContent className="pb-2">
-          <Skeleton className="h-6 w-24" />
-        </CardContent>
-        <CardFooter>
-          <Skeleton className="h-9 w-full" />
-        </CardFooter>
-      </Card>
-    ))
-  ) : (
-    themes.map((theme) => (
-      <Card
-        key={theme.id}
-        className={`overflow-hidden ${theme.active ? "border-primary border-2" : ""}`}
-      >
-                      <div className="aspect-video w-full overflow-hidden">
-                        <img
-                          src={theme.thumbnail || "/placeholder.svg"}
-                          alt={theme.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">
-                            {theme.name}
-                          </CardTitle>
-                          {theme.popular && (
-                            <Badge
-                              variant="secondary"
-                              className="bg-amber-100 text-amber-800"
-                            >
-                              <Star className="h-3 w-3 ml-1" />
-                              شائع
-                            </Badge>
-                          )}
-                        </div>
-                        <CardDescription>{theme.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="pb-2">
-                        <Badge
-                          variant="outline"
-                          className="bg-blue-50 text-blue-700 border-blue-200"
+                  {isLoadingThemes
+                    ? [1, 2, 3, 4].map((i) => (
+                        <Card key={i} className="overflow-hidden">
+                          <Skeleton className="aspect-video w-full rounded-none" />
+                          <CardHeader className="pb-2">
+                            <div className="space-y-2">
+                              <Skeleton className="h-6 w-3/4" />
+                              <Skeleton className="h-4 w-full" />
+                              <Skeleton className="h-4 w-1/2" />
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pb-2">
+                            <Skeleton className="h-6 w-24" />
+                          </CardContent>
+                          <CardFooter>
+                            <Skeleton className="h-9 w-full" />
+                          </CardFooter>
+                        </Card>
+                      ))
+                    : themes.map((theme) => (
+                        <Card
+                          key={theme.id}
+                          className={`overflow-hidden ${theme.active ? "border-primary border-2" : ""}`}
                         >
-                          {theme.category === "business" && "أعمال"}
-                          {theme.category === "portfolio" && "معرض أعمال"}
-                          {theme.category === "restaurant" && "مطاعم"}
-                          {theme.category === "ecommerce" && "متاجر إلكترونية"}
-                        </Badge>
-                      </CardContent>
-                      <CardFooter>
-      {theme.active ? (
-        <Button variant="outline" className="w-full" disabled>
-          <Check className="h-4 w-4 ml-1" />
-          السمة النشطة
-        </Button>
-      ) : (
-        <Button
-          variant="default"
-          className="w-full"
-          onClick={() => handleActivateTheme(theme.id)}
-        >
-          <Sparkles className="h-4 w-4 ml-1" />
-          تنشيط السمة
-        </Button>
-      )}
-    </CardFooter>
-                    </Card>
-                  )))}
-
-
+                          <div className="aspect-video w-full overflow-hidden">
+                            <img
+                              src={theme.thumbnail || "/placeholder.svg"}
+                              alt={theme.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <CardHeader className="pb-2">
+                            <div className="flex items-center justify-between">
+                              <CardTitle className="text-lg">
+                                {theme.name}
+                              </CardTitle>
+                              {theme.popular && (
+                                <Badge
+                                  variant="secondary"
+                                  className="bg-amber-100 text-amber-800"
+                                >
+                                  <Star className="h-3 w-3 ml-1" />
+                                  شائع
+                                </Badge>
+                              )}
+                            </div>
+                            <CardDescription>
+                              {theme.description}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent className="pb-2">
+                            <Badge
+                              variant="outline"
+                              className="bg-blue-50 text-blue-700 border-blue-200"
+                            >
+                              {theme.category === "business" && "أعمال"}
+                              {theme.category === "portfolio" && "معرض أعمال"}
+                              {theme.category === "restaurant" && "مطاعم"}
+                              {theme.category === "ecommerce" &&
+                                "متاجر إلكترونية"}
+                            </Badge>
+                          </CardContent>
+                          <CardFooter>
+                            {theme.active ? (
+                              <Button
+                                variant="outline"
+                                className="w-full"
+                                disabled
+                              >
+                                <Check className="h-4 w-4 ml-1" />
+                                السمة النشطة
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="default"
+                                className="w-full"
+                                onClick={() => handleActivateTheme(theme.id)}
+                              >
+                                <Sparkles className="h-4 w-4 ml-1" />
+                                تنشيط السمة
+                              </Button>
+                            )}
+                          </CardFooter>
+                        </Card>
+                      ))}
                 </div>
               </TabsContent>
             </Tabs>
@@ -1023,23 +1039,27 @@ const handleVerifyDomain = async (domainId) => {
         </main>
       </div>
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-<DialogContent>
-        <DialogHeader>
-          <DialogTitle>تأكيد الحذف</DialogTitle>
-          <DialogDescription>
-            هل أنت متأكد من رغبتك في حذف هذا النطاق؟ لا يمكن التراجع عن هذا الإجراء.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-            إلغاء
-          </Button>
-          <Button variant="destructive" onClick={handleDeleteDomain}>
-            تأكيد الحذف
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-</Dialog>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>تأكيد الحذف</DialogTitle>
+            <DialogDescription>
+              هل أنت متأكد من رغبتك في حذف هذا النطاق؟ لا يمكن التراجع عن هذا
+              الإجراء.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              إلغاء
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteDomain}>
+              تأكيد الحذف
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

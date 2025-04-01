@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import axiosInstance from "@/lib/axiosInstance";
 import { Separator } from "@/components/ui/separator";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import {
   Facebook,
   Twitter,
@@ -58,16 +58,14 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useState, useEffect, useCallback } from "react";
 
-
-
-function SortableLink({ link, columnId, handleColumnLinkChange, removeColumnLink }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: link.id });
+function SortableLink({
+  link,
+  columnId,
+  handleColumnLinkChange,
+  removeColumnLink,
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: link.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -82,7 +80,8 @@ function SortableLink({ link, columnId, handleColumnLinkChange, removeColumnLink
       {...listeners} // يجعل البطاقة بأكملها قابلة للسحب
       className="flex items-center gap-2 rounded-md border p-2 cursor-move bg-white hover:bg-gray-50"
     >
-      <GripVertical className="h-4 w-4 text-muted-foreground" /> {/* يظل كمؤشر بصري فقط */}
+      <GripVertical className="h-4 w-4 text-muted-foreground" />{" "}
+      {/* يظل كمؤشر بصري فقط */}
       <div className="grid flex-1 gap-2">
         <div className="grid grid-cols-2 gap-2">
           <Input
@@ -114,8 +113,6 @@ function SortableLink({ link, columnId, handleColumnLinkChange, removeColumnLink
   );
 }
 
-
-
 export function FooterManagementPage() {
   const [activeTab, setActiveTab] = useState("general");
   const [footerData, setFooterData] = useState(null);
@@ -146,10 +143,9 @@ export function FooterManagementPage() {
     fetchFooterData();
   }, []);
 
-
   useEffect(() => {
-console.log("footerData",footerData)
-}, [footerData]);
+    console.log("footerData", footerData);
+  }, [footerData]);
   function ColumnDndWrapper({ columnId, children, handleDragEnd }) {
     // 2. Initialize sensors at the component level
     const sensors = useSensors(
@@ -157,9 +153,9 @@ console.log("footerData",footerData)
         activationConstraint: {
           distance: 8,
         },
-      })
+      }),
     );
-  
+
     return (
       <DndContext
         sensors={sensors}
@@ -170,7 +166,6 @@ console.log("footerData",footerData)
       </DndContext>
     );
   }
-  
 
   const socialIcons = {
     facebook: <Facebook className="h-5 w-5" />,
@@ -207,27 +202,25 @@ console.log("footerData",footerData)
     });
   };
 
-
-  
-const handleDragEnd = (event, columnId) => {
-  const { active, over } = event;
-  if (active.id !== over.id) {
-    setFooterData((prevData) => {
-      const column = prevData.columns.find((col) => col.id === columnId);
-      const oldIndex = column.links.findIndex((link) => link.id === active.id);
-      const newIndex = column.links.findIndex((link) => link.id === over.id);
-      const newLinks = arrayMove(column.links, oldIndex, newIndex);
-      return {
-        ...prevData,
-        columns: prevData.columns.map((col) =>
-          col.id === columnId ? { ...col, links: newLinks } : col
-        ),
-      };
-    });
-  }
-};
-
-
+  const handleDragEnd = (event, columnId) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      setFooterData((prevData) => {
+        const column = prevData.columns.find((col) => col.id === columnId);
+        const oldIndex = column.links.findIndex(
+          (link) => link.id === active.id,
+        );
+        const newIndex = column.links.findIndex((link) => link.id === over.id);
+        const newLinks = arrayMove(column.links, oldIndex, newIndex);
+        return {
+          ...prevData,
+          columns: prevData.columns.map((col) =>
+            col.id === columnId ? { ...col, links: newLinks } : col,
+          ),
+        };
+      });
+    }
+  };
 
   const addSocialPlatform = () => {
     const newId = (footerData.social.length + 1).toString();
@@ -261,22 +254,25 @@ const handleDragEnd = (event, columnId) => {
     });
   };
 
-  const handleColumnLinkChange = useCallback((columnId, linkId, field, value) => {
-    setFooterData(prev => ({
-      ...prev,
-      columns: prev.columns.map(column => {
-        if (column.id === columnId) {
-          return {
-            ...column,
-            links: column.links.map(link => 
-              link.id === linkId ? { ...link, [field]: value } : link
-            )
-          };
-        }
-        return column;
-      })
-    }));
-  }, [])
+  const handleColumnLinkChange = useCallback(
+    (columnId, linkId, field, value) => {
+      setFooterData((prev) => ({
+        ...prev,
+        columns: prev.columns.map((column) => {
+          if (column.id === columnId) {
+            return {
+              ...column,
+              links: column.links.map((link) =>
+                link.id === linkId ? { ...link, [field]: value } : link,
+              ),
+            };
+          }
+          return column;
+        }),
+      }));
+    },
+    [],
+  );
 
   const addColumnLink = (columnId) => {
     const column = footerData.columns.find((col) => col.id === columnId);
@@ -689,109 +685,120 @@ const handleDragEnd = (event, columnId) => {
               </Card>
             </TabsContent>
 
-            
             <TabsContent value="columns" className="space-y-4">
-  <Card>
-    <CardHeader>
-      <CardTitle>أعمدة التذييل</CardTitle>
-      <CardDescription>
-        أضف وعدل أعمدة الروابط في تذييل موقعك
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-6">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {footerData.columns.map((column) => (
-          <Card key={column.id} className="border-dashed">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label htmlFor={`column-title-${column.id}`}>
-                    عنوان العمود
-                  </Label>
-                  <Input
-                    id={`column-title-${column.id}`}
-                    value={column.title}
-                    onChange={(e) =>
-                      handleColumnChange(column.id, "title", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id={`column-enabled-${column.id}`}
-                    checked={column.enabled}
-                    onCheckedChange={(checked) =>
-                      handleColumnChange(column.id, "enabled", checked)
-                    }
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeColumn(column.id)}
-                    className="h-8 w-8"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">حذف العمود</span>
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>الروابط</Label>
-                  <Badge variant="outline">{column.links.length}</Badge>
-                </div>
-                <ColumnDndWrapper 
-          columnId={column.id} 
-          handleDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={column.links.map((link) => link.id)}
-            strategy={verticalListSortingStrategy}
-          >
-                    <div className="space-y-2">
-                      {column.links.map((link) => (
-                        <SortableLink
-                          key={link.id}
-                          link={link}
-                          columnId={column.id}
-                          handleColumnLinkChange={handleColumnLinkChange}
-                          removeColumnLink={removeColumnLink}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </ColumnDndWrapper >
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => addColumnLink(column.id)}
-                className="w-full"
-              >
-                <Plus className="ml-2 h-4 w-4" />
-                إضافة رابط
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-        <Card
-          className="flex h-full cursor-pointer flex-col items-center justify-center border-dashed p-6 text-center transition-colors hover:bg-muted/50"
-          onClick={addColumn}
-        >
-          <div className="mb-4 rounded-full bg-primary/10 p-3">
-            <Plus className="h-6 w-6 text-primary" />
-          </div>
-          <h3 className="mb-1 font-medium">إضافة عمود جديد</h3>
-          <p className="text-sm text-muted-foreground">
-            إضافة مجموعة روابط جديدة
-          </p>
-        </Card>
-      </div>
-    </CardContent>
-  </Card>
-</TabsContent>
+              <Card>
+                <CardHeader>
+                  <CardTitle>أعمدة التذييل</CardTitle>
+                  <CardDescription>
+                    أضف وعدل أعمدة الروابط في تذييل موقعك
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {footerData.columns.map((column) => (
+                      <Card key={column.id} className="border-dashed">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                              <Label htmlFor={`column-title-${column.id}`}>
+                                عنوان العمود
+                              </Label>
+                              <Input
+                                id={`column-title-${column.id}`}
+                                value={column.title}
+                                onChange={(e) =>
+                                  handleColumnChange(
+                                    column.id,
+                                    "title",
+                                    e.target.value,
+                                  )
+                                }
+                              />
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                id={`column-enabled-${column.id}`}
+                                checked={column.enabled}
+                                onCheckedChange={(checked) =>
+                                  handleColumnChange(
+                                    column.id,
+                                    "enabled",
+                                    checked,
+                                  )
+                                }
+                              />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeColumn(column.id)}
+                                className="h-8 w-8"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">حذف العمود</span>
+                              </Button>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <Label>الروابط</Label>
+                              <Badge variant="outline">
+                                {column.links.length}
+                              </Badge>
+                            </div>
+                            <ColumnDndWrapper
+                              columnId={column.id}
+                              handleDragEnd={handleDragEnd}
+                            >
+                              <SortableContext
+                                items={column.links.map((link) => link.id)}
+                                strategy={verticalListSortingStrategy}
+                              >
+                                <div className="space-y-2">
+                                  {column.links.map((link) => (
+                                    <SortableLink
+                                      key={link.id}
+                                      link={link}
+                                      columnId={column.id}
+                                      handleColumnLinkChange={
+                                        handleColumnLinkChange
+                                      }
+                                      removeColumnLink={removeColumnLink}
+                                    />
+                                  ))}
+                                </div>
+                              </SortableContext>
+                            </ColumnDndWrapper>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addColumnLink(column.id)}
+                            className="w-full"
+                          >
+                            <Plus className="ml-2 h-4 w-4" />
+                            إضافة رابط
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    <Card
+                      className="flex h-full cursor-pointer flex-col items-center justify-center border-dashed p-6 text-center transition-colors hover:bg-muted/50"
+                      onClick={addColumn}
+                    >
+                      <div className="mb-4 rounded-full bg-primary/10 p-3">
+                        <Plus className="h-6 w-6 text-primary" />
+                      </div>
+                      <h3 className="mb-1 font-medium">إضافة عمود جديد</h3>
+                      <p className="text-sm text-muted-foreground">
+                        إضافة مجموعة روابط جديدة
+                      </p>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
             <TabsContent value="newsletter" className="space-y-4">
               <Card>

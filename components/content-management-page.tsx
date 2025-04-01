@@ -48,7 +48,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import {
   Select,
   SelectContent,
@@ -56,7 +56,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import useStore from "@/context/Store"; 
+import useStore from "@/context/Store";
 export function ContentManagementPage() {
   const { contentManagement, fetchContentSections, setContentManagement } =
     useStore();

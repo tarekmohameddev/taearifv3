@@ -34,7 +34,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
@@ -196,11 +196,11 @@ export default function EditPropertyPage() {
     } else {
       const validFiles = Array.from(files).filter((file) => {
         if (!file.type.startsWith("image/")) {
-        toast.error("يرجى تحميل ملفات صور فقط (JPG, PNG, GIF)");
+          toast.error("يرجى تحميل ملفات صور فقط (JPG, PNG, GIF)");
           return false;
         }
         if (file.size > 5 * 1024 * 1024) {
-        toast.error("يجب أن يكون حجم الملف أقل من 5 ميجابايت");
+          toast.error("يجب أن يكون حجم الملف أقل من 5 ميجابايت");
           return false;
         }
         return true;
@@ -217,7 +217,6 @@ export default function EditPropertyPage() {
         ],
       }));
       toast.success("تم بنجاح");
-
     }
 
     e.target.value = "";
@@ -270,7 +269,6 @@ export default function EditPropertyPage() {
       setIsLoading(true);
       setUploading(true);
       toast.loading("يرجى الانتظار...");
-
 
       try {
         let thumbnailUrl: string | null = null;
@@ -328,9 +326,9 @@ export default function EditPropertyPage() {
           `/properties/${id}`,
           propertyData,
         );
-        toast.success(publish
-          ? "تم تحديث ونشر العقار بنجاح"
-          : "تم حفظ التغييرات كمسودة");
+        toast.success(
+          publish ? "تم تحديث ونشر العقار بنجاح" : "تم حفظ التغييرات كمسودة",
+        );
         setIsLoading(false);
 
         const currentState = useStore.getState();
@@ -357,7 +355,7 @@ export default function EditPropertyPage() {
       }
     } else {
       setSubmitError("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
-        toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
+      toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
     }
   };
 

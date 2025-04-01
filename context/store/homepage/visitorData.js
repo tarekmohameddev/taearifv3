@@ -34,7 +34,7 @@ module.exports = (set) => ({
             ...state.homepage.visitorData,
             [timeRange]: {
               data: response.data.visitor_data,
-              fetched: true, 
+              fetched: true,
             },
           },
         },

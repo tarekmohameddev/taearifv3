@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 export default function AchievementsManagementPage() {
   const [isLoading, setIsLoading] = useState(false);

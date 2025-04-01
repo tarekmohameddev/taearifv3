@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, ImagePlus, Plus, Save, Trash2 } from "lucide-react";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import { uploadSingleFile } from "@/utils/uploadSingle";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
@@ -66,7 +66,7 @@ export function AboutCompanyPage() {
         }
       } catch (err) {
         setError(err.message);
-      toast.error("فشل في تحميل بيانات من نحن");
+        toast.error("فشل في تحميل بيانات من نحن");
       } finally {
         setIsLoading(false);
       }
@@ -122,23 +122,20 @@ export function AboutCompanyPage() {
     setIsSaving(true);
     try {
       let newAboutData = { ...aboutData };
-  
+
       if (selectedFile) {
-        const uploadedData = await uploadSingleFile(
-          selectedFile,
-          "content"   
-        );
-  
+        const uploadedData = await uploadSingleFile(selectedFile, "content");
+
         setAboutData((prevData) => ({
           ...prevData,
           image_path: uploadedData.url,
         }));
-  
+
         newAboutData.image_path = uploadedData.path;
       }
       const response = await axiosInstance.post(
         "https://taearif.com/api/content/about",
-        newAboutData
+        newAboutData,
       );
       if (response.data.status === "success") {
         toast.success("تم الحفظ بنجاح");
@@ -152,7 +149,6 @@ export function AboutCompanyPage() {
       setIsSaving(false);
     }
   };
-  
 
   if (isLoading) {
     return (

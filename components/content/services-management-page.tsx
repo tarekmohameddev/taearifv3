@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Grip, Plus, Save, Trash2 } from "lucide-react";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import {
   Select,
   SelectContent,

@@ -34,7 +34,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
@@ -163,11 +163,11 @@ export default function AddPropertyPage() {
     } else {
       const validFiles = Array.from(files).filter((file) => {
         if (!file.type.startsWith("image/")) {
-        toast.error("يجب أن يكون حجم الملف أقل من 5 ميجابايت");
+          toast.error("يجب أن يكون حجم الملف أقل من 5 ميجابايت");
           return false;
         }
         if (file.size > 5 * 1024 * 1024) {
-        toast.error("يجب أن يكون حجم الملف أقل من 5 ميجابايت");
+          toast.error("يجب أن يكون حجم الملف أقل من 5 ميجابايت");
           return false;
         }
         return true;
@@ -185,7 +185,7 @@ export default function AddPropertyPage() {
       }));
     }
 
-    e.target.value = ""; 
+    e.target.value = "";
   };
 
   const removeImage = (
@@ -231,33 +231,43 @@ export default function AddPropertyPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-
-
-  
   const handleSubmit = async (publish: boolean) => {
     setSubmitError(null);
     if (validateForm()) {
       setIsLoading(true);
       setUploading(true);
-  
+
       try {
         let thumbnailPath: string | null = null;
         let galleryPaths: string[] = [];
         let floorPlansPaths: string[] = [];
-  
+
         if (images.thumbnail) {
-          const uploadedFile = await uploadSingleFile(images.thumbnail, "property");
+          const uploadedFile = await uploadSingleFile(
+            images.thumbnail,
+            "property",
+          );
           thumbnailPath = uploadedFile.path.replace("https://taearif.com", "");
         }
-  
+
         if (images.gallery.length > 0) {
-          const uploadedFiles = await uploadMultipleFiles(images.gallery, "property");
-          galleryPaths = uploadedFiles.map((f) => f.path.replace("https://taearif.com", ""));
+          const uploadedFiles = await uploadMultipleFiles(
+            images.gallery,
+            "property",
+          );
+          galleryPaths = uploadedFiles.map((f) =>
+            f.path.replace("https://taearif.com", ""),
+          );
         }
-  
+
         if (images.floorPlans.length > 0) {
-          const uploadedFiles = await uploadMultipleFiles(images.floorPlans, "property");
-          floorPlansPaths = uploadedFiles.map((f) => f.path.replace("https://taearif.com", ""));
+          const uploadedFiles = await uploadMultipleFiles(
+            images.floorPlans,
+            "property",
+          );
+          floorPlansPaths = uploadedFiles.map((f) =>
+            f.path.replace("https://taearif.com", ""),
+          );
         }
 
         const propertyData = {
@@ -282,13 +292,17 @@ export default function AddPropertyPage() {
           city_id: 1,
           category_id: 1,
         };
-  
+
         let response = await axiosInstance.post("/properties", propertyData);
         toast.success("تم نشر العقار بنجاح");
         const currentState = useStore.getState();
         const createdProject = response.data.user_property;
-        createdProject.status = createdProject.status === true ? "منشور" : "مسودة";
-        const updatedProperties = [createdProject, ...currentState.propertiesManagement.properties];
+        createdProject.status =
+          createdProject.status === true ? "منشور" : "مسودة";
+        const updatedProperties = [
+          createdProject,
+          ...currentState.propertiesManagement.properties,
+        ];
         setPropertiesManagement({
           properties: updatedProperties,
         });
@@ -305,8 +319,6 @@ export default function AddPropertyPage() {
       setSubmitError("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
     }
   };
-
-
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
@@ -330,9 +342,11 @@ export default function AddPropertyPage() {
               </div>
               <div className="flex flex-col items-end gap-2">
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => handleSubmit(false)}
-                        disabled={isLoading}>
-                  
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSubmit(false)}
+                    disabled={isLoading}
+                  >
                     {isLoading ? "جاري الحفظ..." : "حفظ كمسودة"}
                   </Button>
                   <Button
@@ -384,7 +398,9 @@ export default function AddPropertyPage() {
                       className={errors.description ? "border-red-500" : ""}
                     />
                     {errors.description && (
-                      <p className="text-sm text-red-500">{errors.description}</p>
+                      <p className="text-sm text-red-500">
+                        {errors.description}
+                      </p>
                     )}
                   </div>
 
@@ -889,9 +905,8 @@ export default function AddPropertyPage() {
                             variant="outline"
                             onClick={() => handleSubmit(false)}
                             disabled={isLoading}
-                            >
+                          >
                             {isLoading ? "جاري الحفظ..." : "حفظ كمسودة"}
-
                           </Button>
                           <Button
                             onClick={() => handleSubmit(true)}

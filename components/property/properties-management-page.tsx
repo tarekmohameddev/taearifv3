@@ -106,25 +106,19 @@ export function PropertiesManagementPage() {
     fetchProperties,
   } = useStore();
 
-
-    
   const normalizeStatus = (status) => {
     if (status === "1" || status === 1) return "منشور";
     if (status === "0" || status === 0) return "مسودة";
-    return status; 
+    return status;
   };
 
-
   const normalizedProperties = useMemo(() => {
-    return properties.map(property => ({
+    return properties.map((property) => ({
       ...property,
-      status: normalizeStatus(property.status)
+      status: normalizeStatus(property.status),
     }));
   }, [properties]);
-  
-  
 
-  
   const setViewMode = (mode: "grid" | "list") => {
     setPropertiesManagement({ viewMode: mode });
   };
@@ -144,13 +138,8 @@ export function PropertiesManagementPage() {
     if (!isInitialized && !loading) {
       fetchProperties();
     }
-    console.log("Properties",properties)
+    console.log("Properties", properties);
   }, [fetchProperties, isInitialized, loading, properties]);
-
-
-
-
-
 
   const renderSkeletons = () => (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -378,7 +367,9 @@ export function PropertiesManagementPage() {
                   {viewMode === "grid" ? (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       {normalizedProperties
-                        .filter((property) => property.transaction_type === "sale")
+                        .filter(
+                          (property) => property.transaction_type === "sale",
+                        )
                         .map((property) => (
                           <PropertyCard
                             key={property.id}
@@ -393,7 +384,9 @@ export function PropertiesManagementPage() {
                   ) : (
                     <div className="space-y-4">
                       {normalizedProperties
-                        .filter((property) => property.transaction_type === "sale")
+                        .filter(
+                          (property) => property.transaction_type === "sale",
+                        )
                         .map((property) => (
                           <PropertyListItem
                             key={property.id}
@@ -564,10 +557,6 @@ function PropertyCard({
   onToggleFavorite,
 }: PropertyCardProps) {
   const router = useRouter();
-   
-
-
-
 
   return (
     <Card className="overflow-hidden">
@@ -584,7 +573,7 @@ function PropertyCard({
           />
         </div>
         {property.featured && (
-            <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
+          <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
             مميز
           </div>
         )}
@@ -667,12 +656,12 @@ function PropertyCard({
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
-      <div className="text-lg font-semibold flex flex-row-reverse gap-1">
+        <div className="text-lg font-semibold flex flex-row-reverse gap-1">
           {property.transaction_type === "sale" ? (
             <>
               <span>بسعر {property.price.toLocaleString()}</span>
-              <img 
-                src="/Saudi_Riyal_Symbol.svg" 
+              <img
+                src="/Saudi_Riyal_Symbol.svg"
                 alt="ريال سعودي"
                 className="w-5 h-5 filter brightness-0 contrast-100"
               />
@@ -680,12 +669,12 @@ function PropertyCard({
           ) : (
             <>
               <span>بسعر {property.price.toLocaleString()}</span>
-              <img 
-                src="/Saudi_Riyal_Symbol.svg" 
+              <img
+                src="/Saudi_Riyal_Symbol.svg"
                 alt="ريال سعودي"
                 className="w-5 h-5 filter brightness-0 contrast-100"
-                />
-                <span>شهر/</span>
+              />
+              <span>شهر/</span>
             </>
           )}
         </div>
@@ -700,18 +689,19 @@ function PropertyCard({
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">حمام</span>
             <span className="font-medium flex flex-row-reverse items-center gap-1">
-            <Bath className="h-3 w-3" /> {property.bath}
+              <Bath className="h-3 w-3" /> {property.bath}
             </span>
           </div>
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">مساحة</span>
             <span className="font-medium flex flex-row-reverse items-center gap-1">
-            <Ruler className="h-3 w-3" /> {property.area || property.size} m²
+              <Ruler className="h-3 w-3" /> {property.area || property.size} m²
             </span>
           </div>
         </div>
         <div className="flex flex-wrap gap-1 pt-2">
-          {property.features?.slice(0, 3)
+          {property.features
+            ?.slice(0, 3)
             .map((feature: string, index: number) => (
               <span
                 key={index}
@@ -728,12 +718,12 @@ function PropertyCard({
         </div>
       </CardContent>
       <CardFooter className="flex flex-row-reverse gap-2 p-4 pt-0">
-      <Button
-            variant="outline"
-            size="sm"
-            className="w-full gap-1"
-            onClick={() => router.push("/properties/" + property.id + "/edit")}
-          >
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full gap-1"
+          onClick={() => router.push("/properties/" + property.id + "/edit")}
+        >
           <Edit className="h-3.5 w-3.5" />
           تعديل
         </Button>
@@ -795,32 +785,35 @@ function PropertyListItem({
         <div className="flex flex-1 flex-col p-4">
           <div className="flex flex-row-reverse items-start justify-between">
             <div>
-              <h3 className="font-semibold">{property.title || property.contents[0].title}</h3>
+              <h3 className="font-semibold">
+                {property.title || property.contents[0].title}
+              </h3>
               <p className="text-sm text-muted-foreground flex flex-row-reverse items-center gap-1">
-                <MapPin className="h-3 w-3" /> {property.address || property.contents[0].address }
+                <MapPin className="h-3 w-3" />{" "}
+                {property.address || property.contents[0].address}
               </p>
             </div>
             <div className="text-lg font-semibold">
-            {property.transaction_type === "sale" ? (
-      <div className="flex items-center gap-1">
-<img 
-  src="/Saudi_Riyal_Symbol.svg" 
-  alt="ريال سعودي"
-  className="w-5 h-5 filter brightness-0 contrast-100"
-/>
-        <span>بسعر {property.price.toLocaleString()}</span>
-      </div>
-    ) : (
-      <div className="flex items-center gap-1">
-        <span>شهر/</span>
-<img 
-  src="/Saudi_Riyal_Symbol.svg" 
-  alt="ريال سعودي"
-  className="w-5 h-5 filter brightness-0 contrast-100"
-/>
-        <span>بسعر {property.price.toLocaleString()}</span>
-        </div>
-    )}
+              {property.transaction_type === "sale" ? (
+                <div className="flex items-center gap-1">
+                  <img
+                    src="/Saudi_Riyal_Symbol.svg"
+                    alt="ريال سعودي"
+                    className="w-5 h-5 filter brightness-0 contrast-100"
+                  />
+                  <span>بسعر {property.price.toLocaleString()}</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1">
+                  <span>شهر/</span>
+                  <img
+                    src="/Saudi_Riyal_Symbol.svg"
+                    alt="ريال سعودي"
+                    className="w-5 h-5 filter brightness-0 contrast-100"
+                  />
+                  <span>بسعر {property.price.toLocaleString()}</span>
+                </div>
+              )}
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">

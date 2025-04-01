@@ -93,19 +93,22 @@ export default function MenuManagementPage() {
   });
   const [editingItem, setEditingItem] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [formErrors, setFormErrors] = useState<{ label?: string; url?: string }>({});
+  const [formErrors, setFormErrors] = useState<{
+    label?: string;
+    url?: string;
+  }>({});
 
   useEffect(() => {
-console.log("menuItems",menuItems)
-console.log("editingItem",editingItem)
-  }, [menuItems,editingItem]);
-  
+    console.log("menuItems", menuItems);
+    console.log("editingItem", editingItem);
+  }, [menuItems, editingItem]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 10, 
+        distance: 10,
       },
-    })
+    }),
   );
 
   const handleDragEnd = (event) => {
@@ -121,25 +124,27 @@ console.log("editingItem",editingItem)
           .sort((a, b) => a.order - b.order);
 
         const oldIndex = itemsInSameLevel.findIndex(
-          (item) => item.id === active.id
+          (item) => item.id === active.id,
         );
         const newIndex = itemsInSameLevel.findIndex(
-          (item) => item.id === over.id
+          (item) => item.id === over.id,
         );
 
-        const updatedItems = arrayMove(itemsInSameLevel, oldIndex, newIndex).map(
-          (item, index) => ({
-            ...item,
-            order: index + 1,
-          })
-        );
+        const updatedItems = arrayMove(
+          itemsInSameLevel,
+          oldIndex,
+          newIndex,
+        ).map((item, index) => ({
+          ...item,
+          order: index + 1,
+        }));
 
         setMenuItems((prevItems) => {
           const otherItems = prevItems.filter(
-            (item) => item.parentId !== activeItem.parentId
+            (item) => item.parentId !== activeItem.parentId,
           );
           return [...otherItems, ...updatedItems].sort(
-            (a, b) => a.order - b.order
+            (a, b) => a.order - b.order,
           );
         });
 
@@ -153,7 +158,7 @@ console.log("editingItem",editingItem)
       menuItems
         .filter((item) => item.parentId === null)
         .sort((a, b) => a.order - b.order),
-    [menuItems]
+    [menuItems],
   );
 
   const getChildItems = (parentId) => {
@@ -206,7 +211,9 @@ console.log("editingItem",editingItem)
   const handleRemoveMenuItem = (id: number) => {
     const itemsToDelete = [
       id,
-      ...menuItems.filter((item) => item.parentId === id).map((item) => item.id),
+      ...menuItems
+        .filter((item) => item.parentId === id)
+        .map((item) => item.id),
     ];
     setMenuItems(menuItems.filter((item) => !itemsToDelete.includes(item.id)));
     toast.success("تم حذف عنصر القائمة بنجاح");
@@ -214,8 +221,8 @@ console.log("editingItem",editingItem)
 
   useEffect(() => {
     if (isLoaded) return; // توقف إذا تم التحميل مسبقاً
-    setIsLoaded(true); 
-    
+    setIsLoaded(true);
+
     const fetchData = async () => {
       const loadingToast = toast.loading("جاري تحميل بيانات القائمة...");
       try {
@@ -227,15 +234,15 @@ console.log("editingItem",editingItem)
         toast.error("فشل في التحميل", { id: loadingToast });
       }
     };
-  
+
     fetchData();
   }, [isLoaded]);
 
   const handleToggleActive = (id) => {
     setMenuItems(
       menuItems.map((item) =>
-        item.id === id ? { ...item, isActive: !item.isActive } : item
-      )
+        item.id === id ? { ...item, isActive: !item.isActive } : item,
+      ),
     );
     toast.success("تم تغيير حالة العنصر");
   };
@@ -243,8 +250,8 @@ console.log("editingItem",editingItem)
   const handleToggleMobile = (id) => {
     setMenuItems(
       menuItems.map((item) =>
-        item.id === id ? { ...item, showOnMobile: !item.showOnMobile } : item
-      )
+        item.id === id ? { ...item, showOnMobile: !item.showOnMobile } : item,
+      ),
     );
     toast.success("تم تغيير إعدادات عرض الجوال");
   };
@@ -252,8 +259,8 @@ console.log("editingItem",editingItem)
   const handleToggleDesktop = (id) => {
     setMenuItems(
       menuItems.map((item) =>
-        item.id === id ? { ...item, showOnDesktop: !item.showOnDesktop } : item
-      )
+        item.id === id ? { ...item, showOnDesktop: !item.showOnDesktop } : item,
+      ),
     );
     toast.success("تم تغيير إعدادات عرض سطح المكتب");
   };
@@ -268,8 +275,8 @@ console.log("editingItem",editingItem)
 
     setMenuItems(
       menuItems.map((item) =>
-        item.id === editingItem.id ? editingItem : item
-      )
+        item.id === editingItem.id ? editingItem : item,
+      ),
     );
 
     setIsEditDialogOpen(false);
@@ -288,7 +295,7 @@ console.log("editingItem",editingItem)
       const updatedItems = menuItems.map((item) => {
         if (item.parentId === null) {
           const index = parentItems.findIndex(
-            (parent) => parent.id === item.id
+            (parent) => parent.id === item.id,
           );
           return { ...item, order: index + 1 };
         }
@@ -299,7 +306,7 @@ console.log("editingItem",editingItem)
         ...new Set(
           updatedItems
             .filter((item) => item.parentId !== null)
-            .map((item) => item.parentId)
+            .map((item) => item.parentId),
         ),
       ];
       parentIds.forEach((parentId) => {
@@ -308,7 +315,7 @@ console.log("editingItem",editingItem)
           .sort((a, b) => a.order - b.order);
         children.forEach((child, index) => {
           const childIndex = updatedItems.findIndex(
-            (item) => item.id === child.id
+            (item) => item.id === child.id,
           );
           if (childIndex !== -1) {
             updatedItems[childIndex].order = index + 1;
@@ -332,25 +339,23 @@ console.log("editingItem",editingItem)
   const SortableCard = ({ item, children }) => {
     const { attributes, listeners, setNodeRef, transform, transition } =
       useSortable({ id: item.id });
-  
+
     const style = {
       transform: CSS.Transform.toString(transform),
       transition,
     };
-  
+
     return (
       <div
         ref={setNodeRef}
         style={style}
         {...attributes}
-        {...listeners} 
-        className="cursor-grab" 
+        {...listeners}
+        className="cursor-grab"
       >
         <Card className="mb-3">
           <CardContent className="p-4">
-            <div className="flex items-center">
-              {children}
-            </div>
+            <div className="flex items-center">{children}</div>
           </CardContent>
         </Card>
       </div>
@@ -360,7 +365,7 @@ console.log("editingItem",editingItem)
   // عرض عنصر القائمة
   const renderMenuItem = (item) => {
     const children = getChildItems(item.id);
-  
+
     return (
       <SortableCard key={item.id} item={item}>
         <div className="flex-1">
@@ -383,7 +388,7 @@ console.log("editingItem",editingItem)
                 {item.url}
               </div>
             </div>
-  
+
             <div className="flex items-center gap-2">
               <div className="flex flex-col items-end mr-4">
                 <div className="flex items-center mb-1">
@@ -416,7 +421,7 @@ console.log("editingItem",editingItem)
                   </span>
                 </div>
               </div>
-  
+
               <div className="flex">
                 <Button
                   variant="ghost"
@@ -439,7 +444,7 @@ console.log("editingItem",editingItem)
               </div>
             </div>
           </div>
-  
+
           {children.length > 0 && (
             <div className="border-t px-4 py-2 bg-muted/20 mt-2">
               <div className="text-xs font-medium mb-2">العناصر الفرعية:</div>
@@ -461,7 +466,9 @@ console.log("editingItem",editingItem)
                               <div className="flex items-center">
                                 <span
                                   className={`font-medium ${
-                                    !child.isActive ? "text-muted-foreground" : ""
+                                    !child.isActive
+                                      ? "text-muted-foreground"
+                                      : ""
                                   }`}
                                 >
                                   {child.label}
@@ -475,7 +482,7 @@ console.log("editingItem",editingItem)
                                 {child.url}
                               </div>
                             </div>
-  
+
                             <div className="flex items-center gap-2">
                               <div className="flex flex-col items-end mr-4">
                                 <div className="flex items-center mb-1">
@@ -510,7 +517,7 @@ console.log("editingItem",editingItem)
                                   </span>
                                 </div>
                               </div>
-  
+
                               <div className="flex">
                                 <Button
                                   variant="ghost"

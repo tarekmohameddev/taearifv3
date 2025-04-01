@@ -41,7 +41,11 @@ module.exports = (set) => ({
       const mappedProperties = propertiesList.map((property) => ({
         ...property,
         thumbnail: property.featured_image,
-        listingType: String(property.transaction_type) === "1" || property.transaction_type === "sale" ? "للبيع" : "للإيجار",
+        listingType:
+          String(property.transaction_type) === "1" ||
+          property.transaction_type === "sale"
+            ? "للبيع"
+            : "للإيجار",
         status: property.status === 1 ? "منشور" : "مسودة",
         lastUpdated: new Date(property.updated_at).toLocaleDateString("ar-AE"),
       }));

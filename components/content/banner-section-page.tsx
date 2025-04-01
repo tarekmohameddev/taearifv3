@@ -12,11 +12,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, ImagePlus, Plus, Save, Trash2, X } from "lucide-react";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
-
 
 interface BannerSettings {
   banner_type: string;
@@ -58,7 +57,7 @@ export function BannerSectionPage() {
   const [staticBannerImage, setStaticBannerImage] = useState<string | null>(
     null,
   );
-  const [staticBannerFile, setStaticBannerFile] = useState<File | null>(null); 
+  const [staticBannerFile, setStaticBannerFile] = useState<File | null>(null);
   const [sliders, setSliders] = useState<
     Array<{
       id: string;
@@ -69,7 +68,7 @@ export function BannerSectionPage() {
       buttonText: string;
       buttonLink: string;
       image: string | null;
-      file: File | null; 
+      file: File | null;
     }>
   >([]);
 
@@ -80,7 +79,7 @@ export function BannerSectionPage() {
         const data = response.data.data.settings;
         setBannerData(data);
         setBannerType(data.banner_type);
-        setStaticBannerImage(data.static?.image || null); 
+        setStaticBannerImage(data.static?.image || null);
 
         if (data.slider?.slides) {
           const formattedSlides = data.slider.slides.map((slide) => ({
@@ -92,7 +91,7 @@ export function BannerSectionPage() {
             buttonText: slide.buttonText,
             buttonLink: slide.buttonUrl,
             image: slide.image,
-            file: null, 
+            file: null,
           }));
           setSliders(formattedSlides);
         }
@@ -108,15 +107,18 @@ export function BannerSectionPage() {
     setIsLoading(true);
     try {
       let staticImageUrl = bannerData?.static?.image || "";
-      let staticImagePath = staticImageUrl; 
-  
+      let staticImagePath = staticImageUrl;
+
       if (bannerType === "static" && staticBannerFile) {
-        const uploadResult = await uploadSingleFile(staticBannerFile, "content");
-        staticImageUrl = uploadResult.url; 
-        staticImagePath = uploadResult.path; 
-        setStaticBannerImage(uploadResult.url); 
+        const uploadResult = await uploadSingleFile(
+          staticBannerFile,
+          "content",
+        );
+        staticImageUrl = uploadResult.url;
+        staticImagePath = uploadResult.path;
+        setStaticBannerImage(uploadResult.url);
       } else if (bannerType === "static" && staticBannerImage === null) {
-        staticImagePath = ""; 
+        staticImagePath = "";
       }
       const updatedSlides = await Promise.all(
         sliders.map(async (slide) => {
@@ -124,28 +126,28 @@ export function BannerSectionPage() {
             const uploadResult = await uploadSingleFile(slide.file, "content");
             return {
               ...slide,
-              image: uploadResult.url, 
-              imagePath: uploadResult.path, 
+              image: uploadResult.url,
+              imagePath: uploadResult.path,
             };
           } else if (slide.image === null) {
             return { ...slide, image: "", imagePath: "" };
           }
-          return { ...slide, imagePath: slide.image }; 
+          return { ...slide, imagePath: slide.image };
         }),
       );
-  
+
       setSliders(
         updatedSlides.map((slide) => ({
           ...slide,
-          file: null, 
+          file: null,
         })),
       );
-  
+
       const formData = {
         banner_type: bannerType,
         static: {
           enabled: bannerType === "static",
-          image: staticImagePath.replace("https://taearif.com",""),
+          image: staticImagePath.replace("https://taearif.com", ""),
           title: bannerData?.static?.title || "",
           subtitle: bannerData?.static?.subtitle || "",
           caption: bannerData?.static?.caption || "",
@@ -154,14 +156,18 @@ export function BannerSectionPage() {
           buttonUrl: bannerData?.static?.buttonUrl || "",
           buttonStyle: bannerData?.static?.buttonStyle || "primary",
           textAlignment: bannerData?.static?.textAlignment || "center",
-          overlayColor: bannerData?.static?.overlayColor || "rgba(0, 0, 0, 0.5)",
+          overlayColor:
+            bannerData?.static?.overlayColor || "rgba(0, 0, 0, 0.5)",
           textColor: bannerData?.static?.textColor || "#ffffff",
         },
         slider: {
           enabled: bannerType === "slider",
           slides: updatedSlides.map((slide) => ({
             id: slide.id,
-            image: (slide.imagePath || slide.image).replace("https://taearif.com",""), 
+            image: (slide.imagePath || slide.image).replace(
+              "https://taearif.com",
+              "",
+            ),
             title: slide.title,
             subtitle: slide.subtitle,
             caption: slide.caption || "",
@@ -177,7 +183,8 @@ export function BannerSectionPage() {
           showArrows: bannerData?.slider?.showArrows || false,
           showDots: bannerData?.slider?.showDots || false,
           animation: bannerData?.slider?.animation || "fade",
-          overlayColor: bannerData?.slider?.overlayColor || "rgba(0, 0, 0, 0.6)",
+          overlayColor:
+            bannerData?.slider?.overlayColor || "rgba(0, 0, 0, 0.6)",
           textColor: bannerData?.slider?.textColor || "#ffffff",
         },
         common: {
@@ -188,7 +195,7 @@ export function BannerSectionPage() {
           fullWidth: true,
         },
       };
-  
+
       await axiosInstance.post("/content/banner", formData);
       toast.success("تم تحديث إعدادات البانر بنجاح");
     } catch (error) {
@@ -213,7 +220,7 @@ export function BannerSectionPage() {
         buttonText: "اضغط هنا",
         buttonLink: "/",
         image: null,
-        file: null, 
+        file: null,
       },
     ]);
   };
@@ -233,10 +240,10 @@ export function BannerSectionPage() {
   const handleStaticImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setStaticBannerFile(file); 
+      setStaticBannerFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
-        setStaticBannerImage(e.target.result); 
+        setStaticBannerImage(e.target.result);
       };
       reader.readAsDataURL(file);
     }
@@ -261,7 +268,7 @@ export function BannerSectionPage() {
 
   const removeStaticImage = () => {
     setStaticBannerImage(null);
-    setStaticBannerFile(null); 
+    setStaticBannerFile(null);
     if (staticFileInputRef.current) {
       staticFileInputRef.current.value = "";
     }

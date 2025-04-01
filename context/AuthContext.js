@@ -34,7 +34,7 @@ const useAuthStore = create((set, get) => ({
         UserIslogged: true,
         userData: {
           ...userData,
-          onboarding_completed: userData.onboarding_completed || false, 
+          onboarding_completed: userData.onboarding_completed || false,
         },
       });
       set({ IsDone: false, error: null });

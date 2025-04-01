@@ -1,5 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 module.exports = (set) => ({
   contentManagement: {
@@ -25,7 +25,7 @@ module.exports = (set) => ({
       },
     }));
 
-    const loadingToast = toast.loading('جاري تحميل الأقسام...');
+    const loadingToast = toast.loading("جاري تحميل الأقسام...");
 
     try {
       const response = await axiosInstance.get(
@@ -39,7 +39,7 @@ module.exports = (set) => ({
           loading: false,
         },
       }));
-      toast.success('تم تحميل الأقسام بنجاح', { id: loadingToast });
+      toast.success("تم تحميل الأقسام بنجاح", { id: loadingToast });
     } catch (error) {
       set((state) => ({
         contentManagement: {
@@ -48,7 +48,9 @@ module.exports = (set) => ({
           loading: false,
         },
       }));
-      toast.error(error.message || 'حدث خطأ أثناء تحميل الأقسام', { id: loadingToast });
+      toast.error(error.message || "حدث خطأ أثناء تحميل الأقسام", {
+        id: loadingToast,
+      });
     }
   },
 

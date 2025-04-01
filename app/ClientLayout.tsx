@@ -15,23 +15,25 @@ export default function ClientLayout({
   const fetchUserData = useAuthStore((state) => state.fetchUserData);
   const UserIslogged = useAuthStore((state) => state.UserIslogged);
   const IsLoading = useAuthStore((state) => state.IsLoading);
-  const onboardingCompleted = useAuthStore((state) => state.onboarding_completed);
+  const onboardingCompleted = useAuthStore(
+    (state) => state.onboarding_completed,
+  );
   const userData = useAuthStore((state) => state.userData);
   const setUserData = useAuthStore((state) => state.setUserData);
   const setUserIsLogged = useAuthStore((state) => state.setUserIsLogged);
   const setIsLoading = useAuthStore((state) => state.setIsLoading);
   const { setOnboardingCompleted } = useAuthStore();
 
-//   setUserData({
-//     email: userData.email,
-//     token: userData.token,
-//     username: userData.username,
-//     first_name: userData.first_name,
-//     last_name: userData.last_name,
-//     onboarding_completed: userData.onboarding_completed || false,
-//   });
-        // setUserIsLogged(true);
-// 
+  //   setUserData({
+  //     email: userData.email,
+  //     token: userData.token,
+  //     username: userData.username,
+  //     first_name: userData.first_name,
+  //     last_name: userData.last_name,
+  //     onboarding_completed: userData.onboarding_completed || false,
+  //   });
+  // setUserIsLogged(true);
+  //
   useEffect(() => {
     setIsMounted(true);
     fetchUserData();
@@ -42,8 +44,6 @@ export default function ClientLayout({
       router.push("/login");
     }
   }, [isMounted, IsLoading, UserIslogged, router]);
-
-  
 
   useEffect(() => {
     async function fetchUser() {
@@ -64,15 +64,21 @@ export default function ClientLayout({
     }
     fetchUser();
   }, [isMounted, IsLoading, UserIslogged, router, onboardingCompleted]);
-  
 
-
-  if (pathname !== "/login" && pathname !== "/register" && pathname !== "/onboarding") {
+  if (
+    pathname !== "/login" &&
+    pathname !== "/register" &&
+    pathname !== "/onboarding"
+  ) {
     if (!UserIslogged) {
       return <></>;
     }
   }
-  if (pathname == "/login" && pathname == "/register" && pathname == "/onboarding") {
+  if (
+    pathname == "/login" &&
+    pathname == "/register" &&
+    pathname == "/onboarding"
+  ) {
     if (UserIslogged) {
     }
   }

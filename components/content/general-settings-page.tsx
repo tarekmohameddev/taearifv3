@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Save, Upload } from "lucide-react";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
 import { useCallback } from "react";
@@ -46,22 +46,22 @@ export function GeneralSettingsPage() {
       },
     } as AdditionalSettings,
   });
-  
+
   // Add dedicated state for image previews
   const [imagePreviews, setImagePreviews] = useState({
     logo: "",
-    favicon: ""
+    favicon: "",
   });
-  
+
   const [tempFiles, setTempFiles] = useState<{
     logo?: File;
     favicon?: File;
   }>({});
-  
+
   const getPreviewUrl = useCallback((file: File | undefined) => {
     return file ? URL.createObjectURL(file) : "";
   }, []);
-  
+
   const logoInputRef = useRef<HTMLInputElement>(null);
   const faviconInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,11 +83,11 @@ export function GeneralSettingsPage() {
             },
           },
         });
-        
+
         // Initialize image previews with current values
         setImagePreviews({
           logo: settings.logo || "",
-          favicon: settings.favicon || ""
+          favicon: settings.favicon || "",
         });
       } catch (error) {
         toast.error("تعذر تحميل الإعدادات العامة");
@@ -99,10 +99,10 @@ export function GeneralSettingsPage() {
   // Clean up object URLs when component unmounts or when previews change
   useEffect(() => {
     return () => {
-      if (imagePreviews.logo && imagePreviews.logo.startsWith('blob:')) {
+      if (imagePreviews.logo && imagePreviews.logo.startsWith("blob:")) {
         URL.revokeObjectURL(imagePreviews.logo);
       }
-      if (imagePreviews.favicon && imagePreviews.favicon.startsWith('blob:')) {
+      if (imagePreviews.favicon && imagePreviews.favicon.startsWith("blob:")) {
         URL.revokeObjectURL(imagePreviews.favicon);
       }
     };
@@ -116,14 +116,14 @@ export function GeneralSettingsPage() {
     if (!file) return;
 
     setTempFiles((prev) => ({ ...prev, [type]: file }));
-    
+
     // Create preview URL and update preview state
     const previewUrl = getPreviewUrl(file);
-    setImagePreviews(prev => ({
+    setImagePreviews((prev) => ({
       ...prev,
-      [type]: previewUrl
+      [type]: previewUrl,
     }));
-    
+
     // Also update formData to maintain existing behavior
     setFormData((prev) => ({
       ...prev,
@@ -135,41 +135,41 @@ export function GeneralSettingsPage() {
     setIsLoading(true);
     try {
       const finalData = { ...formData };
-  
-      let logoUrl = formData.logo.replace("https://taearif.com","");
-      let faviconUrl = formData.favicon.replace("https://taearif.com",""); 
+
+      let logoUrl = formData.logo.replace("https://taearif.com", "");
+      let faviconUrl = formData.favicon.replace("https://taearif.com", "");
       if (tempFiles.logo) {
         const result = await uploadSingleFile(tempFiles.logo, "content");
-        finalData.logo = result.path.replace("https://taearif.com",""); 
+        finalData.logo = result.path.replace("https://taearif.com", "");
         setFormData((prev) => ({
           ...prev,
           logo: result.url,
         }));
-        
-        setImagePreviews(prev => ({
+
+        setImagePreviews((prev) => ({
           ...prev,
-          logo: result.url
+          logo: result.url,
         }));
       }
-  
+
       if (tempFiles.favicon) {
         const result = await uploadSingleFile(tempFiles.favicon, "content");
-        finalData.favicon = result.path.replace("https://taearif.com",""); 
+        finalData.favicon = result.path.replace("https://taearif.com", "");
         setFormData((prev) => ({
           ...prev,
           favicon: result.url,
         }));
-        
-        setImagePreviews(prev => ({
+
+        setImagePreviews((prev) => ({
           ...prev,
-          favicon: result.url
+          favicon: result.url,
         }));
       }
-  
+
       await axiosInstance.put("/content/general", finalData);
-  
-      setTempFiles({}); 
-      
+
+      setTempFiles({});
+
       toast.success("تم تحديث الإعدادات العامة بنجاح");
     } catch (error) {
       toast.error("تعذر حفظ التغييرات");
@@ -178,7 +178,7 @@ export function GeneralSettingsPage() {
       router.push("/content");
     }
   };
-  
+
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader />

@@ -407,7 +407,11 @@ function ProjectListItem({ project }: { project: IProject }) {
         <div className="relative sm:w-1/3 md:w-1/4">
           <div className="aspect-[16/9] sm:aspect-auto sm:h-full w-full overflow-hidden">
             <img
-              src={project.thumbnail || project.featured_image || "/placeholder.svg"}
+              src={
+                project.thumbnail ||
+                project.featured_image ||
+                "/placeholder.svg"
+              }
               alt={project.contents?.[0]?.title}
               className="h-full w-full object-cover"
             />

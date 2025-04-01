@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, Plus, Save, Trash2, Upload } from "lucide-react";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
