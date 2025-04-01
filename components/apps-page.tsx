@@ -31,8 +31,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DashboardHeader } from "@/components/dashboard-header";
-import { EnhancedSidebar } from "@/components/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 
 export function AppsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");

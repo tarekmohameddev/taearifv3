@@ -17,8 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
-import { DashboardHeader } from "@/components/dashboard-header";
-import { EnhancedSidebar } from "@/components/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 
 export default function PortfolioManagementPage() {
   const [isLoading, setIsLoading] = useState(false);

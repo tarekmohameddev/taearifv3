@@ -17,8 +17,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
-import { DashboardHeader } from "@/components/dashboard-header";
-import { EnhancedSidebar } from "@/components/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 
 export default function BrandsManagementPage() {
   const [isLoading, setIsLoading] = useState(false);

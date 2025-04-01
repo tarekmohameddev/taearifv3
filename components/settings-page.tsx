@@ -36,7 +36,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DashboardHeader } from "@/components/dashboard-header";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -59,7 +59,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { EnhancedSidebar } from "@/components/enhanced-sidebar";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { HelpCenter } from "@/components/help-center";
 import { Progress } from "@/components/ui/progress";
 import {

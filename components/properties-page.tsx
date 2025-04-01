@@ -53,7 +53,7 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DashboardHeader } from "@/components/dashboard-header";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
 
 export function PropertiesPage() {

@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import axiosInstance from "@/lib/axiosInstance"; // تأكد من المسار الصحيح
-import { EnhancedSidebar } from "@/components/enhanced-sidebar";
-import { DashboardHeader } from "@/components/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

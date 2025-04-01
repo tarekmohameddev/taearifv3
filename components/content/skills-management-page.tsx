@@ -9,8 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { ArrowRight, Plus, Save, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { DashboardHeader } from "@/components/dashboard-header";
-import { EnhancedSidebar } from "@/components/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 
 export default function SkillsManagementPage() {
   const [isLoading, setIsLoading] = useState(false);

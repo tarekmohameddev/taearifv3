@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { EnhancedSidebar } from "@/components/enhanced-sidebar";
-import { DashboardHeader } from "@/components/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

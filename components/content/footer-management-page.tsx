@@ -1,8 +1,8 @@
 "use client";
 import CustomTitle from "@/components/CustomTitle";
 import Head from "next/head";
-import { EnhancedSidebar } from "@/components/enhanced-sidebar";
-import { DashboardHeader } from "@/components/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import {
   Card,

@@ -32,8 +32,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useRouter, useParams } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
-import { DashboardHeader } from "@/components/dashboard-header";
-import { EnhancedSidebar } from "@/components/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import toast from 'react-hot-toast';
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";

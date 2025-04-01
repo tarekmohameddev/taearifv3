@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { DashboardHeader } from "@/components/dashboard-header";
-import { EnhancedSidebar } from "@/components/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { WebsitesList } from "@/components/websites-list";
 import { Analytics } from "@/components/analytics";
 import { Settings } from "@/components/settings";
