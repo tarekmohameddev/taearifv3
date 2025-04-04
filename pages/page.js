@@ -1,7 +1,7 @@
-import { WelcomeDashboard } from "@/components/welcome-dashboard";
+import { WelcomeDashboard } from "@/components/homepage/welcome-dashboard";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { GuidedTour } from "@/components/guided-tour";
+import { GuidedTour } from "@/components/mainCOMP/guided-tour";
 
 export default function Page() {
   return (

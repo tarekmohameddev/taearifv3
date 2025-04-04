@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { EnhancedSidebar } from "./enhanced-sidebar";
-import { DashboardHeader } from "./dashboard-header";
+import { EnhancedSidebar } from "./mainCOMP/enhanced-sidebar";
+import { DashboardHeader } from "./mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";

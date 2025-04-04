@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { EnhancedSidebar } from "./enhanced-sidebar";
-import { DashboardHeader } from "./dashboard-header";
+import { EnhancedSidebar } from "./mainCOMP/enhanced-sidebar";
+import { DashboardHeader } from "./mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
