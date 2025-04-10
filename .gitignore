@@ -27,4 +27,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+chat.groovy
+test.js
+
 /pagebuildDashboard/

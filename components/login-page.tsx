@@ -18,6 +18,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import useAuthStore from "@/context/AuthContext";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 export function LoginPage() {
   const router = useRouter();
@@ -32,20 +33,17 @@ export function LoginPage() {
     password: "",
     general: "",
   });
-
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
-    // Clear error when typing
     setErrors((prev) => ({
       ...prev,
       [name]: "",
@@ -67,10 +65,12 @@ export function LoginPage() {
     }
   }, [userData, router]);
 
+  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // التحقق من الحقول الإجبارية
+    // Validate required fields
     const newErrors = {
       email: !formData.email ? "البريد الإلكتروني مطلوب" : "",
       password: !formData.password ? "كلمة المرور مطلوبة" : "",
@@ -80,16 +80,26 @@ export function LoginPage() {
     setErrors(newErrors);
     if (Object.values(newErrors).some((error) => error !== "")) return;
 
+    // Check if reCAPTCHA is available
+    if (!executeRecaptcha) {
+      console.log("!executeRecaptcha")
+      setErrors((prev) => ({
+        ...prev,
+        general: "reCAPTCHA غير متاح. يرجى المحاولة لاحقًا.",
+      }));
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const result = await login(formData.email, formData.password);
-      if (!result.success) {
+    const token = await executeRecaptcha("login");
+    const result = await login(formData.email, formData.password, token);
+    if (!result.success) {
         setErrors((prev) => ({
           ...prev,
           general: result.error || "فشل تسجيل الدخول",
         }));
       }
-      // لا نحتاج إلى التحقق من userData هنا، لأن useEffect سيتولى التوجيه
     } catch (error) {
       const errorMessage =
         error instanceof Error

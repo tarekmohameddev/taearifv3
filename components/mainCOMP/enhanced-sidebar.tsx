@@ -12,6 +12,7 @@ import {
   Settings,
   Users,
   ExternalLink,
+  LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,11 +23,38 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useAuthStore from "@/context/AuthContext";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface EnhancedSidebarProps {
   activeTab?: string;
   setActiveTab?: (tab: string) => void;
 }
+
+// دالة لتحويل أسماء الأيقونات النصية إلى مكونات React
+const getIconComponent = (iconName: string) => {
+  switch (iconName) {
+    case "panel":
+      return LayoutDashboard; // لوحة التحكم
+    case "content-settings":
+      return FileText; // إدارة المحتوى
+    case "web-settings":
+      return Settings; // إعدادات الموقع
+    case "building":
+      return Building2; // المشاريع أو العقارات
+    case "home":
+      return Home; // الصفحة الرئيسية أو العقارات
+    case "message":
+      return MessageSquare; // الرسائل
+    case "package":
+      return Package; // التطبيقات
+    case "users":
+      return Users; // العملاء
+    case "external-link":
+      return ExternalLink; // رابط خارجي
+    default:
+      return FileText; // أيقونة افتراضية
+  }
+};
 
 export function EnhancedSidebar({
   activeTab,
@@ -38,14 +66,36 @@ export function EnhancedSidebar({
   const [internalActiveTab, setInternalActiveTab] = useState<string>(
     activeTab || "dashboard",
   );
+  const [mainNavItems, setMainNavItems] = useState<any[]>([]); // حالة لتخزين العناصر المجلوبة
 
-  // Check if user has visited before
+  // جلب البيانات من الـ API عند تحميل المكون
+  useEffect(() => {
+    const fetchSideMenus = async () => {
+      try {
+        const response = await axiosInstance.get("/settings/side-menus");
+        const sections = response.data.data.sections;
+        const items = sections.map((section: any) => ({
+          id: section.path.split("/").pop(), // استخراج المعرف من المسار
+          label: section.title, // العنوان كـ label
+          description: section.description, // الوصف
+          icon: getIconComponent(section.icon), // تحويل الأيقونة إلى مكون
+          path: section.path, // المسار
+        }));
+        setMainNavItems(items);
+      } catch (error) {
+        console.error("فشل في جلب القوائم الجانبية:", error);
+        // يمكن هنا تعيين قيم افتراضية في حالة الفشل إذا لزم الأمر
+      }
+    };
+    fetchSideMenus();
+  }, []);
+
+  // التحقق من زيارة المستخدم السابقة
   useEffect(() => {
     const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");
     if (hasVisitedBefore) {
       setIsNewUser(false);
     } else {
-      // Set after 3 days
       setTimeout(
         () => {
           localStorage.setItem("hasVisitedBefore", "true");
@@ -56,74 +106,7 @@ export function EnhancedSidebar({
     }
   }, []);
 
-  // Update the mainNavItems array to include settings as a regular menu item
-  const mainNavItems = [
-    {
-      id: "dashboard",
-      label: "لوحة التحكم",
-      description: "نظرة عامة على الموقع",
-      icon: Home,
-      path: "/",
-    },
-    {
-      id: "content",
-      label: "إدارة المحتوى",
-      description: "إدارة محتوى موقعك",
-      icon: FileText,
-      path: "/content",
-    },
-    {
-      id: "blog",
-      label: "المدونة",
-      description: "إدارة مدونتك",
-      icon: FileText,
-      path: "/blog",
-    },
-    {
-      id: "projects",
-      label: "المشاريع",
-      description: "إدارة مشاريعك",
-      icon: Building2,
-      path: "/projects",
-    },
-    {
-      id: "properties",
-      label: "العقارات",
-      description: "إدارة عقاراتك",
-      icon: Home,
-      path: "/properties",
-    },
-    // {
-    //   id: "customers",
-    //   label: "العملاء",
-    //   description: "إدارة عملائك",
-    //   icon: Users,
-    //   path: "/customers",
-    // },
-    // {
-    //   id: "messages",
-    //   label: "الرسائل",
-    //   description: "عرض رسائلك",
-    //   icon: MessageSquare,
-    //   path: "/messages",
-    // },
-    // {
-    //   id: "apps",
-    //   label: "التطبيقات",
-    //   description: "إدارة تطبيقاتك",
-    //   icon: Package,
-    //   path: "/apps",
-    // },
-    {
-      id: "settings",
-      label: "إعدادات الموقع",
-      description: "تكوين موقعك",
-      icon: Settings,
-      path: "/settings",
-    },
-  ];
-
-  // Determine active tab from pathname
+  // تحديد العنصر النشط بناءً على المسار الحالي
   const currentPath = pathname || "/";
   const isContentSection = currentPath.startsWith("/content");
   const currentTab = isContentSection
@@ -134,7 +117,7 @@ export function EnhancedSidebar({
           (item.path !== "/" && currentPath.startsWith(item.path)),
       )?.id || "dashboard";
 
-  // Update the active tab state when pathname changes
+  // تحديث العنصر النشط عند تغيير المسار
   useEffect(() => {
     if (currentTab) {
       setInternalActiveTab(currentTab);

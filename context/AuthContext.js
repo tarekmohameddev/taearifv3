@@ -51,7 +51,7 @@ const useAuthStore = create((set, get) => ({
   },
 
   // ! --------------login
-  login: async (email, password) => {
+  login: async (email, password, recaptchaToken) => {
     set({ IsLoading: true, errorLogin: null, errorLoginATserver: null });
     try {
       const externalResponse = await fetch("https://taearif.com/api/login", {
@@ -59,7 +59,7 @@ const useAuthStore = create((set, get) => ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, 'recaptcha_token': recaptchaToken, }),
       });
       if (!externalResponse.ok) {
         const errorData = await externalResponse.json().catch(() => ({}));

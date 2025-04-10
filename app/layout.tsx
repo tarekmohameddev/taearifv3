@@ -7,6 +7,8 @@ import "@/app/globals.css";
 import useAuthStore from "@/context/AuthContext";
 import ClientLayout from "./ClientLayout";
 import { Toaster } from "react-hot-toast";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
+import { ReCaptchaWrapper } from "@/components/ReCaptchaWrapper";
 
 export default function RootLayout({ children }) {
   const router = useRouter();
@@ -49,7 +51,9 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <Toaster />
+          <ReCaptchaWrapper>
           <ClientLayout>{children}</ClientLayout>
+          </ReCaptchaWrapper>
         </ThemeProvider>
       </body>
     </html>
