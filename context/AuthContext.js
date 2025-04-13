@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { serialize as serializeCookie } from "cookie";
+import axiosInstance from "@/lib/axiosInstance";
 
 const useAuthStore = create((set, get) => ({
   UserIslogged: false,
@@ -15,6 +16,12 @@ const useAuthStore = create((set, get) => ({
     username: null,
     first_name: null,
     last_name: null,
+    is_free_plan: null,
+    days_remaining: null,
+    package_title: null,
+    package_features: [],
+    project_limit_number: null,
+    real_estate_limit_number: null,
   },
 
   // ! --------------fetch User Data
@@ -37,6 +44,21 @@ const useAuthStore = create((set, get) => ({
           onboarding_completed: userData.onboarding_completed || false,
         },
       });
+      if (get().userData.is_free_plan == null) {
+        const ress = await axiosInstance.get("/user");
+        const subscriptionDATA = ress.data.data;
+        set({
+          userData: {
+            ...userData,
+            days_remaining: subscriptionDATA.membership.days_remaining || null,
+            is_free_plan: subscriptionDATA.membership.is_free_plan || false,
+            package_title: subscriptionDATA.membership.package.title || null,
+            package_features: subscriptionDATA.membership.package.features || [],
+            project_limit_number: subscriptionDATA.membership.package.project_limit_number || null,
+            real_estate_limit_number: subscriptionDATA.membership.package.real_estate_limit_number || null,
+          },
+        });
+      }
       set({ IsDone: false, error: null });
     } catch (error) {
       set({
@@ -59,7 +81,11 @@ const useAuthStore = create((set, get) => ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, 'recaptcha_token': recaptchaToken, }),
+        body: JSON.stringify({
+          email,
+          password,
+          recaptcha_token: recaptchaToken,
+        }),
       });
       if (!externalResponse.ok) {
         const errorData = await externalResponse.json().catch(() => ({}));

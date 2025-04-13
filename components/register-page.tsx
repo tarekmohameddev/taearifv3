@@ -206,10 +206,10 @@ export function RegisterPage() {
   // Handle previous step
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     if (isSubmitting) return;
     setIsSubmitting(true);
-  
+
     const newErrors: Errors = {
       email: validateEmail(formData.email),
       phone: validatePhone(formData.phone),
@@ -218,9 +218,9 @@ export function RegisterPage() {
       general: "", // تهيئة الحقل الجديد
     };
     setErrors(newErrors);
-  
+
     const hasErrors = Object.values(newErrors).some((error) => error !== "");
-  
+
     if (!hasErrors) {
       try {
         // التحقق من توفر executeRecaptcha
@@ -232,33 +232,33 @@ export function RegisterPage() {
           setIsSubmitting(false);
           return;
         }
-  
+
         // الحصول على رمز reCAPTCHA
         const token = await executeRecaptcha("register");
-  
+
         const link = "https://taearif.com/api/register";
         const payload = {
           email: formData.email,
           password: formData.password,
           phone: formData.phone,
           username: formData.subdomain,
-          "recaptcha_token": token, 
+          recaptcha_token: token,
         };
-  
+
         console.log("🚀 Sending registration request...");
-  
+
         const response = await axios.post(link, payload, {
           headers: { "Content-Type": "application/json" },
         });
-  
+
         if (response.status < 200 || response.status >= 300) {
           throw new Error(response.data.message || "فشل تسجيل الدخول");
         }
-  
+
         console.log("✅ Registration response:", response.data);
-  
+
         const { user, token: UserToken } = response.data;
-  
+
         // إرسال بيانات المستخدم والتوكن إلى /api/user/setAuth
         const setAuthResponse = await fetch("/api/user/setAuth", {
           method: "POST",
@@ -267,7 +267,7 @@ export function RegisterPage() {
           },
           body: JSON.stringify({ user, UserToken }),
         });
-  
+
         if (!setAuthResponse.ok) {
           const errorData = await setAuthResponse.json().catch(() => ({}));
           const errorMsg = errorData.error || "فشل في تعيين التوكن";
@@ -278,7 +278,7 @@ export function RegisterPage() {
           }));
           return;
         }
-  
+
         console.log("✅ Auth token set successfully");
         if (setAuthResponse.ok) {
           await useAuthStore.getState().fetchUserData();
@@ -301,7 +301,7 @@ export function RegisterPage() {
         if (axios.isAxiosError(error)) {
           const errorMessage = error.response?.data?.message || error.message;
           console.error("❌ Axios error:", errorMessage);
-  
+
           if (errorMessage.includes("The email has already been taken")) {
             setErrors((prevErrors) => ({
               ...prevErrors,

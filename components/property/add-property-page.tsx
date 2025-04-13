@@ -2,6 +2,8 @@
 
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 import {
   ChevronLeft,
   Upload,
@@ -40,6 +42,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
 import { uploadMultipleFiles } from "@/utils/uploadMultiple";
 import useStore from "@/context/Store";
+import useAuthStore from "@/context/AuthContext";
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -54,10 +57,20 @@ const MapComponent = dynamic(() => import("@/components/map-component"), {
 });
 
 export default function AddPropertyPage() {
+  const {
+    propertiesManagement: {
+      properties,
+      loading,
+      isInitialized,
+    },
+    setPropertiesManagement,
+    fetchProperties,
+  } = useStore();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { userData, fetchUserData } = useAuthStore();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
-  const { setPropertiesManagement } = useStore();
+  let hasReachedLimit;
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -94,6 +107,21 @@ export default function AddPropertyPage() {
     floorPlans: [],
   });
   const [uploading, setUploading] = useState(false);
+
+    useEffect(() => {
+      if (!isInitialized && !loading) {
+        fetchProperties();
+      }
+    }, [fetchProperties, isInitialized, loading, properties]);
+
+
+  React.useEffect(() => {
+    if (properties.length >= useAuthStore.getState().userData?.real_estate_limit_number) {
+      toast.error(`لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.real_estate_limit_number} عقارات`);
+      hasReachedLimit = properties.length >= (useAuthStore.getState().userData?.real_estate_limit_number || 10);
+      router.push("/properties");
+    }
+  }, [properties, router]);
 
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -327,6 +355,19 @@ export default function AddPropertyPage() {
         <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
+            {hasReachedLimit && (
+              <div
+                className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-6"
+                role="alert"
+              >
+                <strong className="font-bold">تنبيه!</strong>
+                <span className="block sm:inline">
+                  {" "}
+                  لقد وصلت إلى الحد الأقصى لعدد العقارات المسموح به (10 عقارات).
+                  لا يمكنك إضافة المزيد من العقارات.
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Button

@@ -61,7 +61,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
       console.error(error);
     }
   };
-
+  const hey = true;
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 md:px-6">
       <div className="flex items-center gap-4">
@@ -259,6 +259,24 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
         {/* إذا كان المستخدم مسجل دخول */}
         {useAuthStore.getState().UserIslogged && (
           <>
+            {/* زر الأيام المتبقية */}
+            {useAuthStore.getState().userData?.days_remaining !== undefined && (
+              <Button
+                size="sm"
+                className={
+                  useAuthStore.getState().userData.is_free_plan
+                    ? ""
+                    : "bg-gradient-to-r from-yellow-500 to-yellow-700 text-white"
+                }
+              >
+                <Link href="/settings">
+                  {useAuthStore.getState().userData.is_free_plan
+                    ? `الباقة المجانية : عدد الأيام المتبقية هو ${useAuthStore.getState().userData.days_remaining}`
+                    : useAuthStore.getState().userData.package_title}
+                </Link>
+              </Button>
+            )}
+
             {/* الإشعارات */}
             <TooltipProvider>
               <Tooltip>
@@ -325,13 +343,15 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                 <div className="flex items-center gap-2 p-2">
                   <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-sm font-medium text-primary">
-                      {userData?.initial}
+                      {useAuthStore.getState().userData?.initial}
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{userData?.username}</p>
+                    <p className="text-sm font-medium">
+                      {useAuthStore.getState().userData?.username}
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      {userData?.email}
+                      {useAuthStore.getState().userData?.email}
                     </p>
                   </div>
                 </div>

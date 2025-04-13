@@ -5,7 +5,9 @@ import { ReactNode } from "react";
 
 export function ReCaptchaWrapper({ children }: { children: ReactNode }) {
   return (
-    <GoogleReCaptchaProvider reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}>
+    <GoogleReCaptchaProvider
+      reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+    >
       {children}
     </GoogleReCaptchaProvider>
   );

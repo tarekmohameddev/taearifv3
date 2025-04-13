@@ -39,6 +39,8 @@ import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
+import useAuthStore from "@/context/AuthContext";
+
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
   loading: () => (
@@ -102,7 +104,32 @@ export default function AddProjectPage(): JSX.Element {
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [mapLoaded, setMapLoaded] = useState<boolean>(false);
-  const { setProjectsManagement } = useStore();
+  const {
+    projectsManagement: {
+      projects,
+      loading,
+      isInitialized,
+    },
+    setProjectsManagement,
+    fetchProjects,
+  } = useStore();
+
+  useEffect(() => {
+    if (!isInitialized) {
+      fetchProjects();
+    }
+  }, [fetchProjects, isInitialized]);
+
+  let hasReachedLimit;
+
+useEffect(() => {
+  if (projects.length >= useAuthStore.getState().userData?.project_limit_number) {
+    toast.error(`لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.project_limit_number} مشروع`);
+    hasReachedLimit = projects.length >= (useAuthStore.getState().userData?.project_limit_number || 10);
+    router.push("/projects");
+  }
+}, [projects, router]);
+
 
   useEffect(() => {
     setMapLoaded(true);
@@ -339,7 +366,6 @@ export default function AddProjectPage(): JSX.Element {
         }
       }
 
-      console.log("111111111111111111111111111111111111");
       let minPrice = 0;
       let maxPrice = 0;
       if (newProject.price.includes("-")) {
@@ -353,13 +379,11 @@ export default function AddProjectPage(): JSX.Element {
         maxPrice = minPrice;
       }
 
-      console.log("2222222222222222222222222");
       const formattedDate = newProject.completionDate
         ? new Date(newProject.completionDate).toISOString().split("T")[0]
         : "";
 
       const publishedValue = status === "منشور" ? 1 : 0;
-      console.log("3333333333333333333333333333333333");
 
       const projectData = {
         featured_image: featuredImagePath,
@@ -429,7 +453,7 @@ export default function AddProjectPage(): JSX.Element {
         "https://taearif.com/api/projects",
         projectData,
       );
-      console.log("44444444444444444444444444444444444");
+
 
       console.log("response.data", response.data);
       const currentState = useStore.getState();
@@ -439,7 +463,6 @@ export default function AddProjectPage(): JSX.Element {
         createdProject,
         ...currentState.projectsManagement.projects,
       ];
-      console.log("5555555555555555555555555555555");
       setProjectsManagement({
         projects: updatedProjects,
         pagination: {
@@ -447,7 +470,6 @@ export default function AddProjectPage(): JSX.Element {
           total: (currentState.projectsManagement.pagination?.total || 0) + 1,
         },
       });
-      console.log("66666666666666666666666666666666666");
 
       router.push("/projects");
     } catch (error: any) {
@@ -465,6 +487,19 @@ export default function AddProjectPage(): JSX.Element {
         <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
+          {hasReachedLimit && (
+              <div
+                className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-6"
+                role="alert"
+              >
+                <strong className="font-bold">تنبيه!</strong>
+                <span className="block sm:inline">
+                  {" "}
+                  لقد وصلت إلى الحد الأقصى لعدد المشاريع المسموح به (10 مشاريع).
+                  لا يمكنك إضافة المزيد من المشاريع.
+                </span>
+              </div>
+            )}
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

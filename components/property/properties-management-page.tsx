@@ -1,6 +1,7 @@
 "use client";
 import { useMemo } from "react";
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import {
   Bath,
   Bed,
@@ -47,6 +48,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import useAuthStore from "@/context/AuthContext";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -311,12 +313,21 @@ export function PropertiesManagementPage() {
                   </DialogContent>
                 </Dialog>
                 <Button
-                  className="gap-1"
-                  onClick={() => router.push("/properties/add")}
-                >
-                  <Plus className="h-4 w-4" />
-                  إضافة عقار
-                </Button>
+  className="gap-1"
+  onClick={() => {
+    const propertiesLength = properties?.length || 0;
+    const limit = useAuthStore.getState().userData?.real_estate_limit_number;
+    
+    if (propertiesLength >= limit) {
+      toast.error(`لا يمكنك إضافة أكثر من ${limit} عقارات`);
+    } else {
+      router.push("/properties/add");
+    }
+  }}
+>
+  <Plus className="h-4 w-4" />
+  إضافة عقار
+</Button>
               </div>
             </div>
 

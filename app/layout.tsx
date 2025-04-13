@@ -52,7 +52,7 @@ export default function RootLayout({ children }) {
         >
           <Toaster />
           <ReCaptchaWrapper>
-          <ClientLayout>{children}</ClientLayout>
+            <ClientLayout>{children}</ClientLayout>
           </ReCaptchaWrapper>
         </ThemeProvider>
       </body>

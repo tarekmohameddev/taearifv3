@@ -65,8 +65,6 @@ export function LoginPage() {
     }
   }, [userData, router]);
 
-  
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -82,7 +80,7 @@ export function LoginPage() {
 
     // Check if reCAPTCHA is available
     if (!executeRecaptcha) {
-      console.log("!executeRecaptcha")
+      console.log("!executeRecaptcha");
       setErrors((prev) => ({
         ...prev,
         general: "reCAPTCHA غير متاح. يرجى المحاولة لاحقًا.",
@@ -92,9 +90,9 @@ export function LoginPage() {
 
     setIsLoading(true);
     try {
-    const token = await executeRecaptcha("login");
-    const result = await login(formData.email, formData.password, token);
-    if (!result.success) {
+      const token = await executeRecaptcha("login");
+      const result = await login(formData.email, formData.password, token);
+      if (!result.success) {
         setErrors((prev) => ({
           ...prev,
           general: result.error || "فشل تسجيل الدخول",
