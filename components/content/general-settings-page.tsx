@@ -37,6 +37,7 @@ export function GeneralSettingsPage() {
     favicon: "",
     maintenance_mode: false,
     show_breadcrumb: true,
+    show_properties: false,
     additional_settings: {
       theme_color: "#FF5733",
       timezone: "Asia/Riyadh",
@@ -376,6 +377,24 @@ export function GeneralSettingsPage() {
                     checked={formData.show_breadcrumb}
                     onCheckedChange={(checked) =>
                       setFormData({ ...formData, show_breadcrumb: checked })
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="show-breadcrumb">
+                      جعل الصفحة الرئيسية العقارات
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      
+                    </p>
+                  </div>
+                  <Switch
+                    id="show-properties"
+                    checked={formData.show_properties}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, show_properties: checked })
                     }
                   />
                 </div>
