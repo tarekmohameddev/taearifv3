@@ -10,6 +10,7 @@ const useAuthStore = create((set, get) => ({
   errorLogin: null,
   errorLoginATserver: null,
   onboarding_completed: false,
+  clickedOnSubButton: "domains",
   userData: {
     email: null,
     token: null,
@@ -24,6 +25,12 @@ const useAuthStore = create((set, get) => ({
     real_estate_limit_number: null,
   },
 
+  
+  clickedONSubButton: async () => {
+    set({ clickedOnSubButton: "subscription" });
+  },
+
+    
   // ! --------------fetch User Data
   fetchUserData: async () => {
     set({ IsLoading: true, error: null });

@@ -40,27 +40,35 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import useAuthStore from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+
 
 interface DashboardHeaderProps {
   children?: ReactNode;
 }
 
 export function DashboardHeader({ children }: DashboardHeaderProps) {
-  const { userData, fetchUserData } = useAuthStore();
+  const { userData, fetchUserData, clickedONSubButton } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
     fetchUserData();
   }, [fetchUserData]);
 
-  // ! محتاج شغل لسة
+  const clickedONButton = async () => {
+    clickedONSubButton()
+    router.push("/settings")
+  }
+    
   const handleLogout = async () => {
     try {
-      console.log("userData1 on dashboard-header", userData);
       await useAuthStore.getState().logout();
     } catch (error) {
       console.error(error);
     }
   };
+
+  
   const hey = true;
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 md:px-6">
@@ -268,6 +276,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                     ? ""
                     : "bg-gradient-to-r from-yellow-500 to-yellow-700 text-white"
                 }
+                onClick={clickedONButton}
               >
                 <Link href="/settings">
                   {useAuthStore.getState().userData.is_free_plan

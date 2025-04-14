@@ -81,13 +81,16 @@ const domainsHelp = {
     { title: "استكشاف مشكلات النطاق وإصلاحها", href: "#", type: "article" },
   ],
 };
+import useAuthStore from "@/context/AuthContext";
+
 
 export function SettingsPage() {
+  const { clickedOnSubButton } = useAuthStore();
   const [isAddDomainOpen, setIsAddDomainOpen] = useState(false);
   const [newDomain, setNewDomain] = useState("");
   const [isVerifyingDomain, setIsVerifyingDomain] = useState(false);
   const [setupProgress, setSetupProgress] = useState(40);
-  const [activeTab, setActiveTab] = useState("domains");
+  const [activeTab, setActiveTab] = useState(`${clickedOnSubButton}`);
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -136,10 +139,8 @@ export function SettingsPage() {
     }
   }, [activeTab]);
 
-  useEffect(() => {
-    console.log("domains", domains);
-  }, [domains]);
 
+  
   const handleAddDomain = async () => {
     // التحقق من البادئات الممنوعة أولاً
     if (
