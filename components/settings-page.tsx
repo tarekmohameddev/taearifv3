@@ -806,9 +806,16 @@ export function SettingsPage() {
                           <CardHeader className="pb-4">
                             <CardTitle>{plan.name}</CardTitle>
                             <CardDescription className="flex items-end gap-1 mt-2">
+                            <div className="flex items-center gap-1">
+                  <img
+                    src="/Saudi_Riyal_Symbol.svg"
+                    alt="ريال سعودي"
+                    className="w-5 h-5 filter brightness-0 contrast-100"
+                  />
                               <span className="text-2xl font-bold text-foreground">
-                                ${plan.price}
+                                {plan.price}
                               </span>
+                              </div>
                               <span className="text-muted-foreground">
                                 / {plan.billing}
                               </span>
