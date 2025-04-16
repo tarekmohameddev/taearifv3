@@ -10,10 +10,6 @@ const PaymentPopup = ({ paymentUrl, onClose }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setShowFailed(true); 
-    
-        }, 30000);
         const handleMessage = (event) => {
       if (event.data === "payment_success") {
         setShowSuccess(true); 
