@@ -84,6 +84,19 @@ body {
   }
 }
 
+.popup {
+  position: fixed; /* يجعل العنصر ثابتًا فوق الصفحة */
+  top: 0;
+  left: 0;
+  width: 100vw; /* عرض الشاشة بالكامل */
+  height: 100vh; /* ارتفاع الشاشة بالكامل */
+  background-color: rgba(0, 0, 0, 0.5); /* خلفية شفافة داكنة */
+  display: flex;
+  justify-content: center; /* توسيط المحتوى أفقيًا */
+  align-items: center; /* توسيط المحتوى عموديًا */
+  z-index: 1000; /* يضمن ظهوره فوق جميع العناصر */
+}
+
 @layer base {
   * {
     @apply border-border;

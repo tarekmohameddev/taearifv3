@@ -1,0 +1,105 @@
+"use client";
+import { useEffect, useState, useRef } from "react";
+import { FaCheckCircle } from "react-icons/fa";
+import { ShieldCheck } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const PaymentPopup = ({ paymentUrl, onClose }) => {
+  const [showSuccess, setShowSuccess] = useState(false);
+  const iframeRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const checkForSuccessWord = () => {
+    try {
+      // الوصول إلى محتوى الـ HTML داخل الـ iframe
+      const iframeDocument = iframeRef.current.contentWindow.document;
+      const htmlContent = iframeDocument.body.innerHTML;
+console.log("iframeDocument",iframeDocument)
+console.log("htmlContent",htmlContent)
+      // البحث عن كلمة معينة (مثل "نجاح"، يمكنك تغييرها حسب الحاجة)
+      if (htmlContent.includes("الناجح")) {
+        setShowSuccess(true);
+        setTimeout(() => {
+          window.location.reload(); // تحديث الصفحة
+          onClose(); // إغلاق النافذة
+        }, 2000);
+      }
+    } catch (error) {
+      console.log("خطأ أثناء الوصول إلى محتوى الـ iframe:", error);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(checkForSuccessWord, 1000); // التحقق كل ثانية
+    return () => clearInterval(interval); // تنظيف الفاصل الزمني عند إلغاء التأثير
+  }, []);
+
+  const handleLoad = () => {
+    setIsLoading(false);
+    checkForSuccessWord(); // التحقق فور تحميل الـ iframe
+  };
+
+  return (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white p-6 rounded-lg max-w-2xl w-full relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {showSuccess ? (
+          <div className="animate-bounce-in flex flex-col items-center justify-center h-[700px]">
+            <FaCheckCircle className="text-6xl text-green-500 mb-4 animate-pulse" />
+            <h2 className="text-3xl font-bold text-green-700 mb-2">تمت العملية بنجاح!</h2>
+            <p className="text-lg text-gray-600">سيتم إغلاق النافذة تلقائياً...</p>
+          </div>
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold mb-2 text-center text-blue-700">بوابة دفع إلكترونية آمنة</h2>
+
+            <div className="flex flex-row items-center justify-center gap-2 mb-4">
+              <ShieldCheck className="text-center" />
+              <p className="text-md text-center text-green-500 font-bold">
+                مدعومة من مصرف الراجحي - تشفير وحماية عالية
+              </p>
+              <ShieldCheck className="text-center" />
+            </div>
+
+            {isLoading && (
+              <div className="space-y-4">
+                <Skeleton className="h-10 w-full" />
+                <div className="flex space-x-4">
+                  <Skeleton className="h-10 w-1/2" />
+                  <Skeleton className="h-10 w-1/2" />
+                </div>
+                <Skeleton className="h-12 w-full" />
+              </div>
+            )}
+
+            <iframe
+              ref={iframeRef}
+              src={paymentUrl}
+              className={`w-full h-[700px] border-0 ${isLoading ? "hidden" : "block"}`}
+              title="Payment Gateway"
+              onLoad={handleLoad}
+            />
+
+            <div className="text-center text-sm mt-4">
+              تتم معالجة معلوماتك المالية من خلال نظام مشفر وآمن تمامًا لضمان حماية بياناتك.
+            </div>
+
+            <button
+              className="mt-4 w-full bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              onClick={onClose}
+            >
+              إلغاء
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default PaymentPopup;

@@ -82,7 +82,7 @@ const domainsHelp = {
   ],
 };
 import useAuthStore from "@/context/AuthContext";
-
+import PaymentPopup from "@/components/popup/Popup";
 
 export function SettingsPage() {
   const { clickedOnSubButton } = useAuthStore();
@@ -94,7 +94,7 @@ export function SettingsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [domains, setDomains] = useState([]); // البداية بمصفوفة فارغة لأننا سنجلب البيانات من الـ API
+  const [domains, setDomains] = useState([]); 
   const [dnsInstructions, setDnsInstructions] = useState([]);
   const [verifyingDomains, setVerifyingDomains] = useState({});
   const [deleteDomainId, setDeleteDomainId] = useState(null);
@@ -103,6 +103,35 @@ export function SettingsPage() {
   const [hasFormatError, setHasFormatError] = useState(false);
   const [isLoadingDomains, setIsLoadingDomains] = useState(true);
   const [isLoadingThemes, setIsLoadingThemes] = useState(true);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState("");
+
+  const handleUpgradeClick = async () => {
+    try {
+      setIsPopupOpen(true);
+      const response = await axiosInstance.post("/make-payment", {
+        package_id: 1,
+        price: 99.99,
+      });
+      console.log("استجابة الـ API:", response.data);
+      if (response.data.status === "success") {
+        setPaymentUrl(response.data.payment_url);
+      } else {
+        toast.error("فشل في الحصول على رابط الدفع");
+      }
+    } catch (error) {
+      console.error("خطأ:", error);
+      toast.error("حدث خطأ أثناء الاتصال بالخادم");
+    }
+  };
+  
+  // في نهاية الـ return:
+  {isPopupOpen && (
+    <PaymentPopup
+      paymentUrl={paymentUrl}
+      onClose={() => setIsPopupOpen(false)}
+    />
+  )}
 
   useEffect(() => {
     const fetchData = async () => {
@@ -827,7 +856,7 @@ export function SettingsPage() {
                           <Button
                             variant={plan.popular ? "default" : "outline"}
                             className="w-full"
-                            onClick={() => handleSubscriptionChange(plan.id)}
+                            onClick={handleUpgradeClick}
                           >
                             الترقية
                           </Button>
@@ -1061,6 +1090,12 @@ export function SettingsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {isPopupOpen && (
+        <PaymentPopup
+    paymentUrl={paymentUrl}
+    onClose={() => setIsPopupOpen(false)}
+  />
+    )}
     </div>
   );
 }
