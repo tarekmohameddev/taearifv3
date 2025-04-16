@@ -1,35 +1,42 @@
 "use client";
 import { useEffect, useState } from "react";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle , FaTimesCircle } from "react-icons/fa";
 import { ShieldCheck } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const PaymentPopup = ({ paymentUrl, onClose }) => {
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showFailed, setShowFailed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // الاستماع إلى الرسائل القادمة من الـ iframe
+    
     const handleMessage = (event) => {
       if (event.data === "payment_success") {
-        setShowSuccess(true); // عرض رسالة النجاح
+        setShowSuccess(true); 
         setTimeout(() => {
-          window.location.reload(); // تحديث الصفحة بالكامل
-          onClose(); // إغلاق الـ popup
-        }, 2000); // تأخير 2 ثانية لعرض رسالة النجاح
+          window.location.reload();
+          onClose(); 
+        }, 2000); 
+      }else if(event.data === "payment_failed"){
+        setShowFailed(true); 
+        setTimeout(() => {
+          window.location.reload(); 
+          onClose();
+        }, 2000);
       }
     };
 
     window.addEventListener("message", handleMessage);
 
-    // تنظيف المستمع عند إلغاء التأثير
+    
     return () => {
       window.removeEventListener("message", handleMessage);
     };
   }, [onClose]);
 
   const handleLoad = () => {
-    setIsLoading(false); // إخفاء مؤشر التحميل عند اكتمال تحميل الـ iframe
+    setIsLoading(false); 
   };
 
   return (
@@ -41,12 +48,23 @@ const PaymentPopup = ({ paymentUrl, onClose }) => {
         className="bg-white p-6 rounded-lg max-w-2xl w-full relative"
         onClick={(e) => e.stopPropagation()}
       >
+        {showFailed?(
+          <div className="animate-bounce-in flex flex-col items-center justify-center h-[700px]">
+          <FaTimesCircle  className="text-6xl text-green-500 mb-4 animate-pulse" />
+          <h2 className="text-3xl font-bold text-red-700 mb-2">فشلت عملية الترقية!</h2>
+          <p className="text-lg text-gray-600">سيتم إغلاق النافذة تلقائياً...</p>
+        </div>
+        ):(
+          <>
+        
         {showSuccess ? (
+          <>
           <div className="animate-bounce-in flex flex-col items-center justify-center h-[700px]">
             <FaCheckCircle className="text-6xl text-green-500 mb-4 animate-pulse" />
             <h2 className="text-3xl font-bold text-green-700 mb-2">تمت العملية بنجاح!</h2>
             <p className="text-lg text-gray-600">سيتم إغلاق النافذة تلقائياً...</p>
           </div>
+          </>
         ) : (
           <>
             <h2 className="text-2xl font-bold mb-2 text-center text-blue-700">بوابة دفع إلكترونية آمنة</h2>
@@ -87,6 +105,9 @@ const PaymentPopup = ({ paymentUrl, onClose }) => {
             >
               إلغاء
             </button>
+          </>
+          
+        )}
           </>
         )}
       </div>
