@@ -19,15 +19,15 @@ const config = {
     },
     extend: {
       animation: {
-        'bounce-in': 'bounce-in 0.5s ease-out',
-        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+        "bounce-in": "bounce-in 0.5s ease-out",
+        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       keyframes: {
-        'bounce-in': {
-          '0%': { transform: 'scale(0)', opacity: '0' },
-          '60%': { transform: 'scale(1.1)', opacity: '1' },
-          '100%': { transform: 'scale(1)' },
-        }
+        "bounce-in": {
+          "0%": { transform: "scale(0)", opacity: "0" },
+          "60%": { transform: "scale(1.1)", opacity: "1" },
+          "100%": { transform: "scale(1)" },
+        },
       },
       colors: {
         border: "hsl(var(--border))",

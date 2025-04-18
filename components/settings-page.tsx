@@ -94,7 +94,7 @@ export function SettingsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [domains, setDomains] = useState([]); 
+  const [domains, setDomains] = useState([]);
   const [dnsInstructions, setDnsInstructions] = useState([]);
   const [verifyingDomains, setVerifyingDomains] = useState({});
   const [deleteDomainId, setDeleteDomainId] = useState(null);
@@ -117,8 +117,8 @@ export function SettingsPage() {
 
         // جمع جميع الميزات الفريدة من جميع الخطط
         const featuresSet = new Set();
-        response.data.plans.forEach(plan => {
-          plan.features.forEach(feature => featuresSet.add(feature));
+        response.data.plans.forEach((plan) => {
+          plan.features.forEach((feature) => featuresSet.add(feature));
         });
         setAllFeatures(Array.from(featuresSet));
       } catch (error) {
@@ -328,9 +328,6 @@ export function SettingsPage() {
     return true;
   });
 
-  
-  
-  
   // تغيير شكل الfeatures عشان تكون بالشكل ده :
   // https://cdn.discordapp.com/attachments/738090102152233011/1362727790184497162/image.png?ex=680372a7&is=68022127&hm=5cc3027b47e87b03fc533b91ec48e0c2ab0a4fbcab0ad265ddc0167af04484df&
   // const renderFeatures = (plan) => {
@@ -783,78 +780,89 @@ export function SettingsPage() {
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-3">
-                  {isLoadingPlans ? (
-                    [1, 2, 3, 4].map((i) => (
-                      <Card key={i}>
-                        <CardHeader>
-                          <Skeleton className="h-6 w-3/4" />
-                          <Skeleton className="h-4 w-1/2" />
-                        </CardHeader>
-                        <CardContent>
-                          <Skeleton className="h-4 w-full" />
-                          <Skeleton className="h-4 w-full mt-2" />
-                          <Skeleton className="h-4 w-full mt-2" />
-                        </CardContent>
-                        <CardFooter>
-                          <Skeleton className="h-10 w-full" />
-                        </CardFooter>
-                      </Card>
-                    ))
-                  ) : (
-                    subscriptionPlans.map((plan) => {
-                      const isCurrentPlan = userData.package_title === plan.name;
-                      return (
-<Card
-  key={plan.id}
-  className={`relative flex flex-col ${isCurrentPlan ? "border-primary border-2" : ""}`}
->
-  <CardHeader className="pb-4">
-    <CardTitle>{plan.name}</CardTitle>
-    <CardDescription className="flex items-end gap-1 mt-2">
-      <div className="flex items-center gap-1">
-        <img
-          src="/Saudi_Riyal_Symbol.svg"
-          alt="ريال سعودي"
-          className="w-5 h-5 filter brightness-0 contrast-100"
-        />
-        <span className="text-2xl font-bold text-foreground">{plan.price}</span>
-      </div>
-      <span className="text-muted-foreground">/ {plan.billing}</span>
-    </CardDescription>
-  </CardHeader>
+                  {isLoadingPlans
+                    ? [1, 2, 3, 4].map((i) => (
+                        <Card key={i}>
+                          <CardHeader>
+                            <Skeleton className="h-6 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                          </CardHeader>
+                          <CardContent>
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-full mt-2" />
+                            <Skeleton className="h-4 w-full mt-2" />
+                          </CardContent>
+                          <CardFooter>
+                            <Skeleton className="h-10 w-full" />
+                          </CardFooter>
+                        </Card>
+                      ))
+                    : subscriptionPlans.map((plan) => {
+                        const isCurrentPlan =
+                          userData.package_title === plan.name;
+                        return (
+                          <Card
+                            key={plan.id}
+                            className={`relative flex flex-col ${isCurrentPlan ? "border-primary border-2" : ""}`}
+                          >
+                            <CardHeader className="pb-4">
+                              <CardTitle>{plan.name}</CardTitle>
+                              <CardDescription className="flex items-end gap-1 mt-2">
+                                <div className="flex items-center gap-1">
+                                  <img
+                                    src="/Saudi_Riyal_Symbol.svg"
+                                    alt="ريال سعودي"
+                                    className="w-5 h-5 filter brightness-0 contrast-100"
+                                  />
+                                  <span className="text-2xl font-bold text-foreground">
+                                    {plan.price}
+                                  </span>
+                                </div>
+                                <span className="text-muted-foreground">
+                                  / {plan.billing}
+                                </span>
+                              </CardDescription>
+                            </CardHeader>
 
-  <CardContent className="pb-4 flex-1">
-    <ul className="space-y-1">
-      {plan.features.map((feature, index) => (
-        <li key={index} className="flex items-center gap-2">
-          <Check className="h-4 w-4 text-green-600" />
-          <span className="text-sm">{feature}</span>
-        </li>
-      ))}
-    </ul>
-  </CardContent>
+                            <CardContent className="pb-4 flex-1">
+                              <ul className="space-y-1">
+                                {plan.features.map((feature, index) => (
+                                  <li
+                                    key={index}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Check className="h-4 w-4 text-green-600" />
+                                    <span className="text-sm">{feature}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </CardContent>
 
-  <CardFooter className="mt-auto">
-    {isCurrentPlan ? (
-      <Button variant="outline" className="w-full" disabled>
-        <Check className="h-4 w-4 ml-1" />
-        {plan.name}
-      </Button>
-    ) : (
-      <Button
-        variant="default"
-        className="w-full"
-        onClick={() => handleUpgradeClick(plan.id, plan.price)}
-      >
-        الترقية
-      </Button>
-    )}
-  </CardFooter>
-</Card>
-
-                      );
-                    })
-                  )}
+                            <CardFooter className="mt-auto">
+                              {isCurrentPlan ? (
+                                <Button
+                                  variant="outline"
+                                  className="w-full"
+                                  disabled
+                                >
+                                  <Check className="h-4 w-4 ml-1" />
+                                  {plan.name}
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="default"
+                                  className="w-full"
+                                  onClick={() =>
+                                    handleUpgradeClick(plan.id, plan.price)
+                                  }
+                                >
+                                  الترقية
+                                </Button>
+                              )}
+                            </CardFooter>
+                          </Card>
+                        );
+                      })}
                 </div>
               </TabsContent>
 

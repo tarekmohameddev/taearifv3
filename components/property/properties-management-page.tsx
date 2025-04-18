@@ -335,7 +335,8 @@ export function PropertiesManagementPage() {
                   onClick={() => {
                     const propertiesLength = properties?.length || 0;
                     const limit =
-                      useAuthStore.getState().userData?.real_estate_limit_number;
+                      useAuthStore.getState().userData
+                        ?.real_estate_limit_number;
                     if (propertiesLength >= limit) {
                       toast.error(`لا يمكنك إضافة أكثر من ${limit} عقارات`);
                     } else {
@@ -370,7 +371,9 @@ export function PropertiesManagementPage() {
                         <PropertyCard
                           key={property.id}
                           property={property}
-                          isFavorite={favorites.includes(property.id.toString())}
+                          isFavorite={favorites.includes(
+                            property.id.toString(),
+                          )}
                           onToggleFavorite={toggleFavorite}
                           onDelete={handleDeleteProperty}
                         />
@@ -382,7 +385,9 @@ export function PropertiesManagementPage() {
                         <PropertyListItem
                           key={property.id}
                           property={property}
-                          isFavorite={favorites.includes(property.id.toString())}
+                          isFavorite={favorites.includes(
+                            property.id.toString(),
+                          )}
                           onToggleFavorite={toggleFavorite}
                           onDelete={handleDeleteProperty}
                         />

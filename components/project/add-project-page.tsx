@@ -105,11 +105,7 @@ export default function AddProjectPage(): JSX.Element {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [mapLoaded, setMapLoaded] = useState<boolean>(false);
   const {
-    projectsManagement: {
-      projects,
-      loading,
-      isInitialized,
-    },
+    projectsManagement: { projects, loading, isInitialized },
     setProjectsManagement,
     fetchProjects,
   } = useStore();
@@ -122,14 +118,19 @@ export default function AddProjectPage(): JSX.Element {
 
   let hasReachedLimit;
 
-useEffect(() => {
-  if (projects.length >= useAuthStore.getState().userData?.project_limit_number) {
-    toast.error(`لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.project_limit_number} مشروع`);
-    hasReachedLimit = projects.length >= (useAuthStore.getState().userData?.project_limit_number || 10);
-    router.push("/projects");
-  }
-}, [projects, router]);
-
+  useEffect(() => {
+    if (
+      projects.length >= useAuthStore.getState().userData?.project_limit_number
+    ) {
+      toast.error(
+        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.project_limit_number} مشروع`,
+      );
+      hasReachedLimit =
+        projects.length >=
+        (useAuthStore.getState().userData?.project_limit_number || 10);
+      router.push("/projects");
+    }
+  }, [projects, router]);
 
   useEffect(() => {
     setMapLoaded(true);
@@ -454,7 +455,6 @@ useEffect(() => {
         projectData,
       );
 
-
       console.log("response.data", response.data);
       const currentState = useStore.getState();
       const createdProject = response.data.user_project;
@@ -487,7 +487,7 @@ useEffect(() => {
         <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
-          {hasReachedLimit && (
+            {hasReachedLimit && (
               <div
                 className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-6"
                 role="alert"

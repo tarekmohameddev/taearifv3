@@ -116,7 +116,8 @@ export default function AddPropertyPage() {
 
   React.useEffect(() => {
     if (
-      properties.length >= useAuthStore.getState().userData?.real_estate_limit_number
+      properties.length >=
+      useAuthStore.getState().userData?.real_estate_limit_number
     ) {
       toast.error(
         `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.real_estate_limit_number} عقارات`,
@@ -266,12 +267,18 @@ export default function AddPropertyPage() {
         let floorPlansPaths = [];
 
         if (images.thumbnail) {
-          const uploadedFile = await uploadSingleFile(images.thumbnail, "property");
+          const uploadedFile = await uploadSingleFile(
+            images.thumbnail,
+            "property",
+          );
           thumbnailPath = uploadedFile.path.replace("https://taearif.com", "");
         }
 
         if (images.gallery.length > 0) {
-          const uploadedFiles = await uploadMultipleFiles(images.gallery, "property");
+          const uploadedFiles = await uploadMultipleFiles(
+            images.gallery,
+            "property",
+          );
           galleryPaths = uploadedFiles.map((f) =>
             f.path.replace("https://taearif.com", ""),
           );
@@ -525,7 +532,9 @@ export default function AddPropertyPage() {
                         </SelectContent>
                       </Select>
                       {errors.category && (
-                        <p className="text-sm text-red-500">{errors.category}</p>
+                        <p className="text-sm text-red-500">
+                          {errors.category}
+                        </p>
                       )}
                     </div>
 

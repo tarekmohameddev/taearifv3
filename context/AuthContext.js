@@ -25,12 +25,10 @@ const useAuthStore = create((set, get) => ({
     real_estate_limit_number: null,
   },
 
-  
   clickedONSubButton: async () => {
     set({ clickedOnSubButton: "subscription" });
   },
 
-    
   // ! --------------fetch User Data
   fetchUserData: async () => {
     set({ IsLoading: true, error: null });
@@ -60,9 +58,13 @@ const useAuthStore = create((set, get) => ({
             days_remaining: subscriptionDATA.membership.days_remaining || null,
             is_free_plan: subscriptionDATA.membership.is_free_plan || false,
             package_title: subscriptionDATA.membership.package.title || null,
-            package_features: subscriptionDATA.membership.package.features || [],
-            project_limit_number: subscriptionDATA.membership.package.project_limit_number || null,
-            real_estate_limit_number: subscriptionDATA.membership.package.real_estate_limit_number || null,
+            package_features:
+              subscriptionDATA.membership.package.features || [],
+            project_limit_number:
+              subscriptionDATA.membership.package.project_limit_number || null,
+            real_estate_limit_number:
+              subscriptionDATA.membership.package.real_estate_limit_number ||
+              null,
           },
         });
       }

@@ -126,12 +126,11 @@ export function RegisterPage() {
     if (!password) return "كلمة المرور مطلوبة";
     return "";
   };
-  
-  useEffect(() => {
-if(UserIslogged == true){
-  router.push("/");
 
-}
+  useEffect(() => {
+    if (UserIslogged == true) {
+      router.push("/");
+    }
   }, [UserIslogged]);
 
   // Generate subdomain suggestions based on email

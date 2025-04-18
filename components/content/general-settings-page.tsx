@@ -384,11 +384,9 @@ export function GeneralSettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="show-breadcrumb">
-                    الصفحة الرئيسية هي صفحة العقارات
+                      الصفحة الرئيسية هي صفحة العقارات
                     </Label>
-                    <p className="text-sm text-muted-foreground">
-                      
-                    </p>
+                    <p className="text-sm text-muted-foreground"></p>
                   </div>
                   <Switch
                     id="show-properties"

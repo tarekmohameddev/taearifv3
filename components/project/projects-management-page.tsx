@@ -206,21 +206,22 @@ export function ProjectsManagementPage() {
                   تصفية
                 </Button>
                 <Button
-  className="gap-1"
-  onClick={() => {
-    const projectsLength = projects?.length || 0;
-    const limit = useAuthStore.getState().userData?.project_limit_number;
-    
-    if (projectsLength >= limit) {
-      toast.error(`لا يمكنك إضافة أكثر من ${limit} مشاريع`);
-    } else {
-      router.push("/projects/add");
-    }
-  }}
->
-  <Plus className="h-4 w-4" />
-  إضافة مشروع
-</Button>
+                  className="gap-1"
+                  onClick={() => {
+                    const projectsLength = projects?.length || 0;
+                    const limit =
+                      useAuthStore.getState().userData?.project_limit_number;
+
+                    if (projectsLength >= limit) {
+                      toast.error(`لا يمكنك إضافة أكثر من ${limit} مشاريع`);
+                    } else {
+                      router.push("/projects/add");
+                    }
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                  إضافة مشروع
+                </Button>
               </div>
             </div>
 

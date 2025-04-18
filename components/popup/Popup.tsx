@@ -48,20 +48,30 @@ const PaymentPopup = ({ paymentUrl, onClose }) => {
         {showFailed ? (
           <div className="animate-bounce-in flex flex-col items-center justify-center h-[700px]">
             <FaTimesCircle className="text-6xl text-red-500 mb-4 animate-pulse" />
-            <h2 className="text-3xl font-bold text-red-700 mb-2">فشلت عملية الترقية!</h2>
-            <p className="text-lg text-gray-600">سيتم إغلاق النافذة تلقائياً...</p>
+            <h2 className="text-3xl font-bold text-red-700 mb-2">
+              فشلت عملية الترقية!
+            </h2>
+            <p className="text-lg text-gray-600">
+              سيتم إغلاق النافذة تلقائياً...
+            </p>
           </div>
         ) : (
           <>
             {showSuccess ? (
               <div className="animate-bounce-in flex flex-col items-center justify-center h-[700px]">
                 <FaCheckCircle className="text-6xl text-green-500 mb-4 animate-pulse" />
-                <h2 className="text-3xl font-bold text-green-700 mb-2">تمت العملية بنجاح!</h2>
-                <p className="text-lg text-gray-600">سيتم إغلاق النافذة تلقائياً...</p>
+                <h2 className="text-3xl font-bold text-green-700 mb-2">
+                  تمت العملية بنجاح!
+                </h2>
+                <p className="text-lg text-gray-600">
+                  سيتم إغلاق النافذة تلقائياً...
+                </p>
               </div>
             ) : (
               <>
-                <h2 className="text-2xl font-bold mb-2 text-center text-blue-700">بوابة دفع إلكترونية آمنة</h2>
+                <h2 className="text-2xl font-bold mb-2 text-center text-blue-700">
+                  بوابة دفع إلكترونية آمنة
+                </h2>
 
                 <div className="flex flex-row items-center justify-center gap-2 mb-4">
                   <ShieldCheck className="text-center" />
@@ -73,7 +83,9 @@ const PaymentPopup = ({ paymentUrl, onClose }) => {
 
                 {isLoading && (
                   <div className="flex flex-col items-center justify-center h-[700px]">
-                    <p className="text-lg font-semibold mb-4">جاري تحميل بوابة الدفع</p>
+                    <p className="text-lg font-semibold mb-4">
+                      جاري تحميل بوابة الدفع
+                    </p>
                     <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
                   </div>
                 )}
@@ -86,7 +98,8 @@ const PaymentPopup = ({ paymentUrl, onClose }) => {
                 />
 
                 <div className="text-center text-sm mt-4">
-                  تتم معالجة معلوماتك المالية من خلال نظام مشفر وآمن تمامًا لضمان حماية بياناتك.
+                  تتم معالجة معلوماتك المالية من خلال نظام مشفر وآمن تمامًا
+                  لضمان حماية بياناتك.
                 </div>
 
                 <button
