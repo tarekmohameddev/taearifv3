@@ -71,7 +71,7 @@ export default function AddPropertyPage() {
     address: "",
     price: "",
     category: "",
-    project: "",
+    project_id: "",
     transaction_type: "",
     bedrooms: "",
     bathrooms: "",
@@ -316,6 +316,7 @@ export default function AddPropertyPage() {
           title: formData.title,
           address: formData.address,
           price: Number(formData.price),
+          project_id: formData.project_id,
           beds: parseInt(formData.bedrooms),
           bath: parseInt(formData.bathrooms),
           size: parseInt(formData.size),
@@ -560,14 +561,14 @@ export default function AddPropertyPage() {
                       <Label htmlFor="project">المشروع</Label>
                       <Select
                         name="project"
-                        value={formData.project}
+                        value={formData.project_id}
                         onValueChange={(value) =>
-                          setFormData((prev) => ({ ...prev, project: value }))
+                          setFormData((prev) => ({ ...prev, project_id: value }))
                         }
                       >
                         <SelectTrigger
                           id="project"
-                          className={errors.project ? "border-red-500" : ""}
+                          className={errors.project_id ? "border-red-500" : ""}
                         >
                           <SelectValue placeholder="اختر المشروع" />
                         </SelectTrigger>
