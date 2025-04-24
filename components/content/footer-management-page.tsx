@@ -192,6 +192,12 @@ export function FooterManagementPage() {
       },
     });
   };
+  const handleStatusChange = (value) => {
+    setFooterData({
+      ...footerData,
+      status: value, // تحديث status مباشرة في footerData
+    });
+  };
 
   const handleSocialChange = (id, field, value) => {
     setFooterData({
@@ -410,6 +416,7 @@ export function FooterManagementPage() {
     return null;
   }
 
+
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader />
@@ -450,7 +457,22 @@ export function FooterManagementPage() {
               </Button>
             </div>
           </div>
-
+          <div
+  onClick={(e) => e.stopPropagation()}
+  className="flex flex-row items-center gap-3 mb-5"
+>
+  <div
+    className={`px-3 py-1 text-white rounded-2xl font-semibold shadow-sm transition-colors duration-300 ${
+      footerData?.status === true ? "bg-emerald-600" : "bg-rose-600"
+    }`}
+  >
+    {footerData?.status === true ? "التذييل مفعل" : "التذييل معطل"}
+  </div>
+  <Switch
+    checked={footerData?.status === true}
+    onCheckedChange={(checked) => handleStatusChange(checked)}
+  />
+</div>
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}

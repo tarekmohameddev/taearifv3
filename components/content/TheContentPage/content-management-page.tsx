@@ -103,30 +103,6 @@ export function ContentManagementPage() {
     setContentManagement({ newSectionIcon: value });
   };
 
-  // مصفوفة المسارات التي تحتاج إلى مفتاح تبديل
-  const togglePaths = [
-    "/content/footer", // تذييل الصفحة
-    "/content/banner", // البانر الرئيسي
-    "/content/menu", // إدارة القائمة
-    "/content/about", // عن الشركة
-  ];
-
-  // دالة لمعالجة تبديل الحالة وإرسال طلب إلى API
-const handleToggleSection = async (sectionId, isActive) => { // إزالة المعامل event
-  const status = isActive ? "active" : "inactive";
-  // try {
-  //   await axiosInstance.put("/content/general", {
-  //     id: sectionId,
-  //     status: status,
-  //   });
-  //   fetchContentSections();
-  //   toast.success("تم تحديث حالة القسم بنجاح");
-  // } catch (error) {
-  //   toast.error("فشل في تحديث حالة القسم");
-  //   console.error("خطأ في طلب API:", error);
-  // }
-};
-
   useEffect(() => {
     if (sections.length === 0) {
       fetchContentSections();
@@ -405,14 +381,7 @@ const handleToggleSection = async (sectionId, isActive) => { // إزالة ال�
                                 غير نشط
                               </Badge>
                             )}
-{togglePaths.includes(section.path) && (
-  <div onClick={(e) => e.stopPropagation()}> {/* إضافة div لمنع الانتشار */}
-    <Switch
-      checked={section.status === "active"}
-      onCheckedChange={(checked) => handleToggleSection(section.id, checked)}
-    />
-  </div>
-)}
+
                           </CardTitle>
                           <CardDescription>
                             {section.description}
