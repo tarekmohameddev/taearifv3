@@ -350,7 +350,7 @@ export default function EditPropertyPage() {
           city_id: 1,
           category_id: 1,
         };
-        const response = await axiosInstance.post(
+const response = await axiosInstance.post(
           `/properties/${id}`,
           propertyData,
         );
@@ -360,8 +360,9 @@ export default function EditPropertyPage() {
         setIsLoading(false);
 
         const currentState = useStore.getState();
-        const updatedProperty = response.data.data.property;
-        updatedProperty.status =
+        const updatedProperty = response.data.user_property;
+        console.log("updatedProperty.status",updatedProperty.status)
+updatedProperty.status =
           updatedProperty.status === 1 ? "منشور" : "مسودة";
         const updatedProperties =
           currentState.propertiesManagement.properties.map((prop) =>
