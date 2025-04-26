@@ -309,19 +309,19 @@ export function RegisterPage() {
         if (axios.isAxiosError(error)) {
           const errorMessage = error.response?.data?.message || error.message;
           console.error("❌ Axios error:", errorMessage);
-          
+
           if (errorMessage.includes("The email has already been taken")) {
             setErrors((prevErrors) => ({
               ...prevErrors,
               api: "هذا البريد الإلكتروني مسجل بالفعل.",
             }));
-            setCurrentStep(1)
-          } else  if (errorMessage.includes("The username has already")) {
+            setCurrentStep(1);
+          } else if (errorMessage.includes("The username has already")) {
             setErrors((prevErrors) => ({
               ...prevErrors,
               api: "اسم موقعك مسجل بالفعل.",
             }));
-            setCurrentStep(2)
+            setCurrentStep(2);
           } else {
             setErrors((prevErrors) => ({
               ...prevErrors,

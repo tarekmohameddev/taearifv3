@@ -70,7 +70,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
 
   const hey = true;
   return (
-<header className="sticky top-0 z-30 bg-background flex flex-col gap-6">
+    <header className="sticky top-0 z-30 bg-background flex flex-col gap-6">
       {/* الـ navbar الأول مع المحتوى الحالي */}
       <div className="h-16 items-center justify-between px-4 md:px-6 md:border-b flex">
         <div className="flex items-center gap-4">
@@ -99,7 +99,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                             onClick={() =>
                               window.open(
                                 `${useAuthStore.getState().userData?.domain}`,
-                                "_blank"
+                                "_blank",
                               )
                             }
                           >
@@ -189,7 +189,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
               </SheetContent>
             </Sheet>
           </div>
-  
+
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <Image
               src="/logo.png"
@@ -199,7 +199,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
               className=""
             />
           </Link>
-  
+
           <div className="hidden md:flex items-center gap-1 mr-6">
             <TooltipProvider>
               <Tooltip>
@@ -213,7 +213,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-  
+
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -227,10 +227,10 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
               </Tooltip>
             </TooltipProvider>
           </div>
-  
+
           {children}
         </div>
-  
+
         {/* أزرار تسجيل الدخول والمستخدم */}
         <div className="flex items-center gap-2">
           {!useAuthStore.getState().UserIslogged && (
@@ -243,10 +243,11 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
               </Button>
             </>
           )}
-  
+
           {useAuthStore.getState().UserIslogged && (
             <>
-              {useAuthStore.getState().userData?.days_remaining !== undefined && (
+              {useAuthStore.getState().userData?.days_remaining !==
+                undefined && (
                 <Button
                   variant={
                     useAuthStore.getState().userData.is_free_plan
@@ -293,7 +294,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-  
+
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -311,7 +312,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-  
+
               <DropdownMenu>
                 <TooltipProvider>
                   <Tooltip>
@@ -370,37 +371,39 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
           )}
         </div>
       </div>
-  
-{/* الـ navbar الثاني */}
-<div className="flex h-5 items-center justify-center border-b px-4 md:px-6 md:hidden ">
-  {useAuthStore.getState().UserIslogged && (
-    <>
-      {useAuthStore.getState().userData?.days_remaining !== undefined && (
-        <Button
-          variant={
-            useAuthStore.getState().userData.is_free_plan ? "outline" : "secondary"
-          }
-          size="sm"
-          className={
-            useAuthStore.getState().userData.is_free_plan
-              ? "mb-10"
-              : "bg-amber-100 text-amber-800 mb-10" 
-          }
-          onClick={clickedONButton}
-        >
-          <Link href="/settings">
-            {useAuthStore.getState().userData.is_free_plan
-              ? `الباقة المجانية : عدد الأيام المتبقية هو ${useAuthStore.getState().userData.days_remaining}`
-              : useAuthStore.getState().userData.package_title}
-          </Link>
-          {!useAuthStore.getState().userData.is_free_plan && (
-            <Star className="h-3 w-3 ml-1" />
-          )}
-        </Button>
-      )}
-    </>
-  )}
-</div>
+
+      {/* الـ navbar الثاني */}
+      <div className="flex h-5 items-center justify-center border-b px-4 md:px-6 md:hidden ">
+        {useAuthStore.getState().UserIslogged && (
+          <>
+            {useAuthStore.getState().userData?.days_remaining !== undefined && (
+              <Button
+                variant={
+                  useAuthStore.getState().userData.is_free_plan
+                    ? "outline"
+                    : "secondary"
+                }
+                size="sm"
+                className={
+                  useAuthStore.getState().userData.is_free_plan
+                    ? "mb-10"
+                    : "bg-amber-100 text-amber-800 mb-10"
+                }
+                onClick={clickedONButton}
+              >
+                <Link href="/settings">
+                  {useAuthStore.getState().userData.is_free_plan
+                    ? `الباقة المجانية : عدد الأيام المتبقية هو ${useAuthStore.getState().userData.days_remaining}`
+                    : useAuthStore.getState().userData.package_title}
+                </Link>
+                {!useAuthStore.getState().userData.is_free_plan && (
+                  <Star className="h-3 w-3 ml-1" />
+                )}
+              </Button>
+            )}
+          </>
+        )}
+      </div>
     </header>
   );
 }

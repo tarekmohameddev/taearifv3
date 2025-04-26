@@ -322,205 +322,213 @@ export default function AddProjectPage(): JSX.Element {
     return Object.keys(errors).length === 0;
   };
 
-const hasArabicNumbers = (str) => /[٠-٩]/.test(str);
+  const hasArabicNumbers = (str) => /[٠-٩]/.test(str);
 
-const convertArabicToEnglishNumbers = (str) => {
-  const arabicNumbers = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
-  const englishNumbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-  return str.replace(/[٠-٩]/g, (match) => {
-    const index = arabicNumbers.indexOf(match);
-    return englishNumbers[index];
-  });
-};
-
-const handleSaveProject = async (
-  status: "منشور" | "مسودة" | "Pre-construction",
-) => {
-  if (!validateForm()) {
-    toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
-    setSubmitError("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
-    return;
-  }
-  setSubmitError(null);
-  setIsLoading(true);
-
-  try {
-    const priceStr = newProject.price ? newProject.price.toString() : "";
-    let convertedPrice = hasArabicNumbers(priceStr)
-      ? convertArabicToEnglishNumbers(priceStr)
-      : priceStr;
-
-    const unitsStr = newProject.units ? newProject.units.toString() : "";
-    let convertedUnits = hasArabicNumbers(unitsStr)
-      ? convertArabicToEnglishNumbers(unitsStr)
-      : unitsStr;
-
-    const latitudeStr = newProject.latitude ? newProject.latitude.toString() : "";
-    let convertedLatitude = hasArabicNumbers(latitudeStr)
-      ? convertArabicToEnglishNumbers(latitudeStr)
-      : latitudeStr;
-
-    const longitudeStr = newProject.longitude ? newProject.longitude.toString() : "";
-    let convertedLongitude = hasArabicNumbers(longitudeStr)
-      ? convertArabicToEnglishNumbers(longitudeStr)
-      : longitudeStr;
-
-    let featuredImagePath = "";
-    if (thumbnailImage) {
-      const uploadResult = await uploadSingleFile(
-        thumbnailImage.file,
-        "project",
-      );
-      featuredImagePath = uploadResult.path;
-    }
-
-    let floorplanPaths = [];
-    if (planImages.length > 0) {
-      const files = planImages.map((image) => image.file);
-      const uploadResults = await uploadMultipleFiles(files, "project");
-      if (uploadResults && Array.isArray(uploadResults)) {
-        floorplanPaths = uploadResults.map((file) => file.path);
-        toast.success("تم رفع صور ال floor plan بنجاح");
-      } else {
-        toast.error("حدث خطأ فالسيرفر");
-      }
-    }
-
-    let galleryPaths = [];
-    if (galleryImages.length > 0) {
-      const files = galleryImages.map((image) => image.file);
-      const uploadResults = await uploadMultipleFiles(files, "project");
-      if (uploadResults && Array.isArray(uploadResults)) {
-        galleryPaths = uploadResults.map((file) => file.path);
-        toast.success("تم رفع صور ال gallary بنجاح");
-      } else {
-        toast.error("حدث خطأ فالسيرفر");
-      }
-    }
-
-    let minPrice = 0;
-let maxPrice = 0;
-if (convertedPrice.includes("-")) {
-  const [min, max] = convertedPrice
-    .split("-")
-    .map((val) => parseFloat(val.trim()));
-  minPrice = min;
-  maxPrice = max;
-} else {
-  minPrice = parseFloat(convertedPrice) || 0;
-  maxPrice = minPrice;
-}
-
-const isValidDate = (dateString) => {
-  const date = new Date(dateString);
-  return !isNaN(date.getTime());
-};
-
-let formattedDate = "";
-if (newProject.completionDate) {
-  const convertedDateStr = convertArabicToEnglishNumbers(newProject.completionDate);
-  
-  if (isValidDate(convertedDateStr)) {
-    formattedDate = new Date(convertedDateStr).toISOString().split("T")[0];
-  } else {
-    formattedDate = ""; 
-  }
-} else {
-  formattedDate = ""; 
-}
-    const publishedValue = status === "منشور" ? 1 : 0;
-
-    const projectData = {
-          featured_image: featuredImagePath,
-      min_price: minPrice,
-      max_price: maxPrice,
-      latitude: parseFloat(convertedLatitude),
-      longitude: parseFloat(convertedLongitude),
-      featured: newProject.featured,
-      complete_status: status === "منشور" ? "In Progress" : status,
-      units: Number(convertedUnits),
-      completion_date: formattedDate,
-      developer: newProject.developer,
-      published: publishedValue,
-      contents: [
-        {
-          language_id: 1,
-          title: newProject.name,
-          address: newProject.location,
-          description: newProject.description,
-          meta_keyword: "luxury, apartments, Dubai",
-          meta_description:
-            "Luxury apartments in Dubai with sea view and top facilities.",
-        },
-        {
-          language_id: 2,
-          title: newProject.name,
-          address: newProject.location,
-          description: newProject.description,
-          meta_keyword: "فخامة، شقق، دبي",
-          meta_description:
-            "شقق فاخرة في دبي بإطلالة على البحر ومرافق متميزة.",
-        },
-      ],
-      gallery_images: galleryPaths,
-      floorplan_images: floorplanPaths,
-      specifications: [
-        { key: "Bedrooms", label: "Number of Bedrooms", value: "3" },
-        { key: "Bathrooms", label: "Number of Bathrooms", value: "2" },
-        { key: "Parking", label: "Parking Spaces", value: "2" },
-      ],
-      types: [
-        {
-          language_id: 1,
-          title: "3 BHK Apartment",
-          min_area: 1200,
-          max_area: 1500,
-          min_price: 50000,
-          max_price: 100000,
-          unit: "sqft",
-        },
-        {
-          language_id: 2,
-          title: "شقة 3 غرف",
-          min_area: 1200,
-          max_area: 1500,
-          min_price: 50000,
-          max_price: 100000,
-          unit: "قدم مربع",
-        },
-      ],
-      amenities: newProject.amenities
-        ? newProject.amenities.split(",").map((amenity) => amenity.trim())
-        : [],
-    };
-
-    const response = await axiosInstance.post(
-      "https://taearif.com/api/projects",
-      projectData,
-    );
-
-    const currentState = useStore.getState();
-    const createdProject = response.data.user_project;
-    const updatedProjects = [
-      createdProject,
-      ...currentState.projectsManagement.projects,
-    ];
-    setProjectsManagement({
-      projects: updatedProjects,
-      pagination: {
-        ...currentState.projectsManagement.pagination,
-        total: (currentState.projectsManagement.pagination?.total || 0) + 1,
-      },
+  const convertArabicToEnglishNumbers = (str) => {
+    const arabicNumbers = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+    const englishNumbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    return str.replace(/[٠-٩]/g, (match) => {
+      const index = arabicNumbers.indexOf(match);
+      return englishNumbers[index];
     });
+  };
 
-    router.push("/projects");
-  } catch (error: any) {
-    setSubmitError("حدث خطأ أثناء حفظ العقار. يرجى المحاولة مرة أخرى.");
-    toast.error("حدث خطأ فالسيرفر");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  const handleSaveProject = async (
+    status: "منشور" | "مسودة" | "Pre-construction",
+  ) => {
+    if (!validateForm()) {
+      toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
+      setSubmitError("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
+      return;
+    }
+    setSubmitError(null);
+    setIsLoading(true);
+
+    try {
+      const priceStr = newProject.price ? newProject.price.toString() : "";
+      let convertedPrice = hasArabicNumbers(priceStr)
+        ? convertArabicToEnglishNumbers(priceStr)
+        : priceStr;
+
+      const unitsStr = newProject.units ? newProject.units.toString() : "";
+      let convertedUnits = hasArabicNumbers(unitsStr)
+        ? convertArabicToEnglishNumbers(unitsStr)
+        : unitsStr;
+
+      const latitudeStr = newProject.latitude
+        ? newProject.latitude.toString()
+        : "";
+      let convertedLatitude = hasArabicNumbers(latitudeStr)
+        ? convertArabicToEnglishNumbers(latitudeStr)
+        : latitudeStr;
+
+      const longitudeStr = newProject.longitude
+        ? newProject.longitude.toString()
+        : "";
+      let convertedLongitude = hasArabicNumbers(longitudeStr)
+        ? convertArabicToEnglishNumbers(longitudeStr)
+        : longitudeStr;
+
+      let featuredImagePath = "";
+      if (thumbnailImage) {
+        const uploadResult = await uploadSingleFile(
+          thumbnailImage.file,
+          "project",
+        );
+        featuredImagePath = uploadResult.path;
+      }
+
+      let floorplanPaths = [];
+      if (planImages.length > 0) {
+        const files = planImages.map((image) => image.file);
+        const uploadResults = await uploadMultipleFiles(files, "project");
+        if (uploadResults && Array.isArray(uploadResults)) {
+          floorplanPaths = uploadResults.map((file) => file.path);
+          toast.success("تم رفع صور ال floor plan بنجاح");
+        } else {
+          toast.error("حدث خطأ فالسيرفر");
+        }
+      }
+
+      let galleryPaths = [];
+      if (galleryImages.length > 0) {
+        const files = galleryImages.map((image) => image.file);
+        const uploadResults = await uploadMultipleFiles(files, "project");
+        if (uploadResults && Array.isArray(uploadResults)) {
+          galleryPaths = uploadResults.map((file) => file.path);
+          toast.success("تم رفع صور ال gallary بنجاح");
+        } else {
+          toast.error("حدث خطأ فالسيرفر");
+        }
+      }
+
+      let minPrice = 0;
+      let maxPrice = 0;
+      if (convertedPrice.includes("-")) {
+        const [min, max] = convertedPrice
+          .split("-")
+          .map((val) => parseFloat(val.trim()));
+        minPrice = min;
+        maxPrice = max;
+      } else {
+        minPrice = parseFloat(convertedPrice) || 0;
+        maxPrice = minPrice;
+      }
+
+      const isValidDate = (dateString) => {
+        const date = new Date(dateString);
+        return !isNaN(date.getTime());
+      };
+
+      let formattedDate = "";
+      if (newProject.completionDate) {
+        const convertedDateStr = convertArabicToEnglishNumbers(
+          newProject.completionDate,
+        );
+
+        if (isValidDate(convertedDateStr)) {
+          formattedDate = new Date(convertedDateStr)
+            .toISOString()
+            .split("T")[0];
+        } else {
+          formattedDate = "";
+        }
+      } else {
+        formattedDate = "";
+      }
+      const publishedValue = status === "منشور" ? 1 : 0;
+
+      const projectData = {
+        featured_image: featuredImagePath,
+        min_price: minPrice,
+        max_price: maxPrice,
+        latitude: parseFloat(convertedLatitude),
+        longitude: parseFloat(convertedLongitude),
+        featured: newProject.featured,
+        complete_status: status === "منشور" ? "In Progress" : status,
+        units: Number(convertedUnits),
+        completion_date: formattedDate,
+        developer: newProject.developer,
+        published: publishedValue,
+        contents: [
+          {
+            language_id: 1,
+            title: newProject.name,
+            address: newProject.location,
+            description: newProject.description,
+            meta_keyword: "luxury, apartments, Dubai",
+            meta_description:
+              "Luxury apartments in Dubai with sea view and top facilities.",
+          },
+          {
+            language_id: 2,
+            title: newProject.name,
+            address: newProject.location,
+            description: newProject.description,
+            meta_keyword: "فخامة، شقق، دبي",
+            meta_description:
+              "شقق فاخرة في دبي بإطلالة على البحر ومرافق متميزة.",
+          },
+        ],
+        gallery_images: galleryPaths,
+        floorplan_images: floorplanPaths,
+        specifications: [
+          { key: "Bedrooms", label: "Number of Bedrooms", value: "3" },
+          { key: "Bathrooms", label: "Number of Bathrooms", value: "2" },
+          { key: "Parking", label: "Parking Spaces", value: "2" },
+        ],
+        types: [
+          {
+            language_id: 1,
+            title: "3 BHK Apartment",
+            min_area: 1200,
+            max_area: 1500,
+            min_price: 50000,
+            max_price: 100000,
+            unit: "sqft",
+          },
+          {
+            language_id: 2,
+            title: "شقة 3 غرف",
+            min_area: 1200,
+            max_area: 1500,
+            min_price: 50000,
+            max_price: 100000,
+            unit: "قدم مربع",
+          },
+        ],
+        amenities: newProject.amenities
+          ? newProject.amenities.split(",").map((amenity) => amenity.trim())
+          : [],
+      };
+
+      const response = await axiosInstance.post(
+        "https://taearif.com/api/projects",
+        projectData,
+      );
+
+      const currentState = useStore.getState();
+      const createdProject = response.data.user_project;
+      const updatedProjects = [
+        createdProject,
+        ...currentState.projectsManagement.projects,
+      ];
+      setProjectsManagement({
+        projects: updatedProjects,
+        pagination: {
+          ...currentState.projectsManagement.pagination,
+          total: (currentState.projectsManagement.pagination?.total || 0) + 1,
+        },
+      });
+
+      router.push("/projects");
+    } catch (error: any) {
+      setSubmitError("حدث خطأ أثناء حفظ العقار. يرجى المحاولة مرة أخرى.");
+      toast.error("حدث خطأ فالسيرفر");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
       <DashboardHeader />

@@ -381,7 +381,6 @@ export function ContentManagementPage() {
                                 غير نشط
                               </Badge>
                             )}
-
                           </CardTitle>
                           <CardDescription>
                             {section.description}

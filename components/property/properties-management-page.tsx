@@ -63,7 +63,6 @@ import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 
-
 function SkeletonPropertyCard() {
   return (
     <Card className="overflow-hidden animate-pulse">
@@ -93,7 +92,7 @@ function SkeletonPropertyCard() {
 
 export function PropertiesManagementPage() {
   // حالة للتحكم في فتح وإغلاق النافذة المنبثقة
-const [isLimitReached, setIsLimitReached] = useState(false);
+  const [isLimitReached, setIsLimitReached] = useState(false);
 
   const router = useRouter();
   const {
@@ -356,8 +355,10 @@ const [isLimitReached, setIsLimitReached] = useState(false);
             <Dialog open={isLimitReached} onOpenChange={setIsLimitReached}>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle className="text-center text-red-500">لقد وصلت للحد الأقصى للإضافة</DialogTitle>
-                  <DialogDescription  className="text-center">
+                  <DialogTitle className="text-center text-red-500">
+                    لقد وصلت للحد الأقصى للإضافة
+                  </DialogTitle>
+                  <DialogDescription className="text-center">
                     برجاء ترقية الباقة لإضافة المزيد من العقارات.
                   </DialogDescription>
                 </DialogHeader>

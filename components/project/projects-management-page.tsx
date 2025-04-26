@@ -111,7 +111,7 @@ function SkeletonProjectCard() {
 }
 
 export function ProjectsManagementPage() {
-const [isLimitReached, setIsLimitReached] = useState(false);
+  const [isLimitReached, setIsLimitReached] = useState(false);
   const router = useRouter();
   const {
     projectsManagement: {
@@ -240,8 +240,10 @@ const [isLimitReached, setIsLimitReached] = useState(false);
             <Dialog open={isLimitReached} onOpenChange={setIsLimitReached}>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle className="text-center text-red-500">لقد وصلت للحد الأقصى للإضافة</DialogTitle>
-                  <DialogDescription  className="text-center">
+                  <DialogTitle className="text-center text-red-500">
+                    لقد وصلت للحد الأقصى للإضافة
+                  </DialogTitle>
+                  <DialogDescription className="text-center">
                     برجاء ترقية الباقة لإضافة المزيد من المشاريع.
                   </DialogDescription>
                 </DialogHeader>
@@ -258,7 +260,7 @@ const [isLimitReached, setIsLimitReached] = useState(false);
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            
+
             {/* Tabs for filtering by status */}
             <Tabs defaultValue="all">
               <TabsList>

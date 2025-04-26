@@ -26,6 +26,7 @@ export function AboutCompanyPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [aboutData, setAboutData] = useState({
     title: "",
+    status: true,
     subtitle: "",
     history: "",
     mission: "",
@@ -36,6 +37,13 @@ export function AboutCompanyPage() {
 
   const handleImageUploadClick = () => {
     fileInputRef.current.click();
+  };
+
+  const handleStatusChange = (value) => {
+    setAboutData({
+      ...aboutData,
+      status: value, // تحديث status مباشرة في footerData
+    });
   };
 
   const handleImageChange = (e) => {
@@ -212,6 +220,36 @@ export function AboutCompanyPage() {
                 </span>
               )}
             </Button>
+          </div>
+
+          <div className="flex flex-col space-y-8 p-6">
+            <button
+              onClick={() =>
+                handleStatusChange(aboutData?.status === true ? false : true)
+              }
+              className={`relative flex h-12 w-[120px] items-center rounded-full px-4 transition-colors duration-500 ${
+                aboutData?.status === true ? "bg-black" : "bg-gray-200"
+              }`}
+            >
+              <span
+                className={`absolute text-sm font-medium ${
+                  aboutData?.status === true
+                    ? "left-6 text-white"
+                    : "right-3 text-gray-600"
+                } transition-[left,right] duration-1000 ease-in-out`}
+              >
+                {aboutData?.status === true ? "مفعل" : "غير مفعل"}
+              </span>
+
+              <div
+                className={`absolute h-10 w-10 rounded-full bg-white shadow-md transition-transform duration-1000 ease-in-out ${
+                  aboutData?.status === true
+                    ? "translate-x-0"
+                    : "translate-x-[-72px]"
+                }`}
+                style={{ right: "4px" }}
+              />
+            </button>
           </div>
 
           <div className="grid gap-6">

@@ -116,7 +116,6 @@ export default function AddPropertyPage() {
     fetchCategories();
   }, []);
 
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -266,8 +265,7 @@ export default function AddPropertyPage() {
     //   newErrors.gallery = "يجب تحميل صورة واحدة على الأقل في معرض الصور";
     if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
     if (!formData.description)
-      newErrors.description   = "من فضلك اكتب وصف للعقار"
-
+      newErrors.description = "من فضلك اكتب وصف للعقار";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -563,7 +561,10 @@ export default function AddPropertyPage() {
                         name="project"
                         value={formData.project_id}
                         onValueChange={(value) =>
-                          setFormData((prev) => ({ ...prev, project_id: value }))
+                          setFormData((prev) => ({
+                            ...prev,
+                            project_id: value,
+                          }))
                         }
                       >
                         <SelectTrigger
@@ -584,12 +585,9 @@ export default function AddPropertyPage() {
                         </SelectContent>
                       </Select>
                       {errors.project && (
-                        <p className="text-sm text-red-500">
-                          {errors.project}
-                        </p>
+                        <p className="text-sm text-red-500">{errors.project}</p>
                       )}
                     </div>
-
                   </div>
                 </CardContent>
               </Card>

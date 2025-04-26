@@ -103,6 +103,13 @@ export function BannerSectionPage() {
     fetchBannerData();
   }, []);
 
+  const handleStatusChange = (value) => {
+    setBannerData({
+      ...bannerData,
+      status: value,
+    });
+  };
+
   const handleSave = async () => {
     setIsLoading(true);
     try {
@@ -145,6 +152,7 @@ export function BannerSectionPage() {
 
       const formData = {
         banner_type: bannerType,
+        status: bannerData?.status,
         static: {
           enabled: bannerType === "static",
           image: staticImagePath.replace("https://taearif.com", ""),
@@ -316,6 +324,38 @@ export function BannerSectionPage() {
                 </span>
               )}
             </Button>
+          </div>
+
+          <div className="flex flex-col space-y-8 p-6">
+            <button
+              onClick={() =>
+                handleStatusChange(bannerData?.status === true ? false : true)
+              }
+              className={`relative flex h-12 w-[160px] items-center rounded-full px-4 transition-colors duration-500 ${
+                bannerData?.status === true ? "bg-black" : "bg-gray-200"
+              }`}
+            >
+              <span
+                className={`absolute text-sm font-medium ${
+                  bannerData?.status === true
+                    ? "left-6 text-white"
+                    : "right-5 text-gray-600"
+                } transition-[left,right] duration-1000 ease-in-out`}
+              >
+                {bannerData?.status === true
+                  ? "البانر مفعل"
+                  : "البانر غير مفعل"}
+              </span>
+
+              <div
+                className={`absolute h-10 w-10 rounded-full bg-white shadow-md transition-transform duration-1000 ease-in-out ${
+                  bannerData?.status === true
+                    ? "translate-x-0"
+                    : "translate-x-[-112px]"
+                }`}
+                style={{ right: "4px" }}
+              />
+            </button>
           </div>
 
           <div className="grid gap-6">

@@ -66,13 +66,11 @@ const useAuthStore = create((set, get) => ({
             real_estate_limit_number:
               subscriptionDATA.membership.package.real_estate_limit_number ||
               null,
-              domain:
-              subscriptionDATA.domain ||
-              null,
+            domain: subscriptionDATA.domain || null,
           },
         });
       }
-      
+
       set({ IsDone: false, error: null });
     } catch (error) {
       set({
