@@ -30,29 +30,28 @@ interface EnhancedSidebarProps {
   setActiveTab?: (tab: string) => void;
 }
 
-// دالة لتحويل أسماء الأيقونات النصية إلى مكونات React
 const getIconComponent = (iconName: string) => {
   switch (iconName) {
     case "panel":
-      return LayoutDashboard; // لوحة التحكم
+      return LayoutDashboard; 
     case "content-settings":
-      return FileText; // إدارة المحتوى
+      return FileText; 
     case "web-settings":
-      return Settings; // إعدادات الموقع
+      return Settings; 
     case "building":
-      return Building2; // المشاريع أو العقارات
+      return Building2; 
     case "home":
-      return Home; // الصفحة الرئيسية أو العقارات
+      return Home; 
     case "message":
-      return MessageSquare; // الرسائل
+      return MessageSquare; 
     case "package":
-      return Package; // التطبيقات
+      return Package; 
     case "users":
-      return Users; // العملاء
+      return Users; 
     case "external-link":
-      return ExternalLink; // رابط خارجي
+      return ExternalLink; 
     default:
-      return FileText; // أيقونة افتراضية
+      return FileText; 
   }
 };
 
@@ -66,31 +65,28 @@ export function EnhancedSidebar({
   const [internalActiveTab, setInternalActiveTab] = useState<string>(
     activeTab || "dashboard",
   );
-  const [mainNavItems, setMainNavItems] = useState<any[]>([]); // حالة لتخزين العناصر المجلوبة
+  const [mainNavItems, setMainNavItems] = useState<any[]>([]); 
 
-  // جلب البيانات من الـ API عند تحميل المكون
   useEffect(() => {
     const fetchSideMenus = async () => {
       try {
         const response = await axiosInstance.get("/settings/side-menus");
         const sections = response.data.data.sections;
         const items = sections.map((section: any) => ({
-          id: section.path.split("/").pop(), // استخراج المعرف من المسار
-          label: section.title, // العنوان كـ label
-          description: section.description, // الوصف
-          icon: getIconComponent(section.icon), // تحويل الأيقونة إلى مكون
-          path: section.path, // المسار
+          id: section.path.split("/").pop(), 
+          label: section.title, 
+          description: section.description, 
+          icon: getIconComponent(section.icon), 
+          path: section.path, 
         }));
         setMainNavItems(items);
       } catch (error) {
         console.error("فشل في جلب القوائم الجانبية:", error);
-        // يمكن هنا تعيين قيم افتراضية في حالة الفشل إذا لزم الأمر
       }
     };
     fetchSideMenus();
   }, []);
 
-  // التحقق من زيارة المستخدم السابقة
   useEffect(() => {
     const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");
     if (hasVisitedBefore) {
@@ -198,19 +194,21 @@ export function EnhancedSidebar({
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>
-            <Button
-  variant="outline"
-  size="sm"
-  className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
-  onClick={() => {
-    const domain = useAuthStore.getState().userData?.domain || "";
-    const url = domain.startsWith("http") ? domain : `https://${domain}`;
-    window.open(url, "_blank");
-  }}
->
-  <ExternalLink className="h-4 w-4 text-primary" />
-  {!isCollapsed && <span>معاينة الموقع</span>}
-</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
+                onClick={() => {
+                  const domain = useAuthStore.getState().userData?.domain || "";
+                  const url = domain.startsWith("http")
+                    ? domain
+                    : `https://${domain}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <ExternalLink className="h-4 w-4 text-primary" />
+                {!isCollapsed && <span>معاينة الموقع</span>}
+              </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
               <p>فتح الموقع في نافذة جديدة</p>

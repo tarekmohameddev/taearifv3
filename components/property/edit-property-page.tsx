@@ -61,6 +61,7 @@ export default function EditPropertyPage() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    project_id: "",
     address: "",
     price: "",
     type: "",
@@ -98,6 +99,34 @@ export default function EditPropertyPage() {
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const floorPlansInputRef = useRef<HTMLInputElement>(null);
+  const [categories, setCategories] = useState([]);
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axiosInstance.get("/user/projects");
+        setProjects(response.data.data.user_projects);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("حدث خطأ أثناء جلب أنواع العقارات.");
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axiosInstance.get("/properties/categories");
+        setCategories(response.data.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("حدث خطأ أثناء جلب أنواع العقارات.");
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // جلب بيانات العقار عند تحميل الصفحة
   useEffect(() => {
@@ -107,6 +136,7 @@ export default function EditPropertyPage() {
         const property = response.data.data.property;
         setFormData({
           title: property.title || "",
+          project_id: property.project_id || "",
           description: property.description || "",
           address: property.address || "",
           price: property.price || "",
@@ -245,19 +275,19 @@ export default function EditPropertyPage() {
     const newErrors: Record<string, string> = {};
     if (!formData.title) newErrors.title = "عنوان العقار مطلوب";
     if (!formData.description) newErrors.description = "وصف العقار مطلوب";
-    if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
-    if (!formData.price) newErrors.price = "السعر مطلوب";
-    if (!formData.type) newErrors.type = "نوع العقار مطلوب";
-    if (!formData.transaction_type)
-      newErrors.transaction_type = "نوع القائمة مطلوب";
-    if (!formData.bedrooms) newErrors.bedrooms = "عدد غرف النوم مطلوب";
-    if (!formData.bathrooms) newErrors.bathrooms = "عدد الحمامات مطلوب";
-    if (!formData.area) newErrors.area = "مساحة العقار مطلوبة";
-    if (!formData.features) newErrors.features = "ميزات العقار مطلوبة";
+    // if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
+    // if (!formData.price) newErrors.price = "السعر مطلوب";
+    // if (!formData.type) newErrors.type = "نوع العقار مطلوب";
+    // if (!formData.transaction_type)
+      // newErrors.transaction_type = "نوع القائمة مطلوب";
+    // if (!formData.bedrooms) newErrors.bedrooms = "عدد غرف النوم مطلوب";
+    // if (!formData.bathrooms) newErrors.bathrooms = "عدد الحمامات مطلوب";
+    // if (!formData.area) newErrors.area = "مساحة العقار مطلوبة";
+    // if (!formData.features) newErrors.features = "ميزات العقار مطلوبة";
     if (!previews.thumbnail && !images.thumbnail)
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
-    if (previews.gallery.length === 0 && images.gallery.length === 0)
-      newErrors.gallery = "يجب إضافة صورة واحدة على الأقل في معرض الصور";
+    // if (previews.gallery.length === 0 && images.gallery.length === 0)
+      // newErrors.gallery = "يجب إضافة صورة واحدة على الأقل في معرض الصور";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -268,8 +298,7 @@ export default function EditPropertyPage() {
       setSubmitError(null); // إعادة تعيين رسالة الخطأ عند كل محاولة
       setIsLoading(true);
       setUploading(true);
-      toast.loading("يرجى الانتظار...");
-
+      
       try {
         let thumbnailUrl: string | null = null;
         let galleryUrls: string[] = [];
@@ -303,6 +332,7 @@ export default function EditPropertyPage() {
           title: formData.title,
           address: formData.address,
           price: formData.price,
+          project_id: formData.project_id,
           type: formData.type,
           beds: parseInt(formData.bedrooms),
           bath: parseInt(formData.bathrooms),
@@ -320,8 +350,6 @@ export default function EditPropertyPage() {
           city_id: 1,
           category_id: 1,
         };
-
-        // تعديل العقار باستخدام PUT بدلاً من POST
         const response = await axiosInstance.post(
           `/properties/${id}`,
           propertyData,
@@ -494,63 +522,74 @@ export default function EditPropertyPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="type">نوع العقار</Label>
-                      <Select
-                        name="type"
-                        value={formData.type}
-                        onValueChange={(value) =>
-                          handleInputChange({
-                            target: { name: "type", value },
-                          } as any)
-                        }
-                      >
-                        <SelectTrigger
-                          id="type"
-                          className={errors.type ? "border-red-500" : ""}
-                        >
-                          <SelectValue placeholder="اختر النوع" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="فيلا">فيلا</SelectItem>
-                          <SelectItem value="شقة">شقة</SelectItem>
-                          <SelectItem value="تاون هاوس">تاون هاوس</SelectItem>
-                          <SelectItem value="استوديو">استوديو</SelectItem>
-                          <SelectItem value="بنتهاوس">بنتهاوس</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {errors.type && (
-                        <p className="text-sm text-red-500">{errors.type}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="status">الحالة</Label>
-                      <RadioGroup
-                        value={formData.status}
-                        className="flex gap-4"
-                        onValueChange={(value) =>
-                          handleInputChange({
-                            target: { name: "status", value },
-                          } as any)
-                        }
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="draft" id="draft" />
-                          <Label htmlFor="draft" className="mr-2">
-                            مسودة
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="published" id="published" />
-                          <Label htmlFor="published" className="mr-2">
-                            منشور
-                          </Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                  </div>
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                      <Label htmlFor="category">نوع العقار</Label>
+                                      <Select
+                                        name="category"
+                                        value={formData.category}
+                                        onValueChange={(value) =>
+                                          setFormData((prev) => ({ ...prev, category: value }))
+                                        }
+                                      >
+                                        <SelectTrigger
+                                          id="category"
+                                          className={errors.category ? "border-red-500" : ""}
+                                        >
+                                          <SelectValue placeholder="اختر النوع" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {categories.map((category) => (
+                                            <SelectItem
+                                              key={category.id}
+                                              value={category.id.toString()}
+                                            >
+                                              {category.name}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                      {errors.category && (
+                                        <p className="text-sm text-red-500">
+                                          {errors.category}
+                                        </p>
+                                      )}
+                                    </div>
+                
+                                    <div className="space-y-2">
+                                      <Label htmlFor="project">المشروع</Label>
+                                      <Select
+                                        name="project"
+                                        value={formData.project_id}
+                                        onValueChange={(value) =>
+                                          setFormData((prev) => ({
+                                            ...prev,
+                                            project_id: value,
+                                          }))
+                                        }
+                                      >
+                                        <SelectTrigger
+                                          id="project"
+                                          className={errors.project_id ? "border-red-500" : ""}
+                                        >
+                                          <SelectValue placeholder="اختر المشروع" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {projects.map((project) => (
+                                            <SelectItem
+                                              key={project.id}
+                                              value={project.id.toString()}
+                                            >
+                                              {project.title}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                      {errors.project && (
+                                        <p className="text-sm text-red-500">{errors.project}</p>
+                                      )}
+                                    </div>
+                                  </div>
                 </CardContent>
               </Card>
 

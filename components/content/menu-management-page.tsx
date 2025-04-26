@@ -248,7 +248,6 @@ export default function MenuManagementPage() {
     toast.success("تم تغيير حالة العنصر");
   };
 
-
   const handleToggleMobile = (id) => {
     setMenuItems(
       menuItems.map((item) =>
@@ -586,7 +585,6 @@ export default function MenuManagementPage() {
               )}
             </Button>
           </div>
-
 
           <Tabs defaultValue="menu" className="w-full">
             {/* <TabsList className="grid w-full grid-cols-2">

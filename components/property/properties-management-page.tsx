@@ -93,6 +93,7 @@ function SkeletonPropertyCard() {
 export function PropertiesManagementPage() {
   // حالة للتحكم في فتح وإغلاق النافذة المنبثقة
   const [isLimitReached, setIsLimitReached] = useState(false);
+  const { clickedONSubButton } = useAuthStore();
 
   const router = useRouter();
   const {
@@ -114,6 +115,12 @@ export function PropertiesManagementPage() {
     if (status === "0" || status === 0) return "مسودة";
     return status;
   };
+
+  const clickedONButton = async () => {
+    clickedONSubButton();
+    router.push("/settings");
+  };
+
 
   const normalizedProperties = useMemo(() => {
     return properties.map((property) => ({
@@ -338,8 +345,7 @@ export function PropertiesManagementPage() {
                       useAuthStore.getState().userData
                         ?.real_estate_limit_number;
                     if (propertiesLength >= limit) {
-                      toast.error(`لا يمكنك إضافة أكثر من ${limit} عقار`);
-                      setIsLimitReached(true); // فتح النافذة المنبثقة
+                      setIsLimitReached(true); 
                     } else {
                       router.push("/properties/add");
                     }
@@ -369,7 +375,7 @@ export function PropertiesManagementPage() {
                   >
                     إلغاء
                   </Button>
-                  <Button onClick={() => router.push("/settings")}>
+                  <Button onClick={clickedONButton}>
                     اشتراك
                   </Button>
                 </DialogFooter>
