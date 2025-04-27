@@ -361,7 +361,6 @@ const response = await axiosInstance.post(
 
         const currentState = useStore.getState();
         const updatedProperty = response.data.user_property;
-        console.log("updatedProperty.status",updatedProperty.status)
 updatedProperty.status =
           updatedProperty.status === 1 ? "منشور" : "مسودة";
         const updatedProperties =

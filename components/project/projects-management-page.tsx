@@ -222,9 +222,9 @@ export function ProjectsManagementPage() {
                     const limit =
                       useAuthStore.getState().userData?.project_limit_number;
 
-                    if (projectsLength >= 1) {
+                    if (projectsLength >= limit) {
                       toast.error(`لا يمكنك إضافة أكثر من ${limit} مشاريع`);
-                      setIsLimitReached(true); // فتح النافذة المنبثقة
+                      setIsLimitReached(true);
                     } else {
                       router.push("/projects/add");
                     }
