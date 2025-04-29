@@ -370,7 +370,14 @@ function ProjectCard({ project }: { project: IProject }) {
                 <Edit className="mr-2 h-4 w-4" />
                 تعديل
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                              onClick={() => {
+                                const domain = useAuthStore.getState().userData?.domain || "";
+                                const url = domain.startsWith("http")
+                                  ? `${domain}project/${project.contents?.[0]?.title}`
+                                  : `https://${domain}/project/${project.contents?.[0]?.title}`;
+                                window.open(url, "_blank");
+                              }}>
                 <ExternalLink className="mr-2 h-4 w-4" />
                 معاينة
               </DropdownMenuItem>
@@ -437,7 +444,15 @@ function ProjectCard({ project }: { project: IProject }) {
           <Edit className="h-3.5 w-3.5" />
           تعديل
         </Button>
-        <Button size="sm" variant="secondary" className="w-full gap-1">
+        <Button size="sm" variant="secondary" className="w-full gap-1"
+          onClick={() => {
+            const domain = useAuthStore.getState().userData?.domain || "";
+            const url = domain.startsWith("http")
+              ? `${domain}project/${project.contents?.[0]?.title}`
+              : `https://${domain}/project/${project.contents?.[0]?.title}`;
+            window.open(url, "_blank");
+          }}
+          >
           <ExternalLink className="h-3.5 w-3.5" />
           معاينة
         </Button>
@@ -515,7 +530,15 @@ function ProjectListItem({ project }: { project: IProject }) {
                 <Edit className="mr-1 h-3.5 w-3.5" />
                 تعديل
               </Button>
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm"
+                onClick={() => {
+                  const domain = useAuthStore.getState().userData?.domain || "";
+                  const url = domain.startsWith("http")
+                    ? `${domain}project/${project.contents?.[0]?.title}`
+                    : `https://${domain}/project/${project.contents?.[0]?.title}`;
+                  window.open(url, "_blank");
+                }}
+                >
                 <ExternalLink className="mr-1 h-3.5 w-3.5" />
                 معاينة
               </Button>

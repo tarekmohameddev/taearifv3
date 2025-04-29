@@ -246,7 +246,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
 
           {useAuthStore.getState().UserIslogged && (
             <>
-              {useAuthStore.getState().userData?.days_remaining !==
+              {useAuthStore.getState().userData?.package_title !==
                 undefined && (
                 <Button
                   variant={
@@ -258,13 +258,13 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                   className={
                     useAuthStore.getState().userData.is_free_plan
                       ? "hidden md:flex gap-1"
-                      : "bg-amber-100 text-amber-800"
+                      : "bg-amber-100 text-amber-800 hidden md:flex"
                   }
                   onClick={clickedONButton}
                 >
                   <Link href="/settings">
                     {useAuthStore.getState().userData.is_free_plan
-                      ? `الباقة المجانية : عدد الأيام المتبقية هو ${useAuthStore.getState().userData.days_remaining}`
+                      ? `الباقة المجانية`
                       : useAuthStore.getState().userData.package_title}
                   </Link>
                   {useAuthStore.getState().userData.is_free_plan ? (
@@ -376,7 +376,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
       <div className="flex h-5 items-center justify-center border-b px-4 md:px-6 md:hidden ">
         {useAuthStore.getState().UserIslogged && (
           <>
-            {useAuthStore.getState().userData?.days_remaining !== undefined && (
+            {useAuthStore.getState().userData?.package_title !== undefined && (
               <Button
                 variant={
                   useAuthStore.getState().userData.is_free_plan
@@ -393,7 +393,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
               >
                 <Link href="/settings">
                   {useAuthStore.getState().userData.is_free_plan
-                    ? `الباقة المجانية : عدد الأيام المتبقية هو ${useAuthStore.getState().userData.days_remaining}`
+                    ? `الباقة المجانية `
                     : useAuthStore.getState().userData.package_title}
                 </Link>
                 {!useAuthStore.getState().userData.is_free_plan && (

@@ -517,7 +517,15 @@ function PropertyCard({
                 <Edit className="mr-2 h-4 w-4" />
                 تعديل
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const domain = useAuthStore.getState().userData?.domain || "";
+                  const url = domain.startsWith("http")
+                    ? `${domain}property/${property.title}`
+                    : `https://${domain}/property/${property.title}`;
+                  window.open(url, "_blank");
+                }}
+              >
                 <ExternalLink className="mr-2 h-4 w-4" />
                 معاينة
               </DropdownMenuItem>
@@ -623,7 +631,15 @@ function PropertyCard({
           <Edit className="h-3.5 w-3.5" />
           تعديل
         </Button>
-        <Button size="sm" variant="secondary" className="w-full gap-1">
+        <Button size="sm" variant="secondary" className="w-full gap-1"
+                        onClick={() => {
+                          const domain = useAuthStore.getState().userData?.domain || "";
+                          const url = domain.startsWith("http")
+                            ? `${domain}property/${property.title}`
+                            : `https://${domain}/property/${property.title}`;
+                          window.open(url, "_blank");
+                        }}
+                        >
           <ExternalLink className="h-3.5 w-3.5" />
           معاينة
         </Button>
@@ -746,7 +762,15 @@ function PropertyListItem({
               <Edit className="mr-1 h-3.5 w-3.5" />
               تعديل
             </Button>
-            <Button variant="secondary" size="sm">
+            <Button variant="secondary" size="sm"
+                onClick={() => {
+                              const domain = useAuthStore.getState().userData?.domain || "";
+                              const url = domain.startsWith("http")
+                                ? `${domain}property/${property.title}`
+                                : `https://${domain}/property/${property.title}`;
+                              window.open(url, "_blank");
+                            }}
+            >
               <ExternalLink className="mr-1 h-3.5 w-3.5" />
               معاينة
             </Button>

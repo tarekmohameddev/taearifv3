@@ -334,7 +334,7 @@ export default function AddProjectPage(): JSX.Element {
   };
 
   const handleSaveProject = async (
-    status: "منشور" | "مسودة" | "Pre-construction",
+    status_publish: "منشور" | "مسودة" | "Pre-construction",
   ) => {
     if (!validateForm()) {
       toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
@@ -436,7 +436,7 @@ export default function AddProjectPage(): JSX.Element {
       } else {
         formattedDate = "";
       }
-      const publishedValue = status === "منشور" ? 1 : 0;
+      const publishedValue = status_publish === "منشور" ? 1 : 0;
 
       const projectData = {
         featured_image: featuredImagePath,
@@ -445,7 +445,7 @@ export default function AddProjectPage(): JSX.Element {
         latitude: parseFloat(convertedLatitude),
         longitude: parseFloat(convertedLongitude),
         featured: newProject.featured,
-        complete_status: status === "منشور" ? "In Progress" : status,
+        complete_status: newProject.status === "منتهي" ? 1 : 0,
         units: Number(convertedUnits),
         completion_date: formattedDate,
         developer: newProject.developer,
