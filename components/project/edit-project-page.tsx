@@ -443,7 +443,6 @@ console.log("newProject",newProject)
         typeof amenitiesNAMES === "string"
           ? amenitiesNAMES.split(",").map((item) => item.trim())
           : [];
-console.log("newProject.complete_status",newProject.complete_status)
       const projectData = {
         featured_image: thumbnailImage.url,
         min_price: minPrice,
@@ -452,9 +451,7 @@ console.log("newProject.complete_status",newProject.complete_status)
         longitude: newProject.longitude,
         featured: newProject.featured,
         complete_status:
-          newProject.complete_status === "In Progress"
-            ? 0 
-            : 1,
+          newProject.complete_status,
         units: Number(newProject.units),
         completion_date: formattedDate,
         developer: newProject.developer,
@@ -670,8 +667,8 @@ console.log("newProject.complete_status",newProject.complete_status)
       <SelectValue placeholder="اختر الحالة" />
     </SelectTrigger>
     <SelectContent>
-      <SelectItem value="In Progress">قيد الإنشاء</SelectItem>
-      <SelectItem value="Completed">منتهي</SelectItem>
+      <SelectItem value="0">قيد الإنشاء</SelectItem>
+      <SelectItem value="1">منتهي</SelectItem>
     </SelectContent>
   </Select>
   {formErrors.status && (
