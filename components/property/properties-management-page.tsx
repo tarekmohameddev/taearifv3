@@ -635,8 +635,8 @@ function PropertyCard({
                         onClick={() => {
                           const domain = useAuthStore.getState().userData?.domain || "";
                           const url = domain.startsWith("http")
-                            ? `${domain}property/${property.title}`
-                            : `https://${domain}/property/${property.title}`;
+                            ? `${domain}property/${property.slug}`
+                            : `https://${domain}/property/${property.slug}`;
                           window.open(url, "_blank");
                         }}
                         >

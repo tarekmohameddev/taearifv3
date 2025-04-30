@@ -511,6 +511,8 @@ export default function AddPropertyPage() {
                         <SelectContent>
                           <SelectItem value="sale">للبيع</SelectItem>
                           <SelectItem value="rent">للإيجار</SelectItem>
+                          <SelectItem value="sold">مباعة</SelectItem>
+                          <SelectItem value="rented">مؤجرة</SelectItem>
                         </SelectContent>
                       </Select>
                       {errors.transaction_type && (

@@ -133,9 +133,28 @@ export function ContentManagementPage() {
       toast.error(`يرجى إدخال اسم للقسم`);
       return;
     }
-
+  
+    const newSection = {
+      id: newId,
+      title: newSectionName,
+      description: newSectionDescription,
+      icon: newSectionIcon,
+      path: `/content/${newId}`,
+      status: newSectionStatus,
+      count: 0,
+      info: {
+        email: newSectionDescription,
+        website: null,
+      },
+      badge: newSectionStatus
+        ? { label: "قسم نشط", color: randomColor }
+        : null,
+      lastUpdate: new Date().toISOString(),
+      lastUpdateFormatted: "آخر تحديث الآن",
+    };
+  
     setContentManagement({
-      sections: [...sections],
+      sections: [...sections, newSection],
       newSectionName: "",
       newSectionDescription: "",
       newSectionStatus: true,
@@ -349,74 +368,70 @@ export function ContentManagementPage() {
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {sections.map((section) => {
-                const IconComponent =
-                  availableIcons[section.icon] || availableIcons["FileText"];
-                return (
-                  <Link href={section.path} key={section.id}>
-                    <Card
-                      className={`h-full cursor-pointer transition-all hover:shadow-md ${
-                        section.status === "inactive"
-                          ? "opacity-70 border-dashed"
-                          : ""
-                      }`}
-                    >
-                      <CardHeader className="flex flex-row items-start justify-between p-6">
-                        <div className="flex flex-col gap-1">
-                          <CardTitle className="flex items-center gap-2 text-lg">
-                            <IconComponent className="h-5 w-5 text-muted-foreground" />
-                            {section.title}
-                            {section.status === 1 ? (
-                              <Badge
-                                variant="outline"
-                                className="bg-green-50 text-green-700 border-green-200 ml-2"
-                              >
-                                نشط
-                              </Badge>
-                            ) : (
-                              <Badge
-                                variant="outline"
-                                className="bg-gray-50 text-gray-700 border-gray-200 ml-2"
-                              >
-                                غير نشط
-                              </Badge>
-                            )}
-                          </CardTitle>
-                          <CardDescription>
-                            {section.description}
-                          </CardDescription>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="px-6 pb-6">
-                        {section.count !== undefined && (
-                          <Badge
-                            variant="secondary"
-                            className={`mb-4 ${section.badge?.color}`}
-                          >
-                            {section.count} {section.badge?.label}
-                          </Badge>
-                        )}
-                        {section.info && (
-                          <div className="space-y-2 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                              <Globe className="h-4 w-4" />
-                              <span>{section.info.website}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MessageSquare className="h-4 w-4" />
-                              <span>{section.info.email}</span>
-                            </div>
-                          </div>
-                        )}
-                        <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4" />
-                          <span>{section.lastUpdateFormatted}</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                );
-              })}
+            {sections.map((section) => {
+  const IconComponent = availableIcons[section.icon] || availableIcons["FileText"];
+  return (
+    <Link href={section.path} key={section.id}>
+      <Card
+        className={`h-full cursor-pointer transition-all hover:shadow-md ${
+          !section.status ? "opacity-70 border-dashed" : ""
+        }`}
+      >
+        <CardHeader className="flex flex-row items-start justify-between p-6">
+          <div className="flex flex-col gap-1">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <IconComponent className="h-5 w-5 text-muted-foreground" />
+              {section.title}
+              {section.status ? (
+                <Badge
+                  variant="outline"
+                  className="bg-green-50 text-green-700 border-green-200 ml-2"
+                >
+                  نشط
+                </Badge>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="bg-gray-50 text-gray-700 border-gray-200 ml-2"
+                >
+                  غير نشط
+                </Badge>
+              )}
+            </CardTitle>
+            <CardDescription>{section.description}</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="px-6 pb-6">
+          {section.badge && (
+            <Badge variant="secondary" className={`mb-4 ${section.badge.color}`}>
+              {section.count > 0 ? `${section.count} ${section.badge.label}` : section.badge.label}
+            </Badge>
+          )}
+          {section.info && (
+            <div className="space-y-2 text-sm text-muted-foreground">
+              {section.info.website && (
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  <span>{section.info.website}</span>
+                </div>
+              )}
+              {section.info.email && (
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  <span>{section.info.email}</span>
+                </div>
+              )}
+            </div>
+          )}
+          <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="h-4 w-4" />
+            <span>{section.lastUpdateFormatted}</span>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+})}
               <Card
                 className="flex h-full cursor-pointer flex-col items-center justify-center border-dashed p-6 text-center transition-colors hover:bg-muted/50"
                 onClick={() => setNewSectionDialogOpen(true)}

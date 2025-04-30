@@ -534,8 +534,8 @@ function ProjectListItem({ project }: { project: IProject }) {
                 onClick={() => {
                   const domain = useAuthStore.getState().userData?.domain || "";
                   const url = domain.startsWith("http")
-                    ? `${domain}project/${project.contents?.[0]?.title}`
-                    : `https://${domain}/project/${project.contents?.[0]?.title}`;
+                    ? `${domain}project/${project.contents?.[0]?.slug}`
+                    : `https://${domain}/project/${project.contents?.[0]?.slug}`;
                   window.open(url, "_blank");
                 }}
                 >

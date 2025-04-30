@@ -107,7 +107,9 @@ export default function AddProjectPage(): JSX.Element {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [mapLoaded, setMapLoaded] = useState<boolean>(false);
   const { setProjectsManagement } = useStore();
-
+  useEffect(() => {
+console.log("newProject",newProject)
+  }, [newProject]);
   useEffect(() => {
     const fetchProjectData = async () => {
       try {
@@ -121,6 +123,7 @@ export default function AddProjectPage(): JSX.Element {
           Array.isArray(projectData.contents) &&
           projectData.contents.length > 0
         ) {
+          console.log("projectData", projectData);
           setNewProject({
             id: projectData.id,
             name: projectData.contents[0].title,
@@ -338,33 +341,33 @@ export default function AddProjectPage(): JSX.Element {
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
-    if (!newProject.name.trim()) {
+    if (!newProject.name) {
       errors.name = "اسم المشروع مطلوب";
     }
-    if (!newProject.location.trim()) {
-      errors.location = "الموقع مطلوب";
-    }
-    if (!newProject.price.trim()) {
-      errors.price = "السعر مطلوب";
-    }
-    if (!newProject.complete_status) {
-      errors.status = "الحالة مطلوبة";
-    }
-    if (!newProject.completion_date.trim()) {
-      errors.completion_date = "تاريخ الإنجاز مطلوب";
-    }
-    if (!newProject.developer.trim()) {
-      errors.developer = "المطور مطلوب";
-    }
-    if (!newProject.description.trim()) {
-      errors.description = "الوصف مطلوب";
-    }
+    // if (!newProject.location) {
+    //   errors.location = "الموقع مطلوب";
+    // }
+    // if (!newProject.price) {
+    //   errors.price = "السعر مطلوب";
+    // }
+    // if (!newProject.complete_status) {
+    //   errors.status = "الحالة مطلوبة";
+    // }
+    // if (!newProject.completion_date) {
+    //   errors.completion_date = "تاريخ الإنجاز مطلوب";
+    // }
+    // if (!newProject.developer) {
+    //   errors.developer = "المطور مطلوب";
+    // }
+    // if (!newProject.description) {
+    //   errors.description = "الوصف مطلوب";
+    // }
     if (!thumbnailImage) {
       errors.thumbnail = "صورة المشروع الرئيسية مطلوبة";
     }
-    if (isNaN(newProject.latitude) || isNaN(newProject.longitude)) {
-      errors.coordinates = "إحداثيات الموقع غير صحيحة";
-    }
+    // if (isNaN(newProject.latitude) || isNaN(newProject.longitude)) {
+    //   errors.coordinates = "إحداثيات الموقع غير صحيحة";
+    // }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -440,7 +443,7 @@ export default function AddProjectPage(): JSX.Element {
         typeof amenitiesNAMES === "string"
           ? amenitiesNAMES.split(",").map((item) => item.trim())
           : [];
-
+console.log("newProject.complete_status",newProject.complete_status)
       const projectData = {
         featured_image: thumbnailImage.url,
         min_price: minPrice,
@@ -449,11 +452,9 @@ export default function AddProjectPage(): JSX.Element {
         longitude: newProject.longitude,
         featured: newProject.featured,
         complete_status:
-          newProject.status === "قيد الإنشاء" ? "in progress" : "completed",
-        complete_status:
-          newProject.complete_status === "قيد الإنشاء"
-            ? "in progress"
-            : "completed",
+          newProject.complete_status === "In Progress"
+            ? 0 
+            : 1,
         units: Number(newProject.units),
         completion_date: formattedDate,
         developer: newProject.developer,
@@ -655,29 +656,30 @@ export default function AddProjectPage(): JSX.Element {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="complete_status">الحالة</Label>
-                    <Select
-                      onValueChange={(value) =>
-                        handleSelectChange("complete_status", value)
-                      }
-                    >
-                      <SelectTrigger
-                        id="status"
-                        className={formErrors.status ? "border-red-500" : ""}
-                      >
-                        <SelectValue placeholder="اختر الحالة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="قيد الإنشاء">قيد الإنشاء</SelectItem>
-                        <SelectItem value="منتهي">منتهي</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {formErrors.status && (
-                      <p className="text-xs text-red-500">
-                        {formErrors.status}
-                      </p>
-                    )}
-                  </div>
+  <Label htmlFor="complete_status">الحالة</Label>
+  <Select
+    onValueChange={(value) =>
+      handleSelectChange("complete_status", value)
+    }
+    value={newProject.complete_status || ""}
+  >
+    <SelectTrigger
+      id="status"
+      className={formErrors.status ? "border-red-500" : ""}
+    >
+      <SelectValue placeholder="اختر الحالة" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="In Progress">قيد الإنشاء</SelectItem>
+      <SelectItem value="Completed">منتهي</SelectItem>
+    </SelectContent>
+  </Select>
+  {formErrors.status && (
+    <p className="text-xs text-red-500">
+      {formErrors.status}
+    </p>
+  )}
+</div>
                   <div className="grid gap-2">
                     <Label htmlFor="completion_date">تاريخ الإنجاز</Label>
                     <Input
