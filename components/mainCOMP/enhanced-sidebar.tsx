@@ -33,25 +33,25 @@ interface EnhancedSidebarProps {
 const getIconComponent = (iconName: string) => {
   switch (iconName) {
     case "panel":
-      return LayoutDashboard; 
+      return LayoutDashboard;
     case "content-settings":
-      return FileText; 
+      return FileText;
     case "web-settings":
-      return Settings; 
+      return Settings;
     case "building":
-      return Building2; 
+      return Building2;
     case "home":
-      return Home; 
+      return Home;
     case "message":
-      return MessageSquare; 
+      return MessageSquare;
     case "package":
-      return Package; 
+      return Package;
     case "users":
-      return Users; 
+      return Users;
     case "external-link":
-      return ExternalLink; 
+      return ExternalLink;
     default:
-      return FileText; 
+      return FileText;
   }
 };
 
@@ -65,7 +65,7 @@ export function EnhancedSidebar({
   const [internalActiveTab, setInternalActiveTab] = useState<string>(
     activeTab || "dashboard",
   );
-  const [mainNavItems, setMainNavItems] = useState<any[]>([]); 
+  const [mainNavItems, setMainNavItems] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchSideMenus = async () => {
@@ -73,11 +73,11 @@ export function EnhancedSidebar({
         const response = await axiosInstance.get("/settings/side-menus");
         const sections = response.data.data.sections;
         const items = sections.map((section: any) => ({
-          id: section.path.split("/").pop(), 
-          label: section.title, 
-          description: section.description, 
-          icon: getIconComponent(section.icon), 
-          path: section.path, 
+          id: section.path.split("/").pop(),
+          label: section.title,
+          description: section.description,
+          icon: getIconComponent(section.icon),
+          path: section.path,
         }));
         setMainNavItems(items);
       } catch (error) {

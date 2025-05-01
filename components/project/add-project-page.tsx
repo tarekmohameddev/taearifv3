@@ -509,6 +509,7 @@ export default function AddProjectPage(): JSX.Element {
 
       const currentState = useStore.getState();
       const createdProject = response.data.user_project;
+      console.log("Created project:", createdProject);
       const updatedProjects = [
         createdProject,
         ...currentState.projectsManagement.projects,

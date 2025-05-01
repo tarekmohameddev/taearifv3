@@ -36,9 +36,9 @@ import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
-import useStore from "@/context/Store";
 import { uploadSingleFile } from "@/utils/uploadSingle";
 import { uploadMultipleFiles } from "@/utils/uploadMultiple";
+import useStore from "@/context/Store";
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -72,7 +72,11 @@ interface INewProject {
 export const metadata = {
   title: "Project Edit",
 };
-export default function AddProjectPage(): JSX.Element {
+export default function EditProjectPage(): JSX.Element {
+  const {
+    projectsManagement: { projects, loading, isInitialized },
+    setProjectsManagement,
+  } = useStore();
   const router = useRouter();
   const { id } = useParams();
   const [originalData, setOriginalData] = useState(null);
@@ -106,9 +110,8 @@ export default function AddProjectPage(): JSX.Element {
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [mapLoaded, setMapLoaded] = useState<boolean>(false);
-  const { setProjectsManagement } = useStore();
   useEffect(() => {
-console.log("newProject",newProject)
+    console.log("newProject", newProject);
   }, [newProject]);
   useEffect(() => {
     const fetchProjectData = async () => {
@@ -383,6 +386,7 @@ console.log("newProject",newProject)
 
     setIsLoading(true);
     setSubmitError(null);
+
     try {
       let minPrice = 0;
       let maxPrice = 0;
@@ -404,7 +408,7 @@ console.log("newProject",newProject)
       if (thumbnailImage) {
         if (!thumbnailImage.url.startsWith("https://taearif.com/")) {
           const uploadResult = await uploadSingleFile(
-            thumbnailImage.file, // استخدم ملف الصورة الفعلي
+            thumbnailImage.file,
             "project",
           );
           featuredImageUrl = uploadResult.url;
@@ -417,7 +421,6 @@ console.log("newProject",newProject)
       if (planImages.length > 0) {
         const files = planImages.map((image) => image.file);
         const uploadResults = await uploadMultipleFiles(files, "project");
-
         if (uploadResults && Array.isArray(uploadResults)) {
           floorplanUrls = uploadResults.map((file) => file.url);
         } else {
@@ -429,9 +432,8 @@ console.log("newProject",newProject)
       if (galleryImages.length > 0) {
         const files = galleryImages.map((image) => image.file);
         const uploadResults = await uploadMultipleFiles(files, "project");
-
         if (uploadResults && Array.isArray(uploadResults)) {
-          galleryUrls = uploadResults.map((file) => file.url); // استخراج الروابط
+          galleryUrls = uploadResults.map((file) => file.url);
         } else {
           console.error(
             "Error: uploadResults does not contain files array",
@@ -439,19 +441,20 @@ console.log("newProject",newProject)
           );
         }
       }
+
       const amenitiesArray =
         typeof amenitiesNAMES === "string"
           ? amenitiesNAMES.split(",").map((item) => item.trim())
           : [];
+
       const projectData = {
-        featured_image: thumbnailImage.url,
+        featured_image: featuredImageUrl,
         min_price: minPrice,
         max_price: maxPrice,
         latitude: newProject.latitude,
         longitude: newProject.longitude,
         featured: newProject.featured,
-        complete_status:
-          newProject.complete_status,
+        complete_status: newProject.complete_status,
         units: Number(newProject.units),
         completion_date: formattedDate,
         developer: newProject.developer,
@@ -512,15 +515,36 @@ console.log("newProject",newProject)
       );
       toast.success("تم الحفظ بنجاح");
 
-      const currentState = useStore.getState();
-      const updatedProjects = currentState.projectsManagement.projects.map(
-        (proj) => (proj.id === id ? { ...proj, ...response.data.data } : proj),
-      );
-
-      setProjectsManagement({
-        projects: updatedProjects,
-        pagination: currentState.projectsManagement.pagination,
+      const updatedProject = response.data.data?.user_project || response.data;
+      console.log("Test", {
+        ...updatedProject,
+        name: newProject.name,
+        location: newProject.location,
+        price: newProject.price,
+        status: status === "منشور" ? 1 : 0,
+        featured: newProject.featured ? 1 : 0,
+        description: newProject.description,
+        completion_date: formattedDate,
+        developer: newProject.developer,
+        units: Number(newProject.units),
+        amenities: amenitiesArray,
       });
+
+      if (updatedProject) {
+        useStore.getState().updateProject(id, {
+          ...updatedProject.user_project,
+          name: newProject.name,
+          location: newProject.location,
+          price: newProject.price,
+          status: status === "منشور" ? 1 : 0,
+          featured: newProject.featured ? 1 : 0,
+          description: newProject.description,
+          completion_date: formattedDate,
+          developer: newProject.developer,
+          units: Number(newProject.units),
+          amenities: amenitiesArray,
+        });
+      }
 
       router.push("/projects");
     } catch (error) {
@@ -653,30 +677,30 @@ console.log("newProject",newProject)
                     />
                   </div>
                   <div className="grid gap-2">
-  <Label htmlFor="complete_status">الحالة</Label>
-  <Select
-    onValueChange={(value) =>
-      handleSelectChange("complete_status", value)
-    }
-    value={newProject.complete_status || ""}
-  >
-    <SelectTrigger
-      id="status"
-      className={formErrors.status ? "border-red-500" : ""}
-    >
-      <SelectValue placeholder="اختر الحالة" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="0">قيد الإنشاء</SelectItem>
-      <SelectItem value="1">منتهي</SelectItem>
-    </SelectContent>
-  </Select>
-  {formErrors.status && (
-    <p className="text-xs text-red-500">
-      {formErrors.status}
-    </p>
-  )}
-</div>
+                    <Label htmlFor="complete_status">الحالة</Label>
+                    <Select
+                      onValueChange={(value) =>
+                        handleSelectChange("complete_status", value)
+                      }
+                      value={newProject.complete_status || ""}
+                    >
+                      <SelectTrigger
+                        id="status"
+                        className={formErrors.status ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder="اختر الحالة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0">قيد الإنشاء</SelectItem>
+                        <SelectItem value="1">منتهي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {formErrors.status && (
+                      <p className="text-xs text-red-500">
+                        {formErrors.status}
+                      </p>
+                    )}
+                  </div>
                   <div className="grid gap-2">
                     <Label htmlFor="completion_date">تاريخ الإنجاز</Label>
                     <Input

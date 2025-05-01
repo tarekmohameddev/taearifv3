@@ -121,7 +121,6 @@ export function PropertiesManagementPage() {
     router.push("/settings");
   };
 
-
   const normalizedProperties = useMemo(() => {
     return properties.map((property) => ({
       ...property,
@@ -345,7 +344,7 @@ export function PropertiesManagementPage() {
                       useAuthStore.getState().userData
                         ?.real_estate_limit_number;
                     if (propertiesLength >= limit) {
-                      setIsLimitReached(true); 
+                      setIsLimitReached(true);
                     } else {
                       router.push("/properties/add");
                     }
@@ -375,9 +374,7 @@ export function PropertiesManagementPage() {
                   >
                     إلغاء
                   </Button>
-                  <Button onClick={clickedONButton}>
-                    اشتراك
-                  </Button>
+                  <Button onClick={clickedONButton}>اشتراك</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -631,15 +628,18 @@ function PropertyCard({
           <Edit className="h-3.5 w-3.5" />
           تعديل
         </Button>
-        <Button size="sm" variant="secondary" className="w-full gap-1"
-                        onClick={() => {
-                          const domain = useAuthStore.getState().userData?.domain || "";
-                          const url = domain.startsWith("http")
-                            ? `${domain}property/${property.slug}`
-                            : `https://${domain}/property/${property.slug}`;
-                          window.open(url, "_blank");
-                        }}
-                        >
+        <Button
+          size="sm"
+          variant="secondary"
+          className="w-full gap-1"
+          onClick={() => {
+            const domain = useAuthStore.getState().userData?.domain || "";
+            const url = domain.startsWith("http")
+              ? `${domain}property/${property.slug}`
+              : `https://${domain}/property/${property.slug}`;
+            window.open(url, "_blank");
+          }}
+        >
           <ExternalLink className="h-3.5 w-3.5" />
           معاينة
         </Button>
@@ -762,14 +762,16 @@ function PropertyListItem({
               <Edit className="mr-1 h-3.5 w-3.5" />
               تعديل
             </Button>
-            <Button variant="secondary" size="sm"
-                onClick={() => {
-                              const domain = useAuthStore.getState().userData?.domain || "";
-                              const url = domain.startsWith("http")
-                                ? `${domain}property/${property.title}`
-                                : `https://${domain}/property/${property.title}`;
-                              window.open(url, "_blank");
-                            }}
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                const domain = useAuthStore.getState().userData?.domain || "";
+                const url = domain.startsWith("http")
+                  ? `${domain}property/${property.title}`
+                  : `https://${domain}/property/${property.title}`;
+                window.open(url, "_blank");
+              }}
             >
               <ExternalLink className="mr-1 h-3.5 w-3.5" />
               معاينة

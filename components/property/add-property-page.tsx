@@ -41,6 +41,8 @@ import { uploadSingleFile } from "@/utils/uploadSingle";
 import { uploadMultipleFiles } from "@/utils/uploadMultiple";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import CitySelector from "@/components/CitySelector";
+import DistrictSelector from "@/components/DistrictSelector";
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -59,6 +61,8 @@ export default function AddPropertyPage() {
     propertiesManagement: { properties, loading, isInitialized },
     setPropertiesManagement,
     fetchProperties,
+    cities,
+    neighborhoods,
   } = useStore();
   const [submitError, setSubmitError] = useState(null);
   const { userData, fetchUserData } = useAuthStore();
@@ -81,6 +85,8 @@ export default function AddPropertyPage() {
     featured: false,
     latitude: 24.766316905850978,
     longitude: 46.73579692840576,
+    city_id: null,
+    district_id: null,
   });
   const [errors, setErrors] = useState({});
   const [images, setImages] = useState({
@@ -329,7 +335,8 @@ export default function AddPropertyPage() {
           longitude: formData.longitude,
           featured: formData.featured,
           area: parseInt(formData.size),
-          city_id: 1,
+          city_id: formData.city_id,
+          district_id: formData.district_id,
           category_id: parseInt(formData.category),
         };
 
@@ -589,6 +596,31 @@ export default function AddPropertyPage() {
                       {errors.project && (
                         <p className="text-sm text-red-500">{errors.project}</p>
                       )}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex flex-col space-y-2">
+                        <Label htmlFor="city" className="mb-1">
+                          اختر المدينة
+                        </Label>
+                        <CitySelector
+                    selectedCityId={formData.city_id}
+                    onCitySelect={(cityId) =>
+                      setFormData((prev) => ({ ...prev, city_id: cityId }))
+                    }
+                  />
+                      </div>
+
+                      <div className="flex flex-col space-y-2">
+                        <Label htmlFor="neighborhood" className="mb-1">
+                          اختر الحي
+                        </Label>
+                        <DistrictSelector
+      selectedDistrictId={formData.district_id}
+      onDistrictSelect={(districtId) => setFormData((prev) => ({ ...prev, district_id: districtId }))}
+    />
+                      </div>
                     </div>
                   </div>
                 </CardContent>

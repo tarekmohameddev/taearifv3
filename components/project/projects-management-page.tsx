@@ -331,19 +331,45 @@ function ProjectCard({ project }: { project: IProject }) {
             className="h-full w-full object-cover transition-all hover:scale-105"
           />
         </div>
-        {project.featured === 1 && (
+        {typeof project.published === "number" ? (
+          /* إذا كانت قيمة published رقم (مثلاً 1) */
+          project.featured == 1 ? (
+            <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
+              مميز
+            </div>
+          ) : (
+            ""
+          )
+        ) : /* خلاف ذلك نفترض أنها boolean */
+        project.featured === true ? (
           <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
             مميز
           </div>
+        ) : (
+          ""
         )}
         <div
           className={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-medium ${
-            project.published === true
-              ? "bg-green-500 text-white"
-              : "bg-amber-500 text-white"
+            typeof project.published === "number"
+              ? /* إذا كانت قيمة published رقم (مثلاً 1) */
+                project.published == 1
+                ? "bg-green-500 text-white"
+                : "bg-amber-500 text-white"
+              : /* خلاف ذلك نفترض أنها boolean */
+                project.published === true
+                ? "bg-green-500 text-white"
+                : "bg-amber-500 text-white"
           }`}
         >
-          {project.published === true ? "منشور" : "مسودة"}
+          {typeof project.published === "number"
+            ? /* إذا كانت قيمة published رقم (مثلاً 1) */
+              project.published == 1
+              ? "منشور"
+              : "مسودة"
+            : /* خلاف ذلك نفترض أنها boolean */
+              project.published === true
+              ? "منشور"
+              : "مسودة"}
         </div>
       </div>
       <CardHeader className="p-4">
@@ -371,13 +397,14 @@ function ProjectCard({ project }: { project: IProject }) {
                 تعديل
               </DropdownMenuItem>
               <DropdownMenuItem
-                              onClick={() => {
-                                const domain = useAuthStore.getState().userData?.domain || "";
-                                const url = domain.startsWith("http")
-                                  ? `${domain}project/${project.contents?.[0]?.title}`
-                                  : `https://${domain}/project/${project.contents?.[0]?.title}`;
-                                window.open(url, "_blank");
-                              }}>
+                onClick={() => {
+                  const domain = useAuthStore.getState().userData?.domain || "";
+                  const url = domain.startsWith("http")
+                    ? `${domain}project/${project.contents?.[0]?.slug}`
+                    : `https://${domain}/project/${project.contents?.[0]?.slug}`;
+                  window.open(url, "_blank");
+                }}
+              >
                 <ExternalLink className="mr-2 h-4 w-4" />
                 معاينة
               </DropdownMenuItem>
@@ -444,15 +471,18 @@ function ProjectCard({ project }: { project: IProject }) {
           <Edit className="h-3.5 w-3.5" />
           تعديل
         </Button>
-        <Button size="sm" variant="secondary" className="w-full gap-1"
+        <Button
+          size="sm"
+          variant="secondary"
+          className="w-full gap-1"
           onClick={() => {
             const domain = useAuthStore.getState().userData?.domain || "";
             const url = domain.startsWith("http")
-              ? `${domain}project/${project.contents?.[0]?.title}`
-              : `https://${domain}/project/${project.contents?.[0]?.title}`;
+              ? `${domain}project/${project.contents?.[0]?.slug}`
+              : `https://${domain}/project/${project.contents?.[0]?.slug}`;
             window.open(url, "_blank");
           }}
-          >
+        >
           <ExternalLink className="h-3.5 w-3.5" />
           معاينة
         </Button>
@@ -479,10 +509,23 @@ function ProjectListItem({ project }: { project: IProject }) {
               className="h-full w-full object-cover"
             />
           </div>
-          {project.featured === 1 && (
+
+          {typeof project.published === "number" ? (
+            /* إذا كانت قيمة published رقم (مثلاً 1) */
+            project.featured == 1 ? (
+              <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
+                مميز
+              </div>
+            ) : (
+              ""
+            )
+          ) : /* خلاف ذلك نفترض أنها boolean */
+          project.featured === true ? (
             <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
               مميز
             </div>
+          ) : (
+            ""
           )}
           <div
             className={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-medium ${
@@ -530,7 +573,9 @@ function ProjectListItem({ project }: { project: IProject }) {
                 <Edit className="mr-1 h-3.5 w-3.5" />
                 تعديل
               </Button>
-              <Button variant="secondary" size="sm"
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => {
                   const domain = useAuthStore.getState().userData?.domain || "";
                   const url = domain.startsWith("http")
@@ -538,7 +583,7 @@ function ProjectListItem({ project }: { project: IProject }) {
                     : `https://${domain}/project/${project.contents?.[0]?.slug}`;
                   window.open(url, "_blank");
                 }}
-                >
+              >
                 <ExternalLink className="mr-1 h-3.5 w-3.5" />
                 معاينة
               </Button>

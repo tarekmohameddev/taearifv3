@@ -279,7 +279,7 @@ export default function EditPropertyPage() {
     // if (!formData.price) newErrors.price = "السعر مطلوب";
     // if (!formData.type) newErrors.type = "نوع العقار مطلوب";
     // if (!formData.transaction_type)
-      // newErrors.transaction_type = "نوع القائمة مطلوب";
+    // newErrors.transaction_type = "نوع القائمة مطلوب";
     // if (!formData.bedrooms) newErrors.bedrooms = "عدد غرف النوم مطلوب";
     // if (!formData.bathrooms) newErrors.bathrooms = "عدد الحمامات مطلوب";
     // if (!formData.area) newErrors.area = "مساحة العقار مطلوبة";
@@ -287,7 +287,7 @@ export default function EditPropertyPage() {
     if (!previews.thumbnail && !images.thumbnail)
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
     // if (previews.gallery.length === 0 && images.gallery.length === 0)
-      // newErrors.gallery = "يجب إضافة صورة واحدة على الأقل في معرض الصور";
+    // newErrors.gallery = "يجب إضافة صورة واحدة على الأقل في معرض الصور";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -298,7 +298,7 @@ export default function EditPropertyPage() {
       setSubmitError(null); // إعادة تعيين رسالة الخطأ عند كل محاولة
       setIsLoading(true);
       setUploading(true);
-      
+
       try {
         let thumbnailUrl: string | null = null;
         let galleryUrls: string[] = [];
@@ -350,7 +350,7 @@ export default function EditPropertyPage() {
           city_id: 1,
           category_id: 1,
         };
-const response = await axiosInstance.post(
+        const response = await axiosInstance.post(
           `/properties/${id}`,
           propertyData,
         );
@@ -361,7 +361,7 @@ const response = await axiosInstance.post(
 
         const currentState = useStore.getState();
         const updatedProperty = response.data.user_property;
-updatedProperty.status =
+        updatedProperty.status =
           updatedProperty.status === 1 ? "منشور" : "مسودة";
         const updatedProperties =
           currentState.propertiesManagement.properties.map((prop) =>
@@ -522,74 +522,74 @@ updatedProperty.status =
                     </div>
                   </div>
 
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                      <Label htmlFor="category">نوع العقار</Label>
-                                      <Select
-                                        name="category"
-                                        value={formData.category}
-                                        onValueChange={(value) =>
-                                          setFormData((prev) => ({ ...prev, category: value }))
-                                        }
-                                      >
-                                        <SelectTrigger
-                                          id="category"
-                                          className={errors.category ? "border-red-500" : ""}
-                                        >
-                                          <SelectValue placeholder="اختر النوع" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          {categories.map((category) => (
-                                            <SelectItem
-                                              key={category.id}
-                                              value={category.id.toString()}
-                                            >
-                                              {category.name}
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
-                                      {errors.category && (
-                                        <p className="text-sm text-red-500">
-                                          {errors.category}
-                                        </p>
-                                      )}
-                                    </div>
-                
-                                    <div className="space-y-2">
-                                      <Label htmlFor="project">المشروع</Label>
-                                      <Select
-                                        name="project"
-                                        value={formData.project_id}
-                                        onValueChange={(value) =>
-                                          setFormData((prev) => ({
-                                            ...prev,
-                                            project_id: value,
-                                          }))
-                                        }
-                                      >
-                                        <SelectTrigger
-                                          id="project"
-                                          className={errors.project_id ? "border-red-500" : ""}
-                                        >
-                                          <SelectValue placeholder="اختر المشروع" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          {projects.map((project) => (
-                                            <SelectItem
-                                              key={project.id}
-                                              value={project.id.toString()}
-                                            >
-                                              {project.title}
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
-                                      {errors.project && (
-                                        <p className="text-sm text-red-500">{errors.project}</p>
-                                      )}
-                                    </div>
-                                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="category">نوع العقار</Label>
+                      <Select
+                        name="category"
+                        value={formData.category}
+                        onValueChange={(value) =>
+                          setFormData((prev) => ({ ...prev, category: value }))
+                        }
+                      >
+                        <SelectTrigger
+                          id="category"
+                          className={errors.category ? "border-red-500" : ""}
+                        >
+                          <SelectValue placeholder="اختر النوع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((category) => (
+                            <SelectItem
+                              key={category.id}
+                              value={category.id.toString()}
+                            >
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.category && (
+                        <p className="text-sm text-red-500">
+                          {errors.category}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="project">المشروع</Label>
+                      <Select
+                        name="project"
+                        value={formData.project_id}
+                        onValueChange={(value) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            project_id: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger
+                          id="project"
+                          className={errors.project_id ? "border-red-500" : ""}
+                        >
+                          <SelectValue placeholder="اختر المشروع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {projects.map((project) => (
+                            <SelectItem
+                              key={project.id}
+                              value={project.id.toString()}
+                            >
+                              {project.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.project && (
+                        <p className="text-sm text-red-500">{errors.project}</p>
+                      )}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 

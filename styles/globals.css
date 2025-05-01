@@ -105,3 +105,8 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.dropdown-item {
+  color: black;
+  background-color: white;
+}
