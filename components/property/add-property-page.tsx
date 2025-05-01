@@ -336,7 +336,7 @@ export default function AddPropertyPage() {
           featured: formData.featured,
           area: parseInt(formData.size),
           city_id: formData.city_id,
-          district_id: formData.district_id,
+          state_id: formData.district_id,
           category_id: parseInt(formData.category),
         };
 
