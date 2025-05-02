@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,49 +18,40 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import axiosInstance from "@/lib/axiosInstance"; // استيراد axiosInstance
+import { useState, useEffect } from "react";
 
 export default function CategoriesManagementPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [categories, setCategories] = useState([
-    {
-      id: 1,
-      name: "تصميم الويب",
-      slug: "web-design",
-      description: "تصميمات مواقع ويب جميلة لجميع أنواع الشركات",
-      isActive: true,
-      order: 1,
-    },
-    {
-      id: 2,
-      name: "تطبيقات الجوال",
-      slug: "mobile-apps",
-      description: "تطبيقات مخصصة لنظامي iOS و Android",
-      isActive: true,
-      order: 2,
-    },
-    {
-      id: 3,
-      name: "الهوية البصرية",
-      slug: "branding",
-      description: "خدمات تصميم هوية بصرية كاملة",
-      isActive: true,
-      order: 3,
-    },
-    {
-      id: 4,
-      name: "تحسين محركات البحث",
-      slug: "seo",
-      description: "تحسين ظهور موقعك في نتائج البحث",
-      isActive: false,
-      order: 4,
-    },
-  ]);
-
+  const [categories, setCategories] = useState([{
+    "id": null,
+    "is_active": false
+}]);
   const [newCategory, setNewCategory] = useState({
     name: "",
     description: "",
   });
+  
+  const fetchCategories = async () => {
+    try {
+      const response = await axiosInstance.get("/user/categories");
+      if (response.status === 200) {
+        console.log("Fetched categories:", response.data.categories);
+        setCategories(response.data.categories);
+      } else {
+        toast.error("حدث خطأ أثناء جلب التصنيفات.");
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast.error("حدث خطأ أثناء جلب التصنيفات.");
+    }
+  };
+  
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
+  
   const handleAddCategory = () => {
     if (newCategory.name.trim() === "") return;
 
@@ -77,7 +67,7 @@ export default function CategoriesManagementPage() {
         name: newCategory.name,
         slug: slug,
         description: newCategory.description,
-        isActive: true,
+        is_active: true,
         order: categories.length + 1,
       },
     ]);
@@ -96,7 +86,7 @@ export default function CategoriesManagementPage() {
     setCategories(
       categories.map((category) =>
         category.id === id
-          ? { ...category, isActive: !category.isActive }
+          ? { ...category, is_active: !category.is_active }
           : category,
       ),
     );
@@ -111,7 +101,6 @@ export default function CategoriesManagementPage() {
     newCategories[index] = newCategories[index - 1];
     newCategories[index - 1] = temp;
 
-    // Update order values
     newCategories.forEach((category, i) => {
       category.order = i + 1;
     });
@@ -128,7 +117,6 @@ export default function CategoriesManagementPage() {
     newCategories[index] = newCategories[index + 1];
     newCategories[index + 1] = temp;
 
-    // Update order values
     newCategories.forEach((category, i) => {
       category.order = i + 1;
     });
@@ -136,14 +124,32 @@ export default function CategoriesManagementPage() {
     setCategories(newCategories);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // إعداد البيانات بنفس شكل الـ request المطلوب
+      const dataToSend = {
+        categories: categories.map((category) => ({
+          id: category.id,
+          is_active: category.is_active,
+        })),
+      };
+
+      // إرسال طلب PUT باستخدام axiosInstance
+      const response = await axiosInstance.put("/user/categories", dataToSend);
+
+      // معالجة الاستجابة
+      if (response.status === 200) {
+        toast.success("تم حفظ التصنيفات بنجاح!");
+      } else {
+        toast.error("حدث خطأ أثناء حفظ التصنيفات.");
+      }
+    } catch (error) {
+      console.error("Error saving categories:", error);
+      toast.error("حدث خطأ أثناء حفظ التصنيفات.");
+    } finally {
       setIsLoading(false);
-      // Show success toast
-      alert("تم حفظ التصنيفات بنجاح!");
-    }, 1000);
+    }
   };
 
   return (
@@ -197,7 +203,7 @@ export default function CategoriesManagementPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex flex-col">
-                          <Button
+                          {/* <Button
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6"
@@ -214,7 +220,7 @@ export default function CategoriesManagementPage() {
                             disabled={index === categories.length - 1}
                           >
                             <ArrowDown className="h-4 w-4" />
-                          </Button>
+                          </Button> */}
                         </div>
                         <div>
                           <h3 className="font-medium">{category.name}</h3>
@@ -226,7 +232,7 @@ export default function CategoriesManagementPage() {
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
                           <Switch
-                            checked={category.isActive}
+                            checked={category.is_active}
                             onCheckedChange={() =>
                               handleToggleActive(category.id)
                             }
@@ -236,16 +242,16 @@ export default function CategoriesManagementPage() {
                             htmlFor={`active-${category.id}`}
                             className="text-sm"
                           >
-                            {category.isActive ? "نشط" : "معطل"}
+                            {category.is_active ? "نشط" : "معطل"}
                           </Label>
                         </div>
-                        <Button
+                        {/* <Button
                           variant="destructive"
                           size="sm"
                           onClick={() => handleRemoveCategory(category.id)}
                         >
                           <Trash2 className="h-4 w-4" />
-                        </Button>
+                        </Button> */}
                       </div>
                     </div>
                     <p className="text-sm">{category.description}</p>
@@ -255,7 +261,7 @@ export default function CategoriesManagementPage() {
             </CardContent>
           </Card>
 
-          <Card className="mb-6">
+          {/* <Card className="mb-6">
             <CardHeader>
               <CardTitle>إضافة تصنيف جديد</CardTitle>
             </CardHeader>
@@ -296,9 +302,9 @@ export default function CategoriesManagementPage() {
                 </Button>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>نصائح للتصنيفات الفعالة</CardTitle>
             </CardHeader>
@@ -313,7 +319,7 @@ export default function CategoriesManagementPage() {
                 </li>
               </ul>
             </CardContent>
-          </Card>
+          </Card> */}
         </main>
       </div>
     </div>

@@ -47,7 +47,7 @@ import DistrictSelector from "@/components/DistrictSelector";
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
   loading: () => (
-    <div className="h-[400px] w-full flex items-center justify-center bg-muted rounded-md">
+    <div className="h-[400px] w-full flex items-center justify-center bg-muted rounded-md z-[-1]">
       <div className="flex flex-col items-center gap-2">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         <p className="text-sm text-muted-foreground">جاري تحميل الخريطة...</p>
@@ -598,7 +598,7 @@ export default function AddPropertyPage() {
                       )}
                     </div>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-4 z-9999">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="flex flex-col space-y-2">
                         <Label htmlFor="city" className="mb-1">

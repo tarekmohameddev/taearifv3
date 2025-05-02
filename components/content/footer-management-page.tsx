@@ -563,6 +563,16 @@ export function FooterManagementPage() {
                       }
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="address">رخصة فال</Label>
+                    <Textarea
+                      id="address"
+                      value={footerData?.general?.faal_number}
+                      onChange={(e) =>
+                        handleGeneralChange("faal_number", e.target.value)
+                      }
+                    />
+                  </div>
                   <div className="flex items-center space-x-2 space-x-reverse">
                     <Switch
                       id="showContactInfo"

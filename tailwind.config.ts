@@ -18,6 +18,9 @@ const config = {
       },
     },
     extend: {
+      zIndex: {
+        '9999': '9999',
+      },
       animation: {
         "bounce-in": "bounce-in 0.5s ease-out",
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
