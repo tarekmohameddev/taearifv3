@@ -43,6 +43,7 @@ import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
+import { PropertyCounter } from "@/components/property/propertyCOMP/property-counter"
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -85,6 +86,31 @@ export default function AddPropertyPage() {
     longitude: 46.73579692840576,
     city_id: null,
     district_id: null,
+    rooms: "",
+    floors: "",
+    floor_number: "",
+    driver_room: "",
+    maid_room: "",
+    dining_room: "",
+    living_room: "",
+    majlis: "",
+    storage_room: "",
+    basement: "",
+    swimming_pool: "",
+    kitchen: "",
+    balcony: "",
+    garden: "",
+    annex: "",
+    elevator: "",
+    private_parking: "",
+    facade_id: "",
+    length: "",
+    width: "",
+    street_width_north: "",
+    street_width_south: "",
+    street_width_east: "",
+    street_width_west: "",
+    building_age: "",
   });
   const [errors, setErrors] = useState({});
   const [images, setImages] = useState({
@@ -100,6 +126,7 @@ export default function AddPropertyPage() {
   const [uploading, setUploading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [facades, setFacades] = useState([]);
 
   useEffect(() => {
     if (!isInitialized && !loading) {
@@ -119,6 +146,18 @@ export default function AddPropertyPage() {
     };
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    axiosInstance
+      .get("/property/facades")
+      .then((response) => {
+        setFacades(response.data.data);
+      })
+      .catch((error) => {
+        console.error("خطأ في جلب الواجهات:", error);
+      });
+  }, []); 
+
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -233,7 +272,11 @@ export default function AddPropertyPage() {
 
     e.target.value = "";
   };
-
+  const years = [];
+  for (let year = 2030; year >= 1925; year--) {
+    years.push(year);
+  }
+  
   const removeImage = (type, index) => {
     if (type === "thumbnail") {
       setImages((prev) => ({ ...prev, thumbnail: null }));
@@ -249,6 +292,16 @@ export default function AddPropertyPage() {
       }));
     }
   };
+
+  const handleCounterChange = (name: keyof PropertyFormData, value: number) => {
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -310,6 +363,33 @@ export default function AddPropertyPage() {
           city_id: formData.city_id,
           state_id: formData.district_id,
           category_id: parseInt(formData.category),
+
+          rooms: parseInt(formData.rooms) || 0,
+          floors: parseInt(formData.floors) || 0,
+          floor_number: parseInt(formData.floor_number) || 0,
+          driver_room: parseInt(formData.driver_room) || 0,
+          maid_room: parseInt(formData.maid_room) || 0,
+          dining_room: parseInt(formData.dining_room) || 0,
+          living_room: parseInt(formData.living_room) || 0,
+          majlis: parseInt(formData.majlis) || 0,
+          storage_room: parseInt(formData.storage_room) || 0,
+          basement: parseInt(formData.basement) || 0,
+          swimming_pool: parseInt(formData.swimming_pool) || 0,
+          kitchen: parseInt(formData.kitchen) || 0,
+          balcony: parseInt(formData.balcony) || 0,
+          garden: parseInt(formData.garden) || 0,
+          annex: parseInt(formData.annex) || 0,
+          elevator: parseInt(formData.elevator) || 0,
+          private_parking: parseInt(formData.private_parking) || 0,
+          facade_id: parseInt(formData.facade_id) || 0,
+          length: parseFloat(formData.length) || 0,
+          width: parseFloat(formData.width) || 0,
+          street_width_north: parseFloat(formData.street_width_north) || 0,
+          street_width_south: parseFloat(formData.street_width_south) || 0,
+          street_width_east: parseFloat(formData.street_width_east) || 0,
+          street_width_west: parseFloat(formData.street_width_west) || 0,
+          building_age: parseFloat(formData.building_age) || 0,
+          
         };
 
         let response = await axiosInstance.post("/properties", propertyData);
@@ -596,6 +676,233 @@ export default function AddPropertyPage() {
                     <Label htmlFor="featured" className="mr-2">
                       عرض هذا العقار في الصفحة الرئيسية
                     </Label>
+                  </div>
+                    
+                  {/* الخصائص - Property Specifications */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-right">الخصائص</h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="length">طول القطعة</Label>
+                        <Input
+                          id="length"
+                          name="length"
+                          value={formData.length}
+                          onChange={handleInputChange}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="width">عرض القطعة</Label>
+                        <Input
+                          id="width"
+                          name="width"
+                          value={formData.width}
+                          onChange={handleInputChange}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="facade_id">الواجهة</Label>
+                        <Select
+                          value={formData.facade_id?.toString() || ""}
+                          onValueChange={(value) => handleSelectChange("facade_id", value)}
+                        >
+                          <SelectTrigger id="facade_id" dir="rtl">
+                            <SelectValue placeholder="اختر الواجهة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {facades.map((facade) => (
+                              <SelectItem key={facade.id} value={facade.id.toString()}>
+                                {facade.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="street_width_north">عرض الشارع الشمالي</Label>
+                        <Input
+                          id="street_width_north"
+                          name="street_width_north"
+                          value={formData.street_width_north}
+                          onChange={handleInputChange}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="street_width_south">عرض الشارع الجنوبي</Label>
+                        <Input
+                          id="street_width_south"
+                          name="street_width_south"
+                          value={formData.street_width_south}
+                          onChange={handleInputChange}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="street_width_east">عرض الشارع الشرقي</Label>
+                        <Input
+                          id="street_width_east"
+                          name="street_width_east"
+                          value={formData.street_width_east}
+                          onChange={handleInputChange}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="street_width_west">عرض الشارع الغربي</Label>
+                        <Input
+                          id="street_width_west"
+                          name="street_width_west"
+                          value={formData.street_width_west}
+                          onChange={handleInputChange}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+
+                      <div className="space-y-2">
+  <Label htmlFor="building_age">سنة البناء</Label>
+  <Select
+    value={formData.building_age}
+    onValueChange={(value) => handleSelectChange("building_age", value)}
+  >
+    <SelectTrigger id="building_age" dir="rtl">
+      <SelectValue placeholder="اختر سنة البناء" />
+    </SelectTrigger>
+    <SelectContent>
+      {years.map((year) => (
+        <SelectItem key={year} value={String(year)}>
+          {year}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
+
+                    </div>
+                  </div>
+
+                  {/* مرافق العقار - Property Features */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-right">مرافق العقار</h3>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <PropertyCounter
+                        label="الغرف"
+                        value={formData.rooms}
+                        onChange={(value) => handleCounterChange("rooms", value)}
+                      />
+                      <PropertyCounter
+                        label="الأدوار"
+                        value={formData.floors}
+                        onChange={(value) => handleCounterChange("floors", value)}
+                      />
+                      <PropertyCounter
+                        label="رقم الدور"
+                        value={formData.floor_number}
+                        onChange={(value) => handleCounterChange("floor_number", value)}
+                      />
+                      <PropertyCounter
+                        label="غرفة السائق"
+                        value={formData.driver_room}
+                        onChange={(value) => handleCounterChange("driver_room", value)}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <PropertyCounter
+                        label="غرفة الخادمات"
+                        value={formData.maid_room}
+                        onChange={(value) => handleCounterChange("maid_room", value)}
+                      />
+                      <PropertyCounter
+                        label="غرفة الطعام"
+                        value={formData.dining_room}
+                        onChange={(value) => handleCounterChange("dining_room", value)}
+                      />
+                      <PropertyCounter
+                        label="الصالة"
+                        value={formData.living_room}
+                        onChange={(value) => handleCounterChange("living_room", value)}
+                      />
+                      <PropertyCounter
+                        label="المجلس"
+                        value={formData.majlis}
+                        onChange={(value) => handleCounterChange("majlis", value)}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <PropertyCounter
+                        label="المخزن"
+                        value={formData.storage_room}
+                        onChange={(value) => handleCounterChange("storage_room", value)}
+                      />
+                      <PropertyCounter
+                        label="القبو"
+                        value={formData.basement}
+                        onChange={(value) => handleCounterChange("basement", value)}
+                      />
+                      <PropertyCounter
+                        label="المسبح"
+                        value={formData.swimming_pool}
+                        onChange={(value) => handleCounterChange("swimming_pool", value)}
+                      />
+                      <PropertyCounter
+                        label="المطبخ"
+                        value={formData.kitchen}
+                        onChange={(value) => handleCounterChange("kitchen", value)}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <PropertyCounter
+                        label="الشرفة"
+                        value={formData.balcony}
+                        onChange={(value) => handleCounterChange("balcony", value)}
+                      />
+                      <PropertyCounter
+                        label="الحديقة"
+                        value={formData.garden}
+                        onChange={(value) => handleCounterChange("garden", value)}
+                      />
+                      <PropertyCounter
+                        label="الملحق"
+                        value={formData.annex}
+                        onChange={(value) => handleCounterChange("annex", value)}
+                      />
+                      <PropertyCounter
+                        label="المصعد"
+                        value={formData.elevator}
+                        onChange={(value) => handleCounterChange("elevator", value)}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <PropertyCounter
+                        label="موقف سيارة مخصص"
+                        value={formData.private_parking}
+                        onChange={(value) => handleCounterChange("private_parking", value)}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
