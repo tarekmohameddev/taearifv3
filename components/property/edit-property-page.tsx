@@ -40,6 +40,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
 import { uploadMultipleFiles } from "@/utils/uploadMultiple";
 import useStore from "@/context/Store";
+import { PropertyCounter } from "@/components/property/propertyCOMP/property-counter"
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -74,6 +75,32 @@ export default function EditPropertyPage() {
     featured: false,
     latitude: 24.766316905850978,
     longitude: 46.73579692840576,
+    size: "",
+    length: "",
+    width: "",
+    facade_id: "",
+    street_width_north: "",
+    street_width_south: "",
+    street_width_east: "",
+    street_width_west: "",
+    building_age: "",
+    rooms: "",
+    floors: "",
+    floor_number: "",
+    driver_room: "",
+    maid_room: "",
+    dining_room: "",
+    living_room: "",
+    majlis: "",
+    storage_room: "",
+    basement: "",
+    swimming_pool: "",
+    kitchen: "",
+    balcony: "",
+    garden: "",
+    annex: "",
+    elevator: "",
+    private_parking: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [images, setImages] = useState<{
@@ -101,6 +128,7 @@ export default function EditPropertyPage() {
   const floorPlansInputRef = useRef<HTMLInputElement>(null);
   const [categories, setCategories] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [facades, setFacades] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -128,6 +156,17 @@ export default function EditPropertyPage() {
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    axiosInstance
+      .get("/property/facades")
+      .then((response) => {
+        setFacades(response.data.data);
+      })
+      .catch((error) => {
+        console.error("خطأ في جلب الواجهات:", error);
+      });
+  }, []);
+
   // جلب بيانات العقار عند تحميل الصفحة
   useEffect(() => {
     const fetchProperty = async () => {
@@ -150,6 +189,32 @@ export default function EditPropertyPage() {
           featured: property.featured || false,
           latitude: property.latitude || 24.766316905850978,
           longitude: property.longitude || 46.73579692840576,
+          size: property.size?.toString() || "",
+          length: property.length?.toString() || "",
+          width: property.width?.toString() || "",
+          facade_id: property.facade_id?.toString() || "",
+          street_width_north: property.street_width_north?.toString() || "",
+          street_width_south: property.street_width_south?.toString() || "",
+          street_width_east: property.street_width_east?.toString() || "",
+          street_width_west: property.street_width_west?.toString() || "",
+          building_age: property.building_age?.toString() || "",
+          rooms: property.rooms?.toString() || "",
+          floors: property.floors?.toString() || "",
+          floor_number: property.floor_number?.toString() || "",
+          driver_room: property.driver_room?.toString() || "",
+          maid_room: property.maid_room?.toString() || "",
+          dining_room: property.dining_room?.toString() || "",
+          living_room: property.living_room?.toString() || "",
+          majlis: property.majlis?.toString() || "",
+          storage_room: property.storage_room?.toString() || "",
+          basement: property.basement?.toString() || "",
+          swimming_pool: property.swimming_pool?.toString() || "",
+          kitchen: property.kitchen?.toString() || "",
+          balcony: property.balcony?.toString() || "",
+          garden: property.garden?.toString() || "",
+          annex: property.annex?.toString() || "",
+          elevator: property.elevator?.toString() || "",
+          private_parking: property.private_parking?.toString() || "",
         });
         setPreviews({
           thumbnail: property.featured_image || null,
@@ -178,6 +243,9 @@ export default function EditPropertyPage() {
       });
     }
   };
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleSwitchChange = (name: string, checked: boolean) => {
     setFormData((prev) => ({ ...prev, [name]: checked }));
@@ -190,7 +258,10 @@ export default function EditPropertyPage() {
       longitude: lng,
     }));
   };
-
+  const years = [];
+  for (let year = 2030; year >= 1925; year--) {
+    years.push(year);
+  }
   const triggerFileInput = (type: "thumbnail" | "gallery" | "floorPlans") => {
     if (type === "thumbnail" && thumbnailInputRef.current) {
       thumbnailInputRef.current.click();
@@ -349,6 +420,32 @@ export default function EditPropertyPage() {
           featured: formData.featured,
           city_id: 1,
           category_id: 1,
+          size: parseInt(formData.size) || 0,
+          length: parseFloat(formData.length) || 0,
+          width: parseFloat(formData.width) || 0,
+          facade_id: parseInt(formData.facade_id) || 0,
+          street_width_north: parseFloat(formData.street_width_north) || 0,
+          street_width_south: parseFloat(formData.street_width_south) || 0,
+          street_width_east: parseFloat(formData.street_width_east) || 0,
+          street_width_west: parseFloat(formData.street_width_west) || 0,
+          building_age: parseFloat(formData.building_age) || 0,
+          rooms: parseInt(formData.rooms) || 0,
+          floors: parseInt(formData.floors) || 0,
+          floor_number: parseInt(formData.floor_number) || 0,
+          driver_room: parseInt(formData.driver_room) || 0,
+          maid_room: parseInt(formData.maid_room) || 0,
+          dining_room: parseInt(formData.dining_room) || 0,
+          living_room: parseInt(formData.living_room) || 0,
+          majlis: parseInt(formData.majlis) || 0,
+          storage_room: parseInt(formData.storage_room) || 0,
+          basement: parseInt(formData.basement) || 0,
+          swimming_pool: parseInt(formData.swimming_pool) || 0,
+          kitchen: parseInt(formData.kitchen) || 0,
+          balcony: parseInt(formData.balcony) || 0,
+          garden: parseInt(formData.garden) || 0,
+          annex: parseInt(formData.annex) || 0,
+          elevator: parseInt(formData.elevator) || 0,
+          private_parking: parseInt(formData.private_parking) || 0,
         };
         const response = await axiosInstance.post(
           `/properties/${id}`,
@@ -385,6 +482,10 @@ export default function EditPropertyPage() {
       setSubmitError("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
       toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
     }
+  };
+
+  const handleCounterChange = (name: string, value: number) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -598,9 +699,9 @@ export default function EditPropertyPage() {
                   <CardTitle>تفاصيل العقار</CardTitle>
                   <CardDescription>أدخل مواصفات وميزات العقار</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
+                <CardContent>
+<div className="grid grid-cols-3 gap-4">
+                    {/* <div className="space-y-2">
                       <Label htmlFor="bedrooms">غرف النوم</Label>
                       <Input
                         id="bedrooms"
@@ -611,14 +712,10 @@ export default function EditPropertyPage() {
                         onChange={handleInputChange}
                         className={errors.bedrooms ? "border-red-500" : ""}
                       />
-                      {errors.bedrooms && (
-                        <p className="text-sm text-red-500">
-                          {errors.bedrooms}
-                        </p>
-                      )}
-                    </div>
+                      {errors.bedrooms && <p className="text-sm text-red-500">{errors.bedrooms}</p>}
+                    </div> */}
 
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <Label htmlFor="bathrooms">الحمامات</Label>
                       <Input
                         id="bathrooms"
@@ -629,28 +726,9 @@ export default function EditPropertyPage() {
                         onChange={handleInputChange}
                         className={errors.bathrooms ? "border-red-500" : ""}
                       />
-                      {errors.bathrooms && (
-                        <p className="text-sm text-red-500">
-                          {errors.bathrooms}
-                        </p>
-                      )}
-                    </div>
+                      {errors.bathrooms && <p className="text-sm text-red-500">{errors.bathrooms}</p>}
+                    </div> */}
 
-                    <div className="space-y-2">
-                      <Label htmlFor="size">المساحة (قدم مربع)</Label>
-                      <Input
-                        id="size"
-                        name="size"
-                        type="number"
-                        placeholder="1200"
-                        value={formData.area}
-                        onChange={handleInputChange}
-                        className={errors.area ? "border-red-500" : ""}
-                      />
-                      {errors.area && (
-                        <p className="text-sm text-red-500">{errors.size}</p>
-                      )}
-                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -661,21 +739,305 @@ export default function EditPropertyPage() {
                       placeholder="شرفة، أرضيات خشبية، أجهزة منزلية حديثة"
                       value={formData.features}
                       onChange={handleInputChange}
+                      className={errors.features ? "border-red-500" : ""}
                     />
+                    {errors.features && <p className="text-sm text-red-500">{errors.features}</p>}
                   </div>
 
-                  <div className="flex items-center space-x-2 pt-4">
+                  <div className="flex items-center space-x-2 pt-4 gap-2">
                     <Switch
                       id="featured"
                       checked={formData.featured}
-                      onCheckedChange={(checked) =>
-                        handleSwitchChange("featured", checked)
-                      }
+                      onCheckedChange={(checked) => handleSwitchChange("featured", checked)}
                     />
                     <Label htmlFor="featured" className="mr-2">
                       عرض هذا العقار في الصفحة الرئيسية
                     </Label>
                   </div>
+                    
+                  {/* الخصائص - Property Specifications */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-right">الخصائص</h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    <div className="space-y-2">
+                        <Label htmlFor="size">المساحة</Label>
+                        <Input
+                          id="size"
+                          name="size"
+                          value={formData.size}
+                          inputMode="numeric"
+pattern="[0-9]*"
+onChange={(e) => {
+      const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
+      handleInputChange({
+        // نمرر نفس الحدث لكن بقيمة منقحة
+        target: { name: e.currentTarget.name, value: onlyDigits },
+      });
+    }}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">قدم مربع</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="length">طول القطعة</Label>
+                        <Input
+                          id="length"
+                          name="length"
+                          value={formData.length}
+                          inputMode="numeric"
+pattern="[0-9]*"
+onChange={(e) => {
+      const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
+      handleInputChange({
+        // نمرر نفس الحدث لكن بقيمة منقحة
+        target: { name: e.currentTarget.name, value: onlyDigits },
+      });
+    }}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="width">عرض القطعة</Label>
+                        <Input
+                          id="width"
+                          name="width"
+                          value={formData.width}
+                          inputMode="numeric"
+pattern="[0-9]*"
+onChange={(e) => {
+      const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
+      handleInputChange({
+        // نمرر نفس الحدث لكن بقيمة منقحة
+        target: { name: e.currentTarget.name, value: onlyDigits },
+      });
+    }}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="facade_id">الواجهة</Label>
+                        <Select
+                          value={formData.facade_id?.toString() || ""}
+                          onValueChange={(value) => handleSelectChange("facade_id", value)}
+                        >
+                          <SelectTrigger id="facade_id" dir="rtl">
+                            <SelectValue placeholder="اختر الواجهة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {facades.map((facade) => (
+                              <SelectItem key={facade.id} value={facade.id.toString()}>
+                                {facade.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="street_width_north">عرض الشارع الشمالي</Label>
+                        <Input
+                          id="street_width_north"
+                          name="street_width_north"
+                          value={formData.street_width_north}
+                          inputMode="numeric"
+pattern="[0-9]*"
+onChange={(e) => {
+      const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
+      handleInputChange({
+        // نمرر نفس الحدث لكن بقيمة منقحة
+        target: { name: e.currentTarget.name, value: onlyDigits },
+      });
+    }}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="street_width_south">عرض الشارع الجنوبي</Label>
+                        <Input
+                          id="street_width_south"
+                          name="street_width_south"
+                          value={formData.street_width_south}
+                          inputMode="numeric"
+pattern="[0-9]*"
+onChange={(e) => {
+      const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
+      handleInputChange({
+        // نمرر نفس الحدث لكن بقيمة منقحة
+        target: { name: e.currentTarget.name, value: onlyDigits },
+      });
+    }}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="street_width_east">عرض الشارع الشرقي</Label>
+                        <Input
+                          id="street_width_east"
+                          name="street_width_east"
+                          value={formData.street_width_east}
+                          inputMode="numeric"
+pattern="[0-9]*"
+onChange={(e) => {
+      const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
+      handleInputChange({
+        // نمرر نفس الحدث لكن بقيمة منقحة
+        target: { name: e.currentTarget.name, value: onlyDigits },
+      });
+    }}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="street_width_west">عرض الشارع الغربي</Label>
+                        <Input
+                          id="street_width_west"
+                          name="street_width_west"
+                          value={formData.street_width_west}
+                          inputMode="numeric"
+pattern="[0-9]*"
+onChange={(e) => {
+      const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
+      handleInputChange({
+        // نمرر نفس الحدث لكن بقيمة منقحة
+        target: { name: e.currentTarget.name, value: onlyDigits },
+      });
+    }}
+                          dir="rtl"
+                        />
+                        <span className="text-sm text-gray-500 block text-right">متر</span>
+                      </div>
+
+                      <div className="space-y-2">
+  <Label htmlFor="building_age">سنة البناء</Label>
+  <Select
+    value={formData.building_age}
+    onValueChange={(value) => handleSelectChange("building_age", value)}
+  >
+    <SelectTrigger id="building_age" dir="rtl">
+      <SelectValue placeholder="اختر سنة البناء" />
+    </SelectTrigger>
+    <SelectContent>
+      {years.map((year) => (
+        <SelectItem key={year} value={String(year)}>
+          {year}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
+
+                    </div>
+                  </div>
+                                  {/* مرافق العقار - Property Features */}
+                                  <div className="space-y-4  whitespace-nowraps">
+                    <h3 className="text-lg font-semibold text-right">مرافق العقار</h3>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 whitespace-nowraps ">
+                      <PropertyCounter
+                        label="الغرف"
+                        value={formData.rooms}
+                        onChange={(value) => handleCounterChange("rooms", value)}
+                      />
+                      <PropertyCounter
+                        label="الأدوار"
+                        value={formData.floors}
+                        onChange={(value) => handleCounterChange("floors", value)}
+                      />
+                      <PropertyCounter
+                        label="رقم الدور"
+                        value={formData.floor_number}
+                        onChange={(value) => handleCounterChange("floor_number", value)}
+                      />
+                      <PropertyCounter
+                        label="غرفة السائق"
+                        value={formData.driver_room}
+                        onChange={(value) => handleCounterChange("driver_room", value)}
+                      />
+
+                      <PropertyCounter
+                        label="غرفة الخادمات"
+                        value={formData.maid_room}
+                        onChange={(value) => handleCounterChange("maid_room", value)}
+                      />
+                      <PropertyCounter
+                        label="غرفة الطعام"
+                        value={formData.dining_room}
+                        onChange={(value) => handleCounterChange("dining_room", value)}
+                      />
+                      <PropertyCounter
+                        label="الصالة"
+                        value={formData.living_room}
+                        onChange={(value) => handleCounterChange("living_room", value)}
+                      />
+                      <PropertyCounter
+                        label="المجلس"
+                        value={formData.majlis}
+                        onChange={(value) => handleCounterChange("majlis", value)}
+                      />
+
+                      <PropertyCounter
+                        label="المخزن"
+                        value={formData.storage_room}
+                        onChange={(value) => handleCounterChange("storage_room", value)}
+                      />
+                      <PropertyCounter
+                        label="القبو"
+                        value={formData.basement}
+                        onChange={(value) => handleCounterChange("basement", value)}
+                      />
+                      <PropertyCounter
+                        label="المسبح"
+                        value={formData.swimming_pool}
+                        onChange={(value) => handleCounterChange("swimming_pool", value)}
+                      />
+                      <PropertyCounter
+                        label="المطبخ"
+                        value={formData.kitchen}
+                        onChange={(value) => handleCounterChange("kitchen", value)}
+                      />
+
+                      <PropertyCounter
+                        label="الشرفة"
+                        value={formData.balcony}
+                        onChange={(value) => handleCounterChange("balcony", value)}
+                      />
+                      <PropertyCounter
+                        label="الحديقة"
+                        value={formData.garden}
+                        onChange={(value) => handleCounterChange("garden", value)}
+                      />
+                      <PropertyCounter
+                        label="الملحق"
+                        value={formData.annex}
+                        onChange={(value) => handleCounterChange("annex", value)}
+                      />
+                      <PropertyCounter
+                        label="المصعد"
+                        value={formData.elevator}
+                        onChange={(value) => handleCounterChange("elevator", value)}
+                      />
+
+                      <PropertyCounter
+                        label="موقف سيارة مخصص"
+                        value={formData.private_parking}
+                        onChange={(value) => handleCounterChange("private_parking", value)}
+                      />
+                  </div>
+                  </div>
+
+
+
                 </CardContent>
               </Card>
 
