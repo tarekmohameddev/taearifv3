@@ -623,8 +623,10 @@ export default function EditPropertyPage() {
                           <SelectValue placeholder="اختر النوع" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="للبيع">للبيع</SelectItem>
-                          <SelectItem value="للإيجار">للإيجار</SelectItem>
+                          <SelectItem value="sale">للبيع</SelectItem>
+                          <SelectItem value="rent">للإيجار</SelectItem>
+                          <SelectItem value="sold">مباعة</SelectItem>
+                          <SelectItem value="rented">مؤجرة</SelectItem>
                         </SelectContent>
                       </Select>
                       {errors.type && (
