@@ -302,14 +302,14 @@ export function ProjectsManagementPage() {
               </TabsContent>
             </Tabs>
 
-            {pagination && (
-              <div className="mt-6">
-                <span className="text-sm text-muted-foreground">
-                  Showing {pagination.from} to {pagination.to} of{" "}
-                  {pagination.total} projects
-                </span>
-              </div>
-            )}
+            {pagination && pagination.total !== 0 && (
+  <div className="mt-6">
+    <span className="text-sm text-muted-foreground">
+      Showing {pagination.from} to {pagination.to} of {pagination.total} projects
+    </span>
+  </div>
+)}
+
           </div>
         </main>
       </div>

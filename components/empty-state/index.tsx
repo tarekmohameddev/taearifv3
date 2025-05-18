@@ -173,7 +173,7 @@ export default function EmptyState({ type }) {
             className="mt-8 gap-2 text-base empty-state-pulse-subtle hover:scale-105 transition-transform duration-300"
             asChild
           >
-            <Link href="/properties/add">
+            <Link href={type === "مشاريع" ? "/projects/add" : "/properties/add"}>
               <Plus className="h-5 w-5 empty-state-bounce-subtle" />
               أضف {type === "مشاريع" ? "مشروعك" : "عقارك"} الأول
             </Link>
