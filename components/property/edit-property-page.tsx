@@ -44,7 +44,6 @@ import { PropertyCounter } from "@/components/property/propertyCOMP/property-cou
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
 
-
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
   loading: () => (
@@ -715,7 +714,7 @@ export default function EditPropertyPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="space-y-4 z-9999">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="flex flex-col space-y-2">

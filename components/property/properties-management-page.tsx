@@ -396,8 +396,7 @@ export function PropertiesManagementPage() {
                 </TabsList>
                 <TabsContent value="all" className="mt-4">
                   {normalizedProperties.length === 0 ? (
-                    <EmptyState 
-                    type="عقارات"/>
+                    <EmptyState type="عقارات" />
                   ) : viewMode === "grid" ? (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       {normalizedProperties.map((property) => (

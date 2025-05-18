@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { Plus } from "lucide-react"
-import Link from "next/link"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Plus } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
-export default function EmptyState({type}) {
-  const [isVisible, setIsVisible] = useState(false)
+export default function EmptyState({ type }) {
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     // Trigger animations after component mounts
-    setIsVisible(true)
-  }, [])
+    setIsVisible(true);
+  }, []);
 
   return (
     <Card
@@ -57,11 +57,34 @@ export default function EmptyState({type}) {
 
               {/* Empty document with house icon */}
               <g className="empty-state-float-slow">
-                <rect x="90" y="110" width="60" height="75" rx="3" fill="white" stroke="#3B82F6" strokeWidth="2" />
+                <rect
+                  x="90"
+                  y="110"
+                  width="60"
+                  height="75"
+                  rx="3"
+                  fill="white"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
 
                 {/* Document lines */}
-                <line x1="100" y1="125" x2="140" y2="125" stroke="#CBD5E1" strokeWidth="2" />
-                <line x1="100" y1="135" x2="140" y2="135" stroke="#CBD5E1" strokeWidth="2" />
+                <line
+                  x1="100"
+                  y1="125"
+                  x2="140"
+                  y2="125"
+                  stroke="#CBD5E1"
+                  strokeWidth="2"
+                />
+                <line
+                  x1="100"
+                  y1="135"
+                  x2="140"
+                  y2="135"
+                  stroke="#CBD5E1"
+                  strokeWidth="2"
+                />
 
                 {/* House icon on document */}
                 <path d="M120 165L105 150H135L120 165Z" fill="#3B82F6" />
@@ -71,15 +94,54 @@ export default function EmptyState({type}) {
               {/* Plus sign */}
               <g className="empty-state-pulse-slow">
                 <circle cx="170" cy="170" r="18" fill="#3B82F6" />
-                <line x1="170" y1="162" x2="170" y2="178" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-                <line x1="162" y1="170" x2="178" y2="170" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                <line
+                  x1="170"
+                  y1="162"
+                  x2="170"
+                  y2="178"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="162"
+                  y1="170"
+                  x2="178"
+                  y2="170"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
               </g>
 
               {/* Search/not found element */}
               <g className="empty-state-bounce-very-subtle">
-                <circle cx="75" cy="75" r="15" fill="white" stroke="#94A3B8" strokeWidth="2" />
-                <line x1="85" y1="85" x2="95" y2="95" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
-                <line x1="71" y1="75" x2="79" y2="75" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
+                <circle
+                  cx="75"
+                  cy="75"
+                  r="15"
+                  fill="white"
+                  stroke="#94A3B8"
+                  strokeWidth="2"
+                />
+                <line
+                  x1="85"
+                  y1="85"
+                  x2="95"
+                  y2="95"
+                  stroke="#94A3B8"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="71"
+                  y1="75"
+                  x2="79"
+                  y2="75"
+                  stroke="#94A3B8"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               </g>
             </svg>
           </div>
@@ -91,9 +153,13 @@ export default function EmptyState({type}) {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
-          <h3 className="text-xl text-center font-semibold tracking-tight">لا توجد {type}</h3>
+          <h3 className="text-xl text-center font-semibold tracking-tight">
+            لا توجد {type}
+          </h3>
           <p className="text-sm text-center text-muted-foreground">
-            لم تقم بإضافة أي {type === "مشاريع"? "مشروع": "عقار"} إلى لوحة التحكم الخاصة بك بعد. أضف {type === "مشاريع"? "مشروعك":"عقارك"} الأول للبدء في إدارة محفظتك العقارية.
+            لم تقم بإضافة أي {type === "مشاريع" ? "مشروع" : "عقار"} إلى لوحة
+            التحكم الخاصة بك بعد. أضف {type === "مشاريع" ? "مشروعك" : "عقارك"}{" "}
+            الأول للبدء في إدارة محفظتك العقارية.
           </p>
         </div>
 
@@ -114,7 +180,6 @@ export default function EmptyState({type}) {
             </Link>
           </Button>
         </div>
-
 
         {/* Scoped CSS for animations */}
         <style jsx global>{`
@@ -227,5 +292,5 @@ export default function EmptyState({type}) {
         `}</style>
       </CardContent>
     </Card>
-  )
+  );
 }

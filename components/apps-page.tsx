@@ -55,7 +55,6 @@ export function AppsPage() {
     "وسائط",
     "أعمال",
   ];
-  
 
   const [installedApps, setInstalledApps] = useState(
     apps.filter((app) => app.installed),
@@ -68,7 +67,7 @@ export function AppsPage() {
         const res = await axiosInstance.get("/apps");
         const fetchedApps = res.data.data.apps;
         setApps(fetchedApps);
-  
+
         const installed = fetchedApps.filter((app) => app.installed === true);
         setInstalledApps(installed);
         toast.dismiss(loadingToast);
@@ -83,26 +82,26 @@ export function AppsPage() {
     };
     fetchApps();
   }, []);
-  
 
-  
   const handleInstall = async (appId: string) => {
     const loadingToast = toast.loading("جاري تثبيت التطبيق...");
     try {
       await axiosInstance.post("/apps/install", {
         app_id: Number(appId),
       });
-  
+
       const updatedApps = apps.map((app) => {
         if (app.id === appId) {
           return { ...app, installed: true };
         }
         return app;
       });
-  
+
       setApps(updatedApps);
-  
-      const updatedInstalledApps = updatedApps.filter((app) => app.installed === true);
+
+      const updatedInstalledApps = updatedApps.filter(
+        (app) => app.installed === true,
+      );
       setInstalledApps(updatedInstalledApps);
 
       toast.dismiss(loadingToast);
@@ -113,24 +112,24 @@ export function AppsPage() {
       console.error("فشل في تثبيت التطبيق:", error);
     }
   };
-  
-  
 
   const handleUninstall = async (appId: string) => {
     const loadingToast = toast.loading("جاري إزالة التطبيق...");
     try {
       await axiosInstance.post(`/apps/uninstall/${appId}`);
-  
+
       const updatedApps = apps.map((app) => {
         if (app.id === appId) {
           return { ...app, installed: false };
         }
         return app;
       });
-  
+
       setApps(updatedApps);
-  
-      const updatedInstalledApps = updatedApps.filter((app) => app.installed === true);
+
+      const updatedInstalledApps = updatedApps.filter(
+        (app) => app.installed === true,
+      );
       setInstalledApps(updatedInstalledApps);
 
       toast.dismiss(loadingToast);
@@ -141,8 +140,6 @@ export function AppsPage() {
       console.error("فشل في إزالة تثبيت التطبيق:", error);
     }
   };
-  
-  
 
   const filteredApps = apps.filter(
     (app) =>
@@ -153,8 +150,6 @@ export function AppsPage() {
   if (loading) {
     return <div className="p-6 text-center">جاري تحميل التطبيقات...</div>;
   }
-
-  
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
