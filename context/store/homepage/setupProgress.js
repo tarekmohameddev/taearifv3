@@ -4,25 +4,14 @@ module.exports = (set) => ({
   setupProgressData: null,
   isSetupProgressDataUpdated: false,
 
-  setSetupProgressData: (data) =>
-    set((state) => ({
-      homepage: {
-        ...state.homepage,
-        setupProgressData: data,
-        isSetupProgressDataUpdated: true,
-      },
-    })),
-
   fetchSetupProgressData: async () => {
     set({ loading: true });
     try {
-      const response = await axiosInstance.get(
-        "https://taearif.com/api/dashboard/setup-progress",
-      );
+      const response = await axiosInstance.get("/steps/progress"); // ← تأكد من المسار الصحيح
       set((state) => ({
         homepage: {
           ...state.homepage,
-          setupProgressData: response.data,
+          setupProgressData: response.data,  // نخزن الكل: { steps, progress, continue_path }
           isSetupProgressDataUpdated: true,
         },
       }));
