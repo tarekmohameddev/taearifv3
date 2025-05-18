@@ -37,8 +37,7 @@ export default function EmptyState({ type }) {
               aria-hidden="true"
             >
               {/* Light background */}
-              <circle cx="120" cy="120" r="90" fill="#EBF2FE" />
-
+              <circle cx="120" cy="120" r="90" fill="black" />
               {/* Empty folder */}
               <path
                 d="M60 85C60 82.2386 62.2386 80 65 80H95L105 90H175C177.761 90 180 92.2386 180 95V160C180 162.761 177.761 165 175 165H65C62.2386 165 60 162.761 60 160V85Z"
@@ -64,7 +63,7 @@ export default function EmptyState({ type }) {
                   height="75"
                   rx="3"
                   fill="white"
-                  stroke="#3B82F6"
+                  stroke="black"
                   strokeWidth="2"
                 />
 
@@ -87,19 +86,19 @@ export default function EmptyState({ type }) {
                 />
 
                 {/* House icon on document */}
-                <path d="M120 165L105 150H135L120 165Z" fill="#3B82F6" />
-                <rect x="110" y="150" width="20" height="15" fill="#3B82F6" />
+                <path d="M120 165L105 150H135L120 165Z" fill="black" />
+                <rect x="110" y="150" width="20" height="15" fill="black" />
               </g>
 
               {/* Plus sign */}
               <g className="empty-state-pulse-slow">
-                <circle cx="170" cy="170" r="18" fill="#3B82F6" />
+                <circle cx="170" cy="170" r="18" fill="white" />
                 <line
                   x1="170"
                   y1="162"
                   x2="170"
                   y2="178"
-                  stroke="white"
+                  stroke="black"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                 />
@@ -108,7 +107,7 @@ export default function EmptyState({ type }) {
                   y1="170"
                   x2="178"
                   y2="170"
-                  stroke="white"
+                  stroke="black"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                 />
@@ -176,7 +175,7 @@ export default function EmptyState({ type }) {
           >
             <Link href="/properties/add">
               <Plus className="h-5 w-5 empty-state-bounce-subtle" />
-              أضف عقارك الأول
+              أضف {type === "مشاريع" ? "مشروعك" : "عقارك"} الأول
             </Link>
           </Button>
         </div>
