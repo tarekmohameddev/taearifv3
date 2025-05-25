@@ -118,7 +118,7 @@ export function SetupProgressCard() {
                   {step.completed ? (
                     <Check className="h-3.5 w-3.5" />
                   ) : (
-                  <span className="text-xs">?</span>
+                  <span className="text-md ">?</span>
                 )}
                 </div>
                 <span className="text-sm">
