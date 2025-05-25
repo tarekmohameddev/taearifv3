@@ -40,31 +40,40 @@ module.exports = (set) => ({
       },
     })),
 
-  fetchVisitorData: async (timeRange) => {
-    set({ loading: true });
-    try {
-      const response = await axiosInstance.get(
-        "https://taearif.com/api/dashboard/visitors",
-        { time_range: timeRange },
-      );
-      set((state) => ({
-        homepage: {
-          ...state.homepage,
-          visitorData: {
-            ...state.homepage.visitorData,
-            [timeRange]: {
-              data: response.data.visitor_data,
-              totalVisits: response.data.total_visits,
-              totalUniqueVisitors: response.data.total_unique_visitors,
-              fetched: true,
+  setSelectedTimeRange: (timeRange) =>
+    set((state) => ({
+      homepage: {
+        ...state.homepage,
+        selectedTimeRange: timeRange,
+      },
+    })),
+
+    fetchVisitorData: async (timeRange) => {
+      set({ loading: true });
+      try {
+        const response = await axiosInstance.post(  // تغيير من get إلى post
+          "/dashboard/visitors",
+          { time_range: timeRange }  // هذا سيذهب في body الطلب
+        );
+        
+        set((state) => ({
+          homepage: {
+            ...state.homepage,
+            visitorData: {
+              ...state.homepage.visitorData,
+              [timeRange]: {
+                data: response.data.visitor_data,
+                totalVisits: response.data.total_visits,
+                totalUniqueVisitors: response.data.total_unique_visitors,
+                fetched: true,
+              },
             },
           },
-        },
-      }));
-    } catch (error) {
-      console.error("Error fetching visitor data:", error);
-    } finally {
-      set({ loading: false });
-    }
-  },
+        }));
+      } catch (error) {
+        console.error("Error fetching visitor data:", error);
+      } finally {
+        set({ loading: false });
+      }
+    },
 });

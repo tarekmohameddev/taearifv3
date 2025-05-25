@@ -4,10 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   ChevronLeft,
   Upload,
-  X,
   Loader2,
   ImageIcon,
-  Plus,
   MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -43,6 +41,7 @@ import useStore from "@/context/Store";
 import { PropertyCounter } from "@/components/property/propertyCOMP/property-counter";
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
+import { X, Plus } from "lucide-react";
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -57,6 +56,7 @@ const MapComponent = dynamic(() => import("@/components/map-component"), {
 });
 
 export default function EditPropertyPage() {
+  const [newFeature, setNewFeature] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { id } = useParams();
   const router = useRouter();
@@ -73,7 +73,7 @@ export default function EditPropertyPage() {
     bedrooms: "",
     bathrooms: "",
     area: "",
-    features: "",
+    features: [], // Change from "" to []
     status: "draft",
     featured: false,
     latitude: 24.766316905850978,
@@ -174,79 +174,97 @@ export default function EditPropertyPage() {
   }, []);
 
   // جلب بيانات العقار عند تحميل الصفحة
-  useEffect(() => {
-    const fetchProperty = async () => {
-      try {
-        const response = await axiosInstance.get(`/properties/${id}`);
-        const property = response.data.data.property;
-        const projectsResponse = await axiosInstance.get("/user/projects");
-        const projects = projectsResponse.data.data.user_projects;
-        setProjects(projects);
+// في useEffect الخاص بجلب بيانات العقار، قم بتحديث هذا الجزء:
 
-        // البحث عن المشروع المطابق
-        const matchedProject = projects.find(
-          (p) => p.id === property.project_id,
-        );
+useEffect(() => {
+  const fetchProperty = async () => {
+    try {
+      const response = await axiosInstance.get(`/properties/${id}`);
+      const property = response.data.data.property;
+      const projectsResponse = await axiosInstance.get("/user/projects");
+      const projects = projectsResponse.data.data.user_projects;
+      setProjects(projects);
 
-        setFormData({
-          ...formData,
-          project_id: matchedProject ? matchedProject.id.toString() : "",
-          title: property.title || "",
-          category_id: property.category_id || "",
-          description: property.description || "",
-          address: property.address || "",
-          price: property.price || "",
-          type: property.type || "",
-          transaction_type: property.transaction_type || "",
-          bedrooms: property.beds?.toString() || "",
-          bathrooms: property.bath?.toString() || "",
-          area: property.area?.toString() || "",
-          features: property.features?.join(", ") || "",
-          status: property.status === 1 ? "published" : "draft",
-          featured: property.featured || false,
-          latitude: property.latitude || 24.766316905850978,
-          longitude: property.longitude || 46.73579692840576,
-          category: property.category_id?.toString() || "",
-          size: property.size?.toString() || "",
-          length: property.length?.toString() || "",
-          width: property.width?.toString() || "",
-          facade_id: property.facade_id?.toString() || "",
-          street_width_north: property.street_width_north?.toString() || "",
-          street_width_south: property.street_width_south?.toString() || "",
-          street_width_east: property.street_width_east?.toString() || "",
-          street_width_west: property.street_width_west?.toString() || "",
-          building_age: property.building_age?.toString() || "",
-          rooms: property.rooms?.toString() || "",
-          floors: property.floors?.toString() || "",
-          floor_number: property.floor_number?.toString() || "",
-          driver_room: property.driver_room?.toString() || "",
-          maid_room: property.maid_room?.toString() || "",
-          dining_room: property.dining_room?.toString() || "",
-          living_room: property.living_room?.toString() || "",
-          majlis: property.majlis?.toString() || "",
-          storage_room: property.storage_room?.toString() || "",
-          basement: property.basement?.toString() || "",
-          swimming_pool: property.swimming_pool?.toString() || "",
-          kitchen: property.kitchen?.toString() || "",
-          balcony: property.balcony?.toString() || "",
-          garden: property.garden?.toString() || "",
-          annex: property.annex?.toString() || "",
-          elevator: property.elevator?.toString() || "",
-          private_parking: property.private_parking?.toString() || "",
-          city_id: property.city_id,
-          district_id: property.state_id,
-        });
-        setPreviews({
-          thumbnail: property.featured_image || null,
-          gallery: property.gallery || [],
-          floorPlans: property.floor_planning_image || [],
-        });
-      } catch (error) {
-        toast.error("حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى.");
+      // البحث عن المشروع المطابق
+      const matchedProject = projects.find(
+        (p) => p.id === property.project_id,
+      );
+
+      // معالجة الميزات - تحويل من string إلى array
+      let featuresArray = [];
+      if (property.features) {
+        if (typeof property.features === 'string') {
+          // إذا كان string، قم بتقسيمه على الفواصل وتنظيفه
+          featuresArray = property.features
+            .split(',')
+            .map(feature => feature.trim())
+            .filter(feature => feature.length > 0);
+        } else if (Array.isArray(property.features)) {
+          // إذا كان array بالفعل، استخدمه كما هو
+          featuresArray = property.features;
+        }
       }
-    };
-    fetchProperty();
-  }, []);
+
+      setFormData({
+        ...formData,
+        project_id: matchedProject ? matchedProject.id.toString() : "",
+        title: property.title || "",
+        category_id: property.category_id || "",
+        description: property.description || "",
+        address: property.address || "",
+        price: property.price || "",
+        type: property.type || "",
+        transaction_type: property.transaction_type || "",
+        bedrooms: property.beds?.toString() || "",
+        bathrooms: property.bath?.toString() || "",
+        area: property.area?.toString() || "",
+        features: featuresArray, // استخدام المصفوفة المعالجة
+        status: property.status === 1 ? "published" : "draft",
+        featured: property.featured || false,
+        latitude: property.latitude || 24.766316905850978,
+        longitude: property.longitude || 46.73579692840576,
+        category: property.category_id?.toString() || "",
+        size: property.size?.toString() || "",
+        length: property.length?.toString() || "",
+        width: property.width?.toString() || "",
+        facade_id: property.facade_id?.toString() || "",
+        street_width_north: property.street_width_north?.toString() || "",
+        street_width_south: property.street_width_south?.toString() || "",
+        street_width_east: property.street_width_east?.toString() || "",
+        street_width_west: property.street_width_west?.toString() || "",
+        building_age: property.building_age?.toString() || "",
+        rooms: property.rooms?.toString() || "",
+        floors: property.floors?.toString() || "",
+        floor_number: property.floor_number?.toString() || "",
+        driver_room: property.driver_room?.toString() || "",
+        maid_room: property.maid_room?.toString() || "",
+        dining_room: property.dining_room?.toString() || "",
+        living_room: property.living_room?.toString() || "",
+        majlis: property.majlis?.toString() || "",
+        storage_room: property.storage_room?.toString() || "",
+        basement: property.basement?.toString() || "",
+        swimming_pool: property.swimming_pool?.toString() || "",
+        kitchen: property.kitchen?.toString() || "",
+        balcony: property.balcony?.toString() || "",
+        garden: property.garden?.toString() || "",
+        annex: property.annex?.toString() || "",
+        elevator: property.elevator?.toString() || "",
+        private_parking: property.private_parking?.toString() || "",
+        city_id: property.city_id,
+        district_id: property.state_id,
+      });
+
+      setPreviews({
+        thumbnail: property.featured_image || null,
+        gallery: property.gallery || [],
+        floorPlans: property.floor_planning_image || [],
+      });
+    } catch (error) {
+      toast.error("حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى.");
+    }
+  };
+  fetchProperty();
+}, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -430,7 +448,7 @@ export default function EditPropertyPage() {
           beds: parseInt(formData.bedrooms),
           bath: parseInt(formData.bathrooms),
           area: parseInt(formData.area),
-          features: formData.features.split(",").map((f) => f.trim()),
+          features: formData.features, // No need to split, it's already an array
           status: publish ? 1 : 0,
           featured_image: thumbnailUrl || previews.thumbnail,
           floor_planning_image:
@@ -783,20 +801,78 @@ export default function EditPropertyPage() {
                     </div> */}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="features">الميزات (مفصولة بفواصل)</Label>
-                    <Input
-                      id="features"
-                      name="features"
-                      placeholder="شرفة، أرضيات خشبية، أجهزة منزلية حديثة"
-                      value={formData.features}
-                      onChange={handleInputChange}
-                      className={errors.features ? "border-red-500" : ""}
-                    />
-                    {errors.features && (
-                      <p className="text-sm text-red-500">{errors.features}</p>
-                    )}
-                  </div>
+                  <div className="space-y-4">
+  <Label>الميزات</Label>
+  
+  {/* إضافة ميزة جديدة */}
+  <div className="flex gap-2">
+    <Input
+      placeholder="أضف ميزة جديدة"
+      value={newFeature}
+      onChange={(e) => setNewFeature(e.target.value)}
+      onKeyPress={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (newFeature.trim() && !formData.features.includes(newFeature.trim())) {
+            setFormData((prev) => ({
+              ...prev,
+              features: [...prev.features, newFeature.trim()],
+            }));
+            setNewFeature("");
+          }
+        }
+      }}
+    />
+    <Button
+      type="button"
+      onClick={() => {
+        if (newFeature.trim() && !formData.features.includes(newFeature.trim())) {
+          setFormData((prev) => ({
+            ...prev,
+            features: [...prev.features, newFeature.trim()],
+          }));
+          setNewFeature("");
+        }
+      }}
+    >
+      <Plus className="h-4 w-4" />
+    </Button>
+  </div>
+
+  {/* عرض الميزات المضافة */}
+  <div className="mt-4">
+    <Label>الميزات المضافة</Label>
+    <div className="flex flex-wrap gap-2 mt-2">
+      {formData.features.map((feature, index) => (
+        <div
+          key={index}
+          className="bg-gray-200 px-3 py-1 rounded-full flex items-center gap-2"
+        >
+          {feature}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setFormData((prev) => ({
+                ...prev,
+                features: prev.features.filter(
+                  (_, i) => i !== index
+                ),
+              }));
+            }}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* رسالة خطأ إذا لزم الأمر */}
+  {errors.features && (
+    <p className="text-sm text-red-500">{errors.features}</p>
+  )}
+</div>
 
                   <div className="flex items-center space-x-2 pt-4 gap-2">
                     <Switch

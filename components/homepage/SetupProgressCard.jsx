@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect } from "react";
 import useStore from "@/context/Store";
 import {
@@ -77,6 +76,15 @@ export function SetupProgressCard() {
     })
   );
 
+  const stepTranslations = {
+    Banner: "البانر",
+    Footer: "التذييل",
+    About: "من نحن",
+    Menu: "القائمة",
+    Projects: "المشاريع",
+    Properties: "العقارات"
+  };
+
   return (
     <Card className="col-span-3">
       <CardHeader>
@@ -86,7 +94,6 @@ export function SetupProgressCard() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5 gap-5">
-        {/* شريط التقدم */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">اكتمال الإعداد</span>
@@ -94,36 +101,60 @@ export function SetupProgressCard() {
           </div>
           <Progress value={progressPercent} />
         </div>
-
-        {/* قائمة الخطوات */}
-        <div className="space-y-2">
-          {completedSteps.map((step) => (
-            <div key={step.id} className="flex items-center gap-2">
-              <div
-                className={`flex h-6 w-6 items-center justify-center ${
-                  step.completed
-                    ? "rounded-full bg-primary/10 text-primary"
-                    : "rounded-full border border-dashed"
-                }`}
-              >
-                {step.completed ? (
-                  <Check className="h-3.5 w-3.5" />
-                ) : (
-                  <span className="text-xs">?</span>
-                )}
+        
+        {/* مسافة فارغة فوق وتحت قائمة الخطوات */}
+        <div className="py-4">
+          <div className="space-y-2">
+            {completedSteps.map((step) => (
+              <div key={step.id} className="flex items-center gap-2">
+                <div
+                  className={`flex h-6 w-6 items-center justify-center ${
+                    step.completed
+                      ? "rounded-full bg-primary/10 text-primary"
+                      : "rounded-full border border-dashed"
+                  }`}
+                >
+                  {step.completed ? (
+                    <Check className="h-3.5 w-3.5" />
+                  ) : (
+                    <span className="text-xs">?</span>
+                  )}
+                </div>
+                <span className="text-sm">
+                  {stepTranslations[step.name] || step.name}
+                </span>
               </div>
-              <span className="text-sm">{step.name}</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-
-        {/* زر المتابعة إلى المسار القادم من API */}
-        <Button size="sm" className="w-full gap-1" asChild>
-          <Link href={setupProgressData.continue_path}>
-            <span>متابعة الإعداد</span>
-            <ArrowRight className="h-3.5 w-3.5 mr-0 ml-1" />
-          </Link>
-        </Button>
+        
+        {/* عرض الزر فقط إذا كان هناك رابط صحيح */}
+        {setupProgressData.continue_path && (
+          <Button size="sm" className="w-full gap-1" asChild>
+            <Link href={setupProgressData.continue_path}>
+              <span>اضغط هنا لإكمال بياناتك</span>
+              <ArrowRight className="h-3.5 w-3.5 mr-0 ml-1" />
+            </Link>
+          </Button>
+        )}
+        
+        {/* رسالة عندما يكون الإعداد مكتملاً */}
+        {!setupProgressData.continue_path && progressPercent === 100 && (
+          <div className="text-center p-3 bg-white rounded-lg">
+            <p className="text-sm font-medium" style={{ color: '#05543e' }}>
+              تم إكمال إعداد موقعك بنجاح!
+            </p>
+          </div>
+        )}
+        
+        {/* رسالة عندما لا يوجد رابط ولكن الإعداد غير مكتمل */}
+        {!setupProgressData.continue_path && progressPercent < 100 && (
+          <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-800">
+              لا توجد خطوات إضافية متاحة حالياً
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

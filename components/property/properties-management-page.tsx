@@ -604,21 +604,25 @@ function PropertyCard({
           </div>
         </div>
         <div className="flex flex-wrap gap-1 pt-2">
-          {property.features
-            ?.slice(0, 3)
-            .map((feature: string, index: number) => (
-              <span
-                key={index}
-                className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
-              >
-                {feature}
-              </span>
-            ))}
-          {property.features?.length > 3 && (
-            <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
-              +{property.features?.length - 3} more
-            </span>
-          )}
+          {Array.isArray(property.features) && property.features.length > 0 ? (
+            <>
+              {property.features
+                .slice(0, 3)
+                .map((feature: string, index: number) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
+                  >
+                    {feature}
+                  </span>
+                ))}
+              {property.features.length > 3 && (
+                <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
+                  +{property.features.length - 3} more
+                </span>
+              )}
+            </>
+          ) : null}
         </div>
       </CardContent>
       <CardFooter className="flex flex-row-reverse gap-2 p-4 pt-0">

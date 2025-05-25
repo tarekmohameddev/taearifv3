@@ -80,7 +80,7 @@ export default function AddPropertyPage() {
     bedrooms: "",
     bathrooms: "",
     size: "",
-    features: "",
+    features: [], // تم تغييره إلى مصفوفة
     status: "draft",
     featured: false,
     latitude: 24.766316905850978,
@@ -113,6 +113,7 @@ export default function AddPropertyPage() {
     street_width_west: "",
     building_age: "",
   });
+  const [currentFeature, setCurrentFeature] = useState(""); // حالة جديدة للميزة الحالية
   const [errors, setErrors] = useState({});
   const [images, setImages] = useState({
     thumbnail: null,
@@ -272,6 +273,7 @@ export default function AddPropertyPage() {
 
     e.target.value = "";
   };
+
   const years = [];
   for (let year = 2030; year >= 1925; year--) {
     years.push(year);
@@ -293,11 +295,11 @@ export default function AddPropertyPage() {
     }
   };
 
-  const handleCounterChange = (name: keyof PropertyFormData, value: number) => {
+  const handleCounterChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (name: string, value: string) => {
+  const handleSelectChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -310,6 +312,8 @@ export default function AddPropertyPage() {
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
     if (!formData.description)
       newErrors.description = "من فضلك اكتب وصف للعقار";
+    if (formData.features.length === 0)
+      newErrors.features = "يجب إضافة ميزة واحدة على الأقل";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -361,7 +365,7 @@ export default function AddPropertyPage() {
           beds: parseInt(formData.bedrooms),
           bath: parseInt(formData.bathrooms),
           size: parseInt(formData.size),
-          features: formData.features.split(",").map((f) => f.trim()),
+          features: formData.features.join(", "), // تحويل المصفوفة إلى سلسلة نصية
           status: publish ? 1 : 0,
           featured_image: thumbnailPath,
           floor_planning_image: floorPlansPaths,
@@ -418,7 +422,7 @@ export default function AddPropertyPage() {
         setPropertiesManagement({ properties: updatedProperties });
         const setpOB = {
           "step": "properties"
-     }
+        };
         await axiosInstance.post("/steps/complete", setpOB);
         await fetchSetupProgressData();
         router.push("/properties");
@@ -740,18 +744,63 @@ export default function AddPropertyPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="features">الميزات (مفصولة بفواصل)</Label>
-                    <Input
-                      id="features"
-                      name="features"
-                      placeholder="شرفة، أرضيات خشبية، أجهزة منزلية حديثة"
-                      value={formData.features}
-                      onChange={handleInputChange}
-                      className={errors.features ? "border-red-500" : ""}
-                    />
+                    <Label htmlFor="featureInput">الميزات</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="featureInput"
+                        placeholder="أدخل ميزة"
+                        value={currentFeature}
+                        onChange={(e) => setCurrentFeature(e.target.value)}
+                        className={errors.features ? "border-red-500" : ""}
+                      />
+                      <Button
+                        onClick={() => {
+                          if (
+                            currentFeature.trim() !== "" &&
+                            !formData.features.includes(currentFeature.trim())
+                          ) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              features: [...prev.features, currentFeature.trim()],
+                            }));
+                            setCurrentFeature("");
+                          }
+                        }}
+                      >
+                              <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
                     {errors.features && (
                       <p className="text-sm text-red-500">{errors.features}</p>
                     )}
+                  </div>
+
+                  <div className="mt-4">
+                    <Label>الميزات المضافة</Label>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {formData.features.map((feature, index) => (
+                        <div
+                          key={index}
+                          className="bg-gray-200 px-3 py-1 rounded-full flex items-center gap-2"
+                        >
+                          {feature}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                features: prev.features.filter(
+                                  (_, i) => i !== index
+                                ),
+                              }));
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="flex items-center space-x-2 pt-4 gap-2">
@@ -785,10 +834,9 @@ export default function AddPropertyPage() {
                           onChange={(e) => {
                             const onlyDigits = e.currentTarget.value.replace(
                               /\D/g,
-                              "",
+                              ""
                             );
                             handleInputChange({
-                              // نمرر نفس الحدث لكن بقيمة منقحة
                               target: {
                                 name: e.currentTarget.name,
                                 value: onlyDigits,
@@ -813,10 +861,9 @@ export default function AddPropertyPage() {
                           onChange={(e) => {
                             const onlyDigits = e.currentTarget.value.replace(
                               /\D/g,
-                              "",
+                              ""
                             );
                             handleInputChange({
-                              // نمرر نفس الحدث لكن بقيمة منقحة
                               target: {
                                 name: e.currentTarget.name,
                                 value: onlyDigits,
@@ -841,10 +888,9 @@ export default function AddPropertyPage() {
                           onChange={(e) => {
                             const onlyDigits = e.currentTarget.value.replace(
                               /\D/g,
-                              "",
+                              ""
                             );
                             handleInputChange({
-                              // نمرر نفس الحدث لكن بقيمة منقحة
                               target: {
                                 name: e.currentTarget.name,
                                 value: onlyDigits,
@@ -894,10 +940,9 @@ export default function AddPropertyPage() {
                           onChange={(e) => {
                             const onlyDigits = e.currentTarget.value.replace(
                               /\D/g,
-                              "",
+                              ""
                             );
                             handleInputChange({
-                              // نمرر نفس الحدث لكن بقيمة منقحة
                               target: {
                                 name: e.currentTarget.name,
                                 value: onlyDigits,
@@ -924,10 +969,9 @@ export default function AddPropertyPage() {
                           onChange={(e) => {
                             const onlyDigits = e.currentTarget.value.replace(
                               /\D/g,
-                              "",
+                              ""
                             );
                             handleInputChange({
-                              // نمرر نفس الحدث لكن بقيمة منقحة
                               target: {
                                 name: e.currentTarget.name,
                                 value: onlyDigits,
@@ -954,10 +998,9 @@ export default function AddPropertyPage() {
                           onChange={(e) => {
                             const onlyDigits = e.currentTarget.value.replace(
                               /\D/g,
-                              "",
+                              ""
                             );
                             handleInputChange({
-                              // نمرر نفس الحدث لكن بقيمة منقحة
                               target: {
                                 name: e.currentTarget.name,
                                 value: onlyDigits,
@@ -983,10 +1026,9 @@ export default function AddPropertyPage() {
                           onChange={(e) => {
                             const onlyDigits = e.currentTarget.value.replace(
                               /\D/g,
-                              "",
+                              ""
                             );
                             handleInputChange({
-                              // نمرر نفس الحدث لكن بقيمة منقحة
                               target: {
                                 name: e.currentTarget.name,
                                 value: onlyDigits,
