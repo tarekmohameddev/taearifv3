@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
@@ -23,13 +23,13 @@ export function SetupProgressCard() {
     },
     loading,
   } = useStore();
-
+  
   useEffect(() => {
     if (!isSetupProgressDataUpdated) {
       fetchSetupProgressData();
     }
   }, [isSetupProgressDataUpdated, fetchSetupProgressData]);
-
+  
   // عرض Skeleton أثناء التحميل
   if (!isSetupProgressDataUpdated) {
     return (
@@ -56,26 +56,27 @@ export function SetupProgressCard() {
       </Card>
     );
   }
-
+  
   // 1) نحسب النسبة المئوية (لو كانت الـ API تُرجع 0–1)
   //    أو نستخدمها مباشرةً إذا كانت 0–100
   const progressPercent = 
     setupProgressData.progress <= 1
       ? Math.round(setupProgressData.progress * 100)
       : setupProgressData.progress;
-
-  // 2) نحول الـ steps من object إلى array
+  
+  // 2) نحول الـ steps من object إلى array مع استخدام الهيكل الجديد
   const completedSteps = Object.entries(setupProgressData.steps).map(
-    ([id, completed]) => ({
+    ([id, stepData]) => ({
       id,
       name: id
         .split("_")
         .map((w) => w[0].toUpperCase() + w.slice(1))
         .join(" "),
-      completed,
+      completed: stepData.status,
+      text: stepData.text,
     })
   );
-
+  
   const stepTranslations = {
     Banner: "البانر",
     Footer: "التذييل",
@@ -84,7 +85,7 @@ export function SetupProgressCard() {
     Projects: "المشاريع",
     Properties: "العقارات"
   };
-
+  
   return (
     <Card className="col-span-3">
       <CardHeader>
@@ -110,15 +111,15 @@ export function SetupProgressCard() {
                 <div
                   className={`flex h-6 w-6 items-center justify-center ${
                     step.completed
-                      ? "rounded-full bg-primary/10 text-primary"
-                      : "rounded-full border border-dashed"
+                      ? "rounded-full bg-primary/10 text-primary "
+                      : "rounded-full bg-orange-50 text-orange-500  border-dashed"
                   }`}
                 >
                   {step.completed ? (
                     <Check className="h-3.5 w-3.5" />
                   ) : (
-                    <span className="text-xs">?</span>
-                  )}
+                  <span className="text-xs">?</span>
+                )}
                 </div>
                 <span className="text-sm">
                   {stepTranslations[step.name] || step.name}
@@ -127,10 +128,9 @@ export function SetupProgressCard() {
             ))}
           </div>
         </div>
-        
         {/* عرض الزر فقط إذا كان هناك رابط صحيح */}
         {setupProgressData.continue_path && (
-          <Button size="sm" className="w-full gap-1" asChild>
+          <Button size="sm" className="w-full gap-1 " asChild>
             <Link href={setupProgressData.continue_path}>
               <span>اضغط هنا لإكمال بياناتك</span>
               <ArrowRight className="h-3.5 w-3.5 mr-0 ml-1" />
@@ -139,13 +139,13 @@ export function SetupProgressCard() {
         )}
         
         {/* رسالة عندما يكون الإعداد مكتملاً */}
-        {!setupProgressData.continue_path && progressPercent === 100 && (
+        {/* {!setupProgressData.continue_path && progressPercent === 100 && (
           <div className="text-center p-3 bg-white rounded-lg">
             <p className="text-sm font-medium" style={{ color: '#05543e' }}>
               تم إكمال إعداد موقعك بنجاح!
             </p>
           </div>
-        )}
+        )} */}
         
         {/* رسالة عندما لا يوجد رابط ولكن الإعداد غير مكتمل */}
         {!setupProgressData.continue_path && progressPercent < 100 && (
