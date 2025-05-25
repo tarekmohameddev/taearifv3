@@ -2,10 +2,30 @@ import axiosInstance from "@/lib/axiosInstance";
 
 module.exports = (set) => ({
   visitorData: {
-    7: [],
-    30: [],
-    90: [],
-    365: [],
+    7: {
+      data: [],
+      totalVisits: 0,
+      totalUniqueVisitors: 0,
+      fetched: false
+    },
+    30: {
+      data: [],
+      totalVisits: 0,
+      totalUniqueVisitors: 0,
+      fetched: false
+    },
+    90: {
+      data: [],
+      totalVisits: 0,
+      totalUniqueVisitors: 0,
+      fetched: false
+    },
+    365: {
+      data: [],
+      totalVisits: 0,
+      totalUniqueVisitors: 0,
+      fetched: false
+    },
   },
   selectedTimeRange: "7",
 
@@ -34,6 +54,8 @@ module.exports = (set) => ({
             ...state.homepage.visitorData,
             [timeRange]: {
               data: response.data.visitor_data,
+              totalVisits: response.data.total_visits,
+              totalUniqueVisitors: response.data.total_unique_visitors,
               fetched: true,
             },
           },
