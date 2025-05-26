@@ -285,18 +285,21 @@ export function RegisterPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4" dir="rtl">
       <div className="w-full max-w-md">
-        {/* Logo */}
-      <div className="absolute top-1 right-10">
-        <Image
-          src="/logo.png"
-          alt="Website Builder Logo"
-          width={200}
-          height={142}
-          className="h-[7rem] w-auto object-contain dark:invert"
-        />
-      </div>
+{/* Logo - Responsive positioning */}
+{/* Logo - Full width container with logo positioned */}
+<div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
+  <div className="md:absolute md:top-1 md:right-10">
+    <Image
+      src="/logo.png"
+      alt="Website Builder Logo"
+      width={200}
+      height={142}
+      className="h-[7rem] md:h-[7rem] w-auto object-contain dark:invert"
+    />
+  </div>
+</div>
 
-        <h1 className="text-2xl font-bold text-center mb-6 text-foreground">إنشاء حساب جديد</h1>
+        <h1 className="text-2xl font-bold text-center mb-6 text-foreground sm:mt-20">إنشاء حساب جديد</h1>
 
         {formSubmitted ? (
           <div className="text-center py-8 bg-muted/50 rounded-lg border border-border">
