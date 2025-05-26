@@ -235,14 +235,16 @@ const OnboardingPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background" dir="rtl">
       {/* Simple Menu */}
-      <div className="absolute top-1 right-10">
-  <Image
-    src="/logo.png"
-    alt="Website Builder Logo"
-    width={200}
-    height={142}
-    className="h-[7rem] w-auto object-contain dark:invert"
-  />
+<div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
+  <div className="md:absolute md:top-1 md:right-10">
+    <Image
+      src="/logo.png"
+      alt="Website Builder Logo"
+      width={200}
+      height={142}
+      className="h-[7rem] md:h-[7rem] w-auto object-contain dark:invert"
+    />
+  </div>
 </div>
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4">

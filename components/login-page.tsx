@@ -108,14 +108,16 @@ export function LoginPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4" dir="rtl">
       <div className="w-full max-w-md">
         {/* Logo - Positioned absolute top right - Larger size */}
-<div className="absolute top-1 right-10">
-  <Image
-    src="/logo.png"
-    alt="Website Builder Logo"
-    width={200}
-    height={142}
-    className="h-[7rem] w-auto object-contain dark:invert"
-  />
+<div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
+  <div className="md:absolute md:top-1 md:right-10">
+    <Image
+      src="/logo.png"
+      alt="Website Builder Logo"
+      width={200}
+      height={142}
+      className="h-[7rem] md:h-[7rem] w-auto object-contain dark:invert"
+    />
+  </div>
 </div>
         <h1 className="text-2xl font-bold text-center mb-6 text-foreground">تسجيل الدخول</h1>
 
