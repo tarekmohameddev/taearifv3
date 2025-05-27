@@ -112,6 +112,7 @@ export default function AddPropertyPage() {
     street_width_east: "",
     street_width_west: "",
     building_age: "",
+    payment_method: "",
   });
   const [currentFeature, setCurrentFeature] = useState(""); // حالة جديدة للميزة الحالية
   const [errors, setErrors] = useState({});
@@ -405,6 +406,7 @@ export default function AddPropertyPage() {
           street_width_east: parseFloat(formData.street_width_east) || 0,
           street_width_west: parseFloat(formData.street_width_west) || 0,
           building_age: parseFloat(formData.building_age) || 0,
+          payment_method: formData.payment_method || null,
         };
 
         let response = await axiosInstance.post("/properties", propertyData);
@@ -554,55 +556,53 @@ export default function AddPropertyPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="price">السعر</Label>
-                      <Input
-                        id="price"
-                        name="price"
-                        type="number"
-                        placeholder="750000"
-                        value={formData.price}
-                        onChange={handleInputChange}
-                        className={errors.price ? "border-red-500" : ""}
-                      />
-                      {errors.price && (
-                        <p className="text-sm text-red-500">{errors.price}</p>
-                      )}
-                    </div>
+  <div className="space-y-2">
+    <Label htmlFor="price">السعر</Label>
+    <Input
+      id="price"
+      name="price"
+      type="number"
+      placeholder="750000"
+      value={formData.price}
+      onChange={handleInputChange}
+      className={errors.price ? "border-red-500" : ""}
+    />
+    {errors.price && (
+      <p className="text-sm text-red-500">{errors.price}</p>
+    )}
+  </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="transaction_type">نوع القائمة</Label>
-                      <Select
-                        name="transaction_type"
-                        value={formData.transaction_type}
-                        onValueChange={(value) =>
-                          handleInputChange({
-                            target: { name: "transaction_type", value },
-                          })
-                        }
-                      >
-                        <SelectTrigger
-                          id="transaction_type"
-                          className={
-                            errors.transaction_type ? "border-red-500" : ""
-                          }
-                        >
-                          <SelectValue placeholder="اختر النوع" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="sale">للبيع</SelectItem>
-                          <SelectItem value="rent">للإيجار</SelectItem>
-                          <SelectItem value="sold">مباعة</SelectItem>
-                          <SelectItem value="rented">مؤجرة</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {errors.transaction_type && (
-                        <p className="text-sm text-red-500">
-                          {errors.transaction_type}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+  <div className="space-y-2">
+    <Label htmlFor="payment_method">طريقة الدفع</Label>
+    <Select
+      name="payment_method"
+      value={formData.payment_method}
+      onValueChange={(value) =>
+        handleInputChange({
+          target: { name: "payment_method", value },
+        })
+      }
+    >
+      <SelectTrigger
+        id="payment_method"
+        className={errors.payment_method ? "border-red-500" : ""}
+      >
+        <SelectValue placeholder="اختر طريقة الدفع" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="monthly">شهري</SelectItem>
+        <SelectItem value="quarterly">ربع سنوي</SelectItem>
+        <SelectItem value="semi_annual">نصف سنوي</SelectItem>
+        <SelectItem value="annual">سنوي</SelectItem>
+      </SelectContent>
+    </Select>
+    {errors.payment_method && (
+      <p className="text-sm text-red-500">
+        {errors.payment_method}
+      </p>
+    )}
+  </div>
+</div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -702,6 +702,36 @@ export default function AddPropertyPage() {
                       </div>
                     </div>
                   </div>
+                  <div className="space-y-2 mt-4">
+  <Label htmlFor="transaction_type">نوع القائمة</Label>
+  <Select
+    name="transaction_type"
+    value={formData.transaction_type}
+    onValueChange={(value) =>
+      handleInputChange({
+        target: { name: "transaction_type", value },
+      })
+    }
+  >
+    <SelectTrigger
+      id="transaction_type"
+      className={errors.transaction_type ? "border-red-500" : ""}
+    >
+      <SelectValue placeholder="اختر النوع" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="sale">للبيع</SelectItem>
+      <SelectItem value="rent">للإيجار</SelectItem>
+      <SelectItem value="sold">مباعة</SelectItem>
+      <SelectItem value="rented">مؤجرة</SelectItem>
+    </SelectContent>
+  </Select>
+  {errors.transaction_type && (
+    <p className="text-sm text-red-500">
+      {errors.transaction_type}
+    </p>
+  )}
+</div>
                 </CardContent>
               </Card>
 
