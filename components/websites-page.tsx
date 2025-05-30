@@ -45,7 +45,7 @@ export function WebsitesPage() {
     {
       id: "1",
       name: "My Portfolio",
-      domain: "portfolio.example.com",
+      domain: "portfolio.taearif.com",
       status: "published",
       lastUpdated: "2 days ago",
       visitors: 1245,
@@ -54,7 +54,7 @@ export function WebsitesPage() {
     {
       id: "2",
       name: "Business Website",
-      domain: "business.example.com",
+      domain: "business.taearif.com",
       status: "published",
       lastUpdated: "1 week ago",
       visitors: 3456,
@@ -63,7 +63,7 @@ export function WebsitesPage() {
     {
       id: "3",
       name: "Blog",
-      domain: "blog.example.com",
+      domain: "blog.taearif.com",
       status: "draft",
       lastUpdated: "3 days ago",
       visitors: 0,
@@ -106,7 +106,7 @@ export function WebsitesPage() {
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="domain">Domain</Label>
-                      <Input id="domain" placeholder="mywebsite.example.com" />
+                      <Input id="domain" placeholder="mywebsite.taearif.com" />
                     </div>
                   </div>
                   <DialogFooter>

@@ -54,24 +54,7 @@ type ProjectImage = {
   file: File;
   url: string;
 };
-interface INewProject {
-  id: string;
-  name: string;
-  location: string;
-  price: string;
-  status: string;
-  completion_date: string;
-  units: number;
-  developer: string;
-  description: string;
-  featured: boolean;
-  latitude: number;
-  longitude: number;
-  amenities: string; // مدخل نصي للمرافق، مفصول بفواصل
-}
-export const metadata = {
-  title: "Project Edit",
-};
+
 export default function EditProjectPage(): JSX.Element {
   const {
     projectsManagement: { projects, loading, isInitialized },
@@ -80,11 +63,14 @@ export default function EditProjectPage(): JSX.Element {
   const router = useRouter();
   const { id } = useParams();
   const [originalData, setOriginalData] = useState(null);
-  let [amenitiesNAMES, setAmenitiesNAMES] = useState("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [currentAmenity, setCurrentAmenity] = useState("");
+  const [amenities, setAmenities] = useState<string[]>([]);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const plansInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  
   const [newProject, setNewProject] = useState({
     id: "",
     name: "",
@@ -98,21 +84,27 @@ export default function EditProjectPage(): JSX.Element {
     featured: false,
     latitude: 25.2048,
     longitude: 55.2708,
-    amenities: [],
     minPrice: "",
     maxPrice: "",
   });
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(
-    null,
-  );
+
+  const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(null);
   const [planImages, setPlanImages] = useState<ProjectImage[]>([]);
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [mapLoaded, setMapLoaded] = useState<boolean>(false);
-  useEffect(() => {
-    console.log("newProject", newProject);
-  }, [newProject]);
+
+  const addAmenity = () => {
+    if (currentAmenity.trim() !== "" && !amenities.includes(currentAmenity.trim())) {
+      setAmenities(prev => [...prev, currentAmenity.trim()]);
+      setCurrentAmenity("");
+    }
+  };
+  
+  const removeAmenity = (index: number) => {
+    setAmenities(prev => prev.filter((_, i) => i !== index));
+  };
+
   useEffect(() => {
     const fetchProjectData = async () => {
       try {
@@ -121,18 +113,14 @@ export default function EditProjectPage(): JSX.Element {
         );
         const projectData = response.data.data.project;
 
-        if (
-          projectData &&
-          Array.isArray(projectData.contents) &&
-          projectData.contents.length > 0
-        ) {
-          console.log("projectData", projectData);
+        if (projectData && Array.isArray(projectData.contents) && projectData.contents.length > 0) {
+          // تحديث بيانات المشروع
           setNewProject({
             id: projectData.id,
             name: projectData.contents[0].title,
             location: projectData.contents[0].address,
             price: `${projectData.price_range}`,
-            complete_status: projectData.complete_status,
+            complete_status: projectData.complete_status.toString(),
             completion_date: projectData.completion_date.split("T")[0],
             units: projectData.units,
             developer: projectData.developer,
@@ -140,57 +128,79 @@ export default function EditProjectPage(): JSX.Element {
             featured: projectData.featured,
             latitude: projectData.latitude,
             longitude: projectData.longitude,
-            amenities: projectData.amenities,
             minPrice: projectData.min_price,
             maxPrice: projectData.max_price,
           });
 
-          let amenitiesArray;
-          if (typeof newProject.amenities === "string") {
+          // معالجة المرافق
+          let amenitiesArray = [];
+          if (typeof projectData.amenities === "string") {
             try {
-              amenitiesArray = JSON.parse(newProject.amenities);
+              // محاولة تحليل JSON
+              amenitiesArray = JSON.parse(projectData.amenities);
             } catch (error) {
-              console.error("خطأ في تحويل JSON:", error);
-              amenitiesArray = [];
+              // إذا فشل، ربما تكون string مفصولة بفواصل
+              amenitiesArray = projectData.amenities.split(",").map(a => a.trim());
             }
-          } else if (Array.isArray(newProject.amenities)) {
-            amenitiesArray = newProject.amenities;
-          } else {
-            amenitiesArray = [];
+          } else if (Array.isArray(projectData.amenities)) {
+            amenitiesArray = projectData.amenities;
           }
-          const amenitiesNames = amenitiesArray.map((amenity) =>
-            amenity.name.trim(),
-          );
-          setAmenitiesNAMES(amenitiesNames);
-        } else {
-          console.error("البيانات غير مكتملة: خاصية contents مفقودة أو فارغة");
+
+          // استخراج أسماء المرافق
+          if (amenitiesArray.length > 0) {
+            // إذا كانت المرافق كائنات
+            if (typeof amenitiesArray[0] === 'object' && amenitiesArray[0].name) {
+              setAmenities(amenitiesArray.map(amenity => amenity.name.trim()));
+            } else {
+              // إذا كانت المرافق نصوص
+              setAmenities(amenitiesArray.map(amenity => amenity.toString().trim()));
+            }
+          }
         }
 
-        setThumbnailImage({
-          id: "existing-thumbnail",
-          url: projectData.featured_image,
-          file: new File([], "thumbnail.jpg"), // ملف وهمي للتمثيل
-        });
+        // معالجة الصور
+        if (projectData.featured_image) {
+          setThumbnailImage({
+            id: "existing-thumbnail",
+            url: projectData.featured_image,
+            file: new File([], "thumbnail.jpg"),
+          });
+        }
 
-        setGalleryImages(
-          projectData.gallery_images.map((img) => ({
-            id: `existing-${img}`,
-            url: img,
-            file: new File([], img.split("/").pop() || "image.jpg"),
-          })),
-        );
+        if (projectData.gallery_images && Array.isArray(projectData.gallery_images)) {
+          setGalleryImages(
+            projectData.gallery_images.map((img, index) => ({
+              id: `existing-gallery-${index}`,
+              url: img,
+              file: new File([], img.split("/").pop() || "image.jpg"),
+            }))
+          );
+        }
+
+        if (projectData.floorplan_images && Array.isArray(projectData.floorplan_images)) {
+          setPlanImages(
+            projectData.floorplan_images.map((img, index) => ({
+              id: `existing-plan-${index}`,
+              url: img,
+              file: new File([], img.split("/").pop() || "plan.jpg"),
+            }))
+          );
+        }
 
         setOriginalData(projectData);
       } catch (error) {
         console.error("Failed to fetch project data:", error);
-        // router.push('/projects');
+        toast.error("فشل في تحميل بيانات المشروع");
+        router.push('/projects');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchProjectData();
-  }, [id]);
+    if (id) {
+      fetchProjectData();
+    }
+  }, [id, router]);
 
   useEffect(() => {
     setMapLoaded(true);
@@ -200,15 +210,11 @@ export default function EditProjectPage(): JSX.Element {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
+    setNewProject((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
 
-    if (id === "amenities") {
-      setAmenitiesNAMES(value);
-    } else {
-      setNewProject((prev) => ({
-        ...prev,
-        [id]: value,
-      }));
-    }
     if (formErrors[id]) {
       setFormErrors((prev) => {
         const updated = { ...prev };
@@ -291,9 +297,7 @@ export default function EditProjectPage(): JSX.Element {
           setPlanImages((prev) => [
             ...prev,
             {
-              id:
-                Date.now().toString() +
-                Math.random().toString(36).substring(2, 9),
+              id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
               file,
               url: event.target.result.toString(),
             },
@@ -314,9 +318,7 @@ export default function EditProjectPage(): JSX.Element {
           setGalleryImages((prev) => [
             ...prev,
             {
-              id:
-                Date.now().toString() +
-                Math.random().toString(36).substring(2, 9),
+              id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
               file,
               url: event.target.result.toString(),
             },
@@ -347,34 +349,13 @@ export default function EditProjectPage(): JSX.Element {
     if (!newProject.name) {
       errors.name = "اسم المشروع مطلوب";
     }
-    // if (!newProject.location) {
-    //   errors.location = "الموقع مطلوب";
-    // }
-    // if (!newProject.price) {
-    //   errors.price = "السعر مطلوب";
-    // }
-    // if (!newProject.complete_status) {
-    //   errors.status = "الحالة مطلوبة";
-    // }
-    // if (!newProject.completion_date) {
-    //   errors.completion_date = "تاريخ الإنجاز مطلوب";
-    // }
-    // if (!newProject.developer) {
-    //   errors.developer = "المطور مطلوب";
-    // }
-    // if (!newProject.description) {
-    //   errors.description = "الوصف مطلوب";
-    // }
     if (!thumbnailImage) {
       errors.thumbnail = "صورة المشروع الرئيسية مطلوبة";
     }
-    // if (isNaN(newProject.latitude) || isNaN(newProject.longitude)) {
-    //   errors.coordinates = "إحداثيات الموقع غير صحيحة";
-    // }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-  // ! handle update
+
   const handleUpdateProject = async (
     status: "منشور" | "مسودة" | "Pre-construction",
   ) => {
@@ -400,65 +381,68 @@ export default function EditProjectPage(): JSX.Element {
         minPrice = parseFloat(newProject.price) || 0;
         maxPrice = minPrice;
       }
-      const formattedDate = new Date(newProject.completion_date)
-        .toISOString()
-        .split("T")[0];
+      
+      const formattedDate = newProject.completion_date 
+        ? new Date(newProject.completion_date).toISOString().split("T")[0]
+        : "";
 
-      let featuredImageUrl = "";
+      let featuredImagePath = "";
       if (thumbnailImage) {
         if (!thumbnailImage.url.startsWith("https://taearif.com/")) {
           const uploadResult = await uploadSingleFile(
             thumbnailImage.file,
             "project",
           );
-          featuredImageUrl = uploadResult.url;
+          featuredImagePath = uploadResult.path;
         } else {
-          featuredImageUrl = thumbnailImage.url;
+          featuredImagePath = thumbnailImage.url;
         }
       }
 
-      let floorplanUrls = [];
-      if (planImages.length > 0) {
-        const files = planImages.map((image) => image.file);
+      // رفع صور المخططات الجديدة فقط
+      let floorplanPaths = planImages
+        .filter(img => img.url.startsWith("https://taearif.com/"))
+        .map(img => img.url);
+      
+      const newPlanImages = planImages.filter(img => !img.url.startsWith("https://taearif.com/"));
+      if (newPlanImages.length > 0) {
+        const files = newPlanImages.map((image) => image.file);
         const uploadResults = await uploadMultipleFiles(files, "project");
         if (uploadResults && Array.isArray(uploadResults)) {
-          floorplanUrls = uploadResults.map((file) => file.url);
-        } else {
-          console.error("Error: uploadResults is not an array", uploadResults);
+          floorplanPaths = [...floorplanPaths, ...uploadResults.map((file) => file.path)];
+          toast.success("تم رفع صور المخططات بنجاح");
         }
       }
 
-      let galleryUrls = [];
-      if (galleryImages.length > 0) {
-        const files = galleryImages.map((image) => image.file);
+      // رفع صور المعرض الجديدة فقط
+      let galleryPaths = galleryImages
+        .filter(img => img.url.startsWith("https://taearif.com/"))
+        .map(img => img.url);
+      
+      const newGalleryImages = galleryImages.filter(img => !img.url.startsWith("https://taearif.com/"));
+      if (newGalleryImages.length > 0) {
+        const files = newGalleryImages.map((image) => image.file);
         const uploadResults = await uploadMultipleFiles(files, "project");
         if (uploadResults && Array.isArray(uploadResults)) {
-          galleryUrls = uploadResults.map((file) => file.url);
-        } else {
-          console.error(
-            "Error: uploadResults does not contain files array",
-            uploadResults,
-          );
+          galleryPaths = [...galleryPaths, ...uploadResults.map((file) => file.path)];
+          toast.success("تم رفع صور المعرض بنجاح");
         }
       }
 
-      const amenitiesArray =
-        typeof amenitiesNAMES === "string"
-          ? amenitiesNAMES.split(",").map((item) => item.trim())
-          : [];
+      const publishedValue = status === "منشور" ? 1 : 0;
 
       const projectData = {
-        featured_image: featuredImageUrl,
+        featured_image: featuredImagePath,
         min_price: minPrice,
         max_price: maxPrice,
         latitude: newProject.latitude,
         longitude: newProject.longitude,
         featured: newProject.featured,
-        complete_status: newProject.complete_status,
+        complete_status: newProject.complete_status === "1" ? 1 : 0,
         units: Number(newProject.units),
         completion_date: formattedDate,
         developer: newProject.developer,
-        published: status === "منشور",
+        published: publishedValue,
         contents: [
           {
             language_id: 1,
@@ -479,8 +463,8 @@ export default function EditProjectPage(): JSX.Element {
               "شقق فاخرة في دبي بإطلالة على البحر ومرافق متميزة.",
           },
         ],
-        gallery_images: galleryUrls,
-        floorplan_images: floorplanUrls,
+        gallery_images: galleryPaths,
+        floorplan_images: floorplanPaths,
         specifications: [
           { key: "Bedrooms", label: "Number of Bedrooms", value: "3" },
           { key: "Bathrooms", label: "Number of Bathrooms", value: "2" },
@@ -506,50 +490,20 @@ export default function EditProjectPage(): JSX.Element {
             unit: "قدم مربع",
           },
         ],
-        amenities: amenitiesArray,
+        amenities: amenities.join(", "), // تحويل array إلى string
       };
 
       const response = await axiosInstance.post(
         `https://taearif.com/api/projects/${id}`,
         projectData,
       );
-      toast.success("تم الحفظ بنجاح");
-
-      const updatedProject = response.data.data?.user_project || response.data;
-      console.log("Test", {
-        ...updatedProject,
-        name: newProject.name,
-        location: newProject.location,
-        price: newProject.price,
-        status: status === "منشور" ? 1 : 0,
-        featured: newProject.featured ? 1 : 0,
-        description: newProject.description,
-        completion_date: formattedDate,
-        developer: newProject.developer,
-        units: Number(newProject.units),
-        amenities: amenitiesArray,
-      });
-
-      if (updatedProject) {
-        useStore.getState().updateProject(id, {
-          ...updatedProject.user_project,
-          name: newProject.name,
-          location: newProject.location,
-          price: newProject.price,
-          status: status === "منشور" ? 1 : 0,
-          featured: newProject.featured ? 1 : 0,
-          description: newProject.description,
-          completion_date: formattedDate,
-          developer: newProject.developer,
-          units: Number(newProject.units),
-          amenities: amenitiesArray,
-        });
-      }
-
+      
+      toast.success("تم تحديث المشروع بنجاح");
       router.push("/projects");
     } catch (error) {
-      setSubmitError("حدث خطأ أثناء حفظ العقار. يرجى المحاولة مرة أخرى.");
+      setSubmitError("حدث خطأ أثناء حفظ المشروع. يرجى المحاولة مرة أخرى.");
       console.error("Update failed:", error);
+      toast.error("حدث خطأ في السيرفر");
     } finally {
       setIsLoading(false);
     }
@@ -559,16 +513,88 @@ export default function EditProjectPage(): JSX.Element {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
         <DashboardHeader />
-        <div className="flex flex-1 justify-center items-center">
-          <p>جاري تحميل بيانات المشروع...</p>
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="space-y-6">
+              {/* Header Skeleton */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+                <div className="flex gap-2">
+                  <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+              </div>
+  
+              {/* Form Card Skeleton */}
+              <Card>
+                <CardHeader>
+                  <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+                  <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Input Fields Skeleton */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <div key={i} className="space-y-2">
+                        <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Amenities Skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                  
+                  {/* Description Skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-24 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                </CardContent>
+              </Card>
+  
+              {/* Map Card Skeleton */}
+              <Card>
+                <CardHeader>
+                  <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+                  <div className="h-4 w-80 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px] w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </CardContent>
+              </Card>
+  
+              {/* Image Upload Cards Skeleton */}
+              {[1, 2, 3].map((i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <div className="h-6 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+                    <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-48 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </main>
         </div>
       </div>
     );
   }
+
   if (!id) {
     router.push("/projects");
     return null;
   }
+
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
       <DashboardHeader />
@@ -605,7 +631,7 @@ export default function EditProjectPage(): JSX.Element {
                     onClick={() => handleUpdateProject("منشور")}
                     disabled={isLoading}
                   >
-                    {isLoading ? "جاري الحفظ..." : "تعديل المشروع"}
+                    {isLoading ? "جاري الحفظ..." : "تحديث المشروع"}
                   </Button>
                 </div>
                 {submitError && (
@@ -619,11 +645,11 @@ export default function EditProjectPage(): JSX.Element {
               <CardHeader>
                 <CardTitle>معلومات المشروع</CardTitle>
                 <CardDescription>
-                  يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء. أدخل التفاصيل
-                  الأساسية للمشروع العقاري الجديد
+                  قم بتحديث التفاصيل الأساسية للمشروع العقاري
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* الصف الأول من الحقول */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="name">اسم المشروع</Label>
@@ -642,7 +668,7 @@ export default function EditProjectPage(): JSX.Element {
                     <Label htmlFor="location">الموقع</Label>
                     <Input
                       id="location"
-                      placeholder="وسط المدينة، نيويورك"
+                      placeholder="وسط المدينة"
                       value={newProject.location}
                       onChange={handleInputChange}
                       className={formErrors.location ? "border-red-500" : ""}
@@ -653,8 +679,12 @@ export default function EditProjectPage(): JSX.Element {
                       </p>
                     )}
                   </div>
+                </div>
+
+                {/* الصف الثاني من الحقول */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
-                    <Label htmlFor="price">نطاق السعر</Label>
+                    <Label htmlFor="price">السعر الابتدائي</Label>
                     <Input
                       id="price"
                       placeholder="من $750,000"
@@ -676,13 +706,17 @@ export default function EditProjectPage(): JSX.Element {
                       onChange={handleInputChange}
                     />
                   </div>
+                </div>
+
+                {/* الصف الثالث من الحقول */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="complete_status">الحالة</Label>
                     <Select
                       onValueChange={(value) =>
                         handleSelectChange("complete_status", value)
                       }
-                      value={newProject.complete_status || ""}
+                      value={newProject.complete_status}
                     >
                       <SelectTrigger
                         id="status"
@@ -718,6 +752,10 @@ export default function EditProjectPage(): JSX.Element {
                       </p>
                     )}
                   </div>
+                </div>
+
+                {/* الصف الرابع - المطور و Featured switch */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="developer">المطور</Label>
                     <Input
@@ -733,16 +771,7 @@ export default function EditProjectPage(): JSX.Element {
                       </p>
                     )}
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="amenities">المرافق (افصلها بفواصل)</Label>
-                    <Input
-                      id="amenities"
-                      placeholder="حمام سباحة, نادي رياضي, حديقة على السطح"
-                      value={amenitiesNAMES}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2 h-10">
+                  <div className="flex items-center space-x-2 h-10 self-end">
                     <Switch
                       id="featured"
                       checked={newProject.featured}
@@ -754,6 +783,92 @@ export default function EditProjectPage(): JSX.Element {
                   </div>
                 </div>
 
+                {/* حقل المرافق - منفصل تماماً */}
+                <div className="space-y-4">
+                  {/* حقل إدخال المرافق */}
+                  <div className="space-y-2">
+                    <Label htmlFor="amenityInput" className="text-foreground">
+                      المرافق
+                    </Label>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Input
+                        id="amenityInput"
+                        placeholder="أدخل مرفق (مثل: حمام سباحة)"
+                        value={currentAmenity}
+                        onChange={(e) => setCurrentAmenity(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addAmenity();
+                          }
+                        }}
+                        className="flex-1 bg-background border-input text-foreground placeholder:text-muted-foreground"
+                      />
+                      <Button
+                        type="button"
+                        onClick={addAmenity}
+                        disabled={!currentAmenity.trim()}
+                        className="w-full sm:w-auto"
+                        variant="secondary"
+                      >
+                        <Plus className="h-4 w-4 ml-2 sm:ml-0 sm:mr-2" />
+                        <span className="sm:hidden">إضافة مرفق</span>
+                        <span className="hidden sm:inline">إضافة</span>
+                      </Button>
+                    </div>
+                    {formErrors?.amenities && (
+                      <p className="text-sm text-destructive">{formErrors.amenities}</p>
+                    )}
+                  </div>
+
+                  {/* عرض المرافق المضافة */}
+                  {amenities.length > 0 && (
+                    <div className="space-y-2">
+                      <Label className="text-foreground">المرافق المضافة</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {amenities.map((amenity, index) => (
+                          <div
+                            key={index}
+                            className="
+                              bg-secondary/50 dark:bg-secondary/30 
+                              text-secondary-foreground 
+                              px-3 py-1.5 
+                              rounded-full 
+                              flex items-center gap-2
+                              text-sm
+                              transition-colors
+                              hover:bg-secondary/70 dark:hover:bg-secondary/50
+                              group
+                            "
+                          >
+                            <span className="select-none">{amenity}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeAmenity(index)}
+                              className="
+                                h-auto p-0 
+                                hover:bg-transparent 
+                                text-muted-foreground 
+                                hover:text-destructive
+                                transition-colors
+                                -mr-1
+                              "
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {amenities.length} مرفق مضاف
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* حقل الوصف - منفصل أيضاً */}
                 <div className="grid gap-2">
                   <Label htmlFor="description">الوصف</Label>
                   <Textarea
@@ -884,7 +999,7 @@ export default function EditProjectPage(): JSX.Element {
                       5 ميجابايت.
                     </p>
                     {formErrors.thumbnail && (
-                      <p className="text-xs text-red-500">
+                      <p className="text-sm text-red-500">
                         {formErrors.thumbnail}
                       </p>
                     )}
@@ -953,6 +1068,11 @@ export default function EditProjectPage(): JSX.Element {
                     يمكنك رفع مخططات بصيغة JPG أو PNG. الحد الأقصى لعدد المخططات
                     هو 10.
                   </p>
+                  {formErrors.planImages && (
+                    <p className="text-sm text-red-500">
+                      {formErrors.planImages}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1017,6 +1137,11 @@ export default function EditProjectPage(): JSX.Element {
                     يمكنك رفع صور بصيغة JPG أو PNG. الحد الأقصى لعدد الصور هو
                     20.
                   </p>
+                  {formErrors.galleryImages && (
+                    <p className="text-sm text-red-500">
+                      {formErrors.galleryImages}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1042,7 +1167,7 @@ export default function EditProjectPage(): JSX.Element {
                       onClick={() => handleUpdateProject("منشور")}
                       disabled={isLoading}
                     >
-                      {isLoading ? "جاري الحفظ..." : "تعديل المشروع"}
+                      {isLoading ? "جاري الحفظ..." : "تحديث المشروع"}
                     </Button>
                   </div>
                   {submitError && (

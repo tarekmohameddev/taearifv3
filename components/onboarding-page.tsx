@@ -5,33 +5,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { uploadSingleFile } from "@/utils/uploadSingle";
 import axiosInstance from "@/lib/axiosInstance";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  CheckCircle,
-  ChevronRight,
-  ChevronLeft,
-  Upload,
-  Info,
-  Trash2,
-  Palette,
-  Layout,
-  Home,
-  FileImage,
-  Check,
-  FileText,
-  User,
-  LockIcon,
-} from "lucide-react";
+import { Upload, Trash2, FileImage, Loader2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -70,28 +47,33 @@ const COLOR_PALETTES = [
   { primary: "#0f172a", secondary: "#334155", accent: "#94a3b8" },
 ];
 
-const STEPS = [
-  { id: "welcome", title: "مرحباً بك" },
-  { id: "branding", title: "الشعار والأيقونة" },
-  { id: "design", title: "التصميم والألوان" },
-  { id: "complete", title: "اكتمل الإعداد" },
-];
+interface FormErrors {
+  title?: string;
+  valLicense?: string;
+  workingHours?: string;
+  address?: string;
+  [key: string]: string | undefined;
+}
 
 const OnboardingPage: React.FC = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errors, setErrors] = useState<string>("");
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [uploadError, setUploadError] = useState<string>("");
   const [whereErrors, setWhereError] = useState<string>("");
   const { setOnboardingCompleted } = useAuthStore();
-  const [currentStep, setCurrentStep] = useState(0);
+  
   const [websiteData, setWebsiteData] = useState({
     title: "",
     logo: null as string | null,
     favicon: null as string | null,
-    logoFile: null as File | null, // لتخزين ملف الشعار الأصلي
-    faviconFile: null as File | null, // لتخزين ملف الأيقونة الأصلي
+    logoFile: null as File | null,
+    faviconFile: null as File | null,
     category: "realestate",
     colors: { ...COLOR_PALETTES[0] },
+    valLicense: "",
+    workingHours: "",
+    address: "",
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -111,8 +93,8 @@ const OnboardingPage: React.FC = () => {
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWhereError("");
-    setErrors("");
-    setIsLoading("");
+    setUploadError("");
+    setIsLoading(false);
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const reader = new FileReader();
@@ -121,8 +103,8 @@ const OnboardingPage: React.FC = () => {
         if (event.target?.result) {
           setWebsiteData({
             ...websiteData,
-            logo: event.target.result as string, // للمعاينة
-            logoFile: file, // الملف الأصلي
+            logo: event.target.result as string,
+            logoFile: file,
           });
           toast.success("تم رفع الشعار بنجاح");
         }
@@ -134,8 +116,8 @@ const OnboardingPage: React.FC = () => {
 
   const handleFaviconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWhereError("");
-    setIsLoading("");
-    setErrors("");
+    setIsLoading(false);
+    setUploadError("");
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const reader = new FileReader();
@@ -144,8 +126,8 @@ const OnboardingPage: React.FC = () => {
         if (event.target?.result) {
           setWebsiteData({
             ...websiteData,
-            favicon: event.target.result as string, // للمعاينة
-            faviconFile: file, // الملف الأصلي
+            favicon: event.target.result as string,
+            faviconFile: file,
           });
           toast.success("تم رفع أيقونة الموقع بنجاح");
         }
@@ -157,8 +139,8 @@ const OnboardingPage: React.FC = () => {
 
   const useLogoAsFavicon = () => {
     setWhereError("");
-    setIsLoading("");
-    setErrors("");
+    setIsLoading(false);
+    setUploadError("");
     if (websiteData.logo && websiteData.logoFile) {
       setWebsiteData({
         ...websiteData,
@@ -188,41 +170,39 @@ const OnboardingPage: React.FC = () => {
     }
   };
 
-  const nextStep = () => {
-    if (currentStep === 0 && !websiteData.title.trim()) {
-      toast.success("يرجى إدخال عنوان الموقع");
-      return;
-    }
-
-    if (currentStep === 2 && !websiteData.category) {
-      toast.success("يرجى إدخال عنوان الموقع");
-      return;
-    }
-
-    if (currentStep < STEPS.length - 1) {
-      setCurrentStep(currentStep + 1);
-      window.scrollTo(0, 0);
-    } else {
-      setErrors("");
-      setIsLoading("");
-      setWhereError("");
-      completeOnboarding();
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-      window.scrollTo(0, 0);
-    }
-  };
-
   const SkipSetup = async () => {
     await setOnboardingCompleted(true);
     router.push("/");
   };
 
-  const completeOnboarding = async () => {
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+    
+    if (!websiteData.title.trim()) {
+      newErrors.title = "يرجى إدخال عنوان الموقع";
+    }
+    
+    // التحقق من رقم الرخصة (اختياري، ولكن إذا تم إدخاله يجب أن يكون 10 أرقام)
+    if (websiteData.valLicense && websiteData.valLicense.length !== 10) {
+      newErrors.valLicense = "رقم الرخصة يجب أن يكون 10 أرقام";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const completeOnboarding = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    if (!websiteData.category) {
+      toast.error("يرجى اختيار نوع الموقع");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -234,13 +214,10 @@ const OnboardingPage: React.FC = () => {
             "logo",
           );
           logoUrl = logoResponse.url;
-        } catch (error) {
-          setErrors(error.response.data.message);
+        } catch (error: any) {
+          setUploadError(error.response?.data?.message || "خطأ في رفع الشعار");
           setWhereError("Logo");
-          if (currentStep > 0) {
-            setCurrentStep(1);
-            window.scrollTo(0, 0);
-          }
+          setIsLoading(false);
           return;
         }
       }
@@ -253,9 +230,10 @@ const OnboardingPage: React.FC = () => {
             "logo",
           );
           faviconUrl = faviconResponse.url;
-        } catch (error) {
+        } catch (error: any) {
           setWhereError("favicon");
-          setErrors(error.response.data.message);
+          setUploadError(error.response?.data?.message || "خطأ في رفع الأيقونة");
+          setIsLoading(false);
           return;
         }
       }
@@ -266,6 +244,9 @@ const OnboardingPage: React.FC = () => {
         colors: websiteData.colors,
         logo: logoUrl,
         favicon: faviconUrl,
+        valLicense: websiteData.valLicense || null,
+        workingHours: websiteData.workingHours || null,
+        address: websiteData.address || null,
       };
 
       const response = await axiosInstance.post("/onboarding", onboardingData);
@@ -276,702 +257,368 @@ const OnboardingPage: React.FC = () => {
       setTimeout(() => {
         router.push("/");
       }, 2000);
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false);
-      toast.error("حدث خطأ أثناء إكمال الإعداد");
+      toast.error(error.response?.data?.message || "حدث خطأ أثناء إكمال الإعداد");
     }
-  };
-
-  // Render the current step content
-  const renderStepContent = () => {
-    switch (STEPS[currentStep].id) {
-      case "welcome":
-        return (
-          <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <CardTitle className="text-3xl">
-                مرحباً بك في منشئ المواقع!
-              </CardTitle>
-              <CardDescription className="text-xl">
-                سنساعدك على إعداد موقعك الجديد في خطوات بسيطة
-              </CardDescription>
-
-              <div className="bg-muted/50 p-4 rounded-lg text-right">
-                <p className="text-lg font-medium mb-2">ماذا ستحتاج:</p>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span>عنوان لموقعك</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span>شعار وأيقونة (اختياري)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span>اختيار نوع الموقع وألوانه</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="border-t pt-8 mt-8">
-              <div className="text-center mb-6">
-                <CardTitle className="text-2xl mb-2">
-                  ما هو عنوان موقعك؟
-                </CardTitle>
-                <CardDescription>
-                  هذا هو الاسم الذي سيظهر في أعلى موقعك وفي نتائج البحث
-                </CardDescription>
-              </div>
-
-              <div className="space-y-4">
-                <Label
-                  htmlFor="website-title"
-                  className="flex items-center gap-1"
-                >
-                  عنوان الموقع
-                  <span className="text-destructive">*</span>
-                  <span className="text-xs text-muted-foreground">(مطلوب)</span>
-                </Label>
-                <Input
-                  id="website-title"
-                  placeholder="مثال: شركة الأفق للعقارات"
-                  value={websiteData.title}
-                  onChange={(e) =>
-                    setWebsiteData({ ...websiteData, title: e.target.value })
-                  }
-                  className="text-lg h-12"
-                />
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <p className="font-medium mb-2 flex items-center gap-2">
-                    <Info className="h-4 w-4" />
-                    نصائح لاختيار عنوان جيد:
-                  </p>
-                  <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
-                    <li>استخدم اسماً سهل التذكر ومرتبط بنشاطك</li>
-                    <li>تجنب الأسماء الطويلة جداً</li>
-                    <li>يمكن استخدام اسم شركتك أو اسمك الشخصي</li>
-                  </ul>
-                </div>
-
-                {websiteData.title && (
-                  <div className="mt-6 border rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      معاينة:
-                    </p>
-                    <div className="flex items-center justify-between border-b pb-2">
-                      <div className="w-8 h-8 bg-primary/20 rounded-md"></div>
-                      <p className="font-bold text-xl">{websiteData.title}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-
-      case "branding":
-        return (
-          <div className="space-y-8">
-            <div className="text-center mb-6">
-              <CardTitle className="text-2xl mb-2">
-                شعار وأيقونة موقعك
-              </CardTitle>
-              <CardDescription>
-                الشعار سيظهر في أعلى موقعك، والأيقونة ستظهر في تبويب المتصفح
-              </CardDescription>
-            </div>
-            {errors && (
-              <p className="text-sm text-red-500 text-center">
-                في ال {whereErrors} نوع الملف{" "}
-                {errors.replace("Invalid file type: ", "")} غير مدعوم، يرجى
-                استخدام JPG أو PNG.
-              </p>
-            )}
-            {/* Logo Section */}
-            <div className="border rounded-lg p-6 space-y-4">
-              <h3 className="text-lg font-medium">شعار الموقع</h3>
-
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleLogoUpload}
-                accept="image/*"
-                className="hidden"
-              />
-
-              {!websiteData.logo ? (
-                <div
-                  className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
-                  <p className="font-medium mb-2">انقر لرفع شعار</p>
-                  <p className="text-sm text-muted-foreground">
-                    أو اسحب الملف وأفلته هنا
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-4">
-                    يفضل صيغة PNG أو JPG بحجم 200×200 بكسل على الأقل
-                  </p>
-                </div>
-              ) : (
-                <div className="text-center space-y-4">
-                  <div className="relative w-40 h-40 mx-auto border rounded-lg overflow-hidden">
-                    <Image
-                      src={websiteData.logo || "/placeholder.svg"}
-                      alt="شعار الموقع"
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                  <div className="flex justify-center gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      تغيير الشعار
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() =>
-                        setWebsiteData({ ...websiteData, logo: null })
-                      }
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Favicon Section */}
-            <div className="border rounded-lg p-6 space-y-4">
-              <h3 className="text-lg font-medium">أيقونة الموقع (Favicon)</h3>
-              <p className="text-sm text-muted-foreground">
-                هي الأيقونة الصغيرة التي تظهر في تبويب المتصفح وفي المفضلة
-              </p>
-
-              <input
-                type="file"
-                ref={faviconInputRef}
-                onChange={handleFaviconUpload}
-                accept="image/*"
-                className="hidden"
-              />
-
-              <div className="flex flex-col sm:flex-row gap-6 items-center">
-                <div className="w-full sm:w-1/2">
-                  {!websiteData.favicon ? (
-                    <div
-                      className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors h-full"
-                      onClick={() => faviconInputRef.current?.click()}
-                    >
-                      <FileImage className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-                      <p className="font-medium mb-2">
-                        انقر لرفع أيقونة الموقع
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        يفضل صورة مربعة بصيغة PNG بحجم 32×32 بكسل
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="text-center space-y-4">
-                      <div className="relative w-20 h-20 mx-auto border rounded-lg overflow-hidden bg-muted p-2">
-                        <Image
-                          src={websiteData.favicon || "/placeholder.svg"}
-                          alt="أيقونة الموقع"
-                          fill
-                          className="object-contain"
-                        />
-                      </div>
-                      <div className="flex justify-center gap-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => faviconInputRef.current?.click()}
-                        >
-                          تغيير الأيقونة
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          onClick={() =>
-                            setWebsiteData({ ...websiteData, favicon: null })
-                          }
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="w-full sm:w-1/2 border-t sm:border-t-0 sm:border-r pt-4 sm:pt-0 sm:pr-6">
-                  <div className="bg-muted/50 p-4 rounded-lg mb-4">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-1">
-                        <Info className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium mb-2">ما هي أيقونة الموقع؟</p>
-                        <p className="text-sm text-muted-foreground">
-                          هي صورة صغيرة تظهر بجانب عنوان موقعك في تبويب المتصفح،
-                          وتساعد المستخدمين على التعرف على موقعك بسهولة.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {websiteData.logo && !websiteData.favicon && (
-                    <div className="text-center">
-                      <Button
-                        variant="outline"
-                        onClick={useLogoAsFavicon}
-                        className="w-full"
-                      >
-                        استخدام الشعار كأيقونة
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "design":
-        return (
-          <div className="space-y-8">
-            <div className="text-center mb-6">
-              <CardTitle className="text-2xl mb-2">تصميم موقعك</CardTitle>
-              <CardDescription>اختر نوع موقعك وألوانه المناسبة</CardDescription>
-            </div>
-
-            {/* Category Section */}
-            <div className="border rounded-lg p-6 space-y-4">
-              <h3 className="text-lg font-medium mb-4">نوع الموقع</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {WEBSITE_CATEGORIES.map((category) => {
-                  // Define which icon to use based on category id
-                  let CategoryIcon = FileText;
-                  if (category.id === "realestate") CategoryIcon = Home;
-                  if (category.id === "personal") CategoryIcon = User;
-
-                  return (
-                    <div
-                      key={category.id}
-                      className={`border rounded-lg p-6 ${
-                        category.disabled
-                          ? "opacity-60 cursor-not-allowed bg-muted/30"
-                          : "cursor-pointer hover:border-primary hover:shadow-md"
-                      } ${websiteData.category === category.id ? "border-primary bg-primary/5" : ""}`}
-                      onClick={() => handleCategorySelect(category.id)}
-                    >
-                      <div className="flex flex-col items-center text-center space-y-3">
-                        <div className="w-16 h-16 flex items-center justify-center mb-2 relative">
-                          <CategoryIcon
-                            className={`w-12 h-12 ${category.disabled ? "text-muted-foreground" : "text-primary"}`}
-                          />
-                          {category.disabled && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <LockIcon className="w-6 h-6 text-muted-foreground" />
-                            </div>
-                          )}
-                        </div>
-                        <h4 className="text-xl font-medium">
-                          {category.title}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">
-                          {category.description}
-                        </p>
-                        {category.disabled && (
-                          <p className="text-xs text-muted-foreground mt-2">
-                            (قريباً)
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {websiteData.category && (
-                <div className="bg-muted/50 p-4 rounded-lg mt-4">
-                  <p className="font-medium mb-2 flex items-center gap-2">
-                    <Info className="h-4 w-4" />
-                    ميزات متاحة لهذا النوع:
-                  </p>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
-                    {websiteData.category === "personal" && (
-                      <>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>صفحة السيرة الذاتية</span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>معرض الأعمال</span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>نموذج التواصل</span>
-                        </li>
-                      </>
-                    )}
-                    {websiteData.category === "realestate" && (
-                      <>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>عرض العقارات مع التصفية</span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>خريطة تفاعلية للمواقع</span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>نماذج حجز المعاينة</span>
-                        </li>
-                      </>
-                    )}
-                    {websiteData.category === "lawyer" && (
-                      <>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>صفحات الخدمات القانونية</span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>نماذج طلب الاستشارة</span>
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>صفحة الأسئلة الشائعة</span>
-                        </li>
-                      </>
-                    )}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {/* Colors Section */}
-            <div className="border rounded-lg p-6 space-y-4">
-              <h3 className="text-lg font-medium mb-4">ألوان الموقع</h3>
-
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <p className="font-medium">اختر من المجموعات الجاهزة:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {COLOR_PALETTES.map((palette, index) => (
-                      <div
-                        key={index}
-                        className={`border rounded-lg p-3 cursor-pointer transition-all hover:border-primary ${
-                          websiteData.colors.primary === palette.primary
-                            ? "border-primary bg-primary/5"
-                            : ""
-                        }`}
-                        onClick={() => selectColorPalette(palette)}
-                      >
-                        <div className="flex gap-2 mb-3">
-                          <div
-                            className="w-8 h-8 rounded-full"
-                            style={{ backgroundColor: palette.primary }}
-                          ></div>
-                          <div
-                            className="w-8 h-8 rounded-full"
-                            style={{ backgroundColor: palette.secondary }}
-                          ></div>
-                          <div
-                            className="w-8 h-8 rounded-full"
-                            style={{ backgroundColor: palette.accent }}
-                          ></div>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm">مجموعة {index + 1}</span>
-                          {websiteData.colors.primary === palette.primary && (
-                            <CheckCircle className="h-5 w-5 text-primary" />
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-4 pt-6 border-t mt-6">
-                  <p className="font-medium">أو اختر ألوانك المخصصة:</p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <ColorPicker
-                      color={websiteData.colors.primary}
-                      onChange={(color) =>
-                        setWebsiteData({
-                          ...websiteData,
-                          colors: { ...websiteData.colors, primary: color },
-                        })
-                      }
-                      label="اللون الرئيسي"
-                    />
-                    <ColorPicker
-                      color={websiteData.colors.secondary}
-                      onChange={(color) =>
-                        setWebsiteData({
-                          ...websiteData,
-                          colors: { ...websiteData.colors, secondary: color },
-                        })
-                      }
-                      label="اللون الثانوي"
-                    />
-                    <ColorPicker
-                      color={websiteData.colors.accent}
-                      onChange={(color) =>
-                        setWebsiteData({
-                          ...websiteData,
-                          colors: { ...websiteData.colors, accent: color },
-                        })
-                      }
-                      label="لون التأكيد"
-                    />
-                  </div>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <p className="font-medium mb-3 flex items-center gap-2">
-                    <Palette className="h-4 w-4" />
-                    معاينة الألوان المختارة:
-                  </p>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-md"
-                        style={{ backgroundColor: websiteData.colors.primary }}
-                      ></div>
-                      <div>
-                        <p className="font-medium">اللون الرئيسي</p>
-                        <p className="text-xs text-muted-foreground">
-                          {websiteData.colors.primary}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-md"
-                        style={{
-                          backgroundColor: websiteData.colors.secondary,
-                        }}
-                      ></div>
-                      <div>
-                        <p className="font-medium">اللون الثانوي</p>
-                        <p className="text-xs text-muted-foreground">
-                          {websiteData.colors.secondary}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-md"
-                        style={{ backgroundColor: websiteData.colors.accent }}
-                      ></div>
-                      <div>
-                        <p className="font-medium">لون التأكيد</p>
-                        <p className="text-xs text-muted-foreground">
-                          {websiteData.colors.accent}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "complete":
-        return (
-          <div className="text-center space-y-6">
-            <CardTitle className="text-3xl">
-              تهانينا! تم إعداد موقعك بنجاح
-            </CardTitle>
-            <CardDescription className="text-xl">
-              يمكنك الآن البدء في بناء موقعك وتخصيصه
-            </CardDescription>
-
-            <div className="bg-muted/50 p-4 rounded-lg text-right">
-              <p className="text-lg font-medium mb-2">ملخص الإعدادات:</p>
-              <ul className="space-y-3 text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <Home className="h-5 w-5 text-primary" />
-                  <span>
-                    اسم الموقع:{" "}
-                    <span className="font-medium text-foreground">
-                      {websiteData.title}
-                    </span>
-                  </span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Layout className="h-5 w-5 text-primary" />
-                  <span>
-                    نوع الموقع:{" "}
-                    <span className="font-medium text-foreground">
-                      {WEBSITE_CATEGORIES.find(
-                        (c) => c.id === websiteData.category,
-                      )?.title || "غير محدد"}
-                    </span>
-                  </span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Palette className="h-5 w-5 text-primary" />
-                  <span>
-                    الألوان:
-                    <span className="inline-flex items-center gap-1 mr-2">
-                      <span
-                        className="w-4 h-4 rounded-full inline-block"
-                        style={{ backgroundColor: websiteData.colors.primary }}
-                      ></span>
-                      <span
-                        className="w-4 h-4 rounded-full inline-block"
-                        style={{
-                          backgroundColor: websiteData.colors.secondary,
-                        }}
-                      ></span>
-                      <span
-                        className="w-4 h-4 rounded-full inline-block"
-                        style={{ backgroundColor: websiteData.colors.accent }}
-                      ></span>
-                    </span>
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            <p className="text-muted-foreground">
-              سيتم توجيهك إلى لوحة التحكم للبدء في بناء موقعك
-            </p>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  // Render progress steps
-  const renderProgressSteps = () => {
-    return (
-      <div className="flex justify-between items-center mb-8 px-2">
-        {STEPS.map((step, index) => (
-          <React.Fragment key={step.id}>
-            {/* Step indicator */}
-            <div className="flex flex-col items-center">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  index < currentStep
-                    ? "bg-primary text-white"
-                    : index === currentStep
-                      ? "bg-primary/20 text-primary border-2 border-primary"
-                      : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {index < currentStep ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  index + 1
-                )}
-              </div>
-              <span className="text-xs mt-1 hidden sm:block">{step.title}</span>
-            </div>
-
-            {/* Connector line */}
-            {index < STEPS.length - 1 && (
-              <div
-                className={`h-0.5 flex-1 mx-1 ${index < currentStep ? "bg-primary" : "bg-muted"}`}
-              ></div>
-            )}
-          </React.Fragment>
-        ))}
-      </div>
-    );
   };
 
   return (
-    <div className="container max-w-4xl py-8">
-      <Card className="border-none shadow-lg">
-        <CardHeader className="pb-0">
-          {currentStep > 0 &&
-            currentStep < STEPS.length - 1 &&
-            renderProgressSteps()}
-        </CardHeader>
+    <div className="min-h-screen flex flex-col bg-background" dir="rtl">
+      {/* Simple Menu */}
+      <div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
+        <div className="md:absolute md:top-1 md:right-10">
+          <Image
+            src="/logo.png"
+            alt="Website Builder Logo"
+            width={200}
+            height={142}
+            className="h-[7rem] md:h-[7rem] w-auto object-contain dark:invert"
+          />
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold mb-2 text-foreground">إعداد موقعك الجديد</h1>
+            <p className="text-muted-foreground">أكمل المعلومات أدناه لبدء إنشاء موقعك</p>
+          </div>
 
-        <CardContent className="pt-6 pb-4">{renderStepContent()}</CardContent>
-
-        <CardFooter className="flex justify-between border-t pt-6">
-          {currentStep > 0 ? (
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              className="flex items-center gap-1"
-            >
-              <ChevronRight className="h-4 w-4" />
-              السابق
-            </Button>
-          ) : (
-            <div></div> // Empty div to maintain layout
-          )}
-
-          <div className="gap-5 flex flex-col">
-            {currentStep < STEPS.length - 1 ? (
-              <Button onClick={nextStep} className="flex items-center gap-1">
-                التالي
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                onClick={() => {
-                  setErrors("");
-                  nextStep();
+          <form onSubmit={completeOnboarding} className="space-y-8">
+            {/* Website Title */}
+            <div className="space-y-2">
+              <Label htmlFor="website-title" className="text-foreground">
+                اسم الموقع *
+              </Label>
+              <Input
+                id="website-title"
+                placeholder="مثال: شركة الأفق للعقارات"
+                value={websiteData.title}
+                onChange={(e) => {
+                  setWebsiteData({ ...websiteData, title: e.target.value });
+                  if (errors.title) {
+                    setErrors({ ...errors, title: "" });
+                  }
                 }}
-                className="flex items-center gap-1"
+                className={`h-12 ${errors.title ? "border-red-500" : ""}`}
+                required
+              />
+              {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+            </div>
+
+            {/* VAL License Number */}
+            <div className="space-y-2">
+              <Label htmlFor="val-license">رقم رخصة فال</Label>
+              <Input
+                id="val-license"
+                placeholder="مثال: 1234567890"
+                value={websiteData.valLicense}
+                onChange={(e) => {
+                  // Allow only numbers
+                  const value = e.target.value.replace(/\D/g, "");
+                  setWebsiteData({ ...websiteData, valLicense: value });
+                  if (errors.valLicense) {
+                    setErrors({ ...errors, valLicense: "" });
+                  }
+                }}
+                maxLength={10}
+                className={`h-12 ${errors.valLicense ? "border-red-500" : ""}`}
+              />
+              {errors.valLicense && <p className="text-sm text-red-500">{errors.valLicense}</p>}
+              {!errors.valLicense && (
+                <p className="text-xs text-gray-500">رقم رخصة فال يتكون من 10 أرقام (اختياري)</p>
+              )}
+            </div>
+
+            {/* Working Hours */}
+            <div className="space-y-2">
+              <Label htmlFor="working-hours">ساعات العمل</Label>
+              <Input
+                id="working-hours"
+                placeholder="مثال: السبت - الخميس: 9:00 صباحاً - 6:00 مساءً"
+                value={websiteData.workingHours}
+                onChange={(e) => {
+                  setWebsiteData({ ...websiteData, workingHours: e.target.value });
+                  if (errors.workingHours) {
+                    setErrors({ ...errors, workingHours: "" });
+                  }
+                }}
+                className={`h-12 ${errors.workingHours ? "border-red-500" : ""}`}
+              />
+              {errors.workingHours && <p className="text-sm text-red-500">{errors.workingHours}</p>}
+            </div>
+
+            {/* Address */}
+            <div className="space-y-2">
+              <Label htmlFor="address">العنوان</Label>
+              <Input
+                id="address"
+                placeholder="مثال: شارع الملك فهد، حي العليا، الرياض"
+                value={websiteData.address}
+                onChange={(e) => {
+                  setWebsiteData({ ...websiteData, address: e.target.value });
+                  if (errors.address) {
+                    setErrors({ ...errors, address: "" });
+                  }
+                }}
+                className={`h-12 ${errors.address ? "border-red-500" : ""}`}
+              />
+              {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
+            </div>
+
+            {/* Logo and Favicon */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Logo Upload */}
+              <div className="space-y-2">
+                <Label className="text-foreground">شعار الموقع (اختياري)</Label>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleLogoUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+
+                {!websiteData.logo ? (
+                  <div
+                    className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-muted-foreground transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">انقر لرفع شعار</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="relative w-32 h-32 mx-auto border border-border rounded-lg overflow-hidden">
+                      <Image
+                        src={websiteData.logo || "/placeholder.svg"}
+                        alt="شعار الموقع"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    <div className="flex justify-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        تغيير
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setWebsiteData({ ...websiteData, logo: null, logoFile: null })
+                        }
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Favicon Upload */}
+              <div className="space-y-2">
+                <Label className="text-foreground">أيقونة الموقع (اختياري)</Label>
+                <input
+                  type="file"
+                  ref={faviconInputRef}
+                  onChange={handleFaviconUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+
+                {!websiteData.favicon ? (
+                  <div
+                    className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-muted-foreground transition-colors"
+                    onClick={() => faviconInputRef.current?.click()}
+                  >
+                    <FileImage className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">انقر لرفع أيقونة</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="relative w-16 h-16 mx-auto border border-border rounded-lg overflow-hidden bg-muted p-2">
+                      <Image
+                        src={websiteData.favicon || "/placeholder.svg"}
+                        alt="أيقونة الموقع"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    <div className="flex justify-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => faviconInputRef.current?.click()}
+                      >
+                        تغيير
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setWebsiteData({ ...websiteData, favicon: null, faviconFile: null })
+                        }
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {websiteData.logo && !websiteData.favicon && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={useLogoAsFavicon}
+                    className="w-full mt-2"
+                  >
+                    استخدام الشعار كأيقونة
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Color Selection */}
+            <div className="space-y-4">
+              <Label className="text-foreground">ألوان الموقع</Label>
+
+              {/* Predefined Palettes */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {COLOR_PALETTES.map((palette, index) => (
+                  <div
+                    key={index}
+                    className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                      websiteData.colors.primary === palette.primary
+                        ? "border-foreground ring-2 ring-foreground/20"
+                        : "border-border hover:border-muted-foreground"
+                    }`}
+                    onClick={() => selectColorPalette(palette)}
+                  >
+                    <div className="flex gap-1 justify-center">
+                      <div
+                        className="w-6 h-6 rounded"
+                        style={{ backgroundColor: palette.primary }}
+                      ></div>
+                      <div
+                        className="w-6 h-6 rounded"
+                        style={{ backgroundColor: palette.secondary }}
+                      ></div>
+                      <div
+                        className="w-6 h-6 rounded"
+                        style={{ backgroundColor: palette.accent }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Custom Colors */}
+              <div className="border-t border-border pt-4">
+                <p className="text-sm text-muted-foreground mb-3">
+                  أو اختر ألوانك المخصصة:
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <ColorPicker
+                    color={websiteData.colors.primary}
+                    onChange={(color) =>
+                      setWebsiteData({
+                        ...websiteData,
+                        colors: { ...websiteData.colors, primary: color },
+                      })
+                    }
+                    label="اللون الرئيسي"
+                  />
+                  <ColorPicker
+                    color={websiteData.colors.secondary}
+                    onChange={(color) =>
+                      setWebsiteData({
+                        ...websiteData,
+                        colors: { ...websiteData.colors, secondary: color },
+                      })
+                    }
+                    label="اللون الثانوي"
+                  />
+                  <ColorPicker
+                    color={websiteData.colors.accent}
+                    onChange={(color) =>
+                      setWebsiteData({
+                        ...websiteData,
+                        colors: { ...websiteData.colors, accent: color },
+                      })
+                    }
+                    label="لون التأكيد"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Error Messages */}
+            {uploadError && (
+              <div className="text-center text-destructive text-sm bg-destructive/10 p-3 rounded-lg border border-destructive/20">
+                {whereErrors === "Logo" || whereErrors === "favicon" ? (
+                  <>
+                    في ال {whereErrors} نوع الملف{" "}
+                    {uploadError.replace("Invalid file type: ", "")} غير مدعوم، يرجى
+                    استخدام JPG أو PNG.
+                  </>
+                ) : (
+                  uploadError
+                )}
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <div className="pt-6">
+              <Button
+                type="submit"
+                className="w-full h-12 bg-foreground hover:bg-foreground/90 text-background"
                 disabled={isLoading}
               >
-                {isLoading
-                  ? errors
-                    ? "حل الخطأ أولاً"
-                    : "جاري الحفظ"
-                  : errors
-                    ? "حل الخطأ أولاً"
-                    : "الانتقال إلى لوحة التحكم"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    جاري الإعداد...
+                  </>
+                ) : (
+                  "إكمال الإعداد"
+                )}
               </Button>
-            )}
-            {errors && (
-              <p className="text-sm text-red-500">
-                نوع الملف {errors.replace("Invalid file type: ", "")} غير مدعوم،
-                يرجى استخدام JPG أو PNG.
-              </p>
-            )}
-          </div>
-        </CardFooter>
-      </Card>
+            </div>
 
-      <TooltipProvider>
-        <div className="mt-6 text-center">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="link"
-                className="text-muted-foreground"
-                onClick={SkipSetup}
-              >
-                تخطي الإعداد
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>يمكنك إكمال الإعداد لاحقاً من صفحة الإعدادات</p>
-            </TooltipContent>
-          </Tooltip>
+            {/* Skip Setup */}
+            <div className="text-center">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="text-muted-foreground hover:text-foreground"
+                      onClick={SkipSetup}
+                    >
+                      تخطي الإعداد
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>يمكنك إكمال الإعداد لاحقاً من صفحة الإعدادات</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </form>
         </div>
-      </TooltipProvider>
+      </div>
     </div>
   );
 };

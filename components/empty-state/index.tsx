@@ -153,7 +153,7 @@ export default function EmptyState({ type }) {
           }`}
         >
           <h3 className="text-xl text-center font-semibold tracking-tight">
-            لا توجد {type}
+            لا توجد {type === "مشاريع" ? "مشاريع" : "عقارات"}
           </h3>
           <p className="text-sm text-center text-muted-foreground">
             لم تقم بإضافة أي {type === "مشاريع" ? "مشروع" : "عقار"} إلى لوحة
