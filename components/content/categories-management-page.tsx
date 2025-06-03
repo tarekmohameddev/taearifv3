@@ -214,31 +214,23 @@ export default function CategoriesManagementPage() {
             </Button>
           </div>
 
-          <div className="flex flex-col space-y-8 p-6">
-            <button
-              onClick={() => handleStatusChange(!showEvenIfEmpty)}
-              className={`relative flex h-12 w-[220px] items-center rounded-full px-4 transition-colors duration-500 ${
-                showEvenIfEmpty ? "bg-black" : "bg-gray-200"
-              }`}
-            >
-              <span
-                className={`absolute text-sm font-medium ${
-                  showEvenIfEmpty
-                    ? "left-6 text-white"
-                    : "right-5 text-gray-600"
-                } transition-[left,right] duration-1000 ease-in-out`}
-              >
-                {showEvenIfEmpty ? "إخفاء التصنيفات الفارغة" : "إظهار التصنيفات الفارغة"}
-              </span>
-
-              <div
-                className={`absolute h-10 w-10 rounded-full bg-white shadow-md transition-transform duration-1000 ease-in-out ${
-                  showEvenIfEmpty ? "translate-x-0" : "translate-x-[-172px]"
-                }`}
-                style={{ right: "4px" }}
-              />
-            </button>
-          </div>
+          
+          <div className="flex items-center justify-between p-6">
+  <div className="flex items-center space-x-4 gap-4 ">
+    <Label 
+      htmlFor="show-empty-categories" 
+      className=" font-medium cursor-pointer text-lg"
+    >
+      {showEvenIfEmpty ? "إخفاء التصنيفات الفارغة" : "إظهار التصنيفات الفارغة"}
+    </Label>
+    <Switch
+      checked={showEvenIfEmpty}
+      onCheckedChange={handleStatusChange}
+      id="show-empty-categories"
+      className=""
+    />
+  </div>
+</div>
 
           <Card className="mb-6">
             <CardHeader>
