@@ -198,7 +198,7 @@ export function ContentManagementPage() {
                 <p className="text-muted-foreground">تخصيص محتوى موقعك</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <div className="relative">
+                {/* <div className="relative">
                   <Input
                     placeholder="بحث في الأقسام..."
                     className="w-[200px] pl-8"
@@ -206,9 +206,9 @@ export function ContentManagementPage() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <SearchIcon className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                </div>
+                </div> */}
 
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                {/* <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-[150px]">
                     <div className="flex items-center gap-2">
                       <Filter className="h-4 w-4" />
@@ -220,18 +220,18 @@ export function ContentManagementPage() {
                     <SelectItem value="active">الأقسام النشطة</SelectItem>
                     <SelectItem value="inactive">الأقسام غير النشطة</SelectItem>
                   </SelectContent>
-                </Select>
+                </Select> */}
 
                 <Dialog
                   open={newSectionDialogOpen}
                   onOpenChange={setNewSectionDialogOpen}
                 >
-                  <DialogTrigger asChild>
+                  {/* <DialogTrigger asChild>
                     <Button onClick={() => setNewSectionDialogOpen(true)}>
                       <Plus className="h-4 w-4 ml-1" />
                       إضافة قسم
                     </Button>
-                  </DialogTrigger>
+                  </DialogTrigger> */}
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>إضافة قسم جديد</DialogTitle>
@@ -438,7 +438,7 @@ export function ContentManagementPage() {
                   </Link>
                 );
               })}
-              <Card
+              {/* <Card
                 className="flex h-full cursor-pointer flex-col items-center justify-center border-dashed p-6 text-center transition-colors hover:bg-muted/50"
                 onClick={() => setNewSectionDialogOpen(true)}
               >
@@ -449,7 +449,7 @@ export function ContentManagementPage() {
                 <p className="text-sm text-muted-foreground">
                   إنشاء قسم مخصص جديد لموقعك
                 </p>
-              </Card>
+              </Card> */}
             </div>
           )}
         </main>

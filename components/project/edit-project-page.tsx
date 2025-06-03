@@ -70,7 +70,7 @@ export default function EditProjectPage(): JSX.Element {
   const plansInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  
+
   const [newProject, setNewProject] = useState({
     id: "",
     name: "",
@@ -88,21 +88,26 @@ export default function EditProjectPage(): JSX.Element {
     maxPrice: "",
   });
 
-  const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(null);
+  const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(
+    null,
+  );
   const [planImages, setPlanImages] = useState<ProjectImage[]>([]);
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [mapLoaded, setMapLoaded] = useState<boolean>(false);
 
   const addAmenity = () => {
-    if (currentAmenity.trim() !== "" && !amenities.includes(currentAmenity.trim())) {
-      setAmenities(prev => [...prev, currentAmenity.trim()]);
+    if (
+      currentAmenity.trim() !== "" &&
+      !amenities.includes(currentAmenity.trim())
+    ) {
+      setAmenities((prev) => [...prev, currentAmenity.trim()]);
       setCurrentAmenity("");
     }
   };
-  
+
   const removeAmenity = (index: number) => {
-    setAmenities(prev => prev.filter((_, i) => i !== index));
+    setAmenities((prev) => prev.filter((_, i) => i !== index));
   };
 
   useEffect(() => {
@@ -113,7 +118,11 @@ export default function EditProjectPage(): JSX.Element {
         );
         const projectData = response.data.data.project;
 
-        if (projectData && Array.isArray(projectData.contents) && projectData.contents.length > 0) {
+        if (
+          projectData &&
+          Array.isArray(projectData.contents) &&
+          projectData.contents.length > 0
+        ) {
           // تحديث بيانات المشروع
           setNewProject({
             id: projectData.id,
@@ -140,7 +149,9 @@ export default function EditProjectPage(): JSX.Element {
               amenitiesArray = JSON.parse(projectData.amenities);
             } catch (error) {
               // إذا فشل، ربما تكون string مفصولة بفواصل
-              amenitiesArray = projectData.amenities.split(",").map(a => a.trim());
+              amenitiesArray = projectData.amenities
+                .split(",")
+                .map((a) => a.trim());
             }
           } else if (Array.isArray(projectData.amenities)) {
             amenitiesArray = projectData.amenities;
@@ -149,11 +160,18 @@ export default function EditProjectPage(): JSX.Element {
           // استخراج أسماء المرافق
           if (amenitiesArray.length > 0) {
             // إذا كانت المرافق كائنات
-            if (typeof amenitiesArray[0] === 'object' && amenitiesArray[0].name) {
-              setAmenities(amenitiesArray.map(amenity => amenity.name.trim()));
+            if (
+              typeof amenitiesArray[0] === "object" &&
+              amenitiesArray[0].name
+            ) {
+              setAmenities(
+                amenitiesArray.map((amenity) => amenity.name.trim()),
+              );
             } else {
               // إذا كانت المرافق نصوص
-              setAmenities(amenitiesArray.map(amenity => amenity.toString().trim()));
+              setAmenities(
+                amenitiesArray.map((amenity) => amenity.toString().trim()),
+              );
             }
           }
         }
@@ -167,23 +185,29 @@ export default function EditProjectPage(): JSX.Element {
           });
         }
 
-        if (projectData.gallery_images && Array.isArray(projectData.gallery_images)) {
+        if (
+          projectData.gallery_images &&
+          Array.isArray(projectData.gallery_images)
+        ) {
           setGalleryImages(
             projectData.gallery_images.map((img, index) => ({
               id: `existing-gallery-${index}`,
               url: img,
               file: new File([], img.split("/").pop() || "image.jpg"),
-            }))
+            })),
           );
         }
 
-        if (projectData.floorplan_images && Array.isArray(projectData.floorplan_images)) {
+        if (
+          projectData.floorplan_images &&
+          Array.isArray(projectData.floorplan_images)
+        ) {
           setPlanImages(
             projectData.floorplan_images.map((img, index) => ({
               id: `existing-plan-${index}`,
               url: img,
               file: new File([], img.split("/").pop() || "plan.jpg"),
-            }))
+            })),
           );
         }
 
@@ -191,7 +215,7 @@ export default function EditProjectPage(): JSX.Element {
       } catch (error) {
         console.error("Failed to fetch project data:", error);
         toast.error("فشل في تحميل بيانات المشروع");
-        router.push('/projects');
+        router.push("/projects");
       } finally {
         setIsLoading(false);
       }
@@ -297,7 +321,9 @@ export default function EditProjectPage(): JSX.Element {
           setPlanImages((prev) => [
             ...prev,
             {
-              id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+              id:
+                Date.now().toString() +
+                Math.random().toString(36).substring(2, 9),
               file,
               url: event.target.result.toString(),
             },
@@ -318,7 +344,9 @@ export default function EditProjectPage(): JSX.Element {
           setGalleryImages((prev) => [
             ...prev,
             {
-              id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+              id:
+                Date.now().toString() +
+                Math.random().toString(36).substring(2, 9),
               file,
               url: event.target.result.toString(),
             },
@@ -381,8 +409,8 @@ export default function EditProjectPage(): JSX.Element {
         minPrice = parseFloat(newProject.price) || 0;
         maxPrice = minPrice;
       }
-      
-      const formattedDate = newProject.completion_date 
+
+      const formattedDate = newProject.completion_date
         ? new Date(newProject.completion_date).toISOString().split("T")[0]
         : "";
 
@@ -401,30 +429,40 @@ export default function EditProjectPage(): JSX.Element {
 
       // رفع صور المخططات الجديدة فقط
       let floorplanPaths = planImages
-        .filter(img => img.url.startsWith("https://taearif.com/"))
-        .map(img => img.url);
-      
-      const newPlanImages = planImages.filter(img => !img.url.startsWith("https://taearif.com/"));
+        .filter((img) => img.url.startsWith("https://taearif.com/"))
+        .map((img) => img.url);
+
+      const newPlanImages = planImages.filter(
+        (img) => !img.url.startsWith("https://taearif.com/"),
+      );
       if (newPlanImages.length > 0) {
         const files = newPlanImages.map((image) => image.file);
         const uploadResults = await uploadMultipleFiles(files, "project");
         if (uploadResults && Array.isArray(uploadResults)) {
-          floorplanPaths = [...floorplanPaths, ...uploadResults.map((file) => file.path)];
+          floorplanPaths = [
+            ...floorplanPaths,
+            ...uploadResults.map((file) => file.path),
+          ];
           toast.success("تم رفع صور المخططات بنجاح");
         }
       }
 
       // رفع صور المعرض الجديدة فقط
       let galleryPaths = galleryImages
-        .filter(img => img.url.startsWith("https://taearif.com/"))
-        .map(img => img.url);
-      
-      const newGalleryImages = galleryImages.filter(img => !img.url.startsWith("https://taearif.com/"));
+        .filter((img) => img.url.startsWith("https://taearif.com/"))
+        .map((img) => img.url);
+
+      const newGalleryImages = galleryImages.filter(
+        (img) => !img.url.startsWith("https://taearif.com/"),
+      );
       if (newGalleryImages.length > 0) {
         const files = newGalleryImages.map((image) => image.file);
         const uploadResults = await uploadMultipleFiles(files, "project");
         if (uploadResults && Array.isArray(uploadResults)) {
-          galleryPaths = [...galleryPaths, ...uploadResults.map((file) => file.path)];
+          galleryPaths = [
+            ...galleryPaths,
+            ...uploadResults.map((file) => file.path),
+          ];
           toast.success("تم رفع صور المعرض بنجاح");
         }
       }
@@ -497,7 +535,7 @@ export default function EditProjectPage(): JSX.Element {
         `https://taearif.com/api/projects/${id}`,
         projectData,
       );
-      
+
       toast.success("تم تحديث المشروع بنجاح");
       router.push("/projects");
     } catch (error) {
@@ -528,7 +566,7 @@ export default function EditProjectPage(): JSX.Element {
                   <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 </div>
               </div>
-  
+
               {/* Form Card Skeleton */}
               <Card>
                 <CardHeader>
@@ -545,13 +583,13 @@ export default function EditProjectPage(): JSX.Element {
                       </div>
                     ))}
                   </div>
-                  
+
                   {/* Amenities Skeleton */}
                   <div className="space-y-2">
                     <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                     <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </div>
-                  
+
                   {/* Description Skeleton */}
                   <div className="space-y-2">
                     <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
@@ -559,7 +597,7 @@ export default function EditProjectPage(): JSX.Element {
                   </div>
                 </CardContent>
               </Card>
-  
+
               {/* Map Card Skeleton */}
               <Card>
                 <CardHeader>
@@ -570,7 +608,7 @@ export default function EditProjectPage(): JSX.Element {
                   <div className="h-[400px] w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 </CardContent>
               </Card>
-  
+
               {/* Image Upload Cards Skeleton */}
               {[1, 2, 3].map((i) => (
                 <Card key={i}>
@@ -797,7 +835,7 @@ export default function EditProjectPage(): JSX.Element {
                         value={currentAmenity}
                         onChange={(e) => setCurrentAmenity(e.target.value)}
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === "Enter") {
                             e.preventDefault();
                             addAmenity();
                           }
@@ -817,7 +855,9 @@ export default function EditProjectPage(): JSX.Element {
                       </Button>
                     </div>
                     {formErrors?.amenities && (
-                      <p className="text-sm text-destructive">{formErrors.amenities}</p>
+                      <p className="text-sm text-destructive">
+                        {formErrors.amenities}
+                      </p>
                     )}
                   </div>
 

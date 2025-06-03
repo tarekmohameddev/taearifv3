@@ -6,13 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import useAuthStore from "@/context/AuthContext";
 import Link from "next/link";
-import {
-  Eye,
-  EyeOff,
-  Check,
-  AlertCircle,
-  Info,
-} from "lucide-react";
+import { Eye, EyeOff, Check, AlertCircle, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -283,31 +277,40 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4" dir="rtl">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center bg-background p-4"
+      dir="rtl"
+    >
       <div className="w-full max-w-md">
-{/* Logo - Responsive positioning */}
-{/* Logo - Full width container with logo positioned */}
-<div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
-  <div className="md:absolute md:top-1 md:right-10">
-    <Image
-      src="/logo.png"
-      alt="Website Builder Logo"
-      width={200}
-      height={142}
-      className="h-[7rem] md:h-[7rem] w-auto object-contain dark:invert"
-    />
-  </div>
-</div>
+        {/* Logo - Responsive positioning */}
+        {/* Logo - Full width container with logo positioned */}
+        <div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
+          <div className="md:absolute md:top-1 md:right-10">
+            <Image
+              src="/logo.png"
+              alt="Website Builder Logo"
+              width={200}
+              height={142}
+              className="h-[7rem] md:h-[7rem] w-auto object-contain dark:invert"
+            />
+          </div>
+        </div>
 
-        <h1 className="text-2xl font-bold text-center mb-6 text-foreground sm:mt-20">إنشاء حساب جديد</h1>
+        <h1 className="text-2xl font-bold text-center mb-6 text-foreground sm:mt-20">
+          إنشاء حساب جديد
+        </h1>
 
         {formSubmitted ? (
           <div className="text-center py-8 bg-muted/50 rounded-lg border border-border">
             <div className="mx-auto bg-green-100 dark:bg-green-900/20 p-4 rounded-full w-20 h-20 flex items-center justify-center mb-4">
               <Check className="h-10 w-10 text-green-600 dark:text-green-500" />
             </div>
-            <h3 className="text-xl font-bold text-green-700 dark:text-green-500 mb-2">تم إنشاء الحساب بنجاح!</h3>
-            <p className="text-muted-foreground mb-4">سيتم تحويلك إلى لوحة التحكم خلال لحظات...</p>
+            <h3 className="text-xl font-bold text-green-700 dark:text-green-500 mb-2">
+              تم إنشاء الحساب بنجاح!
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              سيتم تحويلك إلى لوحة التحكم خلال لحظات...
+            </p>
             <div className="w-16 h-1 bg-muted rounded-full mx-auto relative overflow-hidden">
               <div className="absolute top-0 right-0 h-full bg-green-500 animate-progress"></div>
             </div>
@@ -316,7 +319,10 @@ export function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-foreground">
+              <Label
+                htmlFor="email"
+                className="text-sm font-medium text-foreground"
+              >
                 البريد الإلكتروني
               </Label>
               <Input
@@ -344,7 +350,10 @@ export function RegisterPage() {
 
             {/* Phone Field */}
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-sm font-medium text-foreground">
+              <Label
+                htmlFor="phone"
+                className="text-sm font-medium text-foreground"
+              >
                 رقم الهاتف
               </Label>
               <div className="relative">
@@ -357,7 +366,9 @@ export function RegisterPage() {
                       height={16}
                       className="rounded-sm ml-1"
                     />
-                    <span className="text-sm font-medium text-foreground">+966</span>
+                    <span className="text-sm font-medium text-foreground">
+                      +966
+                    </span>
                   </div>
                 </div>
                 <Input
@@ -378,7 +389,8 @@ export function RegisterPage() {
                   </p>
                   <p className="text-xs text-muted-foreground flex items-start">
                     <Info className="h-3 w-3 ml-1 mt-0.5 flex-shrink-0" />
-                    أدخل رقم هاتفك السعودي المكون من 9 أرقام ويبدأ بـ 5 (مثال: 5XXXXXXXX)
+                    أدخل رقم هاتفك السعودي المكون من 9 أرقام ويبدأ بـ 5 (مثال:
+                    5XXXXXXXX)
                   </p>
                 </div>
               )}
@@ -386,7 +398,10 @@ export function RegisterPage() {
 
             {/* Subdomain Field */}
             <div className="space-y-2">
-              <Label htmlFor="subdomain" className="text-sm font-medium text-foreground">
+              <Label
+                htmlFor="subdomain"
+                className="text-sm font-medium text-foreground"
+              >
                 اسم موقعك الإلكتروني
               </Label>
               <div className="relative">
@@ -398,18 +413,24 @@ export function RegisterPage() {
                   value={formData.subdomain}
                   onChange={handleChange}
                   onFocus={() => setSubdomainFocused(true)}
-                  onBlur={() => setTimeout(() => setSubdomainFocused(false), 200)}
+                  onBlur={() =>
+                    setTimeout(() => setSubdomainFocused(false), 200)
+                  }
                   className={`pl-32 py-5 text-right ${errors.subdomain ? "border-destructive" : ""}`}
                 />
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <span className="text-sm font-medium text-muted-foreground">.taearif.com</span>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    .taearif.com
+                  </span>
                 </div>
               </div>
 
               {/* Subdomain Suggestions */}
               {subdomainFocused && subdomainSuggestions.length > 0 && (
                 <div className="mt-2">
-                  <p className="text-sm font-medium mb-2 text-foreground">اقتراحات:</p>
+                  <p className="text-sm font-medium mb-2 text-foreground">
+                    اقتراحات:
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {subdomainSuggestions.map((suggestion, index) => (
                       <Button
@@ -442,7 +463,9 @@ export function RegisterPage() {
                       <li>استخدم الأحرف الإنجليزية الصغيرة فقط (a-z)</li>
                       <li>يمكنك استخدام الأرقام (0-9)</li>
                       <li>يمكنك استخدام الشرطات (-) للفصل بين الكلمات</li>
-                      <li>لا تستخدم المسافات أو الأحرف العربية أو الرموز الخاصة</li>
+                      <li>
+                        لا تستخدم المسافات أو الأحرف العربية أو الرموز الخاصة
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -451,7 +474,10 @@ export function RegisterPage() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-foreground">
+              <Label
+                htmlFor="password"
+                className="text-sm font-medium text-foreground"
+              >
                 كلمة المرور
               </Label>
               <div className="relative">
@@ -494,48 +520,51 @@ export function RegisterPage() {
               </div>
             )}
 
-<Button
-  type="submit"
-  className="w-full py-6 mt-4 bg-foreground hover:bg-foreground/90 text-background"
-  disabled={isSubmitting || formSubmitted}
->
-  {isSubmitting ? (
-    <div className="flex items-center justify-center">
-      <svg
-        className="animate-spin -ml-1 mr-2 h-4 w-4 text-background"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        ></circle>
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-        ></path>
-      </svg>
-      جاري إنشاء الحساب...
-    </div>
-  ) : formSubmitted ? (
-    "تم التسجيل بنجاح ✓"
-  ) : (
-    "إنشاء الحساب"
-  )}
-</Button>
+            <Button
+              type="submit"
+              className="w-full py-6 mt-4 bg-foreground hover:bg-foreground/90 text-background"
+              disabled={isSubmitting || formSubmitted}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-background"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  جاري إنشاء الحساب...
+                </div>
+              ) : formSubmitted ? (
+                "تم التسجيل بنجاح ✓"
+              ) : (
+                "إنشاء الحساب"
+              )}
+            </Button>
           </form>
         )}
 
         <div className="text-center mt-6">
           <p className="text-sm text-muted-foreground">
             لديك حساب بالفعل؟{" "}
-            <Link href="/login" className="text-foreground font-semibold hover:underline">
+            <Link
+              href="/login"
+              className="text-foreground font-semibold hover:underline"
+            >
               تسجيل الدخول
             </Link>
           </p>
@@ -546,7 +575,9 @@ export function RegisterPage() {
             <div className="w-full border-t border-border"></div>
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">أو التسجيل باستخدام</span>
+            <span className="bg-background px-2 text-muted-foreground">
+              أو التسجيل باستخدام
+            </span>
           </div>
         </div>
 
@@ -578,11 +609,17 @@ export function RegisterPage() {
 
         <p className="text-xs text-center text-muted-foreground mt-8">
           بالاستمرار، فإنك توافق على{" "}
-          <Link href="/terms" className="text-foreground underline hover:no-underline">
+          <Link
+            href="/terms"
+            className="text-foreground underline hover:no-underline"
+          >
             شروط الخدمة
           </Link>{" "}
           و{" "}
-          <Link href="/privacy" className="text-foreground underline hover:no-underline">
+          <Link
+            href="/privacy"
+            className="text-foreground underline hover:no-underline"
+          >
             سياسة الخصوصية
           </Link>
           .
@@ -592,8 +629,12 @@ export function RegisterPage() {
       {/* Add custom animation for progress bar */}
       <style jsx global>{`
         @keyframes progress {
-          0% { width: 0%; }
-          100% { width: 100%; }
+          0% {
+            width: 0%;
+          }
+          100% {
+            width: 100%;
+          }
         }
         .animate-progress {
           animation: progress 2s linear forwards;

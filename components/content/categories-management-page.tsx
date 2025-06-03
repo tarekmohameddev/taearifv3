@@ -33,6 +33,7 @@ export default function CategoriesManagementPage() {
     name: "",
     description: "",
   });
+  const [showEvenIfEmpty, setShowEvenIfEmpty] = useState(false);
 
   const fetchCategories = async () => {
     try {
@@ -40,6 +41,7 @@ export default function CategoriesManagementPage() {
       if (response.status === 200) {
         console.log("Fetched categories:", response.data.categories);
         setCategories(response.data.categories);
+        setShowEvenIfEmpty(response.data.show_even_if_empty); // إضافة هذا السطر
       } else {
         toast.error("حدث خطأ أثناء جلب التصنيفات.");
       }
@@ -52,7 +54,31 @@ export default function CategoriesManagementPage() {
   useEffect(() => {
     fetchCategories();
   }, []);
+  const handleStatusChange = async (newStatus) => {
+    try {
+      setShowEvenIfEmpty(newStatus);
 
+      // إرسال الطلب لتحديث show_even_if_empty
+      const response = await axiosInstance.put("/user/categories", {
+        show_even_if_empty: newStatus,
+        categories: categories.map((category) => ({
+          id: category.id,
+          is_active: category.is_active,
+        })),
+      });
+
+      if (response.status === 200) {
+        toast.success("تم تحديث الحالة !");
+      } else {
+        toast.error("حدث خطأ أثناء تحديث الحالة.");
+        setShowEvenIfEmpty(!newStatus);
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("حدث خطأ أثناء تحديث الحالة.");
+      setShowEvenIfEmpty(!newStatus);
+    }
+  };
   const handleAddCategory = () => {
     if (newCategory.name.trim() === "") return;
 
@@ -84,6 +110,11 @@ export default function CategoriesManagementPage() {
   };
 
   const handleToggleActive = (id) => {
+    if (!showEvenIfEmpty) {
+      toast.warning("يجب تفعيل اظهار التصنيفات الفارغة أولاً لتتمكن من تعديل التصنيفات");
+      return;
+    }
+
     setCategories(
       categories.map((category) =>
         category.id === id
@@ -128,18 +159,16 @@ export default function CategoriesManagementPage() {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      // إعداد البيانات بنفس شكل الـ request المطلوب
       const dataToSend = {
+        show_even_if_empty: showEvenIfEmpty, // إضافة هذا السطر
         categories: categories.map((category) => ({
           id: category.id,
           is_active: category.is_active,
         })),
       };
 
-      // إرسال طلب PUT باستخدام axiosInstance
       const response = await axiosInstance.put("/user/categories", dataToSend);
 
-      // معالجة الاستجابة
       if (response.status === 200) {
         toast.success("تم حفظ التصنيفات بنجاح!");
       } else {
@@ -184,6 +213,8 @@ export default function CategoriesManagementPage() {
               )}
             </Button>
           </div>
+
+
 
           <div className="flex items-center justify-between p-6">
   <div className="flex items-center space-x-4 gap-4 ">
@@ -242,29 +273,21 @@ export default function CategoriesManagementPage() {
                         {/* </div> */}
                         <h3 className="font-medium">{category.name}</h3>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={category.is_active}
-                            onCheckedChange={() =>
-                              handleToggleActive(category.id)
-                            }
-                            id={`active-${category.id}`}
-                          />
-                          <Label
-                            htmlFor={`active-${category.id}`}
-                            className="text-sm"
-                          >
-                            {category.is_active ? "نشط" : "معطل"}
-                          </Label>
-                        </div>
-                        {/* <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleRemoveCategory(category.id)}
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={category.is_active}
+                          onCheckedChange={() =>
+                            handleToggleActive(category.id)
+                          }
+                          disabled={!showEvenIfEmpty} // إضافة هذا السطر
+                          id={`active-${category.id}`}
+                        />
+                        <Label
+                          htmlFor={`active-${category.id}`}
+                          className={`text-sm ${!showEvenIfEmpty ? "text-gray-400" : ""}`}
                         >
-                          <Trash2 className="h-4 w-4" />
-                        </Button> */}
+                          {category.is_active ? "نشط" : "معطل"}
+                        </Label>
                       </div>
                     </div>
                     {/* <p className="text-sm">{category.description}</p> */}

@@ -105,21 +105,26 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4" dir="rtl">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center bg-background p-4"
+      dir="rtl"
+    >
       <div className="w-full max-w-md">
         {/* Logo - Positioned absolute top right - Larger size */}
-<div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
-  <div className="md:absolute md:top-1 md:right-10">
-    <Image
-      src="/logo.png"
-      alt="Website Builder Logo"
-      width={200}
-      height={142}
-      className="h-[7rem] md:h-[7rem] w-auto object-contain dark:invert"
-    />
-  </div>
-</div>
-        <h1 className="text-2xl font-bold text-center mb-6 text-foreground">تسجيل الدخول</h1>
+        <div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
+          <div className="md:absolute md:top-1 md:right-10">
+            <Image
+              src="/logo.png"
+              alt="Website Builder Logo"
+              width={200}
+              height={142}
+              className="h-[7rem] md:h-[7rem] w-auto object-contain dark:invert"
+            />
+          </div>
+        </div>
+        <h1 className="text-2xl font-bold text-center mb-6 text-foreground">
+          تسجيل الدخول
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {errors.general && (
@@ -131,7 +136,10 @@ export function LoginPage() {
 
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-foreground">
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-foreground"
+            >
               البريد الإلكتروني
             </Label>
             <Input
@@ -154,10 +162,16 @@ export function LoginPage() {
           {/* Password Field */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <Link href="/forgot-password" className="text-sm text-foreground hover:underline">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-foreground hover:underline"
+              >
                 نسيت كلمة المرور؟
               </Link>
-              <Label htmlFor="password" className="text-sm font-medium text-foreground">
+              <Label
+                htmlFor="password"
+                className="text-sm font-medium text-foreground"
+              >
                 كلمة المرور
               </Label>
             </div>
@@ -198,14 +212,17 @@ export function LoginPage() {
               checked={formData.rememberMe}
               onCheckedChange={handleCheckboxChange}
             />
-            <Label htmlFor="remember" className="text-sm font-medium cursor-pointer text-foreground">
+            <Label
+              htmlFor="remember"
+              className="text-sm font-medium cursor-pointer text-foreground"
+            >
               تذكرني
             </Label>
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full py-6 mt-2 bg-foreground hover:bg-foreground/90 text-background" 
+          <Button
+            type="submit"
+            className="w-full py-6 mt-2 bg-foreground hover:bg-foreground/90 text-background"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -216,7 +233,14 @@ export function LoginPage() {
                   fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
                   <path
                     className="opacity-75"
                     fill="currentColor"
@@ -234,7 +258,10 @@ export function LoginPage() {
         <div className="text-center mt-6">
           <p className="text-sm text-muted-foreground">
             ليس لديك حساب؟{" "}
-            <Link href="/register" className="text-foreground font-semibold hover:underline">
+            <Link
+              href="/register"
+              className="text-foreground font-semibold hover:underline"
+            >
               إنشاء حساب جديد
             </Link>
           </p>
@@ -245,7 +272,9 @@ export function LoginPage() {
             <div className="w-full border-t border-border"></div>
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">أو الدخول باستخدام</span>
+            <span className="bg-background px-2 text-muted-foreground">
+              أو الدخول باستخدام
+            </span>
           </div>
         </div>
 
@@ -277,11 +306,17 @@ export function LoginPage() {
 
         <p className="text-xs text-center text-muted-foreground mt-8">
           بالاستمرار، فإنك توافق على{" "}
-          <Link href="/terms" className="text-foreground underline hover:no-underline">
+          <Link
+            href="/terms"
+            className="text-foreground underline hover:no-underline"
+          >
             شروط الخدمة
           </Link>{" "}
           و{" "}
-          <Link href="/privacy" className="text-foreground underline hover:no-underline">
+          <Link
+            href="/privacy"
+            className="text-foreground underline hover:no-underline"
+          >
             سياسة الخصوصية
           </Link>
           .

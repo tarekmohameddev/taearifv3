@@ -90,7 +90,15 @@ function SkeletonPropertyCard() {
     </Card>
   );
 }
-
+const getPaymentMethodText = (paymentMethod) => {
+  const paymentMethods = {
+    monthly: "شهري",
+    quarterly: "ربع سنوي", 
+    semi_annual: "نصف سنوي",
+    annual: "سنوي"
+  };
+  return paymentMethods[paymentMethod] || null;
+};
 export function PropertiesManagementPage() {
   // حالة للتحكم في فتح وإغلاق النافذة المنبثقة
   const [isLimitReached, setIsLimitReached] = useState(false);
@@ -143,7 +151,6 @@ export function PropertiesManagementPage() {
       : [...favorites, id];
     setPropertiesManagement({ favorites: newFavorites });
   };
-
   const handleDeleteProperty = async (id: string) => {
     const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا العقار؟");
     if (confirmDelete) {
@@ -157,6 +164,50 @@ export function PropertiesManagementPage() {
         toast.error("فشل في حذف العقار");
         console.error("Error deleting property:", error);
       }
+    }
+  };
+
+  // دالة المضاعفة
+  const handleDuplicateProperty = async (property) => {
+    try {
+      const duplicateData = {
+        title: property.title || property.contents[0].title,
+        price: property.price,
+      };
+
+      await axiosInstance.post(
+        `/properties/${property.id}/duplicate`,
+        duplicateData,
+      );
+      toast.success("تم مضاعفة العقار بنجاح");
+
+      // إعادة تحميل العقارات لعرض العقار المضاعف
+      fetchProperties();
+    } catch (error) {
+      toast.error("فشل في مضاعفة العقار");
+      console.error("Error duplicating property:", error);
+    }
+  };
+
+  // دالة تغيير حالة النشر
+  const handleToggleStatus = async (property) => {
+    try {
+      await axiosInstance.post(`/properties/${property.id}/toggle-status`);
+
+      const newStatus = property.status === "منشور" ? "مسودة" : "منشور";
+      toast.success(
+        `تم ${property.status === "منشور" ? "إلغاء النشر" : "النشر"} بنجاح`,
+      );
+
+      // تحديث حالة العقار في القائمة المحلية
+      setPropertiesManagement({
+        properties: properties.map((p) =>
+          p.id === property.id ? { ...p, status: newStatus } : p,
+        ),
+      });
+    } catch (error) {
+      toast.error("فشل في تغيير حالة النشر");
+      console.error("Error toggling status:", error);
     }
   };
 
@@ -211,12 +262,12 @@ export function PropertiesManagementPage() {
                   <span className="sr-only">List view</span>
                 </Button>
                 <Dialog>
-                  <DialogTrigger asChild>
+                  {/* <DialogTrigger asChild>
                     <Button variant="outline" className="gap-1">
                       <Filter className="h-4 w-4" />
                       فلتر
                     </Button>
-                  </DialogTrigger>
+                  </DialogTrigger> */}
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                       <DialogTitle>فلتر العقارات</DialogTitle>
@@ -388,15 +439,18 @@ export function PropertiesManagementPage() {
               <Tabs defaultValue="all">
                 <TabsList>
                   <TabsTrigger value="all">جميع العقارات</TabsTrigger>
-                  <TabsTrigger value="for-sale">للبيع</TabsTrigger>
+                  {/* <TabsTrigger value="for-sale">للبيع</TabsTrigger>
                   <TabsTrigger value="for-rent">للإيجار</TabsTrigger>
                   <TabsTrigger value="published">منشور</TabsTrigger>
                   <TabsTrigger value="drafts">مسودات</TabsTrigger>
-                  <TabsTrigger value="featured">مميزة</TabsTrigger>
+                  <TabsTrigger value="featured">مميزة</TabsTrigger> */}
                 </TabsList>
                 <TabsContent value="all" className="mt-4">
                   {normalizedProperties.length === 0 ? (
-                    <EmptyState message="لا يوجد عقارات" description="قم بإضافة عقارات جديدة" />
+                    <EmptyState
+                      message="لا يوجد عقارات"
+                      description="قم بإضافة عقارات جديدة"
+                    />
                   ) : viewMode === "grid" ? (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       {normalizedProperties.map((property) => (
@@ -408,6 +462,8 @@ export function PropertiesManagementPage() {
                           )}
                           onToggleFavorite={toggleFavorite}
                           onDelete={handleDeleteProperty}
+                          onDuplicate={handleDuplicateProperty}
+                          onToggleStatus={handleToggleStatus}
                         />
                       ))}
                     </div>
@@ -422,6 +478,8 @@ export function PropertiesManagementPage() {
                           )}
                           onToggleFavorite={toggleFavorite}
                           onDelete={handleDeleteProperty}
+                          onDuplicate={handleDuplicateProperty}
+                          onToggleStatus={handleToggleStatus}
                         />
                       ))}
                     </div>
@@ -441,6 +499,8 @@ interface PropertyCardProps {
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
   onDelete: (id: string) => void;
+  onDuplicate: (property: any) => void;
+  onToggleStatus: (property: any) => void;
 }
 
 function PropertyCard({
@@ -448,6 +508,8 @@ function PropertyCard({
   isFavorite,
   onToggleFavorite,
   onDelete,
+  onDuplicate,
+  onToggleStatus,
 }: PropertyCardProps) {
   const router = useRouter();
 
@@ -529,17 +591,17 @@ function PropertyCard({
                 <ExternalLink className="mr-2 h-4 w-4" />
                 معاينة
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDuplicate(property)}>
                 <Copy className="mr-2 h-4 w-4" />
                 مضاعفة
               </DropdownMenuItem>
               {property.status === "مسودة" ? (
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onToggleStatus(property)}>
                   <ExternalLink className="mr-2 h-4 w-4" />
                   نشر
                 </DropdownMenuItem>
               ) : (
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onToggleStatus(property)}>
                   <Edit className="mr-2 h-4 w-4" />
                   إلغاء النشر
                 </DropdownMenuItem>
@@ -560,28 +622,30 @@ function PropertyCard({
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
-        <div className="text-lg font-semibold flex flex-row-reverse gap-1">
-          {property.transaction_type === "sale" ? (
-            <>
-              <span>بسعر {property.price.toLocaleString()}</span>
-              <img
-                src="/Saudi_Riyal_Symbol.svg"
-                alt="ريال سعودي"
-                className="w-5 h-5 filter brightness-0 contrast-100"
-              />
-            </>
-          ) : (
-            <>
-              <span>بسعر {property.price.toLocaleString()}</span>
-              <img
-                src="/Saudi_Riyal_Symbol.svg"
-                alt="ريال سعودي"
-                className="w-5 h-5 filter brightness-0 contrast-100"
-              />
-              <span>شهر/</span>
-            </>
-          )}
-        </div>
+      <div className="text-lg font-semibold flex flex-row-reverse gap-1">
+  {property.transaction_type === "sale" || property.purpose === "sale" ? (
+    <>
+      <span>بسعر {property.price.toLocaleString()}</span>
+      <img
+        src="/Saudi_Riyal_Symbol.svg"
+        alt="ريال سعودي"
+        className="w-5 h-5 filter brightness-0 contrast-100"
+      />
+    </>
+  ) : (
+    <>
+      <span>بسعر {property.price.toLocaleString()}</span>
+      <img
+        src="/Saudi_Riyal_Symbol.svg"
+        alt="ريال سعودي"
+        className="w-5 h-5 filter brightness-0 contrast-100"
+      />
+      {getPaymentMethodText(property.payment_method) && (
+        <span>{getPaymentMethodText(property.payment_method)}/</span>
+      )}
+    </>
+  )}
+</div>
         <div className="grid grid-cols-3 gap-2 text-sm ">
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">غرفة</span>
@@ -660,6 +724,8 @@ function PropertyListItem({
   isFavorite,
   onToggleFavorite,
   onDelete,
+  onDuplicate,
+  onToggleStatus,
 }: PropertyCardProps) {
   return (
     <Card>
@@ -714,27 +780,29 @@ function PropertyListItem({
               </p>
             </div>
             <div className="text-lg font-semibold">
-              {property.transaction_type === "sale" ? (
-                <div className="flex items-center gap-1">
-                  <img
-                    src="/Saudi_Riyal_Symbol.svg"
-                    alt="ريال سعودي"
-                    className="w-5 h-5 filter brightness-0 contrast-100"
-                  />
-                  <span>بسعر {property.price.toLocaleString()}</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1">
-                  <span>شهر/</span>
-                  <img
-                    src="/Saudi_Riyal_Symbol.svg"
-                    alt="ريال سعودي"
-                    className="w-5 h-5 filter brightness-0 contrast-100"
-                  />
-                  <span>بسعر {property.price.toLocaleString()}</span>
-                </div>
-              )}
-            </div>
+  {property.transaction_type === "sale" || property.purpose === "sale" ? (
+    <div className="flex items-center gap-1">
+      <img
+        src="/Saudi_Riyal_Symbol.svg"
+        alt="ريال سعودي"
+        className="w-5 h-5 filter brightness-0 contrast-100"
+      />
+      <span>بسعر {property.price.toLocaleString()}</span>
+    </div>
+  ) : (
+    <div className="flex items-center gap-1">
+      {getPaymentMethodText(property.payment_method) && (
+        <span>{getPaymentMethodText(property.payment_method)}/</span>
+      )}
+      <img
+        src="/Saudi_Riyal_Symbol.svg"
+        alt="ريال سعودي"
+        className="w-5 h-5 filter brightness-0 contrast-100"
+      />
+      <span>بسعر {property.price.toLocaleString()}</span>
+    </div>
+  )}
+</div>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">
             <div className="flex flex-row-reverse items-center gap-1">
@@ -790,17 +858,17 @@ function PropertyListItem({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDuplicate(property)}>
                   <Copy className="mr-2 h-4 w-4" />
                   مضاعفة
                 </DropdownMenuItem>
                 {property.status === "مسودة" ? (
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onToggleStatus(property)}>
                     <ExternalLink className="mr-2 h-4 w-4" />
                     نشر
                   </DropdownMenuItem>
                 ) : (
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onToggleStatus(property)}>
                     <Edit className="mr-2 h-4 w-4" />
                     إلغاء النشر
                   </DropdownMenuItem>

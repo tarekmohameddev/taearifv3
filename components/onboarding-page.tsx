@@ -62,7 +62,10 @@ const OnboardingPage: React.FC = () => {
   const [uploadError, setUploadError] = useState<string>("");
   const [whereErrors, setWhereError] = useState<string>("");
   const { setOnboardingCompleted } = useAuthStore();
-  
+  const titleRef = useRef<HTMLInputElement>(null);
+  const valLicenseRef = useRef<HTMLInputElement>(null);
+  const workingHoursRef = useRef<HTMLInputElement>(null);
+  const addressRef = useRef<HTMLInputElement>(null);
   const [websiteData, setWebsiteData] = useState({
     title: "",
     logo: null as string | null,
@@ -177,17 +180,30 @@ const OnboardingPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    
+    let firstErrorField: React.RefObject<HTMLInputElement> | null = null;
+  
     if (!websiteData.title.trim()) {
       newErrors.title = "يرجى إدخال عنوان الموقع";
+      if (!firstErrorField) firstErrorField = titleRef;
     }
-    
+  
     // التحقق من رقم الرخصة (اختياري، ولكن إذا تم إدخاله يجب أن يكون 10 أرقام)
     if (websiteData.valLicense && websiteData.valLicense.length !== 10) {
       newErrors.valLicense = "رقم الرخصة يجب أن يكون 10 أرقام";
+      if (!firstErrorField) firstErrorField = valLicenseRef;
     }
-    
+  
     setErrors(newErrors);
+  
+    // Scroll to the first error field
+    if (firstErrorField && firstErrorField.current) {
+      firstErrorField.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+      firstErrorField.current.focus();
+    }
+  
     return Object.keys(newErrors).length === 0;
   };
 
@@ -232,7 +248,9 @@ const OnboardingPage: React.FC = () => {
           faviconUrl = faviconResponse.url;
         } catch (error: any) {
           setWhereError("favicon");
-          setUploadError(error.response?.data?.message || "خطأ في رفع الأيقونة");
+          setUploadError(
+            error.response?.data?.message || "خطأ في رفع الأيقونة",
+          );
           setIsLoading(false);
           return;
         }
@@ -259,7 +277,9 @@ const OnboardingPage: React.FC = () => {
       }, 2000);
     } catch (error: any) {
       setIsLoading(false);
-      toast.error(error.response?.data?.message || "حدث خطأ أثناء إكمال الإعداد");
+      toast.error(
+        error.response?.data?.message || "حدث خطأ أثناء إكمال الإعداد",
+      );
     }
   };
 
@@ -277,96 +297,119 @@ const OnboardingPage: React.FC = () => {
           />
         </div>
       </div>
-      
+
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-2xl">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2 text-foreground">إعداد موقعك الجديد</h1>
-            <p className="text-muted-foreground">أكمل المعلومات أدناه لبدء إنشاء موقعك</p>
+            <h1 className="text-3xl font-bold mb-2 text-foreground">
+              إعداد موقعك الجديد
+            </h1>
+            <p className="text-muted-foreground">
+              أكمل المعلومات أدناه لبدء إنشاء موقعك
+            </p>
           </div>
 
           <form onSubmit={completeOnboarding} className="space-y-8">
             {/* Website Title */}
             <div className="space-y-2">
-              <Label htmlFor="website-title" className="text-foreground">
-                اسم الموقع *
-              </Label>
-              <Input
-                id="website-title"
-                placeholder="مثال: شركة الأفق للعقارات"
-                value={websiteData.title}
-                onChange={(e) => {
-                  setWebsiteData({ ...websiteData, title: e.target.value });
-                  if (errors.title) {
-                    setErrors({ ...errors, title: "" });
-                  }
-                }}
-                className={`h-12 ${errors.title ? "border-red-500" : ""}`}
-                required
-              />
-              {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
-            </div>
+  <Label htmlFor="website-title" className="text-foreground">
+    اسم الموقع *
+  </Label>
+  <Input
+    ref={titleRef} // إضافة ref
+    id="website-title"
+    placeholder="مثال: شركة الأفق للعقارات"
+    value={websiteData.title}
+    onChange={(e) => {
+      setWebsiteData({ ...websiteData, title: e.target.value });
+      if (errors.title) {
+        setErrors({ ...errors, title: "" });
+      }
+    }}
+    className={`h-12 ${errors.title ? "border-red-500" : ""}`}
+    required
+  />
+  {errors.title && (
+    <p className="text-sm text-red-500">{errors.title}</p>
+  )}
+</div>
 
             {/* VAL License Number */}
-            <div className="space-y-2">
-              <Label htmlFor="val-license">رقم رخصة فال</Label>
-              <Input
-                id="val-license"
-                placeholder="مثال: 1234567890"
-                value={websiteData.valLicense}
-                onChange={(e) => {
-                  // Allow only numbers
-                  const value = e.target.value.replace(/\D/g, "");
-                  setWebsiteData({ ...websiteData, valLicense: value });
-                  if (errors.valLicense) {
-                    setErrors({ ...errors, valLicense: "" });
-                  }
-                }}
-                maxLength={10}
-                className={`h-12 ${errors.valLicense ? "border-red-500" : ""}`}
-              />
-              {errors.valLicense && <p className="text-sm text-red-500">{errors.valLicense}</p>}
-              {!errors.valLicense && (
-                <p className="text-xs text-gray-500">رقم رخصة فال يتكون من 10 أرقام (اختياري)</p>
-              )}
-            </div>
+          
+{/* VAL License Number */}
+<div className="space-y-2">
+  <Label htmlFor="val-license">رقم رخصة فال</Label>
+  <Input
+    ref={valLicenseRef} // إضافة ref
+    id="val-license"
+    placeholder="مثال: 1234567890"
+    value={websiteData.valLicense}
+    onChange={(e) => {
+      // Allow only numbers
+      const value = e.target.value.replace(/\D/g, "");
+      setWebsiteData({ ...websiteData, valLicense: value });
+      if (errors.valLicense) {
+        setErrors({ ...errors, valLicense: "" });
+      }
+    }}
+    maxLength={10}
+    className={`h-12 ${errors.valLicense ? "border-red-500" : ""}`}
+  />
+  {errors.valLicense && (
+    <p className="text-sm text-red-500">{errors.valLicense}</p>
+  )}
+  {!errors.valLicense && (
+    <p className="text-xs text-gray-500">
+      رقم رخصة فال يتكون من 10 أرقام (اختياري)
+    </p>
+  )}
+</div>
 
-            {/* Working Hours */}
-            <div className="space-y-2">
-              <Label htmlFor="working-hours">ساعات العمل</Label>
-              <Input
-                id="working-hours"
-                placeholder="مثال: السبت - الخميس: 9:00 صباحاً - 6:00 مساءً"
-                value={websiteData.workingHours}
-                onChange={(e) => {
-                  setWebsiteData({ ...websiteData, workingHours: e.target.value });
-                  if (errors.workingHours) {
-                    setErrors({ ...errors, workingHours: "" });
-                  }
-                }}
-                className={`h-12 ${errors.workingHours ? "border-red-500" : ""}`}
-              />
-              {errors.workingHours && <p className="text-sm text-red-500">{errors.workingHours}</p>}
-            </div>
+{/* Working Hours */}
+<div className="space-y-2">
+  <Label htmlFor="working-hours">ساعات العمل</Label>
+  <Input
+    ref={workingHoursRef} // إضافة ref
+    id="working-hours"
+    placeholder="مثال: السبت - الخميس: 9:00 صباحاً - 6:00 مساءً"
+    value={websiteData.workingHours}
+    onChange={(e) => {
+      setWebsiteData({
+        ...websiteData,
+        workingHours: e.target.value,
+      });
+      if (errors.workingHours) {
+        setErrors({ ...errors, workingHours: "" });
+      }
+    }}
+    className={`h-12 ${errors.workingHours ? "border-red-500" : ""}`}
+  />
+  {errors.workingHours && (
+    <p className="text-sm text-red-500">{errors.workingHours}</p>
+  )}
+</div>
 
-            {/* Address */}
-            <div className="space-y-2">
-              <Label htmlFor="address">العنوان</Label>
-              <Input
-                id="address"
-                placeholder="مثال: شارع الملك فهد، حي العليا، الرياض"
-                value={websiteData.address}
-                onChange={(e) => {
-                  setWebsiteData({ ...websiteData, address: e.target.value });
-                  if (errors.address) {
-                    setErrors({ ...errors, address: "" });
-                  }
-                }}
-                className={`h-12 ${errors.address ? "border-red-500" : ""}`}
-              />
-              {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
-            </div>
+{/* Address */}
+<div className="space-y-2">
+  <Label htmlFor="address">العنوان</Label>
+  <Input
+    ref={addressRef} // إضافة ref
+    id="address"
+    placeholder="مثال: شارع الملك فهد، حي العليا، الرياض"
+    value={websiteData.address}
+    onChange={(e) => {
+      setWebsiteData({ ...websiteData, address: e.target.value });
+      if (errors.address) {
+        setErrors({ ...errors, address: "" });
+      }
+    }}
+    className={`h-12 ${errors.address ? "border-red-500" : ""}`}
+  />
+  {errors.address && (
+    <p className="text-sm text-red-500">{errors.address}</p>
+  )}
+</div>
 
             {/* Logo and Favicon */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -387,7 +430,9 @@ const OnboardingPage: React.FC = () => {
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">انقر لرفع شعار</p>
+                    <p className="text-sm text-muted-foreground">
+                      انقر لرفع شعار
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -413,7 +458,11 @@ const OnboardingPage: React.FC = () => {
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          setWebsiteData({ ...websiteData, logo: null, logoFile: null })
+                          setWebsiteData({
+                            ...websiteData,
+                            logo: null,
+                            logoFile: null,
+                          })
                         }
                       >
                         <Trash2 className="h-4 w-4" />
@@ -425,7 +474,9 @@ const OnboardingPage: React.FC = () => {
 
               {/* Favicon Upload */}
               <div className="space-y-2">
-                <Label className="text-foreground">أيقونة الموقع (اختياري)</Label>
+                <Label className="text-foreground">
+                  أيقونة الموقع (اختياري)
+                </Label>
                 <input
                   type="file"
                   ref={faviconInputRef}
@@ -440,7 +491,9 @@ const OnboardingPage: React.FC = () => {
                     onClick={() => faviconInputRef.current?.click()}
                   >
                     <FileImage className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">انقر لرفع أيقونة</p>
+                    <p className="text-sm text-muted-foreground">
+                      انقر لرفع أيقونة
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -466,7 +519,11 @@ const OnboardingPage: React.FC = () => {
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          setWebsiteData({ ...websiteData, favicon: null, faviconFile: null })
+                          setWebsiteData({
+                            ...websiteData,
+                            favicon: null,
+                            faviconFile: null,
+                          })
                         }
                       >
                         <Trash2 className="h-4 w-4" />
@@ -569,8 +626,8 @@ const OnboardingPage: React.FC = () => {
                 {whereErrors === "Logo" || whereErrors === "favicon" ? (
                   <>
                     في ال {whereErrors} نوع الملف{" "}
-                    {uploadError.replace("Invalid file type: ", "")} غير مدعوم، يرجى
-                    استخدام JPG أو PNG.
+                    {uploadError.replace("Invalid file type: ", "")} غير مدعوم،
+                    يرجى استخدام JPG أو PNG.
                   </>
                 ) : (
                   uploadError

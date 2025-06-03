@@ -11,7 +11,7 @@ module.exports = (set) => ({
       set((state) => ({
         homepage: {
           ...state.homepage,
-          setupProgressData: response.data,  // نخزن الكل: { steps, progress, continue_path }
+          setupProgressData: response.data, // نخزن الكل: { steps, progress, continue_path }
           isSetupProgressDataUpdated: true,
         },
       }));

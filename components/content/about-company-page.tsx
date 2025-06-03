@@ -35,7 +35,9 @@ export function AboutCompanyPage() {
     image_path: "",
     features: [],
   });
-  const { homepage: { setupProgressData, fetchSetupProgressData } } = useStore();
+  const {
+    homepage: { setupProgressData, fetchSetupProgressData },
+  } = useStore();
 
   const handleImageUploadClick = () => {
     fileInputRef.current.click();
@@ -145,8 +147,8 @@ export function AboutCompanyPage() {
         newAboutData,
       );
       const setpOB = {
-        "step": "homepage_about_update"
-   }
+        step: "homepage_about_update",
+      };
       await axiosInstance.post("/steps/complete", setpOB);
       await fetchSetupProgressData();
 

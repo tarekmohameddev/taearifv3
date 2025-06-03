@@ -436,7 +436,7 @@ export function SettingsPage() {
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="relative">
+                    {/* <div className="relative">
                       <Input
                         placeholder="بحث في النطاقات..."
                         className="w-[200px] pl-8"
@@ -444,7 +444,7 @@ export function SettingsPage() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                       />
                       <SearchIcon className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    </div>
+                    </div> */}
 
                     <Select
                       value={statusFilter}

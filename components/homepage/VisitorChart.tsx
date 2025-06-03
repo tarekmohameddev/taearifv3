@@ -33,7 +33,8 @@ function VisitorChart() {
 
   const chartData = visitorData[selectedTimeRange]?.data || [];
   const totalVisits = visitorData[selectedTimeRange]?.totalVisits || 0;
-  const totalUniqueVisitors = visitorData[selectedTimeRange]?.totalUniqueVisitors || 0;
+  const totalUniqueVisitors =
+    visitorData[selectedTimeRange]?.totalUniqueVisitors || 0;
 
   return (
     <div className="w-full">
@@ -63,14 +64,22 @@ function VisitorChart() {
       <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="rounded-lg border p-4">
           <div className="flex items-center gap-2">
-            <div className="text-xl sm:text-2xl font-bold text-blue-600">{totalVisits}</div>
-            <div className="text-sm sm:text-base text-gray-600">إجمالي الزيارات</div>
+            <div className="text-xl sm:text-2xl font-bold text-blue-600">
+              {totalVisits}
+            </div>
+            <div className="text-sm sm:text-base text-gray-600">
+              إجمالي الزيارات
+            </div>
           </div>
         </div>
         <div className="rounded-lg border p-4">
           <div className="flex items-center gap-2">
-            <div className="text-xl sm:text-2xl font-bold text-green-600">{totalUniqueVisitors}</div>
-            <div className="text-sm sm:text-base text-gray-600">إجمالي الزوار الفريدون</div>
+            <div className="text-xl sm:text-2xl font-bold text-green-600">
+              {totalUniqueVisitors}
+            </div>
+            <div className="text-sm sm:text-base text-gray-600">
+              إجمالي الزوار الفريدون
+            </div>
           </div>
         </div>
       </div>
@@ -115,7 +124,10 @@ function VisitorChart() {
                 content={({ payload }) => (
                   <div className="flex justify-end gap-4 text-sm mb-4">
                     {payload?.map((entry) => (
-                      <div key={entry.value} className="flex items-center gap-2">
+                      <div
+                        key={entry.value}
+                        className="flex items-center gap-2"
+                      >
                         <div
                           className="h-3 w-3 rounded-full"
                           style={{ backgroundColor: entry.color }}

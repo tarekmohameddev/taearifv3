@@ -1,6 +1,6 @@
-//components\project\add-project-page.tsx 
-//components\project\add-project-page.tsx 
-//components\project\add-project-page.tsx 
+//components\project\add-project-page.tsx
+//components\project\add-project-page.tsx
+//components\project\add-project-page.tsx
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -84,7 +84,9 @@ export default function AddProjectPage(): JSX.Element {
   const plansInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const { homepage: { setupProgressData, fetchSetupProgressData } } = useStore();
+  const {
+    homepage: { setupProgressData, fetchSetupProgressData },
+  } = useStore();
   const [newProject, setNewProject] = useState({
     id: "",
     name: "",
@@ -117,17 +119,20 @@ export default function AddProjectPage(): JSX.Element {
   } = useStore();
 
   const addAmenity = () => {
-    if (currentAmenity.trim() !== "" && !amenities.includes(currentAmenity.trim())) {
-      setAmenities(prev => [...prev, currentAmenity.trim()]);
+    if (
+      currentAmenity.trim() !== "" &&
+      !amenities.includes(currentAmenity.trim())
+    ) {
+      setAmenities((prev) => [...prev, currentAmenity.trim()]);
       setCurrentAmenity("");
     }
   };
-  
+
   // دالة لحذف مرفق
   const removeAmenity = (index: number) => {
-    setAmenities(prev => prev.filter((_, i) => i !== index));
+    setAmenities((prev) => prev.filter((_, i) => i !== index));
   };
-    
+
   useEffect(() => {
     if (!isInitialized) {
       fetchProjects();
@@ -518,7 +523,7 @@ export default function AddProjectPage(): JSX.Element {
             unit: "قدم مربع",
           },
         ],
-        amenities: amenities.join(", "), 
+        amenities: amenities.join(", "),
       };
 
       const response = await axiosInstance.post(
@@ -541,8 +546,8 @@ export default function AddProjectPage(): JSX.Element {
         },
       });
       const setpOB = {
-        "step": "projects"
-   }
+        step: "projects",
+      };
       await axiosInstance.post("/steps/complete", setpOB);
       await fetchSetupProgressData();
 
@@ -620,188 +625,190 @@ export default function AddProjectPage(): JSX.Element {
                   أدخل التفاصيل الأساسية للمشروع العقاري الجديد
                 </CardDescription>
               </CardHeader>
-{/* ضع هذا الكود في CardContent */}
-<CardContent className="space-y-6">
-  {/* الصف الأول من الحقول */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div className="grid gap-2">
-      <Label htmlFor="name">اسم المشروع</Label>
-      <Input
-        id="name"
-        placeholder="سكاي لاين ريزيدنس"
-        value={newProject.name}
-        onChange={handleInputChange}
-        className={formErrors.name ? "border-red-500" : ""}
-      />
-      {formErrors.name && (
-        <p className="text-xs text-red-500">{formErrors.name}</p>
-      )}
-    </div>
-    <div className="grid gap-2">
-      <Label htmlFor="location">الموقع</Label>
-      <Input
-        id="location"
-        placeholder="وسط المدينة"
-        value={newProject.location}
-        onChange={handleInputChange}
-        className={formErrors.location ? "border-red-500" : ""}
-      />
-      {formErrors.location && (
-        <p className="text-xs text-red-500">
-          {formErrors.location}
-        </p>
-      )}
-    </div>
-  </div>
+              {/* ضع هذا الكود في CardContent */}
+              <CardContent className="space-y-6">
+                {/* الصف الأول من الحقول */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">اسم المشروع</Label>
+                    <Input
+                      id="name"
+                      placeholder="سكاي لاين ريزيدنس"
+                      value={newProject.name}
+                      onChange={handleInputChange}
+                      className={formErrors.name ? "border-red-500" : ""}
+                    />
+                    {formErrors.name && (
+                      <p className="text-xs text-red-500">{formErrors.name}</p>
+                    )}
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="location">الموقع</Label>
+                    <Input
+                      id="location"
+                      placeholder="وسط المدينة"
+                      value={newProject.location}
+                      onChange={handleInputChange}
+                      className={formErrors.location ? "border-red-500" : ""}
+                    />
+                    {formErrors.location && (
+                      <p className="text-xs text-red-500">
+                        {formErrors.location}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
-  {/* الصف الثاني من الحقول */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div className="grid gap-2">
-      <Label htmlFor="price">السعر الابتدائي</Label>
-      <Input
-        id="price"
-        placeholder="من $750,000"
-        value={newProject.price}
-        onChange={handleInputChange}
-        className={formErrors.price ? "border-red-500" : ""}
-      />
-      {formErrors.price && (
-        <p className="text-xs text-red-500">{formErrors.price}</p>
-      )}
-    </div>
-    <div className="grid gap-2">
-      <Label htmlFor="units">عدد الوحدات</Label>
-      <Input
-        id="units"
-        placeholder="120"
-        type="number"
-        value={newProject.units || ""}
-        onChange={handleInputChange}
-      />
-    </div>
-  </div>
+                {/* الصف الثاني من الحقول */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="price">السعر الابتدائي</Label>
+                    <Input
+                      id="price"
+                      placeholder="من $750,000"
+                      value={newProject.price}
+                      onChange={handleInputChange}
+                      className={formErrors.price ? "border-red-500" : ""}
+                    />
+                    {formErrors.price && (
+                      <p className="text-xs text-red-500">{formErrors.price}</p>
+                    )}
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="units">عدد الوحدات</Label>
+                    <Input
+                      id="units"
+                      placeholder="120"
+                      type="number"
+                      value={newProject.units || ""}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
 
-  {/* الصف الثالث من الحقول */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div className="grid gap-2">
-      <Label htmlFor="status">الحالة</Label>
-      <Select
-        onValueChange={(value) =>
-          handleSelectChange("status", value)
-        }
-      >
-        <SelectTrigger
-          id="status"
-          className={formErrors.status ? "border-red-500" : ""}
-        >
-          <SelectValue placeholder="اختر الحالة" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="قيد الإنشاء">قيد الإنشاء</SelectItem>
-          <SelectItem value="منتهي">منتهي</SelectItem>
-        </SelectContent>
-      </Select>
-      {formErrors.status && (
-        <p className="text-xs text-red-500">
-          {formErrors.status}
-        </p>
-      )}
-    </div>
-    <div className="grid gap-2">
-      <Label htmlFor="completionDate">تاريخ الإنجاز</Label>
-      <Input
-        id="completionDate"
-        placeholder="2025"
-        value={newProject.completionDate}
-        onChange={handleInputChange}
-        className={
-          formErrors.completionDate ? "border-red-500" : ""
-        }
-      />
-      {formErrors.completionDate && (
-        <p className="text-xs text-red-500">
-          {formErrors.completionDate}
-        </p>
-      )}
-    </div>
-  </div>
+                {/* الصف الثالث من الحقول */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="status">الحالة</Label>
+                    <Select
+                      onValueChange={(value) =>
+                        handleSelectChange("status", value)
+                      }
+                    >
+                      <SelectTrigger
+                        id="status"
+                        className={formErrors.status ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder="اختر الحالة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="قيد الإنشاء">قيد الإنشاء</SelectItem>
+                        <SelectItem value="منتهي">منتهي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {formErrors.status && (
+                      <p className="text-xs text-red-500">
+                        {formErrors.status}
+                      </p>
+                    )}
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="completionDate">تاريخ الإنجاز</Label>
+                    <Input
+                      id="completionDate"
+                      placeholder="2025"
+                      value={newProject.completionDate}
+                      onChange={handleInputChange}
+                      className={
+                        formErrors.completionDate ? "border-red-500" : ""
+                      }
+                    />
+                    {formErrors.completionDate && (
+                      <p className="text-xs text-red-500">
+                        {formErrors.completionDate}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
-  {/* الصف الرابع - المطور و Featured switch */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div className="grid gap-2">
-      <Label htmlFor="developer">المطور</Label>
-      <Input
-        id="developer"
-        placeholder="مجموعة التطوير الحضري"
-        value={newProject.developer}
-        onChange={handleInputChange}
-        className={formErrors.developer ? "border-red-500" : ""}
-      />
-      {formErrors.developer && (
-        <p className="text-xs text-red-500">
-          {formErrors.developer}
-        </p>
-      )}
-    </div>
-    <div className="flex items-center space-x-2 h-10 self-end">
-      <Switch
-        id="featured"
-        checked={newProject.featured}
-        onCheckedChange={handleSwitchChange}
-      />
-      <Label htmlFor="featured" className="mr-2">
-        عرض هذا المشروع في الصفحة الرئيسية
-      </Label>
-    </div>
-  </div>
+                {/* الصف الرابع - المطور و Featured switch */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="developer">المطور</Label>
+                    <Input
+                      id="developer"
+                      placeholder="مجموعة التطوير الحضري"
+                      value={newProject.developer}
+                      onChange={handleInputChange}
+                      className={formErrors.developer ? "border-red-500" : ""}
+                    />
+                    {formErrors.developer && (
+                      <p className="text-xs text-red-500">
+                        {formErrors.developer}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2 h-10 self-end">
+                    <Switch
+                      id="featured"
+                      checked={newProject.featured}
+                      onCheckedChange={handleSwitchChange}
+                    />
+                    <Label htmlFor="featured" className="mr-2">
+                      عرض هذا المشروع في الصفحة الرئيسية
+                    </Label>
+                  </div>
+                </div>
 
-  {/* حقل المرافق - منفصل تماماً */}
-  <div className="space-y-4">
-    {/* حقل إدخال المرافق */}
-    <div className="space-y-2">
-      <Label htmlFor="amenityInput" className="text-foreground">
-        المرافق
-      </Label>
-      <div className="flex flex-col sm:flex-row gap-2">
-        <Input
-          id="amenityInput"
-          placeholder="أدخل مرفق (مثل: حمام سباحة)"
-          value={currentAmenity}
-          onChange={(e) => setCurrentAmenity(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              addAmenity();
-            }
-          }}
-          className="flex-1 bg-background border-input text-foreground placeholder:text-muted-foreground"
-        />
-        <Button
-          type="button"
-          onClick={addAmenity}
-          disabled={!currentAmenity.trim()}
-          className="w-full sm:w-auto"
-          variant="secondary"
-        >
-          <Plus className="h-4 w-4 ml-2 sm:ml-0 sm:mr-2" />
-          <span className="sm:hidden">إضافة مرفق</span>
-          <span className="hidden sm:inline">إضافة</span>
-        </Button>
-      </div>
-      {formErrors?.amenities && (
-        <p className="text-sm text-destructive">{formErrors.amenities}</p>
-      )}
-    </div>
+                {/* حقل المرافق - منفصل تماماً */}
+                <div className="space-y-4">
+                  {/* حقل إدخال المرافق */}
+                  <div className="space-y-2">
+                    <Label htmlFor="amenityInput" className="text-foreground">
+                      المرافق
+                    </Label>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Input
+                        id="amenityInput"
+                        placeholder="أدخل مرفق (مثل: حمام سباحة)"
+                        value={currentAmenity}
+                        onChange={(e) => setCurrentAmenity(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            addAmenity();
+                          }
+                        }}
+                        className="flex-1 bg-background border-input text-foreground placeholder:text-muted-foreground"
+                      />
+                      <Button
+                        type="button"
+                        onClick={addAmenity}
+                        disabled={!currentAmenity.trim()}
+                        className="w-full sm:w-auto"
+                        variant="secondary"
+                      >
+                        <Plus className="h-4 w-4 ml-2 sm:ml-0 sm:mr-2" />
+                        <span className="sm:hidden">إضافة مرفق</span>
+                        <span className="hidden sm:inline">إضافة</span>
+                      </Button>
+                    </div>
+                    {formErrors?.amenities && (
+                      <p className="text-sm text-destructive">
+                        {formErrors.amenities}
+                      </p>
+                    )}
+                  </div>
 
-    {/* عرض المرافق المضافة */}
-    {amenities.length > 0 && (
-      <div className="space-y-2">
-        <Label className="text-foreground">المرافق المضافة</Label>
-        <div className="flex flex-wrap gap-2">
-          {amenities.map((amenity, index) => (
-            <div
-              key={index}
-              className="
+                  {/* عرض المرافق المضافة */}
+                  {amenities.length > 0 && (
+                    <div className="space-y-2">
+                      <Label className="text-foreground">المرافق المضافة</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {amenities.map((amenity, index) => (
+                          <div
+                            key={index}
+                            className="
                 bg-secondary/50 dark:bg-secondary/30 
                 text-secondary-foreground 
                 px-3 py-1.5 
@@ -812,14 +819,14 @@ export default function AddProjectPage(): JSX.Element {
                 hover:bg-secondary/70 dark:hover:bg-secondary/50
                 group
               "
-            >
-              <span className="select-none">{amenity}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => removeAmenity(index)}
-                className="
+                          >
+                            <span className="select-none">{amenity}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeAmenity(index)}
+                              className="
                   h-auto p-0 
                   hover:bg-transparent 
                   text-muted-foreground 
@@ -827,37 +834,37 @@ export default function AddProjectPage(): JSX.Element {
                   transition-colors
                   -mr-1
                 "
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          ))}
-        </div>
-        <p className="text-xs text-muted-foreground mt-1">
-          {amenities.length} مرفق مضاف
-        </p>
-      </div>
-    )}
-  </div>
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {amenities.length} مرفق مضاف
+                      </p>
+                    </div>
+                  )}
+                </div>
 
-  {/* حقل الوصف - منفصل أيضاً */}
-  <div className="grid gap-2">
-    <Label htmlFor="description">الوصف</Label>
-    <Textarea
-      id="description"
-      placeholder="شقق فاخرة عالية الارتفاع مع إطلالات بانورامية على المدينة"
-      rows={3}
-      value={newProject.description}
-      onChange={handleInputChange}
-      className={formErrors.description ? "border-red-500" : ""}
-    />
-    {formErrors.description && (
-      <p className="text-xs text-red-500">
-        {formErrors.description}
-      </p>
-    )}
-  </div>
-</CardContent>
+                {/* حقل الوصف - منفصل أيضاً */}
+                <div className="grid gap-2">
+                  <Label htmlFor="description">الوصف</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="شقق فاخرة عالية الارتفاع مع إطلالات بانورامية على المدينة"
+                    rows={3}
+                    value={newProject.description}
+                    onChange={handleInputChange}
+                    className={formErrors.description ? "border-red-500" : ""}
+                  />
+                  {formErrors.description && (
+                    <p className="text-xs text-red-500">
+                      {formErrors.description}
+                    </p>
+                  )}
+                </div>
+              </CardContent>
             </Card>
 
             {/* Map Location */}

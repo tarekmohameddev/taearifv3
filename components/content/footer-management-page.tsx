@@ -120,7 +120,9 @@ export function FooterManagementPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const { homepage: { setupProgressData, fetchSetupProgressData } } = useStore();
+  const {
+    homepage: { setupProgressData, fetchSetupProgressData },
+  } = useStore();
 
   useEffect(() => {
     const fetchFooterData = async () => {
@@ -370,8 +372,8 @@ export function FooterManagementPage() {
         footerData,
       );
       const setpOB = {
-        "step": "footer"
-   }
+        step: "footer",
+      };
       await axiosInstance.post("/steps/complete", setpOB);
       await fetchSetupProgressData();
 

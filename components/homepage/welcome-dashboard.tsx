@@ -168,12 +168,13 @@ export function WelcomeDashboard() {
             <CardTitle className="text-sm font-medium">معدل الارتداد</CardTitle>
           </CardHeader>
           <CardContent>
-          <div className="text-2xl font-bold">
-          {dashboardSummary?.bounce_rate !== undefined && dashboardSummary.bounce_rate !== "N/A"
-  ? Number(dashboardSummary.bounce_rate).toFixed(2)
-  : 0} %
-
-</div>
+            <div className="text-2xl font-bold">
+              {dashboardSummary?.bounce_rate !== undefined &&
+              dashboardSummary.bounce_rate !== "N/A"
+                ? Number(dashboardSummary.bounce_rate).toFixed(2)
+                : 0}{" "}
+              %
+            </div>
             <p className="text-xs text-muted-foreground">
               <span
                 className={
@@ -233,14 +234,19 @@ export function WelcomeDashboard() {
                           `${(percent * 100).toFixed(0)}%`
                         }
                       >
-                        {dashboardDevice?.map((entry: { color: string | undefined; }, index: any) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.color}
-                            stroke="transparent"
-                            strokeWidth={2}
-                          />
-                        ))}
+                        {dashboardDevice?.map(
+                          (
+                            entry: { color: string | undefined },
+                            index: any,
+                          ) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={entry.color}
+                              stroke="transparent"
+                              strokeWidth={2}
+                            />
+                          ),
+                        )}
                       </Pie>
                       <Legend
                         layout="vertical"
@@ -292,14 +298,19 @@ export function WelcomeDashboard() {
                           `${(percent * 100).toFixed(0)}%`
                         }
                       >
-                        {trafficSources?.map((entry: { color: string | undefined; }, index: any) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.color}
-                            stroke="transparent"
-                            strokeWidth={2}
-                          />
-                        ))}
+                        {trafficSources?.map(
+                          (
+                            entry: { color: string | undefined },
+                            index: any,
+                          ) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={entry.color}
+                              stroke="transparent"
+                              strokeWidth={2}
+                            />
+                          ),
+                        )}
                       </Pie>
                       <Legend
                         layout="vertical"

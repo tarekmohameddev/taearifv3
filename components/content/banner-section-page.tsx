@@ -54,7 +54,9 @@ export function BannerSectionPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [bannerType, setBannerType] = useState("static");
   const [bannerData, setBannerData] = useState<BannerSettings | null>(null);
-  const { homepage: { setupProgressData, fetchSetupProgressData } } = useStore();
+  const {
+    homepage: { setupProgressData, fetchSetupProgressData },
+  } = useStore();
   const staticFileInputRef = useRef(null);
   const [staticBannerImage, setStaticBannerImage] = useState<string | null>(
     null,
@@ -206,8 +208,8 @@ export function BannerSectionPage() {
         },
       };
       const setpOB = {
-           "step": "banner"
-      }
+        step: "banner",
+      };
       await axiosInstance.post("/steps/complete", setpOB);
       await axiosInstance.post("/content/banner", formData);
       await fetchSetupProgressData();

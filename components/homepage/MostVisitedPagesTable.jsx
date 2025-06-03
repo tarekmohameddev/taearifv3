@@ -116,10 +116,12 @@ export function MostVisitedPagesTable() {
                   <TableCell>{row.unique_visitors}</TableCell>
                   <TableCell>{row.bounce_rate}</TableCell>
                   <TableCell>
-  {row.avg_time !== undefined && row.avg_time !== null && row.avg_time !== "N/A" 
-    ? row.avg_time 
-    : "0:00"}
-</TableCell>
+                    {row.avg_time !== undefined &&
+                    row.avg_time !== null &&
+                    row.avg_time !== "N/A"
+                      ? row.avg_time
+                      : "0:00"}
+                  </TableCell>
                   <TableCell>{row.percentage}</TableCell>
                 </TableRow>
               ))}

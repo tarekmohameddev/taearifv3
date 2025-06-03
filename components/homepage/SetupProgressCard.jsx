@@ -23,13 +23,13 @@ export function SetupProgressCard() {
     },
     loading,
   } = useStore();
-  
+
   useEffect(() => {
     if (!isSetupProgressDataUpdated) {
       fetchSetupProgressData();
     }
   }, [isSetupProgressDataUpdated, fetchSetupProgressData]);
-  
+
   // عرض Skeleton أثناء التحميل
   if (!isSetupProgressDataUpdated) {
     return (
@@ -56,14 +56,14 @@ export function SetupProgressCard() {
       </Card>
     );
   }
-  
+
   // 1) نحسب النسبة المئوية (لو كانت الـ API تُرجع 0–1)
   //    أو نستخدمها مباشرةً إذا كانت 0–100
-  const progressPercent = 
+  const progressPercent =
     setupProgressData.progress <= 1
       ? Math.round(setupProgressData.progress * 100)
       : setupProgressData.progress;
-  
+
   // 2) نحول الـ steps من object إلى array مع استخدام الهيكل الجديد
   const completedSteps = Object.entries(setupProgressData.steps).map(
     ([id, stepData]) => ({
@@ -74,18 +74,18 @@ export function SetupProgressCard() {
         .join(" "),
       completed: stepData.status,
       text: stepData.text,
-    })
+    }),
   );
-  
+
   const stepTranslations = {
     Banner: "البانر",
     Footer: "التذييل",
     About: "من نحن",
     Menu: "القائمة",
     Projects: "المشاريع",
-    Properties: "العقارات"
+    Properties: "العقارات",
   };
-  
+
   return (
     <Card className="col-span-3">
       <CardHeader>
@@ -102,7 +102,7 @@ export function SetupProgressCard() {
           </div>
           <Progress value={progressPercent} />
         </div>
-        
+
         {/* مسافة فارغة فوق وتحت قائمة الخطوات */}
         <div className="py-4">
           <div className="space-y-2">
@@ -118,8 +118,8 @@ export function SetupProgressCard() {
                   {step.completed ? (
                     <Check className="h-3.5 w-3.5" />
                   ) : (
-                  <span className="text-md ">?</span>
-                )}
+                    <span className="text-md ">?</span>
+                  )}
                 </div>
                 <span className="text-sm">
                   {stepTranslations[step.name] || step.name}
@@ -137,7 +137,7 @@ export function SetupProgressCard() {
             </Link>
           </Button>
         )}
-        
+
         {/* رسالة عندما يكون الإعداد مكتملاً */}
         {/* {!setupProgressData.continue_path && progressPercent === 100 && (
           <div className="text-center p-3 bg-white rounded-lg">
@@ -146,7 +146,7 @@ export function SetupProgressCard() {
             </p>
           </div>
         )} */}
-        
+
         {/* رسالة عندما لا يوجد رابط ولكن الإعداد غير مكتمل */}
         {!setupProgressData.continue_path && progressPercent < 100 && (
           <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">

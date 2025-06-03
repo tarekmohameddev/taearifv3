@@ -206,16 +206,15 @@ export function ProjectsManagementPage() {
                   <List className="h-4 w-4" />
                   <span className="sr-only">عرض القائمة</span>
                 </Button>
-                <Button
+                {/* <Button
                   variant="outline"
                   className="gap-1"
                   onClick={() => {
-                    /* Open filter dialog */
                   }}
                 >
                   <Filter className="h-4 w-4" />
                   تصفية
-                </Button>
+                </Button> */}
                 <Button
                   className="gap-1"
                   onClick={() => {
@@ -266,9 +265,9 @@ export function ProjectsManagementPage() {
             <Tabs defaultValue="all">
               <TabsList>
                 <TabsTrigger value="all">جميع المشاريع</TabsTrigger>
-                <TabsTrigger value="1">منشور</TabsTrigger>
+                {/* <TabsTrigger value="1">منشور</TabsTrigger>
                 <TabsTrigger value="0">مسودات</TabsTrigger>
-                <TabsTrigger value="featured">مميز</TabsTrigger>
+                <TabsTrigger value="featured">مميز</TabsTrigger> */}
               </TabsList>
               <TabsContent value="all" className="mt-4">
                 {loading ? (
@@ -303,13 +302,13 @@ export function ProjectsManagementPage() {
             </Tabs>
 
             {pagination && pagination.total !== 0 && (
-  <div className="mt-6">
-    <span className="text-sm text-muted-foreground">
-      Showing {pagination.from} to {pagination.to} of {pagination.total} projects
-    </span>
-  </div>
-)}
-
+              <div className="mt-6">
+                <span className="text-sm text-muted-foreground">
+                  Showing {pagination.from} to {pagination.to} of{" "}
+                  {pagination.total} projects
+                </span>
+              </div>
+            )}
           </div>
         </main>
       </div>

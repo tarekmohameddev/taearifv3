@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
-  ChevronLeft,
   Upload,
   X,
   Loader2,
@@ -44,6 +43,14 @@ import useAuthStore from "@/context/AuthContext";
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
 import { PropertyCounter } from "@/components/property/propertyCOMP/property-counter";
+import {
+  ChevronLeft,
+  HelpCircle,
+  Eye,
+  EyeOff,
+  Trash2,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -63,10 +70,12 @@ const MapComponent = dynamic(() => import("@/components/map-component"), {
  */
 
 /**
- * @param {PropertyFormProps} props 
+ * @param {PropertyFormProps} props
  */
 export default function PropertyForm({ mode }) {
-  const { homepage: { setupProgressData, fetchSetupProgressData } } = useStore();
+  const {
+    homepage: { setupProgressData, fetchSetupProgressData },
+  } = useStore();
   const {
     propertiesManagement: { properties, loading, isInitialized },
     setPropertiesManagement,
@@ -78,7 +87,10 @@ export default function PropertyForm({ mode }) {
   const router = useRouter();
   const { id } = useParams();
   let hasReachedLimit;
-
+  const [faqs, setFaqs] = useState([]);
+  const [newQuestion, setNewQuestion] = useState("");
+  const [newAnswer, setNewAnswer] = useState("");
+  const [suggestedFaqsList, setSuggestedFaqsList] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -86,13 +98,13 @@ export default function PropertyForm({ mode }) {
     price: "",
     category: "",
     project_id: "",
-    transaction_type: "",
+    purpose: "",
     bedrooms: "",
     bathrooms: "",
     size: "",
     features: [],
     status: "draft",
-    featured: false,
+    featured: true,
     latitude: 24.766316905850978,
     longitude: 46.73579692840576,
     city_id: null,
@@ -139,6 +151,7 @@ export default function PropertyForm({ mode }) {
     gallery: [],
     floorPlans: [],
   });
+  
   const [uploading, setUploading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -147,10 +160,22 @@ export default function PropertyForm({ mode }) {
   const thumbnailInputRef = useRef(null);
   const galleryInputRef = useRef(null);
   const floorPlansInputRef = useRef(null);
-
-  // جلب بيانات العقار للتعديل
   useEffect(() => {
-    if (mode === 'edit' && id) {
+    const fetchSuggestedFaqs = async () => {
+      try {
+        const response = await axiosInstance.get("/property-faqs");
+        console.log("Suggested FAQs response:", response.data.data);
+        setSuggestedFaqsList(response.data.data.suggestedFaqs || []);
+      } catch (error) {
+        console.error("Error fetching suggested FAQs:", error);
+      }
+    };
+    fetchSuggestedFaqs();
+  }, []);
+  // تحديث useEffect لجلب بيانات العقار للتعديل
+  
+  useEffect(() => {
+    if (mode === "edit" && id) {
       const fetchProperty = async () => {
         try {
           const response = await axiosInstance.get(`/properties/${id}`);
@@ -166,14 +191,39 @@ export default function PropertyForm({ mode }) {
           // معالجة الميزات
           let featuresArray = [];
           if (property.features) {
-            if (typeof property.features === 'string') {
+            if (typeof property.features === "string") {
               featuresArray = property.features
-                .split(',')
-                .map(feature => feature.trim())
-                .filter(feature => feature.length > 0);
+                .split(",")
+                .map((feature) => feature.trim())
+                .filter((feature) => feature.length > 0);
             } else if (Array.isArray(property.features)) {
               featuresArray = property.features;
             }
+          }
+          if (property.faqs && Array.isArray(property.faqs)) {
+            setFaqs(property.faqs.map((faq, index) => ({
+              id: index + 1,
+              question: faq.question,
+              answer: faq.answer,
+              displayOnPage: faq.displayOnPage
+            })));
+          }
+          // تحديد قيم transaction_type و PropertyType بناءً على البيانات المُستلمة
+          // let transactionType = "";
+          // if (property.type) {
+          //   transactionType = property.type;
+          // } else if (property.purpose) {
+          //   transactionType = property.purpose;
+          // }
+
+          let propertyType = "";
+          if (property.PropertyType) {
+            propertyType = property.PropertyType;
+          } else if (
+            property.type &&
+            (property.type === "residential" || property.type === "commercial")
+          ) {
+            propertyType = property.type;
           }
 
           setFormData({
@@ -184,7 +234,7 @@ export default function PropertyForm({ mode }) {
             description: property.description || "",
             address: property.address || "",
             price: property.price || "",
-            transaction_type: property.type || "",
+            purpose: property.purpose || "",
             bedrooms: property.beds?.toString() || "",
             bathrooms: property.bath?.toString() || "",
             size: property.size?.toString() || "",
@@ -222,7 +272,8 @@ export default function PropertyForm({ mode }) {
             district_id: property.state_id,
             payment_method: property.payment_method || "",
             pricePerMeter: property.pricePerMeter || "",
-            type: property.PropertyType || "",
+            PropertyType: propertyType, 
+            faqs: property.faqs || "",
           });
 
           setPreviews({
@@ -231,16 +282,53 @@ export default function PropertyForm({ mode }) {
             floorPlans: property.floor_planning_image || [],
           });
         } catch (error) {
-          toast.error("حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى.");
+          toast.error(
+            "حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى.",
+          );
+          console.error("Error fetching property:", error);
         }
       };
       fetchProperty();
     }
   }, [mode, id]);
-
+  
+  
+  const handleAddFaq = () => {
+    if (newQuestion.trim() === "" || newAnswer.trim() === "") {
+      toast.error("يرجى إدخال السؤال والإجابة");
+      return;
+    }
+  
+    const newFaq = {
+      id: Date.now(),
+      question: newQuestion.trim(),
+      answer: newAnswer.trim(),
+      displayOnPage: true,
+    };
+  
+    setFaqs([...faqs, newFaq]);
+    setNewQuestion("");
+    setNewAnswer("");
+    toast.success("تم إضافة السؤال بنجاح");
+  };
+  
+  const handleSelectSuggestedFaq = (suggestedFaq) => {
+    setNewQuestion(suggestedFaq.question); // استخدام .question بدلاً من النص مباشرة
+  };
+  
+  const handleRemoveFaq = (id) => {
+    setFaqs(faqs.filter((faq) => faq.id !== id));
+    toast.success("تم حذف السؤال");
+  };
+  
+  const handleToggleFaqDisplay = (id) => {
+    setFaqs(faqs.map((faq) => 
+      faq.id === id ? { ...faq, displayOnPage: !faq.displayOnPage } : faq
+    ));
+  };
   // جلب البيانات الأساسية
   useEffect(() => {
-    if (mode === 'add' && !isInitialized && !loading) {
+    if (mode === "add" && !isInitialized && !loading) {
       fetchProperties();
     }
   }, [fetchProperties, isInitialized, loading, properties, mode]);
@@ -279,16 +367,17 @@ export default function PropertyForm({ mode }) {
         toast.error("حدث خطأ أثناء جلب المشاريع.");
       }
     };
-    if (mode === 'add') {
+    if (mode === "add") {
       fetchProjects();
     }
   }, [mode]);
 
   // فحص الحد الأقصى للعقارات (للإضافة فقط)
   React.useEffect(() => {
-    if (mode === 'add' &&
+    if (
+      mode === "add" &&
       properties.length >=
-      useAuthStore.getState().userData?.real_estate_limit_number
+        useAuthStore.getState().userData?.real_estate_limit_number
     ) {
       toast.error(
         `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.real_estate_limit_number} عقارات`,
@@ -416,9 +505,9 @@ export default function PropertyForm({ mode }) {
 
     if (!formData.title) newErrors.title = "اسم العقار مطلوب";
     if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
-    if (mode === 'add' && !images.thumbnail)
+    if (mode === "add" && !images.thumbnail)
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
-    if (mode === 'edit' && !previews.thumbnail && !images.thumbnail)
+    if (mode === "edit" && !previews.thumbnail && !images.thumbnail)
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
     if (!formData.description)
       newErrors.description = "من فضلك اكتب وصف للعقار";
@@ -444,9 +533,10 @@ export default function PropertyForm({ mode }) {
             images.thumbnail,
             "property",
           );
-          thumbnailPath = mode === 'add' 
-            ? uploadedFile.path.replace("https://taearif.com", "")
-            : uploadedFile.url;
+          thumbnailPath =
+            mode === "add"
+              ? uploadedFile.path.replace("https://taearif.com", "")
+              : uploadedFile.url;
         }
 
         if (images.gallery.length > 0) {
@@ -454,9 +544,12 @@ export default function PropertyForm({ mode }) {
             images.gallery,
             "property",
           );
-          galleryPaths = mode === 'add'
-            ? uploadedFiles.map((f) => f.path.replace("https://taearif.com", ""))
-            : uploadedFiles.map((f) => f.url);
+          galleryPaths =
+            mode === "add"
+              ? uploadedFiles.map((f) =>
+                  f.path.replace("https://taearif.com", ""),
+                )
+              : uploadedFiles.map((f) => f.url);
         }
 
         if (images.floorPlans.length > 0) {
@@ -464,9 +557,12 @@ export default function PropertyForm({ mode }) {
             images.floorPlans,
             "property",
           );
-          floorPlansPaths = mode === 'add'
-            ? uploadedFiles.map((f) => f.path.replace("https://taearif.com", ""))
-            : uploadedFiles.map((f) => f.url);
+          floorPlansPaths =
+            mode === "add"
+              ? uploadedFiles.map((f) =>
+                  f.path.replace("https://taearif.com", ""),
+                )
+              : uploadedFiles.map((f) => f.url);
         }
 
         const propertyData = {
@@ -476,12 +572,12 @@ export default function PropertyForm({ mode }) {
           beds: parseInt(formData.bedrooms),
           bath: parseInt(formData.bathrooms),
           size: parseInt(formData.size),
-          features: mode === 'add' 
-            ? formData.features.join(", ")
-            : formData.features,
+          features:
+            mode === "add" ? formData.features.join(", ") : formData.features,
           status: publish ? 1 : 0,
           featured_image: thumbnailPath || previews.thumbnail,
-          floor_planning_image: floorPlansPaths.length > 0 ? floorPlansPaths : previews.floorPlans,
+          floor_planning_image:
+            floorPlansPaths.length > 0 ? floorPlansPaths : previews.floorPlans,
           gallery: galleryPaths.length > 0 ? galleryPaths : previews.gallery,
           description: formData.description,
           latitude: formData.latitude,
@@ -489,7 +585,7 @@ export default function PropertyForm({ mode }) {
           featured: formData.featured,
           area: parseInt(formData.size),
           project_id: formData.project_id,
-          purpose: formData.transaction_type,
+          purpose: formData.purpose,
           category_id: parseInt(formData.category),
           city_id: formData.city_id,
           state_id: formData.district_id,
@@ -521,31 +617,43 @@ export default function PropertyForm({ mode }) {
           payment_method: formData.payment_method || null,
           pricePerMeter: formData.pricePerMeter || 0,
           type: formData.PropertyType || "",
+          faqs: faqs,
         };
 
         let response;
-        if (mode === 'add') {
+        if (mode === "add") {
           response = await axiosInstance.post("/properties", propertyData);
           toast.success("تم نشر العقار بنجاح");
           const currentState = useStore.getState();
           const createdProperty = response.data.user_property;
-          createdProperty.status = createdProperty.status === true ? "منشور" : "مسودة";
-          const updatedProperties = [createdProperty, ...currentState.propertiesManagement.properties];
+          createdProperty.status =
+            createdProperty.status === true ? "منشور" : "مسودة";
+          const updatedProperties = [
+            createdProperty,
+            ...currentState.propertiesManagement.properties,
+          ];
           setPropertiesManagement({ properties: updatedProperties });
-          
+
           // تحديث خطوات الإعداد
-          const setpOB = { "step": "properties" };
+          const setpOB = { step: "properties" };
           await axiosInstance.post("/steps/complete", setpOB);
           await fetchSetupProgressData();
         } else {
-          response = await axiosInstance.post(`/properties/${id}`, propertyData);
-          toast.success(publish ? "تم تحديث ونشر العقار بنجاح" : "تم حفظ التغييرات كمسودة");
+          response = await axiosInstance.post(
+            `/properties/${id}`,
+            propertyData,
+          );
+          toast.success(
+            publish ? "تم تحديث ونشر العقار بنجاح" : "تم حفظ التغييرات كمسودة",
+          );
           const currentState = useStore.getState();
           const updatedProperty = response.data.property;
-          updatedProperty.status = updatedProperty.status === 1 ? "منشور" : "مسودة";
-          const updatedProperties = currentState.propertiesManagement.properties.map((prop) =>
-            prop.id === updatedProperty.id ? updatedProperty : prop,
-          );
+          updatedProperty.status =
+            updatedProperty.status === 1 ? "منشور" : "مسودة";
+          const updatedProperties =
+            currentState.propertiesManagement.properties.map((prop) =>
+              prop.id === updatedProperty.id ? updatedProperty : prop,
+            );
           setPropertiesManagement({ properties: updatedProperties });
         }
 
@@ -567,9 +675,10 @@ export default function PropertyForm({ mode }) {
     setFormData((prev) => ({ ...prev, city_id: cityId, district_id: null }));
   };
 
-  const pageTitle = mode === 'add' ? 'إضافة عقار جديد' : 'تعديل العقار';
-  const submitButtonText = mode === 'add' ? 'نشر العقار' : 'حفظ ونشر التغييرات';
-  const draftButtonText = mode === 'add' ? 'حفظ كمسودة' : 'حفظ التغييرات كمسودة';
+  const pageTitle = mode === "add" ? "إضافة عقار جديد" : "تعديل العقار";
+  const submitButtonText = mode === "add" ? "نشر العقار" : "حفظ ونشر التغييرات";
+  const draftButtonText =
+    mode === "add" ? "حفظ كمسودة" : "حفظ التغييرات كمسودة";
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
@@ -578,7 +687,7 @@ export default function PropertyForm({ mode }) {
         <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
-            {mode === 'add' && hasReachedLimit && (
+            {mode === "add" && hasReachedLimit && (
               <div
                 className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-6"
                 role="alert"
@@ -591,7 +700,7 @@ export default function PropertyForm({ mode }) {
                 </span>
               </div>
             )}
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Button
@@ -714,7 +823,9 @@ export default function PropertyForm({ mode }) {
                       >
                         <SelectTrigger
                           id="payment_method"
-                          className={errors.payment_method ? "border-red-500" : ""}
+                          className={
+                            errors.payment_method ? "border-red-500" : ""
+                          }
                         >
                           <SelectValue placeholder="اختر طريقة الدفع" />
                         </SelectTrigger>
@@ -726,67 +837,60 @@ export default function PropertyForm({ mode }) {
                         </SelectContent>
                       </Select>
                       {errors.payment_method && (
-                        <p className="text-sm text-red-500">
-                          {errors.payment_method}
-                        </p>
+                        <p className="text-sm text-red-500"></p>
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-  <Label htmlFor="pricePerMeter">سعر المتر</Label>
-  <Input
-    id="pricePerMeter"
-    name="pricePerMeter"
-    type="number"
-    placeholder="750000"
-    value={formData.pricePerMeter}
-    onChange={handleInputChange}
-    className={errors.pricePerMeter ? "border-red-500" : ""}
-  />
-  {errors.pricePerMeter && (
-    <p className="text-sm text-red-500">{errors.pricePerMeter}</p>
-  )}
-</div>
+                    <div className="space-y-2">
+                      <Label htmlFor="pricePerMeter">سعر المتر</Label>
+                      <Input
+                        id="pricePerMeter"
+                        name="pricePerMeter"
+                        type="number"
+                        placeholder="750000"
+                        value={formData.pricePerMeter}
+                        onChange={handleInputChange}
+                        className={errors.pricePerMeter ? "border-red-500" : ""}
+                      />
+                      {errors.pricePerMeter && (
+                        <p className="text-sm text-red-500">
+                          {errors.pricePerMeter}
+                        </p>
+                      )}
+                    </div>
 
-
-
-                  <div className="space-y-2">
-                    <Label htmlFor="transaction_type">نوع القائمة</Label>
-                    <Select
-                      name="transaction_type"
-                      value={formData.transaction_type}
-                      onValueChange={(value) =>
-                        handleInputChange({
-                          target: { name: "transaction_type", value },
-                        })
-                      }
-                    >
-                      <SelectTrigger
-                        id="transaction_type"
-                        className={errors.transaction_type ? "border-red-500" : ""}
+                    <div className="space-y-2">
+                      <Label htmlFor="purpose">نوع القائمة</Label>
+                      <Select
+                        name="purpose"
+                        value={formData.purpose}
+                        onValueChange={(value) =>
+                          handleInputChange({
+                            target: { name: "purpose", value },
+                          })
+                        }
                       >
-                        <SelectValue placeholder="اختر النوع" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sale">للبيع</SelectItem>
-                        <SelectItem value="rent">للإيجار</SelectItem>
-                        <SelectItem value="sold">مباعة</SelectItem>
-                        <SelectItem value="rented">مؤجرة</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {errors.transaction_type && (
-                      <p className="text-sm text-red-500">
-                        {errors.transaction_type}
-                      </p>
-                    )}
+                        <SelectTrigger
+                          id="purpose"
+                          className={errors.purpose ? "border-red-500" : ""}
+                        >
+                          <SelectValue placeholder="اختر النوع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="sale">للبيع</SelectItem>
+                          <SelectItem value="rent">للإيجار</SelectItem>
+                          <SelectItem value="sold">مباعة</SelectItem>
+                          <SelectItem value="rented">مؤجرة</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.purpose && (
+                        <p className="text-sm text-red-500">{errors.purpose}</p>
+                      )}
+                    </div>
                   </div>
-                  </div>
 
-
-
-                  
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="category">فئة العقار</Label>
@@ -885,7 +989,7 @@ export default function PropertyForm({ mode }) {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="PropertyType">نوع العقار</Label>
                     <Select
@@ -932,7 +1036,7 @@ export default function PropertyForm({ mode }) {
                         value={currentFeature}
                         onChange={(e) => setCurrentFeature(e.target.value)}
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === "Enter") {
                             e.preventDefault();
                             if (
                               currentFeature.trim() !== "" &&
@@ -940,7 +1044,10 @@ export default function PropertyForm({ mode }) {
                             ) {
                               setFormData((prev) => ({
                                 ...prev,
-                                features: [...prev.features, currentFeature.trim()],
+                                features: [
+                                  ...prev.features,
+                                  currentFeature.trim(),
+                                ],
                               }));
                               setCurrentFeature("");
                             }
@@ -956,7 +1063,10 @@ export default function PropertyForm({ mode }) {
                           ) {
                             setFormData((prev) => ({
                               ...prev,
-                              features: [...prev.features, currentFeature.trim()],
+                              features: [
+                                ...prev.features,
+                                currentFeature.trim(),
+                              ],
                             }));
                             setCurrentFeature("");
                           }
@@ -989,7 +1099,9 @@ export default function PropertyForm({ mode }) {
                             group
                           "
                         >
-                          <span className="max-w-[100px] sm:max-w-none truncate">{feature}</span>
+                          <span className="max-w-[100px] sm:max-w-none truncate">
+                            {feature}
+                          </span>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -997,7 +1109,7 @@ export default function PropertyForm({ mode }) {
                               setFormData((prev) => ({
                                 ...prev,
                                 features: prev.features.filter(
-                                  (_, i) => i !== index
+                                  (_, i) => i !== index,
                                 ),
                               }));
                             }}
@@ -1020,7 +1132,7 @@ export default function PropertyForm({ mode }) {
                       </p>
                     )}
                   </div>
-                  
+
                   <div className="flex items-center space-x-2 pt-4 gap-2">
                     <Switch
                       id="featured"
@@ -1050,16 +1162,15 @@ export default function PropertyForm({ mode }) {
                           inputMode="decimal"
                           pattern="[0-9]*\.?[0-9]*"
                           onChange={(e) => {
-                            const numbersAndDecimal = e.currentTarget.value.replace(
-                              /[^0-9.]/g,
-                              ""
-                            );
+                            const numbersAndDecimal =
+                              e.currentTarget.value.replace(/[^0-9.]/g, "");
                             // منع أكثر من نقطة عشرية واحدة
-                            const parts = numbersAndDecimal.split('.');
-                            const validValue = parts.length > 2 
-                              ? parts[0] + '.' + parts.slice(1).join('')
-                              : numbersAndDecimal;
-                            
+                            const parts = numbersAndDecimal.split(".");
+                            const validValue =
+                              parts.length > 2
+                                ? parts[0] + "." + parts.slice(1).join("")
+                                : numbersAndDecimal;
+
                             handleInputChange({
                               target: {
                                 name: e.currentTarget.name,
@@ -1083,16 +1194,15 @@ export default function PropertyForm({ mode }) {
                           inputMode="decimal"
                           pattern="[0-9]*\.?[0-9]*"
                           onChange={(e) => {
-                            const numbersAndDecimal = e.currentTarget.value.replace(
-                              /[^0-9.]/g,
-                              ""
-                            );
+                            const numbersAndDecimal =
+                              e.currentTarget.value.replace(/[^0-9.]/g, "");
                             // منع أكثر من نقطة عشرية واحدة
-                            const parts = numbersAndDecimal.split('.');
-                            const validValue = parts.length > 2 
-                              ? parts[0] + '.' + parts.slice(1).join('')
-                              : numbersAndDecimal;
-                            
+                            const parts = numbersAndDecimal.split(".");
+                            const validValue =
+                              parts.length > 2
+                                ? parts[0] + "." + parts.slice(1).join("")
+                                : numbersAndDecimal;
+
                             handleInputChange({
                               target: {
                                 name: e.currentTarget.name,
@@ -1116,16 +1226,15 @@ export default function PropertyForm({ mode }) {
                           inputMode="decimal"
                           pattern="[0-9]*\.?[0-9]*"
                           onChange={(e) => {
-                            const numbersAndDecimal = e.currentTarget.value.replace(
-                              /[^0-9.]/g,
-                              ""
-                            );
+                            const numbersAndDecimal =
+                              e.currentTarget.value.replace(/[^0-9.]/g, "");
                             // منع أكثر من نقطة عشرية واحدة
-                            const parts = numbersAndDecimal.split('.');
-                            const validValue = parts.length > 2 
-                              ? parts[0] + '.' + parts.slice(1).join('')
-                              : numbersAndDecimal;
-                            
+                            const parts = numbersAndDecimal.split(".");
+                            const validValue =
+                              parts.length > 2
+                                ? parts[0] + "." + parts.slice(1).join("")
+                                : numbersAndDecimal;
+
                             handleInputChange({
                               target: {
                                 name: e.currentTarget.name,
@@ -1163,7 +1272,7 @@ export default function PropertyForm({ mode }) {
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="street_width_north">
                           عرض الشارع الشمالي
@@ -1175,16 +1284,15 @@ export default function PropertyForm({ mode }) {
                           inputMode="decimal"
                           pattern="[0-9]*\.?[0-9]*"
                           onChange={(e) => {
-                            const numbersAndDecimal = e.currentTarget.value.replace(
-                              /[^0-9.]/g,
-                              ""
-                            );
+                            const numbersAndDecimal =
+                              e.currentTarget.value.replace(/[^0-9.]/g, "");
                             // منع أكثر من نقطة عشرية واحدة
-                            const parts = numbersAndDecimal.split('.');
-                            const validValue = parts.length > 2 
-                              ? parts[0] + '.' + parts.slice(1).join('')
-                              : numbersAndDecimal;
-                            
+                            const parts = numbersAndDecimal.split(".");
+                            const validValue =
+                              parts.length > 2
+                                ? parts[0] + "." + parts.slice(1).join("")
+                                : numbersAndDecimal;
+
                             handleInputChange({
                               target: {
                                 name: e.currentTarget.name,
@@ -1210,16 +1318,15 @@ export default function PropertyForm({ mode }) {
                           inputMode="decimal"
                           pattern="[0-9]*\.?[0-9]*"
                           onChange={(e) => {
-                            const numbersAndDecimal = e.currentTarget.value.replace(
-                              /[^0-9.]/g,
-                              ""
-                            );
+                            const numbersAndDecimal =
+                              e.currentTarget.value.replace(/[^0-9.]/g, "");
                             // منع أكثر من نقطة عشرية واحدة
-                            const parts = numbersAndDecimal.split('.');
-                            const validValue = parts.length > 2 
-                              ? parts[0] + '.' + parts.slice(1).join('')
-                              : numbersAndDecimal;
-                            
+                            const parts = numbersAndDecimal.split(".");
+                            const validValue =
+                              parts.length > 2
+                                ? parts[0] + "." + parts.slice(1).join("")
+                                : numbersAndDecimal;
+
                             handleInputChange({
                               target: {
                                 name: e.currentTarget.name,
@@ -1245,16 +1352,15 @@ export default function PropertyForm({ mode }) {
                           inputMode="decimal"
                           pattern="[0-9]*\.?[0-9]*"
                           onChange={(e) => {
-                            const numbersAndDecimal = e.currentTarget.value.replace(
-                              /[^0-9.]/g,
-                              ""
-                            );
+                            const numbersAndDecimal =
+                              e.currentTarget.value.replace(/[^0-9.]/g, "");
                             // منع أكثر من نقطة عشرية واحدة
-                            const parts = numbersAndDecimal.split('.');
-                            const validValue = parts.length > 2 
-                              ? parts[0] + '.' + parts.slice(1).join('')
-                              : numbersAndDecimal;
-                            
+                            const parts = numbersAndDecimal.split(".");
+                            const validValue =
+                              parts.length > 2
+                                ? parts[0] + "." + parts.slice(1).join("")
+                                : numbersAndDecimal;
+
                             handleInputChange({
                               target: {
                                 name: e.currentTarget.name,
@@ -1268,7 +1374,7 @@ export default function PropertyForm({ mode }) {
                           متر
                         </span>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="street_width_west">
                           عرض الشارع الغربي
@@ -1280,16 +1386,15 @@ export default function PropertyForm({ mode }) {
                           inputMode="decimal"
                           pattern="[0-9]*\.?[0-9]*"
                           onChange={(e) => {
-                            const numbersAndDecimal = e.currentTarget.value.replace(
-                              /[^0-9.]/g,
-                              ""
-                            );
+                            const numbersAndDecimal =
+                              e.currentTarget.value.replace(/[^0-9.]/g, "");
                             // منع أكثر من نقطة عشرية واحدة
-                            const parts = numbersAndDecimal.split('.');
-                            const validValue = parts.length > 2 
-                              ? parts[0] + '.' + parts.slice(1).join('')
-                              : numbersAndDecimal;
-                            
+                            const parts = numbersAndDecimal.split(".");
+                            const validValue =
+                              parts.length > 2
+                                ? parts[0] + "." + parts.slice(1).join("")
+                                : numbersAndDecimal;
+
                             handleInputChange({
                               target: {
                                 name: e.currentTarget.name,
@@ -1726,7 +1831,115 @@ export default function PropertyForm({ mode }) {
                   </div>
                 </CardContent>
               </Card>
+              <Card className="md:col-span-2">
+  <CardHeader>
+    <CardTitle>الأسئلة الشائعة الخاصة بالعقار</CardTitle>
+    <CardDescription>أضف أسئلة وأجوبة شائعة حول هذا العقار لمساعدة المشترين المحتملين.</CardDescription>
+  </CardHeader>
+  <CardContent className="space-y-6">
+    {/* Add New FAQ Form */}
+    <div className="space-y-4 p-4 border rounded-md">
+      <h3 className="text-lg font-medium">إضافة سؤال جديد</h3>
+      <div className="space-y-2">
+        <Label htmlFor="newQuestion">السؤال</Label>
+        <Input
+          id="newQuestion"
+          value={newQuestion}
+          onChange={(e) => setNewQuestion(e.target.value)}
+          placeholder="مثال: هل مسموح بالحيوانات الأليفة؟"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="newAnswer">الإجابة</Label>
+        <Textarea
+          id="newAnswer"
+          value={newAnswer}
+          onChange={(e) => setNewAnswer(e.target.value)}
+          placeholder="مثال: نعم، مسموح بالحيوانات الأليفة الصغيرة."
+          rows={3}
+        />
+      </div>
+      <Button onClick={handleAddFaq} className="w-full md:w-auto">
+        <Plus className="ml-2 h-4 w-4" />
+        إضافة سؤال
+      </Button>
+    </div>
 
+    {/* Suggested FAQs */}
+    {suggestedFaqsList?.length > 0 && (
+  <div className="space-y-2">
+    <h4 className="text-md font-medium">أسئلة مقترحة:</h4>
+    <div className="flex flex-wrap gap-2">
+      {suggestedFaqsList.map((sq, index) => (
+        <Button 
+          key={index} 
+          variant="outline" 
+          size="sm" 
+          onClick={() => handleSelectSuggestedFaq(sq)}
+        >
+          <HelpCircle className="ml-2 h-4 w-4" />
+          {sq.question} {/* عرض sq.question بدلاً من sq */}
+        </Button>
+      ))}
+    </div>
+  </div>
+)}
+
+    {/* List of Added FAQs */}
+    {faqs.length > 0 && (
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">الأسئلة المضافة ({faqs.length})</h3>
+        <div className="space-y-3">
+          {faqs.map((faq) => (
+            <div key={faq.id} className="p-4 border rounded-md bg-muted/30">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold text-primary">{faq.question}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{faq.answer}</p>
+                </div>
+                <div className="flex items-center gap-2 rtl:mr-auto ltr:ml-auto">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleToggleFaqDisplay(faq.id)}
+                    title={faq.displayOnPage ? "إخفاء من صفحة العقار" : "عرض في صفحة العقار"}
+                  >
+                    {faq.displayOnPage ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemoveFaq(faq.id)}
+                    className="text-red-500 hover:text-red-600"
+                    title="حذف السؤال"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              {faq.displayOnPage ? (
+                <Badge variant="default" className="mt-2">
+                  معروض في الصفحة
+                </Badge>
+              ) : (
+                <Badge variant="secondary" className="mt-2">
+                  مخفي من الصفحة
+                </Badge>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+    {faqs.length === 0 && (
+      <p className="text-sm text-center text-muted-foreground py-4">لم تتم إضافة أي أسئلة شائعة بعد.</p>
+    )}
+  </CardContent>
+</Card>
               <Card className="md:col-span-2">
                 <CardFooter className="flex flex-col items-end border-t p-6 space-y-4">
                   <div className="w-full">
@@ -1763,6 +1976,7 @@ export default function PropertyForm({ mode }) {
                   </div>
                 </CardFooter>
               </Card>
+          
             </div>
           </div>
         </main>

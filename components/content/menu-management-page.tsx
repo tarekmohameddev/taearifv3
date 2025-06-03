@@ -93,7 +93,9 @@ export default function MenuManagementPage() {
     showOnMobile: true,
     showOnDesktop: true,
   });
-  const { homepage: { setupProgressData, fetchSetupProgressData } } = useStore();
+  const {
+    homepage: { setupProgressData, fetchSetupProgressData },
+  } = useStore();
   const [editingItem, setEditingItem] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<{
@@ -331,8 +333,8 @@ export default function MenuManagementPage() {
         settings: settings,
       });
       const setpOB = {
-        "step": "menu_builder"
-   }
+        step: "menu_builder",
+      };
       await axiosInstance.post("/steps/complete", setpOB);
       await fetchSetupProgressData();
       toast.success("تم حفظ التغييرات بنجاح", { id: loadingToast });
