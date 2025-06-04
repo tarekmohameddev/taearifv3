@@ -18,6 +18,8 @@ import {
   Ruler,
   Share2,
   Trash2,
+  ChevronRight,
+  ChevronLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -64,6 +66,104 @@ import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import EmptyState from "@/components/empty-state";
 
+// Pagination Component
+function Pagination({ 
+  currentPage, 
+  totalPages, 
+  onPageChange, 
+  totalItems, 
+  itemsPerPage,
+  from,
+  to 
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  totalItems: number;
+  itemsPerPage: number;
+  from: number;
+  to: number;
+}) {
+  const pages = [];
+  const maxVisiblePages = 5;
+  
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+  
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+      <div className="text-sm text-muted-foreground">
+        عرض {from} إلى {to} من {totalItems} عقار
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+        
+        {startPage > 1 && (
+          <>
+            <Button
+              variant={currentPage === 1 ? "default" : "outline"}
+              size="icon"
+              onClick={() => onPageChange(1)}
+            >
+              1
+            </Button>
+            {startPage > 2 && <span className="px-2">...</span>}
+          </>
+        )}
+        
+        {pages.map((page) => (
+          <Button
+            key={page}
+            variant={currentPage === page ? "default" : "outline"}
+            size="icon"
+            onClick={() => onPageChange(page)}
+          >
+            {page}
+          </Button>
+        ))}
+        
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span className="px-2">...</span>}
+            <Button
+              variant={currentPage === totalPages ? "default" : "outline"}
+              size="icon"
+              onClick={() => onPageChange(totalPages)}
+            >
+              {totalPages}
+            </Button>
+          </>
+        )}
+        
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function SkeletonPropertyCard() {
   return (
     <Card className="overflow-hidden animate-pulse">
@@ -90,6 +190,7 @@ function SkeletonPropertyCard() {
     </Card>
   );
 }
+
 const getPaymentMethodText = (paymentMethod) => {
   const paymentMethods = {
     monthly: "شهري",
@@ -99,9 +200,10 @@ const getPaymentMethodText = (paymentMethod) => {
   };
   return paymentMethods[paymentMethod] || null;
 };
+
 export function PropertiesManagementPage() {
-  // حالة للتحكم في فتح وإغلاق النافذة المنبثقة
   const [isLimitReached, setIsLimitReached] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const { clickedONSubButton } = useAuthStore();
 
   const router = useRouter();
@@ -114,6 +216,7 @@ export function PropertiesManagementPage() {
       loading,
       error,
       isInitialized,
+      pagination,
     },
     setPropertiesManagement,
     fetchProperties,
@@ -151,15 +254,16 @@ export function PropertiesManagementPage() {
       : [...favorites, id];
     setPropertiesManagement({ favorites: newFavorites });
   };
+
   const handleDeleteProperty = async (id: string) => {
     const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا العقار؟");
     if (confirmDelete) {
       try {
         await axiosInstance.delete(`properties/${id}`);
         toast.success("تم حذف العقار بنجاح");
-        setPropertiesManagement({
-          properties: properties.filter((p) => p.id !== id),
-        });
+        
+        // إعادة تحميل الصفحة الحالية بعد الحذف
+        fetchProperties(currentPage);
       } catch (error) {
         toast.error("فشل في حذف العقار");
         console.error("Error deleting property:", error);
@@ -167,7 +271,6 @@ export function PropertiesManagementPage() {
     }
   };
 
-  // دالة المضاعفة
   const handleDuplicateProperty = async (property) => {
     try {
       const duplicateData = {
@@ -182,14 +285,13 @@ export function PropertiesManagementPage() {
       toast.success("تم مضاعفة العقار بنجاح");
 
       // إعادة تحميل العقارات لعرض العقار المضاعف
-      fetchProperties();
+      fetchProperties(currentPage);
     } catch (error) {
       toast.error("فشل في مضاعفة العقار");
       console.error("Error duplicating property:", error);
     }
   };
 
-  // دالة تغيير حالة النشر
   const handleToggleStatus = async (property) => {
     try {
       await axiosInstance.post(`/properties/${property.id}/toggle-status`);
@@ -211,12 +313,16 @@ export function PropertiesManagementPage() {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchProperties(page);
+  };
+
   useEffect(() => {
     if (!isInitialized && !loading) {
-      fetchProperties();
+      fetchProperties(1);
     }
-    console.log("Properties", properties);
-  }, [fetchProperties, isInitialized, loading, properties]);
+  }, [fetchProperties, isInitialized, loading]);
 
   const renderSkeletons = () => (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -262,12 +368,6 @@ export function PropertiesManagementPage() {
                   <span className="sr-only">List view</span>
                 </Button>
                 <Dialog>
-                  {/* <DialogTrigger asChild>
-                    <Button variant="outline" className="gap-1">
-                      <Filter className="h-4 w-4" />
-                      فلتر
-                    </Button>
-                  </DialogTrigger> */}
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                       <DialogTitle>فلتر العقارات</DialogTitle>
@@ -391,7 +491,7 @@ export function PropertiesManagementPage() {
                 <Button
                   className="gap-1"
                   onClick={() => {
-                    const propertiesLength = properties?.length || 0;
+                    const propertiesLength = pagination?.total || 0;
                     const limit =
                       useAuthStore.getState().userData
                         ?.real_estate_limit_number;
@@ -439,11 +539,6 @@ export function PropertiesManagementPage() {
               <Tabs defaultValue="all">
                 <TabsList>
                   <TabsTrigger value="all">جميع العقارات</TabsTrigger>
-                  {/* <TabsTrigger value="for-sale">للبيع</TabsTrigger>
-                  <TabsTrigger value="for-rent">للإيجار</TabsTrigger>
-                  <TabsTrigger value="published">منشور</TabsTrigger>
-                  <TabsTrigger value="drafts">مسودات</TabsTrigger>
-                  <TabsTrigger value="featured">مميزة</TabsTrigger> */}
                 </TabsList>
                 <TabsContent value="all" className="mt-4">
                   {normalizedProperties.length === 0 ? (
@@ -451,38 +546,54 @@ export function PropertiesManagementPage() {
                       message="لا يوجد عقارات"
                       description="قم بإضافة عقارات جديدة"
                     />
-                  ) : viewMode === "grid" ? (
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                      {normalizedProperties.map((property) => (
-                        <PropertyCard
-                          key={property.id}
-                          property={property}
-                          isFavorite={favorites.includes(
-                            property.id.toString(),
-                          )}
-                          onToggleFavorite={toggleFavorite}
-                          onDelete={handleDeleteProperty}
-                          onDuplicate={handleDuplicateProperty}
-                          onToggleStatus={handleToggleStatus}
-                        />
-                      ))}
-                    </div>
                   ) : (
-                    <div className="space-y-4">
-                      {normalizedProperties.map((property) => (
-                        <PropertyListItem
-                          key={property.id}
-                          property={property}
-                          isFavorite={favorites.includes(
-                            property.id.toString(),
-                          )}
-                          onToggleFavorite={toggleFavorite}
-                          onDelete={handleDeleteProperty}
-                          onDuplicate={handleDuplicateProperty}
-                          onToggleStatus={handleToggleStatus}
+                    <>
+                      {viewMode === "grid" ? (
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                          {normalizedProperties.map((property) => (
+                            <PropertyCard
+                              key={property.id}
+                              property={property}
+                              isFavorite={favorites.includes(
+                                property.id.toString(),
+                              )}
+                              onToggleFavorite={toggleFavorite}
+                              onDelete={handleDeleteProperty}
+                              onDuplicate={handleDuplicateProperty}
+                              onToggleStatus={handleToggleStatus}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {normalizedProperties.map((property) => (
+                            <PropertyListItem
+                              key={property.id}
+                              property={property}
+                              isFavorite={favorites.includes(
+                                property.id.toString(),
+                              )}
+                              onToggleFavorite={toggleFavorite}
+                              onDelete={handleDeleteProperty}
+                              onDuplicate={handleDuplicateProperty}
+                              onToggleStatus={handleToggleStatus}
+                            />
+                          ))}
+                        </div>
+                      )}
+                      
+                      {pagination && pagination.last_page > 1 && (
+                        <Pagination
+                          currentPage={pagination.current_page}
+                          totalPages={pagination.last_page}
+                          onPageChange={handlePageChange}
+                          totalItems={pagination.total}
+                          itemsPerPage={pagination.per_page}
+                          from={pagination.from}
+                          to={pagination.to}
                         />
-                      ))}
-                    </div>
+                      )}
+                    </>
                   )}
                 </TabsContent>
               </Tabs>
@@ -727,6 +838,8 @@ function PropertyListItem({
   onDuplicate,
   onToggleStatus,
 }: PropertyCardProps) {
+  const router = useRouter();
+  
   return (
     <Card>
       <div className="flex flex-col sm:flex-row-reverse">
@@ -823,7 +936,7 @@ function PropertyListItem({
             </div>
           </div>
           <div className="mt-2 flex flex-wrap gap-1">
-            {property.features.map((feature: string, index: number) => (
+            {property.features && property.features.map((feature: string, index: number) => (
               <span
                 key={index}
                 className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
@@ -833,7 +946,11 @@ function PropertyListItem({
             ))}
           </div>
           <div className="mt-auto pt-4 flex gap-2 justify-end">
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => router.push("/properties/" + property.id + "/edit")}
+            >
               <Edit className="mr-1 h-3.5 w-3.5" />
               تعديل
             </Button>
