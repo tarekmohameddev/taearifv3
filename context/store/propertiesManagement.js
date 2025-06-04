@@ -9,6 +9,7 @@ module.exports = (set) => ({
     loading: false,
     error: null,
     isInitialized: false,
+    pagination: null, 
   },
 
   setPropertiesManagement: (newState) =>
@@ -19,54 +20,54 @@ module.exports = (set) => ({
       },
     })),
 
-  fetchProperties: async () => {
-    // إذا كانت البيانات تم جلبها بالفعل، لا داعي للطلب مرة أخرى
-    set((state) => {
-      if (state.propertiesManagement.isInitialized) return {};
-      return {
+    fetchProperties: async (page = 1) => {
+      // تحديث حالة التحميل
+      set((state) => ({
         propertiesManagement: {
           ...state.propertiesManagement,
           loading: true,
           error: null,
         },
-      };
-    });
-
-    try {
-      const response = await axiosInstance.get(
-        "https://taearif.com/api/properties",
-      );
-
-      const propertiesList = response.data.data.properties || [];
-      const mappedProperties = propertiesList.map((property) => ({
-        ...property,
-        thumbnail: property.featured_image,
-        listingType:
-          String(property.transaction_type) === "1" ||
-          property.transaction_type === "sale"
-            ? "للبيع"
-            : "للإيجار",
-        status: property.status === 1 ? "منشور" : "مسودة",
-        lastUpdated: new Date(property.updated_at).toLocaleDateString("ar-AE"),
       }));
-
-      set((state) => ({
-        propertiesManagement: {
-          ...state.propertiesManagement,
-          properties: mappedProperties,
-          loading: false,
-          isInitialized: true,
-        },
-      }));
-    } catch (error) {
-      set((state) => ({
-        propertiesManagement: {
-          ...state.propertiesManagement,
-          error: error.message || "حدث خطأ أثناء جلب بيانات العقارات",
-          loading: false,
-          isInitialized: true,
-        },
-      }));
-    }
-  },
+      
+      try {
+        const response = await axiosInstance.get(
+          `https://taearif.com/api/properties?page=${page}`,
+        );
+        
+        const propertiesList = response.data.data.properties || [];
+        const pagination = response.data.data.pagination || null;
+        
+        const mappedProperties = propertiesList.map((property) => ({
+          ...property,
+          thumbnail: property.featured_image,
+          listingType:
+            String(property.transaction_type) === "1" ||
+            property.transaction_type === "sale"
+              ? "للبيع"
+              : "للإيجار",
+          status: property.status === 1 ? "منشور" : "مسودة",
+          lastUpdated: new Date(property.updated_at).toLocaleDateString("ar-AE"),
+        }));
+        
+        set((state) => ({
+          propertiesManagement: {
+            ...state.propertiesManagement,
+            properties: mappedProperties,
+            pagination: pagination, // إضافة بيانات الـ pagination
+            loading: false,
+            isInitialized: true,
+          },
+        }));
+      } catch (error) {
+        set((state) => ({
+          propertiesManagement: {
+            ...state.propertiesManagement,
+            error: error.message || "حدث خطأ أثناء جلب بيانات العقارات",
+            loading: false,
+            isInitialized: true,
+          },
+        }));
+      }
+    },
 });
