@@ -40,7 +40,7 @@ export default function ClientLayout({
   }, [fetchUserData]);
 
   useEffect(() => {
-    if (isMounted && !IsLoading && !UserIslogged) {
+    if (isMounted && !IsLoading && !UserIslogged && !pathname?.startsWith("/oauth")) {
       router.push("/login");
     }
   }, [isMounted, IsLoading, UserIslogged, router]);
