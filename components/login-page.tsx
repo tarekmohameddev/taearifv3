@@ -15,6 +15,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { signIn, getSession } from "next-auth/react";
 
 export function LoginPage() {
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
@@ -64,6 +65,15 @@ export function LoginPage() {
     fetchGoogleAuthUrl();
   }, []);
 
+
+  useEffect(() => {
+    if (userData && userData.email) {
+      router.push("/");
+    }
+  }, [userData, router]);
+
+
+
   useEffect(() => {
     if (googleToken) {
       handleGoogleToken(googleToken);
@@ -72,13 +82,16 @@ export function LoginPage() {
   
   // استخراج التوكن من URL في حالة الـ redirect
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    
-    if (token && window.location.pathname.includes('/oauth/token/success')) {
-      setGoogleToken(token);
-      // تنظيف الـ URL
-      window.history.replaceState({}, document.title, '/register');
+    // التأكد من أن window متوفر
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      
+      if (token && window.location.pathname.includes('/oauth/token/success')) {
+        setGoogleToken(token);
+        // تنظيف الـ URL
+        window.history.replaceState({}, document.title, '/register');
+      }
     }
   }, []);
   // Handle checkbox change
@@ -89,11 +102,6 @@ export function LoginPage() {
     }));
   };
 
-  useEffect(() => {
-    if (userData.email) {
-      router.push("/");
-    }
-  }, [userData, router]);
 
   // تسجيل الدخول بالطريقة التقليدية
 const handleSubmit = async (e: React.FormEvent) => {
@@ -149,89 +157,97 @@ const handleSubmit = async (e: React.FormEvent) => {
 };
 
   // تسجيل الدخول بـ Google
-const handleGoogleLogin = async () => {
-  if (!googleAuthUrl) {
-    console.error("Google auth URL not available");
-    return;
-  }
+  const handleGoogleLogin = async () => {
+    if (!googleAuthUrl) {
+      console.error("Google auth URL not available");
+      return;
+    }
+    
+    if (typeof window !== 'undefined') {
       console.log("test");
       window.location.href = googleAuthUrl;
-};
-
-  const handleGoogleToken = async (token: string) => {
-    try {
-      setIsGoogleLoading(true);
-      
-      console.log("Google Token received:", token);
-      console.log("Redirect URL:", redirectUrl);
-  
-      // إرسال التوكن إلى الخادم للتحقق منه والتسجيل
-      const response = await fetch("https://taearif.com/api/auth/google/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          token: token,
-          action: "register" // لتمييز عملية التسجيل عن تسجيل الدخول
-        }),
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "فشل في التحقق من التوكن");
-      }
-  
-      const data = await response.json();
-      const { user, token: UserToken } = data;
-  
-      // حفظ بيانات المستخدم باستخدام AuthStore
-      const setAuthResponse = await fetch("/api/user/setAuth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user: user,
-          UserToken: UserToken,
-        }),
-      });
-  
-      if (!setAuthResponse.ok) {
-        throw new Error("فشل في حفظ بيانات المصادقة");
-      }
-  
-      // تحديث الـ AuthStore
-      useAuthStore.setState({
-        UserIslogged: true,
-        userData: {
-          email: user.email,
-          token: UserToken,
-          username: user.username,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          onboarding_completed: user.onboarding_completed || false,
-        },
-      });
-  
-      // تشغيل fetchUserData للحصول على البيانات الكاملة
-      await useAuthStore.getState().fetchUserData();
-      
-      setFormSubmitted(true);
-      setTimeout(() => {
-        router.push("/onboarding");
-      }, 1500);
-  
-    } catch (error) {
-      console.error("OAuth token handling error:", error);
-      setErrors((prev) => ({
-        ...prev,
-        api: error instanceof Error ? error.message : "فشل في التسجيل بـ Google",
-      }));
-    } finally {
-      setIsGoogleLoading(false);
     }
   };
+
+const handleGoogleToken = async (token: string) => {
+  try {
+    setIsGoogleLoading(true);
+    
+    console.log("Google Token received:", token);
+    console.log("Redirect URL:", redirectUrl);
+
+    // إرسال التوكن إلى الخادم للتحقق منه والتسجيل
+    const response = await fetch("https://taearif.com/api/auth/google/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ 
+        token: token,
+        action: "register" // لتمييز عملية التسجيل عن تسجيل الدخول
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "فشل في التحقق من التوكن");
+    }
+
+    const data = await response.json();
+    const { user, token: UserToken } = data;
+
+    // التحقق من وجود البيانات قبل الاستخدام
+    if (!user || !UserToken) {
+      throw new Error("بيانات المستخدم غير مكتملة");
+    }
+
+    // حفظ بيانات المستخدم باستخدام AuthStore
+    const setAuthResponse = await fetch("/api/user/setAuth", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user: user,
+        UserToken: UserToken,
+      }),
+    });
+
+    if (!setAuthResponse.ok) {
+      throw new Error("فشل في حفظ بيانات المصادقة");
+    }
+
+    // تحديث الـ AuthStore
+    useAuthStore.setState({
+      UserIslogged: true,
+      userData: {
+        email: user.email || "",
+        token: UserToken,
+        username: user.username || "",
+        first_name: user.first_name || "",
+        last_name: user.last_name || "",
+        onboarding_completed: user.onboarding_completed || false,
+      },
+    });
+
+    // تشغيل fetchUserData للحصول على البيانات الكاملة
+    await useAuthStore.getState().fetchUserData();
+    
+    setFormSubmitted(true);
+    setTimeout(() => {
+      router.push("/onboarding");
+    }, 1500);
+
+  } catch (error) {
+    console.error("OAuth token handling error:", error);
+    setErrors((prev) => ({
+      ...prev,
+      general: error instanceof Error ? error.message : "فشل في التسجيل بـ Google",
+    }));
+  } finally {
+    setIsGoogleLoading(false);
+  }
+};
 
   return (
     <div
