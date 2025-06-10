@@ -25,13 +25,6 @@ export default function RootLayout({ children }) {
     fetchUserData();
   }, [fetchUserData]);
 
-  // إعادة التوجيه إلى صفحة تسجيل الدخول بعد انتهاء التحميل إذا لم يكن المستخدم مسجّل دخول
-  useEffect(() => {
-    if (isMounted && !IsLoading && !UserIslogged) {
-      router.push("/login");
-    }
-  }, [isMounted, IsLoading, UserIslogged, router]);
-
   // في حال لم يكن التطبيق مثبت بعد نعرض صفحة فارغة لتجنب مشاكل الترطيب (hydration)
   if (!isMounted) {
     return (
