@@ -214,7 +214,8 @@ export default function CategoriesManagementPage() {
             </Button>
           </div>
 
-          
+
+
           <div className="flex items-center justify-between p-6">
   <div className="flex items-center space-x-4 gap-4 ">
     <Label 
