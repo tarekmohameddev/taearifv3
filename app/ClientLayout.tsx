@@ -40,7 +40,7 @@ export default function ClientLayout({
   }, [fetchUserData]);
 
   useEffect(() => {
-    if (isMounted && !IsLoading && !UserIslogged) {
+    if (isMounted && !IsLoading && !UserIslogged && !pathname?.startsWith("/oauth")) {
       router.push("/login");
     }
   }, [isMounted, IsLoading, UserIslogged, router]);
@@ -77,7 +77,9 @@ export default function ClientLayout({
   }
   if (
     pathname == "/login" &&
-    pathname?.startsWith("/oauth")&&
+
+    !pathname?.startsWith("/oauth")&&
+
     pathname == "/register" &&
     pathname == "/onboarding"
   ) {
