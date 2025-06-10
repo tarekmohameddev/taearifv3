@@ -40,10 +40,18 @@ export default function ClientLayout({
   }, [fetchUserData]);
 
   useEffect(() => {
-    if (isMounted && !IsLoading && !UserIslogged && !pathname?.startsWith("/oauth")) {
+    if (
+      isMounted &&
+      !IsLoading &&
+      !UserIslogged &&
+      !(pathname?.startsWith("/oauth"))&&
+      !(pathname?.startsWith("/not-found"))&&
+      !(pathname?.startsWith("/register"))
+    ) {
       router.push("/login");
     }
-  }, [isMounted, IsLoading, UserIslogged, router]);
+  }, [isMounted, IsLoading, UserIslogged, pathname, router]);
+  
 
   useEffect(() => {
     async function fetchUser() {
@@ -66,23 +74,18 @@ export default function ClientLayout({
   }, [isMounted, IsLoading, UserIslogged, router, onboardingCompleted]);
 
   if (
-    pathname !== "/login" &&
-    pathname?.startsWith("/oauth")&&
-    pathname !== "/register" &&
-    pathname !== "/onboarding"
+    !UserIslogged &&
+    !(pathname?.startsWith("/oauth")) &&
+    pathname !== "/onboarding" &&
+      !(pathname?.startsWith("/not-found"))&&
+      pathname !== "/login" &&
+    pathname !== "/register"
   ) {
-    if (!UserIslogged) {
-      return <></>;
-    }
+    return null;
   }
-  if (
-    pathname == "/login" &&
-    !pathname?.startsWith("/oauth")&&
-    pathname == "/register" &&
-    pathname == "/onboarding"
-  ) {
-    if (UserIslogged) {
-    }
-  }
+
+
+
+
   return <>{children}</>;
 }
