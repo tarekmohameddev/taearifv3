@@ -58,12 +58,12 @@ export function LoginPage() {
           setGoogleAuthUrl(data.url);
         }
       } catch (error) {
-        console.error("Error fetching Google auth URL:", error);
       }
     };
   
     fetchGoogleAuthUrl();
   }, []);
+
   useEffect(() => {
     if (googleToken) {
       handleGoogleToken(googleToken);
