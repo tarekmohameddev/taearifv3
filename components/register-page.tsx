@@ -1,3 +1,4 @@
+// components\register-page.tsx
 "use client";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import type React from "react";
