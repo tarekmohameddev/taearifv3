@@ -76,6 +76,7 @@ export default function ClientLayout({
   }
   if (
     pathname == "/login" &&
+    pathname?.startsWith("/oauth")&&
     pathname == "/register" &&
     pathname == "/onboarding"
   ) {
