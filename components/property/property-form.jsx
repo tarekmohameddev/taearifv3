@@ -623,7 +623,6 @@ export default function PropertyForm({ mode }) {
         let response;
         if (mode === "add") {
           response = await axiosInstance.post("/properties", propertyData);
-          await axiosInstance.post("/properties", propertyData);
           toast.success("تم نشر العقار بنجاح");
           const currentState = useStore.getState();
           const createdProperty = response.data.user_property;
