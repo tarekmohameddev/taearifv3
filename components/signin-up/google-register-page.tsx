@@ -17,7 +17,6 @@ import axios from "axios";
 interface FormData {
   phone: string;
   subdomain: string;
-  password: string;
 }
 
 // تعريف واجهة الأخطاء الخاصة بالنموذج
@@ -25,7 +24,6 @@ interface Errors {
   api: string;
   phone: string;
   subdomain: string;
-  password: string;
   general: string;
   tempToken: string;
 }
@@ -42,7 +40,6 @@ export function GoogleRegisterPage() {
   const [formData, setFormData] = useState<FormData>({
     phone: "",
     subdomain: "",
-    password: "",
   });
 
   // حالة الأخطاء
@@ -50,13 +47,11 @@ export function GoogleRegisterPage() {
     api: "",
     phone: "",
     subdomain: "",
-    password: "",
     general: "",
     tempToken: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [subdomainFocused, setSubdomainFocused] = useState(false);
   const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>([]);
 
@@ -82,12 +77,6 @@ export function GoogleRegisterPage() {
       return "لا يمكن استخدام الأحرف العربية في اسم الموقع";
     if (!subdomainRegex.test(subdomain))
       return "اسم الموقع يجب أن يحتوي على أحرف إنجليزية صغيرة وأرقام وشرطات فقط";
-    return "";
-  };
-
-  // Validate password
-  const validatePassword = (password: string) => {
-    if (!password) return "كلمة المرور مطلوبة";
     return "";
   };
 
@@ -166,7 +155,6 @@ export function GoogleRegisterPage() {
     const newErrors: Errors = {
       phone: validatePhone(formData.phone),
       subdomain: validateSubdomain(formData.subdomain),
-      password: validatePassword(formData.password),
       general: "",
       api: "",
       tempToken: "",
@@ -193,7 +181,6 @@ export function GoogleRegisterPage() {
         const link = "https://taearif.com/api/register"; // أو أي endpoint مخصص للـ Google register
         const payload = {
           phone: formData.phone,
-          password: formData.password,
           username: formData.subdomain,
           temp_token: tempToken, // إضافة temp_token هنا
           recaptcha_token: recaptchaToken,
@@ -473,42 +460,7 @@ export function GoogleRegisterPage() {
             </div>
 
             {/* Password Field */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="password"
-                className="text-sm font-medium text-foreground"
-              >
-                كلمة المرور
-              </Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="أدخل كلمة المرور"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`py-5 text-right ${errors.password ? "border-destructive" : ""}`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 left-0 flex items-center pl-3"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-muted-foreground" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-muted-foreground" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-destructive text-sm flex items-center">
-                  <AlertCircle className="h-3 w-3 ml-1" />
-                  {errors.password}
-                </p>
-              )}
-            </div>
+            {/* تم حذف حقل كلمة المرور */}
 
             {/* API Error Display */}
             {errors.api && (
