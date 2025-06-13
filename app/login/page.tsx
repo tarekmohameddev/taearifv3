@@ -1,4 +1,4 @@
-import { LoginPage } from "@/components/login-page";
+import { LoginPage } from "@/components/signin-up/login-page";
 export const metadata = {
   title: "تسجيل الدخول",
 };

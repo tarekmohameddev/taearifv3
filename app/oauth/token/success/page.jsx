@@ -88,7 +88,6 @@ export default function OAuthSuccessPage() {
           },
         });
 
-        // تشغيل fetchUserData للحصول على البيانات الكاملة (إذا احتجت لمزيد من البيانات)
         await useAuthStore.getState().fetchUserData();
 
         setStatus("success");
