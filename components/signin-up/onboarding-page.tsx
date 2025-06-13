@@ -16,7 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import toast from "react-hot-toast";
-import ColorPicker from "./color-picker";
+import ColorPicker from "../color-picker";
 
 const WEBSITE_CATEGORIES = [
   {
