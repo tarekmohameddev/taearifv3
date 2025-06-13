@@ -11,10 +11,8 @@ export default function OAuthSuccessPage() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState("loading"); 
   const [errorMessage, setErrorMessage] = useState("");
-  console.log("OAuthSuccessPage rendered");
 
   useEffect(() => {
-  console.log("OAuthSuccessPage2rendered");
     const handleOAuthSuccess = async () => {
       try {
         const token = searchParams.get("token");
@@ -24,7 +22,6 @@ export default function OAuthSuccessPage() {
           return;
         }
 
-        console.log("OAuth Token received:", token);
 
         // تحديث الـ token في AuthStore مؤقتاً
         useAuthStore.setState({
@@ -42,7 +39,6 @@ export default function OAuthSuccessPage() {
         }
 
         const userData = response.data.data;
-        console.log("User data received:", userData);
 
         // تحضير بيانات المستخدم للحفظ محلياً
         const user = {
@@ -70,7 +66,6 @@ export default function OAuthSuccessPage() {
           throw new Error(errorData.error || "فشل في حفظ بيانات المصادقة");
         }
 
-        console.log("Auth data saved successfully");
 
         // تحديث الـ AuthStore بالبيانات الكاملة
         useAuthStore.setState({
@@ -105,7 +100,7 @@ export default function OAuthSuccessPage() {
         // التوجيه حسب نوع العملية
         setTimeout(() => {
           if (returnPage === 'register' || !user.onboarding_completed) {
-            router.push("/onboarding");
+            router.push("/");
           } else {
             router.push("/");
           }

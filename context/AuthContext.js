@@ -140,7 +140,6 @@ const useAuthStore = create((set, get) => ({
         last_name: user.last_name,
         onboarding_completed: user.onboarding_completed || false, // إضافة onboarding_completed
       };
-      console.log("User data received:", safeUserData);
       set({ UserIslogged: true, userData: safeUserData });
       return { success: true };
     } catch (error) {
