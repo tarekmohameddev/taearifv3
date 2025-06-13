@@ -17,9 +17,7 @@ export default function OAuthSuccessPage() {
   console.log("OAuthSuccessPage2rendered");
     const handleOAuthSuccess = async () => {
       try {
-        // الحصول على التوكن من الـ URL
         const token = searchParams.get("token");
-        
         if (!token) {
           setStatus("error");
           setErrorMessage("لم يتم العثور على رمز المصادقة");
