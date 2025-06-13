@@ -54,14 +54,12 @@ export function LoginPage() {
       try {
         const response = await fetch("https://taearif.com/api/auth/google/redirect");
         const data = await response.json();
-        
         if (data.url) {
           setGoogleAuthUrl(data.url);
         }
       } catch (error) {
       }
     };
-  
     fetchGoogleAuthUrl();
   }, []);
 
@@ -82,14 +80,12 @@ export function LoginPage() {
   
   // استخراج التوكن من URL في حالة الـ redirect
   useEffect(() => {
-    // التأكد من أن window متوفر
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('token');
       
       if (token && window.location.pathname.includes('/oauth/token/success')) {
         setGoogleToken(token);
-        // تنظيف الـ URL
         window.history.replaceState({}, document.title, '/register');
       }
     }
