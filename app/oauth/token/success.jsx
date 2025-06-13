@@ -9,10 +9,12 @@ import Image from "next/image";
 export default function OAuthSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState("loading"); // loading, success, error
+  const [status, setStatus] = useState("loading"); 
   const [errorMessage, setErrorMessage] = useState("");
+  console.log("OAuthSuccessPage rendered");
 
   useEffect(() => {
+  console.log("OAuthSuccessPage2rendered");
     const handleOAuthSuccess = async () => {
       try {
         // الحصول على التوكن من الـ URL
