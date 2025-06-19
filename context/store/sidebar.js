@@ -42,7 +42,6 @@ module.exports = (set, get) => ({
     isSidebarFetched: false,
     loading: false,
     error: null,
-    isRefreshing: false, // إضافة حالة للتحديث في الخلفية
   },
   
   fetchSideMenus: async (app) => {
@@ -51,14 +50,13 @@ module.exports = (set, get) => ({
       if (sidebarData.isSidebarFetched) return;
     }
     
-    // إذا كانت هناك بيانات موجودة، استخدم isRefreshing بدلاً من loading
-    const hasExistingData = sidebarData.mainNavItems.length > 0;
+    // فقط إظهار loading إذا لم تكن هناك بيانات موجودة
+    const showLoading = sidebarData.mainNavItems.length === 0;
     
     set((state) => ({
       sidebarData: {
         ...state.sidebarData,
-        loading: !hasExistingData, // فقط إظهار loading إذا لم تكن هناك بيانات
-        isRefreshing: hasExistingData, // إظهار أنه يتم التحديث في الخلفية
+        loading: showLoading,
         error: null,
       },
     }));
@@ -72,6 +70,7 @@ module.exports = (set, get) => ({
         description: section.description,
         icon: getIconComponent(section.icon),
         path: section.path,
+        isAPP: section.isAPP || false, // إضافة خاصية isAPP
       }));
       
       set((state) => ({
@@ -80,7 +79,6 @@ module.exports = (set, get) => ({
           mainNavItems: items,
           isSidebarFetched: true,
           loading: false,
-          isRefreshing: false,
         },
       }));
     } catch (error) {
@@ -90,7 +88,6 @@ module.exports = (set, get) => ({
           ...state.sidebarData,
           error: error.message || "حدث خطأ أثناء جلب بيانات القوائم الجانبية",
           loading: false,
-          isRefreshing: false,
         },
       }));
     }
