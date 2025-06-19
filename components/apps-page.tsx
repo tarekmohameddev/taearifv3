@@ -35,6 +35,7 @@ import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { useState, useEffect } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
+import useStore from "@/context/Store"; 
 
 export function AppsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -42,7 +43,8 @@ export function AppsPage() {
   const [activeTab, setActiveTab] = useState("apps");
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const { sidebarData, fetchSideMenus } = useStore();
+  const { mainNavItems, error } = sidebarData;
   const categories = [
     "الكل",
     "نماذج",
@@ -70,6 +72,7 @@ export function AppsPage() {
 
         const installed = fetchedApps.filter((app) => app.installed === true);
         setInstalledApps(installed);
+
         toast.dismiss(loadingToast);
         toast.success("تم تحميل التطبيقات بنجاح");
       } catch (err) {
@@ -104,6 +107,7 @@ export function AppsPage() {
       );
       setInstalledApps(updatedInstalledApps);
 
+      fetchSideMenus("apps");
       toast.dismiss(loadingToast);
       toast.success("تم تثبيت التطبيق بنجاح");
     } catch (error) {
@@ -131,6 +135,7 @@ export function AppsPage() {
         (app) => app.installed === true,
       );
       setInstalledApps(updatedInstalledApps);
+      fetchSideMenus("apps");
 
       toast.dismiss(loadingToast);
       toast.success("تم إزالة التطبيق بنجاح");

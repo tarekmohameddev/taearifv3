@@ -22,6 +22,7 @@ const useStore = create((set, get) => {
     ...require("./store/projectsManagement")(set),
     ...require("./store/propertiesManagement")(set),
     ...require("./store/blogManagement")(set, get),
+    ...require("./store/sidebar")(set, get),
   };
 });
 

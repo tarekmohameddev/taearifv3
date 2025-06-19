@@ -3,17 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Building2,
-  FileText,
-  Home,
-  MessageSquare,
-  Package,
-  Settings,
-  Users,
-  ExternalLink,
-  LayoutDashboard,
-} from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -23,37 +13,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useAuthStore from "@/context/AuthContext";
-import axiosInstance from "@/lib/axiosInstance";
+import useStore from "@/context/Store"; 
 
 interface EnhancedSidebarProps {
   activeTab?: string;
   setActiveTab?: (tab: string) => void;
 }
-
-const getIconComponent = (iconName: string) => {
-  switch (iconName) {
-    case "panel":
-      return LayoutDashboard;
-    case "content-settings":
-      return FileText;
-    case "web-settings":
-      return Settings;
-    case "building":
-      return Building2;
-    case "home":
-      return Home;
-    case "message":
-      return MessageSquare;
-    case "package":
-      return Package;
-    case "users":
-      return Users;
-    case "external-link":
-      return ExternalLink;
-    default:
-      return FileText;
-  }
-};
 
 export function EnhancedSidebar({
   activeTab,
@@ -65,27 +30,13 @@ export function EnhancedSidebar({
   const [internalActiveTab, setInternalActiveTab] = useState<string>(
     activeTab || "dashboard",
   );
-  const [mainNavItems, setMainNavItems] = useState<any[]>([]);
+
+  const { sidebarData, fetchSideMenus } = useStore();
+  const { mainNavItems, loading, error } = sidebarData;
 
   useEffect(() => {
-    const fetchSideMenus = async () => {
-      try {
-        const response = await axiosInstance.get("/settings/side-menus");
-        const sections = response.data.data.sections;
-        const items = sections.map((section: any) => ({
-          id: section.path.split("/").pop(),
-          label: section.title,
-          description: section.description,
-          icon: getIconComponent(section.icon),
-          path: section.path,
-        }));
-        setMainNavItems(items);
-      } catch (error) {
-        console.error("فشل في جلب القوائم الجانبية:", error);
-      }
-    };
     fetchSideMenus();
-  }, []);
+  }, [fetchSideMenus]);
 
   useEffect(() => {
     const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");
@@ -218,19 +169,33 @@ export function EnhancedSidebar({
       </div>
 
       <div className="flex-1 py-2 px-1">
-        <div className="space-y-1">
-          {mainNavItems.map((item) => (
-            <NavItem
-              key={item.id}
-              item={item}
-              isActive={
-                activeTab
-                  ? currentTab === item.id && activeTab === item.id
-                  : internalActiveTab === item.id
-              }
-            />
-          ))}
-        </div>
+        {/* {loading && (
+          <div className="flex justify-center py-4">
+            <span className="text-sm text-muted-foreground">جاري التحميل...</span>
+          </div>
+        )} */}
+        
+        {error && (
+          <div className="px-3 py-2">
+            <span className="text-sm text-red-500">{error}</span>
+          </div>
+        )}
+        
+        {!loading && !error && (
+          <div className="space-y-1">
+            {mainNavItems.map((item) => (
+              <NavItem
+                key={item.id}
+                item={item}
+                isActive={
+                  activeTab
+                    ? currentTab === item.id && activeTab === item.id
+                    : internalActiveTab === item.id
+                }
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
