@@ -74,6 +74,25 @@ export function EnhancedSidebar({
     }
   }, [currentPath, currentTab, setActiveTab]);
 
+  // دالة للحصول على الرابط مع إضافة token إذا لزم الأمر
+  const getItemUrl = (item) => {
+    if (item.isAPP) {
+      const token = useAuthStore.getState().token;
+      return `${item.path}?token=${token}`;
+    }
+    return item.path;
+  };
+
+  // دالة للتعامل مع النقر على العنصر
+  const handleItemClick = (item, e) => {
+    if (item.isAPP) {
+      e.preventDefault(); // منع التنقل الافتراضي
+      const url = getItemUrl(item);
+      window.open(url, '_blank'); // فتح في تبويب جديد
+    }
+    // إذا كان isAPP = false، سيتم استخدام Link العادي (نفس الصفحة)
+  };
+
   const NavItem = ({
     item,
     isActive,
@@ -92,24 +111,48 @@ export function EnhancedSidebar({
               isActive &&
                 "bg-primary/10 text-primary border-r-2 border-primary",
             )}
-            asChild
+            asChild={!item.isAPP} // استخدام asChild فقط إذا لم يكن APP
           >
-            <Link href={item.path}>
-              <item.icon
-                className={cn(
-                  "h-5 w-5",
-                  isActive ? "text-primary" : "text-muted-foreground",
+            {item.isAPP ? (
+              // إذا كان APP، استخدام button عادي مع onClick
+              <div 
+                onClick={(e) => handleItemClick(item, e)}
+                className="cursor-pointer flex items-center w-full"
+              >
+                <item.icon
+                  className={cn(
+                    "h-5 w-5",
+                    isActive ? "text-primary" : "text-muted-foreground",
+                  )}
+                />
+                {!isCollapsed && (
+                  <div className="flex flex-col items-start ml-3">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-xs text-muted-foreground hidden md:inline-block">
+                      {item.description}
+                    </span>
+                  </div>
                 )}
-              />
-              {!isCollapsed && (
-                <div className="flex flex-col items-start">
-                  <span className="text-sm font-medium">{item.label}</span>
-                  <span className="text-xs text-muted-foreground hidden md:inline-block">
-                    {item.description}
-                  </span>
-                </div>
-              )}
-            </Link>
+              </div>
+            ) : (
+              // إذا لم يكن APP، استخدام Link العادي
+              <Link href={item.path}>
+                <item.icon
+                  className={cn(
+                    "h-5 w-5",
+                    isActive ? "text-primary" : "text-muted-foreground",
+                  )}
+                />
+                {!isCollapsed && (
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-xs text-muted-foreground hidden md:inline-block">
+                      {item.description}
+                    </span>
+                  </div>
+                )}
+              </Link>
+            )}
           </Button>
         </TooltipTrigger>
         {isCollapsed && (
@@ -119,6 +162,9 @@ export function EnhancedSidebar({
               <p className="text-xs text-muted-foreground">
                 {item.description}
               </p>
+              {item.isAPP && (
+                <p className="text-xs text-blue-500">يفتح في تبويب جديد</p>
+              )}
             </div>
           </TooltipContent>
         )}
@@ -169,12 +215,6 @@ export function EnhancedSidebar({
       </div>
 
       <div className="flex-1 py-2 px-1">
-        {/* {loading && (
-          <div className="flex justify-center py-4">
-            <span className="text-sm text-muted-foreground">جاري التحميل...</span>
-          </div>
-        )} */}
-        
         {error && (
           <div className="px-3 py-2">
             <span className="text-sm text-red-500">{error}</span>
