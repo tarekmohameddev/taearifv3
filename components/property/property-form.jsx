@@ -2,6 +2,9 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { Loader } from "@googlemaps/js-api-loader";
+import { MapSection } from "@/components/property/map-section";
+import { LocationCard } from "@/components/property/location-card";
 import {
   Upload,
   X,
@@ -9,6 +12,9 @@ import {
   ImageIcon,
   Plus,
   MapPin,
+  Video,
+  Globe ,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,6 +57,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import loader from "@/lib/googleMapsLoader";
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -91,6 +98,7 @@ export default function PropertyForm({ mode }) {
   const [newQuestion, setNewQuestion] = useState("");
   const [newAnswer, setNewAnswer] = useState("");
   const [suggestedFaqsList, setSuggestedFaqsList] = useState([]);
+  const [marker, setMarker] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -137,6 +145,8 @@ export default function PropertyForm({ mode }) {
     payment_method: "",
     pricePerMeter: "",
     PropertyType: "",
+    video_url: "",
+    virtual_tour: "",
   });
 
   const [currentFeature, setCurrentFeature] = useState("");
@@ -156,10 +166,219 @@ export default function PropertyForm({ mode }) {
   const [categories, setCategories] = useState([]);
   const [projects, setProjects] = useState([]);
   const [facades, setFacades] = useState([]);
-
+  const [map, setMap] = useState(null);
+  const [searchBox, setSearchBox] = useState(null);
   const thumbnailInputRef = useRef(null);
   const galleryInputRef = useRef(null);
   const floorPlansInputRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const mapRef = useRef(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+
+
+  const handleLocationUpdate = (lat, lng, address) => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng,
+      address: address,
+    }))
+  }
+
+  const validateUrl = (value, name) => {
+    try {
+      new URL(value); // Validate URL format
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    } catch {
+      setErrors((prev) => ({ ...prev, [name]: 'الرجاء إدخال رابط صحيح' }));
+    }
+  };
+
+  const handleUrlChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error when field is edited
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+
+    // Validate URL format if not empty
+    if (value.trim()) {
+      validateUrl(value, name);
+    }
+  };
+
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation || !map || !marker) return;
+  
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        marker.setPosition({ lat, lng });
+        map.setCenter({ lat, lng });
+        map.setZoom(17);
+        
+        setFormData(prev => ({
+          ...prev,
+          latitude: lat,
+          longitude: lng
+        }));
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        toast.error("غير قادر على الحصول على موقعك الحالي");
+      }
+    );
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    
+    const initMap = async () => {
+      try {
+        const google = await loader.load();
+        
+        if (!mounted || !mapRef.current) return;
+
+        const mapInstance = new google.maps.Map(mapRef.current, {
+          center: { 
+            lat: parseFloat(formData.latitude) || 24.766316905850978, 
+            lng: parseFloat(formData.longitude) || 46.73579692840576 
+          },
+          zoom: 13,
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          mapTypeControl: true,
+          streetViewControl: true,
+          fullscreenControl: true,
+        });
+
+        // Create marker
+        const newMarker = new google.maps.Marker({
+          position: { 
+            lat: parseFloat(formData.latitude) || 24.766316905850978,
+            lng: parseFloat(formData.longitude) || 46.73579692840576
+          },
+          map: mapInstance,
+          draggable: true
+        });
+
+        // Add marker drag event
+        newMarker.addListener("dragend", (event) => {
+          const lat = event.latLng.lat();
+          const lng = event.latLng.lng();
+          setFormData(prev => ({
+            ...prev,
+            latitude: lat,
+            longitude: lng,
+          }));
+        });
+
+        // Initialize search box if search input exists
+        if (searchInputRef.current) {
+          const searchBoxInstance = new google.maps.places.SearchBox(searchInputRef.current);
+          setSearchBox(searchBoxInstance);
+
+          searchBoxInstance.addListener("places_changed", () => {
+            const places = searchBoxInstance.getPlaces();
+            if (places && places.length > 0) {
+              const place = places[0];
+              if (place.geometry && place.geometry.location) {
+                const lat = place.geometry.location.lat();
+                const lng = place.geometry.location.lng();
+                
+                newMarker.setPosition({ lat, lng });
+                mapInstance.setCenter({ lat, lng });
+                mapInstance.setZoom(17);
+
+                setFormData(prev => ({
+                  ...prev,
+                  latitude: lat,
+                  longitude: lng,
+                  address: place.formatted_address || "",
+                }));
+              }
+            }
+          });
+        }
+
+        setMap(mapInstance);
+        setMarker(newMarker);
+        setIsMapLoaded(true);
+
+      } catch (error) {
+        console.error("Error loading map:", error);
+        toast.error("حدث خطأ أثناء تحميل الخريطة");
+      }
+    };
+
+    initMap();
+
+    return () => {
+      mounted = false;
+      if (marker) {
+        marker.setMap(null);
+      }
+    };
+  }, [formData.latitude, formData.longitude]);
+
+  const updateLocation = (lat, lng, mapInstance) => {
+    // Remove existing marker
+    if (marker) {
+      marker.setMap(null)
+    }
+  
+    // Create new marker
+    const newMarker = new google.maps.Marker({
+      position: { lat, lng },
+      map: mapInstance,
+      draggable: true,
+      title: "Property Location",
+    })
+  
+    // Add drag listener to marker
+    newMarker.addListener("dragend", (event) => {
+      if (event.latLng) {
+        const newLat = event.latLng.lat()
+        const newLng = event.latLng.lng()
+        setPropertyData((prev) => ({
+          ...prev,
+          latitude: newLat,
+          longitude: newLng,
+        }))
+        reverseGeocode(newLat, newLng)
+      }
+    })
+  
+    setMarker(newMarker)
+    setPropertyData((prev) => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng,
+    }))
+  
+    // Reverse geocode to get address
+    reverseGeocode(lat, lng)
+  }
+  
+  const reverseGeocode = (lat, lng) => {
+    const geocoder = new google.maps.Geocoder()
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+      if (status === "OK" && results && results[0]) {
+        setPropertyData((prev) => ({
+          ...prev,
+          address: results[0].formatted_address,
+        }))
+      }
+    })
+  }
   useEffect(() => {
     const fetchSuggestedFaqs = async () => {
       try {
@@ -274,6 +493,8 @@ export default function PropertyForm({ mode }) {
             pricePerMeter: property.pricePerMeter || "",
             PropertyType: propertyType, 
             faqs: property.faqs || "",
+            video_url: property.video_url || "",
+            virtual_tour: property.virtual_tour || "",
           });
 
           setPreviews({
@@ -404,14 +625,6 @@ export default function PropertyForm({ mode }) {
 
   const handleSwitchChange = (name, checked) => {
     setFormData((prev) => ({ ...prev, [name]: checked }));
-  };
-
-  const handleMapPositionChange = (lat, lng) => {
-    setFormData((prev) => ({
-      ...prev,
-      latitude: lat,
-      longitude: lng,
-    }));
   };
 
   const triggerFileInput = (type) => {
@@ -618,6 +831,8 @@ export default function PropertyForm({ mode }) {
           pricePerMeter: formData.pricePerMeter || 0,
           type: formData.PropertyType || "",
           faqs: faqs,
+          video_url: formData.video_url || "",
+          virtual_tour: formData.virtual_tour || "",
         };
 
         let response;
@@ -1774,172 +1989,204 @@ export default function PropertyForm({ mode }) {
 
               <Card className="md:col-span-2">
                 <CardHeader>
-                  <CardTitle>موقع العقار</CardTitle>
-                  <CardDescription>حدد موقع العقار على الخريطة</CardDescription>
+                  <CardTitle>الوسائط والجولات الافتراضية</CardTitle>
+                  <CardDescription>أضف روابط الفيديو والجولة الافتراضية للعقار</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="w-full md:w-2/3">
-                      <div className="border rounded-md h-[400px] overflow-hidden">
-                        <MapComponent
-                          latitude={formData.latitude}
-                          longitude={formData.longitude}
-                          onPositionChange={handleMapPositionChange}
-                          showSearch={true}
-                        />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Video className="h-4 w-4 text-muted-foreground" />
+                        <Label htmlFor="videoUrl">رابط الفيديو (اختياري)</Label>
                       </div>
+                      <Input
+                        id="video_url"
+                        name="video_url"
+                        type="url"
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        value={formData.video_url}
+                        onChange={handleUrlChange}
+                        className={errors.video_url ? "border-red-500" : ""}
+                      />
+                      {errors.video_url && <p className="text-sm text-red-500">{errors.video_url}</p>}
+                      <p className="text-xs text-muted-foreground">
+                        يمكنك إضافة رابط فيديو من YouTube أو Vimeo أو أي منصة أخرى
+                      </p>
                     </div>
-                    <div className="w-full md:w-1/3 space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <Label htmlFor="latitude">خط العرض</Label>
-                        </div>
-                        <Input
-                          id="latitude"
-                          name="latitude"
-                          type="number"
-                          step="0.000001"
-                          value={formData.latitude}
-                          onChange={handleInputChange}
-                        />
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <Label htmlFor="virtualTourUrl">رابط الجولة الافتراضية (اختياري)</Label>
                       </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <Label htmlFor="longitude">خط الطول</Label>
-                        </div>
-                        <Input
-                          id="longitude"
-                          name="longitude"
-                          type="number"
-                          step="0.000001"
-                          value={formData.longitude}
-                          onChange={handleInputChange}
-                        />
-                      </div>
-                      <div className="bg-muted p-4 rounded-md">
-                        <h4 className="text-sm font-medium mb-2">تعليمات:</h4>
-                        <ul className="text-sm text-muted-foreground space-y-1">
-                          <li>• انقر على الخريطة لتحديد موقع العقار</li>
-                          <li>• اسحب العلامة لضبط الموقع بدقة</li>
-                          <li>• استخدم شريط البحث للعثور على موقع محدد</li>
-                          <li>• يمكنك أيضًا إدخال الإحداثيات يدويًا</li>
-                        </ul>
-                      </div>
+                      <Input
+                        id="virtual_tour"
+                        name="virtual_tour"
+                        type="url"
+                        placeholder="https://my.matterport.com/show/..."
+                        value={formData.virtual_tour}
+                        onChange={handleUrlChange}
+                        className={errors.virtual_tour ? "border-red-500" : ""}
+                      />
+                      {errors.virtual_tour && <p className="text-sm text-red-500">{errors.virtual_tour}</p>}
+                      <p className="text-xs text-muted-foreground">
+                        أضف رابط جولة افتراضية من Matterport أو منصات الجولات الافتراضية الأخرى
+                      </p>
                     </div>
                   </div>
+
+                  {/* Preview sections for URLs */}
+                  {(formData.virtual_tour || formData.video_url) && (
+                    <div className="mt-6 p-4 bg-muted/30 rounded-md">
+                      <h4 className="text-sm font-medium mb-3">معاينة الروابط:</h4>
+                      <div className="space-y-2">
+                        {formData.video_url && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Video className="h-4 w-4 text-blue-500" />
+                            <span className="text-muted-foreground">فيديو:</span>
+                            <a
+                              href={formData.video_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline truncate max-w-xs"
+                            >
+                              {formData.video_url}
+                            </a>
+                          </div>
+                        )}
+                        {formData.virtual_tour && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Globe className="h-4 w-4 text-green-500" />
+                            <span className="text-muted-foreground">جولة افتراضية:</span>
+                            <a
+                              href={formData.virtual_tour}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-green-500 hover:underline truncate max-w-xs"
+                            >
+                              {formData.virtual_tour}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-              <Card className="md:col-span-2">
-  <CardHeader>
-    <CardTitle>الأسئلة الشائعة الخاصة بالعقار</CardTitle>
-    <CardDescription>أضف أسئلة وأجوبة شائعة حول هذا العقار لمساعدة المشترين المحتملين.</CardDescription>
-  </CardHeader>
-  <CardContent className="space-y-6">
-    {/* Add New FAQ Form */}
-    <div className="space-y-4 p-4 border rounded-md">
-      <h3 className="text-lg font-medium">إضافة سؤال جديد</h3>
-      <div className="space-y-2">
-        <Label htmlFor="newQuestion">السؤال</Label>
-        <Input
-          id="newQuestion"
-          value={newQuestion}
-          onChange={(e) => setNewQuestion(e.target.value)}
-          placeholder="مثال: هل مسموح بالحيوانات الأليفة؟"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="newAnswer">الإجابة</Label>
-        <Textarea
-          id="newAnswer"
-          value={newAnswer}
-          onChange={(e) => setNewAnswer(e.target.value)}
-          placeholder="مثال: نعم، مسموح بالحيوانات الأليفة الصغيرة."
-          rows={3}
-        />
-      </div>
-      <Button onClick={handleAddFaq} className="w-full md:w-auto">
-        <Plus className="ml-2 h-4 w-4" />
-        إضافة سؤال
-      </Button>
-    </div>
-
-    {/* Suggested FAQs */}
-    {suggestedFaqsList?.length > 0 && (
-  <div className="space-y-2">
-    <h4 className="text-md font-medium">أسئلة مقترحة:</h4>
-    <div className="flex flex-wrap gap-2">
-      {suggestedFaqsList.map((sq, index) => (
-        <Button 
-          key={index} 
-          variant="outline" 
-          size="sm" 
-          onClick={() => handleSelectSuggestedFaq(sq)}
-        >
-          <HelpCircle className="ml-2 h-4 w-4" />
-          {sq.question} {/* عرض sq.question بدلاً من sq */}
-        </Button>
-      ))}
-    </div>
-  </div>
-)}
-
-    {/* List of Added FAQs */}
-    {faqs.length > 0 && (
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">الأسئلة المضافة ({faqs.length})</h3>
-        <div className="space-y-3">
-          {faqs.map((faq) => (
-            <div key={faq.id} className="p-4 border rounded-md bg-muted/30">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-primary">{faq.question}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{faq.answer}</p>
-                </div>
-                <div className="flex items-center gap-2 rtl:mr-auto ltr:ml-auto">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleToggleFaqDisplay(faq.id)}
-                    title={faq.displayOnPage ? "إخفاء من صفحة العقار" : "عرض في صفحة العقار"}
-                  >
-                    {faq.displayOnPage ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveFaq(faq.id)}
-                    className="text-red-500 hover:text-red-600"
-                    title="حذف السؤال"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+              <div className="md:col-span-2 space-y-6">
+                {/* Map Section */}
+                
+                <MapSection onLocationUpdate={handleLocationUpdate} />
+                <LocationCard propertyData={formData} />
               </div>
-              {faq.displayOnPage ? (
-                <Badge variant="default" className="mt-2">
-                  معروض في الصفحة
-                </Badge>
-              ) : (
-                <Badge variant="secondary" className="mt-2">
-                  مخفي من الصفحة
-                </Badge>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
-    {faqs.length === 0 && (
-      <p className="text-sm text-center text-muted-foreground py-4">لم تتم إضافة أي أسئلة شائعة بعد.</p>
-    )}
-  </CardContent>
-</Card>
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>الأسئلة الشائعة الخاصة بالعقار</CardTitle>
+                  <CardDescription>أضف أسئلة وأجوبة شائعة حول هذا العقار لمساعدة المشترين المحتملين.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Add New FAQ Form */}
+                  <div className="space-y-4 p-4 border rounded-md">
+                    <h3 className="text-lg font-medium">إضافة سؤال جديد</h3>
+                    <div className="space-y-2">
+                      <Label htmlFor="newQuestion">السؤال</Label>
+                      <Input
+                        id="newQuestion"
+                        value={newQuestion}
+                        onChange={(e) => setNewQuestion(e.target.value)}
+                        placeholder="مثال: هل مسموح بالحيوانات الأليفة؟"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="newAnswer">الإجابة</Label>
+                      <Textarea
+                        id="newAnswer"
+                        value={newAnswer}
+                        onChange={(e) => setNewAnswer(e.target.value)}
+                        placeholder="مثال: نعم، مسموح بالحيوانات الأليفة الصغيرة."
+                        rows={3}
+                      />
+                    </div>
+                    <Button onClick={handleAddFaq} className="w-full md:w-auto">
+                      <Plus className="ml-2 h-4 w-4" />
+                      إضافة سؤال
+                    </Button>
+                  </div>
+
+                  {/* Suggested FAQs */}
+                  {suggestedFaqsList?.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-md font-medium">أسئلة مقترحة:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {suggestedFaqsList.map((sq, index) => (
+                          <Button 
+                            key={index} 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleSelectSuggestedFaq(sq)}
+                          >
+                            <HelpCircle className="ml-2 h-4 w-4" />
+                            {sq.question} {/* عرض sq.question بدلاً من sq */}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* List of Added FAQs */}
+                  {faqs.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">الأسئلة المضافة ({faqs.length})</h3>
+                      <div className="space-y-3">
+                        {faqs.map((faq) => (
+                          <div key={faq.id} className="p-4 border rounded-md bg-muted/30">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="font-semibold text-primary">{faq.question}</p>
+                                <p className="text-sm text-muted-foreground mt-1">{faq.answer}</p>
+                              </div>
+                              <div className="flex items-center gap-2 rtl:mr-auto ltr:ml-auto">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleToggleFaqDisplay(faq.id)}
+                                  title={faq.displayOnPage ? "إخفاء من صفحة العقار" : "عرض في صفحة العقار"}
+                                >
+                                  {faq.displayOnPage ? (
+                                    <Eye className="h-4 w-4" />
+                                  ) : (
+                                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                  )}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleRemoveFaq(faq.id)}
+                                  className="text-red-500 hover:text-red-600"
+                                  title="حذف السؤال"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            {faq.displayOnPage ? (
+                              <Badge variant="default" className="mt-2">
+                                معروض في الصفحة
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="mt-2">
+                                مخفي من الصفحة
+                              </Badge>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {faqs.length === 0 && (
+                    <p className="text-sm text-center text-muted-foreground py-4">لم تتم إضافة أي أسئلة شائعة بعد.</p>
+                  )}
+                </CardContent>
+              </Card>
               <Card className="md:col-span-2">
                 <CardFooter className="flex flex-col items-end border-t p-6 space-y-4">
                   <div className="w-full">
@@ -1976,7 +2223,6 @@ export default function PropertyForm({ mode }) {
                   </div>
                 </CardFooter>
               </Card>
-          
             </div>
           </div>
         </main>
