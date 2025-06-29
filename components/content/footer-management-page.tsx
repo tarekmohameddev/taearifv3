@@ -128,7 +128,7 @@ export function FooterManagementPage() {
     const fetchFooterData = async () => {
       try {
         const response = await axiosInstance.get(
-          "https://taearif.com/api/content/footer",
+          `${process.env.NEXT_PUBLIC_Backend_URL}/content/footer`
         );
         console.log("get response", response);
         if (response.data.status === "success") {
@@ -157,7 +157,7 @@ export function FooterManagementPage() {
         activationConstraint: {
           distance: 8,
         },
-      }),
+      })
     );
 
     return (
@@ -207,7 +207,7 @@ export function FooterManagementPage() {
     setFooterData({
       ...footerData,
       social: footerData.social.map((item) =>
-        item.id === id ? { ...item, [field]: value } : item,
+        item.id === id ? { ...item, [field]: value } : item
       ),
     });
   };
@@ -218,14 +218,14 @@ export function FooterManagementPage() {
       setFooterData((prevData) => {
         const column = prevData.columns.find((col) => col.id === columnId);
         const oldIndex = column.links.findIndex(
-          (link) => link.id === active.id,
+          (link) => link.id === active.id
         );
         const newIndex = column.links.findIndex((link) => link.id === over.id);
         const newLinks = arrayMove(column.links, oldIndex, newIndex);
         return {
           ...prevData,
           columns: prevData.columns.map((col) =>
-            col.id === columnId ? { ...col, links: newLinks } : col,
+            col.id === columnId ? { ...col, links: newLinks } : col
           ),
         };
       });
@@ -259,7 +259,7 @@ export function FooterManagementPage() {
     setFooterData({
       ...footerData,
       columns: footerData.columns.map((column) =>
-        column.id === columnId ? { ...column, [field]: value } : column,
+        column.id === columnId ? { ...column, [field]: value } : column
       ),
     });
   };
@@ -273,7 +273,7 @@ export function FooterManagementPage() {
             return {
               ...column,
               links: column.links.map((link) =>
-                link.id === linkId ? { ...link, [field]: value } : link,
+                link.id === linkId ? { ...link, [field]: value } : link
               ),
             };
           }
@@ -281,7 +281,7 @@ export function FooterManagementPage() {
         }),
       }));
     },
-    [],
+    []
   );
 
   const addColumnLink = (columnId) => {
@@ -368,8 +368,8 @@ export function FooterManagementPage() {
     setIsSaving(true); // تعيين isSaving إلى true عند البدء
     try {
       const response = await axiosInstance.put(
-        "https://taearif.com/api/content/footer",
-        footerData,
+        `${process.env.NEXT_PUBLIC_Backend_URL}/content/footer`,
+        footerData
       );
       const setpOB = {
         step: "footer",
@@ -691,7 +691,7 @@ export function FooterManagementPage() {
                                 handleSocialChange(
                                   item.id,
                                   "url",
-                                  e.target.value,
+                                  e.target.value
                                 )
                               }
                               className="flex-1"
@@ -704,7 +704,7 @@ export function FooterManagementPage() {
                                   handleSocialChange(
                                     item.id,
                                     "enabled",
-                                    checked,
+                                    checked
                                   )
                                 }
                               />
@@ -766,7 +766,7 @@ export function FooterManagementPage() {
                                   handleColumnChange(
                                     column.id,
                                     "title",
-                                    e.target.value,
+                                    e.target.value
                                   )
                                 }
                               />
@@ -779,7 +779,7 @@ export function FooterManagementPage() {
                                   handleColumnChange(
                                     column.id,
                                     "enabled",
-                                    checked,
+                                    checked
                                   )
                                 }
                               />
@@ -917,7 +917,7 @@ export function FooterManagementPage() {
                         onChange={(e) =>
                           handleNewsletterChange(
                             "placeholderText",
-                            e.target.value,
+                            e.target.value
                           )
                         }
                         disabled={!footerData.newsletter.enabled}

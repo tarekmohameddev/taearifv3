@@ -33,9 +33,9 @@ export function GoogleRegisterPage() {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // استخراج temp_token من URL
-  const tempToken = searchParams.get('temp_token');
+  const tempToken = searchParams.get("temp_token");
 
   const [formData, setFormData] = useState<FormData>({
     phone: "",
@@ -53,7 +53,9 @@ export function GoogleRegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [subdomainFocused, setSubdomainFocused] = useState(false);
-  const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>([]);
+  const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>(
+    []
+  );
 
   // Validate phone
   const validatePhone = (phone: string) => {
@@ -83,9 +85,9 @@ export function GoogleRegisterPage() {
   // التحقق من وجود temp_token
   useEffect(() => {
     if (!tempToken) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        tempToken: "رمز التوثيق المؤقت مفقود. يرجى المحاولة مرة أخرى."
+        tempToken: "رمز التوثيق المؤقت مفقود. يرجى المحاولة مرة أخرى.",
       }));
     }
   }, [tempToken]);
@@ -99,11 +101,7 @@ export function GoogleRegisterPage() {
   // Generate subdomain suggestions (يمكن تحسينها بناءً على معلومات Google المتاحة)
   useEffect(() => {
     // يمكن إضافة منطق لإنتاج اقتراحات بناءً على معلومات Google المستخدم إذا كانت متاحة
-    const suggestions = [
-      "my-website",
-      "my-site",
-      "portfolio",
-    ];
+    const suggestions = ["my-website", "my-site", "portfolio"];
     setSubdomainSuggestions(suggestions);
   }, []);
 
@@ -144,9 +142,9 @@ export function GoogleRegisterPage() {
 
     // التحقق من وجود temp_token
     if (!tempToken) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        tempToken: "رمز التوثيق المؤقت مفقود. يرجى المحاولة مرة أخرى."
+        tempToken: "رمز التوثيق المؤقت مفقود. يرجى المحاولة مرة أخرى.",
       }));
       setIsSubmitting(false);
       return;
@@ -178,7 +176,7 @@ export function GoogleRegisterPage() {
         // الحصول على رمز reCAPTCHA
         const recaptchaToken = await executeRecaptcha("google_register");
 
-        const link = "https://taearif.com/api/register"; // أو أي endpoint مخصص للـ Google register
+        const link = `${process.env.NEXT_PUBLIC_Backend_URL}/register`; // أو أي endpoint مخصص للـ Google register
         const payload = {
           phone: formData.phone,
           username: formData.subdomain,

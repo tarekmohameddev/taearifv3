@@ -10,14 +10,14 @@ export default async function handler(req, res) {
         rejectUnauthorized:
           process.env.NODE_ENV === "development" ? false : true,
       });
-      await axios.post("https://taearif.com/api/logout", null, {
+      await axios.post(`${process.env.NEXT_PUBLIC_Backend_URL}/logout`, null, {
         headers: { Authorization: `Bearer ${req.body.token}` },
         httpsAgent: httpsAgent,
       });
     } catch (error) {
       console.error(
         "An error occurred while sending the logout request to the external API:",
-        error,
+        error
       );
     }
 

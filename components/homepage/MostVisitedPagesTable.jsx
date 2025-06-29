@@ -29,7 +29,7 @@ export function MostVisitedPagesTable() {
       setLoading(true);
       setError(null);
       const response = await axiosInstance.get(
-        "https://taearif.com/api/dashboard/most-visited-pages",
+        `${process.env.NEXT_PUBLIC_Backend_URL}/dashboard/most-visited-pages`
       );
       setPagesData(response.data.pages);
     } catch (err) {

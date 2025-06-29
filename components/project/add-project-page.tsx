@@ -106,7 +106,7 @@ export default function AddProjectPage(): JSX.Element {
   });
 
   const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(
-    null,
+    null
   );
   const [planImages, setPlanImages] = useState<ProjectImage[]>([]);
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
@@ -146,7 +146,7 @@ export default function AddProjectPage(): JSX.Element {
       projects.length >= useAuthStore.getState().userData?.project_limit_number
     ) {
       toast.error(
-        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.project_limit_number} مشروع`,
+        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.project_limit_number} مشروع`
       );
       hasReachedLimit =
         projects.length >=
@@ -160,7 +160,7 @@ export default function AddProjectPage(): JSX.Element {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
     if (id === "amenities") {
@@ -360,7 +360,7 @@ export default function AddProjectPage(): JSX.Element {
   };
 
   const handleSaveProject = async (
-    status_publish: "منشور" | "مسودة" | "Pre-construction",
+    status_publish: "منشور" | "مسودة" | "Pre-construction"
   ) => {
     if (!validateForm()) {
       toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
@@ -399,7 +399,7 @@ export default function AddProjectPage(): JSX.Element {
       if (thumbnailImage) {
         const uploadResult = await uploadSingleFile(
           thumbnailImage.file,
-          "project",
+          "project"
         );
         featuredImagePath = uploadResult.path;
       }
@@ -449,7 +449,7 @@ export default function AddProjectPage(): JSX.Element {
       let formattedDate = "";
       if (newProject.completionDate) {
         const convertedDateStr = convertArabicToEnglishNumbers(
-          newProject.completionDate,
+          newProject.completionDate
         );
 
         if (isValidDate(convertedDateStr)) {
@@ -527,8 +527,8 @@ export default function AddProjectPage(): JSX.Element {
       };
 
       const response = await axiosInstance.post(
-        "https://taearif.com/api/projects",
-        projectData,
+        `${process.env.NEXT_PUBLIC_Backend_URL}/projects`,
+        projectData
       );
 
       const currentState = useStore.getState();

@@ -1,8 +1,8 @@
 // pages/api/auth/[...nextauth].js
 import NextAuth from "next-auth";
-import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
-import axios from 'axios';
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import axios from "axios";
 
 export default NextAuth({
   providers: [
@@ -13,24 +13,27 @@ export default NextAuth({
     }),
     // إضافة Credentials Provider
     CredentialsProvider({
-      name: 'Credentials',
+      name: "Credentials",
       credentials: {
-        email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
-        recaptcha_token: { label: 'ReCAPTCHA Token', type: 'text' },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+        recaptcha_token: { label: "ReCAPTCHA Token", type: "text" },
       },
       async authorize(credentials) {
         try {
           // إرسال طلب تسجيل الدخول إلى API الخارجي
-          const response = await axios.post('https://taearif.com/api/login', {
-            email: credentials.email,
-            password: credentials.password,
-            recaptcha_token: credentials.recaptcha_token,
-          });
+          const response = await axios.post(
+            `${process.env.NEXT_PUBLIC_Backend_URL}/login`,
+            {
+              email: credentials.email,
+              password: credentials.password,
+              recaptcha_token: credentials.recaptcha_token,
+            }
+          );
 
           if (response.status === 200 && response.data.user) {
             const { user, token } = response.data;
-            
+
             return {
               id: user.id || user._id,
               email: user.email,
@@ -42,8 +45,10 @@ export default NextAuth({
           }
           return null;
         } catch (error) {
-          console.error('Login error:', error.response?.data || error.message);
-          throw new Error(error.response?.data?.message || 'فشل في تسجيل الدخول');
+          console.error("Login error:", error.response?.data || error.message);
+          throw new Error(
+            error.response?.data?.message || "فشل في تسجيل الدخول"
+          );
         }
       },
     }),
@@ -54,32 +59,40 @@ export default NextAuth({
   callbacks: {
     async jwt({ token, user, account, profile }) {
       // إذا كان تسجيل الدخول بـ Google
-      if (account?.provider === 'google' && profile) {
+      if (account?.provider === "google" && profile) {
         try {
           // التحقق من وجود المستخدم أولاً
-          const checkUserResponse = await axios.post('https://taearif.com/api/auth/check-user', {
-            email: profile.email,
-          }).catch(() => ({ data: { exists: false } }));
+          const checkUserResponse = await axios
+            .post(`${process.env.NEXT_PUBLIC_Backend_URL}/auth/check-user`, {
+              email: profile.email,
+            })
+            .catch(() => ({ data: { exists: false } }));
 
           let userData;
 
           if (checkUserResponse.data.exists) {
             // المستخدم موجود - تسجيل دخول
-            const loginResponse = await axios.post('https://taearif.com/api/auth/google/login', {
-              email: profile.email,
-              google_id: profile.sub,
-              name: profile.name,
-            });
+            const loginResponse = await axios.post(
+              `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/login`,
+              {
+                email: profile.email,
+                google_id: profile.sub,
+                name: profile.name,
+              }
+            );
             userData = loginResponse.data;
           } else {
             // المستخدم غير موجود - تسجيل جديد
-            const registerResponse = await axios.post('https://taearif.com/api/auth/google/register', {
-              email: profile.email,
-              google_id: profile.sub,
-              first_name: profile.given_name,
-              last_name: profile.family_name,
-              username: profile.name.replace(/\s+/g, '-').toLowerCase(),
-            });
+            const registerResponse = await axios.post(
+              `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/register`,
+              {
+                email: profile.email,
+                google_id: profile.sub,
+                first_name: profile.given_name,
+                last_name: profile.family_name,
+                username: profile.name.replace(/\s+/g, "-").toLowerCase(),
+              }
+            );
             userData = registerResponse.data;
           }
 
@@ -91,10 +104,12 @@ export default NextAuth({
             token.first_name = userData.user.first_name;
             token.last_name = userData.user.last_name;
           }
-
         } catch (error) {
-          console.error('Google OAuth error:', error.response?.data || error.message);
-          throw new Error('فشل في المصادقة مع Google');
+          console.error(
+            "Google OAuth error:",
+            error.response?.data || error.message
+          );
+          throw new Error("فشل في المصادقة مع Google");
         }
       }
 
@@ -129,8 +144,8 @@ export default NextAuth({
     },
   },
   pages: {
-    signIn: '/login',
-    error: '/login',
+    signIn: "/login",
+    error: "/login",
   },
   cookies: {
     sessionToken: {

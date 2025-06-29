@@ -17,11 +17,11 @@ export async function uploadMultipleFiles(files, context, subFolder = null) {
 
   try {
     const response = await axiosInstance.post(
-      "https://taearif.com/api/upload-multiple",
+      `${process.env.NEXT_PUBLIC_Backend_URL}/upload-multiple`,
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
-      },
+      }
     );
     return response.data.data.files;
   } catch (error) {

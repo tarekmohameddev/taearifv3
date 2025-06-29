@@ -56,7 +56,7 @@ export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [subdomainFocused, setSubdomainFocused] = useState(false);
   const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>(
-    [],
+    []
   );
 
   // Validate email
@@ -179,7 +179,7 @@ export function RegisterPage() {
         // الحصول على رمز reCAPTCHA
         const token = await executeRecaptcha("register");
 
-        const link = "https://taearif.com/api/register";
+        const link = `${process.env.NEXT_PUBLIC_Backend_URL}/register`;
         const payload = {
           email: formData.email,
           password: formData.password,

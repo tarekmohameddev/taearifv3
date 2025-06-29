@@ -88,17 +88,20 @@ const useAuthStore = create((set, get) => ({
   login: async (email, password, recaptchaToken) => {
     set({ IsLoading: true, errorLogin: null, errorLoginATserver: null });
     try {
-      const externalResponse = await fetch("https://taearif.com/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          recaptcha_token: recaptchaToken,
-        }),
-      });
+      const externalResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_Backend_URL}/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            recaptcha_token: recaptchaToken,
+          }),
+        }
+      );
       if (!externalResponse.ok) {
         const errorData = await externalResponse.json().catch(() => ({}));
         let errorMsg = errorData.message || "فشل تسجيل الدخول";

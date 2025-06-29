@@ -89,7 +89,7 @@ export default function EditProjectPage(): JSX.Element {
   });
 
   const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(
-    null,
+    null
   );
   const [planImages, setPlanImages] = useState<ProjectImage[]>([]);
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
@@ -114,7 +114,7 @@ export default function EditProjectPage(): JSX.Element {
     const fetchProjectData = async () => {
       try {
         const response = await axiosInstance.get(
-          `https://taearif.com/api/projects/${id}`,
+          `${process.env.NEXT_PUBLIC_Backend_URL}/projects/${id}`
         );
         const projectData = response.data.data.project;
 
@@ -165,12 +165,12 @@ export default function EditProjectPage(): JSX.Element {
               amenitiesArray[0].name
             ) {
               setAmenities(
-                amenitiesArray.map((amenity) => amenity.name.trim()),
+                amenitiesArray.map((amenity) => amenity.name.trim())
               );
             } else {
               // إذا كانت المرافق نصوص
               setAmenities(
-                amenitiesArray.map((amenity) => amenity.toString().trim()),
+                amenitiesArray.map((amenity) => amenity.toString().trim())
               );
             }
           }
@@ -194,7 +194,7 @@ export default function EditProjectPage(): JSX.Element {
               id: `existing-gallery-${index}`,
               url: img,
               file: new File([], img.split("/").pop() || "image.jpg"),
-            })),
+            }))
           );
         }
 
@@ -207,7 +207,7 @@ export default function EditProjectPage(): JSX.Element {
               id: `existing-plan-${index}`,
               url: img,
               file: new File([], img.split("/").pop() || "plan.jpg"),
-            })),
+            }))
           );
         }
 
@@ -231,7 +231,7 @@ export default function EditProjectPage(): JSX.Element {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
     setNewProject((prev) => ({
@@ -385,7 +385,7 @@ export default function EditProjectPage(): JSX.Element {
   };
 
   const handleUpdateProject = async (
-    status: "منشور" | "مسودة" | "Pre-construction",
+    status: "منشور" | "مسودة" | "Pre-construction"
   ) => {
     if (!validateForm()) {
       toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
@@ -419,7 +419,7 @@ export default function EditProjectPage(): JSX.Element {
         if (!thumbnailImage.url.startsWith("https://taearif.com/")) {
           const uploadResult = await uploadSingleFile(
             thumbnailImage.file,
-            "project",
+            "project"
           );
           featuredImagePath = uploadResult.path;
         } else {
@@ -433,7 +433,7 @@ export default function EditProjectPage(): JSX.Element {
         .map((img) => img.url);
 
       const newPlanImages = planImages.filter(
-        (img) => !img.url.startsWith("https://taearif.com/"),
+        (img) => !img.url.startsWith("https://taearif.com/")
       );
       if (newPlanImages.length > 0) {
         const files = newPlanImages.map((image) => image.file);
@@ -453,7 +453,7 @@ export default function EditProjectPage(): JSX.Element {
         .map((img) => img.url);
 
       const newGalleryImages = galleryImages.filter(
-        (img) => !img.url.startsWith("https://taearif.com/"),
+        (img) => !img.url.startsWith("https://taearif.com/")
       );
       if (newGalleryImages.length > 0) {
         const files = newGalleryImages.map((image) => image.file);
@@ -532,8 +532,8 @@ export default function EditProjectPage(): JSX.Element {
       };
 
       const response = await axiosInstance.post(
-        `https://taearif.com/api/projects/${id}`,
-        projectData,
+        `${process.env.NEXT_PUBLIC_Backend_URL}/projects/${id}`,
+        projectData
       );
 
       toast.success("تم تحديث المشروع بنجاح");

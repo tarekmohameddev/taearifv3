@@ -67,7 +67,7 @@ export function AboutCompanyPage() {
     const fetchData = async () => {
       try {
         const response = await axiosInstance.get(
-          "https://taearif.com/api/content/about",
+          `${process.env.NEXT_PUBLIC_Backend_URL}/content/about`
         );
 
         if (response.data.status === "success") {
@@ -115,7 +115,7 @@ export function AboutCompanyPage() {
     setAboutData({
       ...aboutData,
       features: aboutData.features.map((feature) =>
-        feature.id === id ? { ...feature, [field]: value } : feature,
+        feature.id === id ? { ...feature, [field]: value } : feature
       ),
     });
   };
@@ -143,8 +143,8 @@ export function AboutCompanyPage() {
       }
 
       const response = await axiosInstance.post(
-        "https://taearif.com/api/content/about",
-        newAboutData,
+        `${process.env.NEXT_PUBLIC_Backend_URL}/content/about`,
+        newAboutData
       );
       const setpOB = {
         step: "homepage_about_update",
@@ -429,7 +429,7 @@ export function AboutCompanyPage() {
                               updateFeature(
                                 feature.id,
                                 "description",
-                                e.target.value,
+                                e.target.value
                               )
                             }
                           />

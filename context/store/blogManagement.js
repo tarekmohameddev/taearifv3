@@ -23,7 +23,9 @@ module.exports = (set, get) => ({
     }));
 
     try {
-      const response = await axiosInstance.get("https://taearif.com/api/blogs");
+      const response = await axiosInstance.get(
+        `${process.env.NEXT_PUBLIC_Backend_URL}/blogs`
+      );
       set((state) => ({
         blogsData: {
           ...state.blogsData,

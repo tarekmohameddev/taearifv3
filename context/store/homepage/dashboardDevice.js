@@ -16,7 +16,7 @@ module.exports = (set) => ({
     set({ loading: true });
     try {
       const response = await axiosInstance.get(
-        "https://taearif.com/api/dashboard/devices",
+        `${process.env.NEXT_PUBLIC_Backend_URL}/dashboard/devices`
       );
       set((state) => ({
         homepage: {

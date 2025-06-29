@@ -11,11 +11,11 @@ export async function uploadSingleFile(file, context, subFolder = null) {
 
   try {
     const response = await axiosInstance.post(
-      "https://taearif.com/api/upload",
+      `${process.env.NEXT_PUBLIC_Backend_URL}/upload`,
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
-      },
+      }
     );
     return response.data.data;
   } catch (error) {

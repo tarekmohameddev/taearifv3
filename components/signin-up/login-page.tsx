@@ -52,17 +52,17 @@ export function LoginPage() {
   useEffect(() => {
     const fetchGoogleAuthUrl = async () => {
       try {
-        const response = await fetch("https://taearif.com/api/auth/google/redirect");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`
+        );
         const data = await response.json();
         if (data.url) {
           setGoogleAuthUrl(data.url);
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
     fetchGoogleAuthUrl();
   }, []);
-
 
   useEffect(() => {
     if (userData && userData.email) {
@@ -70,23 +70,21 @@ export function LoginPage() {
     }
   }, [userData, router]);
 
-
-
   useEffect(() => {
     if (googleToken) {
       handleGoogleToken(googleToken);
     }
   }, [googleToken]);
-  
+
   // استخراج التوكن من URL في حالة الـ redirect
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-      
-      if (token && window.location.pathname.includes('/oauth/token/success')) {
+      const token = urlParams.get("token");
+
+      if (token && window.location.pathname.includes("/oauth/token/success")) {
         setGoogleToken(token);
-        window.history.replaceState({}, document.title, '/register');
+        window.history.replaceState({}, document.title, "/register");
       }
     }
   }, []);
@@ -98,59 +96,58 @@ export function LoginPage() {
     }));
   };
 
-
   // تسجيل الدخول بالطريقة التقليدية
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  // Validate required fields
-  const newErrors = {
-    email: !formData.email ? "البريد الإلكتروني مطلوب" : "",
-    password: !formData.password ? "كلمة المرور مطلوبة" : "",
-    general: "",
-  };
+    // Validate required fields
+    const newErrors = {
+      email: !formData.email ? "البريد الإلكتروني مطلوب" : "",
+      password: !formData.password ? "كلمة المرور مطلوبة" : "",
+      general: "",
+    };
 
-  setErrors(newErrors);
-  if (Object.values(newErrors).some((error) => error !== "")) return;
+    setErrors(newErrors);
+    if (Object.values(newErrors).some((error) => error !== "")) return;
 
-  // Check if reCAPTCHA is available
-  if (!executeRecaptcha) {
-    setErrors((prev) => ({
-      ...prev,
-      general: "reCAPTCHA غير متاح. يرجى المحاولة لاحقًا.",
-    }));
-    return;
-  }
-
-  setIsLoading(true);
-  try {
-    const token = await executeRecaptcha("login");
-    
-    // استخدام AuthStore للتسجيل (الطريقة الأصلية)
-    const { login } = useAuthStore.getState();
-    const result = await login(formData.email, formData.password, token);
-    
-    if (!result.success) {
+    // Check if reCAPTCHA is available
+    if (!executeRecaptcha) {
       setErrors((prev) => ({
         ...prev,
-        general: result.error || "فشل تسجيل الدخول",
+        general: "reCAPTCHA غير متاح. يرجى المحاولة لاحقًا.",
       }));
-    } else {
-      router.push("/");
+      return;
     }
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "حدث خطأ أثناء الاتصال بالخادم";
-    setErrors((prev) => ({
-      ...prev,
-      general: errorMessage,
-    }));
-  } finally {
-    setIsLoading(false);
-  }
-};
+
+    setIsLoading(true);
+    try {
+      const token = await executeRecaptcha("login");
+
+      // استخدام AuthStore للتسجيل (الطريقة الأصلية)
+      const { login } = useAuthStore.getState();
+      const result = await login(formData.email, formData.password, token);
+
+      if (!result.success) {
+        setErrors((prev) => ({
+          ...prev,
+          general: result.error || "فشل تسجيل الدخول",
+        }));
+      } else {
+        router.push("/");
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "حدث خطأ أثناء الاتصال بالخادم";
+      setErrors((prev) => ({
+        ...prev,
+        general: errorMessage,
+      }));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // تسجيل الدخول بـ Google
   const handleGoogleLogin = async () => {
@@ -158,92 +155,95 @@ const handleSubmit = async (e: React.FormEvent) => {
       console.error("Google auth URL not available");
       return;
     }
-    
-    if (typeof window !== 'undefined') {
+
+    if (typeof window !== "undefined") {
       console.log("test");
       window.location.href = googleAuthUrl;
     }
   };
 
-const handleGoogleToken = async (token: string) => {
-  try {
-    setIsGoogleLoading(true);
-    
-    console.log("Google Token received:", token);
-    console.log("Redirect URL:", redirectUrl);
+  const handleGoogleToken = async (token: string) => {
+    try {
+      setIsGoogleLoading(true);
 
-    // إرسال التوكن إلى الخادم للتحقق منه والتسجيل
-    const response = await fetch("https://taearif.com/api/auth/google/verify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ 
-        token: token,
-        action: "register" // لتمييز عملية التسجيل عن تسجيل الدخول
-      }),
-    });
+      console.log("Google Token received:", token);
+      console.log("Redirect URL:", redirectUrl);
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "فشل في التحقق من التوكن");
+      // إرسال التوكن إلى الخادم للتحقق منه والتسجيل
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/verify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: token,
+            action: "register", // لتمييز عملية التسجيل عن تسجيل الدخول
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "فشل في التحقق من التوكن");
+      }
+
+      const data = await response.json();
+      const { user, token: UserToken } = data;
+
+      // التحقق من وجود البيانات قبل الاستخدام
+      if (!user || !UserToken) {
+        throw new Error("بيانات المستخدم غير مكتملة");
+      }
+
+      // حفظ بيانات المستخدم باستخدام AuthStore
+      const setAuthResponse = await fetch("/api/user/setAuth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user: user,
+          UserToken: UserToken,
+        }),
+      });
+
+      if (!setAuthResponse.ok) {
+        throw new Error("فشل في حفظ بيانات المصادقة");
+      }
+
+      // تحديث الـ AuthStore
+      useAuthStore.setState({
+        UserIslogged: true,
+        userData: {
+          email: user.email || "",
+          token: UserToken,
+          username: user.username || "",
+          first_name: user.first_name || "",
+          last_name: user.last_name || "",
+          onboarding_completed: user.onboarding_completed || false,
+        },
+      });
+
+      // تشغيل fetchUserData للحصول على البيانات الكاملة
+      await useAuthStore.getState().fetchUserData();
+
+      setFormSubmitted(true);
+      setTimeout(() => {
+        router.push("/onboarding");
+      }, 1500);
+    } catch (error) {
+      console.error("OAuth token handling error:", error);
+      setErrors((prev) => ({
+        ...prev,
+        general:
+          error instanceof Error ? error.message : "فشل في التسجيل بـ Google",
+      }));
+    } finally {
+      setIsGoogleLoading(false);
     }
-
-    const data = await response.json();
-    const { user, token: UserToken } = data;
-
-    // التحقق من وجود البيانات قبل الاستخدام
-    if (!user || !UserToken) {
-      throw new Error("بيانات المستخدم غير مكتملة");
-    }
-
-    // حفظ بيانات المستخدم باستخدام AuthStore
-    const setAuthResponse = await fetch("/api/user/setAuth", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user: user,
-        UserToken: UserToken,
-      }),
-    });
-
-    if (!setAuthResponse.ok) {
-      throw new Error("فشل في حفظ بيانات المصادقة");
-    }
-
-    // تحديث الـ AuthStore
-    useAuthStore.setState({
-      UserIslogged: true,
-      userData: {
-        email: user.email || "",
-        token: UserToken,
-        username: user.username || "",
-        first_name: user.first_name || "",
-        last_name: user.last_name || "",
-        onboarding_completed: user.onboarding_completed || false,
-      },
-    });
-
-    // تشغيل fetchUserData للحصول على البيانات الكاملة
-    await useAuthStore.getState().fetchUserData();
-    
-    setFormSubmitted(true);
-    setTimeout(() => {
-      router.push("/onboarding");
-    }, 1500);
-
-  } catch (error) {
-    console.error("OAuth token handling error:", error);
-    setErrors((prev) => ({
-      ...prev,
-      general: error instanceof Error ? error.message : "فشل في التسجيل بـ Google",
-    }));
-  } finally {
-    setIsGoogleLoading(false);
-  }
-};
+  };
 
   return (
     <div
@@ -277,7 +277,10 @@ const handleGoogleToken = async (token: string) => {
 
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-foreground">
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-foreground"
+            >
               البريد الإلكتروني
             </Label>
             <Input
@@ -300,10 +303,16 @@ const handleGoogleToken = async (token: string) => {
           {/* Password Field */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <Link href="/forgot-password" className="text-sm text-foreground hover:underline">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-foreground hover:underline"
+              >
                 نسيت كلمة المرور؟
               </Link>
-              <Label htmlFor="password" className="text-sm font-medium text-foreground">
+              <Label
+                htmlFor="password"
+                className="text-sm font-medium text-foreground"
+              >
                 كلمة المرور
               </Label>
             </div>
@@ -344,7 +353,10 @@ const handleGoogleToken = async (token: string) => {
               checked={formData.rememberMe}
               onCheckedChange={handleCheckboxChange}
             />
-            <Label htmlFor="remember" className="text-sm font-medium cursor-pointer text-foreground">
+            <Label
+              htmlFor="remember"
+              className="text-sm font-medium cursor-pointer text-foreground"
+            >
               تذكرني
             </Label>
           </div>
@@ -356,9 +368,25 @@ const handleGoogleToken = async (token: string) => {
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-background" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-background"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 جاري تسجيل الدخول...
               </div>
@@ -371,7 +399,10 @@ const handleGoogleToken = async (token: string) => {
         <div className="text-center mt-6">
           <p className="text-sm text-muted-foreground">
             ليس لديك حساب؟{" "}
-            <Link href="/register" className="text-foreground font-semibold hover:underline">
+            <Link
+              href="/register"
+              className="text-foreground font-semibold hover:underline"
+            >
               إنشاء حساب جديد
             </Link>
           </p>
@@ -396,14 +427,33 @@ const handleGoogleToken = async (token: string) => {
           disabled={isGoogleLoading}
         >
           {isGoogleLoading ? (
-            <svg className="animate-spin h-4 w-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              className="animate-spin h-4 w-4 ml-2"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
           ) : (
             <>
               <svg className="ml-2 h-4 w-4" viewBox="0 0 488 512">
-                <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
+                <path
+                  fill="currentColor"
+                  d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                ></path>
               </svg>
               Google
             </>
@@ -412,11 +462,17 @@ const handleGoogleToken = async (token: string) => {
 
         <p className="text-xs text-center text-muted-foreground mt-8">
           بالاستمرار، فإنك توافق على{" "}
-          <Link href="/terms" className="text-foreground underline hover:no-underline">
+          <Link
+            href="/terms"
+            className="text-foreground underline hover:no-underline"
+          >
             شروط الخدمة
           </Link>{" "}
           و{" "}
-          <Link href="/privacy" className="text-foreground underline hover:no-underline">
+          <Link
+            href="/privacy"
+            className="text-foreground underline hover:no-underline"
+          >
             سياسة الخصوصية
           </Link>
           .
