@@ -25,6 +25,7 @@ const useAuthStore = create((set, get) => ({
     project_limit_number: null,
     real_estate_limit_number: null,
   },
+  googleUrlFetched: false,
 
   clickedONSubButton: async () => {
     set({ clickedOnSubButton: "subscription" });
@@ -183,6 +184,7 @@ const useAuthStore = create((set, get) => ({
   setUserIsLogged: (isLogged) => set({ UserIslogged: isLogged }),
   setIsLoading: (loading) => set({ IsLoading: loading }),
   setHasAttemptedLogin: (attempted) => set({ hasAttemptedLogin: attempted }),
+  setGoogleUrlFetched: (value) => set({ googleUrlFetched: value }),
 }));
 
 export default useAuthStore;

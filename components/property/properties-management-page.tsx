@@ -70,13 +70,13 @@ import useStore from "@/context/Store";
 import EmptyState from "@/components/empty-state";
 
 // Share Dialog Component
-function ShareDialog({ 
-  isOpen, 
-  onClose, 
-  property 
-}: { 
-  isOpen: boolean; 
-  onClose: () => void; 
+function ShareDialog({
+  isOpen,
+  onClose,
+  property,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
   property: any;
 }) {
   const [copied, setCopied] = useState(false);
@@ -94,11 +94,11 @@ function ShareDialog({
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(propertyUrl)}`,
-    twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(propertyUrl)}&text=${encodeURIComponent(property?.title || '')}`,
-    whatsapp: `https://wa.me/?text=${encodeURIComponent(`${property?.title || ''} ${propertyUrl}`)}`,
-    telegram: `https://t.me/share/url?url=${encodeURIComponent(propertyUrl)}&text=${encodeURIComponent(property?.title || '')}`,
+    twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(propertyUrl)}&text=${encodeURIComponent(property?.title || "")}`,
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(`${property?.title || ""} ${propertyUrl}`)}`,
+    telegram: `https://t.me/share/url?url=${encodeURIComponent(propertyUrl)}&text=${encodeURIComponent(property?.title || "")}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(propertyUrl)}`,
-    email: `mailto:?subject=${encodeURIComponent(property?.title || 'عقار مميز')}&body=${encodeURIComponent(`شاهد هذا العقار: ${propertyUrl}`)}`,
+    email: `mailto:?subject=${encodeURIComponent(property?.title || "عقار مميز")}&body=${encodeURIComponent(`شاهد هذا العقار: ${propertyUrl}`)}`,
   };
 
   if (!isOpen) return null;
@@ -113,9 +113,9 @@ function ShareDialog({
         >
           <X className="h-5 w-5" />
         </button>
-        
+
         <h3 className="text-xl font-semibold mb-4 text-center">شارك العقار</h3>
-        
+
         <div className="grid grid-cols-3 gap-4 mb-6">
           <a
             href={shareLinks.facebook}
@@ -124,13 +124,17 @@ function ShareDialog({
             className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              <svg
+                className="w-6 h-6 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
             </div>
             <span className="text-sm">فيسبوك</span>
           </a>
-          
+
           <a
             href={shareLinks.twitter}
             target="_blank"
@@ -138,13 +142,17 @@ function ShareDialog({
             className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              <svg
+                className="w-6 h-6 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
             </div>
             <span className="text-sm">إكس</span>
           </a>
-          
+
           <a
             href={shareLinks.whatsapp}
             target="_blank"
@@ -152,13 +160,17 @@ function ShareDialog({
             className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+              <svg
+                className="w-6 h-6 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
               </svg>
             </div>
             <span className="text-sm">واتساب</span>
           </a>
-          
+
           <a
             href={shareLinks.telegram}
             target="_blank"
@@ -166,13 +178,17 @@ function ShareDialog({
             className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <div className="w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+              <svg
+                className="w-6 h-6 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
               </svg>
             </div>
             <span className="text-sm">تيليجرام</span>
           </a>
-          
+
           <a
             href={shareLinks.linkedin}
             target="_blank"
@@ -180,26 +196,40 @@ function ShareDialog({
             className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <div className="w-12 h-12 bg-blue-700 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              <svg
+                className="w-6 h-6 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
               </svg>
             </div>
             <span className="text-sm">لينكدإن</span>
           </a>
-          
+
           <a
             href={shareLinks.email}
             className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
               </svg>
             </div>
             <span className="text-sm">بريد</span>
           </a>
         </div>
-        
+
         <div className="border-t pt-4">
           <button
             onClick={handleCopyLink}
@@ -207,8 +237,18 @@ function ShareDialog({
           >
             {copied ? (
               <>
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-5 h-5 text-green-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 <span>تم النسخ!</span>
               </>
@@ -226,14 +266,14 @@ function ShareDialog({
 }
 
 // Pagination Component
-function Pagination({ 
-  currentPage, 
-  totalPages, 
-  onPageChange, 
-  totalItems, 
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  totalItems,
   itemsPerPage,
   from,
-  to 
+  to,
 }: {
   currentPage: number;
   totalPages: number;
@@ -245,10 +285,10 @@ function Pagination({
 }) {
   const pages = [];
   const maxVisiblePages = 5;
-  
+
   let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
   let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-  
+
   if (endPage - startPage + 1 < maxVisiblePages) {
     startPage = Math.max(1, endPage - maxVisiblePages + 1);
   }
@@ -262,7 +302,7 @@ function Pagination({
       <div className="text-sm text-muted-foreground">
         عرض {from} إلى {to} من {totalItems} عقار
       </div>
-      
+
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
@@ -272,7 +312,7 @@ function Pagination({
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        
+
         {startPage > 1 && (
           <>
             <Button
@@ -285,7 +325,7 @@ function Pagination({
             {startPage > 2 && <span className="px-2">...</span>}
           </>
         )}
-        
+
         {pages.map((page) => (
           <Button
             key={page}
@@ -296,7 +336,7 @@ function Pagination({
             {page}
           </Button>
         ))}
-        
+
         {endPage < totalPages && (
           <>
             {endPage < totalPages - 1 && <span className="px-2">...</span>}
@@ -309,7 +349,7 @@ function Pagination({
             </Button>
           </>
         )}
-        
+
         <Button
           variant="outline"
           size="icon"
@@ -350,12 +390,12 @@ function SkeletonPropertyCard() {
   );
 }
 
-const getPaymentMethodText = (paymentMethod) => {
-  const paymentMethods = {
+const getPaymentMethodText = (paymentMethod: any) => {
+  const paymentMethods: { [key: string]: string } = {
     monthly: "شهري",
-    quarterly: "ربع سنوي", 
+    quarterly: "ربع سنوي",
     semi_annual: "نصف سنوي",
-    annual: "سنوي"
+    annual: "سنوي",
   };
   return paymentMethods[paymentMethod] || null;
 };
@@ -383,7 +423,12 @@ export function PropertiesManagementPage() {
     fetchProperties,
   } = useStore();
 
-  const normalizeStatus = (status) => {
+  const [reorderPopup, setReorderPopup] = useState<{
+    open: boolean;
+    type: "featured" | "normal";
+  }>({ open: false, type: "normal" });
+
+  const normalizeStatus = (status: any) => {
     if (status === "1" || status === 1) return "منشور";
     if (status === "0" || status === 0) return "مسودة";
     return status;
@@ -395,7 +440,7 @@ export function PropertiesManagementPage() {
   };
 
   const normalizedProperties = useMemo(() => {
-    return properties.map((property) => ({
+    return properties.map((property: any) => ({
       ...property,
       status: normalizeStatus(property.status),
     }));
@@ -411,7 +456,7 @@ export function PropertiesManagementPage() {
 
   const toggleFavorite = (id: string) => {
     const newFavorites = favorites.includes(id)
-      ? favorites.filter((item) => item !== id)
+      ? favorites.filter((item: any) => item !== id)
       : [...favorites, id];
     setPropertiesManagement({ favorites: newFavorites });
   };
@@ -422,7 +467,7 @@ export function PropertiesManagementPage() {
       try {
         await axiosInstance.delete(`properties/${id}`);
         toast.success("تم حذف العقار بنجاح");
-        
+
         // إعادة تحميل الصفحة الحالية بعد الحذف
         fetchProperties(currentPage);
       } catch (error) {
@@ -432,7 +477,7 @@ export function PropertiesManagementPage() {
     }
   };
 
-  const handleDuplicateProperty = async (property) => {
+  const handleDuplicateProperty = async (property: any) => {
     try {
       const duplicateData = {
         title: property.title || property.contents[0].title,
@@ -441,7 +486,7 @@ export function PropertiesManagementPage() {
 
       await axiosInstance.post(
         `/properties/${property.id}/duplicate`,
-        duplicateData,
+        duplicateData
       );
       toast.success("تم مضاعفة العقار بنجاح");
 
@@ -453,19 +498,19 @@ export function PropertiesManagementPage() {
     }
   };
 
-  const handleToggleStatus = async (property) => {
+  const handleToggleStatus = async (property: any) => {
     try {
       await axiosInstance.post(`/properties/${property.id}/toggle-status`);
 
       const newStatus = property.status === "منشور" ? "مسودة" : "منشور";
       toast.success(
-        `تم ${property.status === "منشور" ? "إلغاء النشر" : "النشر"} بنجاح`,
+        `تم ${property.status === "منشور" ? "إلغاء النشر" : "النشر"} بنجاح`
       );
 
       // تحديث حالة العقار في القائمة المحلية
       setPropertiesManagement({
-        properties: properties.map((p) =>
-          p.id === property.id ? { ...p, status: newStatus } : p,
+        properties: properties.map((p: any) =>
+          p.id === property.id ? { ...p, status: newStatus } : p
         ),
       });
     } catch (error) {
@@ -502,6 +547,11 @@ export function PropertiesManagementPage() {
       ))}
     </div>
   );
+
+  const reorderList =
+    reorderPopup.type === "featured"
+      ? normalizedProperties.filter((p) => p.featured)
+      : normalizedProperties;
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
@@ -714,6 +764,7 @@ export function PropertiesManagementPage() {
                 <TabsContent value="all" className="mt-4">
                   {normalizedProperties.length === 0 ? (
                     <EmptyState
+                      type={undefined as any}
                       message="لا يوجد عقارات"
                       description="قم بإضافة عقارات جديدة"
                     />
@@ -721,40 +772,42 @@ export function PropertiesManagementPage() {
                     <>
                       {viewMode === "grid" ? (
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                          {normalizedProperties.map((property) => (
+                          {normalizedProperties.map((property: any) => (
                             <PropertyCard
                               key={property.id}
                               property={property}
                               isFavorite={favorites.includes(
-                                property.id.toString(),
+                                property.id.toString()
                               )}
                               onToggleFavorite={toggleFavorite}
                               onDelete={handleDeleteProperty}
                               onDuplicate={handleDuplicateProperty}
                               onToggleStatus={handleToggleStatus}
                               onShare={handleShare}
-                              onShare={handleShare}
+                              setReorderPopup={setReorderPopup}
                             />
                           ))}
                         </div>
                       ) : (
                         <div className="space-y-4">
-                          {normalizedProperties.map((property) => (
+                          {normalizedProperties.map((property: any) => (
                             <PropertyListItem
                               key={property.id}
                               property={property}
                               isFavorite={favorites.includes(
-                                property.id.toString(),
+                                property.id.toString()
                               )}
                               onToggleFavorite={toggleFavorite}
                               onDelete={handleDeleteProperty}
                               onDuplicate={handleDuplicateProperty}
                               onToggleStatus={handleToggleStatus}
+                              onShare={handleShare}
+                              setReorderPopup={setReorderPopup}
                             />
                           ))}
                         </div>
                       )}
-                      
+
                       {pagination && pagination.last_page > 1 && (
                         <Pagination
                           currentPage={pagination.current_page}
@@ -772,12 +825,92 @@ export function PropertiesManagementPage() {
               </Tabs>
             )}
           </div>
-          
-          <ShareDialog 
-            isOpen={shareDialogOpen} 
-            onClose={() => setShareDialogOpen(false)} 
-            property={selectedProperty} 
+
+          <ShareDialog
+            isOpen={shareDialogOpen}
+            onClose={() => setShareDialogOpen(false)}
+            property={selectedProperty}
           />
+
+          {reorderPopup.open && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div
+                className="absolute inset-0 bg-black/50"
+                onClick={() =>
+                  setReorderPopup({ ...reorderPopup, open: false })
+                }
+              />
+              <div className="relative z-10 bg-white dark:bg-background rounded-lg shadow-xl p-6 w-full max-w-2xl">
+                <h2 className="font-bold mb-4 text-lg text-center">
+                  {reorderPopup.type === "featured"
+                    ? "ترتيب العقارات المميزة"
+                    : "ترتيب العقارات في الوحدات"}
+                </h2>
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                  {reorderList.map((property: any, idx: number) => (
+                    <div
+                      key={property.id}
+                      className="flex items-center justify-between border-b pb-2"
+                    >
+                      <span>
+                        {property.title || property.contents?.[0]?.title}
+                      </span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline">
+                            {property.reorder_featured ||
+                              property.reorder ||
+                              idx + 1}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {[...Array(reorderList.length)].map((_, i) => (
+                            <DropdownMenuItem
+                              key={i}
+                              onClick={async () => {
+                                setReorderPopup({
+                                  open: false,
+                                  type: reorderPopup.type,
+                                });
+                                const toastId = toast.loading(
+                                  "جاري تحديث الترتيب..."
+                                );
+                                try {
+                                  if (reorderPopup.type === "featured") {
+                                    await axiosInstance.post(
+                                      "/properties/reorder-featured",
+                                      [
+                                        {
+                                          id: property.id,
+                                          reorder_featured: i + 1,
+                                        },
+                                      ]
+                                    );
+                                  } else {
+                                    await axiosInstance.post(
+                                      "/properties/reorder",
+                                      [{ id: property.id, reorder: i + 1 }]
+                                    );
+                                  }
+                                  toast.success("تم تحديث الترتيب");
+                                } catch (e) {
+                                  toast.error("حدث خطأ أثناء الترتيب");
+                                } finally {
+                                  toast.dismiss(toastId);
+                                }
+                              }}
+                            >
+                              {i + 1}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>
@@ -792,6 +925,12 @@ interface PropertyCardProps {
   onDuplicate: (property: any) => void;
   onToggleStatus: (property: any) => void;
   onShare: (property: any) => void;
+  setReorderPopup: React.Dispatch<
+    React.SetStateAction<{
+      open: boolean;
+      type: "featured" | "normal";
+    }>
+  >;
 }
 
 function PropertyCard({
@@ -802,7 +941,8 @@ function PropertyCard({
   onDuplicate,
   onToggleStatus,
   onShare,
-}: PropertyCardProps) {
+  setReorderPopup,
+}: PropertyCardProps & { setReorderPopup: any }) {
   const router = useRouter();
 
   return (
@@ -863,6 +1003,28 @@ function PropertyCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
+              {/* ترتيب العقار في الرئيسية */}
+              {property.featured && (
+                <DropdownMenuItem
+                  onClick={() => {
+                    /* TODO: ترتيب العقار في الرئيسية */
+                    setReorderPopup({ open: true, type: "featured" });
+                  }}
+                >
+                  <Grid3X3 className="mr-2 h-4 w-4" />
+                  ترتيب العقار في الرئيسية
+                </DropdownMenuItem>
+              )}
+              {/* ترتيب العقار في الوحدات */}
+              <DropdownMenuItem
+                onClick={() => {
+                  /* TODO: ترتيب العقار في الوحدات */
+                  setReorderPopup({ open: true, type: "normal" });
+                }}
+              >
+                <List className="mr-2 h-4 w-4" />
+                ترتيب العقار في الوحدات
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
                   router.push("/properties/" + property.id + "/edit")
@@ -914,30 +1076,31 @@ function PropertyCard({
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
-      <div className="text-lg font-semibold flex flex-row-reverse gap-1">
-  {property.transaction_type === "sale" || property.purpose === "sale" ? (
-    <>
-      <span>بسعر {property.price.toLocaleString()}</span>
-      <img
-        src="/Saudi_Riyal_Symbol.svg"
-        alt="ريال سعودي"
-        className="w-5 h-5 filter brightness-0 contrast-100"
-      />
-    </>
-  ) : (
-    <>
-      <span>بسعر {property.price.toLocaleString()}</span>
-      <img
-        src="/Saudi_Riyal_Symbol.svg"
-        alt="ريال سعودي"
-        className="w-5 h-5 filter brightness-0 contrast-100"
-      />
-      {getPaymentMethodText(property.payment_method) && (
-        <span>{getPaymentMethodText(property.payment_method)}/</span>
-      )}
-    </>
-  )}
-</div>
+        <div className="text-lg font-semibold flex flex-row-reverse gap-1">
+          {property.transaction_type === "sale" ||
+          property.purpose === "sale" ? (
+            <>
+              <span>بسعر {property.price.toLocaleString()}</span>
+              <img
+                src="/Saudi_Riyal_Symbol.svg"
+                alt="ريال سعودي"
+                className="w-5 h-5 filter brightness-0 contrast-100"
+              />
+            </>
+          ) : (
+            <>
+              <span>بسعر {property.price.toLocaleString()}</span>
+              <img
+                src="/Saudi_Riyal_Symbol.svg"
+                alt="ريال سعودي"
+                className="w-5 h-5 filter brightness-0 contrast-100"
+              />
+              {getPaymentMethodText(property.payment_method) && (
+                <span>{getPaymentMethodText(property.payment_method)}/</span>
+              )}
+            </>
+          )}
+        </div>
         <div className="grid grid-cols-3 gap-2 text-sm ">
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">غرفة</span>
@@ -1019,9 +1182,10 @@ function PropertyListItem({
   onDuplicate,
   onToggleStatus,
   onShare,
+  setReorderPopup,
 }: PropertyCardProps) {
   const router = useRouter();
-  
+
   return (
     <Card>
       <div className="flex flex-col sm:flex-row-reverse">
@@ -1075,29 +1239,32 @@ function PropertyListItem({
               </p>
             </div>
             <div className="text-lg font-semibold">
-  {property.transaction_type === "sale" || property.purpose === "sale" ? (
-    <div className="flex items-center gap-1">
-      <img
-        src="/Saudi_Riyal_Symbol.svg"
-        alt="ريال سعودي"
-        className="w-5 h-5 filter brightness-0 contrast-100"
-      />
-      <span>بسعر {property.price.toLocaleString()}</span>
-    </div>
-  ) : (
-    <div className="flex items-center gap-1">
-      {getPaymentMethodText(property.payment_method) && (
-        <span>{getPaymentMethodText(property.payment_method)}/</span>
-      )}
-      <img
-        src="/Saudi_Riyal_Symbol.svg"
-        alt="ريال سعودي"
-        className="w-5 h-5 filter brightness-0 contrast-100"
-      />
-      <span>بسعر {property.price.toLocaleString()}</span>
-    </div>
-  )}
-</div>
+              {property.transaction_type === "sale" ||
+              property.purpose === "sale" ? (
+                <div className="flex items-center gap-1">
+                  <img
+                    src="/Saudi_Riyal_Symbol.svg"
+                    alt="ريال سعودي"
+                    className="w-5 h-5 filter brightness-0 contrast-100"
+                  />
+                  <span>بسعر {property.price.toLocaleString()}</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1">
+                  {getPaymentMethodText(property.payment_method) && (
+                    <span>
+                      {getPaymentMethodText(property.payment_method)}/
+                    </span>
+                  )}
+                  <img
+                    src="/Saudi_Riyal_Symbol.svg"
+                    alt="ريال سعودي"
+                    className="w-5 h-5 filter brightness-0 contrast-100"
+                  />
+                  <span>بسعر {property.price.toLocaleString()}</span>
+                </div>
+              )}
+            </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">
             <div className="flex flex-row-reverse items-center gap-1">
@@ -1118,20 +1285,23 @@ function PropertyListItem({
             </div>
           </div>
           <div className="mt-2 flex flex-wrap gap-1">
-            {property.features && property.features.map((feature: string, index: number) => (
-              <span
-                key={index}
-                className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
-              >
-                {feature}
-              </span>
-            ))}
+            {property.features &&
+              property.features.map((feature: string, index: number) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
+                >
+                  {feature}
+                </span>
+              ))}
           </div>
           <div className="mt-auto pt-4 flex gap-2 justify-end">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
-              onClick={() => router.push("/properties/" + property.id + "/edit")}
+              onClick={() =>
+                router.push("/properties/" + property.id + "/edit")
+              }
             >
               <Edit className="mr-1 h-3.5 w-3.5" />
               تعديل
@@ -1157,6 +1327,27 @@ function PropertyListItem({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                {/* ترتيب العقار في الرئيسية */}
+                {property.featured && (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setReorderPopup({ open: true, type: "featured" });
+                    }}
+                  >
+                    <Grid3X3 className="mr-2 h-4 w-4" />
+                    ترتيب العقار في الرئيسية
+                  </DropdownMenuItem>
+                )}
+                {/* ترتيب العقار في الوحدات */}
+                <DropdownMenuItem
+                  onClick={() => {
+                    /* TODO: ترتيب العقار في الوحدات */
+                    setReorderPopup({ open: true, type: "normal" });
+                  }}
+                >
+                  <List className="mr-2 h-4 w-4" />
+                  ترتيب العقار في الوحدات
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onDuplicate(property)}>
                   <Copy className="mr-2 h-4 w-4" />
                   مضاعفة
@@ -1181,7 +1372,7 @@ function PropertyListItem({
                   onClick={() => onDelete(property.id)}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  حذف
+                  حذف العقار
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

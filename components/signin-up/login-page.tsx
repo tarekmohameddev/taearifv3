@@ -35,6 +35,7 @@ export function LoginPage() {
   const [redirectUrl, setRedirectUrl] = useState<string>("");
   const [googleToken, setGoogleToken] = useState<string>("");
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { googleUrlFetched, setGoogleUrlFetched } = useAuthStore();
 
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,6 +51,7 @@ export function LoginPage() {
     }));
   };
   useEffect(() => {
+    if (googleUrlFetched) return;
     const fetchGoogleAuthUrl = async () => {
       try {
         const response = await fetch(
@@ -62,6 +64,7 @@ export function LoginPage() {
       } catch (error) {}
     };
     fetchGoogleAuthUrl();
+    setGoogleUrlFetched(true);
   }, []);
 
   useEffect(() => {
