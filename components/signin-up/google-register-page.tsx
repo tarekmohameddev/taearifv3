@@ -17,6 +17,7 @@ import axios from "axios";
 interface FormData {
   phone: string;
   subdomain: string;
+  referral_code?: string;
 }
 
 // تعريف واجهة الأخطاء الخاصة بالنموذج
@@ -37,9 +38,12 @@ export function GoogleRegisterPage() {
   // استخراج temp_token من URL
   const tempToken = searchParams.get("temp_token");
 
+  const [referralCodeLocked, setReferralCodeLocked] = useState(false);
+
   const [formData, setFormData] = useState<FormData>({
     phone: "",
     subdomain: "",
+    referral_code: "",
   });
 
   // حالة الأخطاء
@@ -105,15 +109,27 @@ export function GoogleRegisterPage() {
     setSubdomainSuggestions(suggestions);
   }, []);
 
+  // التقاط referral_code من URL عند فتح الصفحة
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("referral_code");
+      if (code) {
+        setFormData((prev) => ({ ...prev, referral_code: code }));
+        setReferralCodeLocked(true);
+      }
+    }
+  }, []);
+
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
+    // لا تسمح بتغيير referral_code إذا كان مقفولاً
+    if (name === "referral_code" && referralCodeLocked) return;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
     // Clear error when typing
     setErrors((prev) => ({
       ...prev,
@@ -177,12 +193,15 @@ export function GoogleRegisterPage() {
         const recaptchaToken = await executeRecaptcha("google_register");
 
         const link = `${process.env.NEXT_PUBLIC_Backend_URL}/register`; // أو أي endpoint مخصص للـ Google register
-        const payload = {
+        const payload: any = {
           phone: formData.phone,
           username: formData.subdomain,
           temp_token: tempToken, // إضافة temp_token هنا
           recaptcha_token: recaptchaToken,
         };
+        if (formData.referral_code) {
+          payload.referral_code = formData.referral_code;
+        }
 
         console.log("🚀 Sending Google registration request...");
 
@@ -457,8 +476,25 @@ export function GoogleRegisterPage() {
               )}
             </div>
 
-            {/* Password Field */}
-            {/* تم حذف حقل كلمة المرور */}
+            {/* Referral Code Field */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="referral_code"
+                className="text-sm font-medium text-foreground"
+              >
+                رمز الإحالة (اختياري)
+              </Label>
+              <Input
+                id="referral_code"
+                name="referral_code"
+                type="text"
+                placeholder="أدخل رمز الإحالة إذا كان لديك"
+                value={formData.referral_code || ""}
+                onChange={handleChange}
+                className="py-5 text-right"
+                disabled={referralCodeLocked}
+              />
+            </div>
 
             {/* API Error Display */}
             {errors.api && (

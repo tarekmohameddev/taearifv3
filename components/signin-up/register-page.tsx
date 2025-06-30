@@ -33,7 +33,8 @@ interface Errors {
 }
 
 export function RegisterPage() {
-  const { UserIslogged } = useAuthStore();
+  const { UserIslogged, googleUrlFetched, setGoogleUrlFetched } =
+    useAuthStore();
   const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
@@ -61,6 +62,7 @@ export function RegisterPage() {
     []
   );
   const [referralCodeLocked, setReferralCodeLocked] = useState(false);
+  const [googleAuthUrl, setGoogleAuthUrl] = useState<string>("");
 
   // Validate email
   const validateEmail = (email: string) => {
@@ -133,6 +135,24 @@ export function RegisterPage() {
     }
   }, [formData.email]);
 
+  // جلب رابط Google OAuth عند فتح الصفحة
+  useEffect(() => {
+    if (googleUrlFetched) return;
+    const fetchGoogleAuthUrl = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`
+        );
+        const data = await response.json();
+        if (data.url) {
+          setGoogleAuthUrl(data.url);
+        }
+      } catch (error) {}
+    };
+    fetchGoogleAuthUrl();
+    setGoogleUrlFetched(true);
+  }, []);
+
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -159,6 +179,17 @@ export function RegisterPage() {
       ...prev,
       subdomain: "",
     }));
+  };
+
+  // تسجيل الدخول بـ Google
+  const handleGoogleLogin = async () => {
+    if (!googleAuthUrl) {
+      console.error("Google auth URL not available");
+      return;
+    }
+    if (typeof window !== "undefined") {
+      window.location.href = googleAuthUrl;
+    }
   };
 
   // Handle form submission - Same as old code
@@ -625,9 +656,7 @@ export function RegisterPage() {
           type="button"
           variant="outline"
           className="w-full py-5 flex items-center justify-center"
-          onClick={() => {
-            // Handle Google sign-in
-          }}
+          onClick={handleGoogleLogin}
         >
           <svg
             className="ml-2 h-4 w-4"
