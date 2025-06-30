@@ -19,6 +19,7 @@ interface FormData {
   phone: string;
   subdomain: string;
   password: string;
+  referral_code?: string;
 }
 
 // تعريف واجهة الأخطاء الخاصة بالنموذج
@@ -40,6 +41,7 @@ export function RegisterPage() {
     phone: "",
     subdomain: "",
     password: "",
+    referral_code: "",
   });
 
   // حالة الأخطاء
@@ -58,6 +60,7 @@ export function RegisterPage() {
   const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>(
     []
   );
+  const [referralCodeLocked, setReferralCodeLocked] = useState(false);
 
   // Validate email
   const validateEmail = (email: string) => {
@@ -104,6 +107,18 @@ export function RegisterPage() {
     }
   }, [UserIslogged]);
 
+  // التقاط referral_code من URL عند فتح الصفحة
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("referral_code");
+      if (code) {
+        setFormData((prev) => ({ ...prev, referral_code: code }));
+        setReferralCodeLocked(true);
+      }
+    }
+  }, []);
+
   // Generate subdomain suggestions based on email
   useEffect(() => {
     if (formData.email && formData.email.includes("@")) {
@@ -121,12 +136,12 @@ export function RegisterPage() {
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
+    // لا تسمح بتغيير referral_code إذا كان مقفولاً
+    if (name === "referral_code" && referralCodeLocked) return;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
     // Clear error when typing
     setErrors((prev) => ({
       ...prev,
@@ -159,6 +174,7 @@ export function RegisterPage() {
       subdomain: validateSubdomain(formData.subdomain),
       password: validatePassword(formData.password),
       general: "",
+      api: "",
     };
     setErrors(newErrors);
 
@@ -180,13 +196,16 @@ export function RegisterPage() {
         const token = await executeRecaptcha("register");
 
         const link = `${process.env.NEXT_PUBLIC_Backend_URL}/register`;
-        const payload = {
+        const payload: any = {
           email: formData.email,
           password: formData.password,
           phone: formData.phone,
           username: formData.subdomain,
           recaptcha_token: token,
         };
+        if (formData.referral_code) {
+          payload.referral_code = formData.referral_code;
+        }
 
         console.log("🚀 Sending registration request...");
 
@@ -509,6 +528,26 @@ export function RegisterPage() {
                   {errors.password}
                 </p>
               )}
+            </div>
+
+            {/* Referral Code Field */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="referral_code"
+                className="text-sm font-medium text-foreground"
+              >
+                رمز الإحالة (اختياري)
+              </Label>
+              <Input
+                id="referral_code"
+                name="referral_code"
+                type="text"
+                placeholder="أدخل رمز الإحالة إذا كان لديك"
+                value={formData.referral_code || ""}
+                onChange={handleChange}
+                className="py-5 text-right"
+                disabled={referralCodeLocked}
+              />
             </div>
 
             {/* API Error Display */}
