@@ -113,7 +113,7 @@ export function RegisterPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      const code = params.get("referral_code");
+      const code = params.get("ref");
       if (code) {
         setFormData((prev) => ({ ...prev, referral_code: code }));
         setReferralCodeLocked(true);
