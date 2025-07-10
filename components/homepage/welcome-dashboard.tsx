@@ -65,6 +65,7 @@ export function WelcomeDashboard() {
 
   // جلب البيانات إذا لم تكن قد تم جلبها بعد
   useEffect(() => {
+    if (!userData?.token) return;
     if (!isDashboardDeviceUpdated) {
       fetchDashboardDevice();
     }
@@ -75,6 +76,7 @@ export function WelcomeDashboard() {
       fetchTrafficSources();
     }
   }, [
+    userData?.token,
     isDashboardDeviceUpdated,
     isDashboardSummaryUpdated,
     isTrafficSourcesUpdated,

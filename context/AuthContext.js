@@ -6,6 +6,7 @@ const useAuthStore = create((set, get) => ({
   UserIslogged: false,
   IsLoading: true,
   IsDone: false,
+  authenticated: false,
   error: null,
   errorLogin: null,
   errorLoginATserver: null,
@@ -40,6 +41,7 @@ const useAuthStore = create((set, get) => ({
       const userInfoResponse = await fetch("/api/user/getUserInfo");
 
       if (!userInfoResponse.ok) {
+        set({ authenticated: false });
         throw new Error("فشل في جلب بيانات المستخدم");
       }
 
@@ -55,6 +57,7 @@ const useAuthStore = create((set, get) => ({
         const ress = await axiosInstance.get("/user");
         const subscriptionDATA = ress.data.data;
         set({
+          authenticated: true,
           userData: {
             ...userData,
             days_remaining: subscriptionDATA.membership.days_remaining || null,
@@ -76,6 +79,7 @@ const useAuthStore = create((set, get) => ({
     } catch (error) {
       set({
         error: error.message || "خطأ في جلب بيانات المستخدم",
+        authenticated: false,
         UserIslogged: false,
       });
       set({ IsDone: false, error: null });
@@ -167,7 +171,7 @@ const useAuthStore = create((set, get) => ({
       });
 
       if (response.ok) {
-        set({ UserIslogged: false, userData: null });
+        set({ UserIslogged: false, authenticated: false, userData: null });
         window.location.href = "/login";
       } else {
         console.error("فشل تسجيل الخروج");
@@ -180,6 +184,7 @@ const useAuthStore = create((set, get) => ({
   // ! --------------set Onboarding Completed
   setOnboardingCompleted: (boolean) => set({ onboarding_completed: boolean }),
   setErrorLogin: (error) => set({ errorLogin: error }),
+  setAuthenticated: (value) => set({ authenticated: value }),
   setUserData: (data) => set({ userData: data }),
   setUserIsLogged: (isLogged) => set({ UserIslogged: isLogged }),
   setIsLoading: (loading) => set({ IsLoading: loading }),

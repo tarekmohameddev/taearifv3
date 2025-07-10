@@ -7,25 +7,18 @@ import "@/app/globals.css";
 import useAuthStore from "@/context/AuthContext";
 import ClientLayout from "./ClientLayout";
 import { Toaster } from "react-hot-toast";
-import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { ReCaptchaWrapper } from "@/components/ReCaptchaWrapper";
-
 export default function RootLayout({ children }) {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 
-  // الحصول على الدوال والبيانات من Zustand
   const fetchUserData = useAuthStore((state) => state.fetchUserData);
-  const UserIslogged = useAuthStore((state) => state.UserIslogged);
-  const IsLoading = useAuthStore((state) => state.IsLoading);
 
-  // عند التركيب (mount)، نقوم بجلب بيانات المستخدم
   useEffect(() => {
     setIsMounted(true);
     fetchUserData();
   }, [fetchUserData]);
 
-  // في حال لم يكن التطبيق مثبت بعد نعرض صفحة فارغة لتجنب مشاكل الترطيب (hydration)
   if (!isMounted) {
     return (
       <html lang="ar" dir="rtl" suppressHydrationWarning>
@@ -44,9 +37,9 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <Toaster />
-          <ReCaptchaWrapper>
-            <ClientLayout>{children}</ClientLayout>
-          </ReCaptchaWrapper>
+            <ReCaptchaWrapper>
+              <ClientLayout>{children}</ClientLayout>
+            </ReCaptchaWrapper>
         </ThemeProvider>
       </body>
     </html>

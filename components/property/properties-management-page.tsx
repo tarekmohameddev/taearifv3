@@ -23,6 +23,7 @@ import {
   X,
   Link2,
   MessageCircle,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -418,6 +419,7 @@ export function PropertiesManagementPage() {
       error,
       isInitialized,
       pagination,
+      propertiesAllData
     },
     setPropertiesManagement,
     fetchProperties,
@@ -857,52 +859,61 @@ export function PropertiesManagementPage() {
                       </span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline">
+                          <Button variant="outline" className="flex justify-evenly">
+                            <div className="w-2">
                             {property.reorder_featured ||
                               property.reorder ||
                               idx + 1}
+                              </div>
+                            <ChevronDown className="-ml-1" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          {[...Array(reorderList.length)].map((_, i) => (
-                            <DropdownMenuItem
-                              key={i}
-                              onClick={async () => {
-                                setReorderPopup({
-                                  open: false,
-                                  type: reorderPopup.type,
-                                });
-                                const toastId = toast.loading(
-                                  "جاري تحديث الترتيب..."
-                                );
-                                try {
-                                  if (reorderPopup.type === "featured") {
-                                    await axiosInstance.post(
-                                      "/properties/reorder-featured",
-                                      [
-                                        {
-                                          id: property.id,
-                                          reorder_featured: i + 1,
-                                        },
-                                      ]
-                                    );
-                                  } else {
-                                    await axiosInstance.post(
-                                      "/properties/reorder",
-                                      [{ id: property.id, reorder: i + 1 }]
-                                    );
+                          {(() => {
+                            // تحديد العدد بناءً على نوع الترتيب
+                            let itemCount = reorderPopup.type === "featured"
+                              ? propertiesAllData?.total_reorder_featured || reorderList.length
+                              : pagination?.total || reorderList.length;
+                            return [...Array(itemCount)].map((_, i) => (
+                              <DropdownMenuItem
+                                key={i}
+                                onClick={async () => {
+                                  setReorderPopup({
+                                    open: false,
+                                    type: reorderPopup.type,
+                                  });
+                                  const toastId = toast.loading(
+                                    "جاري تحديث الترتيب..."
+                                  );
+                                  try {
+                                    if (reorderPopup.type === "featured") {
+                                      await axiosInstance.post(
+                                        "/properties/reorder-featured",
+                                        [
+                                          {
+                                            id: property.id,
+                                            reorder_featured: i + 1,
+                                          },
+                                        ]
+                                      );
+                                    } else {
+                                      await axiosInstance.post(
+                                        "/properties/reorder",
+                                        [{ id: property.id, reorder: i + 1 }]
+                                      );
+                                    }
+                                    toast.success("تم تحديث الترتيب");
+                                  } catch (e) {
+                                    toast.error("حدث خطأ أثناء الترتيب");
+                                  } finally {
+                                    toast.dismiss(toastId);
                                   }
-                                  toast.success("تم تحديث الترتيب");
-                                } catch (e) {
-                                  toast.error("حدث خطأ أثناء الترتيب");
-                                } finally {
-                                  toast.dismiss(toastId);
-                                }
-                              }}
-                            >
-                              {i + 1}
-                            </DropdownMenuItem>
-                          ))}
+                                }}
+                              >
+                                {i + 1}
+                              </DropdownMenuItem>
+                            ));
+                          })()}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>

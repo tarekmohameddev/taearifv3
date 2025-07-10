@@ -86,14 +86,14 @@ export function RegisterPage() {
   const validateSubdomain = (subdomain: string) => {
     // Check for Arabic characters
     const arabicRegex = /[\u0600-\u06FF]/;
-    // Check for valid domain format (letters, numbers, hyphens, no spaces)
-    const subdomainRegex = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/;
-
+    // Check for valid domain format (letters any case, numbers, hyphens, no spaces)
+    const subdomainRegex = /^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/;
+  
     if (!subdomain) return "اسم موقعك الإلكتروني مطلوب";
     if (arabicRegex.test(subdomain))
       return "لا يمكن استخدام الأحرف العربية في اسم الموقع";
     if (!subdomainRegex.test(subdomain))
-      return "اسم الموقع يجب أن يحتوي على أحرف إنجليزية صغيرة وأرقام وشرطات فقط";
+      return "اسم الموقع يجب أن يحتوي على أحرف وأرقام وشرطات فقط (بدون مسافات أو رموز خاصة)";
     return "";
   };
 
@@ -125,11 +125,11 @@ export function RegisterPage() {
   useEffect(() => {
     if (formData.email && formData.email.includes("@")) {
       const username = formData.email.split("@")[0];
-      // Generate suggestions based on email username
+      // لا تحول الحروف إلى صغيرة
       const suggestions = [
-        username.toLowerCase().replace(/[^a-z0-9]/g, "-"),
-        `${username.toLowerCase().replace(/[^a-z0-9]/g, "-")}-site`,
-        `my-${username.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
+        username.replace(/[^A-Za-z0-9]/g, "-"),
+        `${username.replace(/[^A-Za-z0-9]/g, "-")}-site`,
+        `my-${username.replace(/[^A-Za-z0-9]/g, "-")}`,
       ];
       setSubdomainSuggestions(suggestions);
     }
@@ -225,7 +225,6 @@ export function RegisterPage() {
 
         // الحصول على رمز reCAPTCHA
         const token = await executeRecaptcha("register");
-
         const link = `${process.env.NEXT_PUBLIC_Backend_URL}/register`;
         const payload: any = {
           email: formData.email,
@@ -248,7 +247,6 @@ export function RegisterPage() {
           throw new Error(response.data.message || "فشل تسجيل الدخول");
         }
 
-        console.log("✅ Registration response:", response.data);
 
         const { user, token: UserToken } = response.data;
 
@@ -296,7 +294,17 @@ export function RegisterPage() {
           const errorMessage = error.response?.data?.message || error.message;
           console.error("❌ Axios error:", errorMessage);
 
-          if (errorMessage.includes("The email has already been taken")) {
+          if (errorMessage === "Invalid referral code.") {
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              api: "رمز الإحالة غير صحيح، تأكد منه أو اتركه فارغًا.."
+            }));
+          } else if (/recaptcha failed/i.test(errorMessage)) {
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              api: "فشل التحقق من reCAPTCHA. يرجى إعادة المحاولة أو تحديث الصفحة."
+            }));
+          } else if (errorMessage.includes("The email has already been taken")) {
             setErrors((prevErrors) => ({
               ...prevErrors,
               api: "هذا البريد الإلكتروني مسجل بالفعل.",

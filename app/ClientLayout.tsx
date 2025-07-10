@@ -54,6 +54,7 @@ export default function ClientLayout({
   
 
   useEffect(() => {
+    console.log("pathname", pathname);
     async function fetchUser() {
       if (isMounted && !IsLoading && UserIslogged && !onboardingCompleted) {
         if (router.asPath !== "/onboarding") {

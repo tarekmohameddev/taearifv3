@@ -10,6 +10,7 @@ module.exports = (set) => ({
     error: null,
     isInitialized: false,
     pagination: null,
+    propertiesAllData: null,
   },
 
   setPropertiesManagement: (newState) =>
@@ -37,6 +38,7 @@ module.exports = (set) => ({
 
       const propertiesList = response.data.data.properties || [];
       const pagination = response.data.data.pagination || null;
+      const propertiesAllData = response.data.data || null;
 
       const mappedProperties = propertiesList.map((property) => ({
         ...property,
@@ -55,6 +57,7 @@ module.exports = (set) => ({
           ...state.propertiesManagement,
           properties: mappedProperties,
           pagination: pagination, // إضافة بيانات الـ pagination
+          propertiesAllData: propertiesAllData, // إضافة بيانات الـ propertiesAllData
           loading: false,
           isInitialized: true,
         },
