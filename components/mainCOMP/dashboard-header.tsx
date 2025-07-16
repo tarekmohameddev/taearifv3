@@ -42,6 +42,17 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import useAuthStore from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import useStore from "@/context/Store";
+
+// نوع عنصر القائمة الجانبية (يمكنك تعديله حسب تعريفك الفعلي)
+type MainNavItem = {
+  id: string;
+  label: string;
+  description?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  path: string;
+  isAPP?: boolean;
+};
 
 interface DashboardHeaderProps {
   children?: ReactNode;
@@ -50,10 +61,13 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ children }: DashboardHeaderProps) {
   const { userData, fetchUserData, clickedONSubButton } = useAuthStore();
   const router = useRouter();
+  const { sidebarData, fetchSideMenus } = useStore();
+  const { mainNavItems, loading, error } = sidebarData;
 
   useEffect(() => {
     fetchUserData();
-  }, [fetchUserData]);
+    fetchSideMenus();
+  }, [fetchUserData, fetchSideMenus]);
 
   const clickedONButton = async () => {
     clickedONSubButton();
@@ -115,61 +129,40 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                   </div>
                   <div className="flex-1 overflow-auto py-2">
                     <nav className="grid gap-1 px-2">
-                      {[
-                        {
-                          id: "dashboard",
-                          label: "لوحة التحكم",
-                          description: "نظرة عامة على الموقع",
-                          icon: Home,
-                          path: "/",
-                        },
-                        {
-                          id: "content",
-                          label: "إدارة المحتوى",
-                          description: "إدارة محتوى موقعك",
-                          icon: FileText,
-                          path: "/content",
-                        },
-                        {
-                          id: "blog",
-                          label: "المدونة",
-                          description: "إدارة مدونتك",
-                          icon: FileText,
-                          path: "/blog",
-                        },
-                        {
-                          id: "projects",
-                          label: "المشاريع",
-                          description: "إدارة مشاريعك",
-                          icon: Building2,
-                          path: "/projects",
-                        },
-                        {
-                          id: "properties",
-                          label: "العقارات",
-                          description: "إدارة عقاراتك",
-                          icon: Home,
-                          path: "/properties",
-                        },
-                        {
-                          id: "settings",
-                          label: "إعدادات الموقع",
-                          description: "تكوين موقعك",
-                          icon: Settings,
-                          path: "/settings",
-                        },
-                      ].map((item) => (
-                        <Button
-                          key={item.id}
-                          variant="ghost"
-                          className="justify-start gap-2"
-                          asChild
-                        >
-                          <Link href={item.path}>
+                      {error && (
+                        <div className="px-3 py-2">
+                          <span className="text-sm text-red-500">{error}</span>
+                        </div>
+                      )}
+                      {!loading && !error && mainNavItems && mainNavItems.map((item: MainNavItem) => (
+                        item.isAPP ? (
+                          <Button
+                            key={item.id}
+                            variant="ghost"
+                            className="justify-start gap-2"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const token = useAuthStore.getState().token;
+                              const url = `${item.path}?token=${token}`;
+                              window.open(url, '_blank');
+                            }}
+                          >
                             <item.icon className="h-4 w-4" />
                             {item.label}
-                          </Link>
-                        </Button>
+                          </Button>
+                        ) : (
+                          <Button
+                            key={item.id}
+                            variant="ghost"
+                            className="justify-start gap-2"
+                            asChild
+                          >
+                            <Link href={item.path}>
+                              <item.icon className="h-4 w-4" />
+                              {item.label}
+                            </Link>
+                          </Button>
+                        )
                       ))}
                     </nav>
                   </div>
