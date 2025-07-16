@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
+import { CheckCircle2, AlertCircle } from "lucide-react"
 
 export function WhatsappAiPage() {
   // Set default to 'support' and 'official'
@@ -134,9 +135,72 @@ export function WhatsappAiPage() {
               <TabsContent value="link-phone" className="space-y-6 mt-6">
                 {/* Enhanced Progress Indicator - Mobile Responsive */}
                 {isPending ?  (
-        <div className="flex text-center items-center justify-center">
-          <div className="text-2xl font-bold mb-4 text-red-500">{pendingMessage}</div>
-      </div>) :  (<>
+      <div className="min-h-screen  flex items-center justify-center p-4">
+        <Card className="w-full max-w-md mx-auto border-0 shadow-2xl bg-gradient-to-br from-white via-blue-50 to-indigo-100 backdrop-blur-xl">
+          <CardContent className="p-8 text-center">
+            {/* الأيقونة المتحركة */}
+            <div className="relative mb-6">
+              <div className="w-20 h-20 mx-auto bg-gradient-to-r from-amber-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
+                <Clock className="w-8 h-8 text-white" />
+              </div>
+              {/* الدوائر المتحركة */}
+              <div className="absolute inset-0 w-20 h-20 mx-auto">
+                <div className="absolute inset-0 rounded-full border-4 border-amber-200 animate-ping"></div>
+                <div className="absolute inset-2 rounded-full border-2 border-orange-300 animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* النص الرئيسي */}
+            <h2 className="text-2xl font-bold text-gray-800 mb-3" dir="rtl">
+              طلب الربط قيد الانتظار
+            </h2>
+
+            {/* النص الفرعي */}
+            <p className="text-gray-600 mb-4 leading-relaxed" dir="rtl">
+              تم إرسال طلبك بنجاح وهو الآن في انتظار المراجعة والموافقة
+            </p>
+
+            {/* معلومات المدة الزمنية */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-center mb-2">
+                <AlertCircle className="w-5 h-5 text-amber-600 ml-2" />
+                <span className="text-amber-800 font-semibold" dir="rtl">
+                  المدة المتوقعة
+                </span>
+              </div>
+              <p className="text-amber-700 text-sm" dir="rtl">
+                سيتم الرد على طلبك خلال 24 ساعة من تاريخ الإرسال
+              </p>
+            </div>
+
+            {/* معلومات إضافية */}
+            <div className="text-right mb-6" dir="rtl">
+              <h3 className="font-semibold text-gray-700 mb-2">ما يحدث الآن:</h3>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• تم استلام طلبك</li>
+                <li>• جاري مراجعة البيانات</li>
+                <li>• في انتظار الموافقة النهائية</li>
+              </ul>
+            </div>
+
+            {/* مؤشر الحالة */}
+            <div className="flex justify-center items-center space-x-2 mb-4" dir="rtl">
+              <div className="flex space-x-1">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse"></div>
+                <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
+              </div>
+              <span className="text-xs text-gray-500 mr-3">مرحلة المراجعة</span>
+            </div>
+
+            {/* رسالة إضافية */}
+            <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg" dir="rtl">
+              💡 ستصلك رسالة تأكيد عبر البريد الإلكتروني فور الموافقة على الطلب
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    ) :  (<>
 
                 <Card>
                   <CardHeader>
