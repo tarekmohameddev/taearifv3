@@ -11,9 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Search, ArrowUpDown, Calendar, CheckCircle, XCircle, Clock, Copy, Share2, Link2, Download } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast, Toaster } from "react-hot-toast"
 import axiosInstance from "@/lib/axiosInstance"
-import { Toaster } from "react-hot-toast"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function AffiliateDashboardPage() {
@@ -46,13 +45,18 @@ export function AffiliateDashboardPage() {
   const referrals = dashboardData?.referrals || []
   const paymentHistory = dashboardData?.payment_history || []
   const stats = {
-    totalEarnings: Number(dashboardData?.total_commissions || 0),
-    thisMonthEarnings: Number(dashboardData?.collected_payments_count || 0),
-    pendingPayment: Number(dashboardData?.pending_amount || 0),
+    totalCommissions: Number(dashboardData?.total_commissions || 0),
+    totalReferrals: Number(dashboardData?.total_referrals || 0),
+    paidSubscribers: Number(dashboardData?.paid_subscribers_count || 0),
+    pendingPayments: Number(dashboardData?.pending_payments_count || 0),
+    collectedPayments: Number(dashboardData?.collected_payments_count || 0),
+    pendingAmount: Number(dashboardData?.pending_amount || 0),
+    availableAmount: Number(dashboardData?.available_amount || 0),
+    endOfMonthPayment: Number(dashboardData?.end_of_month_payment || 0),
   }
   const affiliateData = {
     referralCode: dashboardData?.referral_code,
-    affiliateLink: dashboardData?.referral_code ? `https://example.com?ref=${dashboardData.referral_code}` : "-"
+    affiliateLink: dashboardData?.referral_code ? `https://taearif.vercel.app/register?ref=${dashboardData.referral_code}` : "-"
   }
   const currentBalance = {
     pending: Number(dashboardData?.pending_amount || 0),
@@ -65,33 +69,33 @@ export function AffiliateDashboardPage() {
   const filteredAndSortedReferrals = referrals
     .filter((referral: any) => {
       const matchesSearch =
-        (referral.username || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (referral.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         (referral.email || "").toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesStatus = statusFilter === "all" || referral.paymentStatus === statusFilter
+      const matchesStatus = statusFilter === "all" || referral.status === statusFilter
       return matchesSearch && matchesStatus
     })
     .sort((a: any, b: any) => {
       let aValue, bValue
       switch (sortBy) {
         case "name":
-          aValue = a.username
-          bValue = b.username
+          aValue = a.name
+          bValue = b.name
           break
         case "email":
           aValue = a.email
           bValue = b.email
           break
         case "date":
-          aValue = new Date(a.registrationDate)
-          bValue = new Date(b.registrationDate)
+          aValue = new Date(a.joined_at)
+          bValue = new Date(b.joined_at)
           break
         case "amount":
-          aValue = a.amount
-          bValue = b.amount
+          aValue = Number(a.collected_commission) + Number(a.pending_commission)
+          bValue = Number(b.collected_commission) + Number(b.pending_commission)
           break
         default:
-          aValue = a.registrationDate
-          bValue = b.registrationDate
+          aValue = a.joined_at
+          bValue = b.joined_at
       }
       if (sortOrder === "asc") {
         return aValue > bValue ? 1 : -1
@@ -103,16 +107,9 @@ export function AffiliateDashboardPage() {
   const copyToClipboard = async (text: string, type: string) => {
     try {
       await navigator.clipboard.writeText(text)
-      toast({
-        title: "تم النسخ بنجاح",
-        description: `تم نسخ ${type} إلى الحافظة`,
-      })
+      toast(`تم نسخ ${type} إلى الحافظة بنجاح`)
     } catch (err) {
-      toast({
-        title: "خطأ في النسخ",
-        description: "حدث خطأ أثناء نسخ النص",
-        variant: "destructive",
-      })
+      toast("حدث خطأ أثناء نسخ النص")
     }
   }
 
@@ -255,7 +252,7 @@ export function AffiliateDashboardPage() {
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalEarnings.toLocaleString()} ريال</div>
+                  <div className="text-2xl font-bold">{stats.totalCommissions} ريال</div>
                   <p className="text-xs text-muted-foreground">+12.5% من الشهر الماضي</p>
                 </CardContent>
               </Card>
@@ -266,7 +263,7 @@ export function AffiliateDashboardPage() {
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.thisMonthEarnings.toLocaleString()} ريال</div>
+                  <div className="text-2xl font-bold">{stats.endOfMonthPayment} ريال</div>
                   <p className="text-xs text-muted-foreground">+8.2% من الشهر الماضي</p>
                 </CardContent>
               </Card>
@@ -393,24 +390,24 @@ export function AffiliateDashboardPage() {
                 {/* Summary Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div className="p-4 border rounded-lg text-center">
-                    <p className="text-2xl font-bold">{referrals.length}</p>
+                    <p className="text-2xl font-bold">{stats.totalReferrals}</p>
                     <p className="text-sm text-muted-foreground">إجمالي المحالين</p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <p className="text-2xl font-bold text-green-600">
-                      {referrals.filter((r: any) => r.paymentStatus === "paid").length}
+                      {stats.paidSubscribers}
                     </p>
                     <p className="text-sm text-muted-foreground">عملاء مدفوعين</p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <p className="text-2xl font-bold text-yellow-600">
-                      {referrals.filter((r: any) => r.paymentStatus === "pending").length}
+                      {stats.pendingPayments}
                     </p>
                     <p className="text-sm text-muted-foreground">دفعات معلقة</p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <p className="text-2xl font-bold">
-                      {referrals.reduce((sum: number, r: any) => sum + r.commissionEarned, 0).toFixed(2)} ريال
+                      {referrals.reduce((sum: number, r: any) => sum + Number(r.collected_commission) + Number(r.pending_commission), 0).toFixed(2)} ريال
                     </p>
                     <p className="text-sm text-muted-foreground">إجمالي العمولات</p>
                   </div>
@@ -439,18 +436,18 @@ export function AffiliateDashboardPage() {
                         ) : (
                           filteredAndSortedReferrals.map((referral: any) => (
                             <TableRow key={referral.id}>
-                              <TableCell className="font-medium">{referral.username}</TableCell>
+                              <TableCell className="font-medium">{referral.name}</TableCell>
                               <TableCell>
                                 <div className="flex items-center gap-2">
                                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                                  {referral.registrationDate}
+                                  {referral.joined_at}
                                 </div>
                               </TableCell>
-                              <TableCell>{referral.amount > 0 ? `${referral.amount} ريال` : "-"}</TableCell>
+                              <TableCell>{Number(referral.collected_commission) + Number(referral.pending_commission)} ريال</TableCell>
                               <TableCell className="font-medium text-green-600">
-                                {referral.commissionEarned > 0 ? `${referral.commissionEarned.toFixed(2)} ريال` : "-"}
+                                {Number(referral.collected_commission).toFixed(2)} ريال
                               </TableCell>
-                              <TableCell>{getPaymentStatusBadge(referral.paymentStatus)}</TableCell>
+                              <TableCell>{getPaymentStatusBadge(referral.status)}</TableCell>
                             </TableRow>
                           ))
                         )}
@@ -485,7 +482,7 @@ export function AffiliateDashboardPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-orange-600">
-                        {currentBalance.pending.toLocaleString()} ريال
+                        {currentBalance.pending} ريال
                       </div>
                       <p className="text-xs text-muted-foreground">سيتم الدفع في {currentBalance.nextPaymentDate}</p>
                     </CardContent>
@@ -498,7 +495,7 @@ export function AffiliateDashboardPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-green-600">
-                        {currentBalance.available.toLocaleString()} ريال
+                        {currentBalance.available} ريال
                       </div>
                       <p className="text-xs text-muted-foreground">متاح للسحب الآن</p>
                     </CardContent>
@@ -527,15 +524,15 @@ export function AffiliateDashboardPage() {
                             <CheckCircle className="h-5 w-5 text-green-600" />
                           </div>
                           <div>
-                            <p className="font-medium">{payment.amount.toLocaleString()} ريال</p>
+                            <p className="font-medium">{payment.amount} ريال</p>
                             <p className="text-sm text-muted-foreground">
-                              {payment.date} • {payment.method}
+                              {payment.type} • {payment.date}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
                           {getPaymentHistoryStatusBadge(payment.status)}
-                          <p className="text-xs text-muted-foreground mt-1">{payment.reference}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{payment.note}</p>
                         </div>
                       </div>
                     ))}
