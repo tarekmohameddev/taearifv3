@@ -52,6 +52,8 @@ const useAuthStore = create((set, get) => ({
           ...userData,
           onboarding_completed: userData.onboarding_completed || false,
         },
+       IsLoading: true,
+       error: null 
       });
       if (get().userData.is_free_plan == null) {
         const ress = await axiosInstance.get("/user");

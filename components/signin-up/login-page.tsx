@@ -69,6 +69,7 @@ export function LoginPage() {
 
   useEffect(() => {
     if (userData && userData.email) {
+      console.log("userData", userData);
       router.push("/");
     }
   }, [userData, router]);
