@@ -54,7 +54,6 @@ export default function ClientLayout({
   
 
   useEffect(() => {
-    console.log("pathname", pathname);
     async function fetchUser() {
       if (isMounted && !IsLoading && UserIslogged && !onboardingCompleted) {
         if (router.asPath !== "/onboarding") {
@@ -73,7 +72,20 @@ export default function ClientLayout({
     }
     fetchUser();
   }, [isMounted, IsLoading, UserIslogged, router, onboardingCompleted]);
+  
+  
+  useEffect(() => {
+    if (
+      (pathname?.startsWith("/login"))
+    ) {
+      if (userData && userData.email) {
+        router.push("/");
+      }
+    }
+  }, [userData, router]);
 
+
+  
   if (
     !UserIslogged &&
     !(pathname?.startsWith("/oauth")) &&

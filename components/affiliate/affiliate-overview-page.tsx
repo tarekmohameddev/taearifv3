@@ -10,23 +10,25 @@ import { Users, DollarSign, TrendingUp, Gift, ArrowRight, CheckCircle, Star, Tar
 import Link from "next/link"
 import axiosInstance from "@/lib/axiosInstance"
 import { useRouter } from "next/navigation"
+import useStore from "@/context/Store";
+import { toast, Toaster } from "react-hot-toast"
+import { Skeleton } from "@/components/ui/skeleton"
+
 
 export function AffiliateOverviewPage() {
-  const [isAffiliate, setIsAffiliate] = useState(false) // This would come from user context
-  const router = useRouter()
+  const { affiliateData: { data, loading }, fetchAffiliateData } = useStore();
+  const router = useRouter();
+  const isAffiliate = !!data;
 
   useEffect(() => {
-    axiosInstance.get("/affiliate")
-      .then((res) => {
-        if (res?.data?.success) {
-          router.push("/affiliate/dashboard")
-        }
-        // إذا لم يكن مسجل (status === 'not_registered') يبقى في الصفحة
-      })
-      .catch((err) => {
-        // optionally handle error, stay on page
-      })
-  }, [router])
+    fetchAffiliateData();
+  }, [fetchAffiliateData]);
+
+  useEffect(() => {
+    if (data) {
+      router.push("/affiliate/dashboard");
+    }
+  }, [data, router]);
 
   const benefits = [
     {
@@ -102,7 +104,49 @@ export function AffiliateOverviewPage() {
     "دعم فني متخصص على مدار الساعة",
     "دفعات شهرية منتظمة",
   ]
-
+  if (loading) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Toaster position="top-center" />
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="space-y-8">
+              {/* Header Skeleton */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <Skeleton className="h-8 w-48 mb-2" />
+                  <Skeleton className="h-5 w-64" />
+                </div>
+                <Skeleton className="h-10 w-32" />
+              </div>
+              {/* Stats Skeleton */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+              </div>
+              {/* Referral Code & Link Skeleton */}
+              <Skeleton className="h-40 w-full" />
+              {/* Referrals Table Skeleton */}
+              <Skeleton className="h-16 w-1/2 mb-2" />
+              <Skeleton className="h-10 w-full mb-2" />
+              <Skeleton className="h-32 w-full" />
+              {/* Payments Section Skeleton */}
+              <Skeleton className="h-10 w-1/3 mb-2" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+              </div>
+              <Skeleton className="h-10 w-1/4 mb-2" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          </main>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader />

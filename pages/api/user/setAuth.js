@@ -1,28 +1,38 @@
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
+import axiosInstance from "@/lib/axiosInstance";
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
     const { user, UserToken } = req.body;
 
     try {
-      if (!user || !UserToken) {
+      if (!UserToken) {
         return res.status(400).json({
           success: false,
           error: "بيانات المستخدم أو التوكن غير موجودة",
         });
       }
       console.log(`UserToken`, UserToken);
-      console.log(`user`, user);
+
+      let userData = user;
+      if (!userData || Object.keys(userData).length === 0) {
+        const response = await axiosInstance.get("/user", {
+          headers: {
+            Authorization: `Bearer ${UserToken}`,
+          },
+        });
+        userData = response.data;
+      }
 
       const token1 = jwt.sign(
         {
-          email: user.email,
+          email: userData.email,
           token: UserToken,
-          username: user.username,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          onboarding_completed: user.onboarding_completed === true,
+          username: userData.username,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          onboarding_completed: userData.onboarding_completed === true,
         },
         process.env.SECRET_KEY,
         { expiresIn: "30d" },
@@ -42,12 +52,12 @@ export default async function handler(req, res) {
       return res.status(200).json({
         success: true,
         user: {
-          email: user.email,
+          email: userData.email,
           token: UserToken,
-          username: user.username,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          onboarding_completed: user.onboarding_completed || false,
+          username: userData.username,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          onboarding_completed: userData.onboarding_completed || false,
         },
       });
     } catch (error) {

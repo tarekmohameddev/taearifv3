@@ -69,7 +69,6 @@ export function LoginPage() {
 
   useEffect(() => {
     if (userData && userData.email) {
-      console.log("userData", userData);
       router.push("/");
     }
   }, [userData, router]);
@@ -92,6 +91,51 @@ export function LoginPage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("token");
+      if (token) {
+        // إزالة التوكن من الـ URL بعد استخدامه (اختياري)
+        window.history.replaceState({}, document.title, "/login");
+
+        // تنظيف التوكن من Bearer إذا كان موجود
+        let cleanToken = token;
+        if (cleanToken.startsWith("Bearer ")) {
+          cleanToken = cleanToken.replace("Bearer ", "");
+        }
+
+        // 1. حفظ التوكن في الstore مباشرة
+        useAuthStore.setState((prev: any) => ({
+          ...prev,
+          userData: {
+            ...prev.userData,
+            token: cleanToken,
+          },
+        }));
+
+        // 2. تسجيل الدخول بالـ token فقط
+        const loginWithToken = async () => {
+          setIsLoading(true);
+          setErrors({ email: "", password: "", general: "" });
+          const { loginWithToken } = useAuthStore.getState();
+          const result = await loginWithToken(cleanToken);
+          setIsLoading(false);
+          if (result.success) {
+            router.push("/");
+          } else {
+            setErrors((prev) => ({
+              ...prev,
+              general: result.error || "فشل تسجيل الدخول بالرمز",
+            }));
+          }
+        };
+        loginWithToken();
+      }
+    }
+  }, []);
+  
   // Handle checkbox change
   const handleCheckboxChange = (checked: boolean) => {
     setFormData((prev) => ({
@@ -161,7 +205,6 @@ export function LoginPage() {
     }
 
     if (typeof window !== "undefined") {
-      console.log("test");
       window.location.href = googleAuthUrl;
     }
   };
@@ -170,8 +213,6 @@ export function LoginPage() {
     try {
       setIsGoogleLoading(true);
 
-      console.log("Google Token received:", token);
-      console.log("Redirect URL:", redirectUrl);
 
       // إرسال التوكن إلى الخادم للتحقق منه والتسجيل
       const response = await fetch(

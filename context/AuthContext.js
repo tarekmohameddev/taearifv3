@@ -148,7 +148,7 @@ const useAuthStore = create((set, get) => ({
         username: user.username,
         first_name: user.first_name,
         last_name: user.last_name,
-        onboarding_completed: user.onboarding_completed || false, // إضافة onboarding_completed
+        onboarding_completed: user.onboarding_completed || false, 
       };
       set({ UserIslogged: true, userData: safeUserData });
       return { success: true };
@@ -192,6 +192,63 @@ const useAuthStore = create((set, get) => ({
   setIsLoading: (loading) => set({ IsLoading: loading }),
   setHasAttemptedLogin: (attempted) => set({ hasAttemptedLogin: attempted }),
   setGoogleUrlFetched: (value) => set({ googleUrlFetched: value }),
+  /**
+   * تسجيل الدخول باستخدام التوكن فقط (بدون recaptcha أو باسورد)
+   * - يحفظ التوكن في الstore
+   * - يجلب بيانات المستخدم من /user
+   * - يحفظ البيانات في الstore
+   * - ينشئ الكوكي بنفس طريقة تسجيل الدخول العادي
+   * @param {string} token - التوكن القادم من URL أو أي مصدر خارجي
+   * @returns {Promise<{success: boolean, error?: string}>}
+   */
+  loginWithToken: async (token) => {
+    try {
+      console.log("token",token)
+      set((state) => ({
+        userData: {
+          ...state.userData,
+          token,
+        },
+      }));
+
+      console.log("done 1111111111")
+
+      const response = await axiosInstance.get("/user");
+      console.log("done 2222222222222222")
+      const user = response.data.data?.user || response.data.data || response.data.user || response.data;
+      console.log("done 33333333333333333")
+
+      set({
+        UserIslogged: true,
+        authenticated: true,
+        userData: {
+          ...user,
+          token,
+          onboarding_completed: user.onboarding_completed || false,
+        },
+      });
+      console.log("done 444444444444444444")
+
+      const setAuthResponse = await fetch("/api/user/setAuth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user, UserToken: token }),
+      });
+      console.log("done 555555555555555")
+
+      if (!setAuthResponse.ok) {
+        const errorData = await setAuthResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || "فشل في تعيين التوكن");
+      }
+
+      return { success: true };
+    } catch (error) {
+      set({ errorLoginATserver: "حدث خطأ أثناء الاتصال بالخادم!" });
+      return { success: false, error: error.message || "خطأ غير معروف" };
+    }
+  },
 }));
 
 export default useAuthStore;

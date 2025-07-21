@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,8 +13,12 @@ import { Toaster, toast } from "react-hot-toast"
 import { ArrowLeft, UserPlus, CreditCard, Shield } from "lucide-react"
 import Link from "next/link"
 import axiosInstance from "@/lib/axiosInstance"
+import useStore from "@/context/Store";
+import { useRouter } from "next/navigation";
 
 export function AffiliateRegistrationPage() {
+  const { affiliateData: { data, loading }, fetchAffiliateData } = useStore();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     bankName: "",
@@ -27,6 +30,16 @@ export function AffiliateRegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isFormDisabled, setIsFormDisabled] = useState(false)
+
+  useEffect(() => {
+    fetchAffiliateData();
+  }, [fetchAffiliateData]);
+
+  useEffect(() => {
+    if (data) {
+      setIsFormDisabled(true);
+    }
+  }, [data]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({
@@ -98,7 +111,11 @@ export function AffiliateRegistrationPage() {
       }
       const res = await axiosInstance.post("/affiliate/register", payload)
       if (res?.data?.status === "success") {
-        toast.success("تم التسجيل بنجاح! سيتم مراجعة طلبك والرد عليك خلال 24-48 ساعة.")
+        toast.success("تم التسجيل بنجاح! سيتم تحويلك للصفحة الان.")
+        setTimeout(() => {
+          router.push("/affiliate/dashboard")
+         }, 2000)
+
         setIsFormDisabled(true)
       } else {
         toast.error(res?.data?.message || "حدث خطأ غير متوقع")

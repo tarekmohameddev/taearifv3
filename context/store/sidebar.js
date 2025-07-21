@@ -9,6 +9,10 @@ import {
   Users,
   ExternalLink,
   LayoutDashboard,
+  LayoutGrid,
+  Dock,
+  Bot,
+  Link as LinkIcon,
 } from "lucide-react";
 
 const getIconComponent = (iconName) => {
@@ -29,8 +33,16 @@ const getIconComponent = (iconName) => {
       return Package;
     case "users":
       return Users;
-    case "external-link":
-      return ExternalLink;
+      case "external-link":
+        return ExternalLink;
+        case "link":
+          return LinkIcon;
+          case "dock":
+            return Dock;
+            case "layout-grid":
+              return LayoutGrid;
+              case "bot":
+                return Bot;
     default:
       return FileText;
   }
@@ -70,7 +82,7 @@ module.exports = (set, get) => ({
         description: section.description,
         icon: getIconComponent(section.icon),
         path: section.path,
-        isAPP: section.isAPP || false, // إضافة خاصية isAPP
+        isAPP: section.isAPP || false, 
       }));
       
       set((state) => ({

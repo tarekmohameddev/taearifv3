@@ -14,10 +14,10 @@ import { Search, ArrowUpDown, Calendar, CheckCircle, XCircle, Clock, Copy, Share
 import { toast, Toaster } from "react-hot-toast"
 import axiosInstance from "@/lib/axiosInstance"
 import { Skeleton } from "@/components/ui/skeleton"
+import useStore from "@/context/Store";
 
 export function AffiliateDashboardPage() {
-  const [dashboardData, setDashboardData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { affiliateData: { data: dashboardData, loading }, fetchAffiliateData } = useStore();
 
   // UI states
   const [searchTerm, setSearchTerm] = useState("")
@@ -26,20 +26,8 @@ export function AffiliateDashboardPage() {
   const [sortOrder, setSortOrder] = useState("desc")
 
   useEffect(() => {
-    setLoading(true)
-    axiosInstance.get("/affiliate")
-      .then(res => {
-        if (res?.data?.success) {
-          setDashboardData(res.data.data)
-        } else {
-          toast.error("فشل في جلب البيانات")
-        }
-      })
-      .catch(() => {
-        toast.error("فشل في جلب البيانات")
-      })
-      .finally(() => setLoading(false))
-  }, [])
+    fetchAffiliateData();
+  }, [fetchAffiliateData]);
 
   // معالجة البيانات
   const referrals = dashboardData?.referrals || []
