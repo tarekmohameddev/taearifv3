@@ -241,7 +241,6 @@ export function AffiliateDashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.totalCommissions} ريال</div>
-                  <p className="text-xs text-muted-foreground">+12.5% من الشهر الماضي</p>
                 </CardContent>
               </Card>
 
@@ -252,7 +251,6 @@ export function AffiliateDashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.endOfMonthPayment} ريال</div>
-                  <p className="text-xs text-muted-foreground">+8.2% من الشهر الماضي</p>
                 </CardContent>
               </Card>
             </div>

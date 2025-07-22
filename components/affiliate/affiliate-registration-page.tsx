@@ -15,6 +15,7 @@ import Link from "next/link"
 import axiosInstance from "@/lib/axiosInstance"
 import useStore from "@/context/Store";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function AffiliateRegistrationPage() {
   const { affiliateData: { data, loading }, fetchAffiliateData } = useStore();
@@ -34,6 +35,12 @@ export function AffiliateRegistrationPage() {
   useEffect(() => {
     fetchAffiliateData();
   }, [fetchAffiliateData]);
+
+  useEffect(() => {
+    if (data) {
+      router.push("/affiliate/dashboard");
+    }
+  }, [data, router]);
 
   useEffect(() => {
     if (data) {
@@ -127,6 +134,50 @@ export function AffiliateRegistrationPage() {
     }
   }
 
+  if (loading || data) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Toaster position="top-center" />
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="space-y-8">
+              {/* Header Skeleton */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <Skeleton className="h-8 w-48 mb-2" />
+                  <Skeleton className="h-5 w-64" />
+                </div>
+                <Skeleton className="h-10 w-32" />
+              </div>
+              {/* Stats Skeleton */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+              </div>
+              {/* Referral Code & Link Skeleton */}
+              <Skeleton className="h-40 w-full" />
+              {/* Referrals Table Skeleton */}
+              <Skeleton className="h-16 w-1/2 mb-2" />
+              <Skeleton className="h-10 w-full mb-2" />
+              <Skeleton className="h-32 w-full" />
+              {/* Payments Section Skeleton */}
+              <Skeleton className="h-10 w-1/3 mb-2" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+              </div>
+              <Skeleton className="h-10 w-1/4 mb-2" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          </main>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <Toaster position="top-center" />
@@ -137,12 +188,6 @@ export function AffiliateRegistrationPage() {
           <div className="max-w-2xl mx-auto space-y-6">
             {/* Header */}
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/affiliate">
-                  <ArrowLeft className="h-4 w-4 ml-1" />
-                  العودة
-                </Link>
-              </Button>
               <div>
                 <h1 className="text-2xl font-bold">انضم إلى برنامج الشراكة</h1>
                 <p className="text-muted-foreground">ابدأ في كسب العمولات من خلال الترويج لخدماتنا</p>
@@ -157,7 +202,7 @@ export function AffiliateRegistrationPage() {
                     <CreditCard className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="font-semibold mb-1">عمولة مجزية</h3>
-                  <p className="text-sm text-muted-foreground">احصل على عمولة تصل إلى 30% من كل عملية بيع</p>
+                  <p className="text-sm text-muted-foreground">احصل على عمولة على كل عملية بيع</p>
                 </CardContent>
               </Card>
               <Card className="text-center">

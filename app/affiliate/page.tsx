@@ -1,5 +1,5 @@
-import { AffiliateOverviewPage } from "@/components/affiliate/affiliate-overview-page"
+import { AffiliateRegistrationPage } from "@/components/affiliate/affiliate-registration-page"
 
 export default function Page() {
-  return <AffiliateOverviewPage />
+  return <AffiliateRegistrationPage />
 }
