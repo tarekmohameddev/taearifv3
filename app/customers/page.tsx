@@ -1,7 +1,5 @@
-import CustomersPage from "@/components/customers-page";
-export const metadata = {
-  title: "Customers",
-};
+import CustomersPage from "@/components/customers/customers-page"
+
 export default function Customers() {
-  return <CustomersPage />;
+  return <CustomersPage />
 }
