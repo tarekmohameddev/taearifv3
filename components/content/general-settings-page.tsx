@@ -76,7 +76,7 @@ export function GeneralSettingsPage() {
     const fetchSettings = async () => {
       try {
         const response = await axiosInstance.get(
-          `${process.env.NEXT_PUBLIC_Backend_URL}/content/general`
+          `${process.env.NEXT_PUBLIC_Backend_URL}/content/general`,
         );
         const settings = response.data.data.settings;
         setFormData({
@@ -120,7 +120,7 @@ export function GeneralSettingsPage() {
 
   const handleFileSelect = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "logo" | "favicon"
+    type: "logo" | "favicon",
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -314,7 +314,7 @@ export function GeneralSettingsPage() {
                             placeholder="Hex code"
                           />
                         </div>
-                      )
+                      ),
                     )}
                   </div>
                 </div>

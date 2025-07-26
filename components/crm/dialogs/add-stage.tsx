@@ -1,16 +1,27 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Plus, AlertTriangle } from "lucide-react"
-import useCrmStore from "@/context/store/crm"
-import axiosInstance from "@/lib/axiosInstance"
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Plus, AlertTriangle } from "lucide-react";
+import useCrmStore from "@/context/store/crm";
+import axiosInstance from "@/lib/axiosInstance";
 
 const stageColors = [
   { value: "#3b82f6", label: "أزرق", color: "#3b82f6" },
@@ -22,8 +33,8 @@ const stageColors = [
   { value: "#6366f1", label: "نيلي", color: "#6366f1" },
   { value: "#14b8a6", label: "تركوازي", color: "#14b8a6" },
   { value: "#f97316", label: "برتقالي", color: "#f97316" },
-  { value: "#84cc16", label: "ليموني", color: "#84cc16" }
-]
+  { value: "#84cc16", label: "ليموني", color: "#84cc16" },
+];
 
 const stageIcons = [
   { value: "fa fa-user", label: "مستخدم" },
@@ -37,45 +48,45 @@ const stageIcons = [
   { value: "fa fa-user-shield", label: "مستخدم محمي" },
   { value: "fa fa-check-circle", label: "دائرة صح" },
   { value: "fa fa-handshake", label: "مصافحة" },
-  { value: "fa fa-chart-line", label: "رسم بياني" }
-]
+  { value: "fa fa-chart-line", label: "رسم بياني" },
+];
 
 interface AddStageDialogProps {
-  onStageAdded?: (stage: any) => void
+  onStageAdded?: (stage: any) => void;
 }
 
 export default function AddStageDialog({ onStageAdded }: AddStageDialogProps) {
-  const { 
-    showAddStageDialog, 
+  const {
+    showAddStageDialog,
     newStage,
     setShowAddStageDialog,
     updateNewStage,
-    setNewStage
-  } = useCrmStore()
+    setNewStage,
+  } = useCrmStore();
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleClose = () => {
-    setShowAddStageDialog(false)
+    setShowAddStageDialog(false);
     setNewStage({
       name: "",
       description: "",
       color: "bg-blue-500",
-      iconName: "Target"
-    })
-  }
+      iconName: "Target",
+    });
+  };
 
   const handleInputChange = (field: string, value: string) => {
-    updateNewStage({ [field]: value })
-  }
+    updateNewStage({ [field]: value });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newStage.name.trim()) return
+    e.preventDefault();
+    if (!newStage.name.trim()) return;
 
-    setIsSubmitting(true)
-    setError(null)
+    setIsSubmitting(true);
+    setError(null);
 
     try {
       // Prepare data for API
@@ -85,11 +96,11 @@ export default function AddStageDialog({ onStageAdded }: AddStageDialogProps) {
         icon: newStage.iconName,
         order: 1, // Default order
         description: newStage.description.trim(),
-        is_active: true
-      }
+        is_active: true,
+      };
 
-      const response = await axiosInstance.post("/crm/stages", stageData)
-      
+      const response = await axiosInstance.post("/crm/stages", stageData);
+
       if (response.data.status === "success") {
         // Add the new stage to the store
         const newStageData = {
@@ -101,25 +112,25 @@ export default function AddStageDialog({ onStageAdded }: AddStageDialogProps) {
           value: 0,
           description: stageData.description,
           order: stageData.order,
-          is_active: stageData.is_active
-        }
-        
+          is_active: stageData.is_active,
+        };
+
         // Update the stages list in the parent component
         if (onStageAdded) {
-          onStageAdded(newStageData)
+          onStageAdded(newStageData);
         }
-        
-        handleClose()
+
+        handleClose();
       } else {
-        setError("فشل في إضافة المرحلة")
+        setError("فشل في إضافة المرحلة");
       }
     } catch (err: any) {
-      console.error("خطأ في إضافة المرحلة:", err)
-      setError(err.response?.data?.message || "فشل في إضافة المرحلة")
+      console.error("خطأ في إضافة المرحلة:", err);
+      setError(err.response?.data?.message || "فشل في إضافة المرحلة");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={showAddStageDialog} onOpenChange={handleClose}>
@@ -163,7 +174,10 @@ export default function AddStageDialog({ onStageAdded }: AddStageDialogProps) {
 
           <div className="space-y-2">
             <Label htmlFor="stage-color">لون المرحلة</Label>
-            <Select value={newStage.color} onValueChange={(value) => handleInputChange("color", value)}>
+            <Select
+              value={newStage.color}
+              onValueChange={(value) => handleInputChange("color", value)}
+            >
               <SelectTrigger id="stage-color">
                 <SelectValue placeholder="اختر لون المرحلة" />
               </SelectTrigger>
@@ -171,8 +185,8 @@ export default function AddStageDialog({ onStageAdded }: AddStageDialogProps) {
                 {stageColors.map((color) => (
                   <SelectItem key={color.value} value={color.value}>
                     <div className="flex items-center gap-2">
-                      <div 
-                        className="w-4 h-4 rounded-full" 
+                      <div
+                        className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: color.color }}
                       />
                       {color.label}
@@ -185,7 +199,10 @@ export default function AddStageDialog({ onStageAdded }: AddStageDialogProps) {
 
           <div className="space-y-2">
             <Label htmlFor="stage-icon">أيقونة المرحلة</Label>
-            <Select value={newStage.iconName} onValueChange={(value) => handleInputChange("iconName", value)}>
+            <Select
+              value={newStage.iconName}
+              onValueChange={(value) => handleInputChange("iconName", value)}
+            >
               <SelectTrigger id="stage-icon">
                 <SelectValue placeholder="اختر أيقونة المرحلة" />
               </SelectTrigger>
@@ -206,13 +223,15 @@ export default function AddStageDialog({ onStageAdded }: AddStageDialogProps) {
           <div className="p-3 bg-muted rounded-lg">
             <Label className="text-sm text-muted-foreground">معاينة:</Label>
             <div className="flex items-center gap-2 mt-2">
-              <div 
-                className={`w-4 h-4 rounded-full ${newStage.color}`}
-              />
-              <span className="font-medium">{newStage.name || "اسم المرحلة"}</span>
+              <div className={`w-4 h-4 rounded-full ${newStage.color}`} />
+              <span className="font-medium">
+                {newStage.name || "اسم المرحلة"}
+              </span>
             </div>
             {newStage.description && (
-              <p className="text-sm text-muted-foreground mt-1">{newStage.description}</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {newStage.description}
+              </p>
             )}
           </div>
 
@@ -235,5 +254,5 @@ export default function AddStageDialog({ onStageAdded }: AddStageDialogProps) {
         </form>
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

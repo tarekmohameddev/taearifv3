@@ -2,13 +2,13 @@
 
 // استبدل المحتوى الحالي بـ:
 
-"use client"
+"use client";
 
-import React, { useState, useRef, useEffect } from "react"
-import type { Customer, PipelineStage, Appointment } from "@/types/crm"
-import useCrmStore from "@/context/store/crm"
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
+import React, { useState, useRef, useEffect } from "react";
+import type { Customer, PipelineStage, Appointment } from "@/types/crm";
+import useCrmStore from "@/context/store/crm";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import {
   CrmStatistics,
   CrmFilters,
@@ -25,22 +25,22 @@ import {
   AddReminderDialog,
   AddInteractionDialog,
   AddStageDialog,
-  CrmSettingsDialog
-} from "./index"
+  CrmSettingsDialog,
+} from "./index";
 
 export default function CrmPage() {
   // Loading and error states
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   // CRM data states
-  const [crmData, setCrmData] = useState<any>(null)
-  const [appointmentsData, setAppointmentsData] = useState<Appointment[]>([])
-  const [totalCustomers, setTotalCustomers] = useState(0)
-  
+  const [crmData, setCrmData] = useState<any>(null);
+  const [appointmentsData, setAppointmentsData] = useState<Appointment[]>([]);
+  const [totalCustomers, setTotalCustomers] = useState(0);
+
   // Get data from store
-  const { 
-    customers: customersData, 
+  const {
+    customers: customersData,
     pipelineStages,
     selectedStage,
     selectedCustomer,
@@ -69,26 +69,26 @@ export default function CrmPage() {
     setShowAppointmentDetailDialog,
     setNewStage,
     updateCustomerStage,
-    updateCustomer
-  } = useCrmStore()
-  
-  const [activeTab, setActiveTab] = useState("crm")
-  const [activeView, setActiveView] = useState("pipeline")
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStage, setFilterStage] = useState("all")
-  const [filterType, setFilterType] = useState("all")
-  const [filterCity, setFilterCity] = useState("all")
-  const [filterUrgency, setFilterUrgency] = useState("all")
+    updateCustomer,
+  } = useCrmStore();
+
+  const [activeTab, setActiveTab] = useState("crm");
+  const [activeView, setActiveView] = useState("pipeline");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStage, setFilterStage] = useState("all");
+  const [filterType, setFilterType] = useState("all");
+  const [filterCity, setFilterCity] = useState("all");
+  const [filterUrgency, setFilterUrgency] = useState("all");
 
   // Enhanced drag and drop states
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragOverStage, setDragOverStage] = useState<string | null>(null)
-  const [dragPreview, setDragPreview] = useState<Customer | null>(null)
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null);
+  const [dragPreview, setDragPreview] = useState<Customer | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   // Keyboard navigation states
-  const [focusedCustomer, setFocusedCustomer] = useState<Customer | null>(null)
-  const [focusedStage, setFocusedStage] = useState<PipelineStage | null>(null)
+  const [focusedCustomer, setFocusedCustomer] = useState<Customer | null>(null);
+  const [focusedStage, setFocusedStage] = useState<PipelineStage | null>(null);
 
   // Initialize handlers
   const dataHandler = DataHandler({
@@ -97,32 +97,40 @@ export default function CrmPage() {
     onSetCrmData: setCrmData,
     onSetAppointmentsData: setAppointmentsData,
     onSetTotalCustomers: setTotalCustomers,
-    onSetPipelineStages: (stages) => useCrmStore.getState().setPipelineStages(stages),
-    onSetCustomers: (customers) => useCrmStore.getState().setCustomers(customers),
-  })
+    onSetPipelineStages: (stages) =>
+      useCrmStore.getState().setPipelineStages(stages),
+    onSetCustomers: (customers) =>
+      useCrmStore.getState().setCustomers(customers),
+  });
 
   const utilities = Utilities({
     onAnnounceToScreenReader: (message) => {
-      const announcement = document.createElement("div")
-      announcement.setAttribute("aria-live", "polite")
-      announcement.setAttribute("aria-atomic", "true")
-      announcement.className = "sr-only"
-      announcement.textContent = message
-      document.body.appendChild(announcement)
+      const announcement = document.createElement("div");
+      announcement.setAttribute("aria-live", "polite");
+      announcement.setAttribute("aria-atomic", "true");
+      announcement.className = "sr-only";
+      announcement.textContent = message;
+      document.body.appendChild(announcement);
       setTimeout(() => {
-        document.body.removeChild(announcement)
-      }, 1000)
+        document.body.removeChild(announcement);
+      }, 1000);
     },
     onShowSuccessAnimation: (stageId) => {
-      const stageElement = document.querySelector(`[data-stage-id="${stageId}"]`)
+      const stageElement = document.querySelector(
+        `[data-stage-id="${stageId}"]`,
+      );
       if (stageElement) {
-        stageElement.classList.add("animate-pulse", "ring-2", "ring-green-500")
+        stageElement.classList.add("animate-pulse", "ring-2", "ring-green-500");
         setTimeout(() => {
-          stageElement.classList.remove("animate-pulse", "ring-2", "ring-green-500")
-        }, 1000)
+          stageElement.classList.remove(
+            "animate-pulse",
+            "ring-2",
+            "ring-green-500",
+          );
+        }, 1000);
       }
     },
-  })
+  });
 
   const enhancedDragDrop = EnhancedDragDrop({
     isDragging,
@@ -131,27 +139,32 @@ export default function CrmPage() {
     dragPreview,
     dragOffset,
     onDragStart: (e, customer) => {
-      setIsDragging(true)
-      setDragPreview(customer)
+      setIsDragging(true);
+      setDragPreview(customer);
       setDragOffset({
         x: e.clientX - e.currentTarget.getBoundingClientRect().left,
         y: e.clientY - e.currentTarget.getBoundingClientRect().top,
-      })
+      });
     },
     onDragEnd: () => {
-      setIsDragging(false)
-      setDragPreview(null)
-      setDragOverStage(null)
+      setIsDragging(false);
+      setDragPreview(null);
+      setDragOverStage(null);
     },
     onDragOver: (e, stageId) => setDragOverStage(stageId),
     onDragLeave: (e, stageId) => setDragOverStage(null),
     onDrop: async (e, stageId) => {
       if (dragPreview && dragPreview.pipelineStage !== stageId) {
-        const success = await dataHandler.updateCustomerStage(dragPreview.id, stageId)
+        const success = await dataHandler.updateCustomerStage(
+          dragPreview.id,
+          stageId,
+        );
         if (success) {
-          updateCustomerStage(dragPreview.id, stageId)
-          utilities.announceToScreenReader(`تم نقل العميل ${dragPreview.name} بنجاح`)
-          utilities.showSuccessAnimation(stageId)
+          updateCustomerStage(dragPreview.id, stageId);
+          utilities.announceToScreenReader(
+            `تم نقل العميل ${dragPreview.name} بنجاح`,
+          );
+          utilities.showSuccessAnimation(stageId);
         }
       }
     },
@@ -161,18 +174,18 @@ export default function CrmPage() {
       }
     },
     onGlobalDragEnd: () => {
-      setIsDragging(false)
-      setDragPreview(null)
-      setDragOverStage(null)
+      setIsDragging(false);
+      setDragPreview(null);
+      setDragOverStage(null);
     },
     onGlobalDragCancel: () => {
-      setIsDragging(false)
-      setDragPreview(null)
-      setDragOverStage(null)
+      setIsDragging(false);
+      setDragPreview(null);
+      setDragOverStage(null);
     },
     onAnnounceToScreenReader: utilities.announceToScreenReader,
     onShowSuccessAnimation: utilities.showSuccessAnimation,
-  })
+  });
 
   const keyboardNavigation = KeyboardNavigation({
     focusedCustomer,
@@ -182,21 +195,24 @@ export default function CrmPage() {
       // Handle keyboard navigation
     },
     onMoveCustomerToStage: async (customer, targetStageId) => {
-      const success = await dataHandler.updateCustomerStage(customer.id, targetStageId)
+      const success = await dataHandler.updateCustomerStage(
+        customer.id,
+        targetStageId,
+      );
       if (success) {
-        updateCustomerStage(customer.id, targetStageId)
+        updateCustomerStage(customer.id, targetStageId);
       }
     },
     onSetFocusedCustomer: setFocusedCustomer,
     onSetFocusedStage: setFocusedStage,
     onAnnounceToScreenReader: utilities.announceToScreenReader,
-  })
+  });
 
   // Fetch data on component mount
   useEffect(() => {
-    dataHandler.fetchCrmData()
-    dataHandler.fetchAppointmentsData()
-  }, [])
+    dataHandler.fetchCrmData();
+    dataHandler.fetchAppointmentsData();
+  }, []);
 
   // Filter customers
   const filteredCustomers = customersData.filter((customer: Customer) => {
@@ -206,75 +222,95 @@ export default function CrmPage() {
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.phone.includes(searchTerm) ||
       customer.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.district.toLowerCase().includes(searchTerm.toLowerCase())
+      customer.district.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStage = filterStage === "all" || customer.pipelineStage === filterStage
-    const matchesType = filterType === "all" || customer.customerType === filterType
-    const matchesCity = filterCity === "all" || customer.city === filterCity
-    const matchesUrgency = filterUrgency === "all" || 
-      (filterUrgency !== "all" && customer.urgency === filterUrgency)
+    const matchesStage =
+      filterStage === "all" || customer.pipelineStage === filterStage;
+    const matchesType =
+      filterType === "all" || customer.customerType === filterType;
+    const matchesCity = filterCity === "all" || customer.city === filterCity;
+    const matchesUrgency =
+      filterUrgency === "all" ||
+      (filterUrgency !== "all" && customer.urgency === filterUrgency);
 
-    return matchesSearch && matchesStage && matchesType && matchesCity && matchesUrgency
-  })
+    return (
+      matchesSearch &&
+      matchesStage &&
+      matchesType &&
+      matchesCity &&
+      matchesUrgency
+    );
+  });
 
   // Calculate statistics
   const pipelineStats = pipelineStages.map((stage: PipelineStage) => ({
     ...stage,
-    count: customersData.filter((c: Customer) => c.pipelineStage === stage.id).length,
-    value: customersData.filter((c: Customer) => c.pipelineStage === stage.id).reduce((sum: number, c: Customer) => sum + (c.dealValue || 0), 0),
-  }))
+    count: customersData.filter((c: Customer) => c.pipelineStage === stage.id)
+      .length,
+    value: customersData
+      .filter((c: Customer) => c.pipelineStage === stage.id)
+      .reduce((sum: number, c: Customer) => sum + (c.dealValue || 0), 0),
+  }));
 
   // Appointment statistics
   const allAppointments = customersData.flatMap(
-    (customer: Customer) => customer.appointments?.map((appointment: Appointment) => ({ ...appointment, customer })) || [],
-  )
-  const totalAppointments = allAppointments.length
-  const scheduledAppointments = allAppointments.filter((app: Appointment) => app.status === "مجدول").length
-  const completedAppointments = allAppointments.filter((app: Appointment) => app.status === "مكتمل").length
+    (customer: Customer) =>
+      customer.appointments?.map((appointment: Appointment) => ({
+        ...appointment,
+        customer,
+      })) || [],
+  );
+  const totalAppointments = allAppointments.length;
+  const scheduledAppointments = allAppointments.filter(
+    (app: Appointment) => app.status === "مجدول",
+  ).length;
+  const completedAppointments = allAppointments.filter(
+    (app: Appointment) => app.status === "مكتمل",
+  ).length;
 
   // Event handlers
   const handleRefresh = () => {
-    dataHandler.fetchCrmData()
-    dataHandler.fetchAppointmentsData()
-  }
+    dataHandler.fetchCrmData();
+    dataHandler.fetchAppointmentsData();
+  };
 
   const handleSettings = () => {
-    setShowCrmSettingsDialog(true)
-  }
+    setShowCrmSettingsDialog(true);
+  };
 
   const handleViewDetails = (customer: Customer) => {
-    setSelectedCustomer(customer)
-    setShowCustomerDialog(true)
-  }
+    setSelectedCustomer(customer);
+    setShowCustomerDialog(true);
+  };
 
   const handleAddNote = (customer: Customer) => {
-    setSelectedCustomer(customer)
-    setShowAddNoteDialog(true)
-  }
+    setSelectedCustomer(customer);
+    setShowAddNoteDialog(true);
+  };
 
   const handleAddReminder = (customer: Customer) => {
-    setSelectedCustomer(customer)
-    setShowAddReminderDialog(true)
-  }
+    setSelectedCustomer(customer);
+    setShowAddReminderDialog(true);
+  };
 
   const handleAddInteraction = (customer: Customer) => {
-    setSelectedCustomer(customer)
-    setShowAddInteractionDialog(true)
-  }
+    setSelectedCustomer(customer);
+    setShowAddInteractionDialog(true);
+  };
 
   const handleViewAppointment = (appointment: Appointment) => {
-    setSelectedAppointment(appointment)
-    setShowAppointmentDetailDialog(true)
-  }
+    setSelectedAppointment(appointment);
+    setShowAppointmentDetailDialog(true);
+  };
 
   const handleEditAppointment = (appointment: Appointment) => {
-    setSelectedAppointment(appointment)
+    setSelectedAppointment(appointment);
     // Handle edit appointment
-  }
+  };
 
   const handleAddAppointment = () => {
-    setShowAddAppointmentDialog(true)
-  }
+    setShowAddAppointmentDialog(true);
+  };
 
   // عرض loading state
   if (loading) {
@@ -285,7 +321,7 @@ export default function CrmPage() {
           <p className="mt-4 text-lg">جاري تحميل بيانات العملاء...</p>
         </div>
       </div>
-    )
+    );
   }
 
   // عرض error state
@@ -296,7 +332,7 @@ export default function CrmPage() {
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold mb-2">خطأ في تحميل البيانات</h2>
           <p className="text-muted-foreground mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
@@ -304,7 +340,7 @@ export default function CrmPage() {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -405,5 +441,5 @@ export default function CrmPage() {
         </main>
       </div>
     </div>
-  )
-} 
+  );
+}

@@ -419,7 +419,7 @@ export function PropertiesManagementPage() {
       error,
       isInitialized,
       pagination,
-      propertiesAllData
+      propertiesAllData,
     },
     setPropertiesManagement,
     fetchProperties,
@@ -488,7 +488,7 @@ export function PropertiesManagementPage() {
 
       await axiosInstance.post(
         `/properties/${property.id}/duplicate`,
-        duplicateData
+        duplicateData,
       );
       toast.success("تم مضاعفة العقار بنجاح");
 
@@ -506,13 +506,13 @@ export function PropertiesManagementPage() {
 
       const newStatus = property.status === "منشور" ? "مسودة" : "منشور";
       toast.success(
-        `تم ${property.status === "منشور" ? "إلغاء النشر" : "النشر"} بنجاح`
+        `تم ${property.status === "منشور" ? "إلغاء النشر" : "النشر"} بنجاح`,
       );
 
       // تحديث حالة العقار في القائمة المحلية
       setPropertiesManagement({
         properties: properties.map((p: any) =>
-          p.id === property.id ? { ...p, status: newStatus } : p
+          p.id === property.id ? { ...p, status: newStatus } : p,
         ),
       });
     } catch (error) {
@@ -779,7 +779,7 @@ export function PropertiesManagementPage() {
                               key={property.id}
                               property={property}
                               isFavorite={favorites.includes(
-                                property.id.toString()
+                                property.id.toString(),
                               )}
                               onToggleFavorite={toggleFavorite}
                               onDelete={handleDeleteProperty}
@@ -797,7 +797,7 @@ export function PropertiesManagementPage() {
                               key={property.id}
                               property={property}
                               isFavorite={favorites.includes(
-                                property.id.toString()
+                                property.id.toString(),
                               )}
                               onToggleFavorite={toggleFavorite}
                               onDelete={handleDeleteProperty}
@@ -859,21 +859,26 @@ export function PropertiesManagementPage() {
                       </span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" className="flex justify-evenly">
+                          <Button
+                            variant="outline"
+                            className="flex justify-evenly"
+                          >
                             <div className="w-2">
-                            {property.reorder_featured ||
-                              property.reorder ||
-                              idx + 1}
-                              </div>
+                              {property.reorder_featured ||
+                                property.reorder ||
+                                idx + 1}
+                            </div>
                             <ChevronDown className="-ml-1" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                           {(() => {
                             // تحديد العدد بناءً على نوع الترتيب
-                            let itemCount = reorderPopup.type === "featured"
-                              ? propertiesAllData?.total_reorder_featured || reorderList.length
-                              : pagination?.total || reorderList.length;
+                            let itemCount =
+                              reorderPopup.type === "featured"
+                                ? propertiesAllData?.total_reorder_featured ||
+                                  reorderList.length
+                                : pagination?.total || reorderList.length;
                             return [...Array(itemCount)].map((_, i) => (
                               <DropdownMenuItem
                                 key={i}
@@ -883,7 +888,7 @@ export function PropertiesManagementPage() {
                                     type: reorderPopup.type,
                                   });
                                   const toastId = toast.loading(
-                                    "جاري تحديث الترتيب..."
+                                    "جاري تحديث الترتيب...",
                                   );
                                   try {
                                     if (reorderPopup.type === "featured") {
@@ -894,12 +899,12 @@ export function PropertiesManagementPage() {
                                             id: property.id,
                                             reorder_featured: i + 1,
                                           },
-                                        ]
+                                        ],
                                       );
                                     } else {
                                       await axiosInstance.post(
                                         "/properties/reorder",
-                                        [{ id: property.id, reorder: i + 1 }]
+                                        [{ id: property.id, reorder: i + 1 }],
                                       );
                                     }
                                     toast.success("تم تحديث الترتيب");

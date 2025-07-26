@@ -58,7 +58,7 @@ export function GoogleRegisterPage() {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [subdomainFocused, setSubdomainFocused] = useState(false);
   const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>(
-    []
+    [],
   );
 
   // Validate phone

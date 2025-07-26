@@ -52,8 +52,8 @@ const useAuthStore = create((set, get) => ({
           ...userData,
           onboarding_completed: userData.onboarding_completed || false,
         },
-       IsLoading: true,
-       error: null 
+        IsLoading: true,
+        error: null,
       });
       if (get().userData.is_free_plan == null) {
         const ress = await axiosInstance.get("/user");
@@ -107,7 +107,7 @@ const useAuthStore = create((set, get) => ({
             password,
             recaptcha_token: recaptchaToken,
           }),
-        }
+        },
       );
       if (!externalResponse.ok) {
         const errorData = await externalResponse.json().catch(() => ({}));
@@ -148,7 +148,7 @@ const useAuthStore = create((set, get) => ({
         username: user.username,
         first_name: user.first_name,
         last_name: user.last_name,
-        onboarding_completed: user.onboarding_completed || false, 
+        onboarding_completed: user.onboarding_completed || false,
       };
       set({ UserIslogged: true, userData: safeUserData });
       return { success: true };
@@ -203,7 +203,7 @@ const useAuthStore = create((set, get) => ({
    */
   loginWithToken: async (token) => {
     try {
-      console.log("token",token)
+      console.log("token", token);
       set((state) => ({
         userData: {
           ...state.userData,
@@ -211,12 +211,16 @@ const useAuthStore = create((set, get) => ({
         },
       }));
 
-      console.log("done 1111111111")
+      console.log("done 1111111111");
 
       const response = await axiosInstance.get("/user");
-      console.log("done 2222222222222222")
-      const user = response.data.data?.user || response.data.data || response.data.user || response.data;
-      console.log("done 33333333333333333")
+      console.log("done 2222222222222222");
+      const user =
+        response.data.data?.user ||
+        response.data.data ||
+        response.data.user ||
+        response.data;
+      console.log("done 33333333333333333");
 
       set({
         UserIslogged: true,
@@ -227,7 +231,7 @@ const useAuthStore = create((set, get) => ({
           onboarding_completed: user.onboarding_completed || false,
         },
       });
-      console.log("done 444444444444444444")
+      console.log("done 444444444444444444");
 
       const setAuthResponse = await fetch("/api/user/setAuth", {
         method: "POST",
@@ -236,7 +240,7 @@ const useAuthStore = create((set, get) => ({
         },
         body: JSON.stringify({ user, UserToken: token }),
       });
-      console.log("done 555555555555555")
+      console.log("done 555555555555555");
 
       if (!setAuthResponse.ok) {
         const errorData = await setAuthResponse.json().catch(() => ({}));

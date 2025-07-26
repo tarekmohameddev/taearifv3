@@ -7,6 +7,7 @@
 ## الملفات المحدثة
 
 ### 1. `context/store/crm.js`
+
 - يحتوي على Zustand store لإدارة بيانات CRM
 - يستخدم axiosInstance للتواصل مع API
 - يتضمن دوال للعمليات الأساسية:
@@ -20,6 +21,7 @@
   - `addInteraction()` - إضافة تفاعل
 
 ### 2. `components/crm/crm-page.tsx`
+
 - تم تحديثه لاستخدام الـ store الجديد
 - يستدعي البيانات من API عند تحميل الصفحة
 - يعرض loading و error states
@@ -30,23 +32,22 @@
 ### استدعاء البيانات في المكونات
 
 ```javascript
-import useCrmStore from "@/context/store/crm"
+import useCrmStore from "@/context/store/crm";
 
 function MyComponent() {
-  const { crmData: { data, loading, error }, fetchCrmData } = useCrmStore();
-  
+  const {
+    crmData: { data, loading, error },
+    fetchCrmData,
+  } = useCrmStore();
+
   useEffect(() => {
     fetchCrmData();
   }, [fetchCrmData]);
 
   if (loading) return <div>جاري التحميل...</div>;
   if (error) return <div>حدث خطأ: {error}</div>;
-  
-  return (
-    <div>
-      {/* عرض البيانات */}
-    </div>
-  );
+
+  return <div>{/* عرض البيانات */}</div>;
 }
 ```
 
@@ -92,34 +93,38 @@ function MyComponent() {
 ### العمليات المتاحة
 
 #### نقل العميل بين المراحل
+
 ```javascript
 const { moveCustomerToStage } = useCrmStore.getState();
 await moveCustomerToStage(customerId, targetStageId);
 ```
 
 #### إضافة ملاحظة
+
 ```javascript
 const { addNote } = useCrmStore.getState();
 await addNote(customerId, "ملاحظة جديدة");
 ```
 
 #### إضافة تذكير
+
 ```javascript
 const { addReminder } = useCrmStore.getState();
 await addReminder(customerId, {
   title: "تذكير مهم",
   date: "2024-01-15",
-  priority: "عالية"
+  priority: "عالية",
 });
 ```
 
 #### إضافة تفاعل
+
 ```javascript
 const { addInteraction } = useCrmStore.getState();
 await addInteraction(customerId, {
   type: "اتصال هاتفي",
   notes: "تم الاتصال بالعميل",
-  duration: "5 دقائق"
+  duration: "5 دقائق",
 });
 ```
 
@@ -136,4 +141,4 @@ await addInteraction(customerId, {
 - جميع العمليات تستخدم axiosInstance مع إدارة التوثيق التلقائية
 - يتم إعادة جلب البيانات تلقائياً بعد كل عملية تحديث
 - يتم عرض حالات التحميل والأخطاء للمستخدم
-- البيانات تأتي من API حقيقي وليس بيانات ثابتة 
+- البيانات تأتي من API حقيقي وليس بيانات ثابتة

@@ -1,27 +1,40 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, Clock, AlertTriangle, Edit } from "lucide-react"
-import useCrmStore from "@/context/store/crm"
-import axiosInstance from "@/lib/axiosInstance"
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar, Clock, AlertTriangle, Edit } from "lucide-react";
+import useCrmStore from "@/context/store/crm";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface EditAppointmentDialogProps {
-  onAppointmentUpdated?: (appointment: any) => void
+  onAppointmentUpdated?: (appointment: any) => void;
 }
 
-export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppointmentDialogProps) {
-  const { 
-    showEditAppointmentDialog, 
-    selectedAppointment, 
+export default function EditAppointmentDialog({
+  onAppointmentUpdated,
+}: EditAppointmentDialogProps) {
+  const {
+    showEditAppointmentDialog,
+    selectedAppointment,
     setShowEditAppointmentDialog,
-    setSelectedAppointment
-  } = useCrmStore()
+    setSelectedAppointment,
+  } = useCrmStore();
 
   const [appointmentData, setAppointmentData] = useState({
     title: "",
@@ -30,38 +43,38 @@ export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppo
     note: "",
     date: "",
     time: "",
-    duration: "30"
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+    duration: "30",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Pre-fill form when appointment is selected
   useEffect(() => {
     if (selectedAppointment) {
       // Parse datetime if it exists
-      let date = ""
-      let time = ""
+      let date = "";
+      let time = "";
       if (selectedAppointment.datetime) {
-        const dateObj = new Date(selectedAppointment.datetime)
-        date = dateObj.toISOString().split('T')[0]
-        time = dateObj.toTimeString().split(' ')[0].substring(0, 5)
+        const dateObj = new Date(selectedAppointment.datetime);
+        date = dateObj.toISOString().split("T")[0];
+        time = dateObj.toTimeString().split(" ")[0].substring(0, 5);
       }
 
       setAppointmentData({
         title: selectedAppointment.title || "",
         type: selectedAppointment.type || "call",
-        priority: selectedAppointment.priority || "2", 
+        priority: selectedAppointment.priority || "2",
         note: selectedAppointment.notes || "",
         date: date,
         time: time,
-        duration: selectedAppointment.duration?.toString() || "30"
-      })
+        duration: selectedAppointment.duration?.toString() || "30",
+      });
     }
-  }, [selectedAppointment])
+  }, [selectedAppointment]);
 
   const handleClose = () => {
-    setShowEditAppointmentDialog(false)
-    setTimeout(() => setSelectedAppointment(null), 150)
+    setShowEditAppointmentDialog(false);
+    setTimeout(() => setSelectedAppointment(null), 150);
     setAppointmentData({
       title: "",
       type: "call",
@@ -69,42 +82,50 @@ export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppo
       note: "",
       date: "",
       time: "",
-      duration: "30"
-    })
-    setError(null)
-  }
+      duration: "30",
+    });
+    setError(null);
+  };
 
   const handleInputChange = (field: string, value: string) => {
-    setAppointmentData(prev => ({
+    setAppointmentData((prev) => ({
       ...prev,
-      [field]: value
-    }))
-    setError(null)
-  }
+      [field]: value,
+    }));
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!selectedAppointment || !appointmentData.title.trim() || !appointmentData.date || !appointmentData.time) {
-      setError("جميع الحقول مطلوبة")
-      return
+    e.preventDefault();
+
+    if (
+      !selectedAppointment ||
+      !appointmentData.title.trim() ||
+      !appointmentData.date ||
+      !appointmentData.time
+    ) {
+      setError("جميع الحقول مطلوبة");
+      return;
     }
 
-    setIsSubmitting(true)
-    setError(null)
-    
+    setIsSubmitting(true);
+    setError(null);
+
     try {
       // Combine date and time for API
-      const datetime = `${appointmentData.date} ${appointmentData.time}:00`
-      
-      const response = await axiosInstance.put(`/crm/customer-appointments/${selectedAppointment.id}`, {
-        title: appointmentData.title.trim(),
-        type: appointmentData.type,
-        priority: parseInt(appointmentData.priority),
-        note: appointmentData.note.trim(),
-        datetime: datetime,
-        duration: parseInt(appointmentData.duration)
-      })
+      const datetime = `${appointmentData.date} ${appointmentData.time}:00`;
+
+      const response = await axiosInstance.put(
+        `/crm/customer-appointments/${selectedAppointment.id}`,
+        {
+          title: appointmentData.title.trim(),
+          type: appointmentData.type,
+          priority: parseInt(appointmentData.priority),
+          note: appointmentData.note.trim(),
+          datetime: datetime,
+          duration: parseInt(appointmentData.duration),
+        },
+      );
 
       if (response.data.status === "success") {
         // Update the appointment in the store
@@ -113,30 +134,35 @@ export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppo
           title: appointmentData.title.trim(),
           type: appointmentData.type,
           priority: appointmentData.priority,
-          priority_label: appointmentData.priority === "3" ? "High" : appointmentData.priority === "2" ? "Medium" : "Low",
+          priority_label:
+            appointmentData.priority === "3"
+              ? "High"
+              : appointmentData.priority === "2"
+                ? "Medium"
+                : "Low",
           note: appointmentData.note.trim(),
           datetime: datetime,
-          duration: parseInt(appointmentData.duration)
-        }
-        
+          duration: parseInt(appointmentData.duration),
+        };
+
         // Update the appointments list in the parent component
         if (onAppointmentUpdated) {
-          onAppointmentUpdated(updatedAppointment)
+          onAppointmentUpdated(updatedAppointment);
         }
-        
-        handleClose()
+
+        handleClose();
       } else {
-        setError("فشل في تحديث الموعد")
+        setError("فشل في تحديث الموعد");
       }
     } catch (error: any) {
-      console.error("خطأ في تحديث الموعد:", error)
-      setError(error.response?.data?.message || "حدث خطأ أثناء تحديث الموعد")
+      console.error("خطأ في تحديث الموعد:", error);
+      setError(error.response?.data?.message || "حدث خطأ أثناء تحديث الموعد");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  if (!selectedAppointment) return null
+  if (!selectedAppointment) return null;
 
   return (
     <Dialog open={showEditAppointmentDialog} onOpenChange={handleClose}>
@@ -152,7 +178,9 @@ export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppo
           <p className="text-sm text-muted-foreground">الموعد الحالي:</p>
           <p className="font-medium">{selectedAppointment.title}</p>
           {selectedAppointment.customer && (
-            <p className="text-sm text-muted-foreground">العميل: {selectedAppointment.customer.name}</p>
+            <p className="text-sm text-muted-foreground">
+              العميل: {selectedAppointment.customer.name}
+            </p>
           )}
         </div>
 
@@ -178,7 +206,10 @@ export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppo
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="appointment-type">نوع الموعد</Label>
-              <Select value={appointmentData.type} onValueChange={(value) => handleInputChange("type", value)}>
+              <Select
+                value={appointmentData.type}
+                onValueChange={(value) => handleInputChange("type", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر النوع" />
                 </SelectTrigger>
@@ -193,7 +224,10 @@ export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppo
 
             <div className="space-y-2">
               <Label htmlFor="appointment-priority">الأولوية</Label>
-              <Select value={appointmentData.priority} onValueChange={(value) => handleInputChange("priority", value)}>
+              <Select
+                value={appointmentData.priority}
+                onValueChange={(value) => handleInputChange("priority", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر الأولوية" />
                 </SelectTrigger>
@@ -208,7 +242,10 @@ export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppo
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="appointment-date" className="flex items-center gap-2">
+              <Label
+                htmlFor="appointment-date"
+                className="flex items-center gap-2"
+              >
                 <Calendar className="h-4 w-4" />
                 التاريخ
               </Label>
@@ -222,7 +259,10 @@ export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppo
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="appointment-time" className="flex items-center gap-2">
+              <Label
+                htmlFor="appointment-time"
+                className="flex items-center gap-2"
+              >
                 <Clock className="h-4 w-4" />
                 الوقت
               </Label>
@@ -237,7 +277,10 @@ export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppo
 
             <div className="space-y-2">
               <Label htmlFor="appointment-duration">المدة (دقيقة)</Label>
-              <Select value={appointmentData.duration} onValueChange={(value) => handleInputChange("duration", value)}>
+              <Select
+                value={appointmentData.duration}
+                onValueChange={(value) => handleInputChange("duration", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="المدة" />
                 </SelectTrigger>
@@ -283,5 +326,5 @@ export default function EditAppointmentDialog({ onAppointmentUpdated }: EditAppo
         </form>
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

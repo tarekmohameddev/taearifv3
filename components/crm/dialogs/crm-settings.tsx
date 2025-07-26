@@ -1,78 +1,93 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Settings, Plus, Edit, Trash2, ArrowUp, ArrowDown, AlertTriangle } from "lucide-react"
-import useCrmStore from "@/context/store/crm"
-import axiosInstance from "@/lib/axiosInstance"
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Settings,
+  Plus,
+  Edit,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  AlertTriangle,
+} from "lucide-react";
+import useCrmStore from "@/context/store/crm";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface CrmSettingsDialogProps {
-  onStageDeleted?: (stageId: string) => void
+  onStageDeleted?: (stageId: string) => void;
 }
 
-export default function CrmSettingsDialog({ onStageDeleted }: CrmSettingsDialogProps) {
-  const { 
-    showCrmSettingsDialog, 
+export default function CrmSettingsDialog({
+  onStageDeleted,
+}: CrmSettingsDialogProps) {
+  const {
+    showCrmSettingsDialog,
     pipelineStages,
     setShowCrmSettingsDialog,
     setShowAddStageDialog,
     setShowEditStageDialog,
-    setSelectedStage
-  } = useCrmStore()
+    setSelectedStage,
+  } = useCrmStore();
 
-  const [isDeleting, setIsDeleting] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleClose = () => {
-    setShowCrmSettingsDialog(false)
-  }
+    setShowCrmSettingsDialog(false);
+  };
 
   const handleAddStage = () => {
-    setShowAddStageDialog(true)
-  }
+    setShowAddStageDialog(true);
+  };
 
   const handleEditStage = (stage: any) => {
-    setSelectedStage(stage)
-    setShowEditStageDialog(true)
-  }
+    setSelectedStage(stage);
+    setShowEditStageDialog(true);
+  };
 
   const handleDeleteStage = async (stageId: string) => {
     if (!confirm("هل أنت متأكد من حذف هذه المرحلة؟")) {
-      return
+      return;
     }
 
-    setIsDeleting(stageId)
-    setError(null)
+    setIsDeleting(stageId);
+    setError(null);
 
     try {
-      const response = await axiosInstance.delete(`/crm/stages/${stageId}`)
-      
+      const response = await axiosInstance.delete(`/crm/stages/${stageId}`);
+
       if (response.data.status === "success") {
         // Remove the stage from the list
         if (onStageDeleted) {
-          onStageDeleted(stageId)
+          onStageDeleted(stageId);
         }
       } else {
-        setError("فشل في حذف المرحلة")
+        setError("فشل في حذف المرحلة");
       }
     } catch (err: any) {
-      console.error("Error deleting stage:", err)
-      setError(err.response?.data?.message || "فشل في حذف المرحلة")
+      console.error("Error deleting stage:", err);
+      setError(err.response?.data?.message || "فشل في حذف المرحلة");
     } finally {
-      setIsDeleting(null)
+      setIsDeleting(null);
     }
-  }
+  };
 
   const handleMoveStageUp = (stageId: string) => {
-    console.log("نقل المرحلة لأعلى:", stageId)
-  }
+    console.log("نقل المرحلة لأعلى:", stageId);
+  };
 
   const handleMoveStageDown = (stageId: string) => {
-    console.log("نقل المرحلة لأسفل:", stageId)
-  }
+    console.log("نقل المرحلة لأسفل:", stageId);
+  };
 
   return (
     <Dialog open={showCrmSettingsDialog} onOpenChange={handleClose}>
@@ -107,18 +122,25 @@ export default function CrmSettingsDialog({ onStageDeleted }: CrmSettingsDialogP
               {pipelineStages && pipelineStages.length > 0 ? (
                 <div className="space-y-3">
                   {pipelineStages.map((stage: any, index: number) => (
-                    <div key={stage.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={stage.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex items-center gap-3">
-                        <div className={`w-4 h-4 rounded-full ${stage.color}`} />
+                        <div
+                          className={`w-4 h-4 rounded-full ${stage.color}`}
+                        />
                         <div>
                           <h4 className="font-medium">{stage.name}</h4>
-                          <p className="text-sm text-muted-foreground">{stage.description}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {stage.description}
+                          </p>
                         </div>
                         <Badge variant="secondary">
                           {stage.count || 0} عميل
                         </Badge>
                       </div>
-                      
+
                       <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
@@ -266,11 +288,9 @@ export default function CrmSettingsDialog({ onStageDeleted }: CrmSettingsDialogP
         </div>
 
         <div className="flex justify-end">
-          <Button onClick={handleClose}>
-            إغلاق
-          </Button>
+          <Button onClick={handleClose}>إغلاق</Button>
         </div>
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

@@ -1,97 +1,118 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, Clock, AlertTriangle, Edit, Bell } from "lucide-react"
-import useCrmStore from "@/context/store/crm"
-import axiosInstance from "@/lib/axiosInstance"
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar, Clock, AlertTriangle, Edit, Bell } from "lucide-react";
+import useCrmStore from "@/context/store/crm";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface EditReminderDialogProps {
-  onReminderUpdated?: (reminder: any) => void
+  onReminderUpdated?: (reminder: any) => void;
 }
 
-export default function EditReminderDialog({ onReminderUpdated }: EditReminderDialogProps) {
-  const { 
-    showEditReminderDialog, 
-    selectedReminder, 
+export default function EditReminderDialog({
+  onReminderUpdated,
+}: EditReminderDialogProps) {
+  const {
+    showEditReminderDialog,
+    selectedReminder,
     setShowEditReminderDialog,
-    setSelectedReminder
-  } = useCrmStore()
+    setSelectedReminder,
+  } = useCrmStore();
 
   const [reminderData, setReminderData] = useState({
     title: "",
     priority: "2", // 1=low, 2=medium, 3=high
     date: "",
-    time: ""
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+    time: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Pre-fill form when reminder is selected
   useEffect(() => {
     if (selectedReminder) {
       // Parse datetime if it exists
-      let date = ""
-      let time = ""
+      let date = "";
+      let time = "";
       if (selectedReminder.datetime) {
-        const dateObj = new Date(selectedReminder.datetime)
-        date = dateObj.toISOString().split('T')[0]
-        time = dateObj.toTimeString().split(' ')[0].substring(0, 5)
+        const dateObj = new Date(selectedReminder.datetime);
+        date = dateObj.toISOString().split("T")[0];
+        time = dateObj.toTimeString().split(" ")[0].substring(0, 5);
       }
 
       setReminderData({
         title: selectedReminder.title || "",
         priority: selectedReminder.priority?.toString() || "2",
         date: date,
-        time: time
-      })
+        time: time,
+      });
     }
-  }, [selectedReminder])
+  }, [selectedReminder]);
 
   const handleClose = () => {
-    setShowEditReminderDialog(false)
-    setTimeout(() => setSelectedReminder(null), 150)
+    setShowEditReminderDialog(false);
+    setTimeout(() => setSelectedReminder(null), 150);
     setReminderData({
       title: "",
       priority: "2",
       date: "",
-      time: ""
-    })
-    setError(null)
-  }
+      time: "",
+    });
+    setError(null);
+  };
 
   const handleInputChange = (field: string, value: string) => {
-    setReminderData(prev => ({
+    setReminderData((prev) => ({
       ...prev,
-      [field]: value
-    }))
-    setError(null)
-  }
+      [field]: value,
+    }));
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!selectedReminder || !reminderData.title.trim() || !reminderData.date || !reminderData.time) {
-      setError("جميع الحقول مطلوبة")
-      return
+    e.preventDefault();
+
+    if (
+      !selectedReminder ||
+      !reminderData.title.trim() ||
+      !reminderData.date ||
+      !reminderData.time
+    ) {
+      setError("جميع الحقول مطلوبة");
+      return;
     }
 
-    setIsSubmitting(true)
-    setError(null)
-    
+    setIsSubmitting(true);
+    setError(null);
+
     try {
       // Combine date and time for API
-      const datetime = `${reminderData.date} ${reminderData.time}:00`
-      
-      const response = await axiosInstance.put(`/crm/customer-reminders/${selectedReminder.id}`, {
-        title: reminderData.title.trim(),
-        priority: parseInt(reminderData.priority),
-        datetime: datetime
-      })
+      const datetime = `${reminderData.date} ${reminderData.time}:00`;
+
+      const response = await axiosInstance.put(
+        `/crm/customer-reminders/${selectedReminder.id}`,
+        {
+          title: reminderData.title.trim(),
+          priority: parseInt(reminderData.priority),
+          datetime: datetime,
+        },
+      );
 
       if (response.data.status === "success") {
         // Update the reminder in the store
@@ -99,28 +120,33 @@ export default function EditReminderDialog({ onReminderUpdated }: EditReminderDi
           ...selectedReminder,
           title: reminderData.title.trim(),
           priority: parseInt(reminderData.priority),
-          priority_label: reminderData.priority === "3" ? "High" : reminderData.priority === "2" ? "Medium" : "Low",
-          datetime: datetime
-        }
-        
+          priority_label:
+            reminderData.priority === "3"
+              ? "High"
+              : reminderData.priority === "2"
+                ? "Medium"
+                : "Low",
+          datetime: datetime,
+        };
+
         // Update the reminders list in the parent component
         if (onReminderUpdated) {
-          onReminderUpdated(updatedReminder)
+          onReminderUpdated(updatedReminder);
         }
-        
-        handleClose()
+
+        handleClose();
       } else {
-        setError("فشل في تحديث التذكير")
+        setError("فشل في تحديث التذكير");
       }
     } catch (error: any) {
-      console.error("خطأ في تحديث التذكير:", error)
-      setError(error.response?.data?.message || "حدث خطأ أثناء تحديث التذكير")
+      console.error("خطأ في تحديث التذكير:", error);
+      setError(error.response?.data?.message || "حدث خطأ أثناء تحديث التذكير");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  if (!selectedReminder) return null
+  if (!selectedReminder) return null;
 
   return (
     <Dialog open={showEditReminderDialog} onOpenChange={handleClose}>
@@ -136,7 +162,9 @@ export default function EditReminderDialog({ onReminderUpdated }: EditReminderDi
           <p className="text-sm text-muted-foreground">التذكير الحالي:</p>
           <p className="font-medium">{selectedReminder.title}</p>
           {selectedReminder.customer && (
-            <p className="text-sm text-muted-foreground">العميل: {selectedReminder.customer.name}</p>
+            <p className="text-sm text-muted-foreground">
+              العميل: {selectedReminder.customer.name}
+            </p>
           )}
         </div>
 
@@ -161,7 +189,10 @@ export default function EditReminderDialog({ onReminderUpdated }: EditReminderDi
 
           <div className="space-y-2">
             <Label htmlFor="reminder-priority">الأولوية</Label>
-            <Select value={reminderData.priority} onValueChange={(value) => handleInputChange("priority", value)}>
+            <Select
+              value={reminderData.priority}
+              onValueChange={(value) => handleInputChange("priority", value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="اختر الأولوية" />
               </SelectTrigger>
@@ -175,7 +206,10 @@ export default function EditReminderDialog({ onReminderUpdated }: EditReminderDi
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="reminder-date" className="flex items-center gap-2">
+              <Label
+                htmlFor="reminder-date"
+                className="flex items-center gap-2"
+              >
                 <Calendar className="h-4 w-4" />
                 التاريخ
               </Label>
@@ -189,7 +223,10 @@ export default function EditReminderDialog({ onReminderUpdated }: EditReminderDi
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reminder-time" className="flex items-center gap-2">
+              <Label
+                htmlFor="reminder-time"
+                className="flex items-center gap-2"
+              >
                 <Clock className="h-4 w-4" />
                 الوقت
               </Label>
@@ -214,7 +251,12 @@ export default function EditReminderDialog({ onReminderUpdated }: EditReminderDi
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !reminderData.title.trim() || !reminderData.date || !reminderData.time}
+              disabled={
+                isSubmitting ||
+                !reminderData.title.trim() ||
+                !reminderData.date ||
+                !reminderData.time
+              }
             >
               {isSubmitting ? "جاري التحديث..." : "تحديث التذكير"}
             </Button>
@@ -222,5 +264,5 @@ export default function EditReminderDialog({ onReminderUpdated }: EditReminderDi
         </form>
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

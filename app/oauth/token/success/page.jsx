@@ -9,7 +9,7 @@ import Image from "next/image";
 export default function OAuthSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState("loading"); 
+  const [status, setStatus] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
@@ -22,7 +22,6 @@ export default function OAuthSuccessPage() {
           return;
         }
 
-
         // تحديث الـ token في AuthStore مؤقتاً
         useAuthStore.setState({
           userData: {
@@ -33,7 +32,7 @@ export default function OAuthSuccessPage() {
 
         // جلب بيانات المستخدم من الخادم باستخدام التوكن
         const response = await axiosInstance.get("/user");
-        
+
         if (!response.data || !response.data.data) {
           throw new Error("لم يتم العثور على بيانات المستخدم");
         }
@@ -55,9 +54,9 @@ export default function OAuthSuccessPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ 
-            user: user, 
-            UserToken: token 
+          body: JSON.stringify({
+            user: user,
+            UserToken: token,
           }),
         });
 
@@ -65,7 +64,6 @@ export default function OAuthSuccessPage() {
           const errorData = await setAuthResponse.json().catch(() => ({}));
           throw new Error(errorData.error || "فشل في حفظ بيانات المصادقة");
         }
-
 
         // تحديث الـ AuthStore بالبيانات الكاملة
         useAuthStore.setState({
@@ -83,8 +81,10 @@ export default function OAuthSuccessPage() {
             days_remaining: userData.membership?.days_remaining || null,
             package_title: userData.membership?.package?.title || null,
             package_features: userData.membership?.package?.features || [],
-            project_limit_number: userData.membership?.package?.project_limit_number || null,
-            real_estate_limit_number: userData.membership?.package?.real_estate_limit_number || null,
+            project_limit_number:
+              userData.membership?.package?.project_limit_number || null,
+            real_estate_limit_number:
+              userData.membership?.package?.real_estate_limit_number || null,
           },
         });
 
@@ -93,25 +93,24 @@ export default function OAuthSuccessPage() {
         setStatus("success");
 
         // التحقق من الصفحة المرجعية لتحديد وجهة التوجيه
-        const returnPage = localStorage.getItem('oauth_return_page');
-        localStorage.removeItem('oauth_return_page');
+        const returnPage = localStorage.getItem("oauth_return_page");
+        localStorage.removeItem("oauth_return_page");
 
         // التوجيه حسب نوع العملية
         setTimeout(() => {
-          if (returnPage === 'register' || !user.onboarding_completed) {
+          if (returnPage === "register" || !user.onboarding_completed) {
             router.push("/");
           } else {
             router.push("/");
           }
         }, 2000);
-
       } catch (error) {
         console.error("OAuth success handling error:", error);
         setStatus("error");
         setErrorMessage(
-          error instanceof Error 
-            ? error.message 
-            : "حدث خطأ أثناء معالجة تسجيل الدخول"
+          error instanceof Error
+            ? error.message
+            : "حدث خطأ أثناء معالجة تسجيل الدخول",
         );
       }
     };
@@ -121,8 +120,8 @@ export default function OAuthSuccessPage() {
   }, [searchParams, router]);
 
   return (
-    <div 
-      className="min-h-screen flex flex-col items-center justify-center bg-background p-4" 
+    <div
+      className="min-h-screen flex flex-col items-center justify-center bg-background p-4"
       dir="rtl"
     >
       <div className="w-full max-w-md">
@@ -196,9 +195,7 @@ export default function OAuthSuccessPage() {
               <h3 className="text-xl font-bold text-red-700 dark:text-red-500 mb-2">
                 فشل في تسجيل الدخول
               </h3>
-              <p className="text-muted-foreground mb-4">
-                {errorMessage}
-              </p>
+              <p className="text-muted-foreground mb-4">{errorMessage}</p>
               <div className="space-y-2">
                 <button
                   onClick={() => router.push("/login")}
@@ -221,8 +218,12 @@ export default function OAuthSuccessPage() {
       {/* CSS Animation */}
       <style jsx global>{`
         @keyframes progress {
-          0% { width: 0%; }
-          100% { width: 100%; }
+          0% {
+            width: 0%;
+          }
+          100% {
+            width: 100%;
+          }
         }
         .animate-progress {
           animation: progress 2s linear forwards;

@@ -1,22 +1,28 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Move, Calendar, BarChart3, Bell } from "lucide-react"
-import { PipelineStage } from "@/types/crm"
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, Move, Calendar, BarChart3, Bell } from "lucide-react";
+import { PipelineStage } from "@/types/crm";
 
 interface CrmFiltersProps {
-  activeView: string
-  setActiveView: (view: string) => void
-  searchTerm: string
-  setSearchTerm: (term: string) => void
-  filterStage: string
-  setFilterStage: (stage: string) => void
-  filterUrgency: string
-  setFilterUrgency: (urgency: string) => void
-  pipelineStages: PipelineStage[]
+  activeView: string;
+  setActiveView: (view: string) => void;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  filterStage: string;
+  setFilterStage: (stage: string) => void;
+  filterUrgency: string;
+  setFilterUrgency: (urgency: string) => void;
+  pipelineStages: PipelineStage[];
 }
 
 export default function CrmFilters({
@@ -111,5 +117,5 @@ export default function CrmFilters({
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

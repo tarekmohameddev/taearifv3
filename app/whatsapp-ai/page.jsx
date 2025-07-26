@@ -1,5 +1,5 @@
-import { WhatsappAiPage } from "@/components/whatsapp-ai-page"
+import { WhatsappAiPage } from "@/components/whatsapp-ai-page";
 
 export default function WhatsappAi() {
-  return <WhatsappAiPage />
+  return <WhatsappAiPage />;
 }

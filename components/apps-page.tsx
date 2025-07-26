@@ -35,7 +35,7 @@ import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { useState, useEffect } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
-import useStore from "@/context/Store"; 
+import useStore from "@/context/Store";
 
 export function AppsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");

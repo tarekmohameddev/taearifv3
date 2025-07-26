@@ -37,9 +37,9 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <Toaster />
-            <ReCaptchaWrapper>
-              <ClientLayout>{children}</ClientLayout>
-            </ReCaptchaWrapper>
+          <ReCaptchaWrapper>
+            <ClientLayout>{children}</ClientLayout>
+          </ReCaptchaWrapper>
         </ThemeProvider>
       </body>
     </html>

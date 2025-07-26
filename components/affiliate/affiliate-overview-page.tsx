@@ -1,22 +1,41 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
-import { Users, DollarSign, TrendingUp, Gift, ArrowRight, CheckCircle, Star, Target, Zap, Shield } from "lucide-react"
-import Link from "next/link"
-import axiosInstance from "@/lib/axiosInstance"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import {
+  Users,
+  DollarSign,
+  TrendingUp,
+  Gift,
+  ArrowRight,
+  CheckCircle,
+  Star,
+  Target,
+  Zap,
+  Shield,
+} from "lucide-react";
+import Link from "next/link";
+import axiosInstance from "@/lib/axiosInstance";
+import { useRouter } from "next/navigation";
 import useStore from "@/context/Store";
-import { toast, Toaster } from "react-hot-toast"
-import { Skeleton } from "@/components/ui/skeleton"
-
+import { toast, Toaster } from "react-hot-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function AffiliateOverviewPage() {
-  const { affiliateData: { data, loading }, fetchAffiliateData } = useStore();
+  const {
+    affiliateData: { data, loading },
+    fetchAffiliateData,
+  } = useStore();
   const router = useRouter();
   const isAffiliate = !!data;
 
@@ -67,7 +86,7 @@ export function AffiliateOverviewPage() {
       description: "مكافآت خاصة للشركاء المتميزين",
       color: "text-pink-600",
     },
-  ]
+  ];
 
   const commissionTiers = [
     {
@@ -94,7 +113,7 @@ export function AffiliateOverviewPage() {
       commission: "30%",
       color: "bg-purple-100 text-purple-800 border-purple-200",
     },
-  ]
+  ];
 
   const features = [
     "روابط تتبع فريدة لكل شريك",
@@ -103,7 +122,7 @@ export function AffiliateOverviewPage() {
     "مواد تسويقية جاهزة للاستخدام",
     "دعم فني متخصص على مدار الساعة",
     "دفعات شهرية منتظمة",
-  ]
+  ];
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col">
@@ -145,7 +164,7 @@ export function AffiliateOverviewPage() {
           </main>
         </div>
       </div>
-    )
+    );
   }
   return (
     <div className="flex min-h-screen flex-col">
@@ -156,9 +175,12 @@ export function AffiliateOverviewPage() {
           <div className="space-y-8">
             {/* Hero Section */}
             <div className="text-center space-y-4">
-              <h1 className="text-4xl font-bold tracking-tight">برنامج الشراكة والعمولة</h1>
+              <h1 className="text-4xl font-bold tracking-tight">
+                برنامج الشراكة والعمولة
+              </h1>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                انضم إلى برنامج الشراكة واربح عمولات مجزية من خلال الترويج لمنصة إنشاء المواقع الرائدة
+                انضم إلى برنامج الشراكة واربح عمولات مجزية من خلال الترويج لمنصة
+                إنشاء المواقع الرائدة
               </p>
               {!isAffiliate ? (
                 <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
@@ -213,18 +235,27 @@ export function AffiliateOverviewPage() {
             <Card>
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl">هيكل العمولات</CardTitle>
-                <CardDescription>كلما زادت مبيعاتك، زادت نسبة العمولة التي تحصل عليها</CardDescription>
+                <CardDescription>
+                  كلما زادت مبيعاتك، زادت نسبة العمولة التي تحصل عليها
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {commissionTiers.map((tier, index) => (
-                    <div key={index} className="text-center p-6 border rounded-lg">
+                    <div
+                      key={index}
+                      className="text-center p-6 border rounded-lg"
+                    >
                       <Badge variant="outline" className={`mb-3 ${tier.color}`}>
                         {tier.tier}
                       </Badge>
                       <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">{tier.sales} مبيعة شهرياً</p>
-                        <p className="text-2xl font-bold text-primary">{tier.commission}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {tier.sales} مبيعة شهرياً
+                        </p>
+                        <p className="text-2xl font-bold text-primary">
+                          {tier.commission}
+                        </p>
                         <p className="text-sm">عمولة</p>
                       </div>
                     </div>
@@ -237,7 +268,9 @@ export function AffiliateOverviewPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-xl">ما ستحصل عليه كشريك</CardTitle>
-                <CardDescription>جميع الأدوات والموارد التي تحتاجها للنجاح في برنامج الشراكة</CardDescription>
+                <CardDescription>
+                  جميع الأدوات والموارد التي تحتاجها للنجاح في برنامج الشراكة
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -255,7 +288,9 @@ export function AffiliateOverviewPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-xl">قصص نجاح الشركاء</CardTitle>
-                <CardDescription>تعرف على تجارب الشركاء الناجحين في برنامجنا</CardDescription>
+                <CardDescription>
+                  تعرف على تجارب الشركاء الناجحين في برنامجنا
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -264,7 +299,8 @@ export function AffiliateOverviewPage() {
                       name: "أحمد محمد",
                       earnings: "15,000 ريال",
                       period: "الشهر الماضي",
-                      testimonial: "برنامج رائع ساعدني على تحقيق دخل إضافي ممتاز",
+                      testimonial:
+                        "برنامج رائع ساعدني على تحقيق دخل إضافي ممتاز",
                     },
                     {
                       name: "فاطمة علي",
@@ -286,11 +322,17 @@ export function AffiliateOverviewPage() {
                         </div>
                         <div>
                           <p className="font-medium">{story.name}</p>
-                          <p className="text-sm text-muted-foreground">{story.period}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {story.period}
+                          </p>
                         </div>
                       </div>
-                      <p className="text-2xl font-bold text-green-600 mb-2">{story.earnings}</p>
-                      <p className="text-sm text-muted-foreground">"{story.testimonial}"</p>
+                      <p className="text-2xl font-bold text-green-600 mb-2">
+                        {story.earnings}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        "{story.testimonial}"
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -301,8 +343,12 @@ export function AffiliateOverviewPage() {
             {!isAffiliate && (
               <Card className="bg-primary text-primary-foreground">
                 <CardContent className="text-center p-8">
-                  <h2 className="text-2xl font-bold mb-4">ابدأ رحلتك كشريك اليوم</h2>
-                  <p className="text-lg mb-6 opacity-90">انضم إلى آلاف الشركاء الذين يحققون أرباحاً ممتازة معنا</p>
+                  <h2 className="text-2xl font-bold mb-4">
+                    ابدأ رحلتك كشريك اليوم
+                  </h2>
+                  <p className="text-lg mb-6 opacity-90">
+                    انضم إلى آلاف الشركاء الذين يحققون أرباحاً ممتازة معنا
+                  </p>
                   <Button size="lg" variant="secondary" asChild>
                     <Link href="/affiliate/register">
                       <Users className="h-5 w-5 ml-2" />
@@ -316,5 +362,5 @@ export function AffiliateOverviewPage() {
         </main>
       </div>
     </div>
-  )
+  );
 }

@@ -77,7 +77,7 @@ export default function AddBlogPage(): JSX.Element {
     const fetchCategories = async () => {
       try {
         const response = await axiosInstance.get(
-          `${process.env.NEXT_PUBLIC_Backend_URL}/blog-categories`
+          `${process.env.NEXT_PUBLIC_Backend_URL}/blog-categories`,
         );
         // نفترض أن الاستجابة تكون بالشكل { status: "success", data: { categories: [...] } }
         setCategories(response.data.data.categories);
@@ -89,7 +89,7 @@ export default function AddBlogPage(): JSX.Element {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -105,7 +105,7 @@ export default function AddBlogPage(): JSX.Element {
       // في التطبيق الحقيقي يتم رفع الصور للسيرفر
       const newImages = Array.from(files).map(
         (_, index) =>
-          `/placeholder.svg?height=200&width=350&text=صورة+${selectedImages.length + index + 1}`
+          `/placeholder.svg?height=200&width=350&text=صورة+${selectedImages.length + index + 1}`,
       );
       setSelectedImages([...selectedImages, ...newImages]);
     }
@@ -134,7 +134,7 @@ export default function AddBlogPage(): JSX.Element {
     try {
       await axiosInstance.post(
         `${process.env.NEXT_PUBLIC_Backend_URL}/blogs`,
-        requestBody
+        requestBody,
       );
       toast.success(`تم إضافة التدوينة بنجاح`);
       router.push("/blogs");
@@ -407,7 +407,7 @@ export default function AddBlogPage(): JSX.Element {
                                 variant="outline"
                                 className={cn(
                                   "w-full justify-start text-right font-normal",
-                                  !date && "text-muted-foreground"
+                                  !date && "text-muted-foreground",
                                 )}
                               >
                                 <CalendarIcon className="ml-2 h-4 w-4" />

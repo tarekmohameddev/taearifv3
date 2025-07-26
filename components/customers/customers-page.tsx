@@ -1,25 +1,44 @@
-"use client"
+"use client";
 
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
-import axiosInstance from '@/lib/axiosInstance'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useEffect, useState } from 'react'
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import axiosInstance from "@/lib/axiosInstance";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Search,
   UserPlus,
@@ -48,11 +67,11 @@ import {
   RefreshCw,
   ArrowRight,
   Move,
-} from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import Link from "next/link"
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 // Customer data (same as CRM page for consistency)
 const customers = [
@@ -89,98 +108,86 @@ const customers = [
     probability: 75,
     expectedCloseDate: "2023-12-15",
   },
-]
+];
 
 export default function CustomersPage() {
-  const [activeTab, setActiveTab] = useState('customers')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCustomer, setSelectedCustomer] = useState(null)
-  const [selectedCustomers, setSelectedCustomers] = useState([])
-  const [sortField, setSortField] = useState('name')
-  const [sortDirection, setSortDirection] = useState('asc')
-  const [filterStatus, setFilterStatus] = useState('all')
-  const [filterType, setFilterType] = useState('all')
-  const [filterCity, setFilterCity] = useState('all')
-  const [showCustomerDialog, setShowCustomerDialog] = useState(false)
-  const [showAddCustomerDialog, setShowAddCustomerDialog] = useState(false)
-  const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false)
-  const [totalCustomers, setTotalCustomers] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [customersData, setCustomersData] = useState([])  // ← هنا يتم حفظ كل العملاء
-const [formData, setFormData] = useState(null)          // ← بيانات العميل المحدد
-const [editingCustomerId, setEditingCustomerId] = useState(null) // ← ID العميل الجاري تعديله
-const [open, setOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState("customers");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [sortField, setSortField] = useState("name");
+  const [sortDirection, setSortDirection] = useState("asc");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterType, setFilterType] = useState("all");
+  const [filterCity, setFilterCity] = useState("all");
+  const [showCustomerDialog, setShowCustomerDialog] = useState(false);
+  const [showAddCustomerDialog, setShowAddCustomerDialog] = useState(false);
+  const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false);
+  const [totalCustomers, setTotalCustomers] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [customersData, setCustomersData] = useState([]); // ← هنا يتم حفظ كل العملاء
+  const [formData, setFormData] = useState(null); // ← بيانات العميل المحدد
+  const [editingCustomerId, setEditingCustomerId] = useState(null); // ← ID العميل الجاري تعديله
+  const [open, setOpen] = useState(false);
 
-  
-  
-  
-  
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await axiosInstance.get("/customers");
+        const { customers, summary } = response.data.data;
+        setCustomersData(customers);
+        setTotalCustomers(summary.total_customers);
+      } catch (err) {
+        console.error("Error fetching customers:", err);
+        setError("حدث خطأ أثناء تحميل البيانات.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-useEffect(() => {
-  const fetchCustomers = async () => {
-    try {
-      const response = await axiosInstance.get('/customers')
-      const { customers, summary } = response.data.data
-      setCustomersData(customers)
-      setTotalCustomers(summary.total_customers)
-    } catch (err) {
-      console.error('Error fetching customers:', err)
-      setError('حدث خطأ أثناء تحميل البيانات.')
-    } finally {
-      setLoading(false)
-    }
-  }
+    fetchCustomers();
+  }, []);
 
-  fetchCustomers()
-}, [])
+  const openEditDialog = (customer) => {
+    setEditingCustomerId(customer.id);
+    setFormData({
+      name: customer.name || "",
+      email: customer.email || "",
+      phone_number: customer.phone_number || "",
+      note: customer.note || "",
+      customer_type: customer.customer_type || "",
+      priority: customer.priority || 1,
+      city_id: customer.city_id || null,
+      district_id: customer.district?.id || null,
+      stage_id: 2,
+    });
+    setOpen(true);
+  };
 
-const openEditDialog = (customer) => {
-  setEditingCustomerId(customer.id)
-  setFormData({
-    name: customer.name || "",
-    email: customer.email || "",
-    phone_number: customer.phone_number || "",
-    note: customer.note || "",
-    customer_type: customer.customer_type || "",
-    priority: customer.priority || 1,
-    city_id: customer.city_id || null,
-    district_id: customer.district?.id || null,
-    stage_id: 2,
-  })
-  setOpen(true)
-}
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
-
-
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>{error}</p>
-  
-  
-  
   const handleUpdateCustomer = async () => {
     try {
-      await axiosInstance.put(`/customers/${editingCustomerId}`, formData)
-  
+      await axiosInstance.put(`/customers/${editingCustomerId}`, formData);
+
       // تحديث الـ customer داخل القائمة
       setCustomersData((prev) =>
         prev.map((cust) =>
-          cust.id === editingCustomerId ? { ...cust, ...formData } : cust
-        )
-      )
-  
-      setOpen(false)
+          cust.id === editingCustomerId ? { ...cust, ...formData } : cust,
+        ),
+      );
+
+      setOpen(false);
     } catch (error) {
-      console.error("Error updating customer:", error)
+      console.error("Error updating customer:", error);
     }
-  }
+  };
 
-  
   const handleChange = (field) => (e) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }))
-  }
-
-  
+    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+  };
 
   // Filter and sort customers
   const filteredAndSortedCustomers = customersData
@@ -192,82 +199,97 @@ const openEditDialog = (customer) => {
         customer.phone_number.includes(searchTerm) ||
         customer.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (typeof customer.district === "string"
-          ? customer.district?.toLowerCase().includes(searchTerm.toLowerCase()) 
-          : customer.district?.name_ar.toLowerCase().includes(searchTerm.toLowerCase()))
+          ? customer.district?.toLowerCase().includes(searchTerm.toLowerCase())
+          : customer.district?.name_ar
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()));
 
-      const matchesStatus = filterStatus === "all" || customer.status === filterStatus
-      const matchesType = filterType === "all" || customer.customer_type === filterType
-      const matchesCity = filterCity === "all" || customer.city === filterCity
+      const matchesStatus =
+        filterStatus === "all" || customer.status === filterStatus;
+      const matchesType =
+        filterType === "all" || customer.customer_type === filterType;
+      const matchesCity = filterCity === "all" || customer.city === filterCity;
 
-      return matchesSearch && matchesStatus && matchesType && matchesCity
+      return matchesSearch && matchesStatus && matchesType && matchesCity;
     })
     .sort((a, b) => {
-      let aValue = a[sortField]
-      let bValue = b[sortField]
+      let aValue = a[sortField];
+      let bValue = b[sortField];
 
       if (typeof aValue === "string") {
-        aValue = aValue.toLowerCase()
-        bValue = bValue.toLowerCase()
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
       }
 
       if (sortDirection === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
       }
-    })
+    });
 
   const handleSort = (field) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      setSortField(field)
-      setSortDirection("asc")
+      setSortField(field);
+      setSortDirection("asc");
     }
-  }
+  };
 
   const handleSelectCustomer = (customerId) => {
     setSelectedCustomers((prev) =>
-      prev.includes(customerId) ? prev.filter((id) => id !== customerId) : [...prev, customerId],
-    )
-  }
+      prev.includes(customerId)
+        ? prev.filter((id) => id !== customerId)
+        : [...prev, customerId],
+    );
+  };
 
   const handleSelectAll = () => {
     if (selectedCustomers.length === filteredAndSortedCustomers.length) {
-      setSelectedCustomers([])
+      setSelectedCustomers([]);
     } else {
-      setSelectedCustomers(filteredAndSortedCustomers.map((c) => c.id))
+      setSelectedCustomers(filteredAndSortedCustomers.map((c) => c.id));
     }
-  }
+  };
 
   // Calculate basic statistics
-  const activeCustomers = customersData.filter((c) => c.status === "نشط").length
-  const totalRevenue = customersData.reduce((sum, c) => sum + c.totalValue, 0)
-  const avgCustomerValue = totalRevenue / totalCustomers
+  const activeCustomers = customersData.filter(
+    (c) => c.status === "نشط",
+  ).length;
+  const totalRevenue = customersData.reduce((sum, c) => sum + c.totalValue, 0);
+  const avgCustomerValue = totalRevenue / totalCustomers;
 
   // Customer type statistics
-  const buyerCount = customersData.filter((c) => c.customer_type === "مشتري").length
-  const sellerCount = customersData.filter((c) => c.customer_type === "بائع").length
-  const renterCount = customersData.filter((c) => c.customer_type === "مستأجر").length
-  const landlordCount = customersData.filter((c) => c.customer_type === "مؤجر").length
-  const investorCount = customersData.filter((c) => c.customer_type === "مستثمر").length
-  
-  
+  const buyerCount = customersData.filter(
+    (c) => c.customer_type === "مشتري",
+  ).length;
+  const sellerCount = customersData.filter(
+    (c) => c.customer_type === "بائع",
+  ).length;
+  const renterCount = customersData.filter(
+    (c) => c.customer_type === "مستأجر",
+  ).length;
+  const landlordCount = customersData.filter(
+    (c) => c.customer_type === "مؤجر",
+  ).length;
+  const investorCount = customersData.filter(
+    (c) => c.customer_type === "مستثمر",
+  ).length;
+
   const handleDelete = async (customerId) => {
     try {
-      await axiosInstance.delete(`/customers/${customerId}`)
+      await axiosInstance.delete(`/customers/${customerId}`);
       // احذف العميل من الواجهة
-      setCustomersData(prev =>
-        prev.filter(customer => customer.id !== customerId)
-      )
+      setCustomersData((prev) =>
+        prev.filter((customer) => customer.id !== customerId),
+      );
     } catch (error) {
-      console.error('Failed to delete customer:', error)
-      alert('حدث خطأ أثناء الحذف')
+      console.error("Failed to delete customer:", error);
+      alert("حدث خطأ أثناء الحذف");
     }
-  }
+  };
 
-  
-  
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
       <DashboardHeader />
@@ -278,8 +300,12 @@ const openEditDialog = (customer) => {
             {/* Header */}
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">إدارة العملاء</h1>
-                <p className="text-muted-foreground">عرض وإدارة بيانات العملاء في جدول منظم</p>
+                <h1 className="text-2xl font-bold tracking-tight">
+                  إدارة العملاء
+                </h1>
+                <p className="text-muted-foreground">
+                  عرض وإدارة بيانات العملاء في جدول منظم
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <Link href="/crm">
@@ -296,7 +322,10 @@ const openEditDialog = (customer) => {
                   <Download className="ml-2 h-4 w-4" />
                   تصدير البيانات
                 </Button> */}
-                <Dialog open={showAddCustomerDialog} onOpenChange={setShowAddCustomerDialog}>
+                <Dialog
+                  open={showAddCustomerDialog}
+                  onOpenChange={setShowAddCustomerDialog}
+                >
                   <DialogTrigger asChild>
                     <Button>
                       <UserPlus className="ml-2 h-4 w-4" />
@@ -315,13 +344,20 @@ const openEditDialog = (customer) => {
                         </div>
                         <div>
                           <Label htmlFor="nameEn">الاسم بالإنجليزية</Label>
-                          <Input id="nameEn" placeholder="Ahmed Mohammed Al-Ali" />
+                          <Input
+                            id="nameEn"
+                            placeholder="Ahmed Mohammed Al-Ali"
+                          />
                         </div>
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div>
                           <Label htmlFor="email">البريد الإلكتروني</Label>
-                          <Input id="email" type="email" placeholder="ahmed@example.com" />
+                          <Input
+                            id="email"
+                            type="email"
+                            placeholder="ahmed@example.com"
+                          />
                         </div>
                         <div>
                           <Label htmlFor="phone">رقم الهاتف</Label>
@@ -373,7 +409,9 @@ const openEditDialog = (customer) => {
                               <SelectItem value="جدة">جدة</SelectItem>
                               <SelectItem value="الدمام">الدمام</SelectItem>
                               <SelectItem value="مكة">مكة المكرمة</SelectItem>
-                              <SelectItem value="المدينة">المدينة المنورة</SelectItem>
+                              <SelectItem value="المدينة">
+                                المدينة المنورة
+                              </SelectItem>
                               <SelectItem value="الطائف">الطائف</SelectItem>
                               <SelectItem value="الخبر">الخبر</SelectItem>
                               <SelectItem value="القطيف">القطيف</SelectItem>
@@ -382,13 +420,20 @@ const openEditDialog = (customer) => {
                         </div>
                         <div>
                           <Label htmlFor="district">الحي</Label>
-                          <Input id="district" placeholder="العليا، الروضة، النرجس..." />
+                          <Input
+                            id="district"
+                            placeholder="العليا، الروضة، النرجس..."
+                          />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="familySize">حجم الأسرة</Label>
-                          <Input id="familySize" type="number" placeholder="5" />
+                          <Input
+                            id="familySize"
+                            type="number"
+                            placeholder="5"
+                          />
                         </div>
                         <div>
                           <Label htmlFor="assignedAgent">الوسيط المسؤول</Label>
@@ -397,24 +442,42 @@ const openEditDialog = (customer) => {
                               <SelectValue placeholder="اختر الوسيط" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="سارة أحمد">سارة أحمد</SelectItem>
-                              <SelectItem value="محمد خالد">محمد خالد</SelectItem>
-                              <SelectItem value="عبدالله محمد">عبدالله محمد</SelectItem>
-                              <SelectItem value="أمل عبدالله">أمل عبدالله</SelectItem>
-                              <SelectItem value="فيصل العتيبي">فيصل العتيبي</SelectItem>
+                              <SelectItem value="سارة أحمد">
+                                سارة أحمد
+                              </SelectItem>
+                              <SelectItem value="محمد خالد">
+                                محمد خالد
+                              </SelectItem>
+                              <SelectItem value="عبدالله محمد">
+                                عبدالله محمد
+                              </SelectItem>
+                              <SelectItem value="أمل عبدالله">
+                                أمل عبدالله
+                              </SelectItem>
+                              <SelectItem value="فيصل العتيبي">
+                                فيصل العتيبي
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
                       <div>
                         <Label htmlFor="notes">ملاحظات</Label>
-                        <Textarea id="notes" placeholder="أدخل أي ملاحظات مهمة عن العميل..." />
+                        <Textarea
+                          id="notes"
+                          placeholder="أدخل أي ملاحظات مهمة عن العميل..."
+                        />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setShowAddCustomerDialog(false)}>
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowAddCustomerDialog(false)}
+                        >
                           إلغاء
                         </Button>
-                        <Button onClick={() => setShowAddCustomerDialog(false)}>إضافة العميل</Button>
+                        <Button onClick={() => setShowAddCustomerDialog(false)}>
+                          إضافة العميل
+                        </Button>
                       </div>
                     </div>
                   </DialogContent>
@@ -434,7 +497,8 @@ const openEditDialog = (customer) => {
                 <CardContent>
                   <div className="text-2xl font-bold">{totalCustomers}</div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-green-500">↑ 12%</span> من الشهر الماضي
+                    <span className="text-green-500">↑ 12%</span> من الشهر
+                    الماضي
                   </p>
                 </CardContent>
               </Card>
@@ -600,8 +664,13 @@ const openEditDialog = (customer) => {
               {/* Bulk Actions */}
               {selectedCustomers.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">{selectedCustomers.length} عميل محدد</span>
-                  <Dialog open={showBulkActionsDialog} onOpenChange={setShowBulkActionsDialog}>
+                  <span className="text-sm text-muted-foreground">
+                    {selectedCustomers.length} عميل محدد
+                  </span>
+                  <Dialog
+                    open={showBulkActionsDialog}
+                    onOpenChange={setShowBulkActionsDialog}
+                  >
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm">
                         <CheckSquare className="ml-2 h-4 w-4" />
@@ -613,31 +682,50 @@ const openEditDialog = (customer) => {
                         <DialogTitle>إجراءات جماعية للعملاء</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4">
-                        <Button className="w-full justify-start bg-transparent" variant="outline">
+                        <Button
+                          className="w-full justify-start bg-transparent"
+                          variant="outline"
+                        >
                           <Mail className="ml-2 h-4 w-4" />
                           إرسال بريد إلكتروني جماعي
                         </Button>
-                        <Button className="w-full justify-start bg-transparent" variant="outline">
+                        <Button
+                          className="w-full justify-start bg-transparent"
+                          variant="outline"
+                        >
                           <MessageSquare className="ml-2 h-4 w-4" />
                           إرسال رسالة واتساب جماعية
                         </Button>
-                        <Button className="w-full justify-start bg-transparent" variant="outline">
+                        <Button
+                          className="w-full justify-start bg-transparent"
+                          variant="outline"
+                        >
                           <Tag className="ml-2 h-4 w-4" />
                           إضافة علامات
                         </Button>
-                        <Button className="w-full justify-start bg-transparent" variant="outline">
+                        <Button
+                          className="w-full justify-start bg-transparent"
+                          variant="outline"
+                        >
                           <Download className="ml-2 h-4 w-4" />
                           تصدير البيانات المحددة
                         </Button>
                         <Separator />
-                        <Button className="w-full justify-start" variant="destructive">
+                        <Button
+                          className="w-full justify-start"
+                          variant="destructive"
+                        >
                           <Trash2 className="ml-2 h-4 w-4" />
                           حذف العملاء المحددين
                         </Button>
                       </div>
                     </DialogContent>
                   </Dialog>
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedCustomers([])}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedCustomers([])}
+                  >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
@@ -651,7 +739,10 @@ const openEditDialog = (customer) => {
                       <TableRow>
                         <TableHead className="w-[50px]">
                           <Checkbox
-                            checked={selectedCustomers.length === filteredAndSortedCustomers.length}
+                            checked={
+                              selectedCustomers.length ===
+                              filteredAndSortedCustomers.length
+                            }
                             onCheckedChange={handleSelectAll}
                           />
                         </TableHead>
@@ -671,12 +762,14 @@ const openEditDialog = (customer) => {
                           </Button>
                         </TableHead>
                         <TableHead className="text-right">الاتصال</TableHead>
-                        <TableHead  className="text-right">النوع</TableHead>
-                        <TableHead  className="text-right">الموقع</TableHead>
+                        <TableHead className="text-right">النوع</TableHead>
+                        <TableHead className="text-right">الموقع</TableHead>
                         {/* <TableHead>الوسيط</TableHead> */}
                         <TableHead className="text-right">آخر تواصل</TableHead>
                         {/* <TableHead className="text-right">القيمة الإجمالية</TableHead> */}
-                        <TableHead className="w-[100px] text-right">الإجراءات</TableHead>
+                        <TableHead className="w-[100px] text-right">
+                          الإجراءات
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -685,7 +778,9 @@ const openEditDialog = (customer) => {
                           <TableCell>
                             <Checkbox
                               checked={selectedCustomers.includes(customer.id)}
-                              onCheckedChange={() => handleSelectCustomer(customer.id)}
+                              onCheckedChange={() =>
+                                handleSelectCustomer(customer.id)
+                              }
                             />
                           </TableCell>
                           <TableCell>
@@ -701,7 +796,9 @@ const openEditDialog = (customer) => {
                                 </AvatarFallback>
                               </Avatar> */}
                               <div>
-                                <div className="font-medium text-right">{customer.name}</div>
+                                <div className="font-medium text-right">
+                                  {customer.name}
+                                </div>
                               </div>
                             </div>
                           </TableCell>
@@ -713,7 +810,9 @@ const openEditDialog = (customer) => {
                               </div>
                               <div className="flex items-center text-sm text-muted-foreground">
                                 <MessageSquare className="ml-2 h-3 w-3" />
-                                {customer.whatsapp ? customer.whatsapp : customer.phone_number}
+                                {customer.whatsapp
+                                  ? customer.whatsapp
+                                  : customer.phone_number}
                               </div>
                             </div>
                           </TableCell>
@@ -737,12 +836,17 @@ const openEditDialog = (customer) => {
                           </TableCell>
                           <TableCell>
                             <div>
-                              <div className="font-medium">{typeof customer.city === "string"
-    ? customer.city
-    : customer.district?.city_name_ar}</div>
-                              <div className="text-sm text-muted-foreground">  {typeof customer.district === "string"
-    ? customer.district
-    : customer.district?.name_ar}</div>
+                              <div className="font-medium">
+                                {typeof customer.city === "string"
+                                  ? customer.city
+                                  : customer.district?.city_name_ar}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {" "}
+                                {typeof customer.district === "string"
+                                  ? customer.district
+                                  : customer.district?.name_ar}
+                              </div>
                             </div>
                           </TableCell>
                           {/* <TableCell>
@@ -751,7 +855,9 @@ const openEditDialog = (customer) => {
                           <TableCell>
                             <div className="flex items-center text-sm text-muted-foreground">
                               <Clock className="ml-2 h-3 w-3" />
-                              {customer.lastContact? customer.lastContact: "2025-7-25"}
+                              {customer.lastContact
+                                ? customer.lastContact
+                                : "2025-7-25"}
                             </div>
                           </TableCell>
                           {/* <TableCell>
@@ -765,8 +871,8 @@ const openEditDialog = (customer) => {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => {
-                                  setSelectedCustomer(customer)
-                                  setShowCustomerDialog(true)
+                                  setSelectedCustomer(customer);
+                                  setShowCustomerDialog(true);
                                 }}
                               >
                                 <Eye className="h-4 w-4" />
@@ -778,35 +884,65 @@ const openEditDialog = (customer) => {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-  <DropdownMenuItem onSelect={(e) => {
-  e.preventDefault()
-  openEditDialog(customer)  // تمرير العميل المحدد
-}}>
-  <Edit className="ml-2 h-4 w-4" />
-  تعديل العميل
-</DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      openEditDialog(customer); // تمرير العميل المحدد
+                                    }}
+                                  >
+                                    <Edit className="ml-2 h-4 w-4" />
+                                    تعديل العميل
+                                  </DropdownMenuItem>
 
-{formData && (
-  <Dialog open={open} onOpenChange={setOpen}>
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>تعديل بيانات العميل</DialogTitle>
-      </DialogHeader>
-      <div className="grid gap-4">
-        <Input id="name" value={formData.name} onChange={handleChange("name")} />
-        <Input id="email" value={formData.email} onChange={handleChange("email")} />
-        <Input id="phone" value={formData.phone_number} onChange={handleChange("phone_number")} />
-        <Textarea id="note" value={formData.note} onChange={handleChange("note")} />
+                                  {formData && (
+                                    <Dialog open={open} onOpenChange={setOpen}>
+                                      <DialogContent>
+                                        <DialogHeader>
+                                          <DialogTitle>
+                                            تعديل بيانات العميل
+                                          </DialogTitle>
+                                        </DialogHeader>
+                                        <div className="grid gap-4">
+                                          <Input
+                                            id="name"
+                                            value={formData.name}
+                                            onChange={handleChange("name")}
+                                          />
+                                          <Input
+                                            id="email"
+                                            value={formData.email}
+                                            onChange={handleChange("email")}
+                                          />
+                                          <Input
+                                            id="phone"
+                                            value={formData.phone_number}
+                                            onChange={handleChange(
+                                              "phone_number",
+                                            )}
+                                          />
+                                          <Textarea
+                                            id="note"
+                                            value={formData.note}
+                                            onChange={handleChange("note")}
+                                          />
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>إلغاء</Button>
-          <Button onClick={handleUpdateCustomer}>تعديل</Button>
-        </div>
-      </div>
-    </DialogContent>
-  </Dialog>
-)}
-
+                                          <div className="flex justify-end gap-2">
+                                            <Button
+                                              variant="outline"
+                                              onClick={() => setOpen(false)}
+                                            >
+                                              إلغاء
+                                            </Button>
+                                            <Button
+                                              onClick={handleUpdateCustomer}
+                                            >
+                                              تعديل
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      </DialogContent>
+                                    </Dialog>
+                                  )}
 
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem>
@@ -822,13 +958,13 @@ const openEditDialog = (customer) => {
                                     إرسال بريد إلكتروني
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
-      <DropdownMenuItem
-        className="text-destructive"
-        onClick={() => handleDelete(customer.id)}
-      >
-        <Trash2 className="ml-2 h-4 w-4" />
-        حذف
-      </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-destructive"
+                                    onClick={() => handleDelete(customer.id)}
+                                  >
+                                    <Trash2 className="ml-2 h-4 w-4" />
+                                    حذف
+                                  </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </div>
@@ -847,9 +983,12 @@ const openEditDialog = (customer) => {
                     <div className="flex flex-col items-center space-y-4">
                       <Target className="h-12 w-12 text-primary" />
                       <div>
-                        <h3 className="text-lg font-semibold">هل تحتاج إلى مزيد من الميزات؟</h3>
+                        <h3 className="text-lg font-semibold">
+                          هل تحتاج إلى مزيد من الميزات؟
+                        </h3>
                         <p className="text-sm text-muted-foreground">
-                          استخدم نظام CRM المتقدم لإدارة مراحل العملاء والمواعيد والتفاعلات
+                          استخدم نظام CRM المتقدم لإدارة مراحل العملاء والمواعيد
+                          والتفاعلات
                         </p>
                       </div>
                       <Link href="/crm">
@@ -865,14 +1004,19 @@ const openEditDialog = (customer) => {
             </div>
 
             {/* Customer Detail Dialog */}
-            <Dialog open={showCustomerDialog} onOpenChange={setShowCustomerDialog}>
+            <Dialog
+              open={showCustomerDialog}
+              onOpenChange={setShowCustomerDialog}
+            >
               <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 {selectedCustomer && (
                   <>
                     <DialogHeader>
                       <DialogTitle className="flex items-center gap-3">
                         <Avatar className="h-12 w-12">
-                          <AvatarImage src={selectedCustomer.avatar || "/placeholder.svg"} />
+                          <AvatarImage
+                            src={selectedCustomer.avatar || "/placeholder.svg"}
+                          />
                           <AvatarFallback>
                             {selectedCustomer.name
                               .split(" ")
@@ -884,7 +1028,8 @@ const openEditDialog = (customer) => {
                         <div>
                           <div className="text-xl">{selectedCustomer.name}</div>
                           <div className="text-sm text-muted-foreground font-normal">
-                            {selectedCustomer.nameEn} • عميل منذ {selectedCustomer.joinDate}
+                            {selectedCustomer.nameEn} • عميل منذ{" "}
+                            {selectedCustomer.joinDate}
                           </div>
                         </div>
                         <div className="mr-auto flex items-center gap-2">
@@ -925,19 +1070,27 @@ const openEditDialog = (customer) => {
                         <CardContent className="space-y-3">
                           <div className="flex items-center justify-between">
                             <span>الهاتف:</span>
-                            <span className="font-medium">{selectedCustomer.phone}</span>
+                            <span className="font-medium">
+                              {selectedCustomer.phone}
+                            </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>واتساب:</span>
-                            <span className="font-medium">{selectedCustomer.whatsapp}</span>
+                            <span className="font-medium">
+                              {selectedCustomer.whatsapp}
+                            </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>البريد:</span>
-                            <span className="font-medium text-sm">{selectedCustomer.email}</span>
+                            <span className="font-medium text-sm">
+                              {selectedCustomer.email}
+                            </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>التفضيل:</span>
-                            <Badge variant="outline">{selectedCustomer.communicationPreference}</Badge>
+                            <Badge variant="outline">
+                              {selectedCustomer.communicationPreference}
+                            </Badge>
                           </div>
                         </CardContent>
                       </Card>
@@ -952,21 +1105,29 @@ const openEditDialog = (customer) => {
                         <CardContent className="space-y-3">
                           <div className="flex items-center justify-between">
                             <span>المدينة:</span>
-                            <span className="font-medium">{selectedCustomer.city}</span>
+                            <span className="font-medium">
+                              {selectedCustomer.city}
+                            </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>الحي:</span>
-                            <span className="font-medium">{typeof selectedCustomer.district === "string"
-    ? selectedCustomer.district
-    : selectedCustomer.district?.name_ar}</span>
-                          </div>  
+                            <span className="font-medium">
+                              {typeof selectedCustomer.district === "string"
+                                ? selectedCustomer.district
+                                : selectedCustomer.district?.name_ar}
+                            </span>
+                          </div>
                           <div className="flex items-center justify-between">
                             <span>الجنسية:</span>
-                            <span className="font-medium">{selectedCustomer.nationality}</span>
+                            <span className="font-medium">
+                              {selectedCustomer.nationality}
+                            </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>حجم الأسرة:</span>
-                            <span className="font-medium">{selectedCustomer.familySize} أفراد</span>
+                            <span className="font-medium">
+                              {selectedCustomer.familySize} أفراد
+                            </span>
                           </div>
                         </CardContent>
                       </Card>
@@ -981,11 +1142,15 @@ const openEditDialog = (customer) => {
                         <CardContent className="space-y-3">
                           <div className="flex items-center justify-between">
                             <span>الوسيط:</span>
-                            <span className="font-medium">{selectedCustomer.assignedAgent}</span>
+                            <span className="font-medium">
+                              {selectedCustomer.assignedAgent}
+                            </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>المصدر:</span>
-                            <span className="font-medium">{selectedCustomer.leadSource}</span>
+                            <span className="font-medium">
+                              {selectedCustomer.leadSource}
+                            </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>الأولوية:</span>
@@ -1017,7 +1182,9 @@ const openEditDialog = (customer) => {
                         <CardTitle className="text-lg">الملاحظات</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm whitespace-pre-line">{selectedCustomer.notes}</p>
+                        <p className="text-sm whitespace-pre-line">
+                          {selectedCustomer.notes}
+                        </p>
                       </CardContent>
                     </Card>
 
@@ -1049,5 +1216,5 @@ const openEditDialog = (customer) => {
         </main>
       </div>
     </div>
-  )
+  );
 }

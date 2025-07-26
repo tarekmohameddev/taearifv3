@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error(
         "An error occurred while sending the logout request to the external API:",
-        error
+        error,
       );
     }
 

@@ -15,7 +15,7 @@ export async function uploadSingleFile(file, context, subFolder = null) {
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
-      }
+      },
     );
     return response.data.data;
   } catch (error) {

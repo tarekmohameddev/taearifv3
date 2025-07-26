@@ -1,19 +1,30 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Edit, AlertTriangle } from "lucide-react"
-import useCrmStore from "@/context/store/crm"
-import axiosInstance from "@/lib/axiosInstance"
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Edit, AlertTriangle } from "lucide-react";
+import useCrmStore from "@/context/store/crm";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface EditStageDialogProps {
-  onStageUpdated?: (stage: any) => void
+  onStageUpdated?: (stage: any) => void;
 }
 
 const stageColors = [
@@ -26,8 +37,8 @@ const stageColors = [
   { value: "#6366f1", label: "نيلي", color: "#6366f1" },
   { value: "#14b8a6", label: "تركوازي", color: "#14b8a6" },
   { value: "#f97316", label: "برتقالي", color: "#f97316" },
-  { value: "#84cc16", label: "ليموني", color: "#84cc16" }
-]
+  { value: "#84cc16", label: "ليموني", color: "#84cc16" },
+];
 
 const stageIcons = [
   { value: "fa fa-user", label: "مستخدم" },
@@ -41,16 +52,18 @@ const stageIcons = [
   { value: "fa fa-user-shield", label: "مستخدم محمي" },
   { value: "fa fa-check-circle", label: "دائرة صح" },
   { value: "fa fa-handshake", label: "مصافحة" },
-  { value: "fa fa-chart-line", label: "رسم بياني" }
-]
+  { value: "fa fa-chart-line", label: "رسم بياني" },
+];
 
-export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps) {
-  const { 
-    showEditStageDialog, 
-    selectedStage, 
+export default function EditStageDialog({
+  onStageUpdated,
+}: EditStageDialogProps) {
+  const {
+    showEditStageDialog,
+    selectedStage,
     setShowEditStageDialog,
-    setSelectedStage
-  } = useCrmStore()
+    setSelectedStage,
+  } = useCrmStore();
 
   const [stageData, setStageData] = useState({
     stage_name: "",
@@ -58,10 +71,10 @@ export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps
     icon: "fa fa-user",
     order: 1,
     description: "",
-    is_active: true
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+    is_active: true,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Pre-fill form when stage is selected
   useEffect(() => {
@@ -72,43 +85,49 @@ export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps
         icon: selectedStage.icon || "fa fa-user",
         order: selectedStage.order || 1,
         description: selectedStage.description || "",
-        is_active: selectedStage.is_active !== false
-      })
+        is_active: selectedStage.is_active !== false,
+      });
     }
-  }, [selectedStage])
+  }, [selectedStage]);
 
   const handleClose = () => {
-    setShowEditStageDialog(false)
-    setTimeout(() => setSelectedStage(null), 150)
+    setShowEditStageDialog(false);
+    setTimeout(() => setSelectedStage(null), 150);
     setStageData({
       stage_name: "",
       color: "#3b82f6",
       icon: "fa fa-user",
       order: 1,
       description: "",
-      is_active: true
-    })
-    setError(null)
-  }
+      is_active: true,
+    });
+    setError(null);
+  };
 
-  const handleInputChange = (field: string, value: string | number | boolean) => {
-    setStageData(prev => ({
+  const handleInputChange = (
+    field: string,
+    value: string | number | boolean,
+  ) => {
+    setStageData((prev) => ({
       ...prev,
-      [field]: value
-    }))
-    setError(null)
-  }
+      [field]: value,
+    }));
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!stageData.stage_name.trim() || !selectedStage) return
+    e.preventDefault();
+    if (!stageData.stage_name.trim() || !selectedStage) return;
 
-    setIsSubmitting(true)
-    setError(null)
+    setIsSubmitting(true);
+    setError(null);
 
     try {
-      const response = await axiosInstance.put(`/crm/stages/${selectedStage.id}`, stageData)
-      
+      const response = await axiosInstance.put(
+        `/crm/stages/${selectedStage.id}`,
+        stageData,
+      );
+
       if (response.data.status === "success") {
         // Update the stage in the store
         const updatedStage = {
@@ -118,27 +137,27 @@ export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps
           icon: stageData.icon,
           order: stageData.order,
           description: stageData.description.trim(),
-          is_active: stageData.is_active
-        }
-        
+          is_active: stageData.is_active,
+        };
+
         // Update the stages list in the parent component
         if (onStageUpdated) {
-          onStageUpdated(updatedStage)
+          onStageUpdated(updatedStage);
         }
-        
-        handleClose()
+
+        handleClose();
       } else {
-        setError("فشل في تحديث المرحلة")
+        setError("فشل في تحديث المرحلة");
       }
     } catch (err: any) {
-      console.error("Error updating stage:", err)
-      setError(err.response?.data?.message || "فشل في تحديث المرحلة")
+      console.error("Error updating stage:", err);
+      setError(err.response?.data?.message || "فشل في تحديث المرحلة");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  if (!selectedStage) return null
+  if (!selectedStage) return null;
 
   return (
     <Dialog open={showEditStageDialog} onOpenChange={handleClose}>
@@ -187,7 +206,10 @@ export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps
 
           <div className="space-y-2">
             <Label htmlFor="stage-color">لون المرحلة</Label>
-            <Select value={stageData.color} onValueChange={(value) => handleInputChange("color", value)}>
+            <Select
+              value={stageData.color}
+              onValueChange={(value) => handleInputChange("color", value)}
+            >
               <SelectTrigger id="stage-color">
                 <SelectValue placeholder="اختر لون المرحلة" />
               </SelectTrigger>
@@ -195,8 +217,8 @@ export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps
                 {stageColors.map((color) => (
                   <SelectItem key={color.value} value={color.value}>
                     <div className="flex items-center gap-2">
-                      <div 
-                        className="w-4 h-4 rounded-full" 
+                      <div
+                        className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: color.color }}
                       />
                       {color.label}
@@ -209,7 +231,10 @@ export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps
 
           <div className="space-y-2">
             <Label htmlFor="stage-icon">أيقونة المرحلة</Label>
-            <Select value={stageData.icon} onValueChange={(value) => handleInputChange("icon", value)}>
+            <Select
+              value={stageData.icon}
+              onValueChange={(value) => handleInputChange("icon", value)}
+            >
               <SelectTrigger id="stage-icon">
                 <SelectValue placeholder="اختر أيقونة المرحلة" />
               </SelectTrigger>
@@ -234,7 +259,9 @@ export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps
               min="1"
               placeholder="1"
               value={stageData.order}
-              onChange={(e) => handleInputChange("order", parseInt(e.target.value) || 1)}
+              onChange={(e) =>
+                handleInputChange("order", parseInt(e.target.value) || 1)
+              }
             />
           </div>
 
@@ -242,7 +269,9 @@ export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps
             <Switch
               id="stage-active"
               checked={stageData.is_active}
-              onCheckedChange={(checked) => handleInputChange("is_active", checked)}
+              onCheckedChange={(checked) =>
+                handleInputChange("is_active", checked)
+              }
             />
             <Label htmlFor="stage-active">مرحلة نشطة</Label>
           </div>
@@ -251,18 +280,24 @@ export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps
           <div className="p-3 bg-muted rounded-lg">
             <Label className="text-sm text-muted-foreground">معاينة:</Label>
             <div className="flex items-center gap-2 mt-2">
-              <div 
-                className="w-4 h-4 rounded-full" 
+              <div
+                className="w-4 h-4 rounded-full"
                 style={{ backgroundColor: stageData.color }}
               />
               <i className={stageData.icon}></i>
-              <span className="font-medium">{stageData.stage_name || "اسم المرحلة"}</span>
+              <span className="font-medium">
+                {stageData.stage_name || "اسم المرحلة"}
+              </span>
               {!stageData.is_active && (
-                <span className="text-xs text-muted-foreground">(غير نشطة)</span>
+                <span className="text-xs text-muted-foreground">
+                  (غير نشطة)
+                </span>
               )}
             </div>
             {stageData.description && (
-              <p className="text-sm text-muted-foreground mt-1">{stageData.description}</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {stageData.description}
+              </p>
             )}
           </div>
 
@@ -285,5 +320,5 @@ export default function EditStageDialog({ onStageUpdated }: EditStageDialogProps
         </form>
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

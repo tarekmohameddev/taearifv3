@@ -13,7 +13,7 @@ import {
   Plus,
   MapPin,
   Video,
-  Globe ,
+  Globe,
   Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -49,13 +49,7 @@ import useAuthStore from "@/context/AuthContext";
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
 import { PropertyCounter } from "@/components/property/propertyCOMP/property-counter";
-import {
-  ChevronLeft,
-  HelpCircle,
-  Eye,
-  EyeOff,
-  Trash2,
-} from "lucide-react";
+import { ChevronLeft, HelpCircle, Eye, EyeOff, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import loader from "@/lib/googleMapsLoader";
 
@@ -161,7 +155,7 @@ export default function PropertyForm({ mode }) {
     gallery: [],
     floorPlans: [],
   });
-  
+
   const [uploading, setUploading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -175,22 +169,21 @@ export default function PropertyForm({ mode }) {
   const mapRef = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
-
   const handleLocationUpdate = (lat, lng, address) => {
     setFormData((prev) => ({
       ...prev,
       latitude: lat,
       longitude: lng,
       address: address,
-    }))
-  }
+    }));
+  };
 
   const validateUrl = (value, name) => {
     try {
       new URL(value); // Validate URL format
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     } catch {
-      setErrors((prev) => ({ ...prev, [name]: 'الرجاء إدخال رابط صحيح' }));
+      setErrors((prev) => ({ ...prev, [name]: "الرجاء إدخال رابط صحيح" }));
     }
   };
 
@@ -213,45 +206,44 @@ export default function PropertyForm({ mode }) {
     }
   };
 
-
   const getCurrentLocation = () => {
     if (!navigator.geolocation || !map || !marker) return;
-  
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        
+
         marker.setPosition({ lat, lng });
         map.setCenter({ lat, lng });
         map.setZoom(17);
-        
-        setFormData(prev => ({
+
+        setFormData((prev) => ({
           ...prev,
           latitude: lat,
-          longitude: lng
+          longitude: lng,
         }));
       },
       (error) => {
         console.error("Error getting location:", error);
         toast.error("غير قادر على الحصول على موقعك الحالي");
-      }
+      },
     );
   };
 
   useEffect(() => {
     let mounted = true;
-    
+
     const initMap = async () => {
       try {
         const google = await loader.load();
-        
+
         if (!mounted || !mapRef.current) return;
 
         const mapInstance = new google.maps.Map(mapRef.current, {
-          center: { 
-            lat: parseFloat(formData.latitude) || 24.766316905850978, 
-            lng: parseFloat(formData.longitude) || 46.73579692840576 
+          center: {
+            lat: parseFloat(formData.latitude) || 24.766316905850978,
+            lng: parseFloat(formData.longitude) || 46.73579692840576,
           },
           zoom: 13,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -262,19 +254,19 @@ export default function PropertyForm({ mode }) {
 
         // Create marker
         const newMarker = new google.maps.Marker({
-          position: { 
+          position: {
             lat: parseFloat(formData.latitude) || 24.766316905850978,
-            lng: parseFloat(formData.longitude) || 46.73579692840576
+            lng: parseFloat(formData.longitude) || 46.73579692840576,
           },
           map: mapInstance,
-          draggable: true
+          draggable: true,
         });
 
         // Add marker drag event
         newMarker.addListener("dragend", (event) => {
           const lat = event.latLng.lat();
           const lng = event.latLng.lng();
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             latitude: lat,
             longitude: lng,
@@ -283,7 +275,9 @@ export default function PropertyForm({ mode }) {
 
         // Initialize search box if search input exists
         if (searchInputRef.current) {
-          const searchBoxInstance = new google.maps.places.SearchBox(searchInputRef.current);
+          const searchBoxInstance = new google.maps.places.SearchBox(
+            searchInputRef.current,
+          );
           setSearchBox(searchBoxInstance);
 
           searchBoxInstance.addListener("places_changed", () => {
@@ -293,12 +287,12 @@ export default function PropertyForm({ mode }) {
               if (place.geometry && place.geometry.location) {
                 const lat = place.geometry.location.lat();
                 const lng = place.geometry.location.lng();
-                
+
                 newMarker.setPosition({ lat, lng });
                 mapInstance.setCenter({ lat, lng });
                 mapInstance.setZoom(17);
 
-                setFormData(prev => ({
+                setFormData((prev) => ({
                   ...prev,
                   latitude: lat,
                   longitude: lng,
@@ -312,7 +306,6 @@ export default function PropertyForm({ mode }) {
         setMap(mapInstance);
         setMarker(newMarker);
         setIsMapLoaded(true);
-
       } catch (error) {
         console.error("Error loading map:", error);
         toast.error("حدث خطأ أثناء تحميل الخريطة");
@@ -332,53 +325,53 @@ export default function PropertyForm({ mode }) {
   const updateLocation = (lat, lng, mapInstance) => {
     // Remove existing marker
     if (marker) {
-      marker.setMap(null)
+      marker.setMap(null);
     }
-  
+
     // Create new marker
     const newMarker = new google.maps.Marker({
       position: { lat, lng },
       map: mapInstance,
       draggable: true,
       title: "Property Location",
-    })
-  
+    });
+
     // Add drag listener to marker
     newMarker.addListener("dragend", (event) => {
       if (event.latLng) {
-        const newLat = event.latLng.lat()
-        const newLng = event.latLng.lng()
+        const newLat = event.latLng.lat();
+        const newLng = event.latLng.lng();
         setPropertyData((prev) => ({
           ...prev,
           latitude: newLat,
           longitude: newLng,
-        }))
-        reverseGeocode(newLat, newLng)
+        }));
+        reverseGeocode(newLat, newLng);
       }
-    })
-  
-    setMarker(newMarker)
+    });
+
+    setMarker(newMarker);
     setPropertyData((prev) => ({
       ...prev,
       latitude: lat,
       longitude: lng,
-    }))
-  
+    }));
+
     // Reverse geocode to get address
-    reverseGeocode(lat, lng)
-  }
-  
+    reverseGeocode(lat, lng);
+  };
+
   const reverseGeocode = (lat, lng) => {
-    const geocoder = new google.maps.Geocoder()
+    const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
       if (status === "OK" && results && results[0]) {
         setPropertyData((prev) => ({
           ...prev,
           address: results[0].formatted_address,
-        }))
+        }));
       }
-    })
-  }
+    });
+  };
   useEffect(() => {
     const fetchSuggestedFaqs = async () => {
       try {
@@ -392,7 +385,7 @@ export default function PropertyForm({ mode }) {
     fetchSuggestedFaqs();
   }, []);
   // تحديث useEffect لجلب بيانات العقار للتعديل
-  
+
   useEffect(() => {
     if (mode === "edit" && id) {
       const fetchProperty = async () => {
@@ -420,12 +413,14 @@ export default function PropertyForm({ mode }) {
             }
           }
           if (property.faqs && Array.isArray(property.faqs)) {
-            setFaqs(property.faqs.map((faq, index) => ({
-              id: index + 1,
-              question: faq.question,
-              answer: faq.answer,
-              displayOnPage: faq.displayOnPage
-            })));
+            setFaqs(
+              property.faqs.map((faq, index) => ({
+                id: index + 1,
+                question: faq.question,
+                answer: faq.answer,
+                displayOnPage: faq.displayOnPage,
+              })),
+            );
           }
           // تحديد قيم transaction_type و PropertyType بناءً على البيانات المُستلمة
           // let transactionType = "";
@@ -491,7 +486,7 @@ export default function PropertyForm({ mode }) {
             district_id: property.state_id,
             payment_method: property.payment_method || "",
             pricePerMeter: property.pricePerMeter || "",
-            PropertyType: propertyType, 
+            PropertyType: propertyType,
             faqs: property.faqs || "",
             video_url: property.video_url || "",
             virtual_tour: property.virtual_tour || "",
@@ -512,40 +507,41 @@ export default function PropertyForm({ mode }) {
       fetchProperty();
     }
   }, [mode, id]);
-  
-  
+
   const handleAddFaq = () => {
     if (newQuestion.trim() === "" || newAnswer.trim() === "") {
       toast.error("يرجى إدخال السؤال والإجابة");
       return;
     }
-  
+
     const newFaq = {
       id: Date.now(),
       question: newQuestion.trim(),
       answer: newAnswer.trim(),
       displayOnPage: true,
     };
-  
+
     setFaqs([...faqs, newFaq]);
     setNewQuestion("");
     setNewAnswer("");
     toast.success("تم إضافة السؤال بنجاح");
   };
-  
+
   const handleSelectSuggestedFaq = (suggestedFaq) => {
     setNewQuestion(suggestedFaq.question); // استخدام .question بدلاً من النص مباشرة
   };
-  
+
   const handleRemoveFaq = (id) => {
     setFaqs(faqs.filter((faq) => faq.id !== id));
     toast.success("تم حذف السؤال");
   };
-  
+
   const handleToggleFaqDisplay = (id) => {
-    setFaqs(faqs.map((faq) => 
-      faq.id === id ? { ...faq, displayOnPage: !faq.displayOnPage } : faq
-    ));
+    setFaqs(
+      faqs.map((faq) =>
+        faq.id === id ? { ...faq, displayOnPage: !faq.displayOnPage } : faq,
+      ),
+    );
   };
   // جلب البيانات الأساسية
   useEffect(() => {
@@ -1990,7 +1986,9 @@ export default function PropertyForm({ mode }) {
               <Card className="md:col-span-2">
                 <CardHeader>
                   <CardTitle>الوسائط والجولات الافتراضية</CardTitle>
-                  <CardDescription>أضف روابط الفيديو والجولة الافتراضية للعقار</CardDescription>
+                  <CardDescription>
+                    أضف روابط الفيديو والجولة الافتراضية للعقار
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2008,15 +2006,22 @@ export default function PropertyForm({ mode }) {
                         onChange={handleUrlChange}
                         className={errors.video_url ? "border-red-500" : ""}
                       />
-                      {errors.video_url && <p className="text-sm text-red-500">{errors.video_url}</p>}
+                      {errors.video_url && (
+                        <p className="text-sm text-red-500">
+                          {errors.video_url}
+                        </p>
+                      )}
                       <p className="text-xs text-muted-foreground">
-                        يمكنك إضافة رابط فيديو من YouTube أو Vimeo أو أي منصة أخرى
+                        يمكنك إضافة رابط فيديو من YouTube أو Vimeo أو أي منصة
+                        أخرى
                       </p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Globe className="h-4 w-4 text-muted-foreground" />
-                        <Label htmlFor="virtualTourUrl">رابط الجولة الافتراضية (اختياري)</Label>
+                        <Label htmlFor="virtualTourUrl">
+                          رابط الجولة الافتراضية (اختياري)
+                        </Label>
                       </div>
                       <Input
                         id="virtual_tour"
@@ -2027,9 +2032,14 @@ export default function PropertyForm({ mode }) {
                         onChange={handleUrlChange}
                         className={errors.virtual_tour ? "border-red-500" : ""}
                       />
-                      {errors.virtual_tour && <p className="text-sm text-red-500">{errors.virtual_tour}</p>}
+                      {errors.virtual_tour && (
+                        <p className="text-sm text-red-500">
+                          {errors.virtual_tour}
+                        </p>
+                      )}
                       <p className="text-xs text-muted-foreground">
-                        أضف رابط جولة افتراضية من Matterport أو منصات الجولات الافتراضية الأخرى
+                        أضف رابط جولة افتراضية من Matterport أو منصات الجولات
+                        الافتراضية الأخرى
                       </p>
                     </div>
                   </div>
@@ -2037,12 +2047,16 @@ export default function PropertyForm({ mode }) {
                   {/* Preview sections for URLs */}
                   {(formData.virtual_tour || formData.video_url) && (
                     <div className="mt-6 p-4 bg-muted/30 rounded-md">
-                      <h4 className="text-sm font-medium mb-3">معاينة الروابط:</h4>
+                      <h4 className="text-sm font-medium mb-3">
+                        معاينة الروابط:
+                      </h4>
                       <div className="space-y-2">
                         {formData.video_url && (
                           <div className="flex items-center gap-2 text-sm">
                             <Video className="h-4 w-4 text-blue-500" />
-                            <span className="text-muted-foreground">فيديو:</span>
+                            <span className="text-muted-foreground">
+                              فيديو:
+                            </span>
                             <a
                               href={formData.video_url}
                               target="_blank"
@@ -2056,7 +2070,9 @@ export default function PropertyForm({ mode }) {
                         {formData.virtual_tour && (
                           <div className="flex items-center gap-2 text-sm">
                             <Globe className="h-4 w-4 text-green-500" />
-                            <span className="text-muted-foreground">جولة افتراضية:</span>
+                            <span className="text-muted-foreground">
+                              جولة افتراضية:
+                            </span>
                             <a
                               href={formData.virtual_tour}
                               target="_blank"
@@ -2074,14 +2090,17 @@ export default function PropertyForm({ mode }) {
               </Card>
               <div className="md:col-span-2 space-y-6">
                 {/* Map Section */}
-                
+
                 <MapSection onLocationUpdate={handleLocationUpdate} />
                 <LocationCard propertyData={formData} />
               </div>
               <Card className="md:col-span-2">
                 <CardHeader>
                   <CardTitle>الأسئلة الشائعة الخاصة بالعقار</CardTitle>
-                  <CardDescription>أضف أسئلة وأجوبة شائعة حول هذا العقار لمساعدة المشترين المحتملين.</CardDescription>
+                  <CardDescription>
+                    أضف أسئلة وأجوبة شائعة حول هذا العقار لمساعدة المشترين
+                    المحتملين.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Add New FAQ Form */}
@@ -2118,10 +2137,10 @@ export default function PropertyForm({ mode }) {
                       <h4 className="text-md font-medium">أسئلة مقترحة:</h4>
                       <div className="flex flex-wrap gap-2">
                         {suggestedFaqsList.map((sq, index) => (
-                          <Button 
-                            key={index} 
-                            variant="outline" 
-                            size="sm" 
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
                             onClick={() => handleSelectSuggestedFaq(sq)}
                           >
                             <HelpCircle className="ml-2 h-4 w-4" />
@@ -2135,21 +2154,34 @@ export default function PropertyForm({ mode }) {
                   {/* List of Added FAQs */}
                   {faqs.length > 0 && (
                     <div className="space-y-4">
-                      <h3 className="text-lg font-medium">الأسئلة المضافة ({faqs.length})</h3>
+                      <h3 className="text-lg font-medium">
+                        الأسئلة المضافة ({faqs.length})
+                      </h3>
                       <div className="space-y-3">
                         {faqs.map((faq) => (
-                          <div key={faq.id} className="p-4 border rounded-md bg-muted/30">
+                          <div
+                            key={faq.id}
+                            className="p-4 border rounded-md bg-muted/30"
+                          >
                             <div className="flex justify-between items-start">
                               <div>
-                                <p className="font-semibold text-primary">{faq.question}</p>
-                                <p className="text-sm text-muted-foreground mt-1">{faq.answer}</p>
+                                <p className="font-semibold text-primary">
+                                  {faq.question}
+                                </p>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {faq.answer}
+                                </p>
                               </div>
                               <div className="flex items-center gap-2 rtl:mr-auto ltr:ml-auto">
                                 <Button
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => handleToggleFaqDisplay(faq.id)}
-                                  title={faq.displayOnPage ? "إخفاء من صفحة العقار" : "عرض في صفحة العقار"}
+                                  title={
+                                    faq.displayOnPage
+                                      ? "إخفاء من صفحة العقار"
+                                      : "عرض في صفحة العقار"
+                                  }
                                 >
                                   {faq.displayOnPage ? (
                                     <Eye className="h-4 w-4" />
@@ -2183,7 +2215,9 @@ export default function PropertyForm({ mode }) {
                     </div>
                   )}
                   {faqs.length === 0 && (
-                    <p className="text-sm text-center text-muted-foreground py-4">لم تتم إضافة أي أسئلة شائعة بعد.</p>
+                    <p className="text-sm text-center text-muted-foreground py-4">
+                      لم تتم إضافة أي أسئلة شائعة بعد.
+                    </p>
                   )}
                 </CardContent>
               </Card>

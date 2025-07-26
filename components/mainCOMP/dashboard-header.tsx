@@ -134,36 +134,39 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                           <span className="text-sm text-red-500">{error}</span>
                         </div>
                       )}
-                      {!loading && !error && mainNavItems && mainNavItems.map((item: MainNavItem) => (
-                        item.isAPP ? (
-                          <Button
-                            key={item.id}
-                            variant="ghost"
-                            className="justify-start gap-2"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              const token = useAuthStore.getState().token;
-                              const url = `${item.path}?token=${token}`;
-                              window.open(url, '_blank');
-                            }}
-                          >
-                            <item.icon className="h-4 w-4" />
-                            {item.label}
-                          </Button>
-                        ) : (
-                          <Button
-                            key={item.id}
-                            variant="ghost"
-                            className="justify-start gap-2"
-                            asChild
-                          >
-                            <Link href={item.path}>
+                      {!loading &&
+                        !error &&
+                        mainNavItems &&
+                        mainNavItems.map((item: MainNavItem) =>
+                          item.isAPP ? (
+                            <Button
+                              key={item.id}
+                              variant="ghost"
+                              className="justify-start gap-2"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const token = useAuthStore.getState().token;
+                                const url = `${item.path}?token=${token}`;
+                                window.open(url, "_blank");
+                              }}
+                            >
                               <item.icon className="h-4 w-4" />
                               {item.label}
-                            </Link>
-                          </Button>
-                        )
-                      ))}
+                            </Button>
+                          ) : (
+                            <Button
+                              key={item.id}
+                              variant="ghost"
+                              className="justify-start gap-2"
+                              asChild
+                            >
+                              <Link href={item.path}>
+                                <item.icon className="h-4 w-4" />
+                                {item.label}
+                              </Link>
+                            </Button>
+                          ),
+                        )}
                     </nav>
                   </div>
                   {useAuthStore.getState().UserIslogged && (

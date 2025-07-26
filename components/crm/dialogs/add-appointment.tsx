@@ -1,27 +1,40 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, Clock, AlertTriangle, CalendarCheck } from "lucide-react"
-import useCrmStore from "@/context/store/crm"
-import axiosInstance from "@/lib/axiosInstance"
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar, Clock, AlertTriangle, CalendarCheck } from "lucide-react";
+import useCrmStore from "@/context/store/crm";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface AddAppointmentDialogProps {
-  onAppointmentAdded?: (appointment: any) => void
+  onAppointmentAdded?: (appointment: any) => void;
 }
 
-export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointmentDialogProps) {
-  const { 
-    showAddAppointmentDialog, 
-    selectedCustomer, 
+export default function AddAppointmentDialog({
+  onAppointmentAdded,
+}: AddAppointmentDialogProps) {
+  const {
+    showAddAppointmentDialog,
+    selectedCustomer,
     setShowAddAppointmentDialog,
-    customers
-  } = useCrmStore()
+    customers,
+  } = useCrmStore();
 
   const [appointmentData, setAppointmentData] = useState({
     customer_id: "",
@@ -31,13 +44,13 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
     note: "",
     date: "",
     time: "",
-    duration: "30"
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+    duration: "30",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleClose = () => {
-    setShowAddAppointmentDialog(false)
+    setShowAddAppointmentDialog(false);
     setAppointmentData({
       customer_id: "",
       title: "",
@@ -46,36 +59,43 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
       note: "",
       date: "",
       time: "",
-      duration: "30"
-    })
-    setError(null)
-  }
+      duration: "30",
+    });
+    setError(null);
+  };
 
   const handleInputChange = (field: string, value: string) => {
-    setAppointmentData(prev => ({
+    setAppointmentData((prev) => ({
       ...prev,
-      [field]: value
-    }))
-    setError(null)
-  }
+      [field]: value,
+    }));
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     // Validation
-    const customerId = selectedCustomer ? selectedCustomer.customer_id : appointmentData.customer_id
-    if (!customerId || !appointmentData.title.trim() || !appointmentData.date || !appointmentData.time) {
-      setError("جميع الحقول مطلوبة")
-      return
+    const customerId = selectedCustomer
+      ? selectedCustomer.customer_id
+      : appointmentData.customer_id;
+    if (
+      !customerId ||
+      !appointmentData.title.trim() ||
+      !appointmentData.date ||
+      !appointmentData.time
+    ) {
+      setError("جميع الحقول مطلوبة");
+      return;
     }
 
-    setIsSubmitting(true)
-    setError(null)
-    
+    setIsSubmitting(true);
+    setError(null);
+
     try {
       // Combine date and time for API
-      const datetime = `${appointmentData.date} ${appointmentData.time}:00`
-      
+      const datetime = `${appointmentData.date} ${appointmentData.time}:00`;
+
       const response = await axiosInstance.post("/crm/customer-appointments", {
         customer_id: parseInt(customerId),
         title: appointmentData.title.trim(),
@@ -83,8 +103,8 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
         priority: parseInt(appointmentData.priority),
         note: appointmentData.note.trim(),
         datetime: datetime,
-        duration: parseInt(appointmentData.duration)
-      })
+        duration: parseInt(appointmentData.duration),
+      });
 
       if (response.data.status === "success") {
         // Add the new appointment to the store
@@ -93,30 +113,39 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
           title: appointmentData.title.trim(),
           type: appointmentData.type,
           priority: appointmentData.priority,
-          priority_label: appointmentData.priority === "3" ? "High" : appointmentData.priority === "2" ? "Medium" : "Low",
+          priority_label:
+            appointmentData.priority === "3"
+              ? "High"
+              : appointmentData.priority === "2"
+                ? "Medium"
+                : "Low",
           note: appointmentData.note.trim(),
           datetime: datetime,
           duration: parseInt(appointmentData.duration),
           status: "مجدول",
-          customer: selectedCustomer ? selectedCustomer : customers.find(c => c.customer_id === appointmentData.customer_id)
-        }
-        
+          customer: selectedCustomer
+            ? selectedCustomer
+            : customers.find(
+                (c) => c.customer_id === appointmentData.customer_id,
+              ),
+        };
+
         // Update the appointments list in the parent component
         if (onAppointmentAdded) {
-          onAppointmentAdded(newAppointment)
+          onAppointmentAdded(newAppointment);
         }
-        
-        handleClose()
+
+        handleClose();
       } else {
-        setError("فشل في إضافة الموعد")
+        setError("فشل في إضافة الموعد");
       }
     } catch (error: any) {
-      console.error("خطأ في إضافة الموعد:", error)
-      setError(error.response?.data?.message || "حدث خطأ أثناء إضافة الموعد")
+      console.error("خطأ في إضافة الموعد:", error);
+      setError(error.response?.data?.message || "حدث خطأ أثناء إضافة الموعد");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={showAddAppointmentDialog} onOpenChange={handleClose}>
@@ -146,7 +175,12 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
           {!selectedCustomer && (
             <div className="space-y-2">
               <Label htmlFor="customer-select">العميل</Label>
-              <Select value={appointmentData.customer_id} onValueChange={(value) => handleInputChange("customer_id", value)}>
+              <Select
+                value={appointmentData.customer_id}
+                onValueChange={(value) =>
+                  handleInputChange("customer_id", value)
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر العميل" />
                 </SelectTrigger>
@@ -175,7 +209,10 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="appointment-type">نوع الموعد</Label>
-              <Select value={appointmentData.type} onValueChange={(value) => handleInputChange("type", value)}>
+              <Select
+                value={appointmentData.type}
+                onValueChange={(value) => handleInputChange("type", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر النوع" />
                 </SelectTrigger>
@@ -190,7 +227,10 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
 
             <div className="space-y-2">
               <Label htmlFor="appointment-priority">الأولوية</Label>
-              <Select value={appointmentData.priority} onValueChange={(value) => handleInputChange("priority", value)}>
+              <Select
+                value={appointmentData.priority}
+                onValueChange={(value) => handleInputChange("priority", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر الأولوية" />
                 </SelectTrigger>
@@ -205,7 +245,10 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="appointment-date" className="flex items-center gap-2">
+              <Label
+                htmlFor="appointment-date"
+                className="flex items-center gap-2"
+              >
                 <Calendar className="h-4 w-4" />
                 التاريخ
               </Label>
@@ -219,7 +262,10 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="appointment-time" className="flex items-center gap-2">
+              <Label
+                htmlFor="appointment-time"
+                className="flex items-center gap-2"
+              >
                 <Clock className="h-4 w-4" />
                 الوقت
               </Label>
@@ -234,7 +280,10 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
 
             <div className="space-y-2">
               <Label htmlFor="appointment-duration">المدة (دقيقة)</Label>
-              <Select value={appointmentData.duration} onValueChange={(value) => handleInputChange("duration", value)}>
+              <Select
+                value={appointmentData.duration}
+                onValueChange={(value) => handleInputChange("duration", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="المدة" />
                 </SelectTrigger>
@@ -272,7 +321,12 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !appointmentData.title.trim() || !appointmentData.date || !appointmentData.time}
+              disabled={
+                isSubmitting ||
+                !appointmentData.title.trim() ||
+                !appointmentData.date ||
+                !appointmentData.time
+              }
             >
               {isSubmitting ? "جاري الحفظ..." : "حفظ الموعد"}
             </Button>
@@ -280,5 +334,5 @@ export default function AddAppointmentDialog({ onAppointmentAdded }: AddAppointm
         </form>
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

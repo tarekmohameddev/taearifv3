@@ -1,58 +1,65 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { FileText } from "lucide-react"
-import useCrmStore from "@/context/store/crm"
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { FileText } from "lucide-react";
+import useCrmStore from "@/context/store/crm";
 
 export default function AddNoteDialog() {
-  const { 
-    showAddNoteDialog, 
-    selectedCustomer, 
+  const {
+    showAddNoteDialog,
+    selectedCustomer,
     setShowAddNoteDialog,
-    updateCustomer
-  } = useCrmStore()
+    updateCustomer,
+  } = useCrmStore();
 
-  const [noteContent, setNoteContent] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [noteContent, setNoteContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClose = () => {
-    setShowAddNoteDialog(false)
-    setNoteContent("")
-  }
+    setShowAddNoteDialog(false);
+    setNoteContent("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedCustomer || !noteContent.trim()) return
+    e.preventDefault();
+    if (!selectedCustomer || !noteContent.trim()) return;
 
-    setIsSubmitting(true)
-    
+    setIsSubmitting(true);
+
     try {
       const newNote = {
         id: Date.now(),
         content: noteContent.trim(),
         author: "المستخدم الحالي", // يمكن استبداله بالمستخدم الحالي
         date: new Date().toLocaleDateString("ar-SA"),
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      };
 
       // تحديث العميل في الـ store
-      const currentNotes = Array.isArray(selectedCustomer.notes) ? selectedCustomer.notes : []
+      const currentNotes = Array.isArray(selectedCustomer.notes)
+        ? selectedCustomer.notes
+        : [];
       updateCustomer(selectedCustomer.id, {
-        notes: [newNote, ...currentNotes] as any
-      })
+        notes: [newNote, ...currentNotes] as any,
+      });
 
       // إغلاق الـ dialog وتنظيف النموذج
-      handleClose()
+      handleClose();
     } catch (error) {
-      console.error("خطأ في إضافة الملاحظة:", error)
+      console.error("خطأ في إضافة الملاحظة:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={showAddNoteDialog} onOpenChange={handleClose}>
@@ -103,5 +110,5 @@ export default function AddNoteDialog() {
         </form>
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

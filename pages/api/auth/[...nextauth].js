@@ -28,7 +28,7 @@ export default NextAuth({
               email: credentials.email,
               password: credentials.password,
               recaptcha_token: credentials.recaptcha_token,
-            }
+            },
           );
 
           if (response.status === 200 && response.data.user) {
@@ -47,7 +47,7 @@ export default NextAuth({
         } catch (error) {
           console.error("Login error:", error.response?.data || error.message);
           throw new Error(
-            error.response?.data?.message || "فشل في تسجيل الدخول"
+            error.response?.data?.message || "فشل في تسجيل الدخول",
           );
         }
       },
@@ -78,7 +78,7 @@ export default NextAuth({
                 email: profile.email,
                 google_id: profile.sub,
                 name: profile.name,
-              }
+              },
             );
             userData = loginResponse.data;
           } else {
@@ -91,7 +91,7 @@ export default NextAuth({
                 first_name: profile.given_name,
                 last_name: profile.family_name,
                 username: profile.name.replace(/\s+/g, "-").toLowerCase(),
-              }
+              },
             );
             userData = registerResponse.data;
           }
@@ -107,7 +107,7 @@ export default NextAuth({
         } catch (error) {
           console.error(
             "Google OAuth error:",
-            error.response?.data || error.message
+            error.response?.data || error.message,
           );
           throw new Error("فشل في المصادقة مع Google");
         }

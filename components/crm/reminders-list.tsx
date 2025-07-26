@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Plus,
   Eye,
@@ -18,26 +18,26 @@ import {
   CheckCircle,
   AlertCircle,
   XCircle,
-} from "lucide-react"
+} from "lucide-react";
 
 interface ApiReminder {
-  id: number
-  title: string
-  priority: number
-  priority_label: string
-  datetime: string
+  id: number;
+  title: string;
+  priority: number;
+  priority_label: string;
+  datetime: string;
   customer: {
-    id: number
-    name: string
-  }
+    id: number;
+    name: string;
+  };
 }
 
 interface RemindersListProps {
-  remindersData: ApiReminder[]
-  onViewReminder: (reminder: ApiReminder) => void
-  onEditReminder: (reminder: ApiReminder) => void
-  onAddReminder: () => void
-  onCompleteReminder: (reminder: ApiReminder) => void
+  remindersData: ApiReminder[];
+  onViewReminder: (reminder: ApiReminder) => void;
+  onEditReminder: (reminder: ApiReminder) => void;
+  onAddReminder: () => void;
+  onCompleteReminder: (reminder: ApiReminder) => void;
 }
 
 export default function RemindersList({
@@ -50,121 +50,123 @@ export default function RemindersList({
   const getStatusColor = (status: string = "pending") => {
     switch (status) {
       case "pending":
-        return "bg-yellow-500"
+        return "bg-yellow-500";
       case "completed":
-        return "bg-green-500"
+        return "bg-green-500";
       case "overdue":
-        return "bg-red-500"
+        return "bg-red-500";
       default:
-        return "bg-yellow-500"
+        return "bg-yellow-500";
     }
-  }
+  };
 
   const getStatusIcon = (status: string = "pending") => {
     switch (status) {
       case "pending":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       case "completed":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "overdue":
-        return <XCircle className="h-4 w-4" />
+        return <XCircle className="h-4 w-4" />;
       default:
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
     }
-  }
+  };
 
   const getPriorityColor = (priorityLabel: string) => {
     switch (priorityLabel) {
       case "High":
-        return "border-red-500 text-red-700"
+        return "border-red-500 text-red-700";
       case "Medium":
-        return "border-yellow-500 text-yellow-700"
+        return "border-yellow-500 text-yellow-700";
       case "Low":
-        return "border-green-500 text-green-700"
+        return "border-green-500 text-green-700";
       default:
-        return "border-gray-500 text-gray-700"
+        return "border-gray-500 text-gray-700";
     }
-  }
+  };
 
   const getTypeLabel = (type: string = "") => {
     switch (type) {
       case "call":
-        return "اتصال"
+        return "اتصال";
       case "meeting":
-        return "اجتماع"
+        return "اجتماع";
       case "follow_up":
-        return "متابعة"
+        return "متابعة";
       case "other":
-        return "أخرى"
+        return "أخرى";
       default:
-        return "عام"
+        return "عام";
     }
-  }
+  };
 
   const getStatusLabel = (status: string = "pending") => {
     switch (status) {
       case "pending":
-        return "في الانتظار"
+        return "في الانتظار";
       case "completed":
-        return "مكتمل"
+        return "مكتمل";
       case "overdue":
-        return "متأخر"
+        return "متأخر";
       default:
-        return "في الانتظار"
+        return "في الانتظار";
     }
-  }
+  };
 
   const getPriorityLabel = (priorityLabel: string) => {
     switch (priorityLabel) {
       case "High":
-        return "عالية"
+        return "عالية";
       case "Medium":
-        return "متوسطة"
+        return "متوسطة";
       case "Low":
-        return "منخفضة"
+        return "منخفضة";
       default:
-        return "عادية"
+        return "عادية";
     }
-  }
+  };
 
   // Format datetime for Saudi Arabia
   const formatSaudiDateTime = (datetime: string) => {
     try {
-      const date = new Date(datetime)
-      
-      const formattedDate = date.toLocaleDateString('en-GB', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        timeZone: 'Asia/Riyadh'
-      })
-      
-      const formattedTime = date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
+      const date = new Date(datetime);
+
+      const formattedDate = date.toLocaleDateString("en-GB", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        timeZone: "Asia/Riyadh",
+      });
+
+      const formattedTime = date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
-        timeZone: 'Asia/Riyadh'
-      })
-      
-      return { formattedDate, formattedTime }
+        timeZone: "Asia/Riyadh",
+      });
+
+      return { formattedDate, formattedTime };
     } catch (error) {
       // Fallback parsing
-      const parts = datetime.split('T')
-      const datePart = parts[0] || ''
-      const timePart = parts[1]?.split('.')[0] || ''
-      return { 
-        formattedDate: datePart.split('-').reverse().join('/'),
-        formattedTime: timePart 
-      }
+      const parts = datetime.split("T");
+      const datePart = parts[0] || "";
+      const timePart = parts[1]?.split(".")[0] || "";
+      return {
+        formattedDate: datePart.split("-").reverse().join("/"),
+        formattedTime: timePart,
+      };
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
           <h3 className="text-lg font-semibold">إدارة التذكيرات</h3>
-          <p className="text-sm text-muted-foreground">عرض وإدارة جميع تذكيرات العملاء</p>
+          <p className="text-sm text-muted-foreground">
+            عرض وإدارة جميع تذكيرات العملاء
+          </p>
         </div>
         <Button onClick={onAddReminder}>
           <Plus className="ml-2 h-4 w-4" />
@@ -175,14 +177,21 @@ export default function RemindersList({
       {/* Reminders List */}
       <div className="space-y-4">
         {remindersData.map((reminder) => {
-          const { formattedDate, formattedTime } = formatSaudiDateTime(reminder.datetime)
+          const { formattedDate, formattedTime } = formatSaudiDateTime(
+            reminder.datetime,
+          );
 
           return (
-            <Card key={reminder.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={reminder.id}
+              className="hover:shadow-md transition-shadow"
+            >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`w-1 h-16 rounded-full ${getStatusColor()}`} />
+                    <div
+                      className={`w-1 h-16 rounded-full ${getStatusColor()}`}
+                    />
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
                         <AvatarImage src="/placeholder.svg" />
@@ -214,10 +223,16 @@ export default function RemindersList({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className={getPriorityColor(reminder.priority_label)}>
+                    <Badge
+                      variant="outline"
+                      className={getPriorityColor(reminder.priority_label)}
+                    >
                       {getPriorityLabel(reminder.priority_label)}
                     </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1">
+                    <Badge
+                      variant="outline"
+                      className="flex items-center gap-1"
+                    >
                       {getStatusIcon()}
                       {getStatusLabel()}
                     </Badge>
@@ -255,9 +270,9 @@ export default function RemindersList({
                 </div>
               </CardContent>
             </Card>
-          )
+          );
         })}
-        
+
         {remindersData.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
             <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -271,5 +286,5 @@ export default function RemindersList({
         )}
       </div>
     </div>
-  )
-} 
+  );
+}

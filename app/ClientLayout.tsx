@@ -44,14 +44,13 @@ export default function ClientLayout({
       isMounted &&
       !IsLoading &&
       !UserIslogged &&
-      !(pathname?.startsWith("/oauth"))&&
-      !(pathname?.startsWith("/not-found"))&&
-      !(pathname?.startsWith("/register"))
+      !pathname?.startsWith("/oauth") &&
+      !pathname?.startsWith("/not-found") &&
+      !pathname?.startsWith("/register")
     ) {
       router.push("/login");
     }
   }, [isMounted, IsLoading, UserIslogged, pathname, router]);
-  
 
   useEffect(() => {
     async function fetchUser() {
@@ -72,33 +71,25 @@ export default function ClientLayout({
     }
     fetchUser();
   }, [isMounted, IsLoading, UserIslogged, router, onboardingCompleted]);
-  
-  
+
   useEffect(() => {
-    if (
-      (pathname?.startsWith("/login"))
-    ) {
+    if (pathname?.startsWith("/login")) {
       if (userData && userData.email) {
         router.push("/");
       }
     }
   }, [userData, router]);
 
-
-  
   if (
     !UserIslogged &&
-    !(pathname?.startsWith("/oauth")) &&
+    !pathname?.startsWith("/oauth") &&
     pathname !== "/onboarding" &&
-      !(pathname?.startsWith("/not-found"))&&
-      pathname !== "/login" &&
+    !pathname?.startsWith("/not-found") &&
+    pathname !== "/login" &&
     pathname !== "/register"
   ) {
     return null;
   }
-
-
-
 
   return <>{children}</>;
 }

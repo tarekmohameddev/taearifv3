@@ -55,7 +55,7 @@ export function LoginPage() {
     const fetchGoogleAuthUrl = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`
+          `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`,
         );
         const data = await response.json();
         if (data.url) {
@@ -135,7 +135,7 @@ export function LoginPage() {
       }
     }
   }, []);
-  
+
   // Handle checkbox change
   const handleCheckboxChange = (checked: boolean) => {
     setFormData((prev) => ({
@@ -213,7 +213,6 @@ export function LoginPage() {
     try {
       setIsGoogleLoading(true);
 
-
       // إرسال التوكن إلى الخادم للتحقق منه والتسجيل
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/verify`,
@@ -226,7 +225,7 @@ export function LoginPage() {
             token: token,
             action: "register", // لتمييز عملية التسجيل عن تسجيل الدخول
           }),
-        }
+        },
       );
 
       if (!response.ok) {

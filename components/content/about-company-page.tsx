@@ -67,7 +67,7 @@ export function AboutCompanyPage() {
     const fetchData = async () => {
       try {
         const response = await axiosInstance.get(
-          `${process.env.NEXT_PUBLIC_Backend_URL}/content/about`
+          `${process.env.NEXT_PUBLIC_Backend_URL}/content/about`,
         );
 
         if (response.data.status === "success") {
@@ -115,7 +115,7 @@ export function AboutCompanyPage() {
     setAboutData({
       ...aboutData,
       features: aboutData.features.map((feature) =>
-        feature.id === id ? { ...feature, [field]: value } : feature
+        feature.id === id ? { ...feature, [field]: value } : feature,
       ),
     });
   };
@@ -144,7 +144,7 @@ export function AboutCompanyPage() {
 
       const response = await axiosInstance.post(
         `${process.env.NEXT_PUBLIC_Backend_URL}/content/about`,
-        newAboutData
+        newAboutData,
       );
       const setpOB = {
         step: "homepage_about_update",
@@ -429,7 +429,7 @@ export function AboutCompanyPage() {
                               updateFeature(
                                 feature.id,
                                 "description",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                           />

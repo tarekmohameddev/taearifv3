@@ -264,8 +264,8 @@ export function ProjectsManagementPage() {
             {/* Tabs for filtering by status */}
             <Tabs defaultValue="all">
               {/* <TabsList> */}
-                {/* <TabsTrigger value="all">جميع المشاريع</TabsTrigger> */}
-                {/* <TabsTrigger value="1">منشور</TabsTrigger>
+              {/* <TabsTrigger value="all">جميع المشاريع</TabsTrigger> */}
+              {/* <TabsTrigger value="1">منشور</TabsTrigger>
                 <TabsTrigger value="0">مسودات</TabsTrigger>
                 <TabsTrigger value="featured">مميز</TabsTrigger> */}
               {/* </TabsList> */}

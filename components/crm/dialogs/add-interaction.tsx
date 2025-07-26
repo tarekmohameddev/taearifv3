@@ -1,14 +1,25 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Activity } from "lucide-react"
-import useCrmStore from "@/context/store/crm"
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Activity } from "lucide-react";
+import useCrmStore from "@/context/store/crm";
 
 const interactionTypes = [
   "مكالمة هاتفية",
@@ -17,48 +28,53 @@ const interactionTypes = [
   "لقاء شخصي",
   "عرض تقديم",
   "متابعة",
-  "أخرى"
-]
+  "أخرى",
+];
 
 export default function AddInteractionDialog() {
-  const { 
-    showAddInteractionDialog, 
-    selectedCustomer, 
+  const {
+    showAddInteractionDialog,
+    selectedCustomer,
     setShowAddInteractionDialog,
-    updateCustomer
-  } = useCrmStore()
+    updateCustomer,
+  } = useCrmStore();
 
   const [interactionData, setInteractionData] = useState({
     type: "",
     notes: "",
     duration: "",
-    agent: ""
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+    agent: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClose = () => {
-    setShowAddInteractionDialog(false)
+    setShowAddInteractionDialog(false);
     setInteractionData({
       type: "",
       notes: "",
       duration: "",
-      agent: ""
-    })
-  }
+      agent: "",
+    });
+  };
 
   const handleInputChange = (field: string, value: string) => {
-    setInteractionData(prev => ({
+    setInteractionData((prev) => ({
       ...prev,
-      [field]: value
-    }))
-  }
+      [field]: value,
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedCustomer || !interactionData.type || !interactionData.notes.trim()) return
+    e.preventDefault();
+    if (
+      !selectedCustomer ||
+      !interactionData.type ||
+      !interactionData.notes.trim()
+    )
+      return;
 
-    setIsSubmitting(true)
-    
+    setIsSubmitting(true);
+
     try {
       const newInteraction = {
         id: Date.now(),
@@ -67,23 +83,25 @@ export default function AddInteractionDialog() {
         duration: interactionData.duration || "غير محدد",
         agent: interactionData.agent || "المستخدم الحالي",
         date: new Date().toLocaleDateString("ar-SA"),
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      };
 
       // تحديث العميل في الـ store
-      const currentInteractions = Array.isArray(selectedCustomer.interactions) ? selectedCustomer.interactions : []
+      const currentInteractions = Array.isArray(selectedCustomer.interactions)
+        ? selectedCustomer.interactions
+        : [];
       updateCustomer(selectedCustomer.id, {
-        interactions: [newInteraction, ...currentInteractions] as any
-      })
+        interactions: [newInteraction, ...currentInteractions] as any,
+      });
 
       // إغلاق الـ dialog وتنظيف النموذج
-      handleClose()
+      handleClose();
     } catch (error) {
-      console.error("خطأ في إضافة التفاعل:", error)
+      console.error("خطأ في إضافة التفاعل:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={showAddInteractionDialog} onOpenChange={handleClose}>
@@ -105,7 +123,10 @@ export default function AddInteractionDialog() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="interaction-type">نوع التفاعل</Label>
-            <Select value={interactionData.type} onValueChange={(value) => handleInputChange("type", value)}>
+            <Select
+              value={interactionData.type}
+              onValueChange={(value) => handleInputChange("type", value)}
+            >
               <SelectTrigger id="interaction-type">
                 <SelectValue placeholder="اختر نوع التفاعل" />
               </SelectTrigger>
@@ -164,7 +185,11 @@ export default function AddInteractionDialog() {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !interactionData.type || !interactionData.notes.trim()}
+              disabled={
+                isSubmitting ||
+                !interactionData.type ||
+                !interactionData.notes.trim()
+              }
             >
               {isSubmitting ? "جاري الحفظ..." : "حفظ التفاعل"}
             </Button>
@@ -172,5 +197,5 @@ export default function AddInteractionDialog() {
         </form>
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

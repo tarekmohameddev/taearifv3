@@ -111,7 +111,9 @@ export default function CategoriesManagementPage() {
 
   const handleToggleActive = (id) => {
     if (!showEvenIfEmpty) {
-      toast.warning("يجب تفعيل اظهار التصنيفات الفارغة أولاً لتتمكن من تعديل التصنيفات");
+      toast.warning(
+        "يجب تفعيل اظهار التصنيفات الفارغة أولاً لتتمكن من تعديل التصنيفات",
+      );
       return;
     }
 
@@ -214,24 +216,24 @@ export default function CategoriesManagementPage() {
             </Button>
           </div>
 
-
-
           <div className="flex items-center justify-between p-6">
-  <div className="flex items-center space-x-4 gap-4 ">
-    <Label 
-      htmlFor="show-empty-categories" 
-      className=" font-medium cursor-pointer text-lg"
-    >
-      {showEvenIfEmpty ? "إخفاء التصنيفات الفارغة" : "إظهار التصنيفات الفارغة"}
-    </Label>
-    <Switch
-      checked={showEvenIfEmpty}
-      onCheckedChange={handleStatusChange}
-      id="show-empty-categories"
-      className=""
-    />
-  </div>
-</div>
+            <div className="flex items-center space-x-4 gap-4 ">
+              <Label
+                htmlFor="show-empty-categories"
+                className=" font-medium cursor-pointer text-lg"
+              >
+                {showEvenIfEmpty
+                  ? "إخفاء التصنيفات الفارغة"
+                  : "إظهار التصنيفات الفارغة"}
+              </Label>
+              <Switch
+                checked={showEvenIfEmpty}
+                onCheckedChange={handleStatusChange}
+                id="show-empty-categories"
+                className=""
+              />
+            </div>
+          </div>
 
           <Card className="mb-6">
             <CardHeader>

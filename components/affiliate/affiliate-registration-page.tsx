@@ -1,24 +1,33 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
-import { Toaster, toast } from "react-hot-toast"
-import { ArrowLeft, UserPlus, CreditCard, Shield } from "lucide-react"
-import Link from "next/link"
-import axiosInstance from "@/lib/axiosInstance"
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import { Toaster, toast } from "react-hot-toast";
+import { ArrowLeft, UserPlus, CreditCard, Shield } from "lucide-react";
+import Link from "next/link";
+import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function AffiliateRegistrationPage() {
-  const { affiliateData: { data, loading }, fetchAffiliateData } = useStore();
+  const {
+    affiliateData: { data, loading },
+    fetchAffiliateData,
+  } = useStore();
   const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
@@ -26,11 +35,11 @@ export function AffiliateRegistrationPage() {
     accountNumber: "",
     iban: "",
     agreeToTerms: false,
-  })
+  });
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isFormDisabled, setIsFormDisabled] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isFormDisabled, setIsFormDisabled] = useState(false);
 
   useEffect(() => {
     fetchAffiliateData();
@@ -52,62 +61,63 @@ export function AffiliateRegistrationPage() {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
-    }))
+    }));
 
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
         [field]: "",
-      }))
+      }));
     }
-  }
+  };
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     // Full name validation
     if (!formData.fullName.trim()) {
-      newErrors.fullName = "الاسم الكامل مطلوب"
+      newErrors.fullName = "الاسم الكامل مطلوب";
     } else if (formData.fullName.trim().length < 2) {
-      newErrors.fullName = "الاسم يجب أن يكون أكثر من حرفين"
+      newErrors.fullName = "الاسم يجب أن يكون أكثر من حرفين";
     }
 
     // Bank details validation
     if (!formData.bankName.trim()) {
-      newErrors.bankName = "اسم البنك مطلوب"
+      newErrors.bankName = "اسم البنك مطلوب";
     }
 
     if (!formData.accountNumber.trim()) {
-      newErrors.accountNumber = "رقم الحساب مطلوب"
+      newErrors.accountNumber = "رقم الحساب مطلوب";
     } else if (formData.accountNumber.length < 10) {
-      newErrors.accountNumber = "رقم الحساب يجب أن يكون 10 أرقام على الأقل"
+      newErrors.accountNumber = "رقم الحساب يجب أن يكون 10 أرقام على الأقل";
     }
 
     if (!formData.iban.trim()) {
-      newErrors.iban = "رقم الآيبان مطلوب"
+      newErrors.iban = "رقم الآيبان مطلوب";
     } else if (!/^SA[0-9]{22}$/.test(formData.iban.replace(/\s/g, ""))) {
-      newErrors.iban = "رقم الآيبان غير صحيح (يجب أن يبدأ بـ SA ويتكون من 24 رقم)"
+      newErrors.iban =
+        "رقم الآيبان غير صحيح (يجب أن يبدأ بـ SA ويتكون من 24 رقم)";
     }
 
     // Terms agreement validation
     if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = "يجب الموافقة على الشروط والأحكام"
+      newErrors.agreeToTerms = "يجب الموافقة على الشروط والأحكام";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      toast.error("الرجاء تصحيح الأخطاء المذكورة أدناه")
-      return
+      toast.error("الرجاء تصحيح الأخطاء المذكورة أدناه");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       const payload = {
@@ -115,24 +125,24 @@ export function AffiliateRegistrationPage() {
         bank_name: formData.bankName,
         bank_account_number: formData.accountNumber,
         iban: formData.iban,
-      }
-      const res = await axiosInstance.post("/affiliate/register", payload)
+      };
+      const res = await axiosInstance.post("/affiliate/register", payload);
       if (res?.data?.status === "success") {
-        toast.success("تم التسجيل بنجاح! سيتم تحويلك للصفحة الان.")
+        toast.success("تم التسجيل بنجاح! سيتم تحويلك للصفحة الان.");
         setTimeout(() => {
-          router.push("/affiliate/dashboard")
-         }, 2000)
+          router.push("/affiliate/dashboard");
+        }, 2000);
 
-        setIsFormDisabled(true)
+        setIsFormDisabled(true);
       } else {
-        toast.error(res?.data?.message || "حدث خطأ غير متوقع")
+        toast.error(res?.data?.message || "حدث خطأ غير متوقع");
       }
     } catch (error) {
-      toast.error("فشل في إرسال الطلب. الرجاء المحاولة مرة أخرى")
+      toast.error("فشل في إرسال الطلب. الرجاء المحاولة مرة أخرى");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   if (loading || data) {
     return (
@@ -175,7 +185,7 @@ export function AffiliateRegistrationPage() {
           </main>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -190,7 +200,9 @@ export function AffiliateRegistrationPage() {
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-2xl font-bold">انضم إلى برنامج الشراكة</h1>
-                <p className="text-muted-foreground">ابدأ في كسب العمولات من خلال الترويج لخدماتنا</p>
+                <p className="text-muted-foreground">
+                  ابدأ في كسب العمولات من خلال الترويج لخدماتنا
+                </p>
               </div>
             </div>
 
@@ -202,7 +214,9 @@ export function AffiliateRegistrationPage() {
                     <CreditCard className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="font-semibold mb-1">عمولة مجزية</h3>
-                  <p className="text-sm text-muted-foreground">احصل على عمولة على كل عملية بيع</p>
+                  <p className="text-sm text-muted-foreground">
+                    احصل على عمولة على كل عملية بيع
+                  </p>
                 </CardContent>
               </Card>
               <Card className="text-center">
@@ -211,7 +225,9 @@ export function AffiliateRegistrationPage() {
                     <Shield className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="font-semibold mb-1">دفع آمن</h3>
-                  <p className="text-sm text-muted-foreground">دفعات شهرية منتظمة وآمنة مباشرة إلى حسابك</p>
+                  <p className="text-sm text-muted-foreground">
+                    دفعات شهرية منتظمة وآمنة مباشرة إلى حسابك
+                  </p>
                 </CardContent>
               </Card>
               <Card className="text-center">
@@ -220,7 +236,9 @@ export function AffiliateRegistrationPage() {
                     <UserPlus className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="font-semibold mb-1">دعم مستمر</h3>
-                  <p className="text-sm text-muted-foreground">فريق دعم متخصص لمساعدتك في تحقيق أهدافك</p>
+                  <p className="text-sm text-muted-foreground">
+                    فريق دعم متخصص لمساعدتك في تحقيق أهدافك
+                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -232,43 +250,61 @@ export function AffiliateRegistrationPage() {
                   <UserPlus className="h-5 w-5" />
                   نموذج التسجيل
                 </CardTitle>
-                <CardDescription>املأ البيانات التالية للانضمام إلى برنامج الشراكة</CardDescription>
+                <CardDescription>
+                  املأ البيانات التالية للانضمام إلى برنامج الشراكة
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Personal Information */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold border-b pb-2">المعلومات الشخصية</h3>
+                    <h3 className="text-lg font-semibold border-b pb-2">
+                      المعلومات الشخصية
+                    </h3>
 
                     <div className="space-y-2">
                       <Label htmlFor="fullName">الاسم الكامل *</Label>
                       <Input
                         id="fullName"
                         value={formData.fullName}
-                        onChange={(e) => handleInputChange("fullName", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("fullName", e.target.value)
+                        }
                         placeholder="أدخل الاسم الكامل"
                         className={errors.fullName ? "border-destructive" : ""}
                         disabled={isFormDisabled}
                       />
-                      {errors.fullName && <p className="text-sm text-destructive">{errors.fullName}</p>}
+                      {errors.fullName && (
+                        <p className="text-sm text-destructive">
+                          {errors.fullName}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   {/* Bank Information */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold border-b pb-2">معلومات الحساب البنكي</h3>
+                    <h3 className="text-lg font-semibold border-b pb-2">
+                      معلومات الحساب البنكي
+                    </h3>
 
                     <div className="space-y-2">
                       <Label htmlFor="bankName">اسم البنك *</Label>
                       <Input
                         id="bankName"
                         value={formData.bankName}
-                        onChange={(e) => handleInputChange("bankName", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("bankName", e.target.value)
+                        }
                         placeholder="مثال: البنك الأهلي السعودي"
                         className={errors.bankName ? "border-destructive" : ""}
                         disabled={isFormDisabled}
                       />
-                      {errors.bankName && <p className="text-sm text-destructive">{errors.bankName}</p>}
+                      {errors.bankName && (
+                        <p className="text-sm text-destructive">
+                          {errors.bankName}
+                        </p>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -277,12 +313,20 @@ export function AffiliateRegistrationPage() {
                         <Input
                           id="accountNumber"
                           value={formData.accountNumber}
-                          onChange={(e) => handleInputChange("accountNumber", e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("accountNumber", e.target.value)
+                          }
                           placeholder="1234567890"
-                          className={errors.accountNumber ? "border-destructive" : ""}
+                          className={
+                            errors.accountNumber ? "border-destructive" : ""
+                          }
                           disabled={isFormDisabled}
                         />
-                        {errors.accountNumber && <p className="text-sm text-destructive">{errors.accountNumber}</p>}
+                        {errors.accountNumber && (
+                          <p className="text-sm text-destructive">
+                            {errors.accountNumber}
+                          </p>
+                        )}
                       </div>
 
                       <div className="space-y-2">
@@ -290,12 +334,21 @@ export function AffiliateRegistrationPage() {
                         <Input
                           id="iban"
                           value={formData.iban}
-                          onChange={(e) => handleInputChange("iban", e.target.value.toUpperCase())}
+                          onChange={(e) =>
+                            handleInputChange(
+                              "iban",
+                              e.target.value.toUpperCase(),
+                            )
+                          }
                           placeholder="SA0000000000000000000000"
                           className={errors.iban ? "border-destructive" : ""}
                           disabled={isFormDisabled}
                         />
-                        {errors.iban && <p className="text-sm text-destructive">{errors.iban}</p>}
+                        {errors.iban && (
+                          <p className="text-sm text-destructive">
+                            {errors.iban}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -306,29 +359,51 @@ export function AffiliateRegistrationPage() {
                       <Checkbox
                         id="terms"
                         checked={formData.agreeToTerms}
-                        onCheckedChange={(checked) => handleInputChange("agreeToTerms", checked)}
-                        className={errors.agreeToTerms ? "border-destructive" : ""}
+                        onCheckedChange={(checked) =>
+                          handleInputChange("agreeToTerms", checked)
+                        }
+                        className={
+                          errors.agreeToTerms ? "border-destructive" : ""
+                        }
                         disabled={isFormDisabled}
                       />
                       <div className="space-y-1">
-                        <Label htmlFor="terms" className="text-sm leading-relaxed">
+                        <Label
+                          htmlFor="terms"
+                          className="text-sm leading-relaxed"
+                        >
                           أوافق على{" "}
-                          <Link href="/terms" className="text-primary hover:underline font-medium">
+                          <Link
+                            href="/terms"
+                            className="text-primary hover:underline font-medium"
+                          >
                             الشروط والأحكام
                           </Link>{" "}
                           و{" "}
-                          <Link href="/privacy" className="text-primary hover:underline font-medium">
+                          <Link
+                            href="/privacy"
+                            className="text-primary hover:underline font-medium"
+                          >
                             سياسة الخصوصية
                           </Link>{" "}
                           الخاصة ببرنامج الشراكة
                         </Label>
-                        {errors.agreeToTerms && <p className="text-sm text-destructive">{errors.agreeToTerms}</p>}
+                        {errors.agreeToTerms && (
+                          <p className="text-sm text-destructive">
+                            {errors.agreeToTerms}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   {/* Submit Button */}
-                  <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || isFormDisabled}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="lg"
+                    disabled={isSubmitting || isFormDisabled}
+                  >
                     {isSubmitting ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2" />
@@ -349,8 +424,10 @@ export function AffiliateRegistrationPage() {
             <Card className="bg-muted/50">
               <CardContent className="p-4">
                 <p className="text-sm text-muted-foreground text-center">
-                  <strong>ملاحظة:</strong> سيتم مراجعة طلبك من قبل فريقنا المختص والرد عليك خلال 24-48 ساعة عبر البريد
-                  الإلكتروني المسجل. في حالة الموافقة، ستحصل على رابط الشراكة الخاص بك ومعلومات الحساب.
+                  <strong>ملاحظة:</strong> سيتم مراجعة طلبك من قبل فريقنا المختص
+                  والرد عليك خلال 24-48 ساعة عبر البريد الإلكتروني المسجل. في
+                  حالة الموافقة، ستحصل على رابط الشراكة الخاص بك ومعلومات
+                  الحساب.
                 </p>
               </CardContent>
             </Card>
@@ -358,5 +435,5 @@ export function AffiliateRegistrationPage() {
         </main>
       </div>
     </div>
-  )
+  );
 }

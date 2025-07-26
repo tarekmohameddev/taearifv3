@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Users,
   TrendingUp,
@@ -14,16 +14,16 @@ import {
   DollarSign,
   Clock,
   BarChart3,
-} from "lucide-react"
-import { Customer, PipelineStage } from "@/types/crm"
+} from "lucide-react";
+import { Customer, PipelineStage } from "@/types/crm";
 
 interface CrmStatisticsProps {
-  totalCustomers: number
-  customersData: Customer[]
-  pipelineStages: PipelineStage[]
-  pipelineStats: any[]
-  scheduledAppointments: number
-  totalAppointments: number
+  totalCustomers: number;
+  customersData: Customer[];
+  pipelineStages: PipelineStage[];
+  pipelineStats: any[];
+  scheduledAppointments: number;
+  totalAppointments: number;
 }
 
 export default function CrmStatistics({
@@ -36,7 +36,6 @@ export default function CrmStatistics({
 }: CrmStatisticsProps) {
   return (
     <div className="space-y-6">
-
       {/* Analytics Section */}
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         <Card>
@@ -50,12 +49,17 @@ export default function CrmStatistics({
             <div className="text-3xl font-bold mb-2">
               {totalCustomers > 0
                 ? Math.round(
-                    ((pipelineStats.find((s) => s.id === "closed-won")?.count || 0) / totalCustomers) * 100,
+                    ((pipelineStats.find((s) => s.id === "closed-won")?.count ||
+                      0) /
+                      totalCustomers) *
+                      100,
                   )
                 : 0}
               %
             </div>
-            <p className="text-sm text-muted-foreground">من العملاء المحتملين إلى صفقات مكتملة</p>
+            <p className="text-sm text-muted-foreground">
+              من العملاء المحتملين إلى صفقات مكتملة
+            </p>
           </CardContent>
         </Card>
 
@@ -68,9 +72,14 @@ export default function CrmStatistics({
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold mb-2">
-              {totalCustomers > 0 ? Math.round(totalCustomers / totalCustomers / 1000) : 0}ك ريال
+              {totalCustomers > 0
+                ? Math.round(totalCustomers / totalCustomers / 1000)
+                : 0}
+              ك ريال
             </div>
-            <p className="text-sm text-muted-foreground">متوسط قيمة الصفقة لكل عميل</p>
+            <p className="text-sm text-muted-foreground">
+              متوسط قيمة الصفقة لكل عميل
+            </p>
           </CardContent>
         </Card>
 
@@ -83,7 +92,9 @@ export default function CrmStatistics({
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold mb-2">45 يوم</div>
-            <p className="text-sm text-muted-foreground">من العميل المحتمل إلى إتمام الصفقة</p>
+            <p className="text-sm text-muted-foreground">
+              من العميل المحتمل إلى إتمام الصفقة
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -102,11 +113,19 @@ export default function CrmStatistics({
                   <span className="font-medium">{stage.name}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground">{stage.count} عميل</span>
-                  <span className="font-semibold">{(stage.value / 1000).toFixed(0)}ك ريال</span>
+                  <span className="text-sm text-muted-foreground">
+                    {stage.count} عميل
+                  </span>
+                  <span className="font-semibold">
+                    {(stage.value / 1000).toFixed(0)}ك ريال
+                  </span>
                   <div className="w-24">
                     <Progress
-                      value={totalCustomers > 0 ? (stage.count / totalCustomers) * 100 : 0}
+                      value={
+                        totalCustomers > 0
+                          ? (stage.count / totalCustomers) * 100
+                          : 0
+                      }
                       className="h-2"
                     />
                   </div>
@@ -117,5 +136,5 @@ export default function CrmStatistics({
         </CardContent>
       </Card>
     </div>
-  )
-} 
+  );
+}

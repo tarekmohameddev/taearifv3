@@ -181,29 +181,29 @@ const OnboardingPage: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
     let firstErrorField: React.RefObject<HTMLInputElement> | null = null;
-  
+
     if (!websiteData.title.trim()) {
       newErrors.title = "يرجى إدخال عنوان الموقع";
       if (!firstErrorField) firstErrorField = titleRef;
     }
-  
+
     // التحقق من رقم الرخصة (اختياري، ولكن إذا تم إدخاله يجب أن يكون 10 أرقام)
     if (websiteData.valLicense && websiteData.valLicense.length !== 10) {
       newErrors.valLicense = "رقم الرخصة يجب أن يكون 10 أرقام";
       if (!firstErrorField) firstErrorField = valLicenseRef;
     }
-  
+
     setErrors(newErrors);
-  
+
     // Scroll to the first error field
     if (firstErrorField && firstErrorField.current) {
       firstErrorField.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
+        behavior: "smooth",
+        block: "center",
       });
       firstErrorField.current.focus();
     }
-  
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -313,103 +313,103 @@ const OnboardingPage: React.FC = () => {
           <form onSubmit={completeOnboarding} className="space-y-8">
             {/* Website Title */}
             <div className="space-y-2">
-  <Label htmlFor="website-title" className="text-foreground">
-    اسم الموقع *
-  </Label>
-  <Input
-    ref={titleRef} // إضافة ref
-    id="website-title"
-    placeholder="مثال: شركة الأفق للعقارات"
-    value={websiteData.title}
-    onChange={(e) => {
-      setWebsiteData({ ...websiteData, title: e.target.value });
-      if (errors.title) {
-        setErrors({ ...errors, title: "" });
-      }
-    }}
-    className={`h-12 ${errors.title ? "border-red-500" : ""}`}
-    required
-  />
-  {errors.title && (
-    <p className="text-sm text-red-500">{errors.title}</p>
-  )}
-</div>
+              <Label htmlFor="website-title" className="text-foreground">
+                اسم الموقع *
+              </Label>
+              <Input
+                ref={titleRef} // إضافة ref
+                id="website-title"
+                placeholder="مثال: شركة الأفق للعقارات"
+                value={websiteData.title}
+                onChange={(e) => {
+                  setWebsiteData({ ...websiteData, title: e.target.value });
+                  if (errors.title) {
+                    setErrors({ ...errors, title: "" });
+                  }
+                }}
+                className={`h-12 ${errors.title ? "border-red-500" : ""}`}
+                required
+              />
+              {errors.title && (
+                <p className="text-sm text-red-500">{errors.title}</p>
+              )}
+            </div>
 
             {/* VAL License Number */}
-          
-{/* VAL License Number */}
-<div className="space-y-2">
-  <Label htmlFor="val-license">رقم رخصة فال</Label>
-  <Input
-    ref={valLicenseRef} // إضافة ref
-    id="val-license"
-    placeholder="مثال: 1234567890"
-    value={websiteData.valLicense}
-    onChange={(e) => {
-      // Allow only numbers
-      const value = e.target.value.replace(/\D/g, "");
-      setWebsiteData({ ...websiteData, valLicense: value });
-      if (errors.valLicense) {
-        setErrors({ ...errors, valLicense: "" });
-      }
-    }}
-    maxLength={10}
-    className={`h-12 ${errors.valLicense ? "border-red-500" : ""}`}
-  />
-  {errors.valLicense && (
-    <p className="text-sm text-red-500">{errors.valLicense}</p>
-  )}
-  {!errors.valLicense && (
-    <p className="text-xs text-gray-500">
-      رقم رخصة فال يتكون من 10 أرقام (اختياري)
-    </p>
-  )}
-</div>
 
-{/* Working Hours */}
-<div className="space-y-2">
-  <Label htmlFor="working-hours">ساعات العمل</Label>
-  <Input
-    ref={workingHoursRef} // إضافة ref
-    id="working-hours"
-    placeholder="مثال: السبت - الخميس: 9:00 صباحاً - 6:00 مساءً"
-    value={websiteData.workingHours}
-    onChange={(e) => {
-      setWebsiteData({
-        ...websiteData,
-        workingHours: e.target.value,
-      });
-      if (errors.workingHours) {
-        setErrors({ ...errors, workingHours: "" });
-      }
-    }}
-    className={`h-12 ${errors.workingHours ? "border-red-500" : ""}`}
-  />
-  {errors.workingHours && (
-    <p className="text-sm text-red-500">{errors.workingHours}</p>
-  )}
-</div>
+            {/* VAL License Number */}
+            <div className="space-y-2">
+              <Label htmlFor="val-license">رقم رخصة فال</Label>
+              <Input
+                ref={valLicenseRef} // إضافة ref
+                id="val-license"
+                placeholder="مثال: 1234567890"
+                value={websiteData.valLicense}
+                onChange={(e) => {
+                  // Allow only numbers
+                  const value = e.target.value.replace(/\D/g, "");
+                  setWebsiteData({ ...websiteData, valLicense: value });
+                  if (errors.valLicense) {
+                    setErrors({ ...errors, valLicense: "" });
+                  }
+                }}
+                maxLength={10}
+                className={`h-12 ${errors.valLicense ? "border-red-500" : ""}`}
+              />
+              {errors.valLicense && (
+                <p className="text-sm text-red-500">{errors.valLicense}</p>
+              )}
+              {!errors.valLicense && (
+                <p className="text-xs text-gray-500">
+                  رقم رخصة فال يتكون من 10 أرقام (اختياري)
+                </p>
+              )}
+            </div>
 
-{/* Address */}
-<div className="space-y-2">
-  <Label htmlFor="address">العنوان</Label>
-  <Input
-    ref={addressRef} // إضافة ref
-    id="address"
-    placeholder="مثال: شارع الملك فهد، حي العليا، الرياض"
-    value={websiteData.address}
-    onChange={(e) => {
-      setWebsiteData({ ...websiteData, address: e.target.value });
-      if (errors.address) {
-        setErrors({ ...errors, address: "" });
-      }
-    }}
-    className={`h-12 ${errors.address ? "border-red-500" : ""}`}
-  />
-  {errors.address && (
-    <p className="text-sm text-red-500">{errors.address}</p>
-  )}
-</div>
+            {/* Working Hours */}
+            <div className="space-y-2">
+              <Label htmlFor="working-hours">ساعات العمل</Label>
+              <Input
+                ref={workingHoursRef} // إضافة ref
+                id="working-hours"
+                placeholder="مثال: السبت - الخميس: 9:00 صباحاً - 6:00 مساءً"
+                value={websiteData.workingHours}
+                onChange={(e) => {
+                  setWebsiteData({
+                    ...websiteData,
+                    workingHours: e.target.value,
+                  });
+                  if (errors.workingHours) {
+                    setErrors({ ...errors, workingHours: "" });
+                  }
+                }}
+                className={`h-12 ${errors.workingHours ? "border-red-500" : ""}`}
+              />
+              {errors.workingHours && (
+                <p className="text-sm text-red-500">{errors.workingHours}</p>
+              )}
+            </div>
+
+            {/* Address */}
+            <div className="space-y-2">
+              <Label htmlFor="address">العنوان</Label>
+              <Input
+                ref={addressRef} // إضافة ref
+                id="address"
+                placeholder="مثال: شارع الملك فهد، حي العليا، الرياض"
+                value={websiteData.address}
+                onChange={(e) => {
+                  setWebsiteData({ ...websiteData, address: e.target.value });
+                  if (errors.address) {
+                    setErrors({ ...errors, address: "" });
+                  }
+                }}
+                className={`h-12 ${errors.address ? "border-red-500" : ""}`}
+              />
+              {errors.address && (
+                <p className="text-sm text-red-500">{errors.address}</p>
+              )}
+            </div>
 
             {/* Logo and Favicon */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

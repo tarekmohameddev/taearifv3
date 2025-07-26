@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 // تعريف واجهة البيانات الخاصة بالنموذج
 interface FormData {
@@ -59,10 +60,11 @@ export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [subdomainFocused, setSubdomainFocused] = useState(false);
   const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>(
-    []
+    [],
   );
   const [referralCodeLocked, setReferralCodeLocked] = useState(false);
   const [googleAuthUrl, setGoogleAuthUrl] = useState<string>("");
+  const [googleUrlLoading, setGoogleUrlLoading] = useState(true);
 
   // Validate email
   const validateEmail = (email: string) => {
@@ -88,7 +90,7 @@ export function RegisterPage() {
     const arabicRegex = /[\u0600-\u06FF]/;
     // Check for valid domain format (letters any case, numbers, hyphens, no spaces)
     const subdomainRegex = /^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/;
-  
+
     if (!subdomain) return "اسم موقعك الإلكتروني مطلوب";
     if (arabicRegex.test(subdomain))
       return "لا يمكن استخدام الأحرف العربية في اسم الموقع";
@@ -140,14 +142,20 @@ export function RegisterPage() {
     if (googleUrlFetched) return;
     const fetchGoogleAuthUrl = async () => {
       try {
+        setGoogleUrlLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`
+          `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`,
         );
         const data = await response.json();
+        console.log("data.url", data.url);
         if (data.url) {
           setGoogleAuthUrl(data.url);
         }
-      } catch (error) {}
+      } catch (error) {
+        // يمكن عرض رسالة خطأ هنا إذا رغبت
+      } finally {
+        setGoogleUrlLoading(false);
+      }
     };
     fetchGoogleAuthUrl();
     setGoogleUrlFetched(true);
@@ -183,8 +191,12 @@ export function RegisterPage() {
 
   // تسجيل الدخول بـ Google
   const handleGoogleLogin = async () => {
+    if (googleUrlLoading) {
+      toast.loading("يتم تحميل رابط Google، يرجى الانتظار...");
+      return;
+    }
     if (!googleAuthUrl) {
-      console.error("Google auth URL not available");
+      toast.error("Google auth URL غير متاح حاليًا");
       return;
     }
     if (typeof window !== "undefined") {
@@ -247,7 +259,6 @@ export function RegisterPage() {
           throw new Error(response.data.message || "فشل تسجيل الدخول");
         }
 
-
         const { user, token: UserToken } = response.data;
 
         // إرسال بيانات المستخدم والتوكن إلى /api/user/setAuth
@@ -297,14 +308,16 @@ export function RegisterPage() {
           if (errorMessage === "Invalid referral code.") {
             setErrors((prevErrors) => ({
               ...prevErrors,
-              api: "رمز الإحالة غير صحيح، تأكد منه أو اتركه فارغًا.."
+              api: "رمز الإحالة غير صحيح، تأكد منه أو اتركه فارغًا..",
             }));
           } else if (/recaptcha failed/i.test(errorMessage)) {
             setErrors((prevErrors) => ({
               ...prevErrors,
-              api: "فشل التحقق من reCAPTCHA. يرجى إعادة المحاولة أو تحديث الصفحة."
+              api: "فشل التحقق من reCAPTCHA. يرجى إعادة المحاولة أو تحديث الصفحة.",
             }));
-          } else if (errorMessage.includes("The email has already been taken")) {
+          } else if (
+            errorMessage.includes("The email has already been taken")
+          ) {
             setErrors((prevErrors) => ({
               ...prevErrors,
               api: "هذا البريد الإلكتروني مسجل بالفعل.",
@@ -663,8 +676,10 @@ export function RegisterPage() {
         <Button
           type="button"
           variant="outline"
-          className="w-full py-5 flex items-center justify-center"
+          className={`w-full py-5 flex items-center justify-center transition-opacity ${googleUrlLoading ? "opacity-60 cursor-not-allowed" : ""}`}
           onClick={handleGoogleLogin}
+          tabIndex={googleUrlLoading ? -1 : 0}
+          aria-disabled={googleUrlLoading}
         >
           <svg
             className="ml-2 h-4 w-4"
@@ -681,7 +696,7 @@ export function RegisterPage() {
               d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
             ></path>
           </svg>
-          Google
+          {googleUrlLoading ? "... جاري التحميل" : "Google"}
         </Button>
 
         <p className="text-xs text-center text-muted-foreground mt-8">

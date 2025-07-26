@@ -1,37 +1,44 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import { Loader } from "@googlemaps/js-api-loader"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { MapPin, Search } from "lucide-react"
+import { useState, useEffect, useRef } from "react";
+import { Loader } from "@googlemaps/js-api-loader";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { MapPin, Search } from "lucide-react";
 
 export function MapSection({ onLocationUpdate }) {
-  const mapRef = useRef(null)
-  const searchInputRef = useRef(null)
-  const [map, setMap] = useState(null)
-  const [marker, setMarker] = useState(null)
-  const [searchBox, setSearchBox] = useState(null)
-  const [isMapLoaded, setIsMapLoaded] = useState(false)
-  const markerRef = useRef(null) // إضافة ref للعلامة
+  const mapRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const [map, setMap] = useState(null);
+  const [marker, setMarker] = useState(null);
+  const [searchBox, setSearchBox] = useState(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const markerRef = useRef(null); // إضافة ref للعلامة
 
   // Initialize Google Maps
   useEffect(() => {
     const initMap = async () => {
       const loader = new Loader({
-        apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_API_KEY_HERE",
+        apiKey:
+          process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_API_KEY_HERE",
         version: "weekly",
         libraries: ["places"],
         language: "ar",
         region: "SA",
-      })
+      });
 
       try {
-        await loader.load()
+        await loader.load();
 
-        const g = window.google
-        if (!g || !mapRef.current) return
+        const g = window.google;
+        if (!g || !mapRef.current) return;
 
         const mapInstance = new g.maps.Map(mapRef.current, {
           center: { lat: 24.766316905850978, lng: 46.73579692840576 },
@@ -40,64 +47,66 @@ export function MapSection({ onLocationUpdate }) {
           mapTypeControl: true,
           streetViewControl: true,
           fullscreenControl: true,
-        })
+        });
 
-        setMap(mapInstance)
-        setIsMapLoaded(true)
+        setMap(mapInstance);
+        setIsMapLoaded(true);
 
         // Add click listener to map
         mapInstance.addListener("click", (event) => {
           if (event.latLng) {
-            const lat = event.latLng.lat()
-            const lng = event.latLng.lng()
-            console.log("Map clicked:", lat, lng) // للتتبع
-            updateLocation(lat, lng, mapInstance)
+            const lat = event.latLng.lat();
+            const lng = event.latLng.lng();
+            console.log("Map clicked:", lat, lng); // للتتبع
+            updateLocation(lat, lng, mapInstance);
           }
-        })
+        });
 
         // Initialize search box
         if (searchInputRef.current) {
-          const searchBoxInstance = new g.maps.places.SearchBox(searchInputRef.current)
-          setSearchBox(searchBoxInstance)
+          const searchBoxInstance = new g.maps.places.SearchBox(
+            searchInputRef.current,
+          );
+          setSearchBox(searchBoxInstance);
 
           mapInstance.addListener("bounds_changed", () => {
-            searchBoxInstance.setBounds(mapInstance.getBounds())
-          })
+            searchBoxInstance.setBounds(mapInstance.getBounds());
+          });
 
           searchBoxInstance.addListener("places_changed", () => {
-            const places = searchBoxInstance.getPlaces()
+            const places = searchBoxInstance.getPlaces();
             if (places && places.length > 0) {
-              const place = places[0]
+              const place = places[0];
               if (place.geometry && place.geometry.location) {
-                const lat = place.geometry.location.lat()
-                const lng = place.geometry.location.lng()
-                updateLocation(lat, lng, mapInstance)
+                const lat = place.geometry.location.lat();
+                const lng = place.geometry.location.lng();
+                updateLocation(lat, lng, mapInstance);
 
-                const address = place.formatted_address || ""
-                onLocationUpdate(lat, lng, address)
+                const address = place.formatted_address || "";
+                onLocationUpdate(lat, lng, address);
 
-                mapInstance.setCenter(place.geometry.location)
-                mapInstance.setZoom(17)
+                mapInstance.setCenter(place.geometry.location);
+                mapInstance.setZoom(17);
               }
             }
-          })
+          });
         }
       } catch (error) {
-        console.error("Error loading Google Maps:", error)
+        console.error("Error loading Google Maps:", error);
       }
-    }
+    };
 
-    initMap()
-  }, []) // إزالة onLocationUpdate من dependencies
+    initMap();
+  }, []); // إزالة onLocationUpdate من dependencies
 
   const updateLocation = (lat, lng, mapInstance) => {
-    console.log("updateLocation called:", lat, lng) // للتتبع
+    console.log("updateLocation called:", lat, lng); // للتتبع
 
     // إزالة العلامة القديمة إذا كانت موجودة
     if (markerRef.current) {
-      console.log("Removing old marker") // للتتبع
-      markerRef.current.setMap(null)
-      markerRef.current = null
+      console.log("Removing old marker"); // للتتبع
+      markerRef.current.setMap(null);
+      markerRef.current = null;
     }
 
     // إنشاء علامة جديدة
@@ -107,119 +116,135 @@ export function MapSection({ onLocationUpdate }) {
       draggable: true,
       title: "موقع العقار",
       animation: window.google.maps.Animation.DROP,
-    })
+    });
 
-    console.log("New marker created:", newMarker) // للتتبع
+    console.log("New marker created:", newMarker); // للتتبع
 
     // إضافة مستمع للسحب
     newMarker.addListener("dragend", (event) => {
       if (event.latLng) {
-        const newLat = event.latLng.lat()
-        const newLng = event.latLng.lng()
-        console.log("Marker dragged to:", newLat, newLng) // للتتبع
-        reverseGeocode(newLat, newLng)
+        const newLat = event.latLng.lat();
+        const newLng = event.latLng.lng();
+        console.log("Marker dragged to:", newLat, newLng); // للتتبع
+        reverseGeocode(newLat, newLng);
       }
-    })
+    });
 
     // حفظ العلامة في الـ ref والـ state
-    markerRef.current = newMarker
-    setMarker(newMarker)
+    markerRef.current = newMarker;
+    setMarker(newMarker);
 
     // الحصول على العنوان وتحديث البيانات
-    reverseGeocode(lat, lng)
-  }
+    reverseGeocode(lat, lng);
+  };
 
   const reverseGeocode = (lat, lng) => {
-    console.log("reverseGeocode called:", lat, lng) // للتتبع
+    console.log("reverseGeocode called:", lat, lng); // للتتبع
 
-    const geocoder = new window.google.maps.Geocoder()
+    const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-      console.log("Geocoding result:", status, results) // للتتبع
+      console.log("Geocoding result:", status, results); // للتتبع
 
       if (status === "OK" && results && results[0]) {
-        const address = results[0].formatted_address
-        onLocationUpdate(lat, lng, address)
+        const address = results[0].formatted_address;
+        onLocationUpdate(lat, lng, address);
       } else {
-        onLocationUpdate(lat, lng, `${lat.toFixed(6)}, ${lng.toFixed(6)}`)
+        onLocationUpdate(lat, lng, `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       }
-    })
-  }
+    });
+  };
 
   const getCurrentLocation = () => {
-    console.log("getCurrentLocation called") // للتتبع
+    console.log("getCurrentLocation called"); // للتتبع
 
     if (navigator.geolocation && map) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const lat = position.coords.latitude
-          const lng = position.coords.longitude
-          console.log("Current location:", lat, lng) // للتتبع
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          console.log("Current location:", lat, lng); // للتتبع
 
-          updateLocation(lat, lng, map)
-          map.setCenter({ lat, lng })
-          map.setZoom(17)
+          updateLocation(lat, lng, map);
+          map.setCenter({ lat, lng });
+          map.setZoom(17);
         },
         (error) => {
-          console.error("Error getting current location:", error)
-          alert("غير قادر على الحصول على موقعك الحالي")
+          console.error("Error getting current location:", error);
+          alert("غير قادر على الحصول على موقعك الحالي");
         },
         {
           enableHighAccuracy: true,
           timeout: 10000,
           maximumAge: 0,
         },
-      )
+      );
     } else {
-      alert("المتصفح لا يدعم تحديد الموقع الجغرافي")
+      alert("المتصفح لا يدعم تحديد الموقع الجغرافي");
     }
-  }
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>اختر موقع العقار</CardTitle>
-        <CardDescription>ابحث عن عنوان أو انقر على الخريطة لتحديد الموقع بدقة</CardDescription>
+        <CardDescription>
+          ابحث عن عنوان أو انقر على الخريطة لتحديد الموقع بدقة
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Search Box */}
         <div className="relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input ref={searchInputRef} placeholder="ابحث عن عنوان..." className="pl-10" />
+          <Input
+            ref={searchInputRef}
+            placeholder="ابحث عن عنوان..."
+            className="pl-10"
+          />
         </div>
 
         {/* Current Location Button */}
-        <Button type="button" variant="outline" onClick={getCurrentLocation} className="w-full">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={getCurrentLocation}
+          className="w-full"
+        >
           <MapPin className="h-4 w-4 mr-2" />
           استخدم الموقع الحالي
         </Button>
 
         {/* Map Container */}
         <div className="relative">
-          <div ref={mapRef} className="w-full h-96 rounded-lg border bg-muted" />
+          <div
+            ref={mapRef}
+            className="w-full h-96 rounded-lg border bg-muted"
+          />
           {!isMapLoaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-muted rounded-lg">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                <p className="text-sm text-muted-foreground">جاري تحميل الخريطة...</p>
+                <p className="text-sm text-muted-foreground">
+                  جاري تحميل الخريطة...
+                </p>
               </div>
             </div>
           )}
         </div>
 
         <div className="text-xs text-muted-foreground dark:text-muted-foreground-dark">
-  <p>• انقر في أي مكان على الخريطة لتحديد موقع العقار</p>
-  <p>• استخدم مربع البحث للعثور على عنوان محدد</p>
-  <p>• اسحب العلامة لضبط الموقع بدقة</p>
-</div>
+          <p>• انقر في أي مكان على الخريطة لتحديد موقع العقار</p>
+          <p>• استخدم مربع البحث للعثور على عنوان محدد</p>
+          <p>• اسحب العلامة لضبط الموقع بدقة</p>
+        </div>
 
-{/* Debug Info */}
-{marker && (
-  <div className="p-2 bg-blue-50 border border-blue-200 rounded text-xs dark:bg-blue-900/50 dark:border-blue-700 dark:text-blue-200">
-    <p>العلامة موجودة: ✅</p>
-    <p>حالة الخريطة: {isMapLoaded ? "محملة" : "غير محملة"}</p>
-  </div>
-)}
+        {/* Debug Info */}
+        {marker && (
+          <div className="p-2 bg-blue-50 border border-blue-200 rounded text-xs dark:bg-blue-900/50 dark:border-blue-700 dark:text-blue-200">
+            <p>العلامة موجودة: ✅</p>
+            <p>حالة الخريطة: {isMapLoaded ? "محملة" : "غير محملة"}</p>
+          </div>
+        )}
       </CardContent>
     </Card>
-  )
+  );
 }

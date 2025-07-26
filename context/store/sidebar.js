@@ -33,16 +33,16 @@ const getIconComponent = (iconName) => {
       return Package;
     case "users":
       return Users;
-      case "external-link":
-        return ExternalLink;
-        case "link":
-          return LinkIcon;
-          case "dock":
-            return Dock;
-            case "layout-grid":
-              return LayoutGrid;
-              case "bot":
-                return Bot;
+    case "external-link":
+      return ExternalLink;
+    case "link":
+      return LinkIcon;
+    case "dock":
+      return Dock;
+    case "layout-grid":
+      return LayoutGrid;
+    case "bot":
+      return Bot;
     default:
       return FileText;
   }
@@ -55,16 +55,16 @@ module.exports = (set, get) => ({
     loading: false,
     error: null,
   },
-  
+
   fetchSideMenus: async (app) => {
     const { sidebarData } = get();
     if (!app) {
       if (sidebarData.isSidebarFetched) return;
     }
-    
+
     // فقط إظهار loading إذا لم تكن هناك بيانات موجودة
     const showLoading = sidebarData.mainNavItems.length === 0;
-    
+
     set((state) => ({
       sidebarData: {
         ...state.sidebarData,
@@ -72,7 +72,7 @@ module.exports = (set, get) => ({
         error: null,
       },
     }));
-    
+
     try {
       const response = await axiosInstance.get("/settings/side-menus");
       const sections = response.data.data.sections;
@@ -82,9 +82,9 @@ module.exports = (set, get) => ({
         description: section.description,
         icon: getIconComponent(section.icon),
         path: section.path,
-        isAPP: section.isAPP || false, 
+        isAPP: section.isAPP || false,
       }));
-      
+
       set((state) => ({
         sidebarData: {
           ...state.sidebarData,
@@ -104,7 +104,7 @@ module.exports = (set, get) => ({
       }));
     }
   },
-  
+
   setSidebarData: (updates) =>
     set((state) => ({
       sidebarData: {
@@ -112,7 +112,7 @@ module.exports = (set, get) => ({
         ...updates,
       },
     })),
-    
+
   // إعادة تعيين البيانات لإجبار إعادة جلبها
   resetSidebarData: () =>
     set((state) => ({

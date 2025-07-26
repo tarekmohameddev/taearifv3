@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Target } from "lucide-react"
-import type { Customer, PipelineStage as PipelineStageType } from "@/types/crm"
-import PipelineStage from "./pipeline-stage"
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Target } from "lucide-react";
+import type { Customer, PipelineStage as PipelineStageType } from "@/types/crm";
+import PipelineStage from "./pipeline-stage";
 
 interface PipelineBoardProps {
-  pipelineStages: PipelineStageType[]
-  customersData: Customer[]
-  filteredCustomers: Customer[]
-  isDragging: boolean
-  draggedCustomer: Customer | null
-  dragOverStage: string | null
-  focusedCustomer: Customer | null
-  onDragStart: (e: any, customer: Customer) => void
-  onDragEnd: (e: any) => void
-  onDragOver: (e: any, stageId: string) => void
-  onDragLeave: (e: any, stageId: string) => void
-  onDrop: (e: any, stageId: string) => void
-  onKeyDown: (e: any, customer: Customer, stageId: string) => void
-  onViewDetails: (customer: Customer) => void
-  onAddNote: (customer: Customer) => void
-  onAddReminder: (customer: Customer) => void
-  onAddInteraction: (customer: Customer) => void
+  pipelineStages: PipelineStageType[];
+  customersData: Customer[];
+  filteredCustomers: Customer[];
+  isDragging: boolean;
+  draggedCustomer: Customer | null;
+  dragOverStage: string | null;
+  focusedCustomer: Customer | null;
+  onDragStart: (e: any, customer: Customer) => void;
+  onDragEnd: (e: any) => void;
+  onDragOver: (e: any, stageId: string) => void;
+  onDragLeave: (e: any, stageId: string) => void;
+  onDrop: (e: any, stageId: string) => void;
+  onKeyDown: (e: any, customer: Customer, stageId: string) => void;
+  onViewDetails: (customer: Customer) => void;
+  onAddNote: (customer: Customer) => void;
+  onAddReminder: (customer: Customer) => void;
+  onAddInteraction: (customer: Customer) => void;
 }
 
 export default function PipelineBoard({
@@ -49,8 +49,7 @@ export default function PipelineBoard({
     <div className="space-y-4">
       {/* Mobile View - Stacked Cards */}
       <div className="block lg:hidden">
-        <div className="space-y-4">
-        </div>
+        <div className="space-y-4"></div>
       </div>
 
       {/* Tablet View - 2 Columns */}
@@ -130,23 +129,37 @@ export default function PipelineBoard({
           </div>
           <div className="mt-2 text-sm text-blue-700 space-y-1">
             <div>
-              • اضغط <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">Enter</kbd> أو{" "}
-              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">Space</kbd> لتحديد عميل
+              • اضغط{" "}
+              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">
+                Enter
+              </kbd>{" "}
+              أو{" "}
+              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">
+                Space
+              </kbd>{" "}
+              لتحديد عميل
             </div>
             <div>
-              • استخدم <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">←</kbd> و{" "}
-              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">→</kbd> للتنقل بين المراحل
+              • استخدم{" "}
+              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">←</kbd> و{" "}
+              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">→</kbd>{" "}
+              للتنقل بين المراحل
             </div>
             <div>
-              • اضغط <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">Enter</kbd> لنقل العميل إلى
-              المرحلة المحددة
+              • اضغط{" "}
+              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">
+                Enter
+              </kbd>{" "}
+              لنقل العميل إلى المرحلة المحددة
             </div>
             <div>
-              • اضغط <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">Esc</kbd> لإلغاء التحديد
+              • اضغط{" "}
+              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">Esc</kbd>{" "}
+              لإلغاء التحديد
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
-} 
+  );
+}

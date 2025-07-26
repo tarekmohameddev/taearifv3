@@ -53,7 +53,7 @@ module.exports = (set) => ({
 
     try {
       const response = await axiosInstance.get(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/projects`
+        `${process.env.NEXT_PUBLIC_Backend_URL}/projects`,
       );
 
       set((state) => ({

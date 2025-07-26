@@ -1,37 +1,70 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
-import { DollarSign, TrendingUp } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, ArrowUpDown, Calendar, CheckCircle, XCircle, Clock, Copy, Share2, Link2, Download } from "lucide-react"
-import { toast, Toaster } from "react-hot-toast"
-import axiosInstance from "@/lib/axiosInstance"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import { DollarSign, TrendingUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Search,
+  ArrowUpDown,
+  Calendar,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Copy,
+  Share2,
+  Link2,
+  Download,
+} from "lucide-react";
+import { toast, Toaster } from "react-hot-toast";
+import axiosInstance from "@/lib/axiosInstance";
+import { Skeleton } from "@/components/ui/skeleton";
 import useStore from "@/context/Store";
 
 export function AffiliateDashboardPage() {
-  const { affiliateData: { data: dashboardData, loading }, fetchAffiliateData } = useStore();
+  const {
+    affiliateData: { data: dashboardData, loading },
+    fetchAffiliateData,
+  } = useStore();
 
   // UI states
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [sortBy, setSortBy] = useState("date")
-  const [sortOrder, setSortOrder] = useState("desc")
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("date");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   useEffect(() => {
     fetchAffiliateData();
   }, [fetchAffiliateData]);
 
   // معالجة البيانات
-  const referrals = dashboardData?.referrals || []
-  const paymentHistory = dashboardData?.payment_history || []
+  const referrals = dashboardData?.referrals || [];
+  const paymentHistory = dashboardData?.payment_history || [];
   const stats = {
     totalCommissions: Number(dashboardData?.total_commissions || 0),
     totalReferrals: Number(dashboardData?.total_referrals || 0),
@@ -41,65 +74,72 @@ export function AffiliateDashboardPage() {
     pendingAmount: Number(dashboardData?.pending_amount || 0),
     availableAmount: Number(dashboardData?.available_amount || 0),
     endOfMonthPayment: Number(dashboardData?.end_of_month_payment || 0),
-  }
+  };
   const affiliateData = {
     referralCode: dashboardData?.referral_code,
-    affiliateLink: dashboardData?.referral_code ? `https://taearif.vercel.app/register?ref=${dashboardData.referral_code}` : "-"
-  }
+    affiliateLink: dashboardData?.referral_code
+      ? `https://taearif.vercel.app/register?ref=${dashboardData.referral_code}`
+      : "-",
+  };
   const currentBalance = {
     pending: Number(dashboardData?.pending_amount || 0),
     available: Number(dashboardData?.available_amount || 0),
     nextPaymentDate: dashboardData?.end_of_month_payment || "-",
     minimumPayout: 100.0,
-  }
+  };
 
   // تصفية وترتيب المحالين
   const filteredAndSortedReferrals = referrals
     .filter((referral: any) => {
       const matchesSearch =
-        (referral.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (referral.email || "").toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesStatus = statusFilter === "all" || referral.status === statusFilter
-      return matchesSearch && matchesStatus
+        (referral.name || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        (referral.email || "").toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === "all" || referral.status === statusFilter;
+      return matchesSearch && matchesStatus;
     })
     .sort((a: any, b: any) => {
-      let aValue, bValue
+      let aValue, bValue;
       switch (sortBy) {
         case "name":
-          aValue = a.name
-          bValue = b.name
-          break
+          aValue = a.name;
+          bValue = b.name;
+          break;
         case "email":
-          aValue = a.email
-          bValue = b.email
-          break
+          aValue = a.email;
+          bValue = b.email;
+          break;
         case "date":
-          aValue = new Date(a.joined_at)
-          bValue = new Date(b.joined_at)
-          break
+          aValue = new Date(a.joined_at);
+          bValue = new Date(b.joined_at);
+          break;
         case "amount":
-          aValue = Number(a.collected_commission) + Number(a.pending_commission)
-          bValue = Number(b.collected_commission) + Number(b.pending_commission)
-          break
+          aValue =
+            Number(a.collected_commission) + Number(a.pending_commission);
+          bValue =
+            Number(b.collected_commission) + Number(b.pending_commission);
+          break;
         default:
-          aValue = a.joined_at
-          bValue = b.joined_at
+          aValue = a.joined_at;
+          bValue = b.joined_at;
       }
       if (sortOrder === "asc") {
-        return aValue > bValue ? 1 : -1
+        return aValue > bValue ? 1 : -1;
       } else {
-        return aValue < bValue ? 1 : -1
+        return aValue < bValue ? 1 : -1;
       }
-    })
+    });
 
   const copyToClipboard = async (text: string, type: string) => {
     try {
-      await navigator.clipboard.writeText(text)
-      toast(`تم نسخ ${type} إلى الحافظة بنجاح`)
+      await navigator.clipboard.writeText(text);
+      toast(`تم نسخ ${type} إلى الحافظة بنجاح`);
     } catch (err) {
-      toast("حدث خطأ أثناء نسخ النص")
+      toast("حدث خطأ أثناء نسخ النص");
     }
-  }
+  };
 
   const shareLink = async () => {
     if (navigator.share) {
@@ -108,15 +148,15 @@ export function AffiliateDashboardPage() {
           title: "رابط الإحالة الخاص بي",
           text: "انضم إلينا باستخدام رابط الإحالة الخاص بي",
           url: affiliateData.affiliateLink,
-        })
+        });
       } catch (err) {
         // User cancelled sharing or error occurred
-        copyToClipboard(affiliateData.affiliateLink, "الرابط")
+        copyToClipboard(affiliateData.affiliateLink, "الرابط");
       }
     } else {
-      copyToClipboard(affiliateData.affiliateLink, "الرابط")
+      copyToClipboard(affiliateData.affiliateLink, "الرابط");
     }
-  }
+  };
 
   const getPaymentStatusBadge = (status: string) => {
     switch (status) {
@@ -126,38 +166,43 @@ export function AffiliateDashboardPage() {
             <CheckCircle className="h-3 w-3 ml-1" />
             مدفوع
           </Badge>
-        )
+        );
       case "pending":
         return (
           <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
             <Clock className="h-3 w-3 ml-1" />
             معلق
           </Badge>
-        )
+        );
       case "unpaid":
         return (
-          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+          <Badge
+            variant="outline"
+            className="bg-red-50 text-red-700 border-red-200"
+          >
             <XCircle className="h-3 w-3 ml-1" />
             غير مدفوع
           </Badge>
-        )
+        );
       default:
-        return <Badge variant="outline">غير محدد</Badge>
+        return <Badge variant="outline">غير محدد</Badge>;
     }
-  }
+  };
 
   const getPaymentHistoryStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return <Badge className="bg-green-100 text-green-800">مكتمل</Badge>
+        return <Badge className="bg-green-100 text-green-800">مكتمل</Badge>;
       case "pending":
-        return <Badge className="bg-yellow-100 text-yellow-800">قيد المعالجة</Badge>
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800">قيد المعالجة</Badge>
+        );
       case "failed":
-        return <Badge className="bg-red-100 text-red-800">فشل</Badge>
+        return <Badge className="bg-red-100 text-red-800">فشل</Badge>;
       default:
-        return <Badge variant="secondary">{status}</Badge>
+        return <Badge variant="secondary">{status}</Badge>;
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -200,7 +245,7 @@ export function AffiliateDashboardPage() {
           </main>
         </div>
       </div>
-    )
+    );
   }
   if (!dashboardData) {
     return (
@@ -208,7 +253,7 @@ export function AffiliateDashboardPage() {
         <Toaster position="top-center" />
         <span className="text-lg text-destructive">تعذر تحميل البيانات</span>
       </div>
-    )
+    );
   }
 
   return (
@@ -222,7 +267,9 @@ export function AffiliateDashboardPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold">لوحة تحكم الشريك</h1>
-                <p className="text-muted-foreground">تتبع أداءك وأرباحك من برنامج الشراكة</p>
+                <p className="text-muted-foreground">
+                  تتبع أداءك وأرباحك من برنامج الشراكة
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm">
@@ -236,21 +283,29 @@ export function AffiliateDashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">إجمالي الأرباح</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    إجمالي الأرباح
+                  </CardTitle>
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalCommissions} ريال</div>
+                  <div className="text-2xl font-bold">
+                    {stats.totalCommissions} ريال
+                  </div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">أرباح هذا الشهر</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    أرباح هذا الشهر
+                  </CardTitle>
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.endOfMonthPayment} ريال</div>
+                  <div className="text-2xl font-bold">
+                    {stats.endOfMonthPayment} ريال
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -262,25 +317,39 @@ export function AffiliateDashboardPage() {
                   <Link2 className="h-5 w-5 text-primary" />
                   رابط الإحالة وكود الشريك
                 </CardTitle>
-                <CardDescription>استخدم هذا الرابط والكود لدعوة عملاء جدد وكسب العمولات</CardDescription>
+                <CardDescription>
+                  استخدم هذا الرابط والكود لدعوة عملاء جدد وكسب العمولات
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Referral Code */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-muted-foreground">كود الإحالة الخاص بك</h3>
-                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      كود الإحالة الخاص بك
+                    </h3>
+                    <Badge
+                      variant="outline"
+                      className="bg-primary/10 text-primary border-primary/20"
+                    >
                       نشط
                     </Badge>
                   </div>
                   <div className="flex items-center gap-2 p-4 bg-white border-2 border-primary/20 rounded-lg">
                     <div className="flex-1">
-                      <p className="text-2xl font-bold text-primary font-mono">{affiliateData.referralCode}</p>
+                      <p className="text-2xl font-bold text-primary font-mono">
+                        {affiliateData.referralCode}
+                      </p>
                     </div>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => copyToClipboard(affiliateData.referralCode, "كود الإحالة")}
+                      onClick={() =>
+                        copyToClipboard(
+                          affiliateData.referralCode,
+                          "كود الإحالة",
+                        )
+                      }
                       className="border-primary/20 hover:bg-primary/10"
                     >
                       <Copy className="h-4 w-4 ml-1" />
@@ -291,16 +360,25 @@ export function AffiliateDashboardPage() {
 
                 {/* Affiliate Link */}
                 <div className="space-y-3">
-                  <h3 className="text-sm font-medium text-muted-foreground">رابط الإحالة الخاص بك</h3>
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    رابط الإحالة الخاص بك
+                  </h3>
                   <div className="flex items-center gap-2 p-4 bg-white border-2 border-primary/20 rounded-lg">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-mono text-primary truncate">{affiliateData.affiliateLink}</p>
+                      <p className="text-sm font-mono text-primary truncate">
+                        {affiliateData.affiliateLink}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => copyToClipboard(affiliateData.affiliateLink, "رابط الإحالة")}
+                        onClick={() =>
+                          copyToClipboard(
+                            affiliateData.affiliateLink,
+                            "رابط الإحالة",
+                          )
+                        }
                         className="border-primary/20 hover:bg-primary/10"
                       >
                         <Copy className="h-4 w-4 ml-1" />
@@ -325,7 +403,9 @@ export function AffiliateDashboardPage() {
             <Card>
               <CardHeader>
                 <CardTitle>المحالين المسجلين</CardTitle>
-                <CardDescription>جميع المستخدمين الذين سجلوا من خلال روابطك</CardDescription>
+                <CardDescription>
+                  جميع المستخدمين الذين سجلوا من خلال روابطك
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {/* Filters and Search */}
@@ -366,7 +446,9 @@ export function AffiliateDashboardPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                    onClick={() =>
+                      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                    }
                   >
                     <ArrowUpDown className="h-4 w-4 ml-1" />
                     {sortOrder === "asc" ? "تصاعدي" : "تنازلي"}
@@ -377,13 +459,17 @@ export function AffiliateDashboardPage() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div className="p-4 border rounded-lg text-center">
                     <p className="text-2xl font-bold">{stats.totalReferrals}</p>
-                    <p className="text-sm text-muted-foreground">إجمالي المحالين</p>
+                    <p className="text-sm text-muted-foreground">
+                      إجمالي المحالين
+                    </p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <p className="text-2xl font-bold text-green-600">
                       {stats.paidSubscribers}
                     </p>
-                    <p className="text-sm text-muted-foreground">عملاء مدفوعين</p>
+                    <p className="text-sm text-muted-foreground">
+                      عملاء مدفوعين
+                    </p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <p className="text-2xl font-bold text-yellow-600">
@@ -393,9 +479,20 @@ export function AffiliateDashboardPage() {
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <p className="text-2xl font-bold">
-                      {referrals.reduce((sum: number, r: any) => sum + Number(r.collected_commission) + Number(r.pending_commission), 0).toFixed(2)} ريال
+                      {referrals
+                        .reduce(
+                          (sum: number, r: any) =>
+                            sum +
+                            Number(r.collected_commission) +
+                            Number(r.pending_commission),
+                          0,
+                        )
+                        .toFixed(2)}{" "}
+                      ريال
                     </p>
-                    <p className="text-sm text-muted-foreground">إجمالي العمولات</p>
+                    <p className="text-sm text-muted-foreground">
+                      إجمالي العمولات
+                    </p>
                   </div>
                 </div>
 
@@ -406,34 +503,52 @@ export function AffiliateDashboardPage() {
                       <TableHeader>
                         <TableRow>
                           <TableHead className="text-right">المستخدم</TableHead>
-                          <TableHead className="text-right">تاريخ التسجيل</TableHead>
+                          <TableHead className="text-right">
+                            تاريخ التسجيل
+                          </TableHead>
                           <TableHead className="text-right">المبلغ</TableHead>
                           <TableHead className="text-right">العمولة</TableHead>
-                          <TableHead className="text-right">حالة الدفع</TableHead>
+                          <TableHead className="text-right">
+                            حالة الدفع
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {filteredAndSortedReferrals.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                            <TableCell
+                              colSpan={5}
+                              className="text-center py-8 text-muted-foreground"
+                            >
                               لا توجد نتائج مطابقة للبحث
                             </TableCell>
                           </TableRow>
                         ) : (
                           filteredAndSortedReferrals.map((referral: any) => (
                             <TableRow key={referral.id}>
-                              <TableCell className="font-medium">{referral.name}</TableCell>
+                              <TableCell className="font-medium">
+                                {referral.name}
+                              </TableCell>
                               <TableCell>
                                 <div className="flex items-center gap-2">
                                   <Calendar className="h-4 w-4 text-muted-foreground" />
                                   {referral.joined_at}
                                 </div>
                               </TableCell>
-                              <TableCell>{Number(referral.collected_commission) + Number(referral.pending_commission)} ريال</TableCell>
-                              <TableCell className="font-medium text-green-600">
-                                {Number(referral.collected_commission).toFixed(2)} ريال
+                              <TableCell>
+                                {Number(referral.collected_commission) +
+                                  Number(referral.pending_commission)}{" "}
+                                ريال
                               </TableCell>
-                              <TableCell>{getPaymentStatusBadge(referral.status)}</TableCell>
+                              <TableCell className="font-medium text-green-600">
+                                {Number(referral.collected_commission).toFixed(
+                                  2,
+                                )}{" "}
+                                ريال
+                              </TableCell>
+                              <TableCell>
+                                {getPaymentStatusBadge(referral.status)}
+                              </TableCell>
                             </TableRow>
                           ))
                         )}
@@ -456,45 +571,61 @@ export function AffiliateDashboardPage() {
             <Card>
               <CardHeader>
                 <CardTitle>المدفوعات والأرباح</CardTitle>
-                <CardDescription>تتبع مدفوعاتك والأرباح المعلقة</CardDescription>
+                <CardDescription>
+                  تتبع مدفوعاتك والأرباح المعلقة
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Balance Overview */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">الرصيد المعلق</CardTitle>
+                      <CardTitle className="text-sm font-medium">
+                        الرصيد المعلق
+                      </CardTitle>
                       <Clock className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-orange-600">
                         {currentBalance.pending} ريال
                       </div>
-                      <p className="text-xs text-muted-foreground">سيتم الدفع في {currentBalance.nextPaymentDate}</p>
+                      <p className="text-xs text-muted-foreground">
+                        سيتم الدفع في {currentBalance.nextPaymentDate}
+                      </p>
                     </CardContent>
                   </Card>
 
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">الرصيد المتاح</CardTitle>
+                      <CardTitle className="text-sm font-medium">
+                        الرصيد المتاح
+                      </CardTitle>
                       <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-green-600">
                         {currentBalance.available} ريال
                       </div>
-                      <p className="text-xs text-muted-foreground">متاح للسحب الآن</p>
+                      <p className="text-xs text-muted-foreground">
+                        متاح للسحب الآن
+                      </p>
                     </CardContent>
                   </Card>
 
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">الدفعة التالية</CardTitle>
+                      <CardTitle className="text-sm font-medium">
+                        الدفعة التالية
+                      </CardTitle>
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold">{currentBalance.nextPaymentDate}</div>
-                      <p className="text-xs text-muted-foreground">الدفع الشهري التلقائي</p>
+                      <div className="text-2xl font-bold">
+                        {currentBalance.nextPaymentDate}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        الدفع الشهري التلقائي
+                      </p>
                     </CardContent>
                   </Card>
                 </div>
@@ -504,7 +635,10 @@ export function AffiliateDashboardPage() {
                   <h3 className="font-medium mb-4">سجل المدفوعات</h3>
                   <div className="space-y-4">
                     {paymentHistory.map((payment: any) => (
-                      <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div
+                        key={payment.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                             <CheckCircle className="h-5 w-5 text-green-600" />
@@ -518,7 +652,9 @@ export function AffiliateDashboardPage() {
                         </div>
                         <div className="text-right">
                           {getPaymentHistoryStatusBadge(payment.status)}
-                          <p className="text-xs text-muted-foreground mt-1">{payment.note}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {payment.note}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -530,5 +666,5 @@ export function AffiliateDashboardPage() {
         </main>
       </div>
     </div>
-  )
+  );
 }

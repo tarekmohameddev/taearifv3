@@ -45,7 +45,10 @@ export default function NotFoundPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4" dir="rtl">
+    <div
+      className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4"
+      dir="rtl"
+    >
       <div className="max-w-2xl mx-auto text-center">
         {/* Logo */}
         <div className="mb-8">
@@ -76,7 +79,8 @@ export default function NotFoundPage() {
             عذراً، الصفحة غير موجودة
           </h2>
           <p className="text-lg text-black dark:text-white max-w-md mx-auto leading-relaxed">
-            يبدو أن الصفحة التي تبحث عنها قد تم نقلها أو حذفها أو أن الرابط غير صحيح
+            يبدو أن الصفحة التي تبحث عنها قد تم نقلها أو حذفها أو أن الرابط غير
+            صحيح
           </p>
         </div>
 
@@ -149,29 +153,29 @@ export default function NotFoundPage() {
             روابط مفيدة:
           </h3>
           <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <Link 
-              href="/login" 
+            <Link
+              href="/login"
               className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors"
             >
               تسجيل الدخول
             </Link>
             <span className="text-black dark:text-white">•</span>
-            <Link 
-              href="/register" 
+            <Link
+              href="/register"
               className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors"
             >
               إنشاء حساب
             </Link>
             <span className="text-black dark:text-white">•</span>
-            <Link 
-              href="/help" 
+            <Link
+              href="/help"
               className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors"
             >
               المساعدة
             </Link>
             <span className="text-black dark:text-white">•</span>
-            <Link 
-              href="/contact" 
+            <Link
+              href="/contact"
               className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors"
             >
               اتصل بنا

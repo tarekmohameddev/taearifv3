@@ -33,7 +33,7 @@ module.exports = (set) => ({
 
     try {
       const response = await axiosInstance.get(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/properties?page=${page}`
+        `${process.env.NEXT_PUBLIC_Backend_URL}/properties?page=${page}`,
       );
 
       const propertiesList = response.data.data.properties || [];

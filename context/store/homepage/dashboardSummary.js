@@ -16,7 +16,7 @@ module.exports = (set) => ({
     set({ loading: true });
     try {
       const response = await axiosInstance.get(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/dashboard/summary`
+        `${process.env.NEXT_PUBLIC_Backend_URL}/dashboard/summary`,
       );
       set((state) => ({
         homepage: {

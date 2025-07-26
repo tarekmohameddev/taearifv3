@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useAuthStore from "@/context/AuthContext";
-import useStore from "@/context/Store"; 
+import useStore from "@/context/Store";
 
 interface EnhancedSidebarProps {
   activeTab?: string;
@@ -88,7 +88,7 @@ export function EnhancedSidebar({
     if (item.isAPP) {
       e.preventDefault(); // منع التنقل الافتراضي
       const url = getItemUrl(item);
-      window.open(url, '_blank'); // فتح في تبويب جديد
+      window.open(url, "_blank"); // فتح في تبويب جديد
     }
     // إذا كان isAPP = false، سيتم استخدام Link العادي (نفس الصفحة)
   };
@@ -115,7 +115,7 @@ export function EnhancedSidebar({
           >
             {item.isAPP ? (
               // إذا كان APP، استخدام button عادي مع onClick
-              <div 
+              <div
                 onClick={(e) => handleItemClick(item, e)}
                 className="cursor-pointer flex items-center w-full"
               >
@@ -220,7 +220,7 @@ export function EnhancedSidebar({
             <span className="text-sm text-red-500">{error}</span>
           </div>
         )}
-        
+
         {!loading && !error && (
           <div className="space-y-1">
             {mainNavItems.map((item) => (
