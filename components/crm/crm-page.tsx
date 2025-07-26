@@ -44,6 +44,7 @@ import {
   EditStageDialog,
   CrmSettingsDialog,
 } from "./index";
+import CrmPageSkeleton from "./crm-page-skeleton";
 
 // Helper functions
 const getStageIcon = (iconName: string) => {
@@ -515,18 +516,14 @@ export default function CrmPage() {
     onDragLeave: (e, stageId) => setDragOverStage(null),
     onDrop: async (e, stageId) => {
       if (dragPreview && dragPreview.pipelineStage !== stageId) {
-        // Optimistic update - update UI immediately
         const originalStage = dragPreview.pipelineStage;
         const customerName = dragPreview.name;
 
-        // Update UI instantly
         updateCustomerStage(dragPreview.id, stageId);
 
-        // Show immediate visual feedback
         utilities.showSuccessAnimation(stageId);
         utilities.announceToScreenReader(`تم نقل العميل ${customerName} بنجاح`);
 
-        // Send API request in background (non-blocking)
         dataHandler
           .updateCustomerStage(dragPreview.id, stageId)
           .then((success) => {
@@ -571,7 +568,6 @@ export default function CrmPage() {
     focusedStage,
     pipelineStages,
     onKeyDown: (e, customer, stageId) => {
-      // Handle keyboard navigation
     },
     onMoveCustomerToStage: async (customer, targetStageId) => {
       const success = await dataHandler.updateCustomerStage(
@@ -587,7 +583,6 @@ export default function CrmPage() {
     onAnnounceToScreenReader: utilities.announceToScreenReader,
   });
 
-  // Functions to update lists without refresh
   const updateRemindersList = (newReminder: any) => {
     setRemindersData((prev) => [newReminder, ...prev]);
   };
@@ -614,7 +609,6 @@ export default function CrmPage() {
     );
   };
 
-  // Functions to update stages
   const updateStagesList = (newStage: any) => {
     setPipelineStages([...pipelineStages, newStage]);
   };
@@ -633,14 +627,12 @@ export default function CrmPage() {
     );
   };
 
-  // Fetch data on component mount
   useEffect(() => {
     dataHandler.fetchCrmData();
     dataHandler.fetchAppointmentsData();
     dataHandler.fetchRemindersData();
   }, []);
 
-  // Filter customers
   const filteredCustomers = customersData.filter((customer: Customer) => {
     const matchesSearch =
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -668,7 +660,6 @@ export default function CrmPage() {
     );
   });
 
-  // Calculate statistics
   const pipelineStats = pipelineStages.map((stage: PipelineStage) => ({
     ...stage,
     count: customersData.filter((c: Customer) => c.pipelineStage === stage.id)
@@ -745,7 +736,6 @@ export default function CrmPage() {
 
   const handleViewReminder = (reminder: any) => {
     setSelectedReminder(reminder);
-    // Handle view reminder details
   };
 
   const handleEditReminder = (reminder: any) => {
@@ -762,7 +752,6 @@ export default function CrmPage() {
         },
       );
       if (response.data.status === "success") {
-        // Update the reminder status in the list
         const updatedReminder = {
           ...reminder,
           status: "completed",
@@ -777,11 +766,12 @@ export default function CrmPage() {
   // عرض loading state
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-lg">جاري تحميل بيانات العملاء...</p>
-        </div>
+      <div className="flex min-h-screen flex-col" dir="rtl">
+      <DashboardHeader />
+      <div className="flex flex-1 flex-col md:flex-row">
+        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <CrmPageSkeleton />
+      </div>
       </div>
     );
   }

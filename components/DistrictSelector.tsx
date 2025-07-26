@@ -13,18 +13,27 @@ import {
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { cn } from "@/lib/utils";
+
+interface District {
+  id: number;
+  name_ar: string;
+}
 
 interface DistrictSelectorProps {
+  selectedCityId: number | null;
   selectedDistrictId: string | number | null;
   onDistrictSelect: (districtId: string | number) => void;
+  className?: string;
 }
 
 const DistrictSelector: React.FC<DistrictSelectorProps> = ({
   selectedCityId,
   selectedDistrictId,
   onDistrictSelect,
+  className,
 }) => {
-  const [districts, setDistricts] = useState([]);
+  const [districts, setDistricts] = useState<District[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = React.useState(false);
 
@@ -58,9 +67,17 @@ const DistrictSelector: React.FC<DistrictSelectorProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full] justify-between text-black"
+          className={cn(
+            "w-full justify-between text-black",
+            className,
+          )}
+          disabled={!selectedCityId || loading}
         >
-          {selectedDistrict ? selectedDistrict.name_ar : "اختر المنطقة"}
+          {loading
+            ? "جاري التحميل..."
+            : selectedDistrict
+              ? selectedDistrict.name_ar
+              : "اختر المنطقة"}
         </Button>
       </PopoverTrigger>
       <PopoverContent side="bottom" align="start" className="w-full] p-0">

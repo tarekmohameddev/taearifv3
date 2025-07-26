@@ -72,15 +72,89 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
+import CitySelector from "../CitySelector";
+import DistrictSelector from "../DistrictSelector";
+import { z } from "zod";
+import toast from "react-hot-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
+// Zod validation schema
+const customerSchema = z.object({
+  name: z.string().min(1, "الاسم مطلوب"),
+  email: z.string().email("البريد الإلكتروني غير صحيح").optional().or(z.literal("")),
+  phone_number: z.string().min(1, "رقم الهاتف مطلوب"),
+  password: z.string().min(1, "كلمة المرور مطلوبة"),
+  city_id: z.number().nullable(),
+  district_id: z.union([z.number(), z.string()]).nullable(),
+  note: z.string().optional(),
+  customer_type: z.string(),
+  priority: z.number(),
+  stage_id: z.number(),
+});
+
+// Error message translation mapping
+const errorTranslations: Record<string, string> = {
+  "The phone number has already been taken.": "رقم الهاتف مُستخدم بالفعل، يرجى استخدام رقم آخر",
+  "The email has already been taken.": "البريد الإلكتروني مُستخدم بالفعل، يرجى استخدام بريد آخر",
+  "The name field is required.": "حقل الاسم مطلوب",
+  "The phone number field is required.": "حقل رقم الهاتف مطلوب",
+  "The password field is required.": "حقل كلمة المرور مطلوب",
+  "The email must be a valid email address.": "يجب أن يكون البريد الإلكتروني صحيحاً",
+  "The phone number format is invalid.": "تنسيق رقم الهاتف غير صحيح",
+  "The password must be at least 6 characters.": "كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل",
+};
+
+// Function to translate error messages
+const translateErrorMessage = (message: string): string => {
+  return errorTranslations[message] || message;
+};
+
+interface Customer {
+  id: number;
+  name: string;
+  nameEn: string;
+  email: string;
+  phone_number: string;
+  whatsapp: string;
+  status: string;
+  customer_type: string;
+  nationality: string;
+  residencyStatus: string;
+  city: string | { id: number; name_ar: string };
+  district: string | { id: number; name_ar: string; city_name_ar: string };
+  budget: { min: number; max: number };
+  propertyPreferences: string[];
+  familySize: number;
+  leadSource: string;
+  assignedAgent: string;
+  joinDate: string;
+  lastContact: string;
+  lastActivity: string;
+  totalTransactions: number;
+  totalValue: number;
+  notes: string;
+  avatar: string;
+  satisfaction: number;
+  communicationPreference: string;
+  urgency: string;
+  pipelineStage: string;
+  dealValue: number;
+  probability: number;
+  expectedCloseDate: string;
+  note: string;
+  priority: number;
+  city_id: number | null;
+  district_id?: number | string | null;
+  stage_id: number;
+}
 // Customer data (same as CRM page for consistency)
-const customers = [
+const customers: Customer[] = [
   {
     id: 1,
     name: "أحمد محمد العلي",
     nameEn: "Ahmed Mohammed Al-Ali",
     email: "ahmed.alali@email.com",
-    phone: "+966 50 123 4567",
+    phone_number: "+966 50 123 4567",
     whatsapp: "+966 50 123 4567",
     status: "نشط",
     customer_type: "مشتري",
@@ -107,14 +181,18 @@ const customers = [
     dealValue: 950000,
     probability: 75,
     expectedCloseDate: "2023-12-15",
+    note: "عميل مهم، يبحث عن فيلا في حي راقي",
+    priority: 1,
+    city_id: 1, // Example city_id
+    stage_id: 2,
   },
 ];
 
 export default function CustomersPage() {
   const [activeTab, setActiveTab] = useState("customers");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomers, setSelectedCustomers] = useState<number[]>([]);
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -125,11 +203,28 @@ export default function CustomersPage() {
   const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false);
   const [totalCustomers, setTotalCustomers] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [customersData, setCustomersData] = useState([]); // ← هنا يتم حفظ كل العملاء
-  const [formData, setFormData] = useState(null); // ← بيانات العميل المحدد
-  const [editingCustomerId, setEditingCustomerId] = useState(null); // ← ID العميل الجاري تعديله
+  const [error, setError] = useState<string | null>(null);
+  const [customersData, setCustomersData] = useState<Customer[]>([]); // ← هنا يتم حفظ كل العملاء
+  const [formData, setFormData] = useState<Partial<Customer> | null>(null); // ← بيانات العميل المحدد
+  const [editingCustomerId, setEditingCustomerId] = useState<number | null>(
+    null,
+  ); // ← ID العميل الجاري تعديله
   const [open, setOpen] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
+  const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newCustomer, setNewCustomer] = useState({
+    name: "",
+    email: "",
+    phone_number: "",
+    password: "",
+    city_id: null,
+    district_id: null,
+    note: "",
+    customer_type: "مشتري", // Default value
+    priority: 1,
+    stage_id: 1,
+  });
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -149,7 +244,107 @@ export default function CustomersPage() {
     fetchCustomers();
   }, []);
 
-  const openEditDialog = (customer) => {
+  const handleNewCustomerChange = (field: keyof typeof newCustomer) => (
+    value: any,
+  ) => {
+    setNewCustomer((prev) => ({ ...prev, [field]: value }));
+  };
+  const handleNewCustomerInputChange = (field: keyof typeof newCustomer) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setNewCustomer((prev) => ({ ...prev, [field]: e.target.value }));
+  };
+
+  const handleAddCustomer = async () => {
+    setIsSubmitting(true);
+    try {
+      // Client-side validation using Zod
+      setClientErrors({});
+      setValidationErrors({});
+      
+      const validationResult = customerSchema.safeParse(newCustomer);
+      
+      if (!validationResult.success) {
+        const errors: Record<string, string> = {};
+        validationResult.error.errors.forEach((error) => {
+          if (error.path[0]) {
+            errors[error.path[0] as string] = error.message;
+          }
+        });
+        setClientErrors(errors);
+        return;
+      }
+
+      const response = await axiosInstance.post("/customers", newCustomer);
+      // Add the new customer to the list
+      setCustomersData((prev) => [response.data.data, ...prev]);
+      
+      // Show success toast
+      toast.success("تم إضافة العميل بنجاح! 🎉", {
+        duration: 4000,
+        position: "top-center",
+        style: {
+          background: "#10B981",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: "16px",
+          padding: "12px 20px",
+          borderRadius: "8px",
+        },
+      });
+      
+      setShowAddCustomerDialog(false);
+      // Reset form - clear all inputs
+      setNewCustomer({
+        name: "",
+        email: "",
+        phone_number: "",
+        password: "",
+        city_id: null,
+        district_id: null,
+        note: "",
+        customer_type: "مشتري",
+        priority: 1,
+        stage_id: 1,
+      });
+      // Clear any existing errors
+      setClientErrors({});
+      setValidationErrors({});
+    } catch (error: any) {
+      console.error("Error adding customer:", error);
+      // You can add error handling here, like showing a toast message
+      if (error?.response && error?.response?.status === 422) {
+        const serverErrors = error?.response?.data?.errors || {};
+        // Translate server error messages to Arabic
+        const translatedErrors: Record<string, string[]> = {};
+        Object.keys(serverErrors).forEach(field => {
+          translatedErrors[field] = serverErrors[field].map((msg: string) => 
+            translateErrorMessage(msg)
+          );
+        });
+        setValidationErrors(translatedErrors);
+      } else {
+        // Handle other types of errors (e.g., show a generic error message)
+        console.error("An unexpected error occurred:", error);
+        toast.error("حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى", {
+          duration: 4000,
+          position: "top-center",
+          style: {
+            background: "#EF4444",
+            color: "#fff",
+            fontWeight: "bold",
+            fontSize: "16px",
+            padding: "12px 20px",
+            borderRadius: "8px",
+          },
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openEditDialog = (customer: Customer) => {
     setEditingCustomerId(customer.id);
     setFormData({
       name: customer.name || "",
@@ -158,14 +353,167 @@ export default function CustomersPage() {
       note: customer.note || "",
       customer_type: customer.customer_type || "",
       priority: customer.priority || 1,
-      city_id: customer.city_id || null,
-      district_id: customer.district?.id || null,
+      city_id: typeof customer.city === 'object' ? customer.city.id : null,
+      district_id: typeof customer.district === 'object' ? customer.district.id : null,
       stage_id: 2,
     });
     setOpen(true);
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="space-y-6">
+              {/* Header Skeleton */}
+              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <div>
+                  <Skeleton className="h-8 w-32 mb-2" />
+                  <Skeleton className="h-4 w-64" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-10 w-40" />
+                  <Skeleton className="h-10 w-32" />
+                </div>
+              </div>
+
+              {/* Statistics Cards Skeleton */}
+              <div className="grid gap-4 mb-8 grid-cols-2 md:grid-cols-6">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium flex items-center">
+                      <Skeleton className="h-4 w-4 ml-2" />
+                      <Skeleton className="h-4 w-20" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-8 w-12 mb-2" />
+                    <Skeleton className="h-3 w-24" />
+                  </CardContent>
+                </Card>
+                {/* Repeat for remaining cards */}
+                {[...Array(5)].map((_, i) => (
+                  <Card key={i}>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center">
+                        <Skeleton className="h-4 w-4 ml-2" />
+                        <Skeleton className="h-4 w-20" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Skeleton className="h-8 w-12 mb-2" />
+                      <Skeleton className="h-3 w-24" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Filters and Search Skeleton */}
+              <div className="flex items-center justify-between">
+                <div className="relative">
+                  <Skeleton className="h-10 w-[300px]" />
+                </div>
+                <div className="flex items-center gap-2 ">
+                  <Skeleton className="h-10 w-[120px]" />
+                  <Skeleton className="h-10 w-[120px]" />
+                  <Skeleton className="h-10 w-[120px]" />
+                  <Skeleton className="h-10 w-10" />
+                </div>
+              </div>
+
+              {/* Table Skeleton */}
+              <Card>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    {/* Table Header */}
+                    <div className="flex items-center border-b p-4">
+                      <Skeleton className="h-4 w-4 ml-4" />
+                      <Skeleton className="h-4 w-20 ml-8" />
+                      <Skeleton className="h-4 w-16 ml-auto" />
+                      <Skeleton className="h-4 w-16 ml-8" />
+                      <Skeleton className="h-4 w-16 ml-8" />
+                      <Skeleton className="h-4 w-20 ml-8" />
+                      <Skeleton className="h-4 w-16 ml-8" />
+                    </div>
+                    
+                    {/* Table Rows */}
+                    {[...Array(8)].map((_, i) => (
+                      <div key={i} className="flex items-center border-b p-4">
+                        {/* Checkbox */}
+                        <Skeleton className="h-4 w-4 ml-4" />
+                        
+                        {/* Customer Info */}
+                        <div className="flex items-center space-x-3 ml-8">
+                          <div>
+                            <Skeleton className="h-5 w-32 mb-1" />
+                          </div>
+                        </div>
+                        
+                        {/* Contact Info */}
+                        <div className="space-y-1 ml-auto">
+                          <div className="flex items-center">
+                            <Skeleton className="h-3 w-3 ml-2" />
+                            <Skeleton className="h-4 w-24" />
+                          </div>
+                          <div className="flex items-center">
+                            <Skeleton className="h-3 w-3 ml-2" />
+                            <Skeleton className="h-3 w-20" />
+                          </div>
+                        </div>
+                        
+                        {/* Type Badge */}
+                        <div className="ml-8">
+                          <Skeleton className="h-6 w-16 rounded-full" />
+                        </div>
+                        
+                        {/* Location */}
+                        <div className="ml-8">
+                          <Skeleton className="h-4 w-16 mb-1" />
+                          <Skeleton className="h-3 w-12" />
+                        </div>
+                        
+                        {/* Last Contact */}
+                        <div className="flex items-center ml-8">
+                          <Skeleton className="h-3 w-3 ml-2" />
+                          <Skeleton className="h-3 w-16" />
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="flex items-center gap-1 ml-8">
+                          <Skeleton className="h-8 w-8" />
+                          <Skeleton className="h-8 w-8" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* CRM Link Card Skeleton */}
+              <div className="text-center py-6">
+                <Card className="max-w-md mx-auto">
+                  <CardContent className="pt-6">
+                    <div className="flex flex-col items-center space-y-4">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="text-center">
+                        <Skeleton className="h-6 w-48 mb-2" />
+                        <Skeleton className="h-4 w-64" />
+                      </div>
+                      <Skeleton className="h-10 w-48" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   if (error) return <p>{error}</p>;
 
   const handleUpdateCustomer = async () => {
@@ -185,7 +533,9 @@ export default function CustomersPage() {
     }
   };
 
-  const handleChange = (field) => (e) => {
+  const handleChange = (field: keyof Customer) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
@@ -194,13 +544,15 @@ export default function CustomersPage() {
     .filter((customer) => {
       const matchesSearch =
         customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.nameEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (customer.nameEn &&
+          customer.nameEn.toLowerCase().includes(searchTerm.toLowerCase())) ||
         customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         customer.phone_number.includes(searchTerm) ||
-        customer.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (typeof customer.city === "string" &&
+          customer.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (typeof customer.district === "string"
           ? customer.district?.toLowerCase().includes(searchTerm.toLowerCase())
-          : customer.district?.name_ar
+          : (customer.district as { name_ar: string })?.name_ar
               .toLowerCase()
               .includes(searchTerm.toLowerCase()));
 
@@ -213,22 +565,21 @@ export default function CustomersPage() {
       return matchesSearch && matchesStatus && matchesType && matchesCity;
     })
     .sort((a, b) => {
-      let aValue = a[sortField];
-      let bValue = b[sortField];
+      let aValue = a[sortField as keyof Customer];
+      let bValue = b[sortField as keyof Customer];
 
-      if (typeof aValue === "string") {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-      }
+      // Handle cases where values might not be strings
+      const aStr = String(aValue ?? "").toLowerCase();
+      const bStr = String(bValue ?? "").toLowerCase();
 
       if (sortDirection === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+        return aStr.localeCompare(bStr);
       } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+        return bStr.localeCompare(aStr);
       }
     });
 
-  const handleSort = (field) => {
+  const handleSort = (field: keyof Customer) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -237,7 +588,7 @@ export default function CustomersPage() {
     }
   };
 
-  const handleSelectCustomer = (customerId) => {
+  const handleSelectCustomer = (customerId: number) => {
     setSelectedCustomers((prev) =>
       prev.includes(customerId)
         ? prev.filter((id) => id !== customerId)
@@ -257,8 +608,11 @@ export default function CustomersPage() {
   const activeCustomers = customersData.filter(
     (c) => c.status === "نشط",
   ).length;
-  const totalRevenue = customersData.reduce((sum, c) => sum + c.totalValue, 0);
-  const avgCustomerValue = totalRevenue / totalCustomers;
+  const totalRevenue = customersData.reduce(
+    (sum, c) => sum + (c.totalValue || 0),
+    0,
+  );
+  const avgCustomerValue = totalCustomers > 0 ? totalRevenue / totalCustomers : 0;
 
   // Customer type statistics
   const buyerCount = customersData.filter(
@@ -277,7 +631,7 @@ export default function CustomersPage() {
     (c) => c.customer_type === "مستثمر",
   ).length;
 
-  const handleDelete = async (customerId) => {
+  const handleDelete = async (customerId: number) => {
     try {
       await axiosInstance.delete(`/customers/${customerId}`);
       // احذف العميل من الواجهة
@@ -324,7 +678,27 @@ export default function CustomersPage() {
                 </Button> */}
                 <Dialog
                   open={showAddCustomerDialog}
-                  onOpenChange={setShowAddCustomerDialog}
+                  onOpenChange={(isOpen) => {
+                    setShowAddCustomerDialog(isOpen);
+                    if (!isOpen) {
+                      setValidationErrors({}); // Clear errors when dialog is closed
+                      setClientErrors({}); // Clear client-side errors when dialog is closed
+                      setIsSubmitting(false); // Reset submitting state when dialog is closed
+                      // Reset form when dialog is closed
+                      setNewCustomer({
+                        name: "",
+                        email: "",
+                        phone_number: "",
+                        password: "",
+                        city_id: null,
+                        district_id: null,
+                        note: "",
+                        customer_type: "مشتري",
+                        priority: 1,
+                        stage_id: 1,
+                      });
+                    }
+                  }}
                 >
                   <DialogTrigger asChild>
                     <Button>
@@ -339,39 +713,80 @@ export default function CustomersPage() {
                     <div className="grid gap-6 py-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="name">الاسم بالعربية</Label>
-                          <Input id="name" placeholder="أحمد محمد العلي" />
-                        </div>
-                        <div>
-                          <Label htmlFor="nameEn">الاسم بالإنجليزية</Label>
+                          <Label htmlFor="name">الاسم بالعربية <span className="text-red-500">*</span></Label>
                           <Input
-                            id="nameEn"
-                            placeholder="Ahmed Mohammed Al-Ali"
+                            id="name"
+                            placeholder="أحمد محمد العلي"
+                            value={newCustomer.name}
+                            onChange={handleNewCustomerInputChange("name")}
+                            className={validationErrors.name || clientErrors.name ? "border-red-500" : ""}
                           />
+                          {(validationErrors.name || clientErrors.name) && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {validationErrors.name?.[0] || clientErrors.name}
+                            </p>
+                          )}
                         </div>
-                      </div>
-                      <div className="grid grid-cols-3 gap-4">
                         <div>
                           <Label htmlFor="email">البريد الإلكتروني</Label>
                           <Input
                             id="email"
                             type="email"
                             placeholder="ahmed@example.com"
+                            value={newCustomer.email}
+                            onChange={handleNewCustomerInputChange("email")}
+                            className={validationErrors.email || clientErrors.email ? "border-red-500" : ""}
                           />
-                        </div>
-                        <div>
-                          <Label htmlFor="phone">رقم الهاتف</Label>
-                          <Input id="phone" placeholder="+966 50 123 4567" />
-                        </div>
-                        <div>
-                          <Label htmlFor="whatsapp">واتساب</Label>
-                          <Input id="whatsapp" placeholder="+966 50 123 4567" />
+                          {(validationErrors.email || clientErrors.email) && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {validationErrors.email?.[0] || clientErrors.email}
+                            </p>
+                          )}
                         </div>
                       </div>
-                      <div className="grid grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="phone">رقم الهاتف <span className="text-red-500">*</span></Label>
+                          <Input
+                            id="phone"
+                            placeholder="+966 50 123 4567"
+                            value={newCustomer.phone_number}
+                            onChange={handleNewCustomerInputChange(
+                              "phone_number",
+                            )}
+                            className={validationErrors.phone_number || clientErrors.phone_number ? "border-red-500" : ""}
+                          />
+                          {(validationErrors.phone_number || clientErrors.phone_number) && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {validationErrors.phone_number?.[0] || clientErrors.phone_number}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <Label htmlFor="password">كلمة المرور <span className="text-red-500">*</span></Label>
+                          <Input
+                            id="password"
+                            type="password"
+                            value={newCustomer.password}
+                            onChange={handleNewCustomerInputChange("password")}
+                            className={validationErrors.password || clientErrors.password ? "border-red-500" : ""}
+                          />
+                          {(validationErrors.password || clientErrors.password) && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {validationErrors.password?.[0] || clientErrors.password}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="customer_type">نوع العميل</Label>
-                          <Select>
+                          <Select
+                            onValueChange={handleNewCustomerChange(
+                              "customer_type",
+                            )}
+                            value={newCustomer.customer_type}
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="اختر النوع" />
                             </SelectTrigger>
@@ -385,98 +800,80 @@ export default function CustomersPage() {
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor="nationality">الجنسية</Label>
-                          <Select>
+                          <Label>الأولوية</Label>
+                          <Select
+                            onValueChange={(value) =>
+                              handleNewCustomerChange("priority")(
+                                parseInt(value, 10),
+                              )
+                            }
+                            value={String(newCustomer.priority)}
+                          >
                             <SelectTrigger>
-                              <SelectValue placeholder="اختر الجنسية" />
+                              <SelectValue placeholder="اختر الأولوية" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="سعودي">سعودي</SelectItem>
-                              <SelectItem value="مقيم">مقيم</SelectItem>
-                              <SelectItem value="خليجي">خليجي</SelectItem>
-                              <SelectItem value="أجنبي">أجنبي</SelectItem>
+                              <SelectItem value="1">منخفضة</SelectItem>
+                              <SelectItem value="2">متوسطة</SelectItem>
+                              <SelectItem value="3">عالية</SelectItem>
                             </SelectContent>
                           </Select>
-                        </div>
-                        <div>
-                          <Label htmlFor="city">المدينة</Label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="اختر المدينة" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="الرياض">الرياض</SelectItem>
-                              <SelectItem value="جدة">جدة</SelectItem>
-                              <SelectItem value="الدمام">الدمام</SelectItem>
-                              <SelectItem value="مكة">مكة المكرمة</SelectItem>
-                              <SelectItem value="المدينة">
-                                المدينة المنورة
-                              </SelectItem>
-                              <SelectItem value="الطائف">الطائف</SelectItem>
-                              <SelectItem value="الخبر">الخبر</SelectItem>
-                              <SelectItem value="القطيف">القطيف</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label htmlFor="district">الحي</Label>
-                          <Input
-                            id="district"
-                            placeholder="العليا، الروضة، النرجس..."
-                          />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="familySize">حجم الأسرة</Label>
-                          <Input
-                            id="familySize"
-                            type="number"
-                            placeholder="5"
+                          <Label htmlFor="city">المدينة</Label>
+                          <CitySelector
+                            selectedCityId={newCustomer.city_id}
+                            onCitySelect={handleNewCustomerChange("city_id")}
+                            className={validationErrors.city_id ? "border-red-500" : ""}
                           />
+                           {validationErrors.city_id && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {validationErrors.city_id[0]}
+                            </p>
+                          )}
                         </div>
                         <div>
-                          <Label htmlFor="assignedAgent">الوسيط المسؤول</Label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="اختر الوسيط" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="سارة أحمد">
-                                سارة أحمد
-                              </SelectItem>
-                              <SelectItem value="محمد خالد">
-                                محمد خالد
-                              </SelectItem>
-                              <SelectItem value="عبدالله محمد">
-                                عبدالله محمد
-                              </SelectItem>
-                              <SelectItem value="أمل عبدالله">
-                                أمل عبدالله
-                              </SelectItem>
-                              <SelectItem value="فيصل العتيبي">
-                                فيصل العتيبي
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <Label htmlFor="district">الحي</Label>
+                          <DistrictSelector
+                            selectedCityId={newCustomer.city_id}
+                            selectedDistrictId={newCustomer.district_id}
+                            onDistrictSelect={handleNewCustomerChange(
+                              "district_id",
+                            )}
+                            className={validationErrors.district_id ? "border-red-500" : ""}
+                          />
+                          {validationErrors.district_id && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {validationErrors.district_id[0]}
+                            </p>
+                          )}
                         </div>
                       </div>
+
                       <div>
                         <Label htmlFor="notes">ملاحظات</Label>
                         <Textarea
                           id="notes"
                           placeholder="أدخل أي ملاحظات مهمة عن العميل..."
+                          value={newCustomer.note}
+                          onChange={handleNewCustomerInputChange("note")}
                         />
                       </div>
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="outline"
                           onClick={() => setShowAddCustomerDialog(false)}
+                          disabled={isSubmitting}
                         >
                           إلغاء
                         </Button>
-                        <Button onClick={() => setShowAddCustomerDialog(false)}>
-                          إضافة العميل
+                        <Button 
+                          onClick={handleAddCustomer}
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? "جاري الإضافة..." : "إضافة العميل"}
                         </Button>
                       </div>
                     </div>
@@ -649,10 +1046,15 @@ export default function CustomersPage() {
                     <SelectItem value="الرياض">الرياض</SelectItem>
                     <SelectItem value="جدة">جدة</SelectItem>
                     <SelectItem value="الدمام">الدمام</SelectItem>
-                    <SelectItem value="مكة">مكة</SelectItem>
-                    <SelectItem value="المدينة">المدينة</SelectItem>
-                  </SelectContent>
-                </Select>
+                    <SelectItem value="مكة">مكة المكرمة</SelectItem>
+                    <SelectItem value="المدينة">
+                                المدينة المنورة
+                              </SelectItem>
+                              <SelectItem value="الطائف">الطائف</SelectItem>
+                              <SelectItem value="الخبر">الخبر</SelectItem>
+                              <SelectItem value="القطيف">القطيف</SelectItem>
+                            </SelectContent>
+                          </Select>
                 <Button variant="outline" size="icon">
                   <RefreshCw className="h-4 w-4" />
                 </Button>
@@ -839,13 +1241,15 @@ export default function CustomersPage() {
                               <div className="font-medium">
                                 {typeof customer.city === "string"
                                   ? customer.city
-                                  : customer.district?.city_name_ar}
+                                  : customer.city?.name_ar}
                               </div>
                               <div className="text-sm text-muted-foreground">
                                 {" "}
                                 {typeof customer.district === "string"
                                   ? customer.district
-                                  : customer.district?.name_ar}
+                                  : (
+                                      customer.district as { name_ar: string }
+                                    )?.name_ar}
                               </div>
                             </div>
                           </TableCell>
@@ -1071,7 +1475,7 @@ export default function CustomersPage() {
                           <div className="flex items-center justify-between">
                             <span>الهاتف:</span>
                             <span className="font-medium">
-                              {selectedCustomer.phone}
+                              {selectedCustomer.phone_number}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
@@ -1106,7 +1510,9 @@ export default function CustomersPage() {
                           <div className="flex items-center justify-between">
                             <span>المدينة:</span>
                             <span className="font-medium">
-                              {selectedCustomer.city}
+                              {typeof selectedCustomer.city === "string"
+                                ? selectedCustomer.city
+                                : selectedCustomer.city?.name_ar}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
@@ -1114,7 +1520,11 @@ export default function CustomersPage() {
                             <span className="font-medium">
                               {typeof selectedCustomer.district === "string"
                                 ? selectedCustomer.district
-                                : selectedCustomer.district?.name_ar}
+                                : (
+                                    selectedCustomer.district as {
+                                      name_ar: string;
+                                    }
+                                  )?.name_ar}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">

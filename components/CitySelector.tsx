@@ -18,17 +18,26 @@ import {
   CommandList,
   CommandItem,
 } from "@/components/ui/command";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+interface City {
+  id: number;
+  name_ar: string;
+}
+
 interface CitySelectorProps {
   selectedCityId: number | null;
   onCitySelect: (cityId: number) => void;
+  className?: string;
 }
-import { Button } from "@/components/ui/button";
 
 const CitySelector: React.FC<CitySelectorProps> = ({
   selectedCityId,
   onCitySelect,
+  className,
 }) => {
-  const [cities, setCities] = useState([]);
+  const [cities, setCities] = useState<City[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = React.useState(false);
 
@@ -55,7 +64,10 @@ const CitySelector: React.FC<CitySelectorProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full justify-between text-black "
+          className={cn(
+            "w-full justify-between text-black",
+            className,
+          )}
         >
           {selectedCity ? selectedCity.name_ar : "اختر مدينة"}
         </Button>

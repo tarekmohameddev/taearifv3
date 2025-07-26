@@ -760,9 +760,9 @@ export function PropertiesManagementPage() {
               <div className="text-center text-red-500 py-10">{error}</div>
             ) : (
               <Tabs defaultValue="all">
-                <TabsList>
+                {/* <TabsList>
                   <TabsTrigger value="all">جميع العقارات</TabsTrigger>
-                </TabsList>
+                </TabsList> */}
                 <TabsContent value="all" className="mt-4">
                   {normalizedProperties.length === 0 ? (
                     <EmptyState
