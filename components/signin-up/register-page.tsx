@@ -34,8 +34,7 @@ interface Errors {
 }
 
 export function RegisterPage() {
-  const { UserIslogged, googleUrlFetched, setGoogleUrlFetched } =
-    useAuthStore();
+  const { UserIslogged, googleUrlFetched, setGoogleUrlFetched, fetchGoogleAuthUrl } = useAuthStore();
   const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
@@ -140,45 +139,31 @@ export function RegisterPage() {
   // جلب رابط Google OAuth عند فتح الصفحة
   useEffect(() => {
     console.log("🔍 useEffect triggered for Google auth URL");
-    if (googleUrlFetched) {
-      console.log("🚫 Google URL already fetched, skipping...");
-      return;
-    }
-    console.log("🔄 Starting to fetch Google auth URL...");
-    const fetchGoogleAuthUrl = async () => {
-      console.log("📡 fetchGoogleAuthUrl function started");
+    const loadGoogleAuthUrl = async () => {
+      console.log("📡 loadGoogleAuthUrl function started");
       try {
         console.log("⏳ Setting googleUrlLoading to true");
         setGoogleUrlLoading(true);
-        console.log("🌐 Making fetch request to:", `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`);
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`,
-        );
-        console.log("📥 Response received:", response);
-        console.log("📄 Parsing response as JSON...");
-        const data = await response.json();
-        console.log("📊 Parsed data:", data);
-        console.log("🔗 data.url:", data.url);
-        if (data.url) {
-          console.log("✅ Setting googleAuthUrl to:", data.url);
-          setGoogleAuthUrl(data.url);
+        console.log("🌐 Calling fetchGoogleAuthUrl from store...");
+        const url = await fetchGoogleAuthUrl();
+        console.log("📥 URL received from store:", url);
+        if (url) {
+          console.log("✅ Setting googleAuthUrl to:", url);
+          setGoogleAuthUrl(url);
         } else {
-          console.log("❌ No URL found in response data");
+          console.log("❌ No URL received from store");
         }
       } catch (error) {
         console.log("💥 Error occurred:", error);
-        // يمكن عرض رسالة خطأ هنا إذا رغبت
       } finally {
         console.log("🏁 Setting googleUrlLoading to false");
         setGoogleUrlLoading(false);
       }
     };
-    console.log("🚀 Calling fetchGoogleAuthUrl function");
-    fetchGoogleAuthUrl();
-    console.log("🔒 Setting googleUrlFetched to true");
-    setGoogleUrlFetched(true);
+    console.log("🚀 Calling loadGoogleAuthUrl function");
+    loadGoogleAuthUrl();
     console.log("✅ useEffect completed");
-  }, []);
+  }, [fetchGoogleAuthUrl]);
 
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

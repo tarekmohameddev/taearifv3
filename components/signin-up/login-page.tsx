@@ -35,7 +35,7 @@ export function LoginPage() {
   const [redirectUrl, setRedirectUrl] = useState<string>("");
   const [googleToken, setGoogleToken] = useState<string>("");
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const { googleUrlFetched, setGoogleUrlFetched } = useAuthStore();
+  const { googleUrlFetched, setGoogleUrlFetched, fetchGoogleAuthUrl } = useAuthStore();
 
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,21 +51,14 @@ export function LoginPage() {
     }));
   };
   useEffect(() => {
-    if (googleUrlFetched) return;
-    const fetchGoogleAuthUrl = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`,
-        );
-        const data = await response.json();
-        if (data.url) {
-          setGoogleAuthUrl(data.url);
-        }
-      } catch (error) {}
+    const loadGoogleAuthUrl = async () => {
+      const url = await fetchGoogleAuthUrl();
+      if (url) {
+        setGoogleAuthUrl(url);
+      }
     };
-    fetchGoogleAuthUrl();
-    setGoogleUrlFetched(true);
-  }, []);
+    loadGoogleAuthUrl();
+  }, [fetchGoogleAuthUrl]);
 
   useEffect(() => {
     if (userData && userData.email) {

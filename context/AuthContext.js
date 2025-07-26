@@ -27,6 +27,7 @@ const useAuthStore = create((set, get) => ({
     real_estate_limit_number: null,
   },
   googleUrlFetched: false,
+  googleAuthUrl: null,
 
   clickedONSubButton: async () => {
     set({ clickedOnSubButton: "subscription" });
@@ -192,6 +193,42 @@ const useAuthStore = create((set, get) => ({
   setIsLoading: (loading) => set({ IsLoading: loading }),
   setHasAttemptedLogin: (attempted) => set({ hasAttemptedLogin: attempted }),
   setGoogleUrlFetched: (value) => set({ googleUrlFetched: value }),
+  setGoogleAuthUrl: (url) => set({ googleAuthUrl: url }),
+  
+  // ! --------------fetch Google Auth URL
+  fetchGoogleAuthUrl: async () => {
+    const { googleUrlFetched, googleAuthUrl } = get();
+    
+    // إذا كان الرابط محفوظ بالفعل، إرجاعه
+    if (googleAuthUrl) {
+      return googleAuthUrl;
+    }
+    
+    // إذا تم جلب الرابط من قبل، لا تكرر العملية
+    if (googleUrlFetched) {
+      return null;
+    }
+    
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`
+      );
+      const data = await response.json();
+      
+      if (data.url) {
+        set({ googleAuthUrl: data.url, googleUrlFetched: true });
+        return data.url;
+      }
+      
+      set({ googleUrlFetched: true });
+      return null;
+    } catch (error) {
+      console.error("Error fetching Google auth URL:", error);
+      set({ googleUrlFetched: true });
+      return null;
+    }
+  },
+  
   /**
    * تسجيل الدخول باستخدام التوكن فقط (بدون recaptcha أو باسورد)
    * - يحفظ التوكن في الstore
@@ -203,7 +240,6 @@ const useAuthStore = create((set, get) => ({
    */
   loginWithToken: async (token) => {
     try {
-      console.log("token", token);
       set((state) => ({
         userData: {
           ...state.userData,
@@ -211,16 +247,13 @@ const useAuthStore = create((set, get) => ({
         },
       }));
 
-      console.log("done 1111111111");
 
       const response = await axiosInstance.get("/user");
-      console.log("done 2222222222222222");
       const user =
         response.data.data?.user ||
         response.data.data ||
         response.data.user ||
         response.data;
-      console.log("done 33333333333333333");
 
       set({
         UserIslogged: true,
@@ -231,7 +264,6 @@ const useAuthStore = create((set, get) => ({
           onboarding_completed: user.onboarding_completed || false,
         },
       });
-      console.log("done 444444444444444444");
 
       const setAuthResponse = await fetch("/api/user/setAuth", {
         method: "POST",
@@ -240,7 +272,6 @@ const useAuthStore = create((set, get) => ({
         },
         body: JSON.stringify({ user, UserToken: token }),
       });
-      console.log("done 555555555555555");
 
       if (!setAuthResponse.ok) {
         const errorData = await setAuthResponse.json().catch(() => ({}));
