@@ -54,28 +54,31 @@ export default function ClientLayout({
 
   useEffect(() => {
     async function fetchUser() {
-      console.log("is it true?",isMounted && !IsLoading && UserIslogged && !onboardingCompleted)
       if (isMounted && !IsLoading && UserIslogged && !onboardingCompleted) {
         if (pathname !== "/onboarding") {
-          
       try {
             const response = await axiosInstance.get("/user");
-            const completed = response.data.onboarding_completed;
-            console.log("completed", completed);
+            const completed = response.data.data.onboarding_completed;
             setOnboardingCompleted(completed); 
-            // if (completed == undefined) {
-            //   router.push("/onboarding");
-            // console.log("completed1", completed);
-
-            // }else{
-            // console.log("completed2", completed);
-
-            // }
+            if (completed == undefined) {
+              router.push("/onboarding");
+            }
           } catch (error) {
             router.push("/onboarding");
           }
         } else {
-          console.log("pathname", pathname);
+          try {
+            const response = await axiosInstance.get("/user");
+            const completed = response.data.data.onboarding_completed;
+            setOnboardingCompleted(completed); 
+            if (completed == undefined) {
+              router.push("/onboarding");
+            } else {
+              router.push("/");
+            }
+          } catch (error) {
+            router.push("/onboarding");
+          }
         }
       } else {
         console.log("onboardingCompleted", onboardingCompleted);
