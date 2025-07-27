@@ -234,14 +234,6 @@ export default function CustomersPage() {
       toast.success("تم إضافة العميل بنجاح! 🎉", {
         duration: 4000,
         position: "top-center",
-        style: {
-          background: "#10B981",
-          color: "#fff",
-          fontWeight: "bold",
-          fontSize: "16px",
-          padding: "12px 20px",
-          borderRadius: "8px",
-        },
       });
       
       setShowAddCustomerDialog(false);
