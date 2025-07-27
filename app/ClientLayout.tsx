@@ -40,13 +40,32 @@ export default function ClientLayout({
   }, [fetchUserData]);
 
   useEffect(() => {
+    console.log("ClientLayout check:", {
+      isMounted,
+      IsLoading,
+      UserIslogged,
+      pathname,
+      shouldRedirect: isMounted &&
+        !IsLoading &&
+        !UserIslogged &&
+        !pathname?.startsWith("/oauth") &&
+        !pathname?.startsWith("/not-found") &&
+        !pathname?.startsWith("/forgot-password") &&
+        !pathname?.startsWith("/reset") &&
+        !pathname?.startsWith("/register") &&
+        pathname !== "/login"
+    });
+
     if (
       isMounted &&
       !IsLoading &&
       !UserIslogged &&
       !pathname?.startsWith("/oauth") &&
       !pathname?.startsWith("/not-found") &&
-      !pathname?.startsWith("/register")
+      !pathname?.startsWith("/forgot-password") &&
+      !pathname?.startsWith("/reset") &&
+      !pathname?.startsWith("/register") &&
+      pathname !== "/login"
     ) {
       router.push("/login");
     }
@@ -96,14 +115,21 @@ export default function ClientLayout({
     }
   }, [userData, router]);
 
-  if (
-    !UserIslogged &&
-    !pathname?.startsWith("/oauth") &&
-    pathname !== "/onboarding" &&
-    !pathname?.startsWith("/not-found") &&
-    pathname !== "/login" &&
-    pathname !== "/register"
-  ) {
+  // السماح بصفحات معينة بدون تسجيل دخول
+  const publicPages = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset",
+    "/onboarding",
+    "/test-reset"
+  ];
+
+  const isPublicPage = publicPages.some(page => pathname?.startsWith(page)) || 
+                      pathname?.startsWith("/oauth") || 
+                      pathname?.startsWith("/not-found");
+
+  if (!UserIslogged && !isPublicPage) {
     return null;
   }
 
