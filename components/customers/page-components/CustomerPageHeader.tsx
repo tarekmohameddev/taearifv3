@@ -17,10 +17,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Move, UserPlus } from "lucide-react";
+import { Move, UserPlus, Loader2 } from "lucide-react";
 import Link from "next/link";
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
+import axiosInstance from "@/lib/axiosInstance";
+import { useState, useEffect } from "react";
+
+interface Stage {
+  id: number;
+  stage_name: string;
+  color: string | null;
+  icon: string | null;
+  description: string | null;
+  order: number;
+}
 
 export const CustomerPageHeader = ({
   showAddCustomerDialog,
@@ -37,6 +48,30 @@ export const CustomerPageHeader = ({
   setIsSubmitting,
   setNewCustomer,
 }: any) => {
+  const [stages, setStages] = useState<Stage[]>([]);
+  const [fetchingStages, setFetchingStages] = useState(false);
+
+  // جلب المراحل من الAPI عند تحميل المكون
+  useEffect(() => {
+    fetchStages();
+  }, []);
+
+  const fetchStages = async () => {
+    setFetchingStages(true);
+    try {
+      const response = await axiosInstance.get("/crm/stages");
+      if (response.data.status === "success") {
+        // ترتيب المراحل حسب order
+        const sortedStages = response.data.data.sort((a: Stage, b: Stage) => a.order - b.order);
+        setStages(sortedStages);
+      }
+    } catch (error) {
+      console.error("Error fetching stages:", error);
+    } finally {
+      setFetchingStages(false);
+    }
+  };
+
   return (
     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div>
@@ -70,7 +105,7 @@ export const CustomerPageHeader = ({
                 note: "",
                 customer_type: "مشتري",
                 priority: 1,
-                stage_id: 1,
+                                 stage_id: null,
               });
             }
           }}
@@ -213,6 +248,49 @@ export const CustomerPageHeader = ({
                       <SelectItem value="3">عالية</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="stage">المرحلة (اختياري)</Label>
+                  {fetchingStages ? (
+                    <div className="flex items-center justify-center py-2 border rounded-md">
+                      <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                      <span className="text-sm text-muted-foreground">جاري التحميل...</span>
+                    </div>
+                  ) : (
+                                          <Select
+                        onValueChange={(value) =>
+                          handleNewCustomerChange("stage_id")(
+                            value === "none" ? null : parseInt(value, 10)
+                          )
+                        }
+                        value={newCustomer.stage_id?.toString() || "none"}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر المرحلة (اختياري)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">بدون مرحلة</SelectItem>
+                          {stages.map((stage) => (
+                            <SelectItem key={stage.id} value={stage.id.toString()}>
+                              <div className="flex items-center gap-2">
+                                {stage.color && (
+                                  <div
+                                    className="w-3 h-3 rounded-full"
+                                    style={{ backgroundColor: stage.color }}
+                                  />
+                                )}
+                                <span>{stage.stage_name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                  )}
+                </div>
+                <div>
+                  {/* حقل فارغ للحفاظ على التخطيط */}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

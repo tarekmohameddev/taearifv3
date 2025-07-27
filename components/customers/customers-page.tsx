@@ -27,7 +27,7 @@ const customerSchema = z.object({
   note: z.string().optional(),
   customer_type: z.string(),
   priority: z.number(),
-  stage_id: z.number(),
+  stage_id: z.union([z.number(), z.null(), z.literal("")]).optional(),
 });
 
 // Error message translation mapping
@@ -83,7 +83,7 @@ interface Customer {
   priority: number;
   city_id: number | null;
   district_id?: number | string | null;
-  stage_id: number;
+  stage_id?: number | null;
 }
 // Customer data (same as CRM page for consistency)
 const customers: Customer[] = [
@@ -163,7 +163,7 @@ export default function CustomersPage() {
     note: "",
     customer_type: "مشتري", // Default value
     priority: 1,
-    stage_id: 1,
+    stage_id: null, // Default empty value for optional stage
   });
 
   useEffect(() => {
@@ -202,7 +202,18 @@ export default function CustomersPage() {
       setClientErrors({});
       setValidationErrors({});
       
-      const validationResult = customerSchema.safeParse(newCustomer);
+      // معالجة stage_id قبل الإرسال
+      const customerDataToSend: any = {
+        ...newCustomer,
+        stage_id: newCustomer.stage_id === null ? "" : newCustomer.stage_id
+      };
+
+      // إزالة stage_id إذا كان فارغاً لتجنب مشاكل الـ API
+      if (customerDataToSend.stage_id === "") {
+        delete customerDataToSend.stage_id;
+      }
+
+      const validationResult = customerSchema.safeParse(customerDataToSend);
       
       if (!validationResult.success) {
         const errors: Record<string, string> = {};
@@ -215,7 +226,7 @@ export default function CustomersPage() {
         return;
       }
 
-      const response = await axiosInstance.post("/customers", newCustomer);
+      const response = await axiosInstance.post("/customers", customerDataToSend);
       // Add the new customer to the list
       setCustomersData((prev) => [response.data.data, ...prev]);
       
@@ -245,7 +256,7 @@ export default function CustomersPage() {
         note: "",
         customer_type: "مشتري",
         priority: 1,
-        stage_id: 1,
+        stage_id: null,
       });
       // Clear any existing errors
       setClientErrors({});
