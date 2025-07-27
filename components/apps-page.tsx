@@ -21,6 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -64,7 +65,6 @@ export function AppsPage() {
 
   useEffect(() => {
     const fetchApps = async () => {
-      const loadingToast = toast.loading("جاري تحميل التطبيقات...");
       try {
         const res = await axiosInstance.get("/apps");
         const fetchedApps = res.data.data.apps;
@@ -73,10 +73,8 @@ export function AppsPage() {
         const installed = fetchedApps.filter((app) => app.installed === true);
         setInstalledApps(installed);
 
-        toast.dismiss(loadingToast);
         toast.success("تم تحميل التطبيقات بنجاح");
       } catch (err) {
-        toast.dismiss(loadingToast);
         toast.error("فشل في تحميل التطبيقات");
         console.error("Failed to load apps:", err);
       } finally {
@@ -153,7 +151,7 @@ export function AppsPage() {
       app.category.toLowerCase().includes(searchQuery.toLowerCase()),
   );
   if (loading) {
-    return <div className="p-6 text-center">جاري تحميل التطبيقات...</div>;
+    return <AppsPageSkeleton />;
   }
 
   return (
@@ -590,6 +588,98 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
           </div>
         </div>
       </div>
+    </Card>
+  );
+}
+
+function AppsPageSkeleton() {
+  return (
+    <div className="flex min-h-screen flex-col" dir="rtl">
+      <DashboardHeader />
+      <div className="flex flex-1 flex-col md:flex-row">
+        <EnhancedSidebar activeTab="apps" setActiveTab={() => {}} />
+        <main className="flex-1 p-4 md:p-6">
+          <div className="space-y-6">
+            {/* Header Section */}
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <div>
+                <Skeleton className="h-8 w-64 mb-2" />
+                <Skeleton className="h-4 w-80" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-9 w-9" />
+                <Skeleton className="h-9 w-9" />
+                <Skeleton className="h-9 w-20" />
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative">
+              <Skeleton className="h-10 w-full" />
+            </div>
+
+            {/* Tabs Section */}
+            <div className="space-y-6">
+              {/* Installed Apps Section */}
+              <div className="mb-6">
+                <Skeleton className="h-6 w-48 mb-4" />
+                
+                {/* Empty State for Installed Apps */}
+                <div className="rounded-lg border border-dashed p-8 text-center">
+                  <Skeleton className="h-6 w-64 mx-auto mb-2" />
+                  <Skeleton className="h-4 w-80 mx-auto" />
+                </div>
+              </div>
+
+              {/* Apps Marketplace Section */}
+              <div>
+                <Skeleton className="h-6 w-32 mb-4" />
+                
+                {/* Grid View Skeleton */}
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <AppCardSkeleton key={index} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function AppCardSkeleton() {
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader className="p-4 pb-0">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-12 w-12 rounded-md" />
+            <div>
+              <Skeleton className="h-5 w-32 mb-1" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+          <Skeleton className="h-5 w-12" />
+        </div>
+      </CardHeader>
+      <CardContent className="p-4">
+        <Skeleton className="h-4 w-full mb-2" />
+        <Skeleton className="h-4 w-3/4 mb-3" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 w-8" />
+            <Skeleton className="h-3 w-12" />
+          </div>
+          <Skeleton className="h-5 w-12" />
+        </div>
+      </CardContent>
+      <CardFooter className="p-4 pt-0">
+        <Skeleton className="h-8 w-full" />
+      </CardFooter>
     </Card>
   );
 }
