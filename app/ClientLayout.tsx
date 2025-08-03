@@ -53,7 +53,7 @@ export default function ClientLayout({
         !pathname?.startsWith("/forgot-password") &&
         !pathname?.startsWith("/reset") &&
         !pathname?.startsWith("/register") &&
-        pathname !== "/login"
+        !pathname?.startsWith("/login")
     });
 
     if (
@@ -65,8 +65,9 @@ export default function ClientLayout({
       !pathname?.startsWith("/forgot-password") &&
       !pathname?.startsWith("/reset") &&
       !pathname?.startsWith("/register") &&
-      pathname !== "/login"
+      !pathname?.startsWith("/login")
     ) {
+      console.error("Redirecting to login");
       router.push("/login");
     }
   }, [isMounted, IsLoading, UserIslogged, pathname, router]);
@@ -93,6 +94,7 @@ export default function ClientLayout({
             if (completed == undefined) {
               router.push("/onboarding");
             } else {
+      console.warn("Redirecting to home page");
               router.push("/");
             }
           } catch (error) {
@@ -110,7 +112,8 @@ export default function ClientLayout({
   useEffect(() => {
     if (pathname?.startsWith("/login")) {
       if (userData && userData.email) {
-        router.push("/");
+      console.log("Redirecting to home page");
+      router.push("/");
       }
     }
   }, [userData, router]);

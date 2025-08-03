@@ -102,6 +102,7 @@ export function LoginPage() {
         // 1. حفظ التوكن في الstore مباشرة
         useAuthStore.setState((prev: any) => ({
           ...prev,
+          UserIslogged: true,
           userData: {
             ...prev.userData,
             token: cleanToken,

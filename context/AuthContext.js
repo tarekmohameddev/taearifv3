@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { serialize as serializeCookie } from "cookie";
-import axiosInstance from "@/lib/axiosInstance";
+import axiosInstance, { unlockAxios } from "@/lib/axiosInstance";
 
 const useAuthStore = create((set, get) => ({
   UserIslogged: false,
@@ -33,7 +33,6 @@ const useAuthStore = create((set, get) => ({
     set({ clickedOnSubButton: "subscription" });
   },
 
-  // ! --------------fetch User Data
   fetchUserData: async () => {
     set({ IsLoading: true, error: null });
     if (get().IsDone === true) return;
@@ -92,7 +91,6 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  // ! --------------login
   login: async (email, password, recaptchaToken) => {
     set({ IsLoading: true, errorLogin: null, errorLoginATserver: null });
     try {
@@ -152,6 +150,9 @@ const useAuthStore = create((set, get) => ({
         onboarding_completed: user.onboarding_completed || false,
       };
       set({ UserIslogged: true, userData: safeUserData });
+
+      unlockAxios(); // ✅ إعادة تفعيل axios
+
       return { success: true };
     } catch (error) {
       const errorMsg = "حدث خطأ أثناء الاتصال بالخادم";
@@ -162,7 +163,6 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  // ! --------------logout
   logout: async () => {
     try {
       const response = await fetch("/api/user/logout", {
@@ -184,7 +184,6 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  // ! --------------set Onboarding Completed
   setOnboardingCompleted: (boolean) => set({ onboarding_completed: boolean }),
   setErrorLogin: (error) => set({ errorLogin: error }),
   setAuthenticated: (value) => set({ authenticated: value }),
@@ -194,32 +193,24 @@ const useAuthStore = create((set, get) => ({
   setHasAttemptedLogin: (attempted) => set({ hasAttemptedLogin: attempted }),
   setGoogleUrlFetched: (value) => set({ googleUrlFetched: value }),
   setGoogleAuthUrl: (url) => set({ googleAuthUrl: url }),
-  
-  // ! --------------fetch Google Auth URL
+
   fetchGoogleAuthUrl: async () => {
     const { googleUrlFetched, googleAuthUrl } = get();
-    
-    // إذا كان الرابط محفوظ بالفعل، إرجاعه
-    if (googleAuthUrl) {
-      return googleAuthUrl;
-    }
-    
-    // إذا تم جلب الرابط من قبل، لا تكرر العملية
-    if (googleUrlFetched) {
-      return null;
-    }
-    
+
+    if (googleAuthUrl) return googleAuthUrl;
+    if (googleUrlFetched) return null;
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`
       );
       const data = await response.json();
-      
+
       if (data.url) {
         set({ googleAuthUrl: data.url, googleUrlFetched: true });
         return data.url;
       }
-      
+
       set({ googleUrlFetched: true });
       return null;
     } catch (error) {
@@ -228,16 +219,7 @@ const useAuthStore = create((set, get) => ({
       return null;
     }
   },
-  
-  /**
-   * تسجيل الدخول باستخدام التوكن فقط (بدون recaptcha أو باسورد)
-   * - يحفظ التوكن في الstore
-   * - يجلب بيانات المستخدم من /user
-   * - يحفظ البيانات في الstore
-   * - ينشئ الكوكي بنفس طريقة تسجيل الدخول العادي
-   * @param {string} token - التوكن القادم من URL أو أي مصدر خارجي
-   * @returns {Promise<{success: boolean, error?: string}>}
-   */
+
   loginWithToken: async (token) => {
     try {
       set((state) => ({
@@ -246,7 +228,6 @@ const useAuthStore = create((set, get) => ({
           token,
         },
       }));
-
 
       const response = await axiosInstance.get("/user");
       const user =
@@ -264,6 +245,8 @@ const useAuthStore = create((set, get) => ({
           onboarding_completed: user.onboarding_completed || false,
         },
       });
+
+      unlockAxios(); // ✅ إعادة تفعيل axios
 
       const setAuthResponse = await fetch("/api/user/setAuth", {
         method: "POST",
