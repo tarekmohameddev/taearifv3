@@ -33,7 +33,7 @@ export default function ClientLayout({
   //     onboarding_completed: userData.onboarding_completed || false,
   //   });
   // setUserIsLogged(true);
-  //
+  
   useEffect(() => {
     setIsMounted(true);
     fetchUserData();
@@ -67,6 +67,7 @@ export default function ClientLayout({
       !pathname?.startsWith("/register") &&
       !pathname?.startsWith("/login")
     ) {
+      console.log("pathname:", pathname);
       console.error("Redirecting to login");
       router.push("/login");
     }

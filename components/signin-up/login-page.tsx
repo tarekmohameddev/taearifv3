@@ -109,6 +109,9 @@ export function LoginPage() {
           },
         }));
 
+        console.log("User data updated with token:", useAuthStore.getState().userData);
+        console.log("UserIslogged updated with token:", useAuthStore.getState().UserIslogged);
+        console.log("Token extracted and stored:", cleanToken);
         // 2. تسجيل الدخول بالـ token فقط
         const loginWithToken = async () => {
           setIsLoading(true);
@@ -116,7 +119,9 @@ export function LoginPage() {
           const { loginWithToken } = useAuthStore.getState();
           const result = await loginWithToken(cleanToken);
           setIsLoading(false);
+          console.log("Login result:", result);
           if (result.success) {
+            console.log("Login successful with token");
             router.push("/");
           } else {
             setErrors((prev) => ({
