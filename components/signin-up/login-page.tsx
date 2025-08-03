@@ -22,7 +22,7 @@ export function LoginPage() {
     password: "",
     rememberMe: false,
   });
-  const { userData } = useAuthStore();
+  const { UserIslogged, userData } = useAuthStore();
   const [errors, setErrors] = useState({
     email: "",
     password: "",
@@ -91,8 +91,14 @@ export function LoginPage() {
       const token = urlParams.get("token");
       if (token) {
         // إزالة التوكن من الـ URL بعد استخدامه (اختياري)
-        window.history.replaceState({}, document.title, "/login");
-
+        // window.history.replaceState({}, document.title, "/login");
+        useAuthStore.setState(() => ({
+          UserIslogged: false,
+          userData: {},
+        }));
+        console.log("UserIslogged:", UserIslogged);
+        console.log("userData:", userData);
+        
         // تنظيف التوكن من Bearer إذا كان موجود
         let cleanToken = token;
         if (cleanToken.startsWith("Bearer ")) {
@@ -116,6 +122,16 @@ export function LoginPage() {
         const loginWithToken = async () => {
           setIsLoading(true);
           setErrors({ email: "", password: "", general: "" });
+          if (typeof window !== 'undefined') {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i];
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                // لحذف ملف تعريف الارتباط، نقوم بتعيين تاريخ انتهاء صلاحيته إلى تاريخ سابق
+                document.cookie = name.trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+            }
+          }
           const { loginWithToken } = useAuthStore.getState();
           const result = await loginWithToken(cleanToken);
           setIsLoading(false);
