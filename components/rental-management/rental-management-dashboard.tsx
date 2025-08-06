@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { DashboardHeader } from "@/components/dashboard-header"
-import { EnhancedSidebar } from "@/components/enhanced-sidebar"
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
 import { RentalApplicationsService } from "@/components/rental-management/services/rental-applications-service"
 import { RentalAgreementsService } from "@/components/rental-management/services/rental-agreements-service"
 import { RentalPaymentsService } from "@/components/rental-management/services/rental-payments-service"

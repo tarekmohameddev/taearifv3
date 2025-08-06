@@ -878,6 +878,27 @@ export default function CrmPage() {
 
             {/* Main Content */}
             {/* مراحل العملاء */}
+            {activeView === "pipeline" && (
+              <PipelineBoard
+                pipelineStages={pipelineStages}
+                customersData={customersData}
+                filteredCustomers={filteredCustomers}
+                isDragging={isDragging}
+                draggedCustomer={dragPreview}
+                dragOverStage={dragOverStage}
+                focusedCustomer={focusedCustomer}
+                onDragStart={enhancedDragDrop.handleDragStart}
+                onDragEnd={enhancedDragDrop.handleDragEnd}
+                onDragOver={enhancedDragDrop.handleDragOver}
+                onDragLeave={enhancedDragDrop.handleDragLeave}
+                onDrop={enhancedDragDrop.handleDrop}
+                onKeyDown={keyboardNavigation.handleKeyDown}
+                onViewDetails={handleViewDetails}
+                onAddNote={handleAddNote}
+                onAddReminder={handleAddReminder}
+                onAddInteraction={handleAddInteraction}
+              />
+            )}
 
             {/* المواعيد */}
             {activeView === "appointments" && (
