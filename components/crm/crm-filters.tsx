@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Move, Calendar, BarChart3, Bell } from "lucide-react";
+import { Search, Move, Calendar, BarChart3, Bell, User } from "lucide-react";
 import { PipelineStage } from "@/types/crm";
 
 interface CrmFiltersProps {
@@ -65,6 +65,15 @@ export default function CrmFilters({
           <Bell className="h-4 w-4" />
           <span className="hidden sm:inline">التذكيرات</span>
           <span className="sm:hidden">التذكيرات</span>
+        </Button>
+        <Button
+          variant={activeView === "inquiry" ? "default" : "outline"}
+          onClick={() => setActiveView("inquiry")}
+          className="flex items-center gap-2"
+        >
+          <User className="h-4 w-4" />
+          <span className="hidden sm:inline">طلبات العملاء</span>
+          <span className="sm:hidden">طلبات العملاء</span>
         </Button>
         {/* <Button
           variant={activeView === "analytics" ? "default" : "outline"}

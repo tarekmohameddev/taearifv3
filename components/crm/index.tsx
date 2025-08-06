@@ -6,6 +6,7 @@ export { default as PipelineStage } from "./pipeline-stage";
 export { default as PipelineBoard } from "./pipeline-board";
 export { default as AppointmentsList } from "./appointments-list";
 export { default as RemindersList } from "./reminders-list";
+export { default as InquiryList } from "./inquiry-list";
 export { default as CrmHeader } from "./crm-header";
 export { default as DragDropHandler } from "./drag-drop-handler";
 export { default as KeyboardNavigation } from "./keyboard-navigation";

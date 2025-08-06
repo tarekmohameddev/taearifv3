@@ -27,6 +27,7 @@ import {
   PipelineBoard,
   AppointmentsList,
   RemindersList,
+  InquiryList,
   CrmHeader,
   DragDropHandler,
   KeyboardNavigation,
@@ -243,6 +244,7 @@ export default function CrmPage() {
       };
     }[]
   >([]);
+  const [inquiriesData, setInquiriesData] = useState<any[]>([]);
   const [totalCustomers, setTotalCustomers] = useState(0);
 
   // Get data from store
@@ -419,6 +421,18 @@ export default function CrmPage() {
         console.error("Error fetching reminders data:", err);
       }
     },
+    fetchInquiriesData: async () => {
+      try {
+        const response = await axiosInstance.get("/v1/inquiry");
+        const inquiriesResponse = response.data;
+
+        if (inquiriesResponse.status === "success") {
+          setInquiriesData(inquiriesResponse.data.inquiries || []);
+        }
+      } catch (err) {
+        console.error("Error fetching inquiries data:", err);
+      }
+    },
     updateCustomerStage: async (customerId: string, stageId: string) => {
       try {
         // Use a faster timeout for better UX
@@ -591,6 +605,10 @@ export default function CrmPage() {
     setAppointmentsData((prev) => [newAppointment, ...prev]);
   };
 
+  const updateInquiriesList = (newInquiry: any) => {
+    setInquiriesData((prev) => [newInquiry, ...prev]);
+  };
+
   const updateReminderInList = (updatedReminder: any) => {
     setRemindersData((prev) =>
       prev.map((reminder) =>
@@ -605,6 +623,14 @@ export default function CrmPage() {
         appointment.id === updatedAppointment.id
           ? updatedAppointment
           : appointment,
+      ),
+    );
+  };
+
+  const updateInquiryInList = (updatedInquiry: any) => {
+    setInquiriesData((prev) =>
+      prev.map((inquiry) =>
+        inquiry.id === updatedInquiry.id ? updatedInquiry : inquiry,
       ),
     );
   };
@@ -631,6 +657,7 @@ export default function CrmPage() {
     dataHandler.fetchCrmData();
     dataHandler.fetchAppointmentsData();
     dataHandler.fetchRemindersData();
+    dataHandler.fetchInquiriesData();
   }, []);
 
   const filteredCustomers = customersData.filter((customer: Customer) => {
@@ -690,6 +717,7 @@ export default function CrmPage() {
     dataHandler.fetchCrmData();
     dataHandler.fetchAppointmentsData();
     dataHandler.fetchRemindersData();
+    dataHandler.fetchInquiriesData();
   };
 
   const handleSettings = () => {
@@ -763,6 +791,26 @@ export default function CrmPage() {
     }
   };
 
+  const handleViewInquiry = (inquiry: any) => {
+    // TODO: Implement inquiry detail view
+    console.log("View inquiry:", inquiry);
+  };
+
+  const handleEditInquiry = (inquiry: any) => {
+    // TODO: Implement inquiry edit
+    console.log("Edit inquiry:", inquiry);
+  };
+
+  const handleAddInquiry = () => {
+    // TODO: Implement add inquiry
+    console.log("Add inquiry");
+  };
+
+  const handleContactCustomer = (inquiry: any) => {
+    // TODO: Implement contact customer
+    console.log("Contact customer:", inquiry);
+  };
+
   // عرض loading state
   if (loading) {
     return (
@@ -830,27 +878,6 @@ export default function CrmPage() {
 
             {/* Main Content */}
             {/* مراحل العملاء */}
-            {activeView === "pipeline" && (
-              <PipelineBoard
-                pipelineStages={pipelineStages}
-                customersData={customersData}
-                filteredCustomers={filteredCustomers}
-                isDragging={isDragging}
-                draggedCustomer={dragPreview}
-                dragOverStage={dragOverStage}
-                focusedCustomer={focusedCustomer}
-                onDragStart={enhancedDragDrop.handleDragStart}
-                onDragEnd={enhancedDragDrop.handleDragEnd}
-                onDragOver={enhancedDragDrop.handleDragOver}
-                onDragLeave={enhancedDragDrop.handleDragLeave}
-                onDrop={enhancedDragDrop.handleDrop}
-                onKeyDown={keyboardNavigation.handleKeyDown}
-                onViewDetails={handleViewDetails}
-                onAddNote={handleAddNote}
-                onAddReminder={handleAddReminder}
-                onAddInteraction={handleAddInteraction}
-              />
-            )}
 
             {/* المواعيد */}
             {activeView === "appointments" && (
@@ -870,6 +897,17 @@ export default function CrmPage() {
                 onEditReminder={handleEditReminder}
                 onAddReminder={handleAddGeneralReminder}
                 onCompleteReminder={handleCompleteReminder}
+              />
+            )}
+
+
+                          {/* طلبات العملاء */}
+            {activeView === "inquiry" && (
+              <InquiryList
+                onViewInquiry={handleViewInquiry}
+                onEditInquiry={handleEditInquiry}
+                onAddInquiry={handleAddInquiry}
+                onContactCustomer={handleContactCustomer}
               />
             )}
 
