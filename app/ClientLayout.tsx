@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import useAuthStore from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
+import InfoPopup from "@/components/ui/popup";
 
 export default function ClientLayout({
   children,
@@ -19,10 +20,10 @@ export default function ClientLayout({
     (state) => state.onboarding_completed,
   );
   const userData = useAuthStore((state) => state.userData);
-  const setUserData = useAuthStore((state) => state.setUserData);
-  const setUserIsLogged = useAuthStore((state) => state.setUserIsLogged);
-  const setIsLoading = useAuthStore((state) => state.setIsLoading);
   const { setOnboardingCompleted } = useAuthStore();
+  const [showPopup, setShowPopup] = useState(false)
+  const clearMessage = useAuthStore((state) => state.clearMessage);
+  const setMessage = useAuthStore((state) => state.setMessage);
 
   //   setUserData({
   //     email: userData.email,
@@ -34,6 +35,42 @@ export default function ClientLayout({
   //   });
   // setUserIsLogged(true);
   
+
+  const handleShowPopup = () => {
+    setShowPopup(true)
+  }
+
+  const handleClosePopup = () => {
+    setShowPopup(false)
+    // لا نحتاج لمسح الرسالة هنا لأن InfoPopup سيقوم بذلك
+  }
+
+  // function لاختبار الـ popup في development mode
+  const testPopup = () => {
+    setMessage("هذه رسالة اختبار للـ popup! 🎉");
+    setShowPopup(true);
+  }
+
+  // مراقبة التغييرات في userData.message
+  useEffect(() => {
+    console.log("Checking userData.message:", userData?.message);
+    if (userData?.message && !showPopup) {
+      console.log("Message detected, showing popup:", userData.message);
+      setShowPopup(true);
+    }
+  }, [userData?.message, showPopup]);
+
+  // إضافة logging للتأكد من حالة الـ popup
+  useEffect(() => {
+    if (userData?.message) {
+      console.log("Popup state:", {
+        showPopup,
+        hasMessage: !!userData?.message,
+        message: userData?.message
+      });
+    }
+  }, [showPopup, userData?.message]);
+
   useEffect(() => {
     setIsMounted(true);
     fetchUserData();
@@ -137,5 +174,17 @@ export default function ClientLayout({
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      
+      {showPopup && userData?.message && (
+        <InfoPopup
+          message={userData.message}
+          isVisible={showPopup}
+          onClose={handleClosePopup}
+        />
+      )}
+    </>
+  );
 }

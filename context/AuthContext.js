@@ -25,6 +25,7 @@ const useAuthStore = create((set, get) => ({
     package_features: [],
     project_limit_number: null,
     real_estate_limit_number: null,
+    message: null,
   },
   googleUrlFetched: false,
   googleAuthUrl: null,
@@ -46,11 +47,13 @@ const useAuthStore = create((set, get) => ({
       }
 
       const userData = await userInfoResponse.json();
+      const currentState = get();
       set({
         UserIslogged: true,
         userData: {
           ...userData,
           onboarding_completed: userData.onboarding_completed || false,
+          message: currentState.userData?.message || null, // حفظ الـ message الموجود
         },
         IsLoading: true,
         error: null,
@@ -58,6 +61,7 @@ const useAuthStore = create((set, get) => ({
       if (get().userData.is_free_plan == null) {
         const ress = await axiosInstance.get("/user");
         const subscriptionDATA = ress.data.data;
+        console.log("subscriptionDATA", subscriptionDATA);
         set({
           authenticated: true,
           userData: {
@@ -73,6 +77,7 @@ const useAuthStore = create((set, get) => ({
               subscriptionDATA.membership.package.real_estate_limit_number ||
               null,
             domain: subscriptionDATA.domain || null,
+            message: subscriptionDATA.message || null,
           },
         });
       }
@@ -90,7 +95,28 @@ const useAuthStore = create((set, get) => ({
       set({ IsDone: false, error: null });
     }
   },
+  
+  clearMessage: () => {
+    console.log("Clearing message from AuthContext");
+    set((state) => ({
+      userData: {
+        ...state.userData,
+        message: null
+      }
+    }))
+  },
 
+  setMessage: (message) => {
+    console.log("Setting message in AuthContext:", message);
+    set((state) => ({
+      userData: {
+        ...state.userData,
+        message: message
+      }
+    }))
+  },
+
+    
   login: async (email, password, recaptchaToken) => {
     set({ IsLoading: true, errorLogin: null, errorLoginATserver: null });
     try {
