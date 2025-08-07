@@ -426,28 +426,30 @@ export default function InquiryList({
                  />
                </div>
 
-                              {/* Budget Range */}
-                <div className="space-y-2 md:col-span-2">
-                  <Label className="text-sm font-medium">
-                    نطاق الميزانية: {formatCurrency(tempFilters.min_budget)} - {formatCurrency(tempFilters.max_budget)}
-                  </Label>
-                  <div className="space-y-4">
-                    <Slider
-                      value={[tempFilters.min_budget, tempFilters.max_budget]}
-                      onValueChange={([min, max]) => 
-                        setTempFilters(prev => ({ ...prev, min_budget: min, max_budget: max }))
-                      }
-                      max={10000000}
-                      min={0}
-                      step={100000}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground" dir="rtl">
-                      <span>10 مليون ريال</span>
-                      <span>0 ريال</span>
-                    </div>
-                  </div>
-                </div>
+                                                             {/* Budget Range */}
+                 <div className="space-y-2 md:col-span-2">
+                   <Label className="text-sm font-medium">
+                     نطاق الميزانية: {formatCurrency(tempFilters.min_budget)} - {formatCurrency(tempFilters.max_budget)}
+                   </Label>
+                   <div className="space-y-4">
+                                           <div className="relative">
+                        <Slider
+                          value={[tempFilters.min_budget, tempFilters.max_budget]}
+                          onValueChange={([min, max]) => 
+                            setTempFilters(prev => ({ ...prev, min_budget: min, max_budget: max }))
+                          }
+                          max={10000000}
+                          min={0}
+                          step={100000}
+                          className="w-full slider-range"
+                        />
+                      </div>
+                     <div className="flex justify-between text-xs text-muted-foreground">
+                       <span>0 ريال</span>
+                       <span>10 مليون ريال</span>
+                     </div>
+                   </div>
+                 </div>
 
                {/* Per Page */}
                <div className="space-y-2">

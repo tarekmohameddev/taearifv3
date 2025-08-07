@@ -123,3 +123,53 @@
 
 /* Add Arabic font */
 @import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap");
+
+/* Custom Slider Styles */
+.slider-range {
+  @apply relative w-full h-2 bg-gray-200 rounded-full;
+}
+
+.slider-range .slider-track {
+  @apply absolute h-2 bg-blue-500 rounded-full;
+}
+
+.slider-range .slider-thumb {
+  @apply absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-lg cursor-pointer transition-transform duration-200 ease-in-out;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.slider-range .slider-thumb:hover {
+  @apply scale-110;
+}
+
+.slider-range .slider-thumb:focus {
+  @apply outline-none ring-2 ring-blue-300 ring-offset-2;
+}
+
+/* Enhanced Slider Styles for better appearance */
+.slider-range [data-radix-slider-thumb] {
+  @apply w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-lg cursor-pointer transition-all duration-200 ease-in-out;
+  display: block;
+}
+
+.slider-range [data-radix-slider-thumb]:hover {
+  @apply scale-110 shadow-xl;
+}
+
+.slider-range [data-radix-slider-thumb]:focus {
+  @apply outline-none ring-2 ring-blue-300 ring-offset-2;
+}
+
+.slider-range [data-radix-slider-track] {
+  @apply h-2 bg-gray-200 rounded-full;
+}
+
+.slider-range [data-radix-slider-range] {
+  @apply h-2 bg-blue-500 rounded-full;
+}
+
+/* RTL Slider adjustments */
+[dir="rtl"] .slider-range .slider-thumb {
+  transform: translateY(-50%) scaleX(-1);
+}

@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FileText, CreditCard, Wrench, Users, Home } from "lucide-react"
 
 export function RentalManagementDashboard() {
-  const [activeService, setActiveService] = useState("applications")
+  const [activeService, setActiveService] = useState("overview")
 
   const services = [
     {

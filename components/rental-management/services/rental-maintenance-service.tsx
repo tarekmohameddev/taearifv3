@@ -33,61 +33,40 @@ import {
   Phone,
   Mail,
   Settings,
+  DollarSign,
+  FileText,
+  MapPin,
+  Sparkles,
+  TrendingUp,
+  Activity,
 } from "lucide-react"
+import axiosInstance from "@/lib/axiosInstance"
+import { toast } from "sonner"
 
 interface MaintenanceRequest {
-  id: string
-  requestNumber: string
-  contractId: string
-  contractNumber: string
-  propertyTitle: string
-  propertyTitleAr: string
-  propertyAddress: string
-  propertyAddressAr: string
-  tenant: {
-    name: string
-    nameAr: string
-    phone: string
-    email: string
-  }
-  requestDetails: {
-    category: string
-    categoryAr: string
-    priority: "low" | "medium" | "high" | "urgent"
-    priorityAr: string
-    description: string
-    descriptionAr: string
-    location: string
-    locationAr: string
-    images?: string[]
-  }
-  status: "submitted" | "assigned" | "in_progress" | "completed" | "cancelled"
-  statusAr: string
-  assignedTo?: {
-    name: string
-    nameAr: string
-    phone: string
-    company: string
-    companyAr: string
-  }
-  dates: {
-    submitted: string
-    submittedHijri: string
-    scheduled?: string
-    scheduledHijri?: string
-    completed?: string
-    completedHijri?: string
-  }
-  cost: {
-    estimated?: number
-    actual?: number
-    paidBy: "tenant" | "landlord" | "management"
-    paidByAr: string
-  }
+  id: number
+  user_id: number
+  rental_id: number
+  category: string
+  priority: "low" | "medium" | "high" | "urgent"
+  title: string
+  description: string
+  estimated_cost: string
+  payer: "tenant" | "landlord" | "management"
+  payer_share_percent: number
+  status: "open" | "assigned" | "in_progress" | "completed" | "cancelled"
+  scheduled_date: string
+  assigned_to_vendor_id: number | null
+  attachments_count: number
   notes: string
-  notesAr: string
-  resolution?: string
-  resolutionAr?: string
+  created_at: string
+  updated_at: string
+  deleted_at: string | null
+}
+
+interface ApiResponse {
+  status: boolean
+  data: MaintenanceRequest[]
 }
 
 export function RentalMaintenanceService() {
@@ -98,262 +77,260 @@ export function RentalMaintenanceService() {
   const [filterPriority, setFilterPriority] = useState("all")
   const [selectedRequest, setSelectedRequest] = useState<MaintenanceRequest | null>(null)
   const [isCreateRequestDialogOpen, setIsCreateRequestDialogOpen] = useState(false)
+  const [stats, setStats] = useState({
+    total: 0,
+    open: 0,
+    inProgress: 0,
+    completed: 0,
+    urgent: 0
+  })
 
-  // Active contracts for creating maintenance requests
-  const activeContracts = [
-    { id: "1", contractNumber: "RC-2024-001", tenantName: "أحمد الراشد", propertyTitle: "شقة فاخرة في حي العليا" },
-    { id: "2", contractNumber: "RC-2024-002", tenantName: "سارة المنصوري", propertyTitle: "فيلا واسعة في جدة" },
-    { id: "3", contractNumber: "RC-2024-003", tenantName: "خالد الحربي", propertyTitle: "استوديو حديث في الدمام" },
+  // Form state for creating new maintenance request
+  const [formData, setFormData] = useState({
+    rental_id: 1,
+    category: "",
+    priority: "",
+    title: "",
+    description: "",
+    estimated_cost: "",
+    payer: "",
+    payer_share_percent: 100,
+    scheduled_date: "",
+    assigned_to_vendor_id: null,
+    notes: ""
+  })
+
+  // Available rentals for selection
+  const availableRentals = [
+    { id: 1, title: "شقة فاخرة في حي العليا", address: "طريق الملك فهد، حي العليا" },
+    { id: 2, title: "فيلا واسعة في جدة", address: "طريق الأمير محمد بن عبدالعزيز" },
+    { id: 3, title: "استوديو حديث في الدمام", address: "طريق الملك سعود، الفيصلية" },
   ]
 
-  useEffect(() => {
-    const fetchRequests = async () => {
+  // Fetch maintenance requests from API
+  const fetchRequests = async () => {
+    try {
       setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
-
-      setRequests([
-        {
-          id: "1",
-          requestNumber: "MR-2024-001",
-          contractId: "1",
-          contractNumber: "RC-2024-001",
-          propertyTitle: "Luxury Apartment in Al-Olaya",
-          propertyTitleAr: "شقة فاخرة في حي العليا",
-          propertyAddress: "King Fahd Road, Al-Olaya District",
-          propertyAddressAr: "طريق الملك فهد، حي العليا",
-          tenant: {
-            name: "Ahmed Al-Rashid",
-            nameAr: "أحمد الراشد",
-            phone: "+966 50 123 4567",
-            email: "ahmed.rashid@email.com",
-          },
-          requestDetails: {
-            category: "air_conditioning",
-            categoryAr: "تكييف",
-            priority: "high",
-            priorityAr: "عالي",
-            description: "Air conditioning unit not working properly",
-            descriptionAr: "وحدة التكييف لا تعمل بشكل صحيح",
-            location: "Living room",
-            locationAr: "غرفة المعيشة",
-            images: ["/placeholder.svg?height=200&width=300", "/placeholder.svg?height=200&width=300"],
-          },
-          status: "assigned",
-          statusAr: "مُعيّن",
-          assignedTo: {
-            name: "Mohammed Al-Otaibi",
-            nameAr: "محمد العتيبي",
-            phone: "+966 55 987 6543",
-            company: "Cool Air Services",
-            companyAr: "خدمات الهواء البارد",
-          },
-          dates: {
-            submitted: "2024-01-16",
-            submittedHijri: "1446/07/16",
-            scheduled: "2024-01-18",
-            scheduledHijri: "1446/07/18",
-          },
-          cost: {
-            estimated: 500,
-            paidBy: "landlord",
-            paidByAr: "المالك",
-          },
-          notes: "Urgent repair needed before summer",
-          notesAr: "إصلاح عاجل مطلوب قبل الصيف",
-        },
-        {
-          id: "2",
-          requestNumber: "MR-2024-002",
-          contractId: "2",
-          contractNumber: "RC-2024-002",
-          propertyTitle: "Spacious Villa in Jeddah",
-          propertyTitleAr: "فيلا واسعة في جدة",
-          propertyAddress: "Prince Mohammed Bin Abdulaziz Road",
-          propertyAddressAr: "طريق الأمير محمد بن عبدالعزيز",
-          tenant: {
-            name: "Sarah Al-Mansouri",
-            nameAr: "سارة المنصوري",
-            phone: "+966 56 345 6789",
-            email: "sarah.mansouri@email.com",
-          },
-          requestDetails: {
-            category: "plumbing",
-            categoryAr: "سباكة",
-            priority: "medium",
-            priorityAr: "متوسط",
-            description: "Kitchen sink faucet leaking",
-            descriptionAr: "تسريب في صنبور حوض المطبخ",
-            location: "Kitchen",
-            locationAr: "المطبخ",
-          },
-          status: "completed",
-          statusAr: "مكتمل",
-          assignedTo: {
-            name: "Ali Hassan",
-            nameAr: "علي حسن",
-            phone: "+966 54 123 7890",
-            company: "Expert Plumbing",
-            companyAr: "السباكة الخبيرة",
-          },
-          dates: {
-            submitted: "2024-01-14",
-            submittedHijri: "1446/07/14",
-            scheduled: "2024-01-15",
-            scheduledHijri: "1446/07/15",
-            completed: "2024-01-15",
-            completedHijri: "1446/07/15",
-          },
-          cost: {
-            estimated: 200,
-            actual: 180,
-            paidBy: "landlord",
-            paidByAr: "المالك",
-          },
-          notes: "Quick fix completed same day",
-          notesAr: "إصلاح سريع تم في نفس اليوم",
-          resolution: "Replaced faucet cartridge and tested for leaks",
-          resolutionAr: "تم استبدال خرطوشة الصنبور واختبار التسريبات",
-        },
-        {
-          id: "3",
-          requestNumber: "MR-2024-003",
-          contractId: "1",
-          contractNumber: "RC-2024-001",
-          propertyTitle: "Luxury Apartment in Al-Olaya",
-          propertyTitleAr: "شقة فاخرة في حي العليا",
-          propertyAddress: "King Fahd Road, Al-Olaya District",
-          propertyAddressAr: "طريق الملك فهد، حي العليا",
-          tenant: {
-            name: "Ahmed Al-Rashid",
-            nameAr: "أحمد الراشد",
-            phone: "+966 50 123 4567",
-            email: "ahmed.rashid@email.com",
-          },
-          requestDetails: {
-            category: "electrical",
-            categoryAr: "كهرباء",
-            priority: "urgent",
-            priorityAr: "عاجل",
-            description: "Power outage in master bedroom",
-            descriptionAr: "انقطاع الكهرباء في غرفة النوم الرئيسية",
-            location: "Master bedroom",
-            locationAr: "غرفة النوم الرئيسية",
-          },
-          status: "in_progress",
-          statusAr: "قيد التنفيذ",
-          assignedTo: {
-            name: "Khalid Al-Harbi",
-            nameAr: "خالد الحربي",
-            phone: "+966 53 789 4561",
-            company: "Power Solutions",
-            companyAr: "حلول الطاقة",
-          },
-          dates: {
-            submitted: "2024-01-17",
-            submittedHijri: "1446/07/17",
-            scheduled: "2024-01-17",
-            scheduledHijri: "1446/07/17",
-          },
-          cost: {
-            estimated: 300,
-            paidBy: "landlord",
-            paidByAr: "المالك",
-          },
-          notes: "Emergency electrical issue",
-          notesAr: "مشكلة كهربائية طارئة",
-        },
-        {
-          id: "4",
-          requestNumber: "MR-2024-004",
-          contractId: "3",
-          contractNumber: "RC-2024-003",
-          propertyTitle: "Modern Studio in Dammam",
-          propertyTitleAr: "استوديو حديث في الدمام",
-          propertyAddress: "King Saud Road, Al-Faisaliyah",
-          propertyAddressAr: "طريق الملك سعود، الفيصلية",
-          tenant: {
-            name: "Khalid Al-Harbi",
-            nameAr: "خالد الحربي",
-            phone: "+966 54 456 7890",
-            email: "khalid.harbi@email.com",
-          },
-          requestDetails: {
-            category: "general",
-            categoryAr: "عام",
-            priority: "low",
-            priorityAr: "منخفض",
-            description: "Door handle loose and needs tightening",
-            descriptionAr: "مقبض الباب مفكوك ويحتاج إلى شد",
-            location: "Main entrance",
-            locationAr: "المدخل الرئيسي",
-          },
-          status: "submitted",
-          statusAr: "مُقدم",
-          dates: {
-            submitted: "2024-01-18",
-            submittedHijri: "1446/07/18",
-          },
-          cost: {
-            estimated: 50,
-            paidBy: "tenant",
-            paidByAr: "المستأجر",
-          },
-          notes: "Minor repair request",
-          notesAr: "طلب إصلاح بسيط",
-        },
-      ])
+      console.log("Fetching maintenance requests...")
+      
+      const response = await axiosInstance.get<ApiResponse>("/v1/rms/maintenance")
+      console.log("API Response:", response.data)
+      
+      if (response.data.status) {
+        console.log("Setting requests:", response.data.data)
+        setRequests(response.data.data)
+        
+        // Calculate stats
+        const data = response.data.data
+        const newStats = {
+          total: data.length,
+          open: data.filter(r => r.status === "open").length,
+          inProgress: data.filter(r => r.status === "in_progress").length,
+          completed: data.filter(r => r.status === "completed").length,
+          urgent: data.filter(r => r.priority === "urgent").length
+        }
+        console.log("Setting stats:", newStats)
+        setStats(newStats)
+      } else {
+        console.log("API returned false status")
+        toast.error("فشل في تحميل البيانات")
+      }
+    } catch (error) {
+      console.error("Error fetching maintenance requests:", error)
+      toast.error("حدث خطأ في تحميل طلبات الصيانة")
+    } finally {
       setLoading(false)
     }
+  }
 
+  // Refresh data function
+  const refreshData = () => {
+    fetchRequests()
+    toast.success("تم تحديث البيانات بنجاح")
+  }
+
+  // Reset form data
+  const resetForm = () => {
+    setFormData({
+      rental_id: 1,
+      category: "",
+      priority: "",
+      title: "",
+      description: "",
+      estimated_cost: "",
+      payer: "",
+      payer_share_percent: 100,
+      scheduled_date: "",
+      assigned_to_vendor_id: null,
+      notes: ""
+    })
+  }
+
+  // Create new maintenance request
+  const createMaintenanceRequest = async () => {
+    try {
+      // Validate required fields
+      if (!formData.rental_id || !formData.category || !formData.priority || !formData.title || !formData.description) {
+        toast.error("يرجى ملء جميع الحقول المطلوبة")
+        return
+      }
+
+      const requestData = {
+        rental_id: formData.rental_id,
+        category: formData.category,
+        priority: formData.priority,
+        title: formData.title,
+        description: formData.description,
+        estimated_cost: parseFloat(formData.estimated_cost) || 0,
+        payer: formData.payer,
+        payer_share_percent: formData.payer_share_percent,
+        scheduled_date: formData.scheduled_date || null,
+        assigned_to_vendor_id: formData.assigned_to_vendor_id,
+        notes: formData.notes
+      }
+
+      console.log("Sending maintenance request:", requestData)
+
+      const response = await axiosInstance.post("/v1/rms/maintenance", requestData)
+      
+      if (response.data.status) {
+        console.log("Maintenance request created:", response.data.data)
+        
+        // Add the new request to the state
+        setRequests(prev => [response.data.data, ...prev])
+        
+        // Update stats
+        const newRequest = response.data.data
+        setStats(prev => ({
+          total: prev.total + 1,
+          open: prev.open + (newRequest.status === "open" ? 1 : 0),
+          inProgress: prev.inProgress + (newRequest.status === "in_progress" ? 1 : 0),
+          completed: prev.completed + (newRequest.status === "completed" ? 1 : 0),
+          urgent: prev.urgent + (newRequest.priority === "urgent" ? 1 : 0)
+        }))
+
+        // Reset form
+        resetForm()
+
+        setIsCreateRequestDialogOpen(false)
+        toast.success("تم إضافة طلب الصيانة بنجاح")
+      } else {
+        toast.error("فشل في إضافة طلب الصيانة")
+      }
+    } catch (error) {
+      console.error("Error creating maintenance request:", error)
+      toast.error("حدث خطأ في إضافة طلب الصيانة")
+    }
+  }
+
+  useEffect(() => {
     fetchRequests()
   }, [])
 
   const filteredRequests = requests.filter((request) => {
     const matchesSearch =
-      request.tenant.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.propertyTitleAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.requestNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.requestDetails.descriptionAr.toLowerCase().includes(searchTerm.toLowerCase())
+      request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.category.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = filterStatus === "all" || request.status === filterStatus
-    const matchesPriority = filterPriority === "all" || request.requestDetails.priority === filterPriority
+    const matchesPriority = filterPriority === "all" || request.priority === filterPriority
     return matchesSearch && matchesStatus && matchesPriority
   })
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "submitted":
-        return "bg-blue-100 text-blue-800"
+      case "open":
+        return "bg-gray-100 text-gray-800 border-gray-300"
       case "assigned":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-gray-100 text-gray-800 border-gray-300"
       case "in_progress":
-        return "bg-orange-100 text-orange-800"
+        return "bg-gray-100 text-gray-800 border-gray-300"
       case "completed":
-        return "bg-green-100 text-green-800"
+        return "bg-gray-100 text-gray-800 border-gray-300"
       case "cancelled":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800 border-gray-300"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800 border-gray-300"
+    }
+  }
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "open":
+        return "مفتوح"
+      case "assigned":
+        return "مُعيّن"
+      case "in_progress":
+        return "قيد التنفيذ"
+      case "completed":
+        return "مكتمل"
+      case "cancelled":
+        return "ملغي"
+      default:
+        return status
     }
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "low":
-        return "bg-green-100 text-green-800"
+        return "bg-gray-100 text-gray-800 border-gray-300"
       case "medium":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-gray-100 text-gray-800 border-gray-300"
       case "high":
-        return "bg-orange-100 text-orange-800"
+        return "bg-gray-100 text-gray-800 border-gray-300"
       case "urgent":
-        return "bg-red-100 text-red-800"
+        return "bg-gray-100 text-gray-800 border-gray-300"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800 border-gray-300"
+    }
+  }
+
+  const getPriorityText = (priority: string) => {
+    switch (priority) {
+      case "low":
+        return "منخفض"
+      case "medium":
+        return "متوسط"
+      case "high":
+        return "عالي"
+      case "urgent":
+        return "عاجل"
+      default:
+        return priority
+    }
+  }
+
+  const getCategoryText = (category: string) => {
+    const categories: { [key: string]: string } = {
+      "AC": "تكييف",
+      "plumbing": "سباكة",
+      "electrical": "كهرباء",
+      "painting": "دهان",
+      "flooring": "أرضيات",
+      "doors_windows": "أبواب ونوافذ",
+      "appliances": "أجهزة",
+      "general": "عام"
+    }
+    return categories[category] || category
+  }
+
+  const getPayerText = (payer: string) => {
+    switch (payer) {
+      case "tenant":
+        return "المستأجر"
+      case "landlord":
+        return "المالك"
+      case "management":
+        return "الإدارة"
+      default:
+        return payer
     }
   }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "submitted":
+      case "open":
         return <Clock className="h-4 w-4" />
       case "assigned":
         return <User className="h-4 w-4" />
@@ -368,34 +345,24 @@ export function RentalMaintenanceService() {
     }
   }
 
-  const handleStatusChange = (requestId: string, newStatus: string) => {
-    setRequests((prev) =>
-      prev.map((req) =>
-        req.id === requestId
-          ? {
-              ...req,
-              status: newStatus as any,
-              statusAr:
-                newStatus === "submitted"
-                  ? "مُقدم"
-                  : newStatus === "assigned"
-                    ? "مُعيّن"
-                    : newStatus === "in_progress"
-                      ? "قيد التنفيذ"
-                      : newStatus === "completed"
-                        ? "مكتمل"
-                        : "ملغي",
-              ...(newStatus === "completed" && {
-                dates: {
-                  ...req.dates,
-                  completed: new Date().toISOString().split("T")[0],
-                  completedHijri: "1446/07/18",
-                },
-              }),
-            }
-          : req,
-      ),
-    )
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('ar-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleString('ar-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
   if (loading) {
@@ -422,121 +389,263 @@ export function RentalMaintenanceService() {
     )
   }
 
+  // Debug info
+  console.log("Current state:", { loading, requests: requests.length, filteredRequests: filteredRequests.length })
+
   return (
     <div className="space-y-6">
-      {/* Header and Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">طلبات الصيانة</h2>
-          <p className="text-muted-foreground">إدارة ومتابعة طلبات الصيانة والإصلاحات</p>
-        </div>
-        <Dialog open={isCreateRequestDialogOpen} onOpenChange={setIsCreateRequestDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="ml-2 h-4 w-4" />
-              إضافة طلب صيانة
+      {/* Header and Stats */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">
+              طلبات الصيانة
+            </h2>
+            <p className="text-muted-foreground">إدارة ومتابعة طلبات الصيانة والإصلاحات</p>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={refreshData}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              <Activity className="h-4 w-4 ml-2" />
+              تحديث
             </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>إضافة طلب صيانة جديد</DialogTitle>
-              <DialogDescription>تسجيل طلب صيانة أو إصلاح للعقار</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="contract">العقد</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر العقد" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {activeContracts.map((contract) => (
-                      <SelectItem key={contract.id} value={contract.id}>
-                        {contract.contractNumber} - {contract.tenantName} - {contract.propertyTitle}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <Dialog open={isCreateRequestDialogOpen} onOpenChange={(open) => {
+              if (!open) {
+                resetForm()
+              }
+              setIsCreateRequestDialogOpen(open)
+            }}>
+              <DialogTrigger asChild>
+                <Button className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg">
+                  <Plus className="ml-2 h-4 w-4" />
+                  إضافة طلب صيانة
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold">إضافة طلب صيانة جديد</DialogTitle>
+                  <DialogDescription>تسجيل طلب صيانة أو إصلاح للعقار</DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  {/* Rental Selection */}
+                  <div className="space-y-2">
+                    <Label htmlFor="rental">العقار</Label>
+                    <Select value={formData.rental_id.toString()} onValueChange={(value) => setFormData(prev => ({ ...prev, rental_id: parseInt(value) }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر العقار" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableRentals.map((rental) => (
+                          <SelectItem key={rental.id} value={rental.id.toString()}>
+                            {rental.title} - {rental.address}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="category">فئة الصيانة</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر الفئة" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="air_conditioning">تكييف</SelectItem>
-                      <SelectItem value="plumbing">سباكة</SelectItem>
-                      <SelectItem value="electrical">كهرباء</SelectItem>
-                      <SelectItem value="painting">دهان</SelectItem>
-                      <SelectItem value="flooring">أرضيات</SelectItem>
-                      <SelectItem value="doors_windows">أبواب ونوافذ</SelectItem>
-                      <SelectItem value="appliances">أجهزة</SelectItem>
-                      <SelectItem value="general">عام</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {/* Category and Priority */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="category">فئة الصيانة *</Label>
+                      <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر الفئة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="AC">تكييف</SelectItem>
+                          <SelectItem value="plumbing">سباكة</SelectItem>
+                          <SelectItem value="electrical">كهرباء</SelectItem>
+                          <SelectItem value="painting">دهان</SelectItem>
+                          <SelectItem value="flooring">أرضيات</SelectItem>
+                          <SelectItem value="doors_windows">أبواب ونوافذ</SelectItem>
+                          <SelectItem value="appliances">أجهزة</SelectItem>
+                          <SelectItem value="general">عام</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="priority">الأولوية *</Label>
+                      <Select value={formData.priority} onValueChange={(value) => setFormData(prev => ({ ...prev, priority: value }))}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر الأولوية" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">منخفض</SelectItem>
+                          <SelectItem value="medium">متوسط</SelectItem>
+                          <SelectItem value="high">عالي</SelectItem>
+                          <SelectItem value="urgent">عاجل</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Title and Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="title">عنوان الطلب *</Label>
+                    <Input 
+                      id="title" 
+                      placeholder="مثال: مشكلة في التكييف" 
+                      value={formData.title}
+                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description">وصف المشكلة *</Label>
+                    <Textarea 
+                      id="description" 
+                      placeholder="وصف تفصيلي للمشكلة أو الإصلاح المطلوب..." 
+                      rows={4}
+                      value={formData.description}
+                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    />
+                  </div>
+
+                  {/* Cost and Payer */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="estimated-cost">التكلفة المتوقعة (ر.س)</Label>
+                      <Input 
+                        id="estimated-cost" 
+                        type="number" 
+                        placeholder="500" 
+                        value={formData.estimated_cost}
+                        onChange={(e) => setFormData(prev => ({ ...prev, estimated_cost: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="payer">يتحمل التكلفة</Label>
+                      <Select value={formData.payer} onValueChange={(value) => setFormData(prev => ({ ...prev, payer: value }))}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="من يدفع؟" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="landlord">المالك</SelectItem>
+                          <SelectItem value="tenant">المستأجر</SelectItem>
+                          <SelectItem value="management">الإدارة</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Payer Share Percent */}
+                  <div className="space-y-2">
+                    <Label htmlFor="payer-share">نسبة الدفع (%)</Label>
+                    <Input 
+                      id="payer-share" 
+                      type="number" 
+                      min="0" 
+                      max="100" 
+                      placeholder="100" 
+                      value={formData.payer_share_percent}
+                      onChange={(e) => setFormData(prev => ({ ...prev, payer_share_percent: parseInt(e.target.value) || 100 }))}
+                    />
+                  </div>
+
+                  {/* Scheduled Date */}
+                  <div className="space-y-2">
+                    <Label htmlFor="scheduled-date">موعد الصيانة (اختياري)</Label>
+                    <Input 
+                      id="scheduled-date" 
+                      type="datetime-local" 
+                      value={formData.scheduled_date}
+                      onChange={(e) => setFormData(prev => ({ ...prev, scheduled_date: e.target.value }))}
+                    />
+                  </div>
+
+                  {/* Notes */}
+                  <div className="space-y-2">
+                    <Label htmlFor="notes">ملاحظات إضافية</Label>
+                    <Textarea 
+                      id="notes" 
+                      placeholder="أي ملاحظات أو تفاصيل إضافية..." 
+                      rows={2}
+                      value={formData.notes}
+                      onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="priority">الأولوية</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر الأولوية" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">منخفض</SelectItem>
-                      <SelectItem value="medium">متوسط</SelectItem>
-                      <SelectItem value="high">عالي</SelectItem>
-                      <SelectItem value="urgent">عاجل</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => {
+                    resetForm()
+                    setIsCreateRequestDialogOpen(false)
+                  }}>
+                    إلغاء
+                  </Button>
+                  <Button onClick={createMaintenanceRequest}>إضافة الطلب</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">إجمالي الطلبات</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-xs text-gray-500">محمل: {requests.length}</p>
                 </div>
+                <Activity className="h-8 w-8 text-gray-600" />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="location">الموقع في العقار</Label>
-                <Input id="location" placeholder="غرفة المعيشة، المطبخ، الحمام..." />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">وصف المشكلة</Label>
-                <Textarea id="description" placeholder="وصف تفصيلي للمشكلة أو الإصلاح المطلوب..." rows={4} />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="estimated-cost">التكلفة المتوقعة (ر.س)</Label>
-                  <Input id="estimated-cost" type="number" placeholder="500" />
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">مفتوحة</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.open}</p>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="paid-by">يتحمل التكلفة</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="من يدفع؟" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="landlord">المالك</SelectItem>
-                      <SelectItem value="tenant">المستأجر</SelectItem>
-                      <SelectItem value="management">الإدارة</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <Clock className="h-8 w-8 text-gray-600" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">قيد التنفيذ</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.inProgress}</p>
                 </div>
+                <Settings className="h-8 w-8 text-gray-600" />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notes">ملاحظات إضافية</Label>
-                <Textarea id="notes" placeholder="أي ملاحظات أو تفاصيل إضافية..." rows={2} />
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">مكتملة</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.completed}</p>
+                </div>
+                <CheckCircle className="h-8 w-8 text-gray-600" />
               </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateRequestDialogOpen(false)}>
-                إلغاء
-              </Button>
-              <Button onClick={() => setIsCreateRequestDialogOpen(false)}>إضافة الطلب</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">عاجلة</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.urgent}</p>
+                </div>
+                <AlertTriangle className="h-8 w-8 text-gray-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -547,17 +656,17 @@ export function RentalMaintenanceService() {
             placeholder="البحث في طلبات الصيانة..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pr-10"
+            className="pr-10 border-2 focus:border-gray-500 transition-colors"
           />
         </div>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-48 border-2 focus:border-gray-500 transition-colors">
             <Filter className="ml-2 h-4 w-4" />
             <SelectValue placeholder="جميع الحالات" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع الحالات</SelectItem>
-            <SelectItem value="submitted">مُقدم</SelectItem>
+            <SelectItem value="open">مفتوح</SelectItem>
             <SelectItem value="assigned">مُعيّن</SelectItem>
             <SelectItem value="in_progress">قيد التنفيذ</SelectItem>
             <SelectItem value="completed">مكتمل</SelectItem>
@@ -565,7 +674,7 @@ export function RentalMaintenanceService() {
           </SelectContent>
         </Select>
         <Select value={filterPriority} onValueChange={setFilterPriority}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-48 border-2 focus:border-gray-500 transition-colors">
             <SelectValue placeholder="الأولوية" />
           </SelectTrigger>
           <SelectContent>
@@ -578,115 +687,117 @@ export function RentalMaintenanceService() {
         </Select>
       </div>
 
+      {/* Results Summary */}
+      {filteredRequests.length > 0 && (
+        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="flex items-center space-x-2 space-x-reverse">
+            <Wrench className="h-5 w-5 text-gray-600" />
+            <span className="text-sm font-medium text-gray-800">
+              تم العثور على {filteredRequests.length} طلب صيانة من أصل {requests.length}
+            </span>
+          </div>
+          <div className="text-xs text-gray-600">
+            آخر تحديث: {new Date().toLocaleTimeString('ar-SA')}
+          </div>
+        </div>
+      )}
+
       {/* Requests List */}
       <div className="space-y-4">
         {filteredRequests.map((request) => (
-          <Card key={request.id} className="hover:shadow-md transition-shadow">
+          <Card key={request.id} className="hover:shadow-lg transition-all duration-300 border-2 hover:border-gray-300 group">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
-                <div className="space-y-3 flex-1">
-                  <div className="flex items-center space-x-3 space-x-reverse">
-                    <h3 className="font-semibold text-lg">{request.requestNumber}</h3>
-                    <Badge className={getStatusColor(request.status)}>
+                <div className="space-y-4 flex-1">
+                  <div className="flex items-center space-x-3 space-x-reverse flex-wrap gap-2">
+                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-gray-700 transition-colors">#{request.id}</h3>
+                    <Badge className={`${getStatusColor(request.status)} border`}>
                       {getStatusIcon(request.status)}
-                      <span className="mr-1">{request.statusAr}</span>
+                      <span className="mr-1">{getStatusText(request.status)}</span>
                     </Badge>
-                    <Badge className={getPriorityColor(request.requestDetails.priority)}>
-                      {request.requestDetails.priorityAr}
+                    <Badge className={`${getPriorityColor(request.priority)} border`}>
+                      {getPriorityText(request.priority)}
                     </Badge>
-                    <Badge variant="outline">{request.requestDetails.categoryAr}</Badge>
+                    <Badge variant="outline" className="border-gray-300">
+                      {getCategoryText(request.category)}
+                    </Badge>
+                    {request.attachments_count > 0 && (
+                      <Badge variant="outline" className="border-gray-300 text-gray-700">
+                        <FileText className="h-3 w-3 ml-1" />
+                        {request.attachments_count} مرفق
+                      </Badge>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2 space-x-reverse text-sm">
-                        <User className="h-3 w-3 text-muted-foreground" />
-                        <span className="font-medium">المستأجر:</span>
-                        <span>{request.tenant.nameAr}</span>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-semibold text-lg text-gray-900 mb-2 group-hover:text-gray-700 transition-colors">{request.title}</h4>
+                      <p className="text-gray-600 leading-relaxed">{request.description}</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="flex items-center space-x-2 space-x-reverse text-sm p-2 bg-gray-50 rounded-lg">
+                        <DollarSign className="h-4 w-4 text-gray-600" />
+                        <span className="font-medium text-gray-700">التكلفة:</span>
+                        <span className="text-gray-900 font-bold">{parseFloat(request.estimated_cost).toLocaleString()} ر.س</span>
                       </div>
-                      <div className="flex items-center space-x-2 space-x-reverse text-sm">
-                        <Building2 className="h-3 w-3 text-muted-foreground" />
-                        <span className="font-medium">العقار:</span>
-                        <span>{request.propertyTitleAr}</span>
+                      <div className="flex items-center space-x-2 space-x-reverse text-sm p-2 bg-gray-50 rounded-lg">
+                        <User className="h-4 w-4 text-gray-600" />
+                        <span className="font-medium text-gray-700">يدفع:</span>
+                        <span className="text-gray-900">{getPayerText(request.payer)}</span>
                       </div>
-                      <div className="flex items-center space-x-2 space-x-reverse text-sm">
-                        <Wrench className="h-3 w-3 text-muted-foreground" />
-                        <span className="font-medium">الموقع:</span>
-                        <span>{request.requestDetails.locationAr}</span>
+                      <div className="flex items-center space-x-2 space-x-reverse text-sm p-2 bg-gray-50 rounded-lg">
+                        <Calendar className="h-4 w-4 text-gray-600" />
+                        <span className="font-medium text-gray-700">تاريخ التقديم:</span>
+                        <span className="text-gray-900">{formatDate(request.created_at)}</span>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2 space-x-reverse text-sm">
-                        <Calendar className="h-3 w-3 text-muted-foreground" />
-                        <span className="font-medium">تاريخ التقديم:</span>
-                        <span>{request.dates.submittedHijri}</span>
-                      </div>
-                      {request.dates.scheduledHijri && (
-                        <div className="flex items-center space-x-2 space-x-reverse text-sm">
-                          <Calendar className="h-3 w-3 text-muted-foreground" />
-                          <span className="font-medium">موعد الصيانة:</span>
-                          <span>{request.dates.scheduledHijri}</span>
+                    {request.notes && (
+                      <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex items-start space-x-2 space-x-reverse">
+                          <FileText className="h-4 w-4 text-gray-600 mt-0.5" />
+                          <p className="text-sm text-gray-800">{request.notes}</p>
                         </div>
-                      )}
-                      {request.assignedTo && (
-                        <div className="flex items-center space-x-2 space-x-reverse text-sm">
-                          <User className="h-3 w-3 text-muted-foreground" />
-                          <span className="font-medium">المُعيّن:</span>
-                          <span>{request.assignedTo.nameAr}</span>
+                      </div>
+                    )}
+
+                    {request.scheduled_date && (
+                      <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <Calendar className="h-4 w-4 text-gray-600" />
+                          <span className="text-sm font-medium text-gray-800">موعد الصيانة:</span>
+                          <span className="text-sm text-gray-700">{formatDateTime(request.scheduled_date)}</span>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
-
-                  <div className="p-3 bg-muted rounded-md">
-                    <p className="text-sm text-muted-foreground">{request.requestDetails.descriptionAr}</p>
-                  </div>
-
-                  {request.notesAr && (
-                    <div className="p-3 bg-blue-50 rounded-md">
-                      <p className="text-sm text-blue-800">{request.notesAr}</p>
-                    </div>
-                  )}
                 </div>
 
-                <div className="flex flex-col items-end space-y-2 ml-4">
+                <div className="flex flex-col items-end space-y-3 ml-6">
                   <div className="text-right">
                     <div className="text-sm text-muted-foreground">
-                      التكلفة المتوقعة: {request.cost.estimated?.toLocaleString() || "غير محدد"} ر.س
+                      آخر تحديث: {formatDateTime(request.updated_at)}
                     </div>
-                    {request.cost.actual && (
-                      <div className="text-sm font-medium text-green-600">
-                        التكلفة الفعلية: {request.cost.actual.toLocaleString()} ر.س
-                      </div>
-                    )}
-                    <div className="text-xs text-muted-foreground">يتحمل التكلفة: {request.cost.paidByAr}</div>
                   </div>
                   <div className="flex gap-2">
-                    {request.status === "submitted" && (
-                      <Button size="sm" onClick={() => handleStatusChange(request.id, "assigned")}>
-                        تعيين فني
-                      </Button>
-                    )}
-                    {request.status === "assigned" && (
-                      <Button size="sm" onClick={() => handleStatusChange(request.id, "in_progress")}>
-                        بدء العمل
-                      </Button>
-                    )}
-                    {request.status === "in_progress" && (
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700"
-                        onClick={() => handleStatusChange(request.id, "completed")}
-                      >
-                        <CheckCircle className="h-3 w-3 ml-1" />
-                        إكمال
-                      </Button>
-                    )}
-                    <Button size="sm" variant="outline" onClick={() => setSelectedRequest(request)}>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => setSelectedRequest(request)}
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
                       <Eye className="h-3 w-3 ml-1" />
                       التفاصيل
                     </Button>
+                    {request.status === "open" && (
+                      <Button 
+                        size="sm" 
+                        className="bg-gray-900 hover:bg-gray-800 text-white transition-all duration-300"
+                      >
+                        تعيين فني
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -699,207 +810,159 @@ export function RentalMaintenanceService() {
       <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
         <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>تفاصيل طلب الصيانة</DialogTitle>
+            <DialogTitle className="text-xl font-bold">تفاصيل طلب الصيانة</DialogTitle>
             <DialogDescription>
-              طلب رقم {selectedRequest?.requestNumber} - {selectedRequest?.tenant.nameAr}
+              طلب رقم #{selectedRequest?.id} - {selectedRequest?.title}
             </DialogDescription>
           </DialogHeader>
           {selectedRequest && (
             <Tabs defaultValue="details" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="details">تفاصيل الطلب</TabsTrigger>
-                <TabsTrigger value="property">العقار</TabsTrigger>
-                <TabsTrigger value="technician">الفني</TabsTrigger>
                 <TabsTrigger value="timeline">الجدول الزمني</TabsTrigger>
+                <TabsTrigger value="costs">التكاليف</TabsTrigger>
+                <TabsTrigger value="actions">الإجراءات</TabsTrigger>
               </TabsList>
 
               <TabsContent value="details" className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h4 className="font-semibold">معلومات الطلب</h4>
-                    <div className="space-y-2">
+                    <h4 className="font-semibold text-lg">معلومات الطلب</h4>
+                    <div className="space-y-3">
                       <div>
-                        <Label className="text-sm font-medium">رقم الطلب</Label>
-                        <p className="text-sm text-muted-foreground">{selectedRequest.requestNumber}</p>
+                        <Label className="text-sm font-medium text-gray-600">رقم الطلب</Label>
+                        <p className="text-lg font-bold text-gray-900">#{selectedRequest.id}</p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">الفئة</Label>
-                        <Badge variant="outline">{selectedRequest.requestDetails.categoryAr}</Badge>
+                        <Label className="text-sm font-medium text-gray-600">العنوان</Label>
+                        <p className="text-gray-900">{selectedRequest.title}</p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">الأولوية</Label>
-                        <Badge className={getPriorityColor(selectedRequest.requestDetails.priority)}>
-                          {selectedRequest.requestDetails.priorityAr}
+                        <Label className="text-sm font-medium text-gray-600">الفئة</Label>
+                        <Badge variant="outline" className="mt-1">{getCategoryText(selectedRequest.category)}</Badge>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-600">الأولوية</Label>
+                        <Badge className={`${getPriorityColor(selectedRequest.priority)} mt-1`}>
+                          {getPriorityText(selectedRequest.priority)}
                         </Badge>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">الحالة</Label>
-                        <Badge className={getStatusColor(selectedRequest.status)}>{selectedRequest.statusAr}</Badge>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium">الموقع</Label>
-                        <p className="text-sm text-muted-foreground">{selectedRequest.requestDetails.locationAr}</p>
+                        <Label className="text-sm font-medium text-gray-600">الحالة</Label>
+                        <Badge className={`${getStatusColor(selectedRequest.status)} mt-1`}>
+                          {getStatusText(selectedRequest.status)}
+                        </Badge>
                       </div>
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <h4 className="font-semibold">التكلفة</h4>
-                    <div className="space-y-2">
+                    <h4 className="font-semibold text-lg">الوصف</h4>
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <p className="text-gray-700 leading-relaxed">{selectedRequest.description}</p>
+                    </div>
+                    {selectedRequest.notes && (
                       <div>
-                        <Label className="text-sm font-medium">التكلفة المتوقعة</Label>
-                        <p className="text-sm text-muted-foreground">
-                          {selectedRequest.cost.estimated?.toLocaleString() || "غير محدد"} ر.س
-                        </p>
-                      </div>
-                      {selectedRequest.cost.actual && (
-                        <div>
-                          <Label className="text-sm font-medium">التكلفة الفعلية</Label>
-                          <p className="text-sm text-muted-foreground font-bold text-green-600">
-                            {selectedRequest.cost.actual.toLocaleString()} ر.س
-                          </p>
+                        <h5 className="font-medium text-gray-700 mb-2">ملاحظات</h5>
+                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                          <p className="text-sm text-gray-800">{selectedRequest.notes}</p>
                         </div>
-                      )}
-                      <div>
-                        <Label className="text-sm font-medium">يتحمل التكلفة</Label>
-                        <p className="text-sm text-muted-foreground">{selectedRequest.cost.paidByAr}</p>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2">وصف المشكلة</h4>
-                  <div className="p-3 bg-muted rounded-md">
-                    <p className="text-sm">{selectedRequest.requestDetails.descriptionAr}</p>
-                  </div>
-                </div>
-
-                {selectedRequest.requestDetails.images && selectedRequest.requestDetails.images.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold mb-3">الصور المرفقة</h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      {selectedRequest.requestDetails.images.map((image, index) => (
-                        <img
-                          key={index}
-                          src={image || "/placeholder.svg"}
-                          alt={`صورة ${index + 1}`}
-                          className="w-full h-32 object-cover rounded-md border"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {selectedRequest.resolution && (
-                  <div>
-                    <h4 className="font-semibold mb-2">الحل المطبق</h4>
-                    <div className="p-3 bg-green-50 rounded-md">
-                      <p className="text-sm text-green-800">{selectedRequest.resolutionAr}</p>
-                    </div>
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="property" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">العقار</Label>
-                    <p className="text-sm text-muted-foreground">{selectedRequest.propertyTitleAr}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">العنوان</Label>
-                    <p className="text-sm text-muted-foreground">{selectedRequest.propertyAddressAr}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">رقم العقد</Label>
-                    <p className="text-sm text-muted-foreground">{selectedRequest.contractNumber}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">المستأجر</Label>
-                    <p className="text-sm text-muted-foreground">{selectedRequest.tenant.nameAr}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">رقم الهاتف</Label>
-                    <p className="text-sm text-muted-foreground">{selectedRequest.tenant.phone}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">البريد الإلكتروني</Label>
-                    <p className="text-sm text-muted-foreground">{selectedRequest.tenant.email}</p>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="technician" className="space-y-4">
-                {selectedRequest.assignedTo ? (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-medium">اسم الفني</Label>
-                      <p className="text-sm text-muted-foreground">{selectedRequest.assignedTo.nameAr}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">الشركة</Label>
-                      <p className="text-sm text-muted-foreground">{selectedRequest.assignedTo.companyAr}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">رقم الهاتف</Label>
-                      <p className="text-sm text-muted-foreground">{selectedRequest.assignedTo.phone}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        <Phone className="h-3 w-3 ml-1" />
-                        اتصال
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        <Mail className="h-3 w-3 ml-1" />
-                        رسالة
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium mb-2">لم يتم تعيين فني بعد</h3>
-                    <p className="text-muted-foreground mb-4">سيتم تعيين فني مختص قريباً</p>
-                    <Button>تعيين فني</Button>
-                  </div>
-                )}
               </TabsContent>
 
               <TabsContent value="timeline" className="space-y-4">
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3 space-x-reverse">
-                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                    <div className="flex-shrink-0 w-8 h-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center">
                       <Clock className="h-4 w-4" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium">تم تقديم الطلب</h4>
-                      <p className="text-sm text-muted-foreground">{selectedRequest.dates.submittedHijri}</p>
+                      <h4 className="font-medium text-gray-900">تم إنشاء الطلب</h4>
+                      <p className="text-sm text-gray-600">{formatDateTime(selectedRequest.created_at)}</p>
                     </div>
                   </div>
 
-                  {selectedRequest.dates.scheduledHijri && (
+                  {selectedRequest.scheduled_date && (
                     <div className="flex items-start space-x-3 space-x-reverse">
-                      <div className="flex-shrink-0 w-8 h-8 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center">
+                      <div className="flex-shrink-0 w-8 h-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center">
                         <Calendar className="h-4 w-4" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-medium">تم جدولة الصيانة</h4>
-                        <p className="text-sm text-muted-foreground">{selectedRequest.dates.scheduledHijri}</p>
+                        <h4 className="font-medium text-gray-900">موعد الصيانة المجدول</h4>
+                        <p className="text-sm text-gray-600">{formatDateTime(selectedRequest.scheduled_date)}</p>
                       </div>
                     </div>
                   )}
 
-                  {selectedRequest.dates.completedHijri && (
-                    <div className="flex items-start space-x-3 space-x-reverse">
-                      <div className="flex-shrink-0 w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
-                        <CheckCircle className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium">تم إكمال الصيانة</h4>
-                        <p className="text-sm text-muted-foreground">{selectedRequest.dates.completedHijri}</p>
-                      </div>
+                  <div className="flex items-start space-x-3 space-x-reverse">
+                    <div className="flex-shrink-0 w-8 h-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center">
+                      <Settings className="h-4 w-4" />
                     </div>
-                  )}
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900">آخر تحديث</h4>
+                      <p className="text-sm text-gray-600">{formatDateTime(selectedRequest.updated_at)}</p>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="costs" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="bg-gray-50 border-gray-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-2 space-x-reverse mb-2">
+                        <DollarSign className="h-5 w-5 text-gray-600" />
+                        <h4 className="font-semibold text-gray-800">التكلفة المتوقعة</h4>
+                      </div>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {parseFloat(selectedRequest.estimated_cost).toLocaleString()} ر.س
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gray-50 border-gray-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-2 space-x-reverse mb-2">
+                        <User className="h-5 w-5 text-gray-600" />
+                        <h4 className="font-semibold text-gray-800">يتحمل التكلفة</h4>
+                      </div>
+                      <p className="text-lg font-bold text-gray-900">{getPayerText(selectedRequest.payer)}</p>
+                      <p className="text-sm text-gray-700">نسبة الدفع: {selectedRequest.payer_share_percent}%</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="actions" className="space-y-4">
+                <div className="text-center py-8">
+                  <Settings className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">إجراءات الطلب</h3>
+                  <p className="text-muted-foreground mb-6">اختر الإجراء المناسب لحالة الطلب</p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    {selectedRequest.status === "open" && (
+                      <Button className="bg-gray-900 hover:bg-gray-800 text-white">
+                        تعيين فني
+                      </Button>
+                    )}
+                    {selectedRequest.status === "assigned" && (
+                      <Button className="bg-gray-900 hover:bg-gray-800 text-white">
+                        بدء العمل
+                      </Button>
+                    )}
+                    {selectedRequest.status === "in_progress" && (
+                      <Button className="bg-gray-900 hover:bg-gray-800 text-white">
+                        <CheckCircle className="ml-2 h-4 w-4" />
+                        إكمال الصيانة
+                      </Button>
+                    )}
+                    <Button variant="outline">
+                      <Phone className="ml-2 h-4 w-4" />
+                      اتصال بالمستأجر
+                    </Button>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
@@ -908,47 +971,77 @@ export function RentalMaintenanceService() {
             <Button variant="outline" onClick={() => setSelectedRequest(null)}>
               إغلاق
             </Button>
-            {selectedRequest?.status === "submitted" && (
-              <Button
-                onClick={() => {
-                  handleStatusChange(selectedRequest.id, "assigned")
-                  setSelectedRequest(null)
-                }}
-              >
-                تعيين فني
-              </Button>
-            )}
-            {selectedRequest?.status === "in_progress" && (
-              <Button
-                className="bg-green-600 hover:bg-green-700"
-                onClick={() => {
-                  handleStatusChange(selectedRequest.id, "completed")
-                  setSelectedRequest(null)
-                }}
-              >
-                <CheckCircle className="ml-2 h-4 w-4" />
-                إكمال الصيانة
-              </Button>
-            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {filteredRequests.length === 0 && (
         <div className="text-center py-12">
-          <Wrench className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">لم يتم العثور على طلبات صيانة</h3>
-          <p className="text-muted-foreground mb-4">
+          <div className="relative">
+            <Wrench className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+              <span className="text-xs text-gray-600 font-bold">{requests.length}</span>
+            </div>
+          </div>
+          <h3 className="text-xl font-medium mb-2">لم يتم العثور على طلبات صيانة</h3>
+          <p className="text-muted-foreground mb-6">
             {searchTerm || filterStatus !== "all" || filterPriority !== "all"
               ? "جرب تعديل معايير البحث"
-              : "لا توجد طلبات صيانة حالياً"}
+              : requests.length === 0 
+                ? "لا توجد طلبات صيانة حالياً" 
+                : "لا توجد نتائج تطابق البحث"}
           </p>
-          <Button onClick={() => setIsCreateRequestDialogOpen(true)}>
-            <Plus className="ml-2 h-4 w-4" />
-            إضافة طلب صيانة
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button 
+              onClick={() => setIsCreateRequestDialogOpen(true)}
+              className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg"
+            >
+              <Plus className="ml-2 h-4 w-4" />
+              إضافة طلب صيانة
+            </Button>
+            {(searchTerm || filterStatus !== "all" || filterPriority !== "all") && (
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm("")
+                  setFilterStatus("all")
+                  setFilterPriority("all")
+                }}
+                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                مسح الفلاتر
+              </Button>
+            )}
+          </div>
+          {requests.length === 0 && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600">عدد الطلبات المحملة: {requests.length}</p>
+              <p className="text-sm text-gray-600">عدد الطلبات المفلترة: {filteredRequests.length}</p>
+            </div>
+          )}
         </div>
       )}
+
+      {/* Quick Actions Floating Button */}
+      <div className="fixed bottom-6 left-6 z-50">
+        <div className="flex flex-col gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={refreshData}
+            className="bg-white shadow-lg border-gray-300 hover:bg-gray-50"
+          >
+            <Activity className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => setIsCreateRequestDialogOpen(true)}
+            className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
