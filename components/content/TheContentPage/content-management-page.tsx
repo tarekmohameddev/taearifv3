@@ -381,21 +381,6 @@ export function ContentManagementPage() {
                           <CardTitle className="flex items-center gap-2 text-lg">
                             <IconComponent className="h-5 w-5 text-muted-foreground" />
                             {section.title}
-                            {section.status ? (
-                              <Badge
-                                variant="outline"
-                                className="bg-green-50 text-green-700 border-green-200 ml-2"
-                              >
-                                نشط
-                              </Badge>
-                            ) : (
-                              <Badge
-                                variant="outline"
-                                className="bg-gray-50 text-gray-700 border-gray-200 ml-2"
-                              >
-                                غير نشط
-                              </Badge>
-                            )}
                           </CardTitle>
                           <CardDescription>
                             {section.description}
@@ -403,16 +388,6 @@ export function ContentManagementPage() {
                         </div>
                       </CardHeader>
                       <CardContent className="px-6 pb-6">
-                        {section.badge && (
-                          <Badge
-                            variant="secondary"
-                            className={`mb-4 ${section.badge.color}`}
-                          >
-                            {section.count > 0
-                              ? `${section.count} ${section.badge.label}`
-                              : section.badge.label}
-                          </Badge>
-                        )}
                         {section.info && (
                           <div className="space-y-2 text-sm text-muted-foreground">
                             {section.info.website && (
@@ -429,10 +404,6 @@ export function ContentManagementPage() {
                             )}
                           </div>
                         )}
-                        <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4" />
-                          <span>{section.lastUpdateFormatted}</span>
-                        </div>
                       </CardContent>
                     </Card>
                   </Link>
