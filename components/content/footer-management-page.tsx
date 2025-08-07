@@ -502,7 +502,7 @@ export function FooterManagementPage() {
             onValueChange={setActiveTab}
             className="space-y-4"
           >
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3">
+            <TabsList className="grid w-full grid-cols-3 md:grid-cols-3">
               <TabsTrigger value="general">معلومات عامة</TabsTrigger>
               <TabsTrigger value="social">وسائل التواصل</TabsTrigger>
               <TabsTrigger value="columns">أعمدة التذييل</TabsTrigger>

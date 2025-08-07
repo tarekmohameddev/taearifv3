@@ -194,7 +194,7 @@ export function GeneralSettingsPage() {
       <DashboardHeader />
       <div className="flex flex-1">
         <EnhancedSidebar activeTab="content" />
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-3">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Link href="/content">

@@ -88,13 +88,13 @@ export function AboutCompanyPage() {
 
   const addNewFeature = () => {
     const newId =
-      aboutData.features.length > 0
-        ? Math.max(...aboutData.features.map((f) => f.id)) + 1
+      aboutData?.features.length > 0
+        ? Math.max(...aboutData?.features.map((f) => f.id)) + 1
         : 1;
     setAboutData({
       ...aboutData,
       features: [
-        ...aboutData.features,
+        ...aboutData?.features,
         {
           id: newId,
           title: "ميزة جديدة",
@@ -107,14 +107,14 @@ export function AboutCompanyPage() {
   const removeFeature = (id) => {
     setAboutData({
       ...aboutData,
-      features: aboutData.features.filter((feature) => feature.id !== id),
+      features: aboutData?.features.filter((feature) => feature.id !== id),
     });
   };
 
   const updateFeature = (id, field, value) => {
     setAboutData({
       ...aboutData,
-      features: aboutData.features.map((feature) =>
+      features: aboutData?.features.map((feature) =>
         feature.id === id ? { ...feature, [field]: value } : feature,
       ),
     });
@@ -271,7 +271,7 @@ export function AboutCompanyPage() {
                   <Label htmlFor="about-title">عنوان القسم</Label>
                   <Input
                     id="about-title"
-                    value={aboutData.title}
+                    value={aboutData?.title}
                     onChange={(e) => handleFieldChange("title", e.target.value)}
                   />
                 </div>
@@ -279,7 +279,7 @@ export function AboutCompanyPage() {
                   <Label htmlFor="about-subtitle">العنوان الفرعي للقسم</Label>
                   <Input
                     id="about-subtitle"
-                    value={aboutData.subtitle}
+                    value={aboutData?.subtitle}
                     onChange={(e) =>
                       handleFieldChange("subtitle", e.target.value)
                     }
@@ -298,7 +298,7 @@ export function AboutCompanyPage() {
                   <Textarea
                     id="company-history"
                     className="min-h-[150px]"
-                    value={aboutData.history}
+                    value={aboutData?.history}
                     onChange={(e) =>
                       handleFieldChange("history", e.target.value)
                     }
@@ -312,7 +312,7 @@ export function AboutCompanyPage() {
                   <Textarea
                     id="company-mission"
                     className="min-h-[100px]"
-                    value={aboutData.mission}
+                    value={aboutData?.mission}
                     onChange={(e) =>
                       handleFieldChange("mission", e.target.value)
                     }
@@ -326,7 +326,7 @@ export function AboutCompanyPage() {
                   <Textarea
                     id="company-vision"
                     className="min-h-[100px]"
-                    value={aboutData.vision}
+                    value={aboutData?.vision}
                     onChange={(e) =>
                       handleFieldChange("vision", e.target.value)
                     }
@@ -363,9 +363,9 @@ export function AboutCompanyPage() {
                       </div>
                     ) : (
                       <>
-                        {aboutData.image_path || selectedImage ? (
+                        {aboutData?.image_path || selectedImage ? (
                           <img
-                            src={selectedImage || aboutData.image_path}
+                            src={selectedImage || aboutData?.image_path}
                             alt="صورة الشركة"
                             className="h-full w-full object-cover rounded-md"
                           />
@@ -401,7 +401,7 @@ export function AboutCompanyPage() {
             </div>
 
             <div className="space-y-4">
-              {aboutData.features.map((feature) => (
+              {aboutData?.features.map((feature) => (
                 <Card key={feature.id}>
                   <CardContent className="p-6">
                     <div className="flex items-start gap-3">
