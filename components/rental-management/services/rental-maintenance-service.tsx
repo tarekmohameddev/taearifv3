@@ -69,6 +69,103 @@ interface ApiResponse {
   data: MaintenanceRequest[]
 }
 
+interface Property {
+  id: number
+  region_id: number | null
+  payment_method: string | null
+  user_id: number
+  project_id: number | null
+  category_id: number | null
+  featured_image: string
+  floor_planning_image: string | null
+  video_image: string | null
+  price: string
+  pricePerMeter: string | null
+  purpose: string
+  type: string
+  beds: number
+  bath: number
+  area: string
+  video_url: string | null
+  virtual_tour: string | null
+  status: number
+  featured: number
+  features: string[] | null
+  faqs: any[]
+  latitude: string
+  longitude: string
+  created_at: string
+  updated_at: string
+  reorder: number
+  reorder_featured: number
+}
+
+interface Rental {
+  id: number
+  user_id: number
+  property_id: number
+  unit_label: string
+  tenant_full_name: string
+  tenant_phone: string
+  tenant_email: string
+  tenant_job_title: string
+  tenant_social_status: string
+  tenant_national_id: string
+  base_rent_amount: string
+  currency: string
+  deposit_amount: string
+  move_in_date: string
+  paying_plan: string
+  rental_period_months: number
+  status: string
+  notes: string
+  created_by: number | null
+  updated_by: number | null
+  created_at: string
+  updated_at: string
+  deleted_at: string | null
+  active_contract: {
+    id: number
+    user_id: number
+    rental_id: number
+    contract_number: string
+    start_date: string
+    end_date: string
+    status: string
+    termination_reason: string | null
+    file_path: string
+    created_by: number | null
+    updated_by: number | null
+    created_at: string
+    updated_at: string
+    deleted_at: string | null
+  }
+  property: Property | null
+}
+
+interface RentalsApiResponse {
+  status: boolean
+  data: {
+    current_page: number
+    data: Rental[]
+    first_page_url: string
+    from: number
+    last_page: number
+    last_page_url: string
+    links: Array<{
+      url: string | null
+      label: string
+      active: boolean
+    }>
+    next_page_url: string | null
+    path: string
+    per_page: number
+    prev_page_url: string | null
+    to: number
+    total: number
+  }
+}
+
 export function RentalMaintenanceService() {
   const [requests, setRequests] = useState<MaintenanceRequest[]>([])
   const [loading, setLoading] = useState(true)
@@ -77,6 +174,8 @@ export function RentalMaintenanceService() {
   const [filterPriority, setFilterPriority] = useState("all")
   const [selectedRequest, setSelectedRequest] = useState<MaintenanceRequest | null>(null)
   const [isCreateRequestDialogOpen, setIsCreateRequestDialogOpen] = useState(false)
+  const [rentals, setRentals] = useState<Rental[]>([])
+  const [rentalsLoading, setRentalsLoading] = useState(false)
   const [stats, setStats] = useState({
     total: 0,
     open: 0,
@@ -100,12 +199,29 @@ export function RentalMaintenanceService() {
     notes: ""
   })
 
-  // Available rentals for selection
-  const availableRentals = [
-    { id: 1, title: "شقة فاخرة في حي العليا", address: "طريق الملك فهد، حي العليا" },
-    { id: 2, title: "فيلا واسعة في جدة", address: "طريق الأمير محمد بن عبدالعزيز" },
-    { id: 3, title: "استوديو حديث في الدمام", address: "طريق الملك سعود، الفيصلية" },
-  ]
+  // Fetch rentals from API
+  const fetchRentals = async () => {
+    try {
+      setRentalsLoading(true)
+      console.log("Fetching rentals...")
+      
+      const response = await axiosInstance.get<RentalsApiResponse>("/v1/rms/rentals")
+      console.log("Rentals API Response:", response.data)
+      
+      if (response.data.status) {
+        console.log("Setting rentals:", response.data.data.data)
+        setRentals(response.data.data.data)
+      } else {
+        console.log("Rentals API returned error status")
+        toast.error("فشل في تحميل العقارات المؤجرة")
+      }
+    } catch (error) {
+      console.error("Error fetching rentals:", error)
+      toast.error("حدث خطأ في تحميل العقارات المؤجرة")
+    } finally {
+      setRentalsLoading(false)
+    }
+  }
 
   // Fetch maintenance requests from API
   const fetchRequests = async () => {
@@ -152,7 +268,7 @@ export function RentalMaintenanceService() {
   // Reset form data
   const resetForm = () => {
     setFormData({
-      rental_id: 1,
+      rental_id: rentals.length > 0 ? rentals[0].id : 0,
       category: "",
       priority: "",
       title: "",
@@ -413,7 +529,10 @@ export function RentalMaintenanceService() {
               تحديث
             </Button>
             <Dialog open={isCreateRequestDialogOpen} onOpenChange={(open) => {
-              if (!open) {
+              if (open) {
+                // Load rentals when dialog opens
+                fetchRentals()
+              } else {
                 resetForm()
               }
               setIsCreateRequestDialogOpen(open)
@@ -433,16 +552,33 @@ export function RentalMaintenanceService() {
                   {/* Rental Selection */}
                   <div className="space-y-2">
                     <Label htmlFor="rental">العقار</Label>
-                    <Select value={formData.rental_id.toString()} onValueChange={(value) => setFormData(prev => ({ ...prev, rental_id: parseInt(value) }))}>
+                    <Select 
+                      value={rentalsLoading ? "loading" : (formData.rental_id > 0 ? formData.rental_id.toString() : "")} 
+                      onValueChange={(value) => {
+                        if (value !== "loading" && value !== "no-rentals") {
+                          setFormData(prev => ({ ...prev, rental_id: parseInt(value) }))
+                        }
+                      }}
+                    >
                       <SelectTrigger>
-                        <SelectValue placeholder="اختر العقار" />
+                        <SelectValue placeholder={rentalsLoading ? "جاري التحميل..." : "اختر العقار المؤجر"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {availableRentals.map((rental) => (
-                          <SelectItem key={rental.id} value={rental.id.toString()}>
-                            {rental.title} - {rental.address}
+                        {rentalsLoading ? (
+                          <SelectItem value="loading" disabled>
+                            جاري تحميل العقارات المؤجرة...
                           </SelectItem>
-                        ))}
+                        ) : rentals.length > 0 ? (
+                          rentals.map((rental) => (
+                            <SelectItem key={rental.id} value={rental.id.toString()}>
+                              {rental.unit_label} - {rental.tenant_full_name} {rental.property ? `(${rental.property.beds} غرف)` : ''}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="no-rentals" disabled>
+                            لا توجد عقارات مؤجرة متاحة
+                          </SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
