@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import useStore from "@/context/Store"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -166,43 +167,48 @@ interface RentalsApiResponse {
   }
 }
 
-export function RentalMaintenanceService() {
-  const [requests, setRequests] = useState<MaintenanceRequest[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [filterPriority, setFilterPriority] = useState("all")
-  const [selectedRequest, setSelectedRequest] = useState<MaintenanceRequest | null>(null)
-  const [isCreateRequestDialogOpen, setIsCreateRequestDialogOpen] = useState(false)
-  const [rentals, setRentals] = useState<Rental[]>([])
-  const [rentalsLoading, setRentalsLoading] = useState(false)
-  const [stats, setStats] = useState({
-    total: 0,
-    open: 0,
-    inProgress: 0,
-    completed: 0,
-    urgent: 0
-  })
+interface RentalMaintenanceServiceProps {
+  openCreateDialogCounter?: number
+}
 
-  // Form state for creating new maintenance request
-  const [formData, setFormData] = useState({
-    rental_id: 1,
-    category: "",
-    priority: "",
-    title: "",
-    description: "",
-    estimated_cost: "",
-    payer: "",
-    payer_share_percent: 100,
-    scheduled_date: "",
-    assigned_to_vendor_id: null,
-    notes: ""
-  })
+export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: RentalMaintenanceServiceProps) {
+  const { rentalMaintenance, setRentalMaintenance } = useStore()
+  const {
+    requests,
+    loading,
+    searchTerm,
+    filterStatus,
+    filterPriority,
+    selectedRequest,
+    isCreateRequestDialogOpen,
+    rentals,
+    rentalsLoading,
+    stats,
+    formData,
+    requestsInitialized,
+    rentalsInitialized,
+    lastProcessedOpenCreateDialogCounter,
+  } = rentalMaintenance
+
+  // Open Create Maintenance Request dialog when requested by parent
+  useEffect(() => {
+    // Simplified logic: if counter > last processed, open dialog
+    if (openCreateDialogCounter > 0 && openCreateDialogCounter > lastProcessedOpenCreateDialogCounter) {
+      console.log("✅ Opening Maintenance Dialog - Simple Logic", { openCreateDialogCounter, lastProcessedOpenCreateDialogCounter })
+      setRentalMaintenance({ 
+        isCreateRequestDialogOpen: true, 
+        lastProcessedOpenCreateDialogCounter: openCreateDialogCounter 
+      })
+    } else if (lastProcessedOpenCreateDialogCounter === -1 && openCreateDialogCounter >= 0) {
+      console.log("🔧 Initializing maintenance counter without opening dialog", { openCreateDialogCounter })
+      setRentalMaintenance({ lastProcessedOpenCreateDialogCounter: openCreateDialogCounter })
+    }
+  }, [openCreateDialogCounter, lastProcessedOpenCreateDialogCounter, setRentalMaintenance])
 
   // Fetch rentals from API
   const fetchRentals = async () => {
     try {
-      setRentalsLoading(true)
+      setRentalMaintenance({ rentalsLoading: true })
       console.log("Fetching rentals...")
       
       const response = await axiosInstance.get<RentalsApiResponse>("/v1/rms/rentals")
@@ -210,7 +216,7 @@ export function RentalMaintenanceService() {
       
       if (response.data.status) {
         console.log("Setting rentals:", response.data.data.data)
-        setRentals(response.data.data.data)
+        setRentalMaintenance({ rentals: response.data.data.data, rentalsInitialized: true })
       } else {
         console.log("Rentals API returned error status")
         toast.error("فشل في تحميل العقارات المؤجرة")
@@ -219,14 +225,14 @@ export function RentalMaintenanceService() {
       console.error("Error fetching rentals:", error)
       toast.error("حدث خطأ في تحميل العقارات المؤجرة")
     } finally {
-      setRentalsLoading(false)
+      setRentalMaintenance({ rentalsLoading: false })
     }
   }
 
   // Fetch maintenance requests from API
   const fetchRequests = async () => {
     try {
-      setLoading(true)
+      setRentalMaintenance({ loading: true })
       console.log("Fetching maintenance requests...")
       
       const response = await axiosInstance.get<ApiResponse>("/v1/rms/maintenance")
@@ -234,7 +240,7 @@ export function RentalMaintenanceService() {
       
       if (response.data.status) {
         console.log("Setting requests:", response.data.data)
-        setRequests(response.data.data)
+        setRentalMaintenance({ requests: response.data.data, requestsInitialized: true })
         
         // Calculate stats
         const data = response.data.data
@@ -246,7 +252,7 @@ export function RentalMaintenanceService() {
           urgent: data.filter(r => r.priority === "urgent").length
         }
         console.log("Setting stats:", newStats)
-        setStats(newStats)
+        setRentalMaintenance({ stats: newStats })
       } else {
         console.log("API returned false status")
         toast.error("فشل في تحميل البيانات")
@@ -255,7 +261,7 @@ export function RentalMaintenanceService() {
       console.error("Error fetching maintenance requests:", error)
       toast.error("حدث خطأ في تحميل طلبات الصيانة")
     } finally {
-      setLoading(false)
+      setRentalMaintenance({ loading: false })
     }
   }
 
@@ -267,7 +273,7 @@ export function RentalMaintenanceService() {
 
   // Reset form data
   const resetForm = () => {
-    setFormData({
+    setRentalMaintenance({ formData: {
       rental_id: rentals.length > 0 ? rentals[0].id : 0,
       category: "",
       priority: "",
@@ -279,14 +285,14 @@ export function RentalMaintenanceService() {
       scheduled_date: "",
       assigned_to_vendor_id: null,
       notes: ""
-    })
+    }})
   }
 
   // Create new maintenance request
   const createMaintenanceRequest = async () => {
     try {
       // Validate required fields
-      if (!formData.rental_id || !formData.category || !formData.priority || !formData.title || !formData.description) {
+       if (!formData.rental_id || !formData.category || !formData.priority || !formData.title || !formData.description) {
         toast.error("يرجى ملء جميع الحقول المطلوبة")
         return
       }
@@ -313,22 +319,24 @@ export function RentalMaintenanceService() {
         console.log("Maintenance request created:", response.data.data)
         
         // Add the new request to the state
-        setRequests(prev => [response.data.data, ...prev])
+       setRentalMaintenance({ requests: [response.data.data, ...requests] })
         
         // Update stats
         const newRequest = response.data.data
-        setStats(prev => ({
-          total: prev.total + 1,
-          open: prev.open + (newRequest.status === "open" ? 1 : 0),
-          inProgress: prev.inProgress + (newRequest.status === "in_progress" ? 1 : 0),
-          completed: prev.completed + (newRequest.status === "completed" ? 1 : 0),
-          urgent: prev.urgent + (newRequest.priority === "urgent" ? 1 : 0)
-        }))
+         setRentalMaintenance({
+           stats: {
+             total: stats.total + 1,
+             open: stats.open + (newRequest.status === "open" ? 1 : 0),
+             inProgress: stats.inProgress + (newRequest.status === "in_progress" ? 1 : 0),
+             completed: stats.completed + (newRequest.status === "completed" ? 1 : 0),
+             urgent: stats.urgent + (newRequest.priority === "urgent" ? 1 : 0)
+           }
+         })
 
         // Reset form
         resetForm()
 
-        setIsCreateRequestDialogOpen(false)
+        setRentalMaintenance({ isCreateRequestDialogOpen: false })
         toast.success("تم إضافة طلب الصيانة بنجاح")
       } else {
         toast.error("فشل في إضافة طلب الصيانة")
@@ -340,10 +348,12 @@ export function RentalMaintenanceService() {
   }
 
   useEffect(() => {
-    fetchRequests()
-  }, [])
+    if (!requestsInitialized) {
+      fetchRequests()
+    }
+  }, [requestsInitialized])
 
-  const filteredRequests = requests.filter((request) => {
+  const filteredRequests = requests.filter((request: MaintenanceRequest) => {
     const matchesSearch =
       request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -512,7 +522,7 @@ export function RentalMaintenanceService() {
     <div className="space-y-6">
       {/* Header and Stats */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h2 className="text-3xl font-bold text-gray-900">
               طلبات الصيانة
@@ -530,12 +540,12 @@ export function RentalMaintenanceService() {
             </Button>
             <Dialog open={isCreateRequestDialogOpen} onOpenChange={(open) => {
               if (open) {
-                // Load rentals when dialog opens
-                fetchRentals()
+                // Load rentals when dialog opens if not initialized
+                if (!rentalsInitialized) fetchRentals()
               } else {
                 resetForm()
               }
-              setIsCreateRequestDialogOpen(open)
+              setRentalMaintenance({ isCreateRequestDialogOpen: open })
             }}>
               <DialogTrigger asChild>
                 <Button className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg">
@@ -552,13 +562,13 @@ export function RentalMaintenanceService() {
                   {/* Rental Selection */}
                   <div className="space-y-2">
                     <Label htmlFor="rental">العقار</Label>
-                    <Select 
-                      value={rentalsLoading ? "loading" : (formData.rental_id > 0 ? formData.rental_id.toString() : "")} 
-                      onValueChange={(value) => {
-                        if (value !== "loading" && value !== "no-rentals") {
-                          setFormData(prev => ({ ...prev, rental_id: parseInt(value) }))
-                        }
-                      }}
+                     <Select 
+                       value={rentalsLoading ? "loading" : (formData.rental_id > 0 ? formData.rental_id.toString() : "")} 
+                       onValueChange={(value) => {
+                         if (value !== "loading" && value !== "no-rentals") {
+                           setRentalMaintenance({ formData: { ...formData, rental_id: parseInt(value) } })
+                         }
+                       }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder={rentalsLoading ? "جاري التحميل..." : "اختر العقار المؤجر"} />
@@ -569,7 +579,7 @@ export function RentalMaintenanceService() {
                             جاري تحميل العقارات المؤجرة...
                           </SelectItem>
                         ) : rentals.length > 0 ? (
-                          rentals.map((rental) => (
+                          rentals.map((rental: Rental) => (
                             <SelectItem key={rental.id} value={rental.id.toString()}>
                               {rental.unit_label} - {rental.tenant_full_name} {rental.property ? `(${rental.property.beds} غرف)` : ''}
                             </SelectItem>
@@ -587,7 +597,7 @@ export function RentalMaintenanceService() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="category">فئة الصيانة *</Label>
-                      <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+                       <Select value={formData.category} onValueChange={(value) => setRentalMaintenance({ formData: { ...formData, category: value } })}>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر الفئة" />
                         </SelectTrigger>
@@ -605,7 +615,7 @@ export function RentalMaintenanceService() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="priority">الأولوية *</Label>
-                      <Select value={formData.priority} onValueChange={(value) => setFormData(prev => ({ ...prev, priority: value }))}>
+                       <Select value={formData.priority} onValueChange={(value) => setRentalMaintenance({ formData: { ...formData, priority: value } })}>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر الأولوية" />
                         </SelectTrigger>
@@ -622,22 +632,22 @@ export function RentalMaintenanceService() {
                   {/* Title and Description */}
                   <div className="space-y-2">
                     <Label htmlFor="title">عنوان الطلب *</Label>
-                    <Input 
+                     <Input 
                       id="title" 
                       placeholder="مثال: مشكلة في التكييف" 
                       value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                       onChange={(e) => setRentalMaintenance({ formData: { ...formData, title: e.target.value } })}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="description">وصف المشكلة *</Label>
-                    <Textarea 
+                     <Textarea 
                       id="description" 
                       placeholder="وصف تفصيلي للمشكلة أو الإصلاح المطلوب..." 
                       rows={4}
                       value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                       onChange={(e) => setRentalMaintenance({ formData: { ...formData, description: e.target.value } })}
                     />
                   </div>
 
@@ -645,17 +655,17 @@ export function RentalMaintenanceService() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="estimated-cost">التكلفة المتوقعة (ر.س)</Label>
-                      <Input 
+                       <Input 
                         id="estimated-cost" 
                         type="number" 
                         placeholder="500" 
                         value={formData.estimated_cost}
-                        onChange={(e) => setFormData(prev => ({ ...prev, estimated_cost: e.target.value }))}
+                         onChange={(e) => setRentalMaintenance({ formData: { ...formData, estimated_cost: e.target.value } })}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="payer">يتحمل التكلفة</Label>
-                      <Select value={formData.payer} onValueChange={(value) => setFormData(prev => ({ ...prev, payer: value }))}>
+                       <Select value={formData.payer} onValueChange={(value) => setRentalMaintenance({ formData: { ...formData, payer: value } })}>
                         <SelectTrigger>
                           <SelectValue placeholder="من يدفع؟" />
                         </SelectTrigger>
@@ -671,44 +681,44 @@ export function RentalMaintenanceService() {
                   {/* Payer Share Percent */}
                   <div className="space-y-2">
                     <Label htmlFor="payer-share">نسبة الدفع (%)</Label>
-                    <Input 
+                     <Input 
                       id="payer-share" 
                       type="number" 
                       min="0" 
                       max="100" 
                       placeholder="100" 
                       value={formData.payer_share_percent}
-                      onChange={(e) => setFormData(prev => ({ ...prev, payer_share_percent: parseInt(e.target.value) || 100 }))}
+                       onChange={(e) => setRentalMaintenance({ formData: { ...formData, payer_share_percent: parseInt(e.target.value) || 100 } })}
                     />
                   </div>
 
                   {/* Scheduled Date */}
                   <div className="space-y-2">
                     <Label htmlFor="scheduled-date">موعد الصيانة (اختياري)</Label>
-                    <Input 
+                     <Input 
                       id="scheduled-date" 
                       type="datetime-local" 
                       value={formData.scheduled_date}
-                      onChange={(e) => setFormData(prev => ({ ...prev, scheduled_date: e.target.value }))}
+                       onChange={(e) => setRentalMaintenance({ formData: { ...formData, scheduled_date: e.target.value } })}
                     />
                   </div>
 
                   {/* Notes */}
                   <div className="space-y-2">
                     <Label htmlFor="notes">ملاحظات إضافية</Label>
-                    <Textarea 
+                     <Textarea 
                       id="notes" 
                       placeholder="أي ملاحظات أو تفاصيل إضافية..." 
                       rows={2}
                       value={formData.notes}
-                      onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                       onChange={(e) => setRentalMaintenance({ formData: { ...formData, notes: e.target.value } })}
                     />
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => {
+                   <Button variant="outline" onClick={() => {
                     resetForm()
-                    setIsCreateRequestDialogOpen(false)
+                    setRentalMaintenance({ isCreateRequestDialogOpen: false })
                   }}>
                     إلغاء
                   </Button>
@@ -791,11 +801,11 @@ export function RentalMaintenanceService() {
           <Input
             placeholder="البحث في طلبات الصيانة..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => setRentalMaintenance({ searchTerm: e.target.value })}
             className="pr-10 border-2 focus:border-gray-500 transition-colors"
           />
         </div>
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
+        <Select value={filterStatus} onValueChange={(v) => setRentalMaintenance({ filterStatus: v })}>
           <SelectTrigger className="w-full sm:w-48 border-2 focus:border-gray-500 transition-colors">
             <Filter className="ml-2 h-4 w-4" />
             <SelectValue placeholder="جميع الحالات" />
@@ -809,7 +819,7 @@ export function RentalMaintenanceService() {
             <SelectItem value="cancelled">ملغي</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={filterPriority} onValueChange={setFilterPriority}>
+        <Select value={filterPriority} onValueChange={(v) => setRentalMaintenance({ filterPriority: v })}>
           <SelectTrigger className="w-full sm:w-48 border-2 focus:border-gray-500 transition-colors">
             <SelectValue placeholder="الأولوية" />
           </SelectTrigger>
@@ -840,7 +850,7 @@ export function RentalMaintenanceService() {
 
       {/* Requests List */}
       <div className="space-y-4">
-        {filteredRequests.map((request) => (
+        {filteredRequests.map((request: MaintenanceRequest) => (
           <Card key={request.id} className="hover:shadow-lg transition-all duration-300 border-2 hover:border-gray-300 group">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
@@ -920,7 +930,7 @@ export function RentalMaintenanceService() {
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      onClick={() => setSelectedRequest(request)}
+                      onClick={() => setRentalMaintenance({ selectedRequest: request })}
                       className="border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       <Eye className="h-3 w-3 ml-1" />
@@ -943,7 +953,7 @@ export function RentalMaintenanceService() {
       </div>
 
       {/* Request Details Dialog */}
-      <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
+      <Dialog open={!!selectedRequest} onOpenChange={() => setRentalMaintenance({ selectedRequest: null })}>
         <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">تفاصيل طلب الصيانة</DialogTitle>
@@ -1104,7 +1114,7 @@ export function RentalMaintenanceService() {
             </Tabs>
           )}
           <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={() => setSelectedRequest(null)}>
+            <Button variant="outline" onClick={() => setRentalMaintenance({ selectedRequest: null })}>
               إغلاق
             </Button>
           </DialogFooter>
@@ -1129,7 +1139,7 @@ export function RentalMaintenanceService() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button 
-              onClick={() => setIsCreateRequestDialogOpen(true)}
+              onClick={() => setRentalMaintenance({ isCreateRequestDialogOpen: true })}
               className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg"
             >
               <Plus className="ml-2 h-4 w-4" />
@@ -1139,9 +1149,7 @@ export function RentalMaintenanceService() {
               <Button 
                 variant="outline"
                 onClick={() => {
-                  setSearchTerm("")
-                  setFilterStatus("all")
-                  setFilterPriority("all")
+                  setRentalMaintenance({ searchTerm: "", filterStatus: "all", filterPriority: "all" })
                 }}
                 className="border-gray-300 text-gray-700 hover:bg-gray-50"
               >
@@ -1169,9 +1177,9 @@ export function RentalMaintenanceService() {
           >
             <Activity className="h-4 w-4" />
           </Button>
-          <Button
+            <Button 
             size="sm"
-            onClick={() => setIsCreateRequestDialogOpen(true)}
+              onClick={() => setRentalMaintenance({ isCreateRequestDialogOpen: true })}
             className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg"
           >
             <Plus className="h-4 w-4" />

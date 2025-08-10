@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
+import useStore from "@/context/Store"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -36,17 +37,21 @@ interface RecentActivity {
   amount?: number
 }
 
-export function RentalOverviewService() {
-  const [stats, setStats] = useState<OverviewStats | null>(null)
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
-  const [loading, setLoading] = useState(true)
+interface RentalOverviewServiceProps {
+  onAddRentalClick?: () => void
+  onCreateMaintenanceClick?: () => void
+}
+
+export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceClick }: RentalOverviewServiceProps) {
+  const { rentalOverview, setRentalOverview } = useStore()
+  const { stats, recentActivity, loading, isInitialized } = rentalOverview
 
   useEffect(() => {
     const fetchOverviewData = async () => {
-      setLoading(true)
+      setRentalOverview({ loading: true })
       await new Promise((resolve) => setTimeout(resolve, 800))
 
-      setStats({
+      const newStats: OverviewStats = {
         totalProperties: 25,
         availableProperties: 8,
         occupiedProperties: 15,
@@ -61,9 +66,9 @@ export function RentalOverviewService() {
         monthlyRevenue: 67500,
         pendingPayments: 5,
         maintenanceRequests: 8,
-      })
+      }
 
-      setRecentActivity([
+      const activity: RecentActivity[] = [
         {
           id: "1",
           type: "request",
@@ -120,13 +125,15 @@ export function RentalOverviewService() {
           status: "approved",
           statusAr: "موافق عليه",
         },
-      ])
+      ]
 
-      setLoading(false)
+      setRentalOverview({ stats: newStats, recentActivity: activity, loading: false, isInitialized: true })
     }
 
-    fetchOverviewData()
-  }, [])
+    if (!isInitialized) {
+      fetchOverviewData()
+    }
+  }, [isInitialized, setRentalOverview])
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -260,11 +267,11 @@ export function RentalOverviewService() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Button className="h-auto p-4 flex flex-col items-center space-y-2">
+            <Button onClick={onAddRentalClick} className="h-auto p-4 flex flex-col items-center space-y-2">
               <Users className="h-6 w-6" />
               <span>إضافة طلب إيجار</span>
             </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2 bg-transparent">
+            <Button onClick={onCreateMaintenanceClick} variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2 bg-transparent">
               <Wrench className="h-6 w-6" />
               <span>طلب صيانة</span>
             </Button>

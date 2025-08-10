@@ -24,6 +24,7 @@ const useStore = create((set, get) => {
     ...require("./store/blogManagement")(set, get),
     ...require("./store/affiliate")(set, get),
     ...require("./store/sidebar")(set, get),
+    ...require("./store/rentalManagement")(set, get),
   };
 });
 

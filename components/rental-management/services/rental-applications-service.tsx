@@ -42,6 +42,7 @@ import {
   Trash2,
 } from "lucide-react"
 import axiosInstance from "@/lib/axiosInstance"
+import useStore from "@/context/Store"
 
 interface Property {
   id: number
@@ -101,45 +102,70 @@ interface ApiResponse {
   }
 }
 
-export function RentalApplicationsService() {
-  const [rentals, setRentals] = useState<RentalData[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [selectedRental, setSelectedRental] = useState<RentalData | null>(null)
-  const [isAddRentalDialogOpen, setIsAddRentalDialogOpen] = useState(false)
-  const [isEditRentalDialogOpen, setIsEditRentalDialogOpen] = useState(false)
-  const [editingRental, setEditingRental] = useState<RentalData | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [deletingRental, setDeletingRental] = useState<RentalData | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
+interface RentalApplicationsServiceProps {
+  openAddDialogCounter?: number
+}
+
+export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalApplicationsServiceProps) {
+  const { rentalApplications, setRentalApplications } = useStore()
+  const {
+    rentals,
+    loading,
+    error,
+    searchTerm,
+    filterStatus,
+    selectedRental,
+    isAddRentalDialogOpen,
+    isEditRentalDialogOpen,
+    editingRental,
+    isSubmitting,
+    isDeleteDialogOpen,
+    deletingRental,
+    isDeleting,
+    isInitialized,
+    lastProcessedOpenAddDialogCounter,
+  } = rentalApplications
+  
+  // Open Add Rental dialog when the counter changes from parent
+  useEffect(() => {
+    // Simplified logic: if counter > last processed, open dialog
+    if (openAddDialogCounter > 0 && openAddDialogCounter > lastProcessedOpenAddDialogCounter) {
+      console.log("✅ Opening Add Rental Dialog - Simple Logic", { openAddDialogCounter, lastProcessedOpenAddDialogCounter })
+      setRentalApplications({ 
+        isAddRentalDialogOpen: true, 
+        lastProcessedOpenAddDialogCounter: openAddDialogCounter 
+      })
+    } else if (lastProcessedOpenAddDialogCounter === -1 && openAddDialogCounter >= 0) {
+      console.log("🔧 Initializing counter without opening dialog", { openAddDialogCounter })
+      setRentalApplications({ lastProcessedOpenAddDialogCounter: openAddDialogCounter })
+    }
+  }, [openAddDialogCounter, lastProcessedOpenAddDialogCounter, setRentalApplications])
 
   useEffect(() => {
-    fetchRentals()
-  }, [])
+    if (!isInitialized) {
+      fetchRentals()
+    }
+  }, [isInitialized])
 
   const fetchRentals = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setRentalApplications({ loading: true, error: null })
       const response = await axiosInstance.get<ApiResponse>("/v1/rms/rentals")
       
       if (response.data.status) {
-        setRentals(response.data.data.data)
+        setRentalApplications({ rentals: response.data.data.data, isInitialized: true })
       } else {
-        setError("فشل في جلب البيانات")
+        setRentalApplications({ error: "فشل في جلب البيانات" })
       }
     } catch (err) {
       console.error("Error fetching rentals:", err)
-      setError("حدث خطأ أثناء جلب البيانات")
+      setRentalApplications({ error: "حدث خطأ أثناء جلب البيانات" })
     } finally {
-      setLoading(false)
+      setRentalApplications({ loading: false })
     }
   }
 
-  const filteredRentals = rentals.filter((rental) => {
+  const filteredRentals = rentals.filter((rental: RentalData) => {
     const matchesSearch =
       rental.tenant_full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       rental.unit_label?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -212,7 +238,7 @@ export function RentalApplicationsService() {
 
   const handleCreateRental = async (formData: any) => {
     try {
-      setIsSubmitting(true)
+      setRentalApplications({ isSubmitting: true })
       console.log("Sending form data:", formData) // للتأكد من البيانات المرسلة
       
       const response = await axiosInstance.post("/v1/rms/rentals", formData)
@@ -232,13 +258,9 @@ export function RentalApplicationsService() {
           status: newRental.status || "active"
         }
         
-        setRentals(prev => {
-          const updatedRentals = [rentalWithId, ...prev]
-          console.log("Updated rentals list:", updatedRentals) // للتأكد من القائمة المحدثة
-          return updatedRentals
-        })
-        
-        setIsAddRentalDialogOpen(false)
+        const updatedRentals = [rentalWithId, ...rentals]
+        console.log("Updated rentals list:", updatedRentals) // للتأكد من القائمة المحدثة
+        setRentalApplications({ rentals: updatedRentals, isAddRentalDialogOpen: false })
         // يمكن إضافة toast notification هنا
       } else {
         console.error("API returned false status:", response.data)
@@ -248,54 +270,47 @@ export function RentalApplicationsService() {
       console.error("Error creating rental:", err)
       alert("خطأ في إضافة الإيجار: " + (err.response?.data?.message || err.message || "خطأ غير معروف"))
       // إغلاق النافذة المنبثقة في حالة الخطأ
-      setIsAddRentalDialogOpen(false)
+      setRentalApplications({ isAddRentalDialogOpen: false })
     } finally {
-      setIsSubmitting(false)
+      setRentalApplications({ isSubmitting: false })
     }
   }
 
   const handleUpdateRental = async (rentalId: number, formData: any) => {
     try {
-      setIsSubmitting(true)
+      setRentalApplications({ isSubmitting: true })
       const response = await axiosInstance.patch(`/v1/rms/rentals/${rentalId}`, formData)
       
       if (response.data.status) {
         // تحديث الإيجار في القائمة بالبيانات الجديدة
-        setRentals(prev => prev.map(rental => 
-          rental.id === rentalId ? response.data.data : rental
-        ))
-        setIsEditRentalDialogOpen(false)
-        setEditingRental(null)
+        const updated = rentals.map((rental: RentalData) => rental.id === rentalId ? response.data.data : rental)
+        setRentalApplications({ rentals: updated, isEditRentalDialogOpen: false, editingRental: null })
         // يمكن إضافة toast notification هنا
       }
     } catch (err) {
       console.error("Error updating rental:", err)
       // يمكن إضافة toast error هنا
       // إغلاق النافذة المنبثقة في حالة الخطأ
-      setIsEditRentalDialogOpen(false)
-      setEditingRental(null)
+      setRentalApplications({ isEditRentalDialogOpen: false, editingRental: null })
     } finally {
-      setIsSubmitting(false)
+      setRentalApplications({ isSubmitting: false })
     }
   }
 
   const handleDeleteRental = async (rentalId: number) => {
     try {
-      setIsDeleteDialogOpen(false)
-      setIsDeleting(true)
+      setRentalApplications({ isDeleteDialogOpen: false, isDeleting: true })
       const response = await axiosInstance.delete(`/v1/rms/rentals/${rentalId}`)
       
       if (response.status) {
-        setRentals(prev => prev.filter(rental => rental.id !== rentalId))
-        setIsDeleteDialogOpen(false)
-        setDeletingRental(null)
+        const updated = rentals.filter((rental: RentalData) => rental.id !== rentalId)
+        setRentalApplications({ rentals: updated, isDeleteDialogOpen: false, deletingRental: null })
       }
     } catch (err) {
       console.error("Error deleting rental:", err)
-      setIsDeleteDialogOpen(false)
-      setDeletingRental(null)
+      setRentalApplications({ isDeleteDialogOpen: false, deletingRental: null })
     } finally {
-      setIsDeleting(false)
+      setRentalApplications({ isDeleting: false })
     }
   }
 
@@ -347,7 +362,7 @@ export function RentalApplicationsService() {
           <h2 className="text-2xl font-bold text-gray-900">إدارة الإيجارات</h2>
           <p className="text-muted-foreground">عرض وإدارة جميع عقود الإيجار</p>
         </div>
-        <Dialog open={isAddRentalDialogOpen} onOpenChange={setIsAddRentalDialogOpen}>
+        <Dialog open={isAddRentalDialogOpen} onOpenChange={(open) => setRentalApplications({ isAddRentalDialogOpen: open })}>
           <DialogTrigger asChild>
             <Button className="bg-gray-700 hover:bg-gray-800">
               <Plus className="ml-2 h-4 w-4" />
@@ -361,7 +376,7 @@ export function RentalApplicationsService() {
             </DialogHeader>
             <AddRentalForm 
               onSubmit={handleCreateRental}
-              onCancel={() => setIsAddRentalDialogOpen(false)}
+              onCancel={() => setRentalApplications({ isAddRentalDialogOpen: false })}
               isSubmitting={isSubmitting}
             />
           </DialogContent>
@@ -375,11 +390,11 @@ export function RentalApplicationsService() {
           <Input
             placeholder="البحث في الإيجارات..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => setRentalApplications({ searchTerm: e.target.value })}
             className="pr-10"
           />
         </div>
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
+        <Select value={filterStatus} onValueChange={(v) => setRentalApplications({ filterStatus: v })}>
           <SelectTrigger className="w-full sm:w-48">
             <Filter className="ml-2 h-4 w-4" />
             <SelectValue placeholder="جميع الحالات" />
@@ -396,7 +411,7 @@ export function RentalApplicationsService() {
 
       {/* Rentals List */}
       <div className="space-y-4">
-        {filteredRentals.map((rental) => (
+        {filteredRentals.map((rental: RentalData) => (
           <Card key={rental.id} className="hover:shadow-lg transition-all duration-200 border-0 shadow-sm">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
@@ -463,7 +478,7 @@ export function RentalApplicationsService() {
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      onClick={() => setSelectedRental(rental)}
+                      onClick={() => setRentalApplications({ selectedRental: rental })}
                       className="border-blue-200 text-blue-600 hover:bg-blue-50"
                     >
                       <Eye className="h-3 w-3 ml-1" />
@@ -473,8 +488,7 @@ export function RentalApplicationsService() {
                       size="sm" 
                       variant="outline" 
                       onClick={() => {
-                        setEditingRental(rental)
-                        setIsEditRentalDialogOpen(true)
+                        setRentalApplications({ editingRental: rental, isEditRentalDialogOpen: true })
                       }}
                       className="border-green-200 text-green-600 hover:bg-green-50"
                     >
@@ -485,8 +499,7 @@ export function RentalApplicationsService() {
                       size="sm" 
                       variant="outline" 
                       onClick={() => {
-                        setDeletingRental(rental)
-                        setIsDeleteDialogOpen(true)
+                        setRentalApplications({ deletingRental: rental, isDeleteDialogOpen: true })
                       }}
                       className="border-red-200 text-red-600 hover:bg-red-50"
                     >
@@ -502,7 +515,7 @@ export function RentalApplicationsService() {
       </div>
 
       {/* Rental Details Dialog */}
-      <Dialog open={!!selectedRental} onOpenChange={() => setSelectedRental(null)}>
+      <Dialog open={!!selectedRental} onOpenChange={() => setRentalApplications({ selectedRental: null })}>
         <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>تفاصيل عقد الإيجار</DialogTitle>
@@ -663,7 +676,7 @@ export function RentalApplicationsService() {
             </Tabs>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedRental(null)}>
+            <Button variant="outline" onClick={() => setRentalApplications({ selectedRental: null })}>
               إغلاق
             </Button>
           </DialogFooter>
@@ -677,7 +690,7 @@ export function RentalApplicationsService() {
           <p className="text-muted-foreground mb-4">
             {searchTerm || filterStatus !== "all" ? "جرب تعديل معايير البحث" : "لا توجد إيجارات حالياً"}
           </p>
-          <Button onClick={() => setIsAddRentalDialogOpen(true)}>
+          <Button onClick={() => setRentalApplications({ isAddRentalDialogOpen: true })}>
             <Plus className="ml-2 h-4 w-4" />
             إضافة إيجار جديد
           </Button>
@@ -685,7 +698,7 @@ export function RentalApplicationsService() {
       )}
 
       {/* Edit Rental Dialog */}
-      <Dialog open={isEditRentalDialogOpen} onOpenChange={() => setIsEditRentalDialogOpen(false)}>
+      <Dialog open={isEditRentalDialogOpen} onOpenChange={() => setRentalApplications({ isEditRentalDialogOpen: false })}>
         <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>تعديل عقد الإيجار</DialogTitle>
@@ -696,8 +709,7 @@ export function RentalApplicationsService() {
               rental={editingRental}
               onSubmit={(formData) => handleUpdateRental(editingRental.id, formData)}
               onCancel={() => {
-                setIsEditRentalDialogOpen(false)
-                setEditingRental(null)
+                setRentalApplications({ isEditRentalDialogOpen: false, editingRental: null })
               }}
               isSubmitting={isSubmitting}
             />
@@ -706,7 +718,7 @@ export function RentalApplicationsService() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={() => setIsDeleteDialogOpen(false)}>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={() => setRentalApplications({ isDeleteDialogOpen: false })}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="text-red-600 flex items-center gap-2">
@@ -744,8 +756,7 @@ export function RentalApplicationsService() {
               type="button" 
               variant="outline" 
               onClick={() => {
-                setIsDeleteDialogOpen(false)
-                setDeletingRental(null)
+                setRentalApplications({ isDeleteDialogOpen: false, deletingRental: null })
               }}
               disabled={isDeleting}
             >
@@ -816,7 +827,7 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
     const processedFormData: any = {
       ...formData,
       property_id: formData.property_id ? parseInt(formData.property_id) : null,
-      rental_period_months: parseInt(formData.rental_period_months) || 12,
+      rental_period_months: Number(formData.rental_period_months) || 12,
       base_rent_amount: formData.base_rent_amount ? parseFloat(formData.base_rent_amount) : 0,
       deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
     }

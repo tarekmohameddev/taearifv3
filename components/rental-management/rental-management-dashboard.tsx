@@ -13,6 +13,14 @@ import { FileText, CreditCard, Wrench, Users, Home } from "lucide-react"
 
 export function RentalManagementDashboard() {
   const [activeService, setActiveService] = useState("overview")
+  const [openAddDialogCounter, setOpenAddDialogCounter] = useState(0)
+  const [openCreateMaintenanceCounter, setOpenCreateMaintenanceCounter] = useState(0)
+
+  console.log("🏗️ Dashboard State:", { 
+    activeService, 
+    openAddDialogCounter, 
+    openCreateMaintenanceCounter 
+  })
 
   const services = [
     {
@@ -29,20 +37,20 @@ export function RentalManagementDashboard() {
       icon: Users,
       description: "إدارة طلبات الإيجار الجديدة",
     },
-    {
-      id: "agreements",
-      name: "عقود الإيجار",
-      nameEn: "Rental Agreements",
-      icon: FileText,
-      description: "إدارة عقود الإيجار النشطة",
-    },
-    {
-      id: "payments",
-      name: "المدفوعات",
-      nameEn: "Payments",
-      icon: CreditCard,
-      description: "تتبع مدفوعات الإيجار",
-    },
+    // {
+    //   id: "agreements",
+    //   name: "عقود الإيجار",
+    //   nameEn: "Rental Agreements",
+    //   icon: FileText,
+    //   description: "إدارة عقود الإيجار النشطة",
+    // },
+    // {
+    //   id: "payments",
+    //   name: "المدفوعات",
+    //   nameEn: "Payments",
+    //   icon: CreditCard,
+    //   description: "تتبع مدفوعات الإيجار",
+    // },
     {
       id: "maintenance",
       name: "الصيانة",
@@ -65,7 +73,7 @@ export function RentalManagementDashboard() {
             </div>
 
             <Tabs value={activeService} onValueChange={setActiveService} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-3">
                 {services.map((service) => (
                   <TabsTrigger key={service.id} value={service.id} className="flex items-center gap-2">
                     <service.icon className="h-4 w-4" />
@@ -75,11 +83,33 @@ export function RentalManagementDashboard() {
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
-                <RentalOverviewService />
+                <RentalOverviewService
+                  onAddRentalClick={() => {
+                    console.log("🏠 Add Rental Click - Before:", { openAddDialogCounter })
+                    setActiveService("applications")
+                    // Add a small delay to ensure tab switch happens first
+                    setTimeout(() => {
+                      setOpenAddDialogCounter((c) => {
+                        const newCount = c + 1
+                        console.log("🏠 Add Rental Click - After:", { oldCount: c, newCount })
+                        return newCount
+                      })
+                    }, 100)
+                  }}
+                  onCreateMaintenanceClick={() => {
+                    console.log("🔧 Maintenance Click - Before:", { openCreateMaintenanceCounter })
+                    setActiveService("maintenance")
+                    setOpenCreateMaintenanceCounter((c) => {
+                      const newCount = c + 1
+                      console.log("🔧 Maintenance Click - After:", { oldCount: c, newCount })
+                      return newCount
+                    })
+                  }}
+                />
               </TabsContent>
 
               <TabsContent value="applications" className="space-y-6">
-                <RentalApplicationsService />
+                <RentalApplicationsService openAddDialogCounter={openAddDialogCounter} />
               </TabsContent>
 
               <TabsContent value="agreements" className="space-y-6">
@@ -91,7 +121,7 @@ export function RentalManagementDashboard() {
               </TabsContent>
 
               <TabsContent value="maintenance" className="space-y-6">
-                <RentalMaintenanceService />
+                <RentalMaintenanceService openCreateDialogCounter={openCreateMaintenanceCounter} />
               </TabsContent>
             </Tabs>
           </div>
