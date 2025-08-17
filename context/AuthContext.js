@@ -26,6 +26,7 @@ const useAuthStore = create((set, get) => ({
     project_limit_number: null,
     real_estate_limit_number: null,
     message: null,
+    company_name: null,
   },
   googleUrlFetched: false,
   googleAuthUrl: null,
@@ -78,6 +79,7 @@ const useAuthStore = create((set, get) => ({
               null,
             domain: subscriptionDATA.domain || null,
             message: subscriptionDATA.message || null,
+            company_name: subscriptionDATA.company_name || null,
           },
         });
       }

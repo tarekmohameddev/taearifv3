@@ -26,6 +26,8 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import { Separator } from "@/components/ui/separator";
 import toast from "react-hot-toast";
+import { RiTiktokLine } from "react-icons/ri";
+import { PiSnapchatLogoBold } from "react-icons/pi";
 import {
   Facebook,
   Twitter,
@@ -177,6 +179,8 @@ export function FooterManagementPage() {
     instagram: <Instagram className="h-5 w-5" />,
     linkedin: <Linkedin className="h-5 w-5" />,
     youtube: <Youtube className="h-5 w-5" />,
+    tiktok: <RiTiktokLine className="h-5 w-5" />,
+    snapchat: <PiSnapchatLogoBold className="h-5 w-5" />,
   };
 
   const socialPlatforms = [
@@ -185,6 +189,8 @@ export function FooterManagementPage() {
     { value: "instagram", label: "انستغرام" },
     { value: "linkedin", label: "لينكد إن" },
     { value: "youtube", label: "يوتيوب" },
+    { value: "tiktok", label: "تيكتوك" },
+    { value: "snapchat", label: "سناب شات" },
   ];
 
   const handleGeneralChange = (field, value) => {

@@ -173,7 +173,7 @@ export function SettingsPage() {
         setThemes(response.data.themes);
       } catch (error) {
         console.error("Error fetching themes:", error);
-        toast.error("فشل في تحميل السمات");
+        toast.error("فشل في تحميل الثيمات");
       } finally {
         setIsLoadingThemes(false);
       }
@@ -311,10 +311,10 @@ export function SettingsPage() {
           active: theme.id === themeId,
         })),
       );
-      toast.success("تم تنشيط السمة بنجاح");
+      toast.success("تم تنشيط الثيم بنجاح");
     } catch (error) {
       console.error("Error activating theme:", error);
-      toast.error("حدث خطأ أثناء تنشيط السمة");
+      toast.error("حدث خطأ أثناء تنشيط الثيم");
     }
   };
 
@@ -367,26 +367,6 @@ export function SettingsPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader>
-        <div className="ml-auto flex items-center gap-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="hidden md:flex gap-1"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  <span>معاينة موقعك</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>فتح موقعك في علامة تبويب جديدة</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <HelpCenter
-            contextualHelp={activeTab === "domains" ? domainsHelp : undefined}
-          />
-        </div>
       </DashboardHeader>
       <div className="flex flex-1 flex-col md:flex-row">
         <EnhancedSidebar activeTab="settings" setActiveTab={() => {}} />
@@ -423,7 +403,7 @@ export function SettingsPage() {
                 </TabsTrigger>
                 <TabsTrigger value="themes" className="flex gap-1 items-center">
                   <Palette className="h-4 w-4" />
-                  <span>السمات</span>
+                  <span>الثيمات</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -431,7 +411,7 @@ export function SettingsPage() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                   <div>
                     <h2 className="text-xl font-semibold">إدارة النطاقات</h2>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground ">
                       ربط وإدارة النطاقات المخصصة لموقعك
                     </p>
                   </div>
@@ -770,10 +750,10 @@ export function SettingsPage() {
               </TabsContent>
 
               <TabsContent value="subscription" className="space-y-4 pt-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-4">
                   <div>
-                    <h2 className="text-xl font-semibold">إدارة الاشتراك</h2>
-                    <p className="text-muted-foreground">
+                    <h2 className="text-xl font-semibold text-right">إدارة الاشتراك</h2>
+                    <p className="text-muted-foreground text-right">
                       عرض وتحديث خطة الاشتراك الخاصة بك
                     </p>
                   </div>
@@ -867,35 +847,12 @@ export function SettingsPage() {
               </TabsContent>
 
               <TabsContent value="themes" className="space-y-4 pt-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-4">
                   <div>
-                    <h2 className="text-xl font-semibold">سمات الموقع</h2>
-                    <p className="text-muted-foreground">
-                      اختر وتخصيص سمة موقعك
+                    <h2 className="text-xl font-semibold text-right">ثيمات الموقع</h2>
+                    <p className="text-muted-foreground  text-right">
+                      اختر وتخصيص ثيم موقعك
                     </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Select defaultValue="all">
-                      <SelectTrigger className="w-[150px]">
-                        <div className="flex items-center gap-2">
-                          <Filter className="h-4 w-4" />
-                          <SelectValue placeholder="تصفية حسب الفئة" />
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">جميع السمات</SelectItem>
-                        <SelectItem value="business">أعمال</SelectItem>
-                        <SelectItem value="portfolio">معرض أعمال</SelectItem>
-                        <SelectItem value="restaurant">مطاعم</SelectItem>
-                        <SelectItem value="ecommerce">
-                          متاجر إلكترونية
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button variant="outline">
-                      <PaintBucket className="h-4 w-4 ml-1" />
-                      تخصيص السمة الحالية
-                    </Button>
                   </div>
                 </div>
 
@@ -970,7 +927,7 @@ export function SettingsPage() {
                                 disabled
                               >
                                 <Check className="h-4 w-4 ml-1" />
-                                السمة النشطة
+                                الثيم النشطة
                               </Button>
                             ) : (
                               <Button
@@ -979,7 +936,7 @@ export function SettingsPage() {
                                 onClick={() => handleActivateTheme(theme.id)}
                               >
                                 <Sparkles className="h-4 w-4 ml-1" />
-                                تنشيط السمة
+                                تنشيط الثيم
                               </Button>
                             )}
                           </CardFooter>

@@ -238,7 +238,7 @@ export function GeneralSettingsPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="tagline">شعار الموقع</Label>
+                  <Label htmlFor="tagline">شعار الموقع النصي</Label>
                   <Input
                     id="tagline"
                     value={formData.tagline}
@@ -246,7 +246,13 @@ export function GeneralSettingsPage() {
                       setFormData({ ...formData, tagline: e.target.value })
                     }
                   />
-                </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                  هذا الشعار سيظهر في نتائج محركات البحث وملخصات المشاركة على وسائل التواصل الاجتماعي.
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                  سيظهر كعنوان تبويب المتصفح (Tab title).
+                  </p>
+                  </div>
                 <div>
                   <Label htmlFor="description">وصف الموقع</Label>
                   <Textarea
@@ -428,7 +434,7 @@ export function GeneralSettingsPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="show-breadcrumb">
                       إظهار شريط التنقل (Breadcrumb)
@@ -445,9 +451,9 @@ export function GeneralSettingsPage() {
                       setFormData({ ...formData, show_breadcrumb: checked })
                     }
                   />
-                </div>
+                </div> */}
 
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="show-breadcrumb">
                       الصفحة الرئيسية هي صفحة العقارات
@@ -461,7 +467,7 @@ export function GeneralSettingsPage() {
                       setFormData({ ...formData, show_properties: checked })
                     }
                   />
-                </div>
+                </div> */}
               </CardContent>
             </Card>
           </div>

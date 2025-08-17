@@ -81,12 +81,6 @@ export const CustomerPageHeader = ({
         </p>
       </div>
       <div className="flex items-center gap-2">
-        <Link href="/crm">
-          <Button variant="outline">
-            <Move className="ml-2 h-4 w-4" />
-            نظام CRM المتقدم
-          </Button>
-        </Link>
         <Dialog
           open={showAddCustomerDialog}
           onOpenChange={(isOpen) => {

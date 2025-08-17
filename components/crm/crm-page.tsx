@@ -854,14 +854,14 @@ export default function CrmPage() {
             <CrmHeader onRefresh={handleRefresh} onSettings={handleSettings} />
 
             {/* Statistics */}
-            <CrmStatisticsInline
+            {/* <CrmStatisticsInline
               totalCustomers={totalCustomers}
               customersData={customersData}
               pipelineStages={pipelineStages}
               pipelineStats={pipelineStats}
               scheduledAppointments={scheduledAppointments}
               totalAppointments={totalAppointments}
-            />
+            /> */}
 
             {/* Filters */}
             <CrmFilters

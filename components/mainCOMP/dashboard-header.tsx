@@ -197,7 +197,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
             />
           </Link>
 
-          <div className="hidden md:flex items-center gap-1 mr-6">
+          {/* <div className="hidden md:flex items-center gap-1 mr-6">
             
             <TooltipProvider>
               <Tooltip>
@@ -224,7 +224,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          </div>
+          </div> */}
 
           {children}
         </div>
@@ -315,7 +315,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                 </Button>
               )}
               
-              <TooltipProvider>
+              {/* <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -334,9 +334,9 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                     <p>عرض الإشعارات</p>
                   </TooltipContent>
                 </Tooltip>
-              </TooltipProvider>
+              </TooltipProvider> */}
 
-              <TooltipProvider>
+              {/* <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -352,7 +352,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                     <p>الحصول على المساعدة والدعم</p>
                   </TooltipContent>
                 </Tooltip>
-              </TooltipProvider>
+              </TooltipProvider> */}
 
               <DropdownMenu>
                 <TooltipProvider>

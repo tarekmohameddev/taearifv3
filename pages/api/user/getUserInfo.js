@@ -1,5 +1,4 @@
 import { authenticateToken } from "../../../middleware/authMiddleware";
-import useAuthStore from "@/context/AuthContext";
 
 export default function handler(req, res) {
   authenticateToken(req, res, () => {
