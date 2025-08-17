@@ -7,6 +7,7 @@ import {
   Building2,
   Download,
   FileText,
+  House,
   Globe,
   Home,
   LayoutTemplate,
@@ -74,6 +75,12 @@ export function DashboardSidebar({
       label: "Settings",
       icon: SettingsIcon,
       path: "/settings",
+    },
+    {
+      id: "property-requests",
+      label: "Property Requests",
+      icon: House,
+      path: "/property-requests",
     },
   ];
 
