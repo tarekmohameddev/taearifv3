@@ -94,10 +94,29 @@ export default function PipelineStage({
   viewType,
 }: PipelineStageProps) {
   const stageCustomers = customers.filter(
-    (customer: any) => String(customer.pipelineStage) === String(stage.id),
+    (customer: any) => {
+      // Check both pipelineStage (for backward compatibility) and stage_id (new format)
+      const customerStage = customer.pipelineStage || customer.stage_id;
+      
+      // If stage.id is "unassigned", show customers with null stage_id
+      if (stage.id === "unassigned") {
+        return customerStage === null || customerStage === undefined;
+      }
+      
+      return String(customerStage) === String(stage.id);
+    },
   );
   const filteredStageCustomers = filteredCustomers.filter(
-    (c) => c.pipelineStage === stage.id,
+    (c) => {
+      const customerStage = c.pipelineStage || c.stage_id;
+      
+      // If stage.id is "unassigned", show customers with null stage_id
+      if (stage.id === "unassigned") {
+        return customerStage === null || customerStage === undefined;
+      }
+      
+      return String(customerStage) === String(stage.id);
+    },
   );
 
   const renderMobileView = () => (

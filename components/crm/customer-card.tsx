@@ -55,16 +55,29 @@ export default function CustomerCard({
   onAddInteraction,
   viewType,
 }: CustomerCardProps) {
-  const getPriorityColor = (priority: string) => {
+  const getPriorityColor = (priority: number) => {
     switch (priority) {
-      case "عالية":
+      case 3:
         return "border-red-500 text-red-700";
-      case "متوسطة":
+      case 2:
         return "border-yellow-500 text-yellow-700";
-      case "منخفضة":
+      case 1:
         return "border-green-500 text-green-700";
       default:
         return "border-gray-500 text-gray-700";
+    }
+  };
+
+  const getPriorityLabel = (priority: number) => {
+    switch (priority) {
+      case 3:
+        return "عالية";
+      case 2:
+        return "متوسطة";
+      case 1:
+        return "منخفضة";
+      default:
+        return "غير محدد";
     }
   };
 
@@ -91,7 +104,7 @@ export default function CustomerCard({
                 {customer.name}
               </div>
               <div className="text-xs text-muted-foreground">
-                {customer.customerType}
+                {customer.customer_type || "غير محدد"}
               </div>
             </div>
           </div>
@@ -137,41 +150,32 @@ export default function CustomerCard({
 
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div className="space-y-1">
-            {/* Deal value and probability can be added here */}
+            {customer.phone_number && (
+              <div className="flex items-center gap-1">
+                <Phone className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{customer.phone_number}</span>
+              </div>
+            )}
           </div>
           <div className="space-y-1">
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate">{customer.city}</span>
-            </div>
+            {customer.email && (
+              <div className="flex items-center gap-1">
+                <MapPin className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{customer.email}</span>
+              </div>
+            )}
           </div>
         </div>
-
-        {customer.probability > 0 && (
-          <Progress value={customer.probability} className="h-2" />
-        )}
 
         <div className="flex items-center justify-between flex-wrap gap-2">
           <Badge
             variant="outline"
-            className={`text-xs ${getPriorityColor(customer.urgency)}`}
+            className={`text-xs ${getPriorityColor(customer.priority)}`}
           >
-            {customer.urgency}
+            {getPriorityLabel(customer.priority)}
           </Badge>
-          {customer.reminders && customer.reminders.length > 0 && (
-            <div className="flex items-center gap-1 text-xs text-orange-600">
-              <Bell className="h-3 w-3" />
-              <span>
-                {
-                  customer.reminders.filter(
-                    (r: Reminder) => r.status !== "completed",
-                  ).length
-                }
-              </span>
-            </div>
-          )}
           <div className="text-xs text-muted-foreground truncate flex-1 text-left">
-            {customer.assignedAgent}
+            {customer.note && customer.note.length > 0 ? "لديه ملاحظات" : "لا توجد ملاحظات"}
           </div>
         </div>
       </div>
@@ -201,7 +205,7 @@ export default function CustomerCard({
                 {customer.name}
               </div>
               <div className="text-xs text-muted-foreground">
-                {customer.customerType}
+                {customer.customer_type || "غير محدد"}
               </div>
             </div>
           </div>
@@ -246,39 +250,30 @@ export default function CustomerCard({
         </div>
 
         <div className="space-y-1">
-          {customer.probability > 0 && (
-            <Progress value={customer.probability} className="h-1" />
+          {customer.phone_number && (
+            <div className="flex items-center gap-1 text-xs">
+              <Phone className="h-3 w-3" />
+              <span className="truncate">{customer.phone_number}</span>
+            </div>
           )}
         </div>
 
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1">
             <MapPin className="h-3 w-3" />
-            <span className="truncate">{customer.city}</span>
+            <span className="truncate">{customer.email || "لا يوجد بريد إلكتروني"}</span>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
           <Badge
             variant="outline"
-            className={`text-xs ${getPriorityColor(customer.urgency)}`}
+            className={`text-xs ${getPriorityColor(customer.priority)}`}
           >
-            {customer.urgency}
+            {getPriorityLabel(customer.priority)}
           </Badge>
-          {customer.reminders && customer.reminders.length > 0 && (
-            <div className="flex items-center gap-1 text-xs text-orange-600">
-              <Bell className="h-3 w-3" />
-              <span>
-                {
-                  customer.reminders.filter(
-                    (r: Reminder) => r.status !== "completed",
-                  ).length
-                }
-              </span>
-            </div>
-          )}
           <div className="text-xs text-muted-foreground truncate max-w-[80px]">
-            {customer.assignedAgent}
+            {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
           </div>
         </div>
       </div>
@@ -306,7 +301,7 @@ export default function CustomerCard({
             <div>
               <div className="font-medium text-sm">{customer.name}</div>
               <div className="text-xs text-muted-foreground">
-                {customer.customerType}
+                {customer.customer_type || "غير محدد"}
               </div>
             </div>
           </div>
@@ -347,41 +342,30 @@ export default function CustomerCard({
         </div>
 
         <div className="space-y-1">
-          {customer.probability > 0 && (
-            <Progress value={customer.probability} className="h-1" />
+          {customer.phone_number && (
+            <div className="flex items-center gap-1 text-xs">
+              <Phone className="h-3 w-3" />
+              <span>{customer.phone_number}</span>
+            </div>
           )}
         </div>
 
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1">
             <MapPin className="h-3 w-3" />
-            <span>{customer.city}</span>
+            <span>{customer.email || "لا يوجد بريد إلكتروني"}</span>
           </div>
         </div>
-
-        {customer.reminders && customer.reminders.length > 0 && (
-          <div className="flex items-center gap-1 text-xs text-orange-600">
-            <Bell className="h-3 w-3" />
-            <span>
-              {
-                customer.reminders.filter(
-                  (r: Reminder) => r.status !== "completed",
-                ).length
-              }{" "}
-              تذكير
-            </span>
-          </div>
-        )}
 
         <div className="flex items-center justify-between">
           <Badge
             variant="outline"
-            className={getPriorityColor(customer.urgency)}
+            className={getPriorityColor(customer.priority)}
           >
-            {customer.urgency}
+            {getPriorityLabel(customer.priority)}
           </Badge>
           <div className="text-xs text-muted-foreground">
-            {customer.assignedAgent}
+            {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
           </div>
         </div>
       </div>

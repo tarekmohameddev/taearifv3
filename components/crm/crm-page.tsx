@@ -334,27 +334,51 @@ export default function CrmPage() {
             }),
           );
 
-          // Transform customers data
+          // Add "unassigned" stage for customers without stage
+          const unassignedCustomers = crmData.stages_with_customers.flatMap(
+            (stage: any) => (stage.customers || []).filter((customer: any) => !customer.stage_id)
+          );
+          
+          if (unassignedCustomers.length > 0) {
+            transformedStages.unshift({
+              id: "unassigned",
+              name: "غير محدد",
+              color: "#9ca3af",
+              icon: "User",
+              count: unassignedCustomers.length,
+              value: 0,
+            });
+          }
+
+          // Transform customers data to match new API response format
           const allCustomers = crmData.stages_with_customers.flatMap(
             (stage: any) =>
               (stage.customers || []).map((customer: any) => ({
-                id: customer.customer_id,
-                customer_id: customer.customer_id,
+                id: customer.id || customer.customer_id,
+                user_id: customer.user_id || 0,
                 name: customer.name || "",
+                email: customer.email || null,
+                note: customer.note || null,
+                customer_type: customer.customer_type || null,
+                priority: customer.priority || 1,
+                stage_id: customer.stage_id || stage.stage_id || null,
+                procedure_id: customer.procedure_id || null,
+                city_id: customer.city_id || null,
+                district_id: customer.district_id || null,
+                phone_number: customer.phone_number || customer.phone || "",
+                created_at: customer.created_at || "",
+                updated_at: customer.updated_at || "",
+                // Backward compatibility fields
+                customer_id: customer.customer_id || customer.id,
                 nameEn: customer.name || "",
-                email: customer.email || "",
-                phone: customer.phone || "",
+                phone: customer.phone_number || customer.phone || "",
                 whatsapp: customer.whatsapp || "",
-                customerType: customer.customer_type || "",
                 city: customer.city?.name_ar || customer.city || "",
                 district: customer.district || "",
                 assignedAgent: customer.assigned_agent || "",
                 lastContact: customer.last_contact || "",
-                urgency: customer.priority
-                  ? getPriorityLabel(customer.priority)
-                  : "",
+                urgency: customer.priority ? getPriorityLabel(customer.priority) : "",
                 pipelineStage: String(stage.stage_id),
-                stage_id: String(stage.stage_id),
                 dealValue: customer.deal_value || 0,
                 probability: customer.probability || 0,
                 avatar: customer.avatar || "",
@@ -367,8 +391,7 @@ export default function CrmPage() {
                 familySize: customer.family_size || 0,
                 leadSource: customer.lead_source || "",
                 satisfaction: customer.satisfaction || 0,
-                communicationPreference:
-                  customer.communication_preference || "",
+                communicationPreference: customer.communication_preference || "",
                 expectedCloseDate: customer.expected_close_date || "",
               })),
           );
@@ -533,17 +556,17 @@ export default function CrmPage() {
         const originalStage = dragPreview.pipelineStage;
         const customerName = dragPreview.name;
 
-        updateCustomerStage(dragPreview.id, stageId);
+        updateCustomerStage(dragPreview.id.toString(), stageId);
 
         utilities.showSuccessAnimation(stageId);
         utilities.announceToScreenReader(`تم نقل العميل ${customerName} بنجاح`);
 
         dataHandler
-          .updateCustomerStage(dragPreview.id, stageId)
+          .updateCustomerStage(dragPreview.id.toString(), stageId)
           .then((success) => {
             if (!success) {
-              // Revert if API fails
-              updateCustomerStage(dragPreview.id, originalStage);
+                          // Revert if API fails
+            updateCustomerStage(dragPreview.id.toString(), originalStage || "");
               utilities.announceToScreenReader(
                 `فشل في نقل العميل ${customerName}`,
               );
@@ -551,7 +574,7 @@ export default function CrmPage() {
           })
           .catch((error) => {
             // Revert if API fails
-            updateCustomerStage(dragPreview.id, originalStage);
+            updateCustomerStage(dragPreview.id.toString(), originalStage || "");
             utilities.announceToScreenReader(
               `فشل في نقل العميل ${customerName}`,
             );
@@ -585,12 +608,12 @@ export default function CrmPage() {
     },
     onMoveCustomerToStage: async (customer, targetStageId) => {
       const success = await dataHandler.updateCustomerStage(
-        customer.id,
+        customer.id.toString(),
         targetStageId,
       );
-      if (success) {
-        updateCustomerStage(customer.id, targetStageId);
-      }
+              if (success) {
+          updateCustomerStage(customer.id.toString(), targetStageId);
+        }
     },
     onSetFocusedCustomer: setFocusedCustomer,
     onSetFocusedStage: setFocusedStage,
@@ -663,16 +686,19 @@ export default function CrmPage() {
   const filteredCustomers = customersData.filter((customer: Customer) => {
     const matchesSearch =
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.nameEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.phone.includes(searchTerm) ||
-      customer.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.district.toLowerCase().includes(searchTerm.toLowerCase());
+      (customer.nameEn?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (customer.email?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (customer.phone_number || customer.phone || "").includes(searchTerm) ||
+      (customer.city?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (customer.district?.toLowerCase() || "").includes(searchTerm.toLowerCase());
 
     const matchesStage =
-      filterStage === "all" || customer.pipelineStage === filterStage;
+      filterStage === "all" || 
+      (filterStage === "unassigned" && (!customer.pipelineStage && !customer.stage_id)) ||
+      customer.pipelineStage === filterStage ||
+      (customer.stage_id && String(customer.stage_id) === filterStage);
     const matchesType =
-      filterType === "all" || customer.customerType === filterType;
+      filterType === "all" || customer.customer_type === filterType;
     const matchesCity = filterCity === "all" || customer.city === filterCity;
     const matchesUrgency =
       filterUrgency === "all" ||
@@ -689,10 +715,19 @@ export default function CrmPage() {
 
   const pipelineStats = pipelineStages.map((stage: PipelineStage) => ({
     ...stage,
-    count: customersData.filter((c: Customer) => c.pipelineStage === stage.id)
-      .length,
+    count: customersData.filter((c: Customer) => {
+      if (stage.id === "unassigned") {
+        return !c.pipelineStage && !c.stage_id;
+      }
+      return c.pipelineStage === stage.id || (c.stage_id && String(c.stage_id) === stage.id);
+    }).length,
     value: customersData
-      .filter((c: Customer) => c.pipelineStage === stage.id)
+      .filter((c: Customer) => {
+        if (stage.id === "unassigned") {
+          return !c.pipelineStage && !c.stage_id;
+        }
+        return c.pipelineStage === stage.id || (c.stage_id && String(c.stage_id) === stage.id);
+      })
       .reduce((sum: number, c: Customer) => sum + (c.dealValue || 0), 0),
   }));
 
@@ -874,6 +909,10 @@ export default function CrmPage() {
               filterUrgency={filterUrgency}
               setFilterUrgency={setFilterUrgency}
               pipelineStages={pipelineStages}
+              onSearchResults={(results) => {
+                console.log("نتائج البحث:", results);
+                // نتائج البحث يتم تحديثها تلقائياً في الـ store
+              }}
             />
 
             {/* Main Content */}
@@ -904,6 +943,9 @@ export default function CrmPage() {
             {activeView === "appointments" && (
               <AppointmentsList
                 appointmentsData={appointmentsData}
+                searchTerm={searchTerm}
+                filterStage={filterStage}
+                filterUrgency={filterUrgency}
                 onViewAppointment={handleViewAppointment}
                 onEditAppointment={handleEditAppointment}
                 onAddAppointment={handleAddAppointment}
@@ -914,6 +956,9 @@ export default function CrmPage() {
             {activeView === "reminders" && (
               <RemindersList
                 remindersData={remindersData}
+                searchTerm={searchTerm}
+                filterStage={filterStage}
+                filterUrgency={filterUrgency}
                 onViewReminder={handleViewReminder}
                 onEditReminder={handleEditReminder}
                 onAddReminder={handleAddGeneralReminder}

@@ -1,36 +1,45 @@
 export interface Customer {
-  id: string;
-  customer_id: string;
+  id: number;
+  user_id: number;
   name: string;
-  nameEn: string;
-  email: string;
-  phone: string;
-  whatsapp: string;
-  customerType: string;
-  city: string;
-  district: string;
-  assignedAgent: string;
-  lastContact: string;
-  urgency: string;
-  pipelineStage: string;
-  stage_id: string;
-  dealValue: number;
-  probability: number;
-  avatar: string;
-  reminders: Reminder[];
-  interactions: Interaction[];
-  appointments: Appointment[];
-  notes: string;
-  joinDate: string;
-  nationality: string;
-  familySize: number;
-  leadSource: string;
-  satisfaction: number;
-  communicationPreference: string;
-  expectedCloseDate: string;
+  email: string | null;
+  note: string | null;
+  customer_type: string | null;
+  priority: number;
+  stage_id: number | null;
+  procedure_id: number | null;
+  city_id: number | null;
+  district_id: number | null;
+  phone_number: string;
+  created_at: string;
+  updated_at: string;
+  // Optional fields for backward compatibility
+  customer_id?: string;
+  nameEn?: string;
+  phone?: string;
+  whatsapp?: string;
+  city?: string;
+  district?: string;
+  assignedAgent?: string;
+  lastContact?: string;
+  urgency?: string;
+  pipelineStage?: string;
+  dealValue?: number;
+  probability?: number;
+  avatar?: string;
+  reminders?: Reminder[];
+  interactions?: Interaction[];
+  appointments?: Appointment[];
+  notes?: string;
+  joinDate?: string;
+  nationality?: string;
+  familySize?: number;
+  leadSource?: string;
+  satisfaction?: number;
+  communicationPreference?: string;
+  expectedCloseDate?: string;
   status?: string;
   totalValue?: number;
-  priority?: number;
 }
 
 export interface PipelineStage {
@@ -42,6 +51,7 @@ export interface PipelineStage {
   value: number;
   description?: string;
   iconName?: string;
+  order?: number;
 }
 
 export interface Reminder {

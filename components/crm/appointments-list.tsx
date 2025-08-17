@@ -20,6 +20,9 @@ import type { Appointment } from "@/types/crm";
 
 interface AppointmentsListProps {
   appointmentsData: Appointment[];
+  searchTerm: string;
+  filterStage: string;
+  filterUrgency: string;
   onViewAppointment: (appointment: Appointment) => void;
   onEditAppointment: (appointment: Appointment) => void;
   onAddAppointment: () => void;
@@ -27,6 +30,9 @@ interface AppointmentsListProps {
 
 export default function AppointmentsList({
   appointmentsData,
+  searchTerm,
+  filterStage,
+  filterUrgency,
   onViewAppointment,
   onEditAppointment,
   onAddAppointment,
@@ -59,6 +65,25 @@ export default function AppointmentsList({
     }
   };
 
+  // Filter appointments based on search and filters
+  const filteredAppointments = appointmentsData.filter((appointment) => {
+    const matchesSearch = searchTerm === "" || 
+      appointment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.customer?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.customer?.phone_number?.includes(searchTerm) ||
+      appointment.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStage = filterStage === "all" || 
+      (filterStage === "unassigned" && (!appointment.customer?.pipelineStage && !appointment.customer?.stage_id)) ||
+      appointment.customer?.pipelineStage === filterStage ||
+      (appointment.customer?.stage_id && String(appointment.customer.stage_id) === filterStage);
+
+    const matchesUrgency = filterUrgency === "all" || 
+      appointment.priority_label === filterUrgency;
+
+    return matchesSearch && matchesStage && matchesUrgency;
+  });
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -76,7 +101,12 @@ export default function AppointmentsList({
 
       {/* Appointments List */}
       <div className="space-y-4">
-        {appointmentsData.map((appointment) => (
+        {filteredAppointments.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">لا توجد مواعيد تطابق معايير البحث</p>
+          </div>
+        ) : (
+          filteredAppointments.map((appointment) => (
           <Card
             key={appointment.id}
             className="hover:shadow-md transition-shadow"
@@ -173,7 +203,8 @@ export default function AppointmentsList({
               </div>
             </CardContent>
           </Card>
-        ))}
+        ))
+        )}
       </div>
     </div>
   );

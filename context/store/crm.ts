@@ -164,7 +164,7 @@ const useCrmStore = create<CrmStore>()(
         // Update customers and cache in one operation for better performance
         const cache = new Map();
         customers.forEach((customer) => {
-          cache.set(customer.id, customer);
+          cache.set(customer.id.toString(), customer);
         });
         set({
           customers,
@@ -197,7 +197,7 @@ const useCrmStore = create<CrmStore>()(
 
         // Update in memory immediately
         const updatedCustomers = customers.map((customer) =>
-          customer.id === customerId
+          customer.id.toString() === customerId
             ? { ...customer, pipelineStage: newStageId }
             : customer,
         );
@@ -225,7 +225,7 @@ const useCrmStore = create<CrmStore>()(
         const { customers, customersCache } = get();
         const updatedCustomers = [...customers, customer];
         const updatedCache = new Map(customersCache);
-        updatedCache.set(customer.id, customer);
+        updatedCache.set(customer.id.toString(), customer);
 
         set({
           customers: updatedCustomers,
@@ -237,7 +237,7 @@ const useCrmStore = create<CrmStore>()(
         const { customers, customersCache } = get();
 
         const updatedCustomers = customers.map((customer) =>
-          customer.id === customerId ? { ...customer, ...updates } : customer,
+          customer.id.toString() === customerId ? { ...customer, ...updates } : customer,
         );
 
         const updatedCache = new Map(customersCache);
@@ -255,7 +255,7 @@ const useCrmStore = create<CrmStore>()(
       removeCustomer: (customerId) => {
         const { customers, customersCache } = get();
         const updatedCustomers = customers.filter(
-          (customer) => customer.id !== customerId,
+          (customer) => customer.id.toString() !== customerId,
         );
         const updatedCache = new Map(customersCache);
         updatedCache.delete(customerId);

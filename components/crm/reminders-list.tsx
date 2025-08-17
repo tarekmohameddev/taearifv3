@@ -34,6 +34,9 @@ interface ApiReminder {
 
 interface RemindersListProps {
   remindersData: ApiReminder[];
+  searchTerm: string;
+  filterStage: string;
+  filterUrgency: string;
   onViewReminder: (reminder: ApiReminder) => void;
   onEditReminder: (reminder: ApiReminder) => void;
   onAddReminder: () => void;
@@ -42,6 +45,9 @@ interface RemindersListProps {
 
 export default function RemindersList({
   remindersData,
+  searchTerm,
+  filterStage,
+  filterUrgency,
   onViewReminder,
   onEditReminder,
   onAddReminder,
@@ -127,6 +133,20 @@ export default function RemindersList({
     }
   };
 
+  // Filter reminders based on search and filters
+  const filteredReminders = remindersData.filter((reminder) => {
+    const matchesSearch = searchTerm === "" || 
+      reminder.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reminder.customer?.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // For reminders, we can't filter by stage since they don't have stage info
+    // But we can filter by priority
+    const matchesUrgency = filterUrgency === "all" || 
+      getPriorityLabel(reminder.priority_label) === filterUrgency;
+
+    return matchesSearch && matchesUrgency;
+  });
+
   // Format datetime for Saudi Arabia
   const formatSaudiDateTime = (datetime: string) => {
     try {
@@ -176,7 +196,12 @@ export default function RemindersList({
 
       {/* Reminders List */}
       <div className="space-y-4">
-        {remindersData.map((reminder) => {
+        {filteredReminders.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">لا توجد تذكيرات تطابق معايير البحث</p>
+          </div>
+        ) : (
+          filteredReminders.map((reminder) => {
           const { formattedDate, formattedTime } = formatSaudiDateTime(
             reminder.datetime,
           );
@@ -271,7 +296,8 @@ export default function RemindersList({
               </CardContent>
             </Card>
           );
-        })}
+        })
+        )}
 
         {remindersData.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">

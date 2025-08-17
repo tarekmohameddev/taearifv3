@@ -125,7 +125,7 @@ export default function AddAppointmentDialog({
           customer: selectedCustomer
             ? selectedCustomer
             : customers.find(
-                (c) => c.customer_id.toString() === appointmentData.customer_id,
+                (c) => c.id.toString() === appointmentData.customer_id,
               ),
         };
 
@@ -182,12 +182,12 @@ export default function AddAppointmentDialog({
               >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر العميل">
-                    {appointmentData.customer_id && customers.find(c => c.customer_id.toString() === appointmentData.customer_id)?.name}
+                    {appointmentData.customer_id && customers.find(c => c.id.toString() === appointmentData.customer_id)?.name}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {customers.map((customer) => (
-                    <SelectItem key={customer.customer_id} value={customer.customer_id.toString()}>
+                    <SelectItem key={customer.id} value={customer.id.toString()}>
                       {customer.name}
                     </SelectItem>
                   ))}
