@@ -177,7 +177,6 @@ export function EnhancedSidebar({
       <div className="flex h-14 items-center border-b px-4 md:h-[60px]">
         <div className="flex flex-col w-full">
           <span className="text-lg font-semibold truncate">
-          {  console.log("useAuthStore.getState().userData",useAuthStore.getState().userData)}
             {useAuthStore.getState().userData?.company_name}
           </span>
         </div>

@@ -35,7 +35,6 @@ export default function AddAppointmentDialog({
     setShowAddAppointmentDialog,
     customers,
   } = useCrmStore();
-
   const [appointmentData, setAppointmentData] = useState({
     customer_id: "",
     title: "",
@@ -126,7 +125,7 @@ export default function AddAppointmentDialog({
           customer: selectedCustomer
             ? selectedCustomer
             : customers.find(
-                (c) => c.customer_id === appointmentData.customer_id,
+                (c) => c.customer_id.toString() === appointmentData.customer_id,
               ),
         };
 
@@ -182,11 +181,13 @@ export default function AddAppointmentDialog({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="اختر العميل" />
+                  <SelectValue placeholder="اختر العميل">
+                    {appointmentData.customer_id && customers.find(c => c.customer_id.toString() === appointmentData.customer_id)?.name}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.customer_id}>
+                    <SelectItem key={customer.customer_id} value={customer.customer_id.toString()}>
                       {customer.name}
                     </SelectItem>
                   ))}
