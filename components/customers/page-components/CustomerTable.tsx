@@ -175,10 +175,11 @@ export const CustomerTable = ({
                       ))}
                   </Button>
                 </TableHead>
-                <TableHead className="text-right">الاتصال</TableHead>
+                <TableHead className="text-right">معلومات الاتصال</TableHead>
                 <TableHead className="text-right">النوع</TableHead>
+                <TableHead className="text-right">المرحلة</TableHead>
+                <TableHead className="text-right">الأولوية</TableHead>
                 <TableHead className="text-right">الموقع</TableHead>
-                <TableHead className="text-right">آخر تواصل</TableHead>
                 <TableHead className="w-[100px] text-right">
                   الإجراءات
                 </TableHead>
@@ -204,8 +205,21 @@ export const CustomerTable = ({
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
+                      {/* Email */}
+                      {customer.email ? (
+                        <div className="flex items-center text-sm">
+                          <Mail className="ml-2 h-3 w-3 text-blue-600" />
+                          <span className="font-medium">{customer.email}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center text-sm text-muted-foreground">
+                          <Mail className="ml-2 h-3 w-3" />
+                          <span className="italic">لا يوجد بريد إلكتروني</span>
+                        </div>
+                      )}
+                      
                       {/* Phone Number */}
-                      {customer.phone_number && customer.phone_number !== "N/A" ? (
+                      {customer.phone_number ? (
                         <div className="flex items-center text-sm">
                           <Phone className="ml-2 h-3 w-3 text-green-600" />
                           <span className="font-medium">{customer.phone_number}</span>
@@ -213,77 +227,65 @@ export const CustomerTable = ({
                       ) : (
                         <div className="flex items-center text-sm text-muted-foreground">
                           <Phone className="ml-2 h-3 w-3" />
-                          <span className="italic">لا يوجد رقم</span>
+                          <span className="italic">لا يوجد رقم هاتف</span>
                         </div>
                       )}
-                      
-                      {/* WhatsApp */}
-                      {customer.whatsapp && customer.whatsapp !== "N/A" && customer.whatsapp !== customer.phone_number ? (
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <MessageSquare className="ml-2 h-3 w-3 text-green-500" />
-                          <span>{customer.whatsapp}</span>
-                        </div>
-                      ) : customer.phone_number && customer.phone_number !== "N/A" ? (
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <MessageSquare className="ml-2 h-3 w-3 text-green-500" />
-                          <span className="text-xs">نفس رقم الهاتف</span>
-                        </div>
-                      ) : null}
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge
                       variant="outline"
                       className={
-                        customer.customer_type === "مشتري"
+                        customer.type?.name === "Buyer" || customer.type?.name === "مشتري"
                           ? "border-blue-500 text-blue-700"
-                          : customer.customer_type === "بائع"
+                          : customer.type?.name === "Seller" || customer.type?.name === "بائع"
                           ? "border-green-500 text-green-700"
-                          : customer.customer_type === "مستأجر"
+                          : customer.type?.name === "Rented" || customer.type?.name === "مستأجر"
                           ? "border-purple-500 text-purple-700"
-                          : customer.customer_type === "مؤجر"
+                          : customer.type?.name === "Landlord" || customer.type?.name === "مؤجر"
                           ? "border-orange-500 text-orange-700"
-                          : "border-red-500 text-red-700"
+                          : customer.type?.name === "Investor" || customer.type?.name === "مستثمر"
+                          ? "border-red-500 text-red-700"
+                          : "border-gray-500 text-gray-700"
                       }
                     >
-                      {customer.customer_type}
+                      {customer.type?.name || "غير محدد"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className="border-gray-500 text-gray-700"
+                    >
+                      {customer.stage?.name || "بدون مرحلة"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={
+                        customer.priority?.name === "High" || customer.priority?.name === "عالية"
+                          ? "border-red-500 text-red-700"
+                          : customer.priority?.name === "Medium" || customer.priority?.name === "متوسطة"
+                          ? "border-yellow-500 text-yellow-700"
+                          : customer.priority?.name === "Low" || customer.priority?.name === "منخفضة"
+                          ? "border-green-500 text-green-700"
+                          : "border-gray-500 text-gray-700"
+                      }
+                    >
+                      {customer.priority?.name || "غير محدد"}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
                       {/* City */}
                       <div className="font-medium text-right">
-                        {typeof customer.district === "string" && customer.district && customer.district !== "N/A" ? 
-                          customer.district : 
-                          customer.district?.city_name_ar ? 
-                          customer.district.city_name_ar : 
-                          <span className="text-muted-foreground text-sm italic">غير محددة</span>
-                        }
+                        {customer.district?.city_name_ar || "غير محدد"}
                       </div>
                       {/* District */}
                       <div className="text-sm text-muted-foreground text-right">
-                        {typeof customer.district === "string" && customer.district && customer.district !== "N/A" ? 
-                          customer.district : 
-                          (customer.district as { name_ar: string })?.name_ar ? 
-                          (customer.district as { name_ar: string }).name_ar :
-                          <span className="italic">لا يوجد حي محدد</span>
-                        }
+                        {customer.district?.name_ar || "لا يوجد حي محدد"}
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center text-sm">
-                      {customer.lastContact ? (
-                        <>
-                          <Clock className="ml-2 h-3 w-3 text-blue-500" />
-                          <span className="font-medium">{customer.lastContact}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="ml-2 h-3 w-3 text-muted-foreground" />
-                          <span className="text-muted-foreground italic">لم يتم التواصل بعد</span>
-                        </>
-                      )}
                     </div>
                   </TableCell>
                   <TableCell>

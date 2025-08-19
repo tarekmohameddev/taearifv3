@@ -4,9 +4,8 @@ import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import { z } from "zod";
-import toast from "react-hot-toast";
+import { useEffect, useState, useCallback } from "react";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { CustomerPageHeader } from "./page-components/CustomerPageHeader";
 import { StatisticsCards } from "./page-components/StatisticsCards";
@@ -15,127 +14,102 @@ import { FiltersAndSearch } from "./page-components/FiltersAndSearch";
 import { CustomerTable } from "./page-components/CustomerTable";
 import { CrmLinkCard } from "./page-components/CrmLinkCard";
 import { CustomerDetailDialog } from "./page-components/CustomerDetailDialog";
+import useCustomersFiltersStore from "@/context/store/customersFilters";
 
-// Zod validation schema
-const customerSchema = z.object({
-  name: z.string().min(1, "الاسم مطلوب"),
-  email: z.string().email("البريد الإلكتروني غير صحيح").optional().or(z.literal("")),
-  phone_number: z.string().min(1, "رقم الهاتف مطلوب"),
-  password: z.string().min(1, "كلمة المرور مطلوبة"),
-  city_id: z.number().nullable(),
-  district_id: z.union([z.number(), z.string()]).nullable(),
-  note: z.string().optional(),
-  customer_type: z.string(),
-  priority: z.number(),
-  stage_id: z.union([z.number(), z.null(), z.literal("")]).optional(),
-});
 
-// Error message translation mapping
-const errorTranslations: Record<string, string> = {
-  "The phone number has already been taken.": "رقم الهاتف مُستخدم بالفعل، يرجى استخدام رقم آخر",
-  "The email has already been taken.": "البريد الإلكتروني مُستخدم بالفعل، يرجى استخدام بريد آخر",
-  "The name field is required.": "حقل الاسم مطلوب",
-  "The phone number field is required.": "حقل رقم الهاتف مطلوب",
-  "The password field is required.": "حقل كلمة المرور مطلوب",
-  "The email must be a valid email address.": "يجب أن يكون البريد الإلكتروني صحيحاً",
-  "The phone number format is invalid.": "تنسيق رقم الهاتف غير صحيح",
-  "The password must be at least 6 characters.": "كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل",
-};
-
-// Function to translate error messages
-const translateErrorMessage = (message: string): string => {
-  return errorTranslations[message] || message;
-};
 
 interface Customer {
   id: number;
   name: string;
-  nameEn: string;
   email: string;
   phone_number: string;
-  whatsapp: string;
-  status: string;
-  customer_type: string;
-  nationality: string;
-  residencyStatus: string;
-  city: string | { id: number; name_ar: string };
-  district: string | { id: number; name_ar: string; city_name_ar: string };
-  budget: { min: number; max: number };
-  propertyPreferences: string[];
-  familySize: number;
-  leadSource: string;
-  assignedAgent: string;
-  joinDate: string;
-  lastContact: string;
-  lastActivity: string;
-  totalTransactions: number;
-  totalValue: number;
-  notes: string;
-  avatar: string;
-  satisfaction: number;
-  communicationPreference: string;
-  urgency: string;
-  pipelineStage: string;
-  dealValue: number;
-  probability: number;
-  expectedCloseDate: string;
-  note: string;
-  priority: number;
-  city_id: number | null;
-  district_id?: number | string | null;
-  stage_id?: number | null;
+  type: {
+    id: number;
+    name: string;
+  };
+  stage: {
+    id: number;
+    name: string;
+  };
+  priority: {
+    id: number;
+    name: string;
+  };
+  procedure: {
+    id: number;
+    name: string;
+  };
+  district: {
+    id: number;
+    name_ar: string;
+    name_en: string;
+    city_id: number;
+    city_name_ar: string;
+    city_name_en: string;
+    country_name_ar: string;
+    country_name_en: string;
+    created_at: string;
+    updated_at: string;
+  };
+  note: string | null;
+  city_id: number;
+  created_by: number;
+  created_at: string;
+  updated_at: string;
+  interested_categories: any[];
+  interested_properties: any[];
 }
 // Customer data (same as CRM page for consistency)
 const customers: Customer[] = [
   {
     id: 1,
     name: "أحمد محمد العلي",
-    nameEn: "Ahmed Mohammed Al-Ali",
     email: "ahmed.alali@email.com",
     phone_number: "+966 50 123 4567",
-    whatsapp: "+966 50 123 4567",
-    status: "نشط",
-    customer_type: "مشتري",
-    nationality: "سعودي",
-    residencyStatus: "مواطن",
-    city: "الرياض",
-    district: "العليا",
-    budget: { min: 800000, max: 1200000 },
-    propertyPreferences: ["فيلا", "شقة"],
-    familySize: 5,
-    leadSource: "إحالة",
-    assignedAgent: "سارة أحمد",
-    joinDate: "2023-08-15",
-    lastContact: "2023-11-10",
-    lastActivity: "2023-11-12",
-    totalTransactions: 1,
-    totalValue: 950000,
-    notes: "عميل مهم، يبحث عن فيلا في حي راقي",
-    avatar: "/placeholder.svg?height=40&width=40",
-    satisfaction: 4.8,
-    communicationPreference: "واتساب",
-    urgency: "عالية",
-    pipelineStage: "negotiation",
-    dealValue: 950000,
-    probability: 75,
-    expectedCloseDate: "2023-12-15",
+    type: {
+      id: 1,
+      name: "مشتري"
+    },
+    stage: {
+      id: 1,
+      name: "مرحلة أولية"
+    },
+    priority: {
+      id: 2,
+      name: "متوسطة"
+    },
+    procedure: {
+      id: 1,
+      name: "لقاء"
+    },
+    district: {
+      id: 10100003001,
+      name_ar: "حي العليا",
+      name_en: "Al Olaya",
+      city_id: 1,
+      city_name_ar: "الرياض",
+      city_name_en: "Riyadh",
+      country_name_ar: "السعودية",
+      country_name_en: "Saudi Arabia",
+      created_at: "2023-08-15T00:00:00.000000Z",
+      updated_at: "2023-08-15T00:00:00.000000Z"
+    },
     note: "عميل مهم، يبحث عن فيلا في حي راقي",
-    priority: 1,
-    city_id: 1, // Example city_id
-    stage_id: 2,
+    city_id: 1,
+    created_by: 1,
+    created_at: "2023-08-15T00:00:00.000000Z",
+    updated_at: "2023-08-15T00:00:00.000000Z",
+    interested_categories: [],
+    interested_properties: []
   },
 ];
 
 export default function CustomersPage() {
   const [activeTab, setActiveTab] = useState("customers");
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedCustomers, setSelectedCustomers] = useState<number[]>([]);
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [filterType, setFilterType] = useState("all");
-  const [filterCity, setFilterCity] = useState("all");
   const [showCustomerDialog, setShowCustomerDialog] = useState(false);
   const [showAddCustomerDialog, setShowAddCustomerDialog] = useState(false);
   const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false);
@@ -145,7 +119,17 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [customersData, setCustomersData] = useState<Customer[]>([]); // ← هنا يتم حفظ كل العملاء
-  const [formData, setFormData] = useState<Partial<Customer> | null>(null); // ← بيانات العميل المحدد
+  const [formData, setFormData] = useState<{
+    name: string;
+    email: string;
+    phone_number: string;
+    note: string;
+    type_id: number;
+    priority_id: number;
+    city_id: number | undefined;
+    district_id: number | undefined;
+    stage_id: number | undefined;
+  } | null>(null); // ← بيانات العميل المحدد
   const [editingCustomerId, setEditingCustomerId] = useState<number | null>(
     null,
   ); // ← ID العميل الجاري تعديله
@@ -161,28 +145,46 @@ export default function CustomersPage() {
     city_id: null,
     district_id: null,
     note: "",
-    customer_type: "مشتري", // Default value
-    priority: 1,
+    type_id: 1, // Default value
+    priority_id: 1,
     stage_id: null, // Default empty value for optional stage
+    procedure_id: null, // Default value for procedure_id
   });
 
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const response = await axiosInstance.get("/customers");
-        const { customers, summary } = response.data.data;
-        setCustomersData(customers);
-        setTotalCustomers(summary.total_customers);
-      } catch (err) {
-        console.error("Error fetching customers:", err);
-        setError("حدث خطأ أثناء تحميل البيانات.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Get filter states from store
+  const { searchTerm, filterType, filterCity } = useCustomersFiltersStore();
 
-    fetchCustomers();
+  // Function to fetch customers with current filters
+  const fetchCustomersWithFilters = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get("/customers");
+      const { customers, summary } = response.data.data;
+      setCustomersData(customers);
+      setTotalCustomers(summary.total_customers);
+    } catch (err) {
+      console.error("Error fetching customers:", err);
+      setError("حدث خطأ أثناء تحميل البيانات.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchCustomersWithFilters();
+  }, [fetchCustomersWithFilters]);
+
+  // Function to handle filter changes from FiltersAndSearch component
+  const handleFilterChange = useCallback((newCustomersData: Customer[]) => {
+    setCustomersData(newCustomersData);
+  }, []);
+
+  // Function to handle new customer added
+  const handleCustomerAdded = useCallback((newCustomer: Customer) => {
+    setCustomersData((prev) => [newCustomer, ...prev]);
+  }, []);
+
+  // Search is now handled by FiltersAndSearch component
 
   const handleNewCustomerChange = (field: keyof typeof newCustomer) => (
     value: any,
@@ -196,95 +198,8 @@ export default function CustomersPage() {
   };
 
   const handleAddCustomer = async () => {
-    setIsSubmitting(true);
-    try {
-      // Client-side validation using Zod
-      setClientErrors({});
-      setValidationErrors({});
-      
-      // معالجة stage_id قبل الإرسال
-      const customerDataToSend: any = {
-        ...newCustomer,
-        stage_id: newCustomer.stage_id === null ? "" : newCustomer.stage_id
-      };
-
-      // إزالة stage_id إذا كان فارغاً لتجنب مشاكل الـ API
-      if (customerDataToSend.stage_id === "") {
-        delete customerDataToSend.stage_id;
-      }
-
-      const validationResult = customerSchema.safeParse(customerDataToSend);
-      
-      if (!validationResult.success) {
-        const errors: Record<string, string> = {};
-        validationResult.error.errors.forEach((error) => {
-          if (error.path[0]) {
-            errors[error.path[0] as string] = error.message;
-          }
-        });
-        setClientErrors(errors);
-        return;
-      }
-
-      const response = await axiosInstance.post("/customers", customerDataToSend);
-      // Add the new customer to the list
-      setCustomersData((prev) => [response.data.data, ...prev]);
-      
-      // Show success toast
-      toast.success("تم إضافة العميل بنجاح! 🎉", {
-        duration: 4000,
-        position: "top-center",
-      });
-      
-      setShowAddCustomerDialog(false);
-      // Reset form - clear all inputs
-      setNewCustomer({
-        name: "",
-        email: "",
-        phone_number: "",
-        password: "",
-        city_id: null,
-        district_id: null,
-        note: "",
-        customer_type: "مشتري",
-        priority: 1,
-        stage_id: null,
-      });
-      // Clear any existing errors
-      setClientErrors({});
-      setValidationErrors({});
-    } catch (error: any) {
-      console.error("Error adding customer:", error);
-      // You can add error handling here, like showing a toast message
-      if (error?.response && error?.response?.status === 422) {
-        const serverErrors = error?.response?.data?.errors || {};
-        // Translate server error messages to Arabic
-        const translatedErrors: Record<string, string[]> = {};
-        Object.keys(serverErrors).forEach(field => {
-          translatedErrors[field] = serverErrors[field].map((msg: string) => 
-            translateErrorMessage(msg)
-          );
-        });
-        setValidationErrors(translatedErrors);
-      } else {
-        // Handle other types of errors (e.g., show a generic error message)
-        console.error("An unexpected error occurred:", error);
-        toast.error("حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى", {
-          duration: 4000,
-          position: "top-center",
-          style: {
-            background: "#EF4444",
-            color: "#fff",
-            fontWeight: "bold",
-            fontSize: "16px",
-            padding: "12px 20px",
-            borderRadius: "8px",
-          },
-        });
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+    // This function is now handled by CustomerPageHeader component
+    // The validation and API call logic has been moved there
   };
 
   const openEditDialog = (customer: Customer) => {
@@ -294,11 +209,11 @@ export default function CustomersPage() {
       email: customer.email || "",
       phone_number: customer.phone_number || "",
       note: customer.note || "",
-      customer_type: customer.customer_type || "",
-      priority: customer.priority || 1,
-      city_id: typeof customer.city === 'object' ? customer.city.id : null,
-      district_id: typeof customer.district === 'object' ? customer.district.id : null,
-      stage_id: 2,
+      type_id: customer.type?.id || 1,
+      priority_id: customer.priority?.id || 1,
+      city_id: customer.city_id || undefined,
+      district_id: customer.district?.id || undefined,
+      stage_id: customer.stage?.id || undefined,
     });
     setOpen(true);
   };
@@ -476,10 +391,10 @@ export default function CustomersPage() {
     }
   };
 
-  const handleChange = (field: keyof Customer) => (
+  const handleChange = (field: string) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+    setFormData((prev) => prev ? ({ ...prev, [field]: e.target.value }) : null);
   };
 
   const handleStageUpdated = (customerId: number, newStageId: number) => {
@@ -493,31 +408,8 @@ export default function CustomersPage() {
     );
   };
 
-  // Filter and sort customers
+  // Sort customers (filtering is now handled by API)
   const filteredAndSortedCustomers = customersData
-    .filter((customer) => {
-      const matchesSearch =
-        customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (customer.nameEn &&
-          customer.nameEn.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.phone_number.includes(searchTerm) ||
-        (typeof customer.city === "string" &&
-          customer.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (typeof customer.district === "string"
-          ? customer.district?.toLowerCase().includes(searchTerm.toLowerCase())
-          : (customer.district as { name_ar: string })?.name_ar
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()));
-
-      const matchesStatus =
-        filterStatus === "all" || customer.status === filterStatus;
-      const matchesType =
-        filterType === "all" || customer.customer_type === filterType;
-      const matchesCity = filterCity === "all" || customer.city === filterCity;
-
-      return matchesSearch && matchesStatus && matchesType && matchesCity;
-    })
     .sort((a, b) => {
       let aValue = a[sortField as keyof Customer];
       let bValue = b[sortField as keyof Customer];
@@ -559,30 +451,25 @@ export default function CustomersPage() {
   };
 
   // Calculate basic statistics
-  const activeCustomers = customersData.filter(
-    (c) => c.status === "نشط",
-  ).length;
-  const totalRevenue = customersData.reduce(
-    (sum, c) => sum + (c.totalValue || 0),
-    0,
-  );
-  const avgCustomerValue = totalCustomers > 0 ? totalRevenue / totalCustomers : 0;
+  const activeCustomers = customersData.length; // All customers are considered active
+  const totalRevenue = 0; // No revenue data in new API
+  const avgCustomerValue = 0; // No value data in new API
 
   // Customer type statistics
   const buyerCount = customersData.filter(
-    (c) => c.customer_type === "مشتري",
+    (c) => c.type?.name === "مشتري" || c.type?.name === "Buyer",
   ).length;
   const sellerCount = customersData.filter(
-    (c) => c.customer_type === "بائع",
+    (c) => c.type?.name === "بائع" || c.type?.name === "Seller",
   ).length;
   const renterCount = customersData.filter(
-    (c) => c.customer_type === "مستأجر",
+    (c) => c.type?.name === "مستأجر" || c.type?.name === "Rented",
   ).length;
   const landlordCount = customersData.filter(
-    (c) => c.customer_type === "مؤجر",
+    (c) => c.type?.name === "مؤجر" || c.type?.name === "Landlord",
   ).length;
   const investorCount = customersData.filter(
-    (c) => c.customer_type === "مستثمر",
+    (c) => c.type?.name === "مستثمر" || c.type?.name === "Investor",
   ).length;
 
   const handleDelete = async (customerId: number) => {
@@ -614,12 +501,12 @@ export default function CustomersPage() {
               handleNewCustomerInputChange={handleNewCustomerInputChange}
               validationErrors={validationErrors}
               clientErrors={clientErrors}
-              handleAddCustomer={handleAddCustomer}
               isSubmitting={isSubmitting}
               setValidationErrors={setValidationErrors}
               setClientErrors={setClientErrors}
               setIsSubmitting={setIsSubmitting}
               setNewCustomer={setNewCustomer}
+              onCustomerAdded={handleCustomerAdded}
             />
 
             {/* Statistics Cards */}
@@ -636,14 +523,10 @@ export default function CustomersPage() {
 
             {/* Filters and Search */}
             <FiltersAndSearch
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              filterStatus={filterStatus}
-              setFilterStatus={setFilterStatus}
-              filterType={filterType}
-              setFilterType={setFilterType}
-              filterCity={filterCity}
-              setFilterCity={setFilterCity}
+              setCustomersData={handleFilterChange}
+              setTotalCustomers={(total: number) => setTotalCustomers(total)}
+              setLoading={setLoading}
+              setError={setError}
             />
 
             {/* Main Content */}
