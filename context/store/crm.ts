@@ -20,12 +20,54 @@ interface Reminder {
   updated_at?: string;
 }
 
+interface CrmProcedure {
+  id: number;
+  user_id: number;
+  procedure_name: string;
+  color: string;
+  icon: string;
+  order: number;
+  description?: string;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface CrmPriority {
+  id: number;
+  user_id: number;
+  name: string;
+  value: number;
+  color: string;
+  icon: string;
+  order: number;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface CrmType {
+  id: number;
+  user_id: number;
+  name: string;
+  value: string;
+  color: string;
+  icon: string;
+  order: number;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
+}
+
 interface CrmStore {
   // CRM Data
   customers: Customer[];
   pipelineStages: PipelineStage[];
   appointments: Appointment[];
   reminders: Reminder[];
+  procedures: CrmProcedure[];
+  priorities: CrmPriority[];
+  types: CrmType[];
 
   // Cache
   customersCache: Map<string, Customer>;
@@ -67,6 +109,9 @@ interface CrmStore {
   setPipelineStages: (stages: PipelineStage[]) => void;
   setAppointments: (appointments: Appointment[]) => void;
   setReminders: (reminders: Reminder[]) => void;
+  setProcedures: (procedures: CrmProcedure[]) => void;
+  setPriorities: (priorities: CrmPriority[]) => void;
+  setTypes: (types: CrmType[]) => void;
   updateCustomerStage: (customerId: string, newStageId: string) => Customer[];
   addCustomer: (customer: Customer) => void;
   updateCustomer: (customerId: string, updates: Partial<Customer>) => void;
@@ -123,6 +168,9 @@ const useCrmStore = create<CrmStore>()(
       pipelineStages: [],
       appointments: [],
       reminders: [],
+      procedures: [],
+      priorities: [],
+      types: [],
 
       // Cache
       customersCache: new Map(),
@@ -190,6 +238,18 @@ const useCrmStore = create<CrmStore>()(
 
       setReminders: (reminders) => {
         set({ reminders });
+      },
+
+      setProcedures: (procedures) => {
+        set({ procedures });
+      },
+
+      setPriorities: (priorities) => {
+        set({ priorities });
+      },
+
+      setTypes: (types) => {
+        set({ types });
       },
 
       updateCustomerStage: (customerId, newStageId) => {
@@ -368,6 +428,9 @@ const useCrmStore = create<CrmStore>()(
         pipelineStages: state.pipelineStages,
         appointments: state.appointments,
         reminders: state.reminders,
+        procedures: state.procedures,
+        priorities: state.priorities,
+        types: state.types,
       }),
     },
   ),
