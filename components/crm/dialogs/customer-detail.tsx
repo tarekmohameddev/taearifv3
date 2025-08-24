@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,303 +10,223 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  Phone,
-  Mail,
-  User,
-  Building2,
-  MessageSquare,
-  Bell,
-  Activity,
-  FileText,
-} from "lucide-react";
+import { Phone, MessageSquare, Loader2, AlertTriangle, PlusCircle } from "lucide-react";
 import useCrmStore from "@/context/store/crm";
+import axiosInstance from "@/lib/axiosInstance";
+import {
+  CrmActivityCard,
+  CrmCard,
+  Project,
+  Property,
+} from "./crm-activity-card";
+import { AddActivityForm } from "./add-activity-form";
 
 export default function CustomerDetailDialog() {
-  const {
-    showCustomerDialog,
-    selectedCustomer,
-    setShowCustomerDialog,
-    setSelectedCustomer,
-    setShowAddNoteDialog,
-    setShowAddReminderDialog,
-    setShowAddInteractionDialog,
-  } = useCrmStore();
+  const { showCustomerDialog, selectedCustomer, setShowCustomerDialog, setSelectedCustomer } = useCrmStore();
+  
+  const [cards, setCards] = useState<CrmCard[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Helper function to safely extract text from potentially nested objects
+  useEffect(() => {
+    if (selectedCustomer) {
+      setShowAddForm(false); // Reset form visibility
+      const fetchDetails = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const [cardsRes, projectsRes, propertiesRes] = await Promise.all([
+            axiosInstance.get(`/v1/crm/cards?customer_id=${selectedCustomer.id}`),
+            axiosInstance.get("/projects"),
+            axiosInstance.get("/properties"),
+          ]);
+
+          if (cardsRes.data.status === "success") {
+            setCards(cardsRes.data.data.cards || []);
+          }
+          if (projectsRes.data.status === "success") {
+            setProjects(projectsRes.data.data.projects || []);
+          }
+          if (propertiesRes.data.status === "success") {
+            setProperties(propertiesRes.data.data.properties || []);
+          }
+        } catch (err) {
+          console.error("Failed to fetch customer details:", err);
+          setError("فشل في تحميل تفاصيل العميل.");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchDetails();
+    }
+  }, [selectedCustomer]);
+  
+  const handleAddCard = async (data: any) => {
+    if (!selectedCustomer) return;
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        ...data,
+        card_customer_id: selectedCustomer.id,
+      };
+      const response = await axiosInstance.post("/v1/crm/cards", payload);
+      if (response.data.status === true) {
+        // Assuming the response returns the newly created card
+        const newCard = response.data.data; 
+        setCards(prev => [newCard, ...prev]);
+        setShowAddForm(false);
+      } else {
+        setError(response.data.message || "فشل في إضافة النشاط.");
+      }
+    } catch (err) {
+      console.error("Failed to add card:", err);
+      setError("حدث خطأ أثناء إضافة النشاط.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+
+  const handleClose = () => {
+    setShowCustomerDialog(false);
+    setTimeout(() => {
+      setSelectedCustomer(null)
+      setCards([]);
+      setProjects([]);
+      setProperties([]);
+    }, 150);
+  };
+
+  const getPriorityBadge = (priority: number) => {
+    switch (priority) {
+      case 3: return <Badge className="bg-red-100 text-red-800">عالية</Badge>;
+      case 2: return <Badge className="bg-yellow-100 text-yellow-800">متوسطة</Badge>;
+      case 1: return <Badge className="bg-green-100 text-green-800">منخفضة</Badge>;
+      default: return <Badge variant="secondary">عادية</Badge>;
+    }
+  };
+
   const getDisplayText = (value: any, fallback: string = "غير محدد") => {
     if (!value) return fallback;
     if (typeof value === 'string') return value;
     if (typeof value === 'object' && 'name_ar' in value) return value.name_ar;
-    if (typeof value === 'object' && 'name_en' in value) return value.name_en;
-    if (typeof value === 'object' && 'name' in value) return value.name;
     return fallback;
+  };
+
+  const handleCall = () => {
+    if (selectedCustomer?.phone_number) {
+      window.open(`tel:${selectedCustomer.phone_number}`, '_blank');
+    }
+  };
+
+  const handleWhatsApp = () => {
+    if (selectedCustomer?.phone_number) {
+      const message = `مرحباً ${selectedCustomer.name}، أتمنى أن تكون بخير.`;
+      const whatsappUrl = `https://wa.me/${selectedCustomer.phone_number.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+    }
   };
 
   if (!selectedCustomer) return null;
 
-  const handleClose = () => {
-    setShowCustomerDialog(false);
-    setTimeout(() => setSelectedCustomer(null), 150);
-  };
-
   return (
     <Dialog open={showCustomerDialog} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            <Avatar className="h-12 w-12">
-              <AvatarImage
-                src={selectedCustomer.avatar || "/placeholder.svg"}
-              />
-              <AvatarFallback>
-                {selectedCustomer.name
-                  .split(" ")
-                  .slice(0, 2)
-                  .map((n: string) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="text-xl font-bold">{selectedCustomer.name}</h2>
-              <p className="text-sm text-muted-foreground">
-                {getDisplayText(selectedCustomer.customer_type, "غير محدد")}
-              </p>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col" dir="rtl">
+        <DialogHeader className="flex-shrink-0 border-b pb-4">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={selectedCustomer.avatar || "/placeholder.svg"} />
+                <AvatarFallback>
+                  {selectedCustomer.name.split(" ").slice(0, 2).map((n: string) => n[0]).join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <DialogTitle className="text-xl font-bold">{selectedCustomer.name}</DialogTitle>
+                <p className="text-sm text-muted-foreground">
+                  {getDisplayText(selectedCustomer.customer_type)}
+                </p>
+              </div>
+              {getPriorityBadge(selectedCustomer.priority)}
             </div>
-          </DialogTitle>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2" 
+                onClick={handleCall}
+                disabled={!selectedCustomer?.phone_number}
+                title={selectedCustomer?.phone_number ? `اتصل بـ ${selectedCustomer.phone_number}` : "لا يوجد رقم هاتف"}
+              >
+                <Phone className="h-4 w-4" />
+                اتصل
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2" 
+                onClick={handleWhatsApp}
+                disabled={!selectedCustomer?.phone_number}
+                title={selectedCustomer?.phone_number ? `راسل على واتساب: ${selectedCustomer.phone_number}` : "لا يوجد رقم هاتف"}
+              >
+                <MessageSquare className="h-4 w-4" />
+                واتساب
+              </Button>
+            </div>
+          </div>
         </DialogHeader>
 
-        <Tabs defaultValue="info" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="info">المعلومات الأساسية</TabsTrigger>
-            <TabsTrigger value="interactions">التفاعلات</TabsTrigger>
-            <TabsTrigger value="notes">الملاحظات</TabsTrigger>
-            <TabsTrigger value="reminders">التذكيرات</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="info" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    معلومات الاتصال
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedCustomer.phone_number || "لا يوجد"}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedCustomer.whatsapp || "لا يوجد"}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedCustomer.email || "لا يوجد"}</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    الموقع
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
-                    <span>
-                      {getDisplayText(selectedCustomer.city, "لا يوجد")}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span>
-                      {getDisplayText(selectedCustomer.district, "لا يوجد")}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="h-4 w-4" />
-                    معلومات إضافية
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span>المسؤول:</span>
-                    <Badge variant="secondary">
-                      {getDisplayText(selectedCustomer.assignedAgent, "غير محدد")}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>الأولوية:</span>
-                    <Badge variant="outline">
-                      {selectedCustomer.priority === 3 ? "عالية" : 
-                       selectedCustomer.priority === 2 ? "متوسطة" : 
-                       selectedCustomer.priority === 1 ? "منخفضة" : "عادية"}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>آخر تواصل:</span>
-                    <span className="text-sm text-muted-foreground">
-                      {selectedCustomer.lastContact || "لا يوجد"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>قيمة الصفقة:</span>
-                    <Badge variant="secondary">
-                      {selectedCustomer.dealValue
-                        ? `${selectedCustomer.dealValue} ر.س`
-                        : "غير محدد"}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="interactions" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">سجل التفاعلات</h3>
-              <Button onClick={() => setShowAddInteractionDialog(true)}>
-                <Activity className="ml-2 h-4 w-4" />
-                إضافة تفاعل
+        <div className="flex-grow overflow-y-auto p-1 pr-2 space-y-4 min-h-[400px]">
+          <div className="max-w-lg mx-auto w-full space-y-4">
+            {!showAddForm && (
+              <Button variant="outline" className="w-full gap-2" onClick={() => setShowAddForm(true)}>
+                <PlusCircle className="h-4 w-4" />
+                إضافة نشاط أو ملاحظة
               </Button>
-            </div>
-            <div className="space-y-3">
-              {selectedCustomer.interactions &&
-              Array.isArray(selectedCustomer.interactions) &&
-              selectedCustomer.interactions.length > 0 ? (
-                selectedCustomer.interactions.map(
-                  (interaction: any, index: number) => (
-                    <Card key={index}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-3">
-                            <Activity className="h-4 w-4 text-blue-600" />
-                            <div>
-                              <p className="font-medium">{interaction.type}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {interaction.notes}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {interaction.date}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {interaction.duration}
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ),
-                )
-              ) : (
-                <p className="text-center text-muted-foreground py-8">
-                  لا توجد تفاعلات مسجلة
-                </p>
-              )}
-            </div>
-          </TabsContent>
+            )}
 
-          <TabsContent value="notes" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">الملاحظات</h3>
-              <Button onClick={() => setShowAddNoteDialog(true)}>
-                <FileText className="ml-2 h-4 w-4" />
-                إضافة ملاحظة
-              </Button>
-            </div>
-            <div className="space-y-3">
-              {selectedCustomer.note ? (
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <FileText className="h-4 w-4 text-green-600 mt-1" />
-                      <div>
-                        <p className="text-sm">{selectedCustomer.note}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          تم الإضافة في: {selectedCustomer.created_at}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <p className="text-center text-muted-foreground py-8">
-                  لا توجد ملاحظات
-                </p>
-              )}
-            </div>
-          </TabsContent>
+            {showAddForm && (
+              <AddActivityForm
+                projects={projects}
+                properties={properties}
+                onSubmit={handleAddCard}
+                onCancel={() => setShowAddForm(false)}
+                isSubmitting={isSubmitting}
+              />
+            )}
 
-          <TabsContent value="reminders" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">التذكيرات</h3>
-              <Button onClick={() => setShowAddReminderDialog(true)}>
-                <Bell className="ml-2 h-4 w-4" />
-                إضافة تذكير
-              </Button>
-            </div>
-            <div className="space-y-3">
-              {selectedCustomer.reminders &&
-              Array.isArray(selectedCustomer.reminders) &&
-              selectedCustomer.reminders.length > 0 ? (
-                selectedCustomer.reminders.map(
-                  (reminder: any, index: number) => (
-                    <Card key={index}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-3">
-                            <Bell className="h-4 w-4 text-orange-600 mt-1" />
-                            <div>
-                              <p className="font-medium">{reminder.title}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {reminder.description || reminder.notes}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {reminder.date || reminder.datetime}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {reminder.time || ""}
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ),
-                )
-              ) : (
-                <p className="text-center text-muted-foreground py-8">
-                  لا توجد تذكيرات
-                </p>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-sm text-muted-foreground">جاري تحميل الأنشطة...</p>
+                </div>
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center h-64 text-red-500">
+                <AlertTriangle className="h-8 w-8 mb-2" />
+                <p>{error}</p>
+              </div>
+            ) : cards.length > 0 ? (
+              cards.map((card) => (
+                <CrmActivityCard
+                  key={card.id}
+                  card={card}
+                  projects={projects}
+                  properties={properties}
+                />
+              ))
+            ) : (
+              <div className="flex items-center justify-center h-64">
+                <p className="text-muted-foreground">لا توجد ملاحظات أو أنشطة لهذا العميل.</p>
+              </div>
+            )}
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

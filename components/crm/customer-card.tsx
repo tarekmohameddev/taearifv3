@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +55,27 @@ export default function CustomerCard({
   onAddInteraction,
   viewType,
 }: CustomerCardProps) {
+  const [hasDragged, setHasDragged] = useState(false);
+
+  const handleClick = (e: React.MouseEvent) => {
+    // إذا لم يتم السحب، افتح تفاصيل العميل
+    if (!hasDragged) {
+      onViewDetails(customer);
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent) => {
+    setHasDragged(true);
+    onDragStart(e, customer);
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    onDragEnd(e);
+    // إعادة تعيين الحالة بعد انتهاء السحب
+    setTimeout(() => {
+      setHasDragged(false);
+    }, 100);
+  };
   const getPriorityColor = (priority: number) => {
     switch (priority) {
       case 3:
@@ -88,8 +109,9 @@ export default function CustomerCard({
       } ${isDragging ? "opacity-50 scale-95 rotate-1" : "hover:scale-[1.02]"}`}
       style={{ borderLeftColor: stage.color?.replace("bg-", "#") }}
       draggable
-      onDragStart={(e) => onDragStart(e, customer)}
-      onDragEnd={onDragEnd}
+      onClick={handleClick}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       tabIndex={0}
       role="button"
       aria-label={`العميل ${customer.name} في مرحلة ${stage.name}. اضغط Enter للتحديد أو اسحب لنقل العميل`}
@@ -189,8 +211,9 @@ export default function CustomerCard({
       } ${isDragging ? "opacity-50 scale-95 rotate-1" : "hover:scale-[1.02]"}`}
       style={{ borderLeftColor: stage.color?.replace("bg-", "#") }}
       draggable
-      onDragStart={(e) => onDragStart(e, customer)}
-      onDragEnd={onDragEnd}
+      onClick={handleClick}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       tabIndex={0}
       role="button"
       aria-label={`العميل ${customer.name} في مرحلة ${stage.name}. اضغط Enter للتحديد أو اسحب لنقل العميل`}
@@ -287,8 +310,9 @@ export default function CustomerCard({
       } ${isDragging ? "opacity-50 scale-95 rotate-2" : "hover:scale-102"}`}
       style={{ borderLeftColor: stage.color?.replace("bg-", "#") }}
       draggable
-      onDragStart={(e) => onDragStart(e, customer)}
-      onDragEnd={onDragEnd}
+      onClick={handleClick}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       tabIndex={0}
       role="button"
       aria-label={`العميل ${customer.name} في مرحلة ${stage.name}. اضغط Enter للتحديد أو اسحب لنقل العميل`}
