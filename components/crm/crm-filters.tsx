@@ -289,7 +289,7 @@ export default function CrmFilters({
           <span className="hidden sm:inline">مراحل العملاء</span>
           <span className="sm:hidden">المراحل</span>
         </Button>
-        <Button
+        {/* <Button
           variant={activeView === "appointments" ? "default" : "outline"}
           onClick={() => setActiveView("appointments")}
           className="flex items-center gap-2"
@@ -315,7 +315,7 @@ export default function CrmFilters({
           <User className="h-4 w-4" />
           <span className="hidden sm:inline">طلبات العملاء</span>
           <span className="sm:hidden">طلبات العملاء</span>
-        </Button>
+        </Button> */}
         {/* <Button
           variant={activeView === "analytics" ? "default" : "outline"}
           onClick={() => setActiveView("analytics")}

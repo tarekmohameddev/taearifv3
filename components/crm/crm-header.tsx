@@ -22,14 +22,14 @@ export default function CrmHeader({ onRefresh, onSettings }: CrmHeaderProps) {
         </p>
       </div>
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-        <Link href="/customers">
+        {/* <Link href="/customers">
           <Button variant="outline" className="w-full sm:w-auto bg-transparent">
             <TableIcon className="ml-2 h-4 w-4" />
             <span className="hidden sm:inline">عرض جدول العملاء</span>
             <span className="sm:hidden">الجدول</span>
           </Button>
-        </Link>
-        <Button
+        </Link> */}
+        {/* <Button
           variant="outline"
           onClick={onRefresh}
           className="w-full sm:w-auto bg-transparent"
@@ -37,7 +37,7 @@ export default function CrmHeader({ onRefresh, onSettings }: CrmHeaderProps) {
           <RefreshCw className="ml-2 h-4 w-4" />
           <span className="hidden sm:inline">تحديث البيانات</span>
           <span className="sm:hidden">تحديث</span>
-        </Button>
+        </Button> */}
         <Button
           variant="outline"
           onClick={onSettings}

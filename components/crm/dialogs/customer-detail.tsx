@@ -38,6 +38,16 @@ export default function CustomerDetailDialog() {
     setShowAddInteractionDialog,
   } = useCrmStore();
 
+  // Helper function to safely extract text from potentially nested objects
+  const getDisplayText = (value: any, fallback: string = "غير محدد") => {
+    if (!value) return fallback;
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object' && 'name_ar' in value) return value.name_ar;
+    if (typeof value === 'object' && 'name_en' in value) return value.name_en;
+    if (typeof value === 'object' && 'name' in value) return value.name;
+    return fallback;
+  };
+
   if (!selectedCustomer) return null;
 
   const handleClose = () => {
@@ -65,7 +75,7 @@ export default function CustomerDetailDialog() {
             <div>
               <h2 className="text-xl font-bold">{selectedCustomer.name}</h2>
               <p className="text-sm text-muted-foreground">
-                {selectedCustomer.customerType}
+                {getDisplayText(selectedCustomer.customer_type, "غير محدد")}
               </p>
             </div>
           </DialogTitle>
@@ -91,7 +101,7 @@ export default function CustomerDetailDialog() {
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedCustomer.phone || "لا يوجد"}</span>
+                    <span>{selectedCustomer.phone_number || "لا يوجد"}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -114,11 +124,15 @@ export default function CustomerDetailDialog() {
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Building2 className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedCustomer.city || "لا يوجد"}</span>
+                    <span>
+                      {getDisplayText(selectedCustomer.city, "لا يوجد")}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedCustomer.district || "لا يوجد"}</span>
+                    <span>
+                      {getDisplayText(selectedCustomer.district, "لا يوجد")}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -134,13 +148,15 @@ export default function CustomerDetailDialog() {
                   <div className="flex items-center justify-between">
                     <span>المسؤول:</span>
                     <Badge variant="secondary">
-                      {selectedCustomer.assignedAgent || "غير محدد"}
+                      {getDisplayText(selectedCustomer.assignedAgent, "غير محدد")}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span>الأولوية:</span>
                     <Badge variant="outline">
-                      {selectedCustomer.urgency || "عادية"}
+                      {selectedCustomer.priority === 3 ? "عالية" : 
+                       selectedCustomer.priority === 2 ? "متوسطة" : 
+                       selectedCustomer.priority === 1 ? "منخفضة" : "عادية"}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
@@ -220,26 +236,20 @@ export default function CustomerDetailDialog() {
               </Button>
             </div>
             <div className="space-y-3">
-              {selectedCustomer.notes &&
-              Array.isArray(selectedCustomer.notes) &&
-              selectedCustomer.notes.length > 0 ? (
-                selectedCustomer.notes.map((note: any, index: number) => (
-                  <Card key={index}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3">
-                          <FileText className="h-4 w-4 text-green-600 mt-1" />
-                          <div>
-                            <p className="text-sm">{note.content}</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              بواسطة: {note.author} • {note.date}
-                            </p>
-                          </div>
-                        </div>
+              {selectedCustomer.note ? (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <FileText className="h-4 w-4 text-green-600 mt-1" />
+                      <div>
+                        <p className="text-sm">{selectedCustomer.note}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          تم الإضافة في: {selectedCustomer.created_at}
+                        </p>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
+                    </div>
+                  </CardContent>
+                </Card>
               ) : (
                 <p className="text-center text-muted-foreground py-8">
                   لا توجد ملاحظات
@@ -270,18 +280,18 @@ export default function CustomerDetailDialog() {
                             <div>
                               <p className="font-medium">{reminder.title}</p>
                               <p className="text-sm text-muted-foreground">
-                                {reminder.description}
+                                {reminder.description || reminder.notes}
                               </p>
                             </div>
                           </div>
                           <div className="text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              {reminder.date}
+                              {reminder.date || reminder.datetime}
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {reminder.time}
+                              {reminder.time || ""}
                             </div>
                           </div>
                         </div>
