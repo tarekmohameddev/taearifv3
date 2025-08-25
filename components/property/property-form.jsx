@@ -912,8 +912,8 @@ export default function PropertyForm({ mode }) {
               </div>
             )}
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-2 min-w-0">
                 <Button
                   variant="outline"
                   size="icon"
@@ -921,33 +921,35 @@ export default function PropertyForm({ mode }) {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <h1 className="text-2xl font-bold tracking-tight">
+                <h1 className="text-2xl font-bold tracking-tight truncate">
                   {pageTitle}
                 </h1>
               </div>
-              <div className="flex flex-col items-end gap-2">
-                <div className="flex gap-2">
+              <div className="flex flex-col items-end gap-2 min-w-0">
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   <Button
                     variant="outline"
                     onClick={() => handleSubmit(false)}
                     disabled={isLoading}
+                    className="w-full sm:w-auto"
                   >
                     {isLoading ? "جاري الحفظ..." : draftButtonText}
                   </Button>
                   <Button
                     onClick={() => handleSubmit(true)}
                     disabled={isLoading}
+                    className="w-full sm:w-auto"
                   >
                     {isLoading ? "جاري الحفظ..." : submitButtonText}
                   </Button>
                 </div>
                 {submitError && (
-                  <div className="text-red-500 text-sm mt-2">{submitError}</div>
+                  <div className="text-red-500 text-sm mt-2 text-right w-full">{submitError}</div>
                 )}
               </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2">
               <Card>
                 <CardHeader>
                   <CardTitle>معلومات العقار الأساسية</CardTitle>
@@ -1004,7 +1006,7 @@ export default function PropertyForm({ mode }) {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="price">المبلغ</Label>
                       <Input
@@ -1053,7 +1055,7 @@ export default function PropertyForm({ mode }) {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="pricePerMeter">سعر المتر</Label>
                       <Input
@@ -1102,7 +1104,7 @@ export default function PropertyForm({ mode }) {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="category">فئة العقار</Label>
                       <Select
@@ -1172,7 +1174,7 @@ export default function PropertyForm({ mode }) {
                   </div>
 
                   <div className="space-y-4 z-9999">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col space-y-2">
                         <Label htmlFor="city" className="mb-1">
                           اختر المدينة
@@ -1240,7 +1242,7 @@ export default function PropertyForm({ mode }) {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="featureInput">الميزات</Label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Input
                         id="featureInput"
                         placeholder="أدخل ميزة"
@@ -1363,7 +1365,7 @@ export default function PropertyForm({ mode }) {
                       الخصائص
                     </h3>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="size">المساحة</Label>
                         <Input
@@ -1648,7 +1650,7 @@ export default function PropertyForm({ mode }) {
                       مرافق العقار
                     </h3>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 whitespace-nowraps">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                       <PropertyCounter
                         label="الغرف"
                         value={formData.rooms}
@@ -1777,7 +1779,7 @@ export default function PropertyForm({ mode }) {
                 </CardContent>
               </Card>
 
-              <Card className="md:col-span-2">
+              <Card className="xl:col-span-2">
                 <CardHeader>
                   <CardTitle>صورة العقار الرئيسية</CardTitle>
                   <CardDescription>
@@ -1785,7 +1787,7 @@ export default function PropertyForm({ mode }) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col md:flex-row items-center gap-6">
+                  <div className="flex flex-col lg:flex-row items-center gap-6">
                     <div className="border rounded-md p-2 flex-1 w-full">
                       <div className="flex items-center justify-center h-48 bg-muted rounded-md relative">
                         {previews.thumbnail ? (
@@ -1809,7 +1811,7 @@ export default function PropertyForm({ mode }) {
                         )}
                       </div>
                     </div>
-                    <div className="flex flex-col gap-4 w-full md:w-1/3">
+                    <div className="flex flex-col gap-4 w-full lg:w-1/3">
                       <input
                         ref={thumbnailInputRef}
                         type="file"
@@ -1846,7 +1848,7 @@ export default function PropertyForm({ mode }) {
                 </CardContent>
               </Card>
 
-              <Card className="md:col-span-2">
+              <Card className="xl:col-span-2">
                 <CardHeader>
                   <CardTitle>معرض صور العقار</CardTitle>
                   <CardDescription>
@@ -1855,7 +1857,7 @@ export default function PropertyForm({ mode }) {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                       {previews.gallery.map((preview, index) => (
                         <div
                           key={index}
@@ -1916,7 +1918,7 @@ export default function PropertyForm({ mode }) {
                 </CardContent>
               </Card>
 
-              <Card className="md:col-span-2">
+              <Card className="xl:col-span-2">
                 <CardHeader>
                   <CardTitle>مخططات الطوابق</CardTitle>
                   <CardDescription>
@@ -1925,7 +1927,7 @@ export default function PropertyForm({ mode }) {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                       {previews.floorPlans.map((preview, index) => (
                         <div
                           key={index}
@@ -1983,7 +1985,7 @@ export default function PropertyForm({ mode }) {
                 </CardContent>
               </Card>
 
-              <Card className="md:col-span-2">
+              <Card className="xl:col-span-2">
                 <CardHeader>
                   <CardTitle>الوسائط والجولات الافتراضية</CardTitle>
                   <CardDescription>
@@ -1991,7 +1993,7 @@ export default function PropertyForm({ mode }) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Video className="h-4 w-4 text-muted-foreground" />
@@ -2061,7 +2063,7 @@ export default function PropertyForm({ mode }) {
                               href={formData.video_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-500 hover:underline truncate max-w-xs"
+                              className="text-blue-500 hover:underline truncate max-w-[200px] sm:max-w-xs"
                             >
                               {formData.video_url}
                             </a>
@@ -2077,7 +2079,7 @@ export default function PropertyForm({ mode }) {
                               href={formData.virtual_tour}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-green-500 hover:underline truncate max-w-xs"
+                              className="text-green-500 hover:underline truncate max-w-[200px] sm:max-w-xs"
                             >
                               {formData.virtual_tour}
                             </a>
@@ -2088,13 +2090,13 @@ export default function PropertyForm({ mode }) {
                   )}
                 </CardContent>
               </Card>
-              <div className="md:col-span-2 space-y-6">
+              <div className="xl:col-span-2 space-y-6">
                 {/* Map Section */}
 
                 <MapSection onLocationUpdate={handleLocationUpdate} />
                 <LocationCard propertyData={formData} />
               </div>
-              <Card className="md:col-span-2">
+              <Card className="xl:col-span-2">
                 <CardHeader>
                   <CardTitle>الأسئلة الشائعة الخاصة بالعقار</CardTitle>
                   <CardDescription>
@@ -2125,7 +2127,7 @@ export default function PropertyForm({ mode }) {
                         rows={3}
                       />
                     </div>
-                    <Button onClick={handleAddFaq} className="w-full md:w-auto">
+                    <Button onClick={handleAddFaq} className="w-full lg:w-auto">
                       <Plus className="ml-2 h-4 w-4" />
                       إضافة سؤال
                     </Button>
@@ -2135,7 +2137,7 @@ export default function PropertyForm({ mode }) {
                   {suggestedFaqsList?.length > 0 && (
                     <div className="space-y-2">
                       <h4 className="text-md font-medium">أسئلة مقترحة:</h4>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                         {suggestedFaqsList.map((sq, index) => (
                           <Button
                             key={index}
@@ -2159,20 +2161,20 @@ export default function PropertyForm({ mode }) {
                       </h3>
                       <div className="space-y-3">
                         {faqs.map((faq) => (
-                          <div
-                            key={faq.id}
-                            className="p-4 border rounded-md bg-muted/30"
-                          >
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <p className="font-semibold text-primary">
-                                  {faq.question}
-                                </p>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                  {faq.answer}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2 rtl:mr-auto ltr:ml-auto">
+                                                      <div
+                              key={faq.id}
+                              className="p-4 border rounded-md bg-muted/30"
+                            >
+                              <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
+                                                              <div className="flex-1 min-w-0">
+                                  <p className="font-semibold text-primary break-words">
+                                    {faq.question}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground mt-1 break-words">
+                                    {faq.answer}
+                                  </p>
+                                </div>
+                              <div className="flex items-center gap-2 rtl:mr-auto ltr:ml-auto flex-shrink-0">
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -2221,28 +2223,31 @@ export default function PropertyForm({ mode }) {
                   )}
                 </CardContent>
               </Card>
-              <Card className="md:col-span-2">
+              <Card className="xl:col-span-2">
                 <CardFooter className="flex flex-col items-end border-t p-6 space-y-4">
                   <div className="w-full">
-                    <div className="flex justify-between w-full">
+                    <div className="flex flex-col sm:flex-row justify-between w-full gap-4">
                       <Button
                         variant="outline"
                         onClick={() => router.push("/properties")}
+                        className="w-full sm:w-auto"
                       >
                         إلغاء
                       </Button>
                       <div className="flex flex-col items-end gap-2">
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                           <Button
                             variant="outline"
                             onClick={() => handleSubmit(false)}
                             disabled={isLoading}
+                            className="w-full sm:w-auto"
                           >
                             {isLoading ? "جاري الحفظ..." : draftButtonText}
                           </Button>
                           <Button
                             onClick={() => handleSubmit(true)}
                             disabled={isLoading}
+                            className="w-full sm:w-auto"
                           >
                             {isLoading ? "جاري الحفظ..." : submitButtonText}
                           </Button>
