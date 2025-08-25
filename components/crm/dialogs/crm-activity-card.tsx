@@ -87,80 +87,82 @@ export function CrmActivityCard({
 
   return (
     <Card className="mb-4 shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-gray-800">
-      <CardContent className="p-4">
-        <p className={`text-gray-800 dark:text-gray-200 text-sm ${textAlignment}`}>
+      <CardContent className="p-3 sm:p-4">
+        <p className={`text-gray-800 dark:text-gray-200 text-sm leading-relaxed ${textAlignment}`}>
           {card.card_content}
         </p>
       </CardContent>
-      <CardFooter className="flex flex-nowrap items-center justify-start gap-2 bg-gray-50 dark:bg-gray-900/50 p-2 sm:p-3 overflow-x-auto">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              size="sm"
-              className="w-[120px] justify-start text-left font-normal text-xs gap-1 flex-shrink-0"
-            >
-              <CalendarIcon className="h-3 w-3" />
-              {date ? format(date, "PP") : <span>التاريخ</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+      <CardFooter className="flex flex-col sm:flex-row items-stretch sm:items-center justify-start gap-2 bg-gray-50 dark:bg-gray-900/50 p-2 sm:p-3">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                size="sm"
+                className="w-full sm:w-[120px] justify-start text-left font-normal text-xs gap-1 flex-shrink-0 h-8 sm:h-9"
+              >
+                <CalendarIcon className="h-3 w-3" />
+                {date ? format(date, "PP") : <span>التاريخ</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
 
-        <Select value={project} onValueChange={setProject}>
-          <SelectTrigger className="w-[110px] text-xs h-8 flex-shrink-0">
-            <div className="flex items-center gap-1">
-              <Briefcase className="h-3 w-3" />
-              <SelectValue placeholder="المشروع" />
-            </div>
-          </SelectTrigger>
-          <SelectContent>
-            {projects.map((p) => (
-              <SelectItem key={p.id} value={p.id.toString()}>
-                {p.contents[0]?.title || `مشروع ${p.id}`}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Select value={project} onValueChange={setProject}>
+            <SelectTrigger className="w-full sm:w-[110px] text-xs h-8 sm:h-9 flex-shrink-0">
+              <div className="flex items-center gap-1">
+                <Briefcase className="h-3 w-3" />
+                <SelectValue placeholder="المشروع" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {projects.map((p) => (
+                <SelectItem key={p.id} value={p.id.toString()}>
+                  {p.contents[0]?.title || `مشروع ${p.id}`}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Select value={property} onValueChange={setProperty}>
-          <SelectTrigger className="w-[110px] text-xs h-8 flex-shrink-0">
-            <div className="flex items-center gap-1">
-              <Building className="h-3 w-3" />
-              <SelectValue placeholder="الوحدة" />
-            </div>
-          </SelectTrigger>
-          <SelectContent>
-            {properties.map((p) => (
-              <SelectItem key={p.id} value={p.id.toString()}>
-                {p.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Select value={property} onValueChange={setProperty}>
+            <SelectTrigger className="w-full sm:w-[110px] text-xs h-8 sm:h-9 flex-shrink-0">
+              <div className="flex items-center gap-1">
+                <Building className="h-3 w-3" />
+                <SelectValue placeholder="الوحدة" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {properties.map((p) => (
+                <SelectItem key={p.id} value={p.id.toString()}>
+                  {p.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Select value={procedure} onValueChange={setProcedure}>
-          <SelectTrigger className="w-[110px] text-xs h-8 flex-shrink-0">
-            <div className="flex items-center gap-1">
-              <ListChecks className="h-3 w-3" />
-              <SelectValue placeholder="الإجراء" />
-            </div>
-          </SelectTrigger>
-          <SelectContent>
-            {procedureOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Select value={procedure} onValueChange={setProcedure}>
+            <SelectTrigger className="w-full sm:w-[110px] text-xs h-8 sm:h-9 flex-shrink-0">
+              <div className="flex items-center gap-1">
+                <ListChecks className="h-3 w-3" />
+                <SelectValue placeholder="الإجراء" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {procedureOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </CardFooter>
     </Card>
   );

@@ -135,55 +135,59 @@ export default function CustomerDetailDialog() {
 
   return (
     <Dialog open={showCustomerDialog} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col" dir="rtl">
-        <DialogHeader className="flex-shrink-0 border-b pb-4">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-12 w-12">
-                <AvatarImage src={selectedCustomer.avatar || "/placeholder.svg"} />
-                <AvatarFallback>
-                  {selectedCustomer.name.split(" ").slice(0, 2).map((n: string) => n[0]).join("")}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <DialogTitle className="text-xl font-bold">{selectedCustomer.name}</DialogTitle>
-                <p className="text-sm text-muted-foreground">
-                  {getDisplayText(selectedCustomer.customer_type)}
-                </p>
+      <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] flex flex-col p-0 sm:p-6 mx-auto my-4 rounded-2xl" dir="قفم">
+        <DialogHeader className="flex-shrink-0 border-b pb-4 px-4 sm:px-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
+                  <AvatarImage src={selectedCustomer.avatar || "/placeholder.svg"} />
+                  <AvatarFallback>
+                    {selectedCustomer.name.split(" ").slice(0, 2).map((n: string) => n[0]).join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <DialogTitle className="text-lg sm:text-xl font-bold truncate">{selectedCustomer.name}</DialogTitle>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {getDisplayText(selectedCustomer.customer_type)}
+                  </p>
+                </div>
               </div>
-              {getPriorityBadge(selectedCustomer.priority)}
+              <div className="self-start sm:self-center">
+                {getPriorityBadge(selectedCustomer.priority)}
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="gap-2" 
+                className="gap-1 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm" 
                 onClick={handleCall}
                 disabled={!selectedCustomer?.phone_number}
                 title={selectedCustomer?.phone_number ? `اتصل بـ ${selectedCustomer.phone_number}` : "لا يوجد رقم هاتف"}
               >
-                <Phone className="h-4 w-4" />
-                اتصل
+                <Phone className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">اتصل</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="gap-2" 
+                className="gap-1 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm" 
                 onClick={handleWhatsApp}
                 disabled={!selectedCustomer?.phone_number}
                 title={selectedCustomer?.phone_number ? `راسل على واتساب: ${selectedCustomer.phone_number}` : "لا يوجد رقم هاتف"}
               >
-                <MessageSquare className="h-4 w-4" />
-                واتساب
+                <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">واتساب</span>
               </Button>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="flex-grow overflow-y-auto p-1 pr-2 space-y-4 min-h-[400px]">
+        <div className="flex-grow overflow-y-auto p-4 sm:p-6 space-y-4 min-h-[300px] sm:min-h-[400px]">
           <div className="max-w-lg mx-auto w-full space-y-4">
             {!showAddForm && (
-              <Button variant="outline" className="w-full gap-2" onClick={() => setShowAddForm(true)}>
+              <Button variant="outline" className="w-full gap-2 text-sm sm:text-base" onClick={() => setShowAddForm(true)}>
                 <PlusCircle className="h-4 w-4" />
                 إضافة نشاط أو ملاحظة
               </Button>
@@ -200,29 +204,31 @@ export default function CustomerDetailDialog() {
             )}
 
             {isLoading ? (
-              <div className="flex items-center justify-center h-64">
+              <div className="flex items-center justify-center h-48 sm:h-64">
                 <div className="flex flex-col items-center gap-3">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="text-sm text-muted-foreground">جاري تحميل الأنشطة...</p>
+                  <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary" />
+                  <p className="text-xs sm:text-sm text-muted-foreground">جاري تحميل الأنشطة...</p>
                 </div>
               </div>
             ) : error ? (
-              <div className="flex flex-col items-center justify-center h-64 text-red-500">
-                <AlertTriangle className="h-8 w-8 mb-2" />
-                <p>{error}</p>
+              <div className="flex flex-col items-center justify-center h-48 sm:h-64 text-red-500">
+                <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 mb-2" />
+                <p className="text-xs sm:text-sm text-center">{error}</p>
               </div>
             ) : cards.length > 0 ? (
-              cards.map((card) => (
-                <CrmActivityCard
-                  key={card.id}
-                  card={card}
-                  projects={projects}
-                  properties={properties}
-                />
-              ))
+              <div className="space-y-3 sm:space-y-4">
+                {cards.map((card) => (
+                  <CrmActivityCard
+                    key={card.id}
+                    card={card}
+                    projects={projects}
+                    properties={properties}
+                  />
+                ))}
+              </div>
             ) : (
-              <div className="flex items-center justify-center h-64">
-                <p className="text-muted-foreground">لا توجد ملاحظات أو أنشطة لهذا العميل.</p>
+              <div className="flex items-center justify-center h-48 sm:h-64">
+                <p className="text-xs sm:text-sm text-muted-foreground text-center">لا توجد ملاحظات أو أنشطة لهذا العميل.</p>
               </div>
             )}
           </div>

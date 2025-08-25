@@ -318,7 +318,7 @@ export function SettingsPage() {
     }
   };
 
-  const filteredDomains = domains.filter((domain) => {
+  const filteredDomains = (domains || []).filter((domain) => {
     if (statusFilter !== "all") {
       if (statusFilter === "active" && domain.status !== "active") return false;
       if (statusFilter === "pending" && domain.status !== "pending")
@@ -530,7 +530,7 @@ export function SettingsPage() {
                       </Card>
                     ))}
                   </div>
-                ) : filteredDomains.length === 0 ? (
+                ) : !filteredDomains || filteredDomains.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-8 text-center">
                     <div className="rounded-full bg-muted p-3 mb-4">
                       <Globe className="h-6 w-6 text-muted-foreground" />
@@ -705,10 +705,10 @@ export function SettingsPage() {
                         </AccordionTrigger>
                         <AccordionContent>
                           <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground">
-                              {dnsInstructions.description ||
-                                "لربط نطاقك، ستحتاج إلى تحديث سجلات DNS الخاصة بك لدى مسجل النطاق."}
-                            </p>
+                                                          <p className="text-sm text-muted-foreground">
+                                {dnsInstructions?.description ||
+                                  "لربط نطاقك، ستحتاج إلى تحديث سجلات DNS الخاصة بك لدى مسجل النطاق."}
+                              </p>
                             <div className="rounded-lg border overflow-hidden">
                               <div className="grid grid-cols-12 gap-4 p-3 bg-muted/50 text-sm font-medium">
                                 <div className="col-span-2">النوع</div>
@@ -716,7 +716,7 @@ export function SettingsPage() {
                                 <div className="col-span-5">القيمة</div>
                                 <div className="col-span-2">TTL</div>
                               </div>
-                              {dnsInstructions.records?.map((record, index) => (
+                              {dnsInstructions?.records?.map((record, index) => (
                                 <div
                                   key={index}
                                   className="grid grid-cols-12 gap-4 p-3 border-t"
@@ -737,7 +737,7 @@ export function SettingsPage() {
                             <div className="flex items-center p-3 rounded-lg bg-blue-50 text-blue-800">
                               <AlertCircle className="h-5 w-5 ml-2 flex-shrink-0" />
                               <p className="text-sm">
-                                {dnsInstructions.note ||
+                                {dnsInstructions?.note ||
                                   `قد تستغرق تغييرات DNS ما يصل إلى 48 ساعة للانتشار عالميًا. هذا يعني أن نطاقك قد لا يعمل مباشرة بعد إجراء هذه التغييرات.`}
                               </p>
                             </div>
@@ -777,9 +777,30 @@ export function SettingsPage() {
                           </CardFooter>
                         </Card>
                       ))
+                    : !subscriptionPlans || subscriptionPlans.length === 0
+                    ? (
+                        <div className="col-span-3 flex flex-col items-center justify-center p-8 text-center">
+                          <div className="rounded-full bg-muted p-3 mb-4">
+                            <CreditCardIcon className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                          <h3 className="text-lg font-medium mb-1">
+                            لا توجد خطط اشتراك متاحة
+                          </h3>
+                          <p className="text-muted-foreground mb-4">
+                            لم يتم العثور على خطط الاشتراك أو حدث خطأ في التحميل
+                          </p>
+                          <Button
+                            variant="outline"
+                            onClick={() => window.location.reload()}
+                          >
+                            <RefreshCw className="h-4 w-4 ml-1" />
+                            إعادة المحاولة
+                          </Button>
+                        </div>
+                      )
                     : subscriptionPlans.map((plan) => {
                         const isCurrentPlan =
-                          userData.package_title === plan.name;
+                          userData?.package_title === plan.name;
                         return (
                           <Card
                             key={plan.id}
@@ -876,6 +897,27 @@ export function SettingsPage() {
                           </CardFooter>
                         </Card>
                       ))
+                    : !themes || themes.length === 0
+                    ? (
+                        <div className="col-span-3 flex flex-col items-center justify-center p-8 text-center">
+                          <div className="rounded-full bg-muted p-3 mb-4">
+                            <Palette className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                          <h3 className="text-lg font-medium mb-1">
+                            لا توجد ثيمات متاحة
+                          </h3>
+                          <p className="text-muted-foreground mb-4">
+                            لم يتم العثور على الثيمات أو حدث خطأ في التحميل
+                          </p>
+                          <Button
+                            variant="outline"
+                            onClick={() => window.location.reload()}
+                          >
+                            <RefreshCw className="h-4 w-4 ml-1" />
+                            إعادة المحاولة
+                          </Button>
+                        </div>
+                      )
                     : themes.map((theme) => (
                         <Card
                           key={theme.id}
