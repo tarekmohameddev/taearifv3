@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Target } from "lucide-react";
 import type { Customer, PipelineStage as PipelineStageType } from "@/types/crm";
 import PipelineStage from "./pipeline-stage";
+import MobileCustomersView from "./mobile-customers-view";
 
 interface PipelineBoardProps {
   pipelineStages: PipelineStageType[];
@@ -24,6 +25,7 @@ interface PipelineBoardProps {
   onAddNote: (customer: Customer) => void;
   onAddReminder: (customer: Customer) => void;
   onAddInteraction: (customer: Customer) => void;
+  onUpdateCustomerStage: (customerId: string, stageId: string) => Promise<boolean>;
 }
 
 export default function PipelineBoard({
@@ -44,12 +46,22 @@ export default function PipelineBoard({
   onAddNote,
   onAddReminder,
   onAddInteraction,
+  onUpdateCustomerStage,
 }: PipelineBoardProps) {
   return (
     <div className="space-y-4">
-      {/* Mobile View - Stacked Cards */}
+      {/* Mobile View - Mobile Customers View */}
       <div className="block lg:hidden">
-        <div className="space-y-4"></div>
+        <MobileCustomersView
+          pipelineStages={pipelineStages}
+          customersData={customersData}
+          filteredCustomers={filteredCustomers}
+          onViewDetails={onViewDetails}
+          onAddNote={onAddNote}
+          onAddReminder={onAddReminder}
+          onAddInteraction={onAddInteraction}
+          onUpdateCustomerStage={onUpdateCustomerStage}
+        />
       </div>
 
       {/* Tablet View - 2 Columns */}

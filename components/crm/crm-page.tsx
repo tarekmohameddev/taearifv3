@@ -936,6 +936,7 @@ export default function CrmPage() {
                 onAddNote={handleAddNote}
                 onAddReminder={handleAddReminder}
                 onAddInteraction={handleAddInteraction}
+                onUpdateCustomerStage={dataHandler.updateCustomerStage}
               />
             )}
 

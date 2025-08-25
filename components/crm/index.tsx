@@ -4,6 +4,7 @@ export { default as CrmFilters } from "./crm-filters";
 export { default as CustomerCard } from "./customer-card";
 export { default as PipelineStage } from "./pipeline-stage";
 export { default as PipelineBoard } from "./pipeline-board";
+export { default as MobileCustomersView } from "./mobile-customers-view";
 export { default as AppointmentsList } from "./appointments-list";
 export { default as RemindersList } from "./reminders-list";
 export { default as InquiryList } from "./inquiry-list";
