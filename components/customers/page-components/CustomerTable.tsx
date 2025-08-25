@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { StageAssignmentDialog } from "./StageAssignmentDialog";
+import { Pagination } from "./Pagination";
 import {
   MoreHorizontal,
   Mail,
@@ -72,6 +73,10 @@ export const CustomerTable = ({
   selectedCustomerForStage,
   setSelectedCustomerForStage,
   onStageUpdated,
+  // Pagination props
+  pagination,
+  onPageChange,
+  loading,
 }: any) => {
   return (
     <div className="space-y-4">
@@ -402,6 +407,20 @@ export const CustomerTable = ({
           </Table>
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {pagination && (
+        <Pagination
+          currentPage={pagination.current_page}
+          lastPage={pagination.last_page}
+          total={pagination.total}
+          perPage={pagination.per_page}
+          from={pagination.from}
+          to={pagination.to}
+          onPageChange={onPageChange}
+          loading={loading}
+        />
+      )}
 
       {/* Stage Assignment Dialog */}
       <StageAssignmentDialog

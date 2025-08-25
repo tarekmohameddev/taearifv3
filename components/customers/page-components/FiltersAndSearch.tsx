@@ -27,6 +27,7 @@ export const FiltersAndSearch = ({
   setTotalCustomers,
   setLoading,
   setError,
+  setPagination,
 }: any) => {
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -116,9 +117,10 @@ export const FiltersAndSearch = ({
       }
       
       if (response.data.status === "success") {
-        const { customers, summary } = response.data.data;
+        const { customers, summary, pagination } = response.data.data;
         setCustomersData(customers || []);
         setTotalCustomers(summary.total_customers || 0);
+        setPagination(pagination);
       } else {
         throw new Error(response.data.message || "Failed to fetch data");
       }

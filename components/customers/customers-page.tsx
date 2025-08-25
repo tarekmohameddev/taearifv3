@@ -119,6 +119,14 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [customersData, setCustomersData] = useState<Customer[]>([]); // ← هنا يتم حفظ كل العملاء
+  const [pagination, setPagination] = useState<{
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+  } | null>(null);
   const [formData, setFormData] = useState<{
     name: string;
     email: string;
@@ -154,35 +162,98 @@ export default function CustomersPage() {
   // Get filter states from store
   const { searchTerm, filterType, filterCity } = useCustomersFiltersStore();
 
-  // Function to fetch customers with current filters
-  const fetchCustomersWithFilters = useCallback(async () => {
+  // Function to fetch customers with current filters and pagination
+  const fetchCustomersWithFilters = useCallback(async (page = 1) => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get("/customers");
-      const { customers, summary } = response.data.data;
+      const response = await axiosInstance.get(`/customers?page=${page}`);
+      const { customers, summary, pagination } = response.data.data;
       setCustomersData(customers);
       setTotalCustomers(summary.total_customers);
+      setPagination(pagination);
     } catch (err) {
       console.error("Error fetching customers:", err);
       setError("حدث خطأ أثناء تحميل البيانات.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setLoading, setError]);
 
   useEffect(() => {
-    fetchCustomersWithFilters();
+    fetchCustomersWithFilters(1);
   }, [fetchCustomersWithFilters]);
 
   // Function to handle filter changes from FiltersAndSearch component
-  const handleFilterChange = useCallback((newCustomersData: Customer[]) => {
+  const handleFilterChange = useCallback((newCustomersData: Customer[], newPagination?: any) => {
     setCustomersData(newCustomersData);
-  }, []);
+    if (newPagination) {
+      setPagination(newPagination);
+    }
+    // Reset selected customers when filters change
+    setSelectedCustomers([]);
+  }, [setSelectedCustomers]);
+
+  // Handle page change
+  const handlePageChange = useCallback((page: number) => {
+    // Get current filters from store
+    const { searchTerm, filterType, filterCity, filterDistrict, filterPriority } = useCustomersFiltersStore.getState();
+    
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append('page', page.toString());
+    
+    if (searchTerm.trim()) {
+      params.append('q', searchTerm.trim());
+    }
+    if (filterCity !== "all") {
+      params.append('city_id', filterCity);
+    }
+    if (filterDistrict !== "all") {
+      params.append('district_id', filterDistrict);
+    }
+    if (filterType !== "all") {
+      params.append('type_id', filterType);
+    }
+    if (filterPriority !== "all") {
+      params.append('priority_id', filterPriority);
+    }
+    
+    // Use search endpoint if there are filters, otherwise use regular endpoint
+    const endpoint = params.toString().includes('q=') || 
+                    params.toString().includes('city_id=') || 
+                    params.toString().includes('district_id=') || 
+                    params.toString().includes('type_id=') || 
+                    params.toString().includes('priority_id=') 
+                    ? '/customers/search' 
+                    : '/customers';
+    
+    // Fetch data with current filters and new page
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(endpoint, { params });
+        const { customers, summary, pagination } = response.data.data;
+        setCustomersData(customers);
+        setTotalCustomers(summary.total_customers);
+        setPagination(pagination);
+        // Reset selected customers when page changes
+        setSelectedCustomers([]);
+      } catch (err) {
+        console.error("Error fetching customers:", err);
+        setError("حدث خطأ أثناء تحميل البيانات.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [setLoading, setError, setSelectedCustomers, setCustomersData, setTotalCustomers, setPagination]);
 
   // Function to handle new customer added
   const handleCustomerAdded = useCallback((newCustomer: Customer) => {
-    setCustomersData((prev) => [newCustomer, ...prev]);
-  }, []);
+    // Refresh the current page to update pagination
+    handlePageChange(pagination?.current_page || 1);
+  }, [handlePageChange, pagination?.current_page]);
 
   // Search is now handled by FiltersAndSearch component
 
@@ -378,13 +449,8 @@ export default function CustomersPage() {
     try {
       await axiosInstance.put(`/customers/${editingCustomerId}`, formData);
 
-      // تحديث الـ customer داخل القائمة
-      setCustomersData((prev) =>
-        prev.map((cust) =>
-          cust.id === editingCustomerId ? { ...cust, ...formData } : cust,
-        ),
-      );
-
+      // Refresh the current page to update data
+      handlePageChange(pagination?.current_page || 1);
       setOpen(false);
     } catch (error) {
       console.error("Error updating customer:", error);
@@ -398,14 +464,8 @@ export default function CustomersPage() {
   };
 
   const handleStageUpdated = (customerId: number, newStageId: number) => {
-    // تحديث المرحلة في قائمة العملاء
-    setCustomersData((prev) =>
-      prev.map((customer) =>
-        customer.id === customerId
-          ? { ...customer, stage_id: newStageId }
-          : customer
-      )
-    );
+    // Refresh the current page to update data
+    handlePageChange(pagination?.current_page || 1);
   };
 
   // Sort customers (filtering is now handled by API)
@@ -475,10 +535,8 @@ export default function CustomersPage() {
   const handleDelete = async (customerId: number) => {
     try {
       await axiosInstance.delete(`/customers/${customerId}`);
-      // احذف العميل من الواجهة
-      setCustomersData((prev) =>
-        prev.filter((customer) => customer.id !== customerId),
-      );
+      // Refresh the current page to update pagination
+      handlePageChange(pagination?.current_page || 1);
     } catch (error) {
       console.error("Failed to delete customer:", error);
       alert("حدث خطأ أثناء الحذف");
@@ -527,6 +585,7 @@ export default function CustomersPage() {
               setTotalCustomers={(total: number) => setTotalCustomers(total)}
               setLoading={setLoading}
               setError={setError}
+              setPagination={setPagination}
             />
 
             {/* Main Content */}
@@ -555,6 +614,9 @@ export default function CustomersPage() {
               selectedCustomerForStage={selectedCustomerForStage}
               setSelectedCustomerForStage={setSelectedCustomerForStage}
               onStageUpdated={handleStageUpdated}
+              pagination={pagination}
+              onPageChange={handlePageChange}
+              loading={loading}
             />
 
             {/* CRM Link */}
