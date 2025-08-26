@@ -492,10 +492,25 @@ export default function PropertyForm({ mode }) {
             virtual_tour: property.virtual_tour || "",
           });
 
+          // تعيين الصور الموجودة مسبقاً للعرض
+          const thumbnailUrl = property.featured_image && property.featured_image !== "" ? property.featured_image : null;
+          const galleryUrls = property.gallery ? (Array.isArray(property.gallery) ? property.gallery.filter(img => img && img !== "") : [property.gallery].filter(img => img && img !== "")) : [];
+          const floorPlanUrls = property.floor_planning_image ? (Array.isArray(property.floor_planning_image) ? property.floor_planning_image.filter(img => img && img !== "") : [property.floor_planning_image].filter(img => img && img !== "")) : [];
+          
+          console.log("Setting previews:", { thumbnailUrl, galleryUrls, floorPlanUrls });
+          console.log("Property featured_image:", property.featured_image);
+          console.log("Thumbnail URL type:", typeof thumbnailUrl);
+          console.log("Thumbnail URL value:", thumbnailUrl);
+          
+          // تأكد من أن الـ URL صحيح
+          if (thumbnailUrl && !thumbnailUrl.startsWith('http')) {
+            console.error("Invalid thumbnail URL:", thumbnailUrl);
+          }
+          
           setPreviews({
-            thumbnail: property.featured_image || null,
-            gallery: property.gallery || [],
-            floorPlans: property.floor_planning_image || [],
+            thumbnail: thumbnailUrl,
+            gallery: galleryUrls,
+            floorPlans: floorPlanUrls,
           });
         } catch (error) {
           toast.error(
@@ -1779,7 +1794,7 @@ export default function PropertyForm({ mode }) {
                 </CardContent>
               </Card>
 
-              <Card className="xl:col-span-2">
+              <Card className="">
                 <CardHeader>
                   <CardTitle>صورة العقار الرئيسية</CardTitle>
                   <CardDescription>
@@ -1787,7 +1802,7 @@ export default function PropertyForm({ mode }) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col lg:flex-row items-center gap-6">
+                  <div className="flex flex-col md:flex-row items-center gap-6">
                     <div className="border rounded-md p-2 flex-1 w-full">
                       <div className="flex items-center justify-center h-48 bg-muted rounded-md relative">
                         {previews.thumbnail ? (
@@ -1811,7 +1826,7 @@ export default function PropertyForm({ mode }) {
                         )}
                       </div>
                     </div>
-                    <div className="flex flex-col gap-4 w-full lg:w-1/3">
+                    <div className="flex flex-col gap-4 w-full md:w-1/3">
                       <input
                         ref={thumbnailInputRef}
                         type="file"
