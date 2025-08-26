@@ -220,9 +220,12 @@ export default function CustomerDetailDialog() {
                 {cards.map((card) => (
                   <CrmActivityCard
                     key={card.id}
-                    card={card}
+                    card={{ ...card, card_customer_id: selectedCustomer?.id }}
                     projects={projects}
                     properties={properties}
+                    onCardUpdate={(updatedCard) => {
+                      setCards(prev => prev.map(c => c.id === updatedCard.id ? updatedCard : c));
+                    }}
                   />
                 ))}
               </div>
