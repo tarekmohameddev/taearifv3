@@ -10,10 +10,7 @@ module.exports = (set, get) => ({
     error: null,
   },
 
-  fetchBlogs: async () => {
-    const { blogsData } = get();
-    if (blogsData.isBlogsFetched) return; // إذا تم جلب البيانات مسبقًا، لا تجلبها مجددًا
-
+  fetchBlogs: async (page = 1) => {
     set((state) => ({
       blogsData: {
         ...state.blogsData,
@@ -24,14 +21,14 @@ module.exports = (set, get) => ({
 
     try {
       const response = await axiosInstance.get(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/blogs`,
+        `${process.env.NEXT_PUBLIC_Backend_URL}/blogs?page=${page}`,
       );
       set((state) => ({
         blogsData: {
           ...state.blogsData,
           posts: response.data.data.posts,
           pagination: response.data.data.pagination,
-          isBlogsFetched: true, // تحديث الحالة للإشارة إلى أن البيانات جُلبت
+          isBlogsFetched: true,
           loading: false,
         },
       }));

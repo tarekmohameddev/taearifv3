@@ -85,7 +85,7 @@ const getImageUrl = (url: string): string => {
   return "/placeholder.svg"; // صورة بديلة في حال عدم صلاحية URL الصورة
 };
 
-export default function BlogsPage(): JSX.Element {
+export default function BlogsPage(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState<string>("blog");
   const router = useRouter();
   const {
@@ -94,12 +94,57 @@ export default function BlogsPage(): JSX.Element {
     setBlogsData,
   } = useStore();
 
-  // جلب البيانات مرة واحدة فقط إذا لم تكن قد جُلبت
+  // جلب البيانات عند تحميل الصفحة
   useEffect(() => {
-    if (!isBlogsFetched) {
-      fetchBlogs(); // استدعاء جلب البيانات إذا لم تكن قد جُلبت
+    fetchBlogs(1); // جلب الصفحة الأولى عند تحميل الصفحة
+  }, [fetchBlogs]);
+
+  // دالة للتعامل مع تغيير الصفحة
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= (pagination?.last_page || 1)) {
+      fetchBlogs(page);
     }
-  }, [fetchBlogs, isBlogsFetched]);
+  };
+
+  // دالة لإنشاء مصفوفة أرقام الصفحات للعرض
+  const getPageNumbers = () => {
+    if (!pagination) return [];
+    
+    const currentPage = pagination.current_page;
+    const lastPage = pagination.last_page;
+    const pages = [];
+    
+    // إذا كان عدد الصفحات أقل من أو يساوي 7، اعرض جميع الصفحات
+    if (lastPage <= 7) {
+      for (let i = 1; i <= lastPage; i++) {
+        pages.push(i);
+      }
+      return pages;
+    }
+    
+    // إظهار أقصى 5 صفحات حول الصفحة الحالية
+    const start = Math.max(1, currentPage - 2);
+    const end = Math.min(lastPage, currentPage + 2);
+    
+    // إضافة الصفحة الأولى إذا لم تكن مدرجة
+    if (start > 1) {
+      pages.push(1);
+      if (start > 2) pages.push('...');
+    }
+    
+    // إضافة الصفحات المحيطة بالصفحة الحالية
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    // إضافة الصفحة الأخيرة إذا لم تكن مدرجة
+    if (end < lastPage) {
+      if (end < lastPage - 1) pages.push('...');
+      pages.push(lastPage);
+    }
+    
+    return pages;
+  };
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
@@ -146,7 +191,7 @@ export default function BlogsPage(): JSX.Element {
             ) : (
               <>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {posts.map((post) => (
+                  {posts.map((post: IBlogPost) => (
                     <Card
                       key={post.id}
                       className="overflow-hidden flex flex-col"
@@ -228,29 +273,64 @@ export default function BlogsPage(): JSX.Element {
                   ))}
                 </div>
 
-                {pagination && (
-                  <Pagination className="mt-6">
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious href="#" />
-                      </PaginationItem>
-                      {Array.from({ length: pagination.last_page }).map(
-                        (_, idx) => (
-                          <PaginationItem key={idx}>
-                            <PaginationLink
-                              href="#"
-                              isActive={pagination.current_page === idx + 1}
-                            >
-                              {idx + 1}
-                            </PaginationLink>
+                {pagination && pagination.last_page > 1 && (
+                  <div className="mt-6 space-y-4">
+                    <Pagination>
+                      <PaginationContent className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                        {/* زر الصفحة السابقة */}
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => handlePageChange(pagination.current_page - 1)}
+                            className={`cursor-pointer transition-colors ${
+                              pagination.current_page <= 1 
+                                ? "pointer-events-none opacity-50" 
+                                : "hover:bg-gray-100"
+                            }`}
+                          />
+                        </PaginationItem>
+                        
+                        {/* أرقام الصفحات */}
+                        {getPageNumbers().map((page, index) => (
+                          <PaginationItem key={index}>
+                            {page === '...' ? (
+                              <span className="px-2 sm:px-3 py-2 text-muted-foreground text-sm">...</span>
+                            ) : (
+                              <PaginationLink
+                                onClick={() => handlePageChange(page as number)}
+                                isActive={pagination.current_page === page}
+                                className={`cursor-pointer transition-colors text-sm ${
+                                  pagination.current_page === page 
+                                    ? "bg-primary text-primary-foreground" 
+                                    : "hover:bg-gray-100"
+                                }`}
+                              >
+                                {page}
+                              </PaginationLink>
+                            )}
                           </PaginationItem>
-                        ),
-                      )}
-                      <PaginationItem>
-                        <PaginationNext href="#" />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
+                        ))}
+                        
+                        {/* زر الصفحة التالية */}
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => handlePageChange(pagination.current_page + 1)}
+                            className={`cursor-pointer transition-colors ${
+                              pagination.current_page >= pagination.last_page 
+                                ? "pointer-events-none opacity-50" 
+                                : "hover:bg-gray-100"
+                            }`}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                    
+                    {/* معلومات إضافية عن الصفحة */}
+                    <div className="text-center text-xs sm:text-sm text-muted-foreground">
+                      عرض {pagination.from} إلى {pagination.to} من أصل {pagination.total} مقال
+                      <span className="block sm:inline sm:mr-2 sm:ml-2">•</span>
+                      الصفحة {pagination.current_page} من {pagination.last_page}
+                    </div>
+                  </div>
                 )}
               </>
             )}
@@ -261,7 +341,7 @@ export default function BlogsPage(): JSX.Element {
   );
 }
 
-function SearchIcon(props: React.SVGProps<SVGSVGElement>): JSX.Element {
+function SearchIcon(props: React.SVGProps<SVGSVGElement>): React.JSX.Element {
   return (
     <svg
       {...props}

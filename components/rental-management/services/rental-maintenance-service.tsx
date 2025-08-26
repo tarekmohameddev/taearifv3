@@ -519,23 +519,23 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
   console.log("Current state:", { loading, requests: requests.length, filteredRequests: filteredRequests.length })
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       {/* Header and Stats */}
       <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div className="w-full lg:w-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
               طلبات الصيانة
             </h2>
-            <p className="text-muted-foreground">إدارة ومتابعة طلبات الصيانة والإصلاحات</p>
+            <p className="text-sm sm:text-base text-muted-foreground">إدارة ومتابعة طلبات الصيانة والإصلاحات</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
             <Button 
               variant="outline" 
               onClick={refreshData}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
             >
-              <Activity className="h-4 w-4 ml-2" />
+              <Activity className="h-4 w-4 mr-2" />
               تحديث
             </Button>
             <Dialog open={isCreateRequestDialogOpen} onOpenChange={(open) => {
@@ -548,12 +548,12 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
               setRentalMaintenance({ isCreateRequestDialogOpen: open })
             }}>
               <DialogTrigger asChild>
-                <Button className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg">
-                  <Plus className="ml-2 h-4 w-4" />
+                <Button className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg w-full sm:w-auto">
+                  <Plus className="mr-2 h-4 w-4" />
                   إضافة طلب صيانة
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+              <DialogContent className="w-[95vw] max-w-[700px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="text-xl font-bold">إضافة طلب صيانة جديد</DialogTitle>
                   <DialogDescription>تسجيل طلب صيانة أو إصلاح للعقار</DialogDescription>
@@ -594,7 +594,7 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
                   </div>
 
                   {/* Category and Priority */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="category">فئة الصيانة *</Label>
                        <Select value={formData.category} onValueChange={(value) => setRentalMaintenance({ formData: { ...formData, category: value } })}>
@@ -652,7 +652,7 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
                   </div>
 
                   {/* Cost and Payer */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="estimated-cost">التكلفة المتوقعة (ر.س)</Label>
                        <Input 
@@ -730,64 +730,64 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
           <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">إجمالي الطلبات</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                <div className="text-right">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">إجمالي الطلبات</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.total}</p>
                   <p className="text-xs text-gray-500">محمل: {requests.length}</p>
                 </div>
-                <Activity className="h-8 w-8 text-gray-600" />
+                <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600" />
               </div>
             </CardContent>
           </Card>
           
           <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">مفتوحة</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.open}</p>
+                <div className="text-right">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">مفتوحة</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.open}</p>
                 </div>
-                <Clock className="h-8 w-8 text-gray-600" />
+                <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600" />
               </div>
             </CardContent>
           </Card>
           
           <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">قيد التنفيذ</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.inProgress}</p>
+                <div className="text-right">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">قيد التنفيذ</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.inProgress}</p>
                 </div>
-                <Settings className="h-8 w-8 text-gray-600" />
+                <Settings className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600" />
               </div>
             </CardContent>
           </Card>
           
           <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">مكتملة</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.completed}</p>
+                <div className="text-right">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">مكتملة</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.completed}</p>
                 </div>
-                <CheckCircle className="h-8 w-8 text-gray-600" />
+                <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600" />
               </div>
             </CardContent>
           </Card>
           
           <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">عاجلة</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.urgent}</p>
+                <div className="text-right">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">عاجلة</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.urgent}</p>
                 </div>
-                <AlertTriangle className="h-8 w-8 text-gray-600" />
+                <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600" />
               </div>
             </CardContent>
           </Card>
@@ -795,19 +795,19 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
         <div className="relative flex-1">
-          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="البحث في طلبات الصيانة..."
             value={searchTerm}
             onChange={(e) => setRentalMaintenance({ searchTerm: e.target.value })}
-            className="pr-10 border-2 focus:border-gray-500 transition-colors"
+            className="pl-10 border-2 focus:border-gray-500 transition-colors"
           />
         </div>
         <Select value={filterStatus} onValueChange={(v) => setRentalMaintenance({ filterStatus: v })}>
-          <SelectTrigger className="w-full sm:w-48 border-2 focus:border-gray-500 transition-colors">
-            <Filter className="ml-2 h-4 w-4" />
+          <SelectTrigger className="w-full lg:w-48 border-2 focus:border-gray-500 transition-colors">
+            <Filter className="mr-2 h-4 w-4" />
             <SelectValue placeholder="جميع الحالات" />
           </SelectTrigger>
           <SelectContent>
@@ -820,7 +820,7 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
           </SelectContent>
         </Select>
         <Select value={filterPriority} onValueChange={(v) => setRentalMaintenance({ filterPriority: v })}>
-          <SelectTrigger className="w-full sm:w-48 border-2 focus:border-gray-500 transition-colors">
+          <SelectTrigger className="w-full lg:w-48 border-2 focus:border-gray-500 transition-colors">
             <SelectValue placeholder="الأولوية" />
           </SelectTrigger>
           <SelectContent>
@@ -835,9 +835,9 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
 
       {/* Results Summary */}
       {filteredRequests.length > 0 && (
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <Wrench className="h-5 w-5 text-gray-600" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200 gap-2">
+          <div className="flex items-center gap-2">
+            <Wrench className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
             <span className="text-sm font-medium text-gray-800">
               تم العثور على {filteredRequests.length} طلب صيانة من أصل {requests.length}
             </span>
@@ -852,24 +852,24 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
       <div className="space-y-4">
         {filteredRequests.map((request: MaintenanceRequest) => (
           <Card key={request.id} className="hover:shadow-lg transition-all duration-300 border-2 hover:border-gray-300 group">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="space-y-4 flex-1">
-                  <div className="flex items-center space-x-3 space-x-reverse flex-wrap gap-2">
-                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-gray-700 transition-colors">#{request.id}</h3>
-                    <Badge className={`${getStatusColor(request.status)} border`}>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col lg:flex-row items-start justify-between gap-4">
+                <div className="space-y-4 flex-1 w-full">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                    <h3 className="font-bold text-base sm:text-lg text-gray-900 group-hover:text-gray-700 transition-colors">#{request.id}</h3>
+                    <Badge className={`${getStatusColor(request.status)} border text-xs sm:text-sm`}>
                       {getStatusIcon(request.status)}
                       <span className="mr-1">{getStatusText(request.status)}</span>
                     </Badge>
-                    <Badge className={`${getPriorityColor(request.priority)} border`}>
+                    <Badge className={`${getPriorityColor(request.priority)} border text-xs sm:text-sm`}>
                       {getPriorityText(request.priority)}
                     </Badge>
-                    <Badge variant="outline" className="border-gray-300">
+                    <Badge variant="outline" className="border-gray-300 text-xs sm:text-sm">
                       {getCategoryText(request.category)}
                     </Badge>
                     {request.attachments_count > 0 && (
-                      <Badge variant="outline" className="border-gray-300 text-gray-700">
-                        <FileText className="h-3 w-3 ml-1" />
+                      <Badge variant="outline" className="border-gray-300 text-gray-700 text-xs sm:text-sm">
+                        <FileText className="h-3 w-3 mr-1" />
                         {request.attachments_count} مرفق
                       </Badge>
                     )}
@@ -877,23 +877,23 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
 
                   <div className="space-y-3">
                     <div>
-                      <h4 className="font-semibold text-lg text-gray-900 mb-2 group-hover:text-gray-700 transition-colors">{request.title}</h4>
-                      <p className="text-gray-600 leading-relaxed">{request.description}</p>
+                      <h4 className="font-semibold text-base sm:text-lg text-gray-900 mb-2 group-hover:text-gray-700 transition-colors">{request.title}</h4>
+                      <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{request.description}</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="flex items-center space-x-2 space-x-reverse text-sm p-2 bg-gray-50 rounded-lg">
-                        <DollarSign className="h-4 w-4 text-gray-600" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm p-2 bg-gray-50 rounded-lg">
+                        <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                         <span className="font-medium text-gray-700">التكلفة:</span>
                         <span className="text-gray-900 font-bold">{parseFloat(request.estimated_cost).toLocaleString()} ر.س</span>
                       </div>
-                      <div className="flex items-center space-x-2 space-x-reverse text-sm p-2 bg-gray-50 rounded-lg">
-                        <User className="h-4 w-4 text-gray-600" />
+                      <div className="flex items-center gap-2 text-xs sm:text-sm p-2 bg-gray-50 rounded-lg">
+                        <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                         <span className="font-medium text-gray-700">يدفع:</span>
                         <span className="text-gray-900">{getPayerText(request.payer)}</span>
                       </div>
-                      <div className="flex items-center space-x-2 space-x-reverse text-sm p-2 bg-gray-50 rounded-lg">
-                        <Calendar className="h-4 w-4 text-gray-600" />
+                      <div className="flex items-center gap-2 text-xs sm:text-sm p-2 bg-gray-50 rounded-lg">
+                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                         <span className="font-medium text-gray-700">تاريخ التقديم:</span>
                         <span className="text-gray-900">{formatDate(request.created_at)}</span>
                       </div>
@@ -901,45 +901,45 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
 
                     {request.notes && (
                       <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex items-start space-x-2 space-x-reverse">
-                          <FileText className="h-4 w-4 text-gray-600 mt-0.5" />
-                          <p className="text-sm text-gray-800">{request.notes}</p>
+                        <div className="flex items-start gap-2">
+                          <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600 mt-0.5" />
+                          <p className="text-xs sm:text-sm text-gray-800">{request.notes}</p>
                         </div>
                       </div>
                     )}
 
                     {request.scheduled_date && (
                       <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex items-center space-x-2 space-x-reverse">
-                          <Calendar className="h-4 w-4 text-gray-600" />
-                          <span className="text-sm font-medium text-gray-800">موعد الصيانة:</span>
-                          <span className="text-sm text-gray-700">{formatDateTime(request.scheduled_date)}</span>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
+                          <span className="text-xs sm:text-sm font-medium text-gray-800">موعد الصيانة:</span>
+                          <span className="text-xs sm:text-sm text-gray-700">{formatDateTime(request.scheduled_date)}</span>
                         </div>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end space-y-3 ml-6">
-                  <div className="text-right">
-                    <div className="text-sm text-muted-foreground">
+                <div className="flex flex-col items-end space-y-3 w-full lg:w-auto lg:mr-6">
+                  <div className="text-right w-full lg:w-auto">
+                    <div className="text-xs sm:text-sm text-muted-foreground">
                       آخر تحديث: {formatDateTime(request.updated_at)}
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
                     <Button 
                       size="sm" 
                       variant="outline" 
                       onClick={() => setRentalMaintenance({ selectedRequest: request })}
-                      className="border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors w-full sm:w-auto"
                     >
-                      <Eye className="h-3 w-3 ml-1" />
+                      <Eye className="h-3 w-3 mr-1" />
                       التفاصيل
                     </Button>
                     {request.status === "open" && (
                       <Button 
                         size="sm" 
-                        className="bg-gray-900 hover:bg-gray-800 text-white transition-all duration-300"
+                        className="bg-gray-900 hover:bg-gray-800 text-white transition-all duration-300 w-full sm:w-auto"
                       >
                         تعيين فني
                       </Button>
@@ -954,7 +954,7 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
 
       {/* Request Details Dialog */}
       <Dialog open={!!selectedRequest} onOpenChange={() => setRentalMaintenance({ selectedRequest: null })}>
-        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-[800px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">تفاصيل طلب الصيانة</DialogTitle>
             <DialogDescription>
@@ -963,54 +963,54 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
           </DialogHeader>
           {selectedRequest && (
             <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="details">تفاصيل الطلب</TabsTrigger>
-                <TabsTrigger value="timeline">الجدول الزمني</TabsTrigger>
-                <TabsTrigger value="costs">التكاليف</TabsTrigger>
-                <TabsTrigger value="actions">الإجراءات</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+                <TabsTrigger value="details" className="text-xs sm:text-sm">تفاصيل الطلب</TabsTrigger>
+                <TabsTrigger value="timeline" className="text-xs sm:text-sm">الجدول الزمني</TabsTrigger>
+                <TabsTrigger value="costs" className="text-xs sm:text-sm">التكاليف</TabsTrigger>
+                <TabsTrigger value="actions" className="text-xs sm:text-sm">الإجراءات</TabsTrigger>
               </TabsList>
 
               <TabsContent value="details" className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h4 className="font-semibold text-lg">معلومات الطلب</h4>
+                    <h4 className="font-semibold text-base sm:text-lg">معلومات الطلب</h4>
                     <div className="space-y-3">
                       <div>
                         <Label className="text-sm font-medium text-gray-600">رقم الطلب</Label>
-                        <p className="text-lg font-bold text-gray-900">#{selectedRequest.id}</p>
+                        <p className="text-base sm:text-lg font-bold text-gray-900">#{selectedRequest.id}</p>
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-gray-600">العنوان</Label>
-                        <p className="text-gray-900">{selectedRequest.title}</p>
+                        <p className="text-sm sm:text-base text-gray-900">{selectedRequest.title}</p>
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-gray-600">الفئة</Label>
-                        <Badge variant="outline" className="mt-1">{getCategoryText(selectedRequest.category)}</Badge>
+                        <Badge variant="outline" className="mt-1 text-xs sm:text-sm">{getCategoryText(selectedRequest.category)}</Badge>
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-gray-600">الأولوية</Label>
-                        <Badge className={`${getPriorityColor(selectedRequest.priority)} mt-1`}>
+                        <Badge className={`${getPriorityColor(selectedRequest.priority)} mt-1 text-xs sm:text-sm`}>
                           {getPriorityText(selectedRequest.priority)}
                         </Badge>
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-gray-600">الحالة</Label>
-                        <Badge className={`${getStatusColor(selectedRequest.status)} mt-1`}>
+                        <Badge className={`${getStatusColor(selectedRequest.status)} mt-1 text-xs sm:text-sm`}>
                           {getStatusText(selectedRequest.status)}
                         </Badge>
                       </div>
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <h4 className="font-semibold text-lg">الوصف</h4>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-gray-700 leading-relaxed">{selectedRequest.description}</p>
+                    <h4 className="font-semibold text-base sm:text-lg">الوصف</h4>
+                    <div className="p-3 sm:p-4 bg-gray-50 rounded-lg">
+                      <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{selectedRequest.description}</p>
                     </div>
                     {selectedRequest.notes && (
                       <div>
-                        <h5 className="font-medium text-gray-700 mb-2">ملاحظات</h5>
+                        <h5 className="font-medium text-gray-700 mb-2 text-sm sm:text-base">ملاحظات</h5>
                         <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                          <p className="text-sm text-gray-800">{selectedRequest.notes}</p>
+                          <p className="text-xs sm:text-sm text-gray-800">{selectedRequest.notes}</p>
                         </div>
                       </div>
                     )}
@@ -1020,7 +1020,7 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
 
               <TabsContent value="timeline" className="space-y-4">
                 <div className="space-y-4">
-                  <div className="flex items-start space-x-3 space-x-reverse">
+                  <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-8 h-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center">
                       <Clock className="h-4 w-4" />
                     </div>
@@ -1031,7 +1031,7 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
                   </div>
 
                   {selectedRequest.scheduled_date && (
-                    <div className="flex items-start space-x-3 space-x-reverse">
+                    <div className="flex items-start gap-3">
                       <div className="flex-shrink-0 w-8 h-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center">
                         <Calendar className="h-4 w-4" />
                       </div>
@@ -1042,7 +1042,7 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
                     </div>
                   )}
 
-                  <div className="flex items-start space-x-3 space-x-reverse">
+                  <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-8 h-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center">
                       <Settings className="h-4 w-4" />
                     </div>
@@ -1055,57 +1055,57 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
               </TabsContent>
 
               <TabsContent value="costs" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <Card className="bg-gray-50 border-gray-200">
-                    <CardContent className="p-4">
-                      <div className="flex items-center space-x-2 space-x-reverse mb-2">
-                        <DollarSign className="h-5 w-5 text-gray-600" />
-                        <h4 className="font-semibold text-gray-800">التكلفة المتوقعة</h4>
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
+                        <h4 className="font-semibold text-gray-800 text-sm sm:text-base">التكلفة المتوقعة</h4>
                       </div>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-lg sm:text-2xl font-bold text-gray-900">
                         {parseFloat(selectedRequest.estimated_cost).toLocaleString()} ر.س
                       </p>
                     </CardContent>
                   </Card>
 
                   <Card className="bg-gray-50 border-gray-200">
-                    <CardContent className="p-4">
-                      <div className="flex items-center space-x-2 space-x-reverse mb-2">
-                        <User className="h-5 w-5 text-gray-600" />
-                        <h4 className="font-semibold text-gray-800">يتحمل التكلفة</h4>
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <User className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
+                        <h4 className="font-semibold text-gray-800 text-sm sm:text-base">يتحمل التكلفة</h4>
                       </div>
-                      <p className="text-lg font-bold text-gray-900">{getPayerText(selectedRequest.payer)}</p>
-                      <p className="text-sm text-gray-700">نسبة الدفع: {selectedRequest.payer_share_percent}%</p>
+                      <p className="text-base sm:text-lg font-bold text-gray-900">{getPayerText(selectedRequest.payer)}</p>
+                      <p className="text-xs sm:text-sm text-gray-700">نسبة الدفع: {selectedRequest.payer_share_percent}%</p>
                     </CardContent>
                   </Card>
                 </div>
               </TabsContent>
 
               <TabsContent value="actions" className="space-y-4">
-                <div className="text-center py-8">
-                  <Settings className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">إجراءات الطلب</h3>
-                  <p className="text-muted-foreground mb-6">اختر الإجراء المناسب لحالة الطلب</p>
+                <div className="text-center py-6 sm:py-8">
+                  <Settings className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">إجراءات الطلب</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">اختر الإجراء المناسب لحالة الطلب</p>
                   
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
                     {selectedRequest.status === "open" && (
-                      <Button className="bg-gray-900 hover:bg-gray-800 text-white">
+                      <Button className="bg-gray-900 hover:bg-gray-800 text-white w-full sm:w-auto">
                         تعيين فني
                       </Button>
                     )}
                     {selectedRequest.status === "assigned" && (
-                      <Button className="bg-gray-900 hover:bg-gray-800 text-white">
+                      <Button className="bg-gray-900 hover:bg-gray-800 text-white w-full sm:w-auto">
                         بدء العمل
                       </Button>
                     )}
                     {selectedRequest.status === "in_progress" && (
-                      <Button className="bg-gray-900 hover:bg-gray-800 text-white">
-                        <CheckCircle className="ml-2 h-4 w-4" />
+                      <Button className="bg-gray-900 hover:bg-gray-800 text-white w-full sm:w-auto">
+                        <CheckCircle className="mr-2 h-4 w-4" />
                         إكمال الصيانة
                       </Button>
                     )}
-                    <Button variant="outline">
-                      <Phone className="ml-2 h-4 w-4" />
+                    <Button variant="outline" className="w-full sm:w-auto">
+                      <Phone className="mr-2 h-4 w-4" />
                       اتصال بالمستأجر
                     </Button>
                   </div>
@@ -1122,27 +1122,27 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
       </Dialog>
 
       {filteredRequests.length === 0 && (
-        <div className="text-center py-12">
+        <div className="text-center py-8 sm:py-12">
           <div className="relative">
-            <Wrench className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+            <Wrench className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground mb-3 sm:mb-4" />
+            <div className="absolute -top-2 -right-2 w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 rounded-full flex items-center justify-center">
               <span className="text-xs text-gray-600 font-bold">{requests.length}</span>
             </div>
           </div>
-          <h3 className="text-xl font-medium mb-2">لم يتم العثور على طلبات صيانة</h3>
-          <p className="text-muted-foreground mb-6">
+          <h3 className="text-lg sm:text-xl font-medium mb-2">لم يتم العثور على طلبات صيانة</h3>
+          <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
             {searchTerm || filterStatus !== "all" || filterPriority !== "all"
               ? "جرب تعديل معايير البحث"
               : requests.length === 0 
                 ? "لا توجد طلبات صيانة حالياً" 
                 : "لا توجد نتائج تطابق البحث"}
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
             <Button 
               onClick={() => setRentalMaintenance({ isCreateRequestDialogOpen: true })}
-              className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg"
+              className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg w-full sm:w-auto"
             >
-              <Plus className="ml-2 h-4 w-4" />
+              <Plus className="mr-2 h-4 w-4" />
               إضافة طلب صيانة
             </Button>
             {(searchTerm || filterStatus !== "all" || filterPriority !== "all") && (
@@ -1151,36 +1151,36 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
                 onClick={() => {
                   setRentalMaintenance({ searchTerm: "", filterStatus: "all", filterPriority: "all" })
                 }}
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
               >
                 مسح الفلاتر
               </Button>
             )}
           </div>
           {requests.length === 0 && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">عدد الطلبات المحملة: {requests.length}</p>
-              <p className="text-sm text-gray-600">عدد الطلبات المفلترة: {filteredRequests.length}</p>
+            <div className="mt-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+              <p className="text-xs sm:text-sm text-gray-600">عدد الطلبات المحملة: {requests.length}</p>
+              <p className="text-xs sm:text-sm text-gray-600">عدد الطلبات المفلترة: {filteredRequests.length}</p>
             </div>
           )}
         </div>
       )}
 
       {/* Quick Actions Floating Button */}
-      <div className="fixed bottom-6 left-6 z-50">
+      <div className="fixed bottom-4 sm:bottom-6 left-4 sm:left-6 z-50">
         <div className="flex flex-col gap-2">
           <Button
             size="sm"
             variant="outline"
             onClick={refreshData}
-            className="bg-white shadow-lg border-gray-300 hover:bg-gray-50"
+            className="bg-white shadow-lg border-gray-300 hover:bg-gray-50 h-10 w-10 sm:h-12 sm:w-12 p-0"
           >
             <Activity className="h-4 w-4" />
           </Button>
             <Button 
             size="sm"
               onClick={() => setRentalMaintenance({ isCreateRequestDialogOpen: true })}
-            className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg"
+            className="bg-gray-900 hover:bg-gray-800 text-white shadow-lg h-10 w-10 sm:h-12 sm:w-12 p-0"
           >
             <Plus className="h-4 w-4" />
           </Button>
