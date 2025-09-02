@@ -552,7 +552,7 @@ export function PropertiesManagementPage() {
 
   const reorderList =
     reorderPopup.type === "featured"
-      ? normalizedProperties.filter((p) => p.featured)
+      ? normalizedProperties.filter((p: any) => p.featured)
       : normalizedProperties;
 
   return (
@@ -766,9 +766,7 @@ export function PropertiesManagementPage() {
                 <TabsContent value="all" className="mt-4">
                   {normalizedProperties.length === 0 ? (
                     <EmptyState
-                      type={undefined as any}
-                      message="لا يوجد عقارات"
-                      description="قم بإضافة عقارات جديدة"
+                      type="عقارات"
                     />
                   ) : (
                     <>
@@ -989,17 +987,6 @@ function PropertyCard({
         >
           {property.status}
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute left-2 bottom-2 rounded-full bg-background/80 hover:bg-background"
-          onClick={() => onToggleFavorite(property.id)}
-        >
-          <Heart
-            className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`}
-          />
-          <span className="sr-only">Toggle favorite</span>
-        </Button>
       </div>
       <CardHeader className="p-4">
         <div className="flex flex-row-reverse items-start justify-between">
@@ -1119,22 +1106,23 @@ function PropertyCard({
         </div>
         <div className="grid grid-cols-3 gap-2 text-sm ">
           <div className="flex flex-col items-end">
+            <span className="text-muted-foreground">زيارات</span>
+            <span className="font-medium flex flex-row-reverse items-center gap-1">
+              <MessageCircle className="h-3 w-3" />
+              {property.visits || 0}
+            </span>
+          </div>
+          <div className="flex flex-col items-end">
             <span className="text-muted-foreground">غرفة</span>
             <span className="font-medium flex flex-row-reverse items-center gap-1">
               <Bed className="h-3 w-3" />
-              {property.beds}
+              {property.beds || 0}
             </span>
           </div>
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">حمام</span>
             <span className="font-medium flex flex-row-reverse items-center gap-1">
-              <Bath className="h-3 w-3" /> {property.bath}
-            </span>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="text-muted-foreground">مساحة</span>
-            <span className="font-medium flex flex-row-reverse items-center gap-1">
-              <Ruler className="h-3 w-3" /> {property.area || property.size} m²
+              <Bath className="h-3 w-3" /> {property.bath || 0}
             </span>
           </div>
         </div>
@@ -1231,17 +1219,6 @@ function PropertyListItem({
           >
             {property.status}
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute left-2 bottom-2 rounded-full bg-background/80 hover:bg-background"
-            onClick={() => onToggleFavorite(property.id)}
-          >
-            <Heart
-              className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`}
-            />
-            <span className="sr-only">Toggle favorite</span>
-          </Button>
         </div>
         <div className="flex flex-1 flex-col p-4">
           <div className="flex flex-row-reverse items-start justify-between">
@@ -1284,20 +1261,24 @@ function PropertyListItem({
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">
             <div className="flex flex-row-reverse items-center gap-1">
+              <MessageCircle className="h-4 w-4 text-muted-foreground" />
+              <span>{property.visits || 0} زيارة</span>
+            </div>
+            <div className="flex flex-row-reverse items-center gap-1">
               <Building className="h-4 w-4 text-muted-foreground" />
-              <span>{property.type}</span>
+              <span>{property.type || 'غير محدد'}</span>
             </div>
             <div className="flex flex-row-reverse items-center gap-1">
               <Bed className="h-4 w-4 text-muted-foreground" />
-              <span>{property.beds} غرفة</span>
+              <span>{property.beds || 0} غرفة</span>
             </div>
             <div className="flex flex-row-reverse items-center gap-1">
               <Bath className="h-4 w-4 text-muted-foreground" />
-              <span>{property.bath} حمام</span>
+              <span>{property.bath || 0} حمام</span>
             </div>
             <div className="flex flex-row-reverse items-center gap-1">
               <Ruler className="h-4 w-4 text-muted-foreground" />
-              <span>{property.size || property.area} م² </span>
+              <span>{property.size || property.area || 0} م² </span>
             </div>
           </div>
           <div className="mt-2 flex flex-wrap gap-1">

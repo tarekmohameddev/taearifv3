@@ -605,17 +605,6 @@ function PropertyCard({
         >
           {property.status}
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-2 bottom-2 rounded-full bg-background/80 hover:bg-background"
-          onClick={() => onToggleFavorite(property.id)}
-        >
-          <Heart
-            className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`}
-          />
-          <span className="sr-only">Toggle favorite</span>
-        </Button>
       </div>
       <CardHeader className="p-4">
         <div className="flex items-start justify-between">
@@ -733,17 +722,6 @@ function PropertyListItem({
           >
             {property.status}
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-2 bottom-2 rounded-full bg-background/80 hover:bg-background"
-            onClick={() => onToggleFavorite(property.id)}
-          >
-            <Heart
-              className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`}
-            />
-            <span className="sr-only">Toggle favorite</span>
-          </Button>
         </div>
         <div className="flex flex-1 flex-col p-4">
           <div className="flex items-start justify-between">

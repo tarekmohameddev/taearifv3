@@ -7,6 +7,10 @@ import {
   Globe,
   LayoutGrid,
   Settings,
+  Building,
+  Home,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -84,6 +88,14 @@ export function WelcomeDashboard() {
     fetchDashboardSummary,
     fetchTrafficSources,
   ]);
+
+  // تحويل بيانات العقارات إلى التنسيق المطلوب للرسم البياني
+  const propertyChartData = dashboardSummary?.properties?.properties_purposes?.map((item: any) => ({
+    name: item.purpose === 'rent' ? 'مؤجر' : item.purpose === 'sale' ? 'مباع' : 'للبيع',
+    value: item.total,
+    color: item.purpose === 'rent' ? '#10B981' : item.purpose === 'sale' ? '#EF4444' : '#3B82F6'
+  })) || [];
+
   return (
     <div className="space-y-6">
       <div>
@@ -100,18 +112,18 @@ export function WelcomeDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardSummary?.visits.toLocaleString() || 0}
+              {dashboardSummary?.visits || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               <span
                 className={
-                  dashboardSummary?.visits_change > 0
+                  (dashboardSummary?.visits_change || 0) > 0
                     ? "text-green-500"
                     : "text-red-500"
                 }
               >
-                {dashboardSummary?.visits_change > 0 ? "↑" : "↓"}{" "}
-                {Math.abs(dashboardSummary?.visits_change) || 0}%
+                {(dashboardSummary?.visits_change || 0) > 0 ? "↑" : "↓"}{" "}
+                {Math.abs(dashboardSummary?.visits_change || 0)}%
               </span>{" "}
               من الشهر الماضي
             </p>
@@ -125,18 +137,18 @@ export function WelcomeDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardSummary?.page_views.toLocaleString() || 0}
+              {dashboardSummary?.page_views || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               <span
                 className={
-                  dashboardSummary?.page_views_change > 0
+                  (dashboardSummary?.page_views_change || 0) > 0
                     ? "text-green-500"
                     : "text-red-500"
                 }
               >
-                {dashboardSummary?.page_views_change > 0 ? "↑" : "↓"}{" "}
-                {Math.abs(dashboardSummary?.page_views_change) || 0}%
+                {(dashboardSummary?.page_views_change || 0) > 0 ? "↑" : "↓"}{" "}
+                {Math.abs(dashboardSummary?.page_views_change || 0)}%
               </span>{" "}
               من الشهر الماضي
             </p>
@@ -148,18 +160,18 @@ export function WelcomeDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardSummary?.average_time || 0}
+              {dashboardSummary?.average_time || "00:00"}
             </div>
             <p className="text-xs text-muted-foreground">
               <span
                 className={
-                  dashboardSummary?.average_time_change > 0
+                  (dashboardSummary?.average_time_change || 0) > 0
                     ? "text-green-500"
                     : "text-red-500"
                 }
               >
-                {dashboardSummary?.average_time_change > 0 ? "↑" : "↓"}{" "}
-                {Math.abs(dashboardSummary?.average_time_change) || 0}%
+                {(dashboardSummary?.average_time_change || 0) > 0 ? "↑" : "↓"}{" "}
+                {Math.abs(dashboardSummary?.average_time_change || 0)}%
               </span>{" "}
               من الشهر الماضي
             </p>
@@ -171,24 +183,80 @@ export function WelcomeDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardSummary?.bounce_rate !== undefined &&
-              dashboardSummary.bounce_rate !== "N/A"
-                ? Number(dashboardSummary.bounce_rate).toFixed(2)
-                : 0}{" "}
-              %
+              {dashboardSummary?.bounce_rate || 0}%
             </div>
             <p className="text-xs text-muted-foreground">
               <span
                 className={
-                  dashboardSummary?.bounce_rate_change > 0
+                  (dashboardSummary?.bounce_rate_change || 0) > 0
                     ? "text-red-500"
                     : "text-green-500"
                 }
               >
-                {dashboardSummary?.bounce_rate_change > 0 ? "↑" : "↓"}{" "}
-                {Math.abs(dashboardSummary?.bounce_rate_change) || 0}%
+                {(dashboardSummary?.bounce_rate_change || 0) > 0 ? "↑" : "↓"}{" "}
+                {Math.abs(dashboardSummary?.bounce_rate_change || 0).toFixed(2)}%
               </span>{" "}
               من الشهر الماضي
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* إحصائيات العقارات */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">إجمالي العقارات</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold flex items-center gap-2">
+              <Building className="h-6 w-6 text-blue-600" />
+              {dashboardSummary?.properties?.total || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              إجمالي العقارات في الموقع
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">عقارات مؤجرة</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold flex items-center gap-2">
+              <Home className="h-6 w-6 text-green-600" />
+              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose === 'rent')?.total || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              عقارات متاحة للإيجار
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">عقارات مباعة</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold flex items-center gap-2">
+              <TrendingUp className="h-6 w-6 text-red-600" />
+              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose === 'sale')?.total || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              عقارات متاحة للبيع
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">عقارات تم تأجيرها</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold flex items-center gap-2">
+              <TrendingDown className="h-6 w-6 text-purple-600" />
+              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose === 'rented')?.total || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              عقارات تم تأجيرها بالفعل
             </p>
           </CardContent>
         </Card>
@@ -277,18 +345,18 @@ export function WelcomeDashboard() {
               </CardContent>
             </Card>
 
-            {/* Traffic Sources Chart */}
+            {/* Properties Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>مصادر الزيارات</CardTitle>
-                <CardDescription>توزيع مصادر حركة المرور</CardDescription>
+                <CardTitle>توزيع العقارات</CardTitle>
+                <CardDescription>توزيع العقارات حسب الغرض</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={trafficSources}
+                        data={propertyChartData}
                         cx="50%"
                         cy="50%"
                         innerRadius={60}
@@ -300,7 +368,7 @@ export function WelcomeDashboard() {
                           `${(percent * 100).toFixed(0)}%`
                         }
                       >
-                        {trafficSources?.map(
+                        {propertyChartData?.map(
                           (
                             entry: { color: string | undefined },
                             index: any,
@@ -326,7 +394,7 @@ export function WelcomeDashboard() {
                         wrapperStyle={{ paddingRight: 20 }}
                       />
                       <Tooltip
-                        formatter={(value, name) => [`${value}%`, name]}
+                        formatter={(value, name) => [`${value}`, name]}
                         contentStyle={{
                           backgroundColor: "white",
                           borderRadius: "8px",

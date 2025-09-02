@@ -10,6 +10,7 @@ import {
   Copy,
   Edit,
   ExternalLink,
+  Eye,
   Filter,
   Grid3X3,
   List,
@@ -52,18 +53,31 @@ import EmptyState from "@/components/empty-state";
 
 export interface IProject {
   id: number;
-  name: string;
-  location: string;
-  price: string;
-  status: number; // 1 => منشور، 0 => مسودة
-  completion_date: string;
+  visits: number;
+  featured_image: string;
+  price_range: string;
+  latitude: string;
+  longitude: string;
+  featured: boolean | number; // يمكن أن يكون boolean أو number (1/0)
+  complete_status: string;
   units: number;
+  completion_date: string;
   developer: string;
-  description: string;
-  thumbnail: string;
-  featured: number; // 1 => مميز، 0 => غير مميز
+  published: boolean | number; // يمكن أن يكون boolean أو number (1/0)
   created_at: string;
   updated_at: string;
+  amenities: any[] | string; // يمكن أن يكون array أو string
+  contents: Array<{
+    id: number;
+    title: string;
+    address: string;
+    description: string;
+    meta_keyword: string | null;
+    meta_description: string | null;
+    slug: string;
+  }>;
+  specifications: any[];
+  types: any[];
 }
 
 export interface IPagination {
@@ -132,7 +146,7 @@ export function ProjectsManagementPage() {
     setProjectsManagement({ viewMode: mode });
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: number) => {
     try {
       const response = await axiosInstance.delete(`/projects/${id}`);
       console.log("تم حذف المشروع بنجاح");
@@ -282,21 +296,39 @@ export function ProjectsManagementPage() {
                 {loading
                   ? renderSkeletons()
                   : renderProjectCards(
-                      projects.filter((project) => project.published === true),
+                      projects.filter((project: IProject) => {
+                        if (typeof project.published === 'boolean') {
+                          return project.published === true;
+                        } else {
+                          return project.published === 1;
+                        }
+                      }),
                     )}
               </TabsContent>
               <TabsContent value="0" className="mt-4">
                 {loading
                   ? renderSkeletons()
                   : renderProjectCards(
-                      projects.filter((project) => project.published === false),
+                      projects.filter((project: IProject) => {
+                        if (typeof project.published === 'boolean') {
+                          return project.published === false;
+                        } else {
+                          return project.published === 0;
+                        }
+                      }),
                     )}
               </TabsContent>
               <TabsContent value="featured" className="mt-4">
                 {loading
                   ? renderSkeletons()
                   : renderProjectCards(
-                      projects.filter((project) => project.featured === 1),
+                      projects.filter((project: IProject) => {
+                        if (typeof project.featured === 'boolean') {
+                          return project.featured === true;
+                        } else {
+                          return project.featured === 1;
+                        }
+                      }),
                     )}
               </TabsContent>
             </Tabs>
@@ -318,7 +350,7 @@ export function ProjectsManagementPage() {
 
 function ProjectCard({ project }: { project: IProject }) {
   const router = useRouter();
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: number) => {
     try {
       const response = await axiosInstance.delete(`/projects/${id}`);
       console.log("تم حذف المشروع بنجاح");
@@ -441,11 +473,17 @@ function ProjectCard({ project }: { project: IProject }) {
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
-        <div className="text-lg font-semibold">{project.price}</div>
+        <div className="text-lg font-semibold">{project.price_range}</div>
         <p className="text-sm text-muted-foreground line-clamp-2">
           {project.contents?.[0]?.description}
         </p>
-        <div className="grid grid-cols-3 gap-2 text-sm">
+        <div className="grid grid-cols-4 gap-2 text-sm">
+          <div className="flex flex-col">
+            <span className="text-muted-foreground">الزيارات</span>
+            <span className="font-medium flex items-center gap-1">
+              <Eye className="h-3 w-3" /> {project.visits}
+            </span>
+          </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground">وحدات</span>
             <span className="font-medium flex items-center gap-1">
@@ -507,7 +545,6 @@ function ProjectListItem({ project }: { project: IProject }) {
           <div className="aspect-[16/9] sm:aspect-auto sm:h-full w-full overflow-hidden">
             <img
               src={
-                project.thumbnail ||
                 project.featured_image ||
                 "/placeholder.svg"
               }
@@ -552,12 +589,16 @@ function ProjectListItem({ project }: { project: IProject }) {
                 {project.contents?.[0]?.address}
               </p>
             </div>
-            <div className="text-lg font-semibold">{project.price}</div>
+            <div className="text-lg font-semibold">{project.price_range}</div>
           </div>
           <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
             {project.contents?.[0]?.description}
           </p>
           <div className="mt-auto pt-4 flex flex-wrap gap-4 text-sm">
+            <div className="flex items-center gap-1">
+              <Eye className="h-4 w-4 text-muted-foreground" />
+              <span>{project.visits} زيارة</span>
+            </div>
             <div className="flex items-center gap-1">
               <Users className="h-4 w-4 text-muted-foreground" />
               <span>{project.units} وحدات</span>
@@ -617,7 +658,10 @@ function ProjectListItem({ project }: { project: IProject }) {
                   )}
                   <DropdownMenuItem
                     className="text-destructive focus:text-destructive"
-                    onClick={() => handleDelete(project.id)}
+                    onClick={() => {
+                      // Handle delete functionality here
+                      console.log("Delete project:", project.id);
+                    }}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     حذف
