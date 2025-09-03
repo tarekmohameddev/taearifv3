@@ -104,7 +104,7 @@ interface Property {
 interface Rental {
   id: number
   user_id: number
-  property_id: number
+  property_number: string
   unit_label: string
   tenant_full_name: string
   tenant_phone: string

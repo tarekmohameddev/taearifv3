@@ -58,7 +58,7 @@ interface Property {
 interface RentalData {
   id: number
   user_id: number
-  property_id: number
+  property_number: string
   unit_label: string
   tenant_full_name: string
   tenant_phone: string
@@ -410,7 +410,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
       </div>
 
       {/* Rentals List */}
-      <div className="space-y-4">
+      <div className="space-y-4" dir="rtl">
         {filteredRentals.map((rental: RentalData) => (
           <Card key={rental.id} className="hover:shadow-lg transition-all duration-200 border-0 shadow-sm">
             <CardContent className="p-6">
@@ -434,7 +434,11 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                       <div className="flex items-center text-gray-600">
                         <Building2 className="h-4 w-4 ml-2 text-blue-500" />
-                        <span>الوحدة: {rental.unit_label}</span>
+                        <span>رمز الوحدة: {rental.unit_label}</span>
+                      </div>
+                      <div className="flex items-center text-gray-600">
+                        <FileText className="h-4 w-4 ml-2 text-blue-500" />
+                        <span>رقم الوحدة: {rental.property_number}</span>
                       </div>
                       <div className="flex items-center text-gray-600">
                         <DollarSign className="h-4 w-4 ml-2 text-green-500" />
@@ -803,7 +807,7 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
     tenant_job_title: "",
     tenant_social_status: "single",
     tenant_national_id: "",
-    property_id: "",
+    property_number: "",
     unit_label: "",
     move_in_date: "",
     rental_period_months: 12,
@@ -818,7 +822,7 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
     e.preventDefault()
     
     // التحقق من البيانات المطلوبة
-    if (!formData.tenant_full_name || !formData.tenant_phone || !formData.tenant_email || !formData.property_id || !formData.unit_label || !formData.move_in_date) {
+    if (!formData.tenant_full_name || !formData.tenant_phone || !formData.tenant_email || !formData.property_number || !formData.unit_label || !formData.move_in_date) {
       alert("يرجى ملء جميع الحقول المطلوبة")
       return
     }
@@ -826,7 +830,7 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
     // تحويل البيانات إلى الأنواع الصحيحة
     const processedFormData: any = {
       ...formData,
-      property_id: formData.property_id ? parseInt(formData.property_id) : null,
+      property_number: formData.property_number,
       rental_period_months: Number(formData.rental_period_months) || 12,
       base_rent_amount: formData.base_rent_amount ? parseFloat(formData.base_rent_amount) : 0,
       deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
@@ -835,7 +839,7 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
     console.log("Processed form data:", processedFormData) // للتأكد من البيانات المعالجة
     
     // التحقق من أن البيانات صحيحة
-    if (!processedFormData.property_id || processedFormData.base_rent_amount <= 0 || processedFormData.deposit_amount <= 0) {
+    if (!processedFormData.property_number || processedFormData.base_rent_amount <= 0 || processedFormData.deposit_amount <= 0) {
       alert("يرجى التأكد من إدخال رقم العقار ومبلغ الإيجار ومبلغ الضمان")
       return
     }
@@ -924,12 +928,12 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
           <h4 className="font-semibold text-lg text-gray-900 border-b pb-2">تفاصيل العقد</h4>
           
           <div className="space-y-2">
-            <Label htmlFor="property_id">رقم العقار *</Label>
+            <Label htmlFor="property_number">رقم العقار *</Label>
             <Input 
-              id="property_id"
-              type="number"
-              value={formData.property_id}
-              onChange={(e) => setFormData(prev => ({ ...prev, property_id: e.target.value }))}
+              id="property_number"
+              type="text"
+              value={formData.property_number}
+              onChange={(e) => setFormData(prev => ({ ...prev, property_number: e.target.value }))}
               placeholder="12"
               
             />
