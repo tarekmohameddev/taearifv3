@@ -255,7 +255,7 @@ export function AffiliateRegistrationPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6" dir="rtl">
                   {/* Personal Information */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold border-b pb-2">

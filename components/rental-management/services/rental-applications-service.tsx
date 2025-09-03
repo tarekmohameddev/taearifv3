@@ -529,13 +529,13 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
           </DialogHeader>
           {selectedRental && (
             <Tabs defaultValue="tenant" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-3"  dir="rtl">
                 <TabsTrigger value="tenant">المستأجر</TabsTrigger>
                 <TabsTrigger value="property">العقار</TabsTrigger>
                 <TabsTrigger value="contract">العقد</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="tenant" className="space-y-6">
+              <TabsContent value="tenant" className="space-y-6"  dir="rtl">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <h4 className="font-semibold text-lg text-gray-900">المعلومات الشخصية</h4>
@@ -586,7 +586,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                 </div>
               </TabsContent>
 
-              <TabsContent value="property" className="space-y-6">
+              <TabsContent value="property" className="space-y-6"  dir="rtl">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <h4 className="font-semibold text-lg text-gray-900">تفاصيل العقار</h4>
@@ -609,7 +609,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-4"  dir="rtl">
                     <h4 className="font-semibold text-lg text-gray-900">الموقع</h4>
                     <div className="space-y-3">
                       <div>
@@ -625,7 +625,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                 </div>
               </TabsContent>
 
-              <TabsContent value="contract" className="space-y-6">
+              <TabsContent value="contract" className="space-y-6"  dir="rtl">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <h4 className="font-semibold text-lg text-gray-900">تفاصيل العقد</h4>
