@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Filter,
   Grid3X3,
+  Eye,
   Heart,
   List,
   MapPin,
@@ -1106,10 +1107,9 @@ function PropertyCard({
         </div>
         <div className="grid grid-cols-3 gap-2 text-sm ">
           <div className="flex flex-col items-end">
-            <span className="text-muted-foreground">زيارات</span>
+            <span className="text-muted-foreground">مشاهدات</span>
             <span className="font-medium flex flex-row-reverse items-center gap-1">
-              <MessageCircle className="h-3 w-3" />
-              {property.visits || 0}
+              <Eye className="h-3 w-3" /> {property.visits || 0}
             </span>
           </div>
           <div className="flex flex-col items-end">

@@ -473,34 +473,34 @@ function ProjectCard({ project }: { project: IProject }) {
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
-        <div className="text-lg font-semibold">{project.price_range}</div>
+        <div className="text-lg font-semibold">{project.price_range || ''}</div>
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {project.contents?.[0]?.description}
+          {project.contents?.[0]?.description || ''}
         </p>
         <div className="grid grid-cols-4 gap-2 text-sm">
           <div className="flex flex-col">
-            <span className="text-muted-foreground">الزيارات</span>
+            <span className="text-muted-foreground">المشاهدات</span>
             <span className="font-medium flex items-center gap-1">
-              <Eye className="h-3 w-3" /> {project.visits}
+              <Eye className="h-3 w-3" /> {project.visits || 0}
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground">وحدات</span>
             <span className="font-medium flex items-center gap-1">
-              <Users className="h-3 w-3" /> {project.units}
+              <Users className="h-3 w-3" /> {project.units || 0}
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground">الإنجاز</span>
             <span className="font-medium flex items-center gap-1">
-              <Calendar className="h-3 w-3" /> {project.completion_date}
+              <Calendar className="h-3 w-3" /> {project.completion_date || ''}
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground">المطور</span>
             <span className="font-medium flex items-center gap-1">
               <Building2 className="h-3 w-3" />{" "}
-              {project.developer?.split(" ")[0]}
+              {project.developer?.split(" ")[0] || '' }
             </span>
           </div>
         </div>
