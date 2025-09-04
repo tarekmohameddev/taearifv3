@@ -91,9 +91,15 @@ export function WelcomeDashboard() {
 
   // تحويل بيانات العقارات إلى التنسيق المطلوب للرسم البياني
   const propertyChartData = dashboardSummary?.properties?.properties_purposes?.map((item: any) => ({
-    name: item.purpose === 'rent' ? 'مؤجر' : item.purpose === 'sale' ? 'مباع' : 'للبيع',
+    name: item.purpose === 'rent' ? 'للإيجار' : 
+          item.purpose === 'sale' ? 'للبيع' : 
+          item.purpose === 'rented' ? 'مؤجرة' : 
+          item.purpose === 'sold' ? 'مباعة' : item.purpose,
     value: item.total,
-    color: item.purpose === 'rent' ? '#10B981' : item.purpose === 'sale' ? '#EF4444' : '#3B82F6'
+    color: item.purpose === 'rent' ? '#10B981' : 
+           item.purpose === 'sale' ? '#EF4444' : 
+           item.purpose === 'rented' ? '#8B5CF6' : 
+           item.purpose === 'sold' ? '#F59E0B' : '#3B82F6'
   })) || [];
 
   return (
@@ -203,7 +209,7 @@ export function WelcomeDashboard() {
       </div>
 
       {/* إحصائيات العقارات */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">إجمالي العقارات</CardTitle>
@@ -220,7 +226,7 @@ export function WelcomeDashboard() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">عقارات مؤجرة</CardTitle>
+            <CardTitle className="text-sm font-medium">للإيجار</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
@@ -234,7 +240,7 @@ export function WelcomeDashboard() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">عقارات مباعة</CardTitle>
+            <CardTitle className="text-sm font-medium">للبيع</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
@@ -248,15 +254,29 @@ export function WelcomeDashboard() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">عقارات تم تأجيرها</CardTitle>
+            <CardTitle className="text-sm font-medium">مؤجرة</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
               <TrendingDown className="h-6 w-6 text-purple-600" />
-              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose === 'rented')?.total || 0}
+              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose.toLowerCase() === 'rented')?.total || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               عقارات تم تأجيرها بالفعل
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">مباعة</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold flex items-center gap-2">
+              <TrendingDown className="h-6 w-6 text-orange-600" />
+              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose.toLowerCase() === 'sold')?.total || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              عقارات تم بيعها بالفعل
             </p>
           </CardContent>
         </Card>
