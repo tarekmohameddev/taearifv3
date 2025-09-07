@@ -94,8 +94,8 @@ export function WelcomeDashboard() {
     name: item.purpose === 'rent' ? 'للإيجار' : 
           item.purpose === 'sale' ? 'للبيع' : 
           item.purpose === 'rented' ? 'مؤجرة' : 
-          item.purpose === 'sold' ? 'مباعة' : item.purpose,
-    value: item.total,
+          item.purpose === 'sold' ? 'مباعة' : item.purpose || 'غير محدد',
+    value: item.total || 0,
     color: item.purpose === 'rent' ? '#10B981' : 
            item.purpose === 'sale' ? '#EF4444' : 
            item.purpose === 'rented' ? '#8B5CF6' : 
@@ -259,7 +259,7 @@ export function WelcomeDashboard() {
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
               <TrendingDown className="h-6 w-6 text-purple-600" />
-              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose.toLowerCase() === 'rented')?.total || 0}
+              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose?.toLowerCase() === 'rented')?.total || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               عقارات تم تأجيرها بالفعل
@@ -273,7 +273,7 @@ export function WelcomeDashboard() {
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
               <TrendingDown className="h-6 w-6 text-orange-600" />
-              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose.toLowerCase() === 'sold')?.total || 0}
+              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose?.toLowerCase() === 'sold')?.total || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               عقارات تم بيعها بالفعل
