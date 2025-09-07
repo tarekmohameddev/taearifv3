@@ -15,6 +15,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -40,6 +59,9 @@ import {
   Edit,
   Save,
   Trash2,
+  MoreVertical,
+  Check,
+  ChevronsUpDown,
 } from "lucide-react"
 import axiosInstance from "@/lib/axiosInstance"
 import useStore from "@/context/Store"
@@ -147,6 +169,56 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     }
   }, [isInitialized])
 
+  // دالة مساعدة للتعامل مع البيانات المفقودة
+  const getSafeValue = (value: any, fallback: string = 'غير محدد') => {
+    if (value === null || value === undefined || value === '') {
+      return fallback
+    }
+    return value
+  }
+
+  // دالة للحصول على اسم المستأجر مع معالجة البيانات المفقودة
+  const getTenantName = (rental: RentalData) => {
+    return getSafeValue(rental.tenant_full_name, 'مستأجر غير محدد')
+  }
+
+  // دالة للحصول على رمز الوحدة مع معالجة البيانات المفقودة
+  const getUnitLabel = (rental: RentalData) => {
+    return getSafeValue(rental.unit_label, 'غير محدد')
+  }
+
+  // دالة للحصول على رقم العقار مع معالجة البيانات المفقودة
+  const getPropertyNumber = (rental: RentalData) => {
+    return getSafeValue(rental.property_number, 'غير محدد')
+  }
+
+  // دالة للحصول على المهنة مع معالجة البيانات المفقودة
+  const getJobTitle = (rental: RentalData) => {
+    return getSafeValue(rental.tenant_job_title, 'غير محدد')
+  }
+
+  // دالة للحصول على رقم الهاتف مع معالجة البيانات المفقودة
+  const getPhoneNumber = (rental: RentalData) => {
+    return getSafeValue(rental.tenant_phone, 'غير محدد')
+  }
+
+  // دالة للحصول على البريد الإلكتروني مع معالجة البيانات المفقودة
+  const getEmail = (rental: RentalData) => {
+    return getSafeValue(rental.tenant_email, 'غير محدد')
+  }
+
+  // دالة للحصول على تفاصيل العقار مع معالجة البيانات المفقودة
+  const getPropertyDetails = (rental: RentalData) => {
+    if (!rental.property) {
+      return { beds: 'غير محدد', bath: 'غير محدد', area: 'غير محدد' }
+    }
+    return {
+      beds: getSafeValue(rental.property.beds, 'غير محدد'),
+      bath: getSafeValue(rental.property.bath, 'غير محدد'),
+      area: getSafeValue(rental.property.area, 'غير محدد')
+    }
+  }
+
   const fetchRentals = async () => {
     try {
       setRentalApplications({ loading: true, error: null })
@@ -167,16 +239,17 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
 
   const filteredRentals = rentals.filter((rental: RentalData) => {
     const matchesSearch =
-      rental.tenant_full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rental.unit_label?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rental.tenant_phone?.includes(searchTerm) ||
-      rental.tenant_email?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === "all" || rental.status === filterStatus
+      getTenantName(rental).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getUnitLabel(rental).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getPhoneNumber(rental).includes(searchTerm) ||
+      getEmail(rental).toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = filterStatus === "all" || getSafeValue(rental.status) === filterStatus
     return matchesSearch && matchesStatus
   })
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const getStatusColor = (status: string | null | undefined) => {
+    const safeStatus = getSafeValue(status, 'unknown')
+    switch (safeStatus) {
       case "active":
         return "bg-green-100 text-green-800 border-green-200"
       case "pending":
@@ -185,13 +258,16 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
         return "bg-red-100 text-red-800 border-red-200"
       case "cancelled":
         return "bg-gray-100 text-gray-800 border-gray-200"
-      default:
+      case "draft":
         return "bg-blue-100 text-blue-800 border-blue-200"
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200"
     }
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
+  const getStatusIcon = (status: string | null | undefined) => {
+    const safeStatus = getSafeValue(status, 'unknown')
+    switch (safeStatus) {
       case "active":
         return <CheckCircle className="h-4 w-4" />
       case "pending":
@@ -200,13 +276,16 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
         return <XCircle className="h-4 w-4" />
       case "cancelled":
         return <XCircle className="h-4 w-4" />
+      case "draft":
+        return <FileText className="h-4 w-4" />
       default:
         return <Clock className="h-4 w-4" />
     }
   }
 
-  const getStatusText = (status: string) => {
-    switch (status) {
+  const getStatusText = (status: string | null | undefined) => {
+    const safeStatus = getSafeValue(status, 'unknown')
+    switch (safeStatus) {
       case "active":
         return "نشط"
       case "pending":
@@ -215,25 +294,38 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
         return "منتهي الصلاحية"
       case "cancelled":
         return "ملغي"
+      case "draft":
+        return "مسودة"
       default:
-        return status
+        return "غير محدد"
     }
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('ar-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return 'غير محدد'
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return 'تاريخ غير صحيح'
+      return date.toLocaleDateString('ar-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    } catch (error) {
+      return 'تاريخ غير صحيح'
+    }
   }
 
-  const formatCurrency = (amount: string, currency: string) => {
-    return new Intl.NumberFormat('ar-US', {
-      style: 'currency',
-      currency: currency || 'SAR'
-    }).format(parseFloat(amount))
+  const formatCurrency = (amount: string | null | undefined, currency: string | null | undefined) => {
+    if (!amount || isNaN(parseFloat(amount))) return 'غير محدد'
+    try {
+      return new Intl.NumberFormat('ar-US', {
+        style: 'currency',
+        currency: currency || 'SAR'
+      }).format(parseFloat(amount))
+    } catch (error) {
+      return 'مبلغ غير صحيح'
+    }
   }
 
   const handleCreateRental = async (formData: any) => {
@@ -358,10 +450,6 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     <div className="space-y-6">
       {/* Header and Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">إدارة الإيجارات</h2>
-          <p className="text-muted-foreground">عرض وإدارة جميع عقود الإيجار</p>
-        </div>
         <Dialog open={isAddRentalDialogOpen} onOpenChange={(open) => setRentalApplications({ isAddRentalDialogOpen: open })}>
           <DialogTrigger asChild>
             <Button className="bg-gray-700 hover:bg-gray-800">
@@ -369,10 +457,10 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
               إضافة إيجار جديد
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto text-right" dir="rtl">
             <DialogHeader>
-              <DialogTitle>إضافة عقد إيجار جديد</DialogTitle>
-              <DialogDescription>أدخل تفاصيل عقد الإيجار الجديد</DialogDescription>
+              <DialogTitle className="text-right" dir="rtl">إضافة عقد إيجار جديد</DialogTitle>
+              <DialogDescription className="text-right" dir="rtl">أدخل تفاصيل طلب الإيجار الجديد</DialogDescription>
             </DialogHeader>
             <AddRentalForm 
               onSubmit={handleCreateRental}
@@ -403,127 +491,275 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
             <SelectItem value="all">جميع الحالات</SelectItem>
             <SelectItem value="active">نشط</SelectItem>
             <SelectItem value="pending">قيد الانتظار</SelectItem>
+            <SelectItem value="draft">مسودة</SelectItem>
             <SelectItem value="expired">منتهي الصلاحية</SelectItem>
             <SelectItem value="cancelled">ملغي</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Rentals List */}
-      <div className="space-y-4" dir="rtl">
-        {filteredRentals.map((rental: RentalData) => (
-          <Card key={rental.id} className="hover:shadow-lg transition-all duration-200 border-0 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-4 space-x-reverse">
-                  <Avatar className="h-12 w-12 bg-gradient-to-br from-blue-500 to-purple-600">
-                    <AvatarImage src={rental.property?.featured_image} alt={rental.tenant_full_name} />
-                    <AvatarFallback className="text-white font-semibold">
-                      {rental.tenant_full_name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-3 flex-1">
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <h3 className="font-semibold text-lg text-gray-900">{rental.tenant_full_name}</h3>
-                      <Badge className={`${getStatusColor(rental.status)} border`}>
-                        {getStatusIcon(rental.status)}
-                        <span className="mr-1">{getStatusText(rental.status)}</span>
-                      </Badge>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                      <div className="flex items-center text-gray-600">
-                        <Building2 className="h-4 w-4 ml-2 text-blue-500" />
-                        <span>رمز الوحدة: {rental.unit_label}</span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <FileText className="h-4 w-4 ml-2 text-blue-500" />
-                        <span>رقم الوحدة: {rental.property_number}</span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <DollarSign className="h-4 w-4 ml-2 text-green-500" />
-                        <span>الإيجار: {formatCurrency(rental.base_rent_amount, rental.currency)}</span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <Calendar className="h-4 w-4 ml-2 text-purple-500" />
-                        <span>تاريخ الانتقال: {formatDate(rental.move_in_date)}</span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <User className="h-4 w-4 ml-2 text-orange-500" />
-                        <span>المهنة: {rental.tenant_job_title}</span>
-                      </div>
-                    </div>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">إجمالي الإيجارات</p>
+              <p className="text-2xl font-bold text-gray-900">{rentals.length}</p>
+            </div>
+            <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
+              <Users className="h-6 w-6 text-gray-600" />
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">الإيجارات النشطة</p>
+              <p className="text-2xl font-bold text-green-600">
+                {rentals.filter((r: RentalData) => getSafeValue(r.status) === 'active').length}
+              </p>
+            </div>
+            <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <CheckCircle className="h-6 w-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">قيد الانتظار</p>
+              <p className="text-2xl font-bold text-yellow-600">
+                {rentals.filter((r: RentalData) => getSafeValue(r.status) === 'pending').length}
+              </p>
+            </div>
+            <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+              <Clock className="h-6 w-6 text-yellow-600" />
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">إجمالي الإيرادات</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {formatCurrency(
+                  rentals.reduce((sum: number, r: RentalData) => {
+                    const amount = r.base_rent_amount ? parseFloat(r.base_rent_amount) : 0
+                    return sum + (isNaN(amount) ? 0 : amount)
+                  }, 0).toString(),
+                  'SAR'
+                )}
+              </p>
+            </div>
+            <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
+              <DollarSign className="h-6 w-6 text-gray-600" />
+            </div>
+          </div>
+        </div>
+      </div>
 
-                    <div className="flex items-center space-x-4 space-x-reverse text-sm text-gray-500">
-                      <div className="flex items-center">
-                        <Mail className="h-3 w-3 ml-1" />
-                        {rental.tenant_email}
+      {/* Modern Rentals Table */}
+      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden" dir="rtl">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gradient-to-r from-gray-900 to-gray-800 border-b border-gray-300">
+              <tr>
+                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                  المستأجر
+                </th>
+                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                  الوحدة
+                </th>
+                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                  مبلغ الإيجار
+                </th>
+                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                  مدة الإيجار
+                </th>
+                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                  تاريخ الانتقال
+                </th>
+                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                  الحالة
+                </th>
+                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                  الإجراءات
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredRentals.map((rental: RentalData, index: number) => (
+                <tr 
+                  key={rental.id} 
+                  className={`hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-300 hover:shadow-sm ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                  }`}
+                >
+                  {/* المستأجر */}
+                  <td className="px-6 py-5">
+                    <div className="flex items-center space-x-4 space-x-reverse">
+                      <div className="flex-shrink-0">
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-gray-800 to-gray-600 flex items-center justify-center">
+                          <span className="text-white font-bold text-lg">
+                            {getTenantName(rental).split(' ').map((n: string) => n[0]).join('').slice(0, 2) || '??'}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center">
-                        <Phone className="h-3 w-3 ml-1" />
-                        {rental.tenant_phone}
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-bold text-gray-900 truncate">
+                          {getTenantName(rental)}
+                        </div>
+                        <div className="text-sm text-gray-500 truncate">
+                          {getJobTitle(rental)}
+                        </div>
+                        <div className="flex items-center mt-1 text-xs text-gray-400">
+                          <Phone className="h-3 w-3 ml-1" />
+                          {getPhoneNumber(rental)}
+                        </div>
                       </div>
                     </div>
+                  </td>
 
-                    {rental.notes && (
-                      <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <p className="text-sm text-blue-800">{rental.notes}</p>
+                  {/* الوحدة */}
+                  <td className="px-6 py-5">
+                    <div className="text-sm font-semibold text-gray-900">
+                      {getUnitLabel(rental)}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      رقم العقار: {getPropertyNumber(rental)}
+                    </div>
+                    {rental.property && (
+                      <div className="text-xs text-gray-400 mt-1">
+                        {getPropertyDetails(rental).beds} غرف • {getPropertyDetails(rental).bath} حمام
                       </div>
                     )}
-                  </div>
-                </div>
-                
-                <div className="flex flex-col items-end space-y-3">
-                  <div className="text-right">
-                    <div className="text-sm text-gray-500">مدة الإيجار</div>
-                    <div className="font-semibold text-gray-900">{rental.rental_period_months} شهر</div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => setRentalApplications({ selectedRental: rental })}
-                      className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                    >
-                      <Eye className="h-3 w-3 ml-1" />
-                      التفاصيل
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => {
-                        setRentalApplications({ editingRental: rental, isEditRentalDialogOpen: true })
-                      }}
-                      className="border-green-200 text-green-600 hover:bg-green-50"
-                    >
-                      <FileText className="h-3 w-3 ml-1" />
-                      تعديل
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => {
-                        setRentalApplications({ deletingRental: rental, isDeleteDialogOpen: true })
-                      }}
-                      className="border-red-200 text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-3 w-3 ml-1" />
-                      حذف
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                  </td>
+
+                  {/* مبلغ الإيجار */}
+                  <td className="px-6 py-5">
+                    <div className="text-lg font-bold text-gray-900">
+                      {formatCurrency(rental.base_rent_amount, rental.currency)}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      الضمان: {formatCurrency(rental.deposit_amount, rental.currency)}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {getSafeValue(rental.paying_plan) === 'monthly' ? 'شهري' : 
+                       getSafeValue(rental.paying_plan) === 'quarterly' ? 'ربع سنوي' :
+                       getSafeValue(rental.paying_plan) === 'semi_annual' ? 'نصف سنوي' :
+                       getSafeValue(rental.paying_plan) === 'annual' ? 'سنوي' : 
+                       getSafeValue(rental.paying_plan)}
+                    </div>
+                  </td>
+
+                  {/* مدة الإيجار */}
+                  <td className="px-6 py-5">
+                    <div className="text-sm font-semibold text-gray-900">
+                      {getSafeValue(rental.rental_period_months, 'غير محدد')} شهر
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      من {formatDate(rental.move_in_date)}
+                    </div>
+                  </td>
+
+                  {/* تاريخ الانتقال */}
+                  <td className="px-6 py-5">
+                    <div className="text-sm font-semibold text-gray-900">
+                      {formatDate(rental.move_in_date)}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {new Date(rental.created_at).toLocaleDateString('ar-SA')}
+                    </div>
+                  </td>
+
+                  {/* الحالة */}
+                  <td className="px-6 py-5">
+                    <div className="flex items-center">
+                      <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm ${getStatusColor(rental.status)}`}>
+                        {getStatusIcon(rental.status)}
+                        <span className="mr-1">{getStatusText(rental.status)}</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* الإجراءات */}
+                  <td className="px-6 py-5">
+                    <div className="flex items-center justify-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="h-8 w-8 p-0 border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 shadow-sm"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem 
+                            onClick={() => setRentalApplications({ selectedRental: rental })}
+                            className="cursor-pointer hover:bg-gray-100"
+                          >
+                            <Eye className="h-4 w-4 ml-2 text-gray-600" />
+                            عرض التفاصيل
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => {
+                              setRentalApplications({ editingRental: rental, isEditRentalDialogOpen: true })
+                            }}
+                            className="cursor-pointer hover:bg-gray-100"
+                          >
+                            <Edit className="h-4 w-4 ml-2 text-gray-600" />
+                            تعديل الإيجار
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => {
+                              setRentalApplications({ deletingRental: rental, isDeleteDialogOpen: true })
+                            }}
+                            className="cursor-pointer hover:bg-red-50 text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4 ml-2 text-red-600" />
+                            حذف الإيجار
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        {filteredRentals.length === 0 && (
+          <div className="text-center py-16">
+            <div className="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <Users className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">لا توجد إيجارات</h3>
+            <p className="text-gray-500 mb-6">
+              {searchTerm || filterStatus !== "all" ? "جرب تعديل معايير البحث" : "ابدأ بإضافة إيجار جديد"}
+            </p>
+            <Button 
+              onClick={() => setRentalApplications({ isAddRentalDialogOpen: true })}
+              className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
+            >
+              <Plus className="ml-2 h-4 w-4" />
+              إضافة إيجار جديد
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Rental Details Dialog */}
       <Dialog open={!!selectedRental} onOpenChange={() => setRentalApplications({ selectedRental: null })}>
-        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto text-right" dir="rtl">
           <DialogHeader>
-            <DialogTitle>تفاصيل عقد الإيجار</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-right" dir="rtl">تفاصيل طلب الإيجار</DialogTitle>
+            <DialogDescription className="text-right" dir="rtl">
               {selectedRental?.tenant_full_name} - {selectedRental?.unit_label}
             </DialogDescription>
           </DialogHeader>
@@ -687,26 +923,13 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
         </DialogContent>
       </Dialog>
 
-      {filteredRentals.length === 0 && (
-        <div className="text-center py-12">
-          <Users className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium mb-2">لم يتم العثور على إيجارات</h3>
-          <p className="text-muted-foreground mb-4">
-            {searchTerm || filterStatus !== "all" ? "جرب تعديل معايير البحث" : "لا توجد إيجارات حالياً"}
-          </p>
-          <Button onClick={() => setRentalApplications({ isAddRentalDialogOpen: true })}>
-            <Plus className="ml-2 h-4 w-4" />
-            إضافة إيجار جديد
-          </Button>
-        </div>
-      )}
 
       {/* Edit Rental Dialog */}
       <Dialog open={isEditRentalDialogOpen} onOpenChange={() => setRentalApplications({ isEditRentalDialogOpen: false })}>
         <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>تعديل عقد الإيجار</DialogTitle>
-            <DialogDescription>تعديل تفاصيل عقد الإيجار</DialogDescription>
+            <DialogTitle>تعديل طلب الإيجار</DialogTitle>
+            <DialogDescription>تعديل تفاصيل طلب الإيجار</DialogDescription>
           </DialogHeader>
           {editingRental && (
             <EditRentalForm 
@@ -807,7 +1030,8 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
     tenant_job_title: "",
     tenant_social_status: "single",
     tenant_national_id: "",
-    property_number: "",
+    property_id: "",
+    project_id: "",
     unit_label: "",
     move_in_date: "",
     rental_period_months: 12,
@@ -818,232 +1042,447 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
     notes: ""
   })
 
+  const [projects, setProjects] = useState<any[]>([])
+  const [properties, setProperties] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<{[key: string]: string}>({})
+  const [openProject, setOpenProject] = useState(false)
+  const [openProperty, setOpenProperty] = useState(false)
+
+  // جلب البيانات عند فتح النموذج
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const [projectsRes, propertiesRes] = await Promise.all([
+          axiosInstance.get("/projects"),
+          axiosInstance.get("/properties"),
+        ])
+        
+        console.log("Projects response:", projectsRes.data)
+        console.log("Properties response:", propertiesRes.data)
+        console.log("Projects array:", projectsRes.data?.data?.projects)
+        console.log("Properties array:", propertiesRes.data?.data?.properties)
+        
+        // معالجة بيانات المشاريع - البيانات في data.projects
+        if (projectsRes.data?.data?.projects && Array.isArray(projectsRes.data.data.projects)) {
+          setProjects(projectsRes.data.data.projects)
+        } else if (projectsRes.data?.projects && Array.isArray(projectsRes.data.projects)) {
+          setProjects(projectsRes.data.projects)
+        } else {
+          console.warn("Projects data is not an array:", projectsRes.data)
+          setProjects([])
+        }
+        
+        // معالجة بيانات العقارات - البيانات في data.properties
+        if (propertiesRes.data?.data?.properties && Array.isArray(propertiesRes.data.data.properties)) {
+          setProperties(propertiesRes.data.data.properties)
+        } else if (propertiesRes.data?.properties && Array.isArray(propertiesRes.data.properties)) {
+          setProperties(propertiesRes.data.properties)
+        } else {
+          console.warn("Properties data is not an array:", propertiesRes.data)
+          setProperties([])
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error)
+        setErrors({ general: "حدث خطأ في جلب البيانات" })
+        setProjects([])
+        setProperties([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // دالة التحقق من البيانات
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {}
+
+    // التحقق من الحقول الإجبارية
+    if (!formData.tenant_full_name.trim()) {
+      newErrors.tenant_full_name = "الاسم الكامل مطلوب"
+    }
+    if (!formData.tenant_phone.trim()) {
+      newErrors.tenant_phone = "رقم الهاتف مطلوب"
+    }
+
+    // التحقق من صحة رقم الهاتف
+    if (formData.tenant_phone && !/^[0-9+\-\s()]+$/.test(formData.tenant_phone)) {
+      newErrors.tenant_phone = "رقم الهاتف غير صحيح"
+    }
+
+    // التحقق من صحة البريد الإلكتروني (إذا تم إدخاله)
+    if (formData.tenant_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.tenant_email)) {
+      newErrors.tenant_email = "البريد الإلكتروني غير صحيح"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    // التحقق من البيانات المطلوبة
-    if (!formData.tenant_full_name || !formData.tenant_phone || !formData.tenant_email || !formData.property_number || !formData.unit_label || !formData.move_in_date) {
-      alert("يرجى ملء جميع الحقول المطلوبة")
+    if (!validateForm()) {
       return
     }
     
     // تحويل البيانات إلى الأنواع الصحيحة
     const processedFormData: any = {
       ...formData,
-      property_number: formData.property_number,
+      property_id: formData.property_id ? parseInt(formData.property_id) : null,
+      project_id: formData.project_id ? parseInt(formData.project_id) : null,
       rental_period_months: Number(formData.rental_period_months) || 12,
       base_rent_amount: formData.base_rent_amount ? parseFloat(formData.base_rent_amount) : 0,
       deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
     }
     
-    console.log("Processed form data:", processedFormData) // للتأكد من البيانات المعالجة
-    
-    // التحقق من أن البيانات صحيحة
-    if (!processedFormData.property_number || processedFormData.base_rent_amount <= 0 || processedFormData.deposit_amount <= 0) {
-      alert("يرجى التأكد من إدخال رقم العقار ومبلغ الإيجار ومبلغ الضمان")
-      return
-    }
-    
+    console.log("Processed form data:", processedFormData)
     onSubmit(processedFormData)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h4 className="font-semibold text-lg text-gray-900 border-b pb-2">معلومات المستأجر</h4>
-          
-          <div className="space-y-2">
-            <Label htmlFor="tenant_full_name">الاسم الكامل *</Label>
-            <Input 
-              id="tenant_full_name"
-              value={formData.tenant_full_name}
-              onChange={(e) => setFormData(prev => ({ ...prev, tenant_full_name: e.target.value }))}
-              placeholder="أدخل الاسم الكامل"
-              
-            />
+    <div className="bg-white rounded-lg">
+      {errors.general && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center">
+            <AlertCircle className="h-4 w-4 text-red-600 ml-2" />
+            <p className="text-sm text-red-600">{errors.general}</p>
+          </div>
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">معلومات المستأجر</h4>
+            
+            <div className="space-y-2">
+              <Label htmlFor="tenant_full_name" className="text-sm font-medium text-gray-700">
+                الاسم الكامل <span className="text-red-500">*</span>
+              </Label>
+              <Input 
+                id="tenant_full_name"
+                value={formData.tenant_full_name}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, tenant_full_name: e.target.value }))
+                  if (errors.tenant_full_name) {
+                    setErrors(prev => ({ ...prev, tenant_full_name: "" }))
+                  }
+                }}
+                placeholder="أدخل الاسم الكامل"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_full_name ? 'border-red-500' : ''}`}
+              />
+              {errors.tenant_full_name && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.tenant_full_name}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tenant_phone" className="text-sm font-medium text-gray-700">
+                رقم الهاتف <span className="text-red-500">*</span>
+              </Label>
+              <Input 
+                id="tenant_phone"
+                value={formData.tenant_phone}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, tenant_phone: e.target.value }))
+                  if (errors.tenant_phone) {
+                    setErrors(prev => ({ ...prev, tenant_phone: "" }))
+                  }
+                }}
+                placeholder="0551234567"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_phone ? 'border-red-500' : ''}`}
+              />
+              {errors.tenant_phone && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.tenant_phone}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tenant_email" className="text-sm font-medium text-gray-700">البريد الإلكتروني</Label>
+              <Input 
+                id="tenant_email"
+                type="email"
+                value={formData.tenant_email}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, tenant_email: e.target.value }))
+                  if (errors.tenant_email) {
+                    setErrors(prev => ({ ...prev, tenant_email: "" }))
+                  }
+                }}
+                placeholder="example@email.com"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_email ? 'border-red-500' : ''}`}
+              />
+              {errors.tenant_email && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.tenant_email}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tenant_job_title" className="text-sm font-medium text-gray-700">المهنة</Label>
+              <Input 
+                id="tenant_job_title"
+                value={formData.tenant_job_title}
+                onChange={(e) => setFormData(prev => ({ ...prev, tenant_job_title: e.target.value }))}
+                placeholder="مهندس، طبيب، معلم..."
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tenant_social_status" className="text-sm font-medium text-gray-700">الحالة الاجتماعية</Label>
+              <Select value={formData.tenant_social_status} onValueChange={(value) => setFormData(prev => ({ ...prev, tenant_social_status: value }))}>
+                <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="single">أعزب</SelectItem>
+                  <SelectItem value="married">متزوج</SelectItem>
+                  <SelectItem value="divorced">مطلق</SelectItem>
+                  <SelectItem value="widowed">أرمل</SelectItem>
+                  <SelectItem value="other">أخرى</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tenant_national_id" className="text-sm font-medium text-gray-700">رقم الهوية</Label>
+              <Input 
+                id="tenant_national_id"
+                value={formData.tenant_national_id}
+                onChange={(e) => setFormData(prev => ({ ...prev, tenant_national_id: e.target.value }))}
+                placeholder="1234567890"
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="tenant_phone">رقم الهاتف *</Label>
-            <Input 
-              id="tenant_phone"
-              value={formData.tenant_phone}
-              onChange={(e) => setFormData(prev => ({ ...prev, tenant_phone: e.target.value }))}
-              placeholder="0551234567"
-              
-            />
-          </div>
+          <div className="space-y-4">
+            <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">تفاصيل العقد</h4>
+            
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">المشروع</Label>
+              <Popover open={openProject} onOpenChange={setOpenProject}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openProject}
+                    className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                  >
+                    {formData.project_id
+                      ? projects.find((project) => project.id.toString() === formData.project_id)?.contents?.[0]?.title || `مشروع ${formData.project_id}`
+                      : "اختر مشروع..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="ابحث عن مشروع..." />
+                    <CommandList>
+                      <CommandEmpty>لم يتم العثور على مشروع.</CommandEmpty>
+                      <CommandGroup>
+                        {Array.isArray(projects) && projects.map((project) => (
+                          <CommandItem
+                            key={project.id}
+                            value={project.contents?.[0]?.title || `مشروع ${project.id}`}
+                            onSelect={() => {
+                              setFormData(prev => ({ ...prev, project_id: project.id.toString() }))
+                              setOpenProject(false)
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.project_id === project.id.toString() ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {project.contents?.[0]?.title || `مشروع ${project.id}`}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="tenant_email">البريد الإلكتروني *</Label>
-            <Input 
-              id="tenant_email"
-              type="email"
-              value={formData.tenant_email}
-              onChange={(e) => setFormData(prev => ({ ...prev, tenant_email: e.target.value }))}
-              placeholder="example@email.com"
-              
-            />
-          </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">العقار</Label>
+              <Popover open={openProperty} onOpenChange={setOpenProperty}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openProperty}
+                    className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                  >
+                    {formData.property_id
+                      ? properties.find((property) => property.id.toString() === formData.property_id)?.title || `عقار ${formData.property_id}`
+                      : "اختر عقار..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="ابحث عن عقار..." />
+                    <CommandList>
+                      <CommandEmpty>لم يتم العثور على عقار.</CommandEmpty>
+                      <CommandGroup>
+                        {Array.isArray(properties) && properties.map((property) => (
+                          <CommandItem
+                            key={property.id}
+                            value={property.title || `عقار ${property.id}`}
+                            onSelect={() => {
+                              setFormData(prev => ({ ...prev, property_id: property.id.toString() }))
+                              setOpenProperty(false)
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.property_id === property.id.toString() ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {property.title || `عقار ${property.id}`}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="tenant_job_title">المهنة</Label>
-            <Input 
-              id="tenant_job_title"
-              value={formData.tenant_job_title}
-              onChange={(e) => setFormData(prev => ({ ...prev, tenant_job_title: e.target.value }))}
-              placeholder="مهندس، طبيب، معلم..."
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="unit_label" className="text-sm font-medium text-gray-700">رمز الوحدة</Label>
+              <Input 
+                id="unit_label"
+                value={formData.unit_label}
+                onChange={(e) => setFormData(prev => ({ ...prev, unit_label: e.target.value }))}
+                placeholder="A-12"
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="tenant_social_status">الحالة الاجتماعية</Label>
-            <Select value={formData.tenant_social_status} onValueChange={(value) => setFormData(prev => ({ ...prev, tenant_social_status: value }))}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="single">أعزب</SelectItem>
-                <SelectItem value="married">متزوج</SelectItem>
-                <SelectItem value="divorced">مطلق</SelectItem>
-                <SelectItem value="widowed">أرمل</SelectItem>
-                <SelectItem value="other">أخرى</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="move_in_date" className="text-sm font-medium text-gray-700">تاريخ الانتقال</Label>
+              <Input 
+                id="move_in_date"
+                type="date"
+                value={formData.move_in_date}
+                onChange={(e) => setFormData(prev => ({ ...prev, move_in_date: e.target.value }))}
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="tenant_national_id">رقم الهوية</Label>
-            <Input 
-              id="tenant_national_id"
-              value={formData.tenant_national_id}
-              onChange={(e) => setFormData(prev => ({ ...prev, tenant_national_id: e.target.value }))}
-              placeholder="1234567890"
-            />
+            <div className="space-y-2">
+              <Label htmlFor="rental_period_months" className="text-sm font-medium text-gray-700">مدة الإيجار (بالشهور)</Label>
+              <Input 
+                id="rental_period_months"
+                type="number"
+                value={formData.rental_period_months}
+                onChange={(e) => setFormData(prev => ({ ...prev, rental_period_months: parseInt(e.target.value) }))}
+                min="1"
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="paying_plan" className="text-sm font-medium text-gray-700">خطة الدفع</Label>
+              <Select value={formData.paying_plan} onValueChange={(value) => setFormData(prev => ({ ...prev, paying_plan: value }))}>
+                <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="monthly">شهري</SelectItem>
+                  <SelectItem value="quarterly">ربع سنوي</SelectItem>
+                  <SelectItem value="semi_annual">نصف سنوي</SelectItem>
+                  <SelectItem value="annual">سنوي</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="base_rent_amount" className="text-sm font-medium text-gray-700">مبلغ الإيجار</Label>
+              <Input 
+                id="base_rent_amount"
+                type="number"
+                value={formData.base_rent_amount}
+                onChange={(e) => setFormData(prev => ({ ...prev, base_rent_amount: e.target.value }))}
+                placeholder="6500"
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deposit_amount" className="text-sm font-medium text-gray-700">مبلغ الضمان</Label>
+              <Input 
+                id="deposit_amount"
+                type="number"
+                value={formData.deposit_amount}
+                onChange={(e) => setFormData(prev => ({ ...prev, deposit_amount: e.target.value }))}
+                placeholder="10000"
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h4 className="font-semibold text-lg text-gray-900 border-b pb-2">تفاصيل العقد</h4>
-          
-          <div className="space-y-2">
-            <Label htmlFor="property_number">رقم العقار *</Label>
-            <Input 
-              id="property_number"
-              type="text"
-              value={formData.property_number}
-              onChange={(e) => setFormData(prev => ({ ...prev, property_number: e.target.value }))}
-              placeholder="12"
-              
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="unit_label">رمز الوحدة *</Label>
-            <Input 
-              id="unit_label"
-              value={formData.unit_label}
-              onChange={(e) => setFormData(prev => ({ ...prev, unit_label: e.target.value }))}
-              placeholder="A-12"
-              
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="move_in_date">تاريخ الانتقال *</Label>
-            <Input 
-              id="move_in_date"
-              type="date"
-              value={formData.move_in_date}
-              onChange={(e) => setFormData(prev => ({ ...prev, move_in_date: e.target.value }))}
-              
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="rental_period_months">مدة الإيجار (بالشهور) *</Label>
-            <Input 
-              id="rental_period_months"
-              type="number"
-              value={formData.rental_period_months}
-              onChange={(e) => setFormData(prev => ({ ...prev, rental_period_months: parseInt(e.target.value) }))}
-              min="1"
-              
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="paying_plan">خطة الدفع</Label>
-            <Select value={formData.paying_plan} onValueChange={(value) => setFormData(prev => ({ ...prev, paying_plan: value }))}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="monthly">شهري</SelectItem>
-                <SelectItem value="quarterly">ربع سنوي</SelectItem>
-                <SelectItem value="semi_annual">نصف سنوي</SelectItem>
-                <SelectItem value="annual">سنوي</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="base_rent_amount">مبلغ الإيجار *</Label>
-            <Input 
-              id="base_rent_amount"
-              type="number"
-              value={formData.base_rent_amount}
-              onChange={(e) => setFormData(prev => ({ ...prev, base_rent_amount: e.target.value }))}
-              placeholder="6500"
-              
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="deposit_amount">مبلغ الضمان *</Label>
-            <Input 
-              id="deposit_amount"
-              type="number"
-              value={formData.deposit_amount}
-              onChange={(e) => setFormData(prev => ({ ...prev, deposit_amount: e.target.value }))}
-              placeholder="10000"
-              
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="notes" className="text-sm font-medium text-gray-700">ملاحظات</Label>
+          <Textarea 
+            id="notes"
+            value={formData.notes}
+            onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+            placeholder="ملاحظات إضافية حول العقد..."
+            rows={3}
+            className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+          />
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="notes">ملاحظات</Label>
-        <Textarea 
-          id="notes"
-          value={formData.notes}
-          onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-          placeholder="ملاحظات إضافية حول العقد..."
-          rows={3}
-        />
-      </div>
-
-      <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-          إلغاء
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <>
-              <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-              جاري الإضافة...
-            </>
-          ) : (
-            <>
-              <Save className="ml-2 h-4 w-4" />
-              إضافة الإيجار
-            </>
-          )}
-        </Button>
-      </DialogFooter>
-    </form>
+        <DialogFooter className="bg-gray-50 px-6 py-4 -mx-6 -mb-6 rounded-b-lg">
+          <div className="flex gap-3 w-full">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onCancel} 
+              disabled={isSubmitting}
+              className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
+            >
+              إلغاء
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={isSubmitting || loading}
+              className="flex-1 bg-gray-900 hover:bg-gray-800 text-white"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  جاري الإضافة...
+                </>
+              ) : (
+                <>
+                  <Save className="ml-2 h-4 w-4" />
+                  إضافة الإيجار
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogFooter>
+      </form>
+    </div>
   )
 }
 
@@ -1057,66 +1496,211 @@ interface EditRentalFormProps {
 
 function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRentalFormProps) {
   const [formData, setFormData] = useState({
-    tenant_full_name: rental.tenant_full_name,
-    tenant_phone: rental.tenant_phone,
-    tenant_email: rental.tenant_email,
-    tenant_job_title: rental.tenant_job_title,
-    tenant_social_status: rental.tenant_social_status,
-    tenant_national_id: rental.tenant_national_id,
-    unit_label: rental.unit_label,
-    move_in_date: rental.move_in_date.split('T')[0],
-    rental_period_months: rental.rental_period_months,
-    paying_plan: rental.paying_plan,
-    base_rent_amount: rental.base_rent_amount,
-    currency: rental.currency,
-    deposit_amount: rental.deposit_amount,
+    tenant_full_name: rental.tenant_full_name || "",
+    tenant_phone: rental.tenant_phone || "",
+    tenant_email: rental.tenant_email || "",
+    tenant_job_title: rental.tenant_job_title || "",
+    tenant_social_status: rental.tenant_social_status || "single",
+    tenant_national_id: rental.tenant_national_id || "",
+    property_id: rental.property?.id?.toString() || "",
+    project_id: "",
+    unit_label: rental.unit_label || "",
+    move_in_date: rental.move_in_date ? rental.move_in_date.split('T')[0] : "",
+    rental_period_months: rental.rental_period_months || 12,
+    paying_plan: rental.paying_plan || "monthly",
+    base_rent_amount: rental.base_rent_amount || "",
+    currency: rental.currency || "SAR",
+    deposit_amount: rental.deposit_amount || "",
     notes: rental.notes || ""
   })
 
+  const [projects, setProjects] = useState<any[]>([])
+  const [properties, setProperties] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<{[key: string]: string}>({})
+  const [openProject, setOpenProject] = useState(false)
+  const [openProperty, setOpenProperty] = useState(false)
+
+  // جلب البيانات عند فتح النموذج
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const [projectsRes, propertiesRes] = await Promise.all([
+          axiosInstance.get("/projects"),
+          axiosInstance.get("/properties"),
+        ])
+        
+        console.log("Edit Form - Projects response:", projectsRes.data)
+        console.log("Edit Form - Properties response:", propertiesRes.data)
+        console.log("Edit Form - Projects array:", projectsRes.data?.data?.projects)
+        console.log("Edit Form - Properties array:", propertiesRes.data?.data?.properties)
+        
+        // معالجة بيانات المشاريع - البيانات في data.projects
+        if (projectsRes.data?.data?.projects && Array.isArray(projectsRes.data.data.projects)) {
+          setProjects(projectsRes.data.data.projects)
+        } else if (projectsRes.data?.projects && Array.isArray(projectsRes.data.projects)) {
+          setProjects(projectsRes.data.projects)
+        } else {
+          console.warn("Edit Form - Projects data is not an array:", projectsRes.data)
+          setProjects([])
+        }
+        
+        // معالجة بيانات العقارات - البيانات في data.properties
+        if (propertiesRes.data?.data?.properties && Array.isArray(propertiesRes.data.data.properties)) {
+          setProperties(propertiesRes.data.data.properties)
+        } else if (propertiesRes.data?.properties && Array.isArray(propertiesRes.data.properties)) {
+          setProperties(propertiesRes.data.properties)
+        } else {
+          console.warn("Edit Form - Properties data is not an array:", propertiesRes.data)
+          setProperties([])
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error)
+        setErrors({ general: "حدث خطأ في جلب البيانات" })
+        setProjects([])
+        setProperties([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // دالة التحقق من البيانات
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {}
+
+    // التحقق من الحقول الإجبارية
+    if (!formData.tenant_full_name.trim()) {
+      newErrors.tenant_full_name = "الاسم الكامل مطلوب"
+    }
+    if (!formData.tenant_phone.trim()) {
+      newErrors.tenant_phone = "رقم الهاتف مطلوب"
+    }
+
+    // التحقق من صحة رقم الهاتف
+    if (formData.tenant_phone && !/^[0-9+\-\s()]+$/.test(formData.tenant_phone)) {
+      newErrors.tenant_phone = "رقم الهاتف غير صحيح"
+    }
+
+    // التحقق من صحة البريد الإلكتروني (إذا تم إدخاله)
+    if (formData.tenant_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.tenant_email)) {
+      newErrors.tenant_email = "البريد الإلكتروني غير صحيح"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(formData)
+    
+    if (!validateForm()) {
+      return
+    }
+    
+    // تحويل البيانات إلى الأنواع الصحيحة
+    const processedFormData: any = {
+      ...formData,
+      property_id: formData.property_id ? parseInt(formData.property_id) : null,
+      project_id: formData.project_id ? parseInt(formData.project_id) : null,
+      rental_period_months: Number(formData.rental_period_months) || 12,
+      base_rent_amount: formData.base_rent_amount ? parseFloat(formData.base_rent_amount) : 0,
+      deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
+    }
+    
+    console.log("Processed form data:", processedFormData)
+    onSubmit(processedFormData)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h4 className="font-semibold text-lg text-gray-900 border-b pb-2">معلومات المستأجر</h4>
+    <div className="bg-white rounded-lg">
+      {errors.general && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center">
+            <AlertCircle className="h-4 w-4 text-red-600 ml-2" />
+            <p className="text-sm text-red-600">{errors.general}</p>
+          </div>
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">معلومات المستأجر</h4>
           
-          <div className="space-y-2">
-            <Label htmlFor="edit_tenant_full_name">الاسم الكامل *</Label>
-            <Input 
-              id="edit_tenant_full_name"
-              value={formData.tenant_full_name}
-              onChange={(e) => setFormData(prev => ({ ...prev, tenant_full_name: e.target.value }))}
-              placeholder="أدخل الاسم الكامل"
-              
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit_tenant_full_name" className="text-sm font-medium text-gray-700">
+                الاسم الكامل <span className="text-red-500">*</span>
+              </Label>
+              <Input 
+                id="edit_tenant_full_name"
+                value={formData.tenant_full_name}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, tenant_full_name: e.target.value }))
+                  if (errors.tenant_full_name) {
+                    setErrors(prev => ({ ...prev, tenant_full_name: "" }))
+                  }
+                }}
+                placeholder="أدخل الاسم الكامل"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_full_name ? 'border-red-500' : ''}`}
+              />
+              {errors.tenant_full_name && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.tenant_full_name}
+                </p>
+              )}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="edit_tenant_phone">رقم الهاتف *</Label>
-            <Input 
-              id="edit_tenant_phone"
-              value={formData.tenant_phone}
-              onChange={(e) => setFormData(prev => ({ ...prev, tenant_phone: e.target.value }))}
-              placeholder="0551234567"
-              
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit_tenant_phone" className="text-sm font-medium text-gray-700">
+                رقم الهاتف <span className="text-red-500">*</span>
+              </Label>
+              <Input 
+                id="edit_tenant_phone"
+                value={formData.tenant_phone}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, tenant_phone: e.target.value }))
+                  if (errors.tenant_phone) {
+                    setErrors(prev => ({ ...prev, tenant_phone: "" }))
+                  }
+                }}
+                placeholder="0551234567"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_phone ? 'border-red-500' : ''}`}
+              />
+              {errors.tenant_phone && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.tenant_phone}
+                </p>
+              )}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="edit_tenant_email">البريد الإلكتروني *</Label>
-            <Input 
-              id="edit_tenant_email"
-              type="email"
-              value={formData.tenant_email}
-              onChange={(e) => setFormData(prev => ({ ...prev, tenant_email: e.target.value }))}
-              placeholder="example@email.com"
-              
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit_tenant_email" className="text-sm font-medium text-gray-700">البريد الإلكتروني</Label>
+              <Input 
+                id="edit_tenant_email"
+                type="email"
+                value={formData.tenant_email}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, tenant_email: e.target.value }))
+                  if (errors.tenant_email) {
+                    setErrors(prev => ({ ...prev, tenant_email: "" }))
+                  }
+                }}
+                placeholder="example@email.com"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_email ? 'border-red-500' : ''}`}
+              />
+              {errors.tenant_email && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.tenant_email}
+                </p>
+              )}
+            </div>
 
           <div className="space-y-2">
             <Label htmlFor="edit_tenant_job_title">المهنة</Label>
@@ -1157,6 +1741,100 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
 
         <div className="space-y-4">
           <h4 className="font-semibold text-lg text-gray-900 border-b pb-2">تفاصيل العقد</h4>
+          
+          {/* اختيار المشروع */}
+          <div className="space-y-2">
+            <Label htmlFor="edit_project">المشروع</Label>
+            <Popover open={openProject} onOpenChange={setOpenProject}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={openProject}
+                  className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                >
+                  {formData.project_id
+                    ? projects.find((project) => project.id.toString() === formData.project_id)?.contents?.[0]?.title || `مشروع ${formData.project_id}`
+                    : "اختر مشروع..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput placeholder="ابحث عن مشروع..." />
+                  <CommandList>
+                    <CommandEmpty>لم يتم العثور على مشروع.</CommandEmpty>
+                    <CommandGroup>
+                      {Array.isArray(projects) && projects.map((project) => (
+                        <CommandItem
+                          key={project.id}
+                          value={project.contents?.[0]?.title || `مشروع ${project.id}`}
+                          onSelect={() => {
+                            setFormData(prev => ({ ...prev, project_id: project.id.toString() }))
+                            setOpenProject(false)
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.project_id === project.id.toString() ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          {project.contents?.[0]?.title || `مشروع ${project.id}`}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* اختيار العقار */}
+          <div className="space-y-2">
+            <Label htmlFor="edit_property">العقار</Label>
+            <Popover open={openProperty} onOpenChange={setOpenProperty}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={openProperty}
+                  className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                >
+                  {formData.property_id
+                    ? properties.find((property) => property.id.toString() === formData.property_id)?.title || `عقار ${formData.property_id}`
+                    : "اختر عقار..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput placeholder="ابحث عن عقار..." />
+                  <CommandList>
+                    <CommandEmpty>لم يتم العثور على عقار.</CommandEmpty>
+                    <CommandGroup>
+                      {Array.isArray(properties) && properties.map((property) => (
+                        <CommandItem
+                          key={property.id}
+                          value={property.title || `عقار ${property.id}`}
+                          onSelect={() => {
+                            setFormData(prev => ({ ...prev, property_id: property.id.toString() }))
+                            setOpenProperty(false)
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formData.property_id === property.id.toString() ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          {property.title || `عقار ${property.id}`}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
           
           <div className="space-y-2">
             <Label htmlFor="edit_unit_label">رمز الوحدة *</Label>
@@ -1244,24 +1922,37 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
         />
       </div>
 
-      <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-          إلغاء
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <>
-              <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-              جاري التحديث...
-            </>
-          ) : (
-            <>
-              <Edit className="ml-2 h-4 w-4" />
-              تحديث الإيجار
-            </>
-          )}
-        </Button>
-      </DialogFooter>
-    </form>
+        <DialogFooter className="bg-gray-50 px-6 py-4 -mx-6 -mb-6 rounded-b-lg">
+          <div className="flex gap-3 w-full">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onCancel} 
+              disabled={isSubmitting}
+              className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
+            >
+              إلغاء
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={isSubmitting || loading}
+              className="flex-1 bg-gray-900 hover:bg-gray-800 text-white"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  جاري التحديث...
+                </>
+              ) : (
+                <>
+                  <Edit className="ml-2 h-4 w-4" />
+                  تحديث الإيجار
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogFooter>
+      </form>
+    </div>
   )
 }

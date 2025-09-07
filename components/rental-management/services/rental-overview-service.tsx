@@ -259,8 +259,8 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
+      {/* Quick Actions - donw delete it , i want it later */}
+      {/* <Card>
         <CardHeader>
           <CardTitle>إجراءات سريعة</CardTitle>
           <CardDescription>الإجراءات الأكثر استخداماً في النظام</CardDescription>
@@ -277,7 +277,7 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   )
 }

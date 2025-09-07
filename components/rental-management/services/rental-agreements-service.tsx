@@ -427,8 +427,8 @@ export function RentalAgreementsService() {
       {/* Header and Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold">عقود الإيجار</h2>
-          <p className="text-muted-foreground">إدارة عقود الإيجار النشطة والمنتهية</p>
+          <h2 className="text-2xl font-bold">طلبات الإيجار</h2>
+          <p className="text-muted-foreground">إدارة طلبات الإيجار النشطة والمنتهية</p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
@@ -705,9 +705,9 @@ export function RentalAgreementsService() {
 
       {/* Agreement Details Dialog */}
       <Dialog open={!!selectedAgreement} onOpenChange={() => setSelectedAgreement(null)}>
-        <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto text-right" dir="rtl">
           <DialogHeader>
-            <DialogTitle>تفاصيل عقد الإيجار</DialogTitle>
+            <DialogTitle className="text-right" dir="rtl">تفاصيل طلب الإيجار</DialogTitle>
             <DialogDescription>
               عقد رقم {selectedAgreement?.contractNumber} - {selectedAgreement?.tenant.nameAr}
             </DialogDescription>

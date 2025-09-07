@@ -23,6 +23,9 @@ import {
   PaintBucket,
   Sparkles,
   Zap,
+  Calendar,
+  CalendarDays,
+  Percent,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,6 +72,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import axiosInstance from "@/lib/axiosInstance";
 import { Skeleton } from "@/components/ui/skeleton";
 import useAuthStore from "@/context/AuthContext";
@@ -94,20 +98,25 @@ export function SettingsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [domains, setDomains] = useState([]);
-  const [dnsInstructions, setDnsInstructions] = useState([]);
-  const [verifyingDomains, setVerifyingDomains] = useState({});
-  const [deleteDomainId, setDeleteDomainId] = useState(null);
+  const [domains, setDomains] = useState<any[]>([]);
+  const [dnsInstructions, setDnsInstructions] = useState<any>([]);
+  const [verifyingDomains, setVerifyingDomains] = useState<any>({});
+  const [deleteDomainId, setDeleteDomainId] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [themes, setThemes] = useState([]);
+  const [themes, setThemes] = useState<any[]>([]);
   const [hasFormatError, setHasFormatError] = useState(false);
   const [isLoadingDomains, setIsLoadingDomains] = useState(true);
   const [isLoadingThemes, setIsLoadingThemes] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
-  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+  const [subscriptionPlans, setSubscriptionPlans] = useState<any>({});
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
-  const [allFeatures, setAllFeatures] = useState([]);
+  const [allFeatures, setAllFeatures] = useState<string[]>([]);
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
+  const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [selectedMonths, setSelectedMonths] = useState([1]);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   useEffect(() => {
     const fetchSubscriptionPlans = async () => {
@@ -117,11 +126,17 @@ export function SettingsPage() {
 
         // جمع جميع الميزات الفريدة من جميع الخطط
         const featuresSet = new Set();
-        response.data.plans.forEach((plan) => {
-          plan.features.forEach((feature) => featuresSet.add(feature));
+        const allPlans = [
+          ...(response.data.plans.plans_monthly || []),
+          ...(response.data.plans.plans_yearly || [])
+        ];
+        allPlans.forEach((plan: any) => {
+          if (plan.features && typeof plan.features === 'object') {
+            Object.values(plan.features).flat().forEach((feature: any) => featuresSet.add(feature));
+          }
         });
-        setAllFeatures(Array.from(featuresSet));
-      } catch (error) {
+        setAllFeatures(Array.from(featuresSet) as string[]);
+      } catch (error: any) {
         console.error("Error fetching subscription plans:", error);
         toast.error("فشل في تحميل خطط الاشتراك");
       } finally {
@@ -131,22 +146,66 @@ export function SettingsPage() {
     fetchSubscriptionPlans();
   }, []);
 
-  const handleUpgradeClick = async (packageId, price) => {
+  const handleUpgradeClick = (plan: any) => {
+    setSelectedPlan(plan);
+    // إذا كانت الخطة سنوية، ابدأ من 1 سنة، وإلا ابدأ من 1 شهر
+    setSelectedMonths([1]);
+    setIsUpgradeDialogOpen(true);
+  };
+
+  const handleConfirmUpgrade = async () => {
+    if (!selectedPlan) return;
+    
+    setIsProcessingPayment(true);
     try {
-      setIsPopupOpen(true);
+      const periods = selectedMonths[0];
+      const periodPrice = parseFloat(selectedPlan.price);
+      // إذا كانت الخطة سنوية، احسب المبلغ بناءً على السنوات
+      const totalAmount = isYearlyPlan(selectedPlan) ? periodPrice * periods : periodPrice * periods;
+      
       const response = await axiosInstance.post("/make-payment", {
-        package_id: packageId,
-        price: price,
+        package_id: selectedPlan.id,
+        price: totalAmount,
+        period: periods,
+        total_amount: totalAmount,
       });
+      
       if (response.data.status === "success") {
         setPaymentUrl(response.data.payment_url);
+        setIsUpgradeDialogOpen(false);
+        setIsPopupOpen(true);
       } else {
         toast.error("فشل في الحصول على رابط الدفع");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("خطأ:", error);
       toast.error("حدث خطأ أثناء الاتصال بالخادم");
+    } finally {
+      setIsProcessingPayment(false);
     }
+  };
+
+  // حساب التوفير في الخطط السنوية
+  const calculateSavings = (monthlyPrice: any, yearlyPrice: any) => {
+    const monthlyTotal = parseFloat(monthlyPrice) * 12;
+    const yearlyTotal = parseFloat(yearlyPrice);
+    const savings = monthlyTotal - yearlyTotal;
+    const savingsPercentage = Math.round((savings / monthlyTotal) * 100);
+    return { savings, savingsPercentage };
+  };
+
+  // الحصول على الخطط الحالية حسب الفترة المختارة
+  const getCurrentPlans = () => {
+    if (billingPeriod === "monthly") {
+      return subscriptionPlans.plans_monthly || [];
+    } else {
+      return subscriptionPlans.plans_yearly || [];
+    }
+  };
+
+  // تحديد ما إذا كانت الخطة سنوية أم شهرية
+  const isYearlyPlan = (plan: any) => {
+    return billingPeriod === "yearly" || plan.billing === "سنويًا";
   };
 
   useEffect(() => {
@@ -156,7 +215,7 @@ export function SettingsPage() {
         const response = await axiosInstance.get("/settings/domain");
         setDomains(response.data.domains);
         setDnsInstructions(response.data.dnsInstructions);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching data:", error);
       } finally {
         setIsLoadingDomains(false);
@@ -171,7 +230,7 @@ export function SettingsPage() {
         setIsLoadingThemes(true);
         const response = await axiosInstance.get("/settings/theme");
         setThemes(response.data.themes);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching themes:", error);
         toast.error("فشل في تحميل الثيمات");
       } finally {
@@ -218,14 +277,14 @@ export function SettingsPage() {
       });
       const addedDomain = response.data.data;
       addedDomain.status = "pending";
-      setDomains([...domains, addedDomain]);
+      setDomains([...domains, addedDomain] as any[]);
       setNewDomain("");
       setIsAddDomainOpen(false);
       setSetupProgress(Math.min(setupProgress + 20, 100));
       toast.dismiss(loadingToast);
       toast.success("تمت إضافة النطاق بنجاح");
       setErrorMessage("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding domain:", error);
       toast.dismiss(loadingToast);
       const errorMessage =
@@ -235,8 +294,8 @@ export function SettingsPage() {
     }
   };
 
-  const handleVerifyDomain = async (domainId) => {
-    setVerifyingDomains((prev) => ({ ...prev, [domainId]: true }));
+  const handleVerifyDomain = async (domainId: any) => {
+    setVerifyingDomains((prev: any) => ({ ...prev, [domainId]: true }));
     const loadingToast = toast.loading("جاري التحقق من النطاق...");
     try {
       const response = await axiosInstance.post("/settings/domain/verify", {
@@ -244,37 +303,37 @@ export function SettingsPage() {
       });
       const verifiedDomain = response.data.data;
       setDomains(
-        domains.map((domain) =>
+        domains.map((domain: any) =>
           domain.id === domainId ? verifiedDomain : domain,
-        ),
+        ) as any[],
       );
       setSetupProgress(Math.min(setupProgress + 20, 100));
       toast.dismiss(loadingToast);
       toast.success("تم التحقق من النطاق بنجاح");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error verifying domain:", error);
       toast.dismiss(loadingToast);
       toast.error("حدث خطأ أثناء التحقق من النطاق");
     } finally {
-      setVerifyingDomains((prev) => ({ ...prev, [domainId]: false }));
+      setVerifyingDomains((prev: any) => ({ ...prev, [domainId]: false }));
     }
   };
 
-  const handleSetPrimaryDomain = async (domainId) => {
+  const handleSetPrimaryDomain = async (domainId: any) => {
     const loadingToast = toast.loading("جاري تحديث النطاق الرئيسي...");
     try {
       await axiosInstance.post("/settings/domain/set-primary", {
         id: domainId,
       });
       setDomains(
-        domains.map((domain) => ({
+        domains.map((domain: any) => ({
           ...domain,
           primary: domain.id === domainId,
-        })),
+        })) as any[],
       );
       toast.dismiss(loadingToast);
       toast.success("تم تحديث النطاق الرئيسي بنجاح");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error setting primary domain:", error);
       toast.dismiss(loadingToast);
       toast.error("حدث خطأ أثناء تحديث النطاق الرئيسي");
@@ -287,10 +346,10 @@ export function SettingsPage() {
     const loadingToast = toast.loading("جاري حذف النطاق...");
     try {
       await axiosInstance.delete(`/settings/domain/${deleteDomainId}`);
-      setDomains(domains.filter((domain) => domain.id !== deleteDomainId));
+      setDomains(domains.filter((domain: any) => domain.id !== deleteDomainId) as any[]);
       toast.dismiss(loadingToast);
       toast.success("تم حذف النطاق بنجاح");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting domain:", error);
       toast.dismiss(loadingToast);
       toast.error("حدث خطأ أثناء حذف النطاق");
@@ -300,25 +359,25 @@ export function SettingsPage() {
     }
   };
 
-  const handleActivateTheme = async (themeId) => {
+  const handleActivateTheme = async (themeId: any) => {
     try {
       await axiosInstance.post("/settings/theme/set-active", {
         theme_id: themeId,
       });
       setThemes(
-        themes.map((theme) => ({
+        themes.map((theme: any) => ({
           ...theme,
           active: theme.id === themeId,
-        })),
+        })) as any[],
       );
       toast.success("تم تنشيط الثيم بنجاح");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error activating theme:", error);
       toast.error("حدث خطأ أثناء تنشيط الثيم");
     }
   };
 
-  const filteredDomains = (domains || []).filter((domain) => {
+  const filteredDomains = (domains || []).filter((domain: any) => {
     if (statusFilter !== "all") {
       if (statusFilter === "active" && domain.status !== "active") return false;
       if (statusFilter === "pending" && domain.status !== "pending")
@@ -553,7 +612,7 @@ export function SettingsPage() {
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2">
-                    {filteredDomains.map((domain) => (
+                    {filteredDomains.map((domain: any) => (
                       <Card
                         key={domain.id}
                         className={`${domain.status === "pending" ? "border-dashed opacity-80" : ""}`}
@@ -716,7 +775,7 @@ export function SettingsPage() {
                                 <div className="col-span-5">القيمة</div>
                                 <div className="col-span-2">TTL</div>
                               </div>
-                              {dnsInstructions?.records?.map((record, index) => (
+                              {dnsInstructions?.records?.map((record: any, index: any) => (
                                 <div
                                   key={index}
                                   className="grid grid-cols-12 gap-4 p-3 border-t"
@@ -749,13 +808,66 @@ export function SettingsPage() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="subscription" className="space-y-4 pt-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-right">إدارة الاشتراك</h2>
-                    <p className="text-muted-foreground text-right">
+              <TabsContent value="subscription" className="space-y-4 pt-4" dir="rtl">
+                <div className="flex flex-col items-center gap-6 mb-6">
+                  <div className="text-center">
+                    <h2 className="text-xl font-semibold">إدارة الاشتراك</h2>
+                    <p className="text-muted-foreground">
                       عرض وتحديث خطة الاشتراك الخاصة بك
                     </p>
+                  </div>
+                  
+                  {/* Toggle مذهل للتبديل بين الخطط الشهرية والسنوية */}
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="relative">
+                      <div className="flex items-center bg-gradient-to-r from-blue-50 to-purple-50 p-1 rounded-2xl border border-blue-200 shadow-lg">
+                        <button
+                          onClick={() => setBillingPeriod("monthly")}
+                          className={`relative px-6 py-3 rounded-xl font-medium text-sm transition-all duration-300 ease-in-out ${
+                            billingPeriod === "monthly"
+                              ? "text-white shadow-lg"
+                              : "text-gray-600 hover:text-gray-800"
+                          }`}
+                        >
+                          {billingPeriod === "monthly" && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg animate-pulse"></div>
+                          )}
+                          <div className="relative flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            <span>شهريًا</span>
+                          </div>
+                        </button>
+                        
+                        <button
+                          onClick={() => setBillingPeriod("yearly")}
+                          className={`relative px-6 py-3 rounded-xl font-medium text-sm transition-all duration-300 ease-in-out ${
+                            billingPeriod === "yearly"
+                              ? "text-white shadow-lg"
+                              : "text-gray-600 hover:text-gray-800"
+                          }`}
+                        >
+                          {billingPeriod === "yearly" && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-lg animate-pulse"></div>
+                          )}
+                          <div className="relative flex items-center gap-2">
+                            <CalendarDays className="h-4 w-4" />
+                            <span>سنويًا</span>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {billingPeriod === "yearly" && subscriptionPlans.plans_monthly && subscriptionPlans.plans_yearly && (
+                      <div className="flex items-center gap-2 text-sm text-green-600 font-medium bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                        <Sparkles className="h-4 w-4" />
+                        <span>
+                          وفر {calculateSavings(
+                            subscriptionPlans.plans_monthly[0]?.price || "0",
+                            subscriptionPlans.plans_yearly[0]?.price || "0"
+                          ).savings.toFixed(0)} ريال سنويًا
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -777,7 +889,7 @@ export function SettingsPage() {
                           </CardFooter>
                         </Card>
                       ))
-                    : !subscriptionPlans || subscriptionPlans.length === 0
+                    : !getCurrentPlans() || getCurrentPlans().length === 0
                     ? (
                         <div className="col-span-3 flex flex-col items-center justify-center p-8 text-center">
                           <div className="rounded-full bg-muted p-3 mb-4">
@@ -798,16 +910,42 @@ export function SettingsPage() {
                           </Button>
                         </div>
                       )
-                    : subscriptionPlans.map((plan) => {
-                        const isCurrentPlan =
-                          userData?.package_title === plan.name;
+                    : getCurrentPlans().map((plan: any) => {
+                        const isCurrentPlan = userData?.package_title === plan.name;
+                        const features = plan.features && typeof plan.features === 'object' 
+                          ? Object.values(plan.features).flat() 
+                          : [];
+                        
                         return (
                           <Card
                             key={plan.id}
-                            className={`relative flex flex-col ${isCurrentPlan ? "border-primary border-2" : ""}`}
+                            className={`relative flex flex-col transition-all duration-300 hover:shadow-lg ${
+                              isCurrentPlan ? "border-primary border-2 shadow-lg" : ""
+                            } ${
+                              billingPeriod === "yearly" ? "ring-2 ring-green-100" : ""
+                            }`}
                           >
+                            {billingPeriod === "yearly" && (
+                              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                                <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg">
+                                  <div className="flex items-center gap-1">
+                                    <Star className="h-3 w-3" />
+                                    <span>الأكثر توفيرًا</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            
                             <CardHeader className="pb-4">
-                              <CardTitle>{plan.name}</CardTitle>
+                              <CardTitle className="flex items-center justify-between">
+                                <span>{plan.name}</span>
+                                {billingPeriod === "yearly" && (
+                                  <Badge className="bg-green-100 text-green-800 border-green-200">
+                                    <Percent className="h-3 w-3 ml-1" />
+                                    توفير
+                                  </Badge>
+                                )}
+                              </CardTitle>
                               <CardDescription className="flex items-end gap-1 mt-2">
                                 <div className="flex items-center gap-1">
                                   <img
@@ -823,17 +961,33 @@ export function SettingsPage() {
                                   / {plan.billing}
                                 </span>
                               </CardDescription>
+                              
+                              {billingPeriod === "yearly" && subscriptionPlans.plans_monthly && (
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  <span className="line-through">
+                                    {subscriptionPlans.plans_monthly[0]?.price} شهريًا
+                                  </span>
+                                  <span className="text-green-600 font-medium mr-2">
+                                    وفر {calculateSavings(
+                                      subscriptionPlans.plans_monthly[0]?.price || "0",
+                                      plan.price
+                                    ).savingsPercentage}%
+                                  </span>
+                                </div>
+                              )}
                             </CardHeader>
 
                             <CardContent className="pb-4 flex-1">
-                              <ul className="space-y-1">
-                                {plan.features.map((feature, index) => (
+                              <ul className="space-y-2">
+                                {features.map((feature: any, index: any) => (
                                   <li
                                     key={index}
                                     className="flex items-center gap-2"
                                   >
-                                    <Check className="h-4 w-4 text-green-600" />
-                                    <span className="text-sm">{feature}</span>
+                                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                                      <Check className="h-3 w-3 text-green-600" />
+                                    </div>
+                                    <span className="text-sm text-gray-700">{feature}</span>
                                   </li>
                                 ))}
                               </ul>
@@ -847,17 +1001,26 @@ export function SettingsPage() {
                                   disabled
                                 >
                                   <Check className="h-4 w-4 ml-1" />
-                                  {plan.name}
+                                  {plan.cta || "الخطة الحالية"}
                                 </Button>
                               ) : (
                                 <Button
                                   variant="default"
-                                  className="w-full"
-                                  onClick={() =>
-                                    handleUpgradeClick(plan.id, plan.price)
-                                  }
+                                  className={`w-full transition-all duration-300 ${
+                                    billingPeriod === "yearly" 
+                                      ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700" 
+                                      : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                                  }`}
+                                  onClick={() => handleUpgradeClick(plan)}
                                 >
-                                  الترقية
+                                  {billingPeriod === "yearly" ? (
+                                    <>
+                                      <Sparkles className="h-4 w-4 ml-1" />
+                                      {plan.cta || "الترقية السنوية"}
+                                    </>
+                                  ) : (
+                                    plan.cta || "الترقية"
+                                  )}
                                 </Button>
                               )}
                             </CardFooter>
@@ -918,7 +1081,7 @@ export function SettingsPage() {
                           </Button>
                         </div>
                       )
-                    : themes.map((theme) => (
+                    : themes.map((theme: any) => (
                         <Card
                           key={theme.id}
                           className={`overflow-hidden ${theme.active ? "border-primary border-2" : ""}`}
@@ -1018,11 +1181,182 @@ export function SettingsPage() {
           onClose={() => setIsPopupOpen(false)}
         />
       )}
+
+      {/* Dialog مذهل للترقية */}
+      <Dialog open={isUpgradeDialogOpen} onOpenChange={setIsUpgradeDialogOpen}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden" dir="rtl">
+          <div className="relative"  dir="rtl">
+            {/* خلفية أبيض وأسود مذهلة */}
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gray-800 via-black to-gray-800"></div>
+            
+            {/* تأثيرات بصرية */}
+            <div className="absolute -top-10 -left-10 w-20 h-20 bg-gradient-to-br from-gray-300 to-gray-600 rounded-full opacity-20 animate-pulse"></div>
+            <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br from-gray-400 to-gray-700 rounded-full opacity-20 animate-pulse delay-1000"></div>
+            
+            <div className="relative p-8"  dir="rtl">
+              <DialogHeader className="text-center mb-8" dir="rtl">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full opacity-30 scale-150 animate-pulse"></div>
+                  <div className="relative w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-gray-800 to-black flex items-center justify-center shadow-2xl">
+                    <Sparkles className="w-10 h-10 text-white" />
+                  </div>
+                </div>
+                
+                <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-black bg-clip-text text-transparent text-right mb-2">
+                  ترقية خطة الاشتراك
+                </DialogTitle>
+                <DialogDescription className="text-lg text-gray-600 text-right">
+                  اختر مدة الاشتراك المناسبة لك واستمتع بجميع الميزات المتقدمة
+                </DialogDescription>
+              </DialogHeader>
+
+              {selectedPlan && (
+                <div className="space-y-8"  dir="rtl">
+                  {/* معلومات الخطة */}
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 shadow-xl" dir="rtl">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-bold text-gray-800">{selectedPlan.name}</h3>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500">
+                          {isYearlyPlan(selectedPlan) ? "سنة /" : "شهر /"}
+                        </span>
+                        <span className="text-2xl font-bold text-gray-800">
+                          {selectedPlan.price}
+                        </span>
+                        <img
+                          src="/Saudi_Riyal_Symbol.svg"
+                          alt="ريال سعودي"
+                          className="w-6 h-6 filter brightness-0 contrast-100"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      {selectedPlan.features && typeof selectedPlan.features === 'object' && 
+                        Object.values(selectedPlan.features).flat().slice(0, 4).map((feature: any, index: any) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <span className="text-sm text-gray-700">{feature}</span>
+                            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                              <Check className="w-3 h-3 text-green-600" />
+                            </div>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  </div>
+
+                  {/* شريط تحديد المدة */}
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 shadow-xl" dir="rtl">
+                    <div className="mb-6">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                        {isYearlyPlan(selectedPlan) ? "مدة الاشتراك السنوي" : "مدة الاشتراك الشهري"}
+                      </h4>
+                      <p className="text-gray-600 text-sm">
+                        {isYearlyPlan(selectedPlan) 
+                          ? "اختر عدد السنوات التي تريد الاشتراك بها" 
+                          : "اختر عدد الشهور التي تريد الاشتراك بها"
+                        }
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      <div className="px-4">
+                        <Slider
+                          value={selectedMonths}
+                          onValueChange={setSelectedMonths}
+                          max={isYearlyPlan(selectedPlan) ? 5 : 24}
+                          min={1}
+                          step={1}
+                          className="w-full"
+                        />
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <div className="text-sm text-gray-500">
+                          {isYearlyPlan(selectedPlan) ? "سنة 5" : "شهر 24"}
+                        </div>
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-gray-800 mb-1">
+                            {selectedMonths[0]}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {isYearlyPlan(selectedPlan) 
+                              ? (selectedMonths[0] === 1 ? "سنة" : "سنة")
+                              : (selectedMonths[0] === 1 ? "شهر" : "شهر")
+                            }
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {isYearlyPlan(selectedPlan) ? "سنة 1" : "شهر 1"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ملخص السعر */}
+                  <div className="bg-gradient-to-r from-gray-800 to-black rounded-2xl p-6 text-white shadow-2xl" dir="rtl">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-lg font-semibold">المبلغ الإجمالي</h4>
+                      <div className="text-left">
+                        <div className="text-3xl font-bold">
+                          {(parseFloat(selectedPlan.price) * selectedMonths[0]).toFixed(2)}
+                        </div>
+                        <div className="text-gray-300 text-sm">ريال سعودي</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-gray-300">
+                      <span className="text-sm">
+                        {selectedMonths[0] === 1 ? "دفعة واحدة" : `${selectedMonths[0]} دفعة`}
+                      </span>
+                      <span>
+                        {isYearlyPlan(selectedPlan) 
+                          ? `سنة ${selectedMonths[0]} × ${selectedPlan.price}`
+                          : `شهر ${selectedMonths[0]} × ${selectedPlan.price}`
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <DialogFooter className="mt-8 flex gap-4" dir="rtl">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsUpgradeDialogOpen(false)}
+                  className="flex-1 py-3 text-lg font-semibold"
+                  disabled={isProcessingPayment}
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  onClick={handleConfirmUpgrade}
+                  disabled={isProcessingPayment}
+                  className="flex-1 py-3 text-lg font-semibold bg-gradient-to-r from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 text-white shadow-xl hover:shadow-2xl transition-all duration-300"
+                >
+                  {isProcessingPayment ? (
+                    <div className="flex items-center gap-2">
+                      <span>جاري المعالجة...</span>
+                      <RefreshCw className="w-5 h-5 animate-spin" />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span>تأكيد الدفع</span>
+                      <CreditCardIcon className="w-5 h-5" />
+                    </div>
+                  )}
+                </Button>
+              </DialogFooter>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-function SearchIcon(props) {
+function SearchIcon(props: any) {
   return (
     <svg
       {...props}
@@ -1041,3 +1375,4 @@ function SearchIcon(props) {
     </svg>
   );
 }
+
