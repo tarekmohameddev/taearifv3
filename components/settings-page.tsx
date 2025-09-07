@@ -911,7 +911,7 @@ export function SettingsPage() {
                         </div>
                       )
                     : getCurrentPlans().map((plan: any) => {
-                        const isCurrentPlan = userData?.package_title === plan.name;
+                        const isCurrentPlan = plan.cta !== "الترقية";
                         const features = plan.features && typeof plan.features === 'object' 
                           ? Object.values(plan.features).flat() 
                           : [];
