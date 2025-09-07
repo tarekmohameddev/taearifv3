@@ -625,7 +625,7 @@ export function SettingsPage() {
                               {domain.primary && (
                                 <Badge
                                   variant="outline"
-                                  className="bg-blue-50 text-blue-700 border-blue-200 ml-2"
+                                  className="bg-gray-100 text-gray-700 border-gray-300 ml-2"
                                 >
                                   رئيسي
                                 </Badge>
@@ -641,7 +641,7 @@ export function SettingsPage() {
                             {domain.status === "active" ? (
                               <Badge
                                 variant="outline"
-                                className="bg-green-50 text-green-700 border-green-200"
+                                className="bg-gray-100 text-gray-700 border-gray-300"
                               >
                                 <span className="flex items-center gap-1">
                                   <CheckCircle2 className="h-3 w-3" />
@@ -651,7 +651,7 @@ export function SettingsPage() {
                             ) : (
                               <Badge
                                 variant="outline"
-                                className="bg-amber-50 text-amber-700 border-amber-200"
+                                className="bg-gray-100 text-gray-700 border-gray-300"
                               >
                                 <span className="flex items-center gap-1">
                                   <AlertTriangle className="h-3 w-3" />
@@ -668,7 +668,7 @@ export function SettingsPage() {
                               {domain.ssl ? (
                                 <Badge
                                   variant="outline"
-                                  className="bg-green-50 text-green-700 border-green-200"
+                                  className="bg-gray-100 text-gray-700 border-gray-300"
                                 >
                                   <span className="flex items-center gap-1">
                                     <Lock className="h-3 w-3" />
@@ -678,7 +678,7 @@ export function SettingsPage() {
                               ) : (
                                 <Badge
                                   variant="outline"
-                                  className="bg-gray-50 text-gray-700 border-gray-200"
+                                  className="bg-gray-100 text-gray-700 border-gray-300"
                                 >
                                   غير مفعل
                                 </Badge>
@@ -793,7 +793,7 @@ export function SettingsPage() {
                                 </div>
                               ))}
                             </div>
-                            <div className="flex items-center p-3 rounded-lg bg-blue-50 text-blue-800">
+                            <div className="flex items-center p-3 rounded-lg bg-gray-100 text-gray-800">
                               <AlertCircle className="h-5 w-5 ml-2 flex-shrink-0" />
                               <p className="text-sm">
                                 {dnsInstructions?.note ||
@@ -820,7 +820,7 @@ export function SettingsPage() {
                   {/* Toggle مذهل للتبديل بين الخطط الشهرية والسنوية */}
                   <div className="flex flex-col items-center gap-3">
                     <div className="relative">
-                      <div className="flex items-center bg-gradient-to-r from-blue-50 to-purple-50 p-1 rounded-2xl border border-blue-200 shadow-lg">
+                      <div className="flex items-center bg-gray-100 p-1 rounded-2xl border border-gray-300 shadow-lg">
                         <button
                           onClick={() => setBillingPeriod("monthly")}
                           className={`relative px-6 py-3 rounded-xl font-medium text-sm transition-all duration-300 ease-in-out ${
@@ -830,7 +830,7 @@ export function SettingsPage() {
                           }`}
                         >
                           {billingPeriod === "monthly" && (
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg animate-pulse"></div>
+                            <div className="absolute inset-0 bg-gray-800 rounded-xl shadow-lg animate-pulse"></div>
                           )}
                           <div className="relative flex items-center gap-2">
                             <Calendar className="h-4 w-4" />
@@ -847,7 +847,7 @@ export function SettingsPage() {
                           }`}
                         >
                           {billingPeriod === "yearly" && (
-                            <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-lg animate-pulse"></div>
+                            <div className="absolute inset-0 bg-gray-800 rounded-xl shadow-lg animate-pulse"></div>
                           )}
                           <div className="relative flex items-center gap-2">
                             <CalendarDays className="h-4 w-4" />
@@ -858,7 +858,7 @@ export function SettingsPage() {
                     </div>
                     
                     {billingPeriod === "yearly" && subscriptionPlans.plans_monthly && subscriptionPlans.plans_yearly && (
-                      <div className="flex items-center gap-2 text-sm text-green-600 font-medium bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                      <div className="flex items-center gap-2 text-sm text-gray-700 font-medium bg-gray-100 px-3 py-2 rounded-lg border border-gray-300">
                         <Sparkles className="h-4 w-4" />
                         <span>
                           وفر {calculateSavings(
@@ -927,7 +927,7 @@ export function SettingsPage() {
                           >
                             {billingPeriod === "yearly" && (
                               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg">
+                                <div className="bg-gray-800 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg">
                                   <div className="flex items-center gap-1">
                                     <Star className="h-3 w-3" />
                                     <span>الأكثر توفيرًا</span>
@@ -940,7 +940,7 @@ export function SettingsPage() {
                               <CardTitle className="flex items-center justify-between">
                                 <span>{plan.name}</span>
                                 {billingPeriod === "yearly" && (
-                                  <Badge className="bg-green-100 text-green-800 border-green-200">
+                                  <Badge className="bg-gray-100 text-gray-800 border-gray-300">
                                     <Percent className="h-3 w-3 ml-1" />
                                     توفير
                                   </Badge>
@@ -967,7 +967,7 @@ export function SettingsPage() {
                                   <span className="line-through">
                                     {subscriptionPlans.plans_monthly[0]?.price} شهريًا
                                   </span>
-                                  <span className="text-green-600 font-medium mr-2">
+                                  <span className="text-gray-700 font-medium mr-2">
                                     وفر {calculateSavings(
                                       subscriptionPlans.plans_monthly[0]?.price || "0",
                                       plan.price
@@ -984,8 +984,8 @@ export function SettingsPage() {
                                     key={index}
                                     className="flex items-center gap-2"
                                   >
-                                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
-                                      <Check className="h-3 w-3 text-green-600" />
+                                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
+                                      <Check className="h-3 w-3 text-gray-700" />
                                     </div>
                                     <span className="text-sm text-gray-700">{feature}</span>
                                   </li>
@@ -1006,11 +1006,7 @@ export function SettingsPage() {
                               ) : (
                                 <Button
                                   variant="default"
-                                  className={`w-full transition-all duration-300 ${
-                                    billingPeriod === "yearly" 
-                                      ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700" 
-                                      : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                                  }`}
+                                  className="w-full transition-all duration-300 bg-gray-800 hover:bg-gray-700 text-white"
                                   onClick={() => handleUpgradeClick(plan)}
                                 >
                                   {billingPeriod === "yearly" ? (
@@ -1101,7 +1097,7 @@ export function SettingsPage() {
                               {theme.popular && (
                                 <Badge
                                   variant="secondary"
-                                  className="bg-amber-100 text-amber-800"
+                                  className="bg-gray-100 text-gray-800"
                                 >
                                   <Star className="h-3 w-3 ml-1" />
                                   شائع
@@ -1115,7 +1111,7 @@ export function SettingsPage() {
                           <CardContent className="pb-2">
                             <Badge
                               variant="outline"
-                              className="bg-blue-50 text-blue-700 border-blue-200"
+                              className="bg-gray-100 text-gray-700 border-gray-300"
                             >
                               {theme.category === "business" && "أعمال"}
                               {theme.category === "portfolio" && "معرض أعمال"}
@@ -1187,23 +1183,23 @@ export function SettingsPage() {
         <DialogContent className="max-w-2xl p-0 overflow-hidden" dir="rtl">
           <div className="relative"  dir="rtl">
             {/* خلفية أبيض وأسود مذهلة */}
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100"></div>
+            <div className="absolute inset-0 bg-white"></div>
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gray-800 via-black to-gray-800"></div>
             
             {/* تأثيرات بصرية */}
-            <div className="absolute -top-10 -left-10 w-20 h-20 bg-gradient-to-br from-gray-300 to-gray-600 rounded-full opacity-20 animate-pulse"></div>
-            <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br from-gray-400 to-gray-700 rounded-full opacity-20 animate-pulse delay-1000"></div>
+            <div className="absolute -top-10 -left-10 w-20 h-20 bg-gray-300 rounded-full opacity-20 animate-pulse"></div>
+            <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gray-400 rounded-full opacity-20 animate-pulse delay-1000"></div>
             
             <div className="relative p-8"  dir="rtl">
               <DialogHeader className="text-center mb-8" dir="rtl">
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full opacity-30 scale-150 animate-pulse"></div>
-                  <div className="relative w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-gray-800 to-black flex items-center justify-center shadow-2xl">
+                  <div className="absolute inset-0 bg-gray-200 rounded-full opacity-30 scale-150 animate-pulse"></div>
+                  <div className="relative w-20 h-20 mx-auto rounded-full bg-gray-800 flex items-center justify-center shadow-2xl">
                     <Sparkles className="w-10 h-10 text-white" />
                   </div>
                 </div>
                 
-                <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-black bg-clip-text text-transparent text-right mb-2">
+                <DialogTitle className="text-3xl font-bold text-gray-800 text-right mb-2">
                   ترقية خطة الاشتراك
                 </DialogTitle>
                 <DialogDescription className="text-lg text-gray-600 text-right">
@@ -1214,7 +1210,7 @@ export function SettingsPage() {
               {selectedPlan && (
                 <div className="space-y-8"  dir="rtl">
                   {/* معلومات الخطة */}
-                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 shadow-xl" dir="rtl">
+                  <div className="bg-white rounded-2xl p-6 border border-gray-300 shadow-xl" dir="rtl">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-xl font-bold text-gray-800">{selectedPlan.name}</h3>
                       <div className="flex items-center gap-2">
@@ -1237,8 +1233,8 @@ export function SettingsPage() {
                         Object.values(selectedPlan.features).flat().slice(0, 4).map((feature: any, index: any) => (
                           <div key={index} className="flex items-center gap-2">
                             <span className="text-sm text-gray-700">{feature}</span>
-                            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
-                              <Check className="w-3 h-3 text-green-600" />
+                            <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
+                              <Check className="w-3 h-3 text-gray-700" />
                             </div>
                           </div>
                         ))
@@ -1247,7 +1243,7 @@ export function SettingsPage() {
                   </div>
 
                   {/* شريط تحديد المدة */}
-                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 shadow-xl" dir="rtl">
+                  <div className="bg-white rounded-2xl p-6 border border-gray-300 shadow-xl" dir="rtl">
                     <div className="mb-6">
                       <h4 className="text-lg font-semibold text-gray-800 mb-2">
                         {isYearlyPlan(selectedPlan) ? "مدة الاشتراك السنوي" : "مدة الاشتراك الشهري"}
@@ -1295,7 +1291,7 @@ export function SettingsPage() {
                   </div>
 
                   {/* ملخص السعر */}
-                  <div className="bg-gradient-to-r from-gray-800 to-black rounded-2xl p-6 text-white shadow-2xl" dir="rtl">
+                  <div className="bg-gray-800 rounded-2xl p-6 text-white shadow-2xl" dir="rtl">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="text-lg font-semibold">المبلغ الإجمالي</h4>
                       <div className="text-left">
@@ -1333,7 +1329,7 @@ export function SettingsPage() {
                 <Button
                   onClick={handleConfirmUpgrade}
                   disabled={isProcessingPayment}
-                  className="flex-1 py-3 text-lg font-semibold bg-gradient-to-r from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 text-white shadow-xl hover:shadow-2xl transition-all duration-300"
+                  className="flex-1 py-3 text-lg font-semibold bg-gray-800 hover:bg-gray-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300"
                 >
                   {isProcessingPayment ? (
                     <div className="flex items-center gap-2">

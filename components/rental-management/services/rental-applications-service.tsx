@@ -251,15 +251,15 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     const safeStatus = getSafeValue(status, 'unknown')
     switch (safeStatus) {
       case "active":
-        return "bg-green-100 text-green-800 border-green-200"
+        return "bg-gray-100 text-gray-800 border-gray-200"
       case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
+        return "bg-gray-100 text-gray-800 border-gray-200"
       case "expired":
-        return "bg-red-100 text-red-800 border-red-200"
+        return "bg-gray-100 text-gray-800 border-gray-200"
       case "cancelled":
         return "bg-gray-100 text-gray-800 border-gray-200"
       case "draft":
-        return "bg-blue-100 text-blue-800 border-blue-200"
+        return "bg-gray-100 text-gray-800 border-gray-200"
       default:
         return "bg-gray-100 text-gray-800 border-gray-200"
     }
@@ -516,12 +516,12 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">الإيجارات النشطة</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-2xl font-bold text-gray-900">
                 {rentals.filter((r: RentalData) => getSafeValue(r.status) === 'active').length}
               </p>
             </div>
-            <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <CheckCircle className="h-6 w-6 text-green-600" />
+            <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
+              <CheckCircle className="h-6 w-6 text-gray-600" />
             </div>
           </div>
         </div>
@@ -719,9 +719,9 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                             onClick={() => {
                               setRentalApplications({ deletingRental: rental, isDeleteDialogOpen: true })
                             }}
-                            className="cursor-pointer hover:bg-red-50 text-red-600"
+                            className="cursor-pointer hover:bg-gray-100 text-gray-600"
                           >
-                            <Trash2 className="h-4 w-4 ml-2 text-red-600" />
+                            <Trash2 className="h-4 w-4 ml-2 text-gray-600" />
                             حذف الإيجار
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -807,7 +807,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-gray-700">مبلغ الإيجار</Label>
-                        <p className="text-lg font-bold text-green-600">
+                        <p className="text-lg font-bold text-gray-900">
                           {formatCurrency(selectedRental.base_rent_amount, selectedRental.currency)}
                         </p>
                       </div>
@@ -907,9 +907,9 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                 </div>
                 
                 {selectedRental.notes && (
-                  <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h4 className="font-semibold text-blue-900 mb-2">ملاحظات</h4>
-                    <p className="text-sm text-blue-800">{selectedRental.notes}</p>
+                  <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-2">ملاحظات</h4>
+                    <p className="text-sm text-gray-800">{selectedRental.notes}</p>
                   </div>
                 )}
               </TabsContent>
@@ -994,7 +994,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
               variant="destructive" 
               onClick={() => deletingRental && handleDeleteRental(deletingRental.id)}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-gray-900 hover:bg-gray-800"
             >
               {isDeleting ? (
                 <>
