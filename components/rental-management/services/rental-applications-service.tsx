@@ -65,6 +65,7 @@ import {
 } from "lucide-react"
 import axiosInstance from "@/lib/axiosInstance"
 import useStore from "@/context/Store"
+import { RentalDetailsDialog } from "../rental-details-dialog"
 
 interface Property {
   id: number
@@ -147,6 +148,22 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     isInitialized,
     lastProcessedOpenAddDialogCounter,
   } = rentalApplications
+
+  // State for rental details dialog
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
+  const [selectedRentalId, setSelectedRentalId] = useState<number | null>(null)
+
+  // Function to open rental details dialog
+  const openRentalDetails = (rentalId: number) => {
+    setSelectedRentalId(rentalId)
+    setIsDetailsDialogOpen(true)
+  }
+
+  // Function to close rental details dialog
+  const closeRentalDetails = () => {
+    setIsDetailsDialogOpen(false)
+    setSelectedRentalId(null)
+  }
   
   // Open Add Rental dialog when the counter changes from parent
   useEffect(() => {
@@ -594,7 +611,8 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
               {filteredRentals.map((rental: RentalData, index: number) => (
                 <tr 
                   key={rental.id} 
-                  className={`hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-300 hover:shadow-sm ${
+                  onClick={() => openRentalDetails(rental.id)}
+                  className={`hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-300 hover:shadow-sm cursor-pointer ${
                     index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
                   }`}
                 >
@@ -686,13 +704,14 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                   </td>
 
                   {/* الإجراءات */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center justify-center">
+                  <td className="px-6 py-5 z-[9999]">
+                    <div className="flex items-center justify-center z-[9999]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button 
                             size="sm" 
                             variant="outline" 
+                            onClick={(e) => e.stopPropagation()}
                             className="h-8 w-8 p-0 border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 shadow-sm"
                           >
                             <MoreVertical className="h-4 w-4" />
@@ -700,14 +719,18 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem 
-                            onClick={() => setRentalApplications({ selectedRental: rental })}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setRentalApplications({ selectedRental: rental })
+                            }}
                             className="cursor-pointer hover:bg-gray-100"
                           >
                             <Eye className="h-4 w-4 ml-2 text-gray-600" />
                             عرض التفاصيل
                           </DropdownMenuItem>
                           <DropdownMenuItem 
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation()
                               setRentalApplications({ editingRental: rental, isEditRentalDialogOpen: true })
                             }}
                             className="cursor-pointer hover:bg-gray-100"
@@ -716,7 +739,8 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                             تعديل الإيجار
                           </DropdownMenuItem>
                           <DropdownMenuItem 
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation()
                               setRentalApplications({ deletingRental: rental, isDeleteDialogOpen: true })
                             }}
                             className="cursor-pointer hover:bg-gray-100 text-gray-600"
@@ -1011,6 +1035,13 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Rental Details Dialog */}
+      <RentalDetailsDialog
+        isOpen={isDetailsDialogOpen}
+        onClose={closeRentalDetails}
+        rentalId={selectedRentalId}
+      />
     </div>
   )
 }
