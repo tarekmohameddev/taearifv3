@@ -22,7 +22,7 @@ module.exports = (set) => ({
       },
     })),
 
-  fetchProperties: async (page = 1) => {
+  fetchProperties: async (page = 1, filters = {}) => {
     // تحديث حالة التحميل
     set((state) => ({
       propertiesManagement: {
@@ -33,10 +33,25 @@ module.exports = (set) => ({
     }));
 
     try {
+      // بناء معاملات الفلترة
+      const params = new URLSearchParams();
+      params.set('page', page.toString());
+      
+      // إضافة فلاتر إذا كانت موجودة
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value && value.length > 0) {
+          if (Array.isArray(value)) {
+            params.set(key, value.join(','));
+          } else {
+            params.set(key, value.toString());
+          }
+        }
+      });
+
       // استخدام نظام إعادة المحاولة مع معالجة الأخطاء المحسنة
       const response = await retryWithBackoff(async () => {
         return await axiosInstance.get(
-          `${process.env.NEXT_PUBLIC_Backend_URL}/properties?page=${page}`,
+          `/properties?${params.toString()}`,
         );
       }, 3, 1000);
 

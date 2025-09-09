@@ -71,6 +71,8 @@ import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import EmptyState from "@/components/empty-state";
 import { ErrorDisplay } from "@/components/ui/error-display";
+import { AdvancedFilterDialog } from "@/components/property/advanced-filter-dialog";
+import { ActiveFiltersDisplay } from "@/components/property/active-filters-display";
 
 // Share Dialog Component
 function ShareDialog({
@@ -408,6 +410,8 @@ export function PropertiesManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
+  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
   const { clickedONSubButton } = useAuthStore();
 
   const router = useRouter();
@@ -530,7 +534,36 @@ export function PropertiesManagementPage() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    fetchProperties(page);
+    fetchProperties(page, appliedFilters);
+  };
+
+  const handleApplyFilters = (filters: any) => {
+    setAppliedFilters(filters);
+    setCurrentPage(1);
+    fetchProperties(1, filters);
+  };
+
+  const handleRemoveFilter = (filterKey: string, filterValue?: any) => {
+    const newFilters: Record<string, any> = { ...appliedFilters };
+    
+    if (Array.isArray(newFilters[filterKey])) {
+      newFilters[filterKey] = newFilters[filterKey].filter((item: any) => item !== filterValue);
+      if (newFilters[filterKey].length === 0) {
+        delete newFilters[filterKey];
+      }
+    } else {
+      delete newFilters[filterKey];
+    }
+    
+    setAppliedFilters(newFilters);
+    setCurrentPage(1);
+    fetchProperties(1, newFilters);
+  };
+
+  const handleClearAllFilters = () => {
+    setAppliedFilters({});
+    setCurrentPage(1);
+    fetchProperties(1);
   };
 
   useEffect(() => {
@@ -587,6 +620,19 @@ export function PropertiesManagementPage() {
                 >
                   <List className="h-4 w-4" />
                   <span className="sr-only">List view</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setFilterDialogOpen(true)}
+                  className="gap-2 border-black text-black hover:bg-gray-100"
+                >
+                  <Filter className="h-4 w-4" />
+                  فلترة
+                  {Object.keys(appliedFilters).length > 0 && (
+                    <span className="bg-black text-white text-xs rounded-full px-2 py-0.5">
+                      {Object.keys(appliedFilters).length}
+                    </span>
+                  )}
                 </Button>
                 <Dialog>
                   <DialogContent className="sm:max-w-[500px]">
@@ -752,6 +798,13 @@ export function PropertiesManagementPage() {
               </DialogContent>
             </Dialog>
 
+            {/* عرض الفلاتر النشطة */}
+            <ActiveFiltersDisplay
+              filters={appliedFilters}
+              onRemoveFilter={handleRemoveFilter}
+              onClearAll={handleClearAllFilters}
+            />
+
             {loading ? (
               renderSkeletons()
             ) : error ? (
@@ -832,6 +885,13 @@ export function PropertiesManagementPage() {
             isOpen={shareDialogOpen}
             onClose={() => setShareDialogOpen(false)}
             property={selectedProperty}
+          />
+
+          <AdvancedFilterDialog
+            isOpen={filterDialogOpen}
+            onClose={() => setFilterDialogOpen(false)}
+            filterData={propertiesAllData}
+            onApplyFilters={handleApplyFilters}
           />
 
           {reorderPopup.open && (
