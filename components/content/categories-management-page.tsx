@@ -39,7 +39,6 @@ export default function CategoriesManagementPage() {
     try {
       const response = await axiosInstance.get("/user/categories");
       if (response.status === 200) {
-        console.log("Fetched categories:", response.data.categories);
         setCategories(response.data.categories);
         setShowEvenIfEmpty(response.data.show_even_if_empty); // إضافة هذا السطر
       } else {

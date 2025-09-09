@@ -104,8 +104,6 @@ export default function MenuManagementPage() {
   }>({});
 
   useEffect(() => {
-    console.log("menuItems", menuItems);
-    console.log("editingItem", editingItem);
   }, [menuItems, editingItem]);
 
   const sensors = useSensors(

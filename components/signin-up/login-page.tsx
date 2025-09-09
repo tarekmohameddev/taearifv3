@@ -96,8 +96,6 @@ export function LoginPage() {
           UserIslogged: false,
           userData: {},
         }));
-        console.log("UserIslogged:", UserIslogged);
-        console.log("userData:", userData);
         
         // تنظيف التوكن من Bearer إذا كان موجود
         let cleanToken = token;
@@ -115,9 +113,6 @@ export function LoginPage() {
           },
         }));
 
-        console.log("User data updated with token:", useAuthStore.getState().userData);
-        console.log("UserIslogged updated with token:", useAuthStore.getState().UserIslogged);
-        console.log("Token extracted and stored:", cleanToken);
         // 2. تسجيل الدخول بالـ token فقط
         const loginWithToken = async () => {
           setIsLoading(true);
@@ -135,9 +130,7 @@ export function LoginPage() {
           const { loginWithToken } = useAuthStore.getState();
           const result = await loginWithToken(cleanToken);
           setIsLoading(false);
-          console.log("Login result:", result);
           if (result.success) {
-            console.log("Login successful with token");
             router.push("/");
           } else {
             setErrors((prev) => ({
@@ -215,7 +208,6 @@ export function LoginPage() {
   // تسجيل الدخول بـ Google
   const handleGoogleLogin = async () => {
     if (!googleAuthUrl) {
-      console.error("Google auth URL not available");
       return;
     }
 
@@ -293,7 +285,6 @@ export function LoginPage() {
         router.push("/onboarding");
       }, 1500);
     } catch (error) {
-      console.error("OAuth token handling error:", error);
       setErrors((prev) => ({
         ...prev,
         general:

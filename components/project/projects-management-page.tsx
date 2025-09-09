@@ -149,7 +149,6 @@ export function ProjectsManagementPage() {
   const handleDelete = async (id: number) => {
     try {
       const response = await axiosInstance.delete(`/projects/${id}`);
-      console.log("تم حذف المشروع بنجاح");
     } catch (error) {
       console.error("حدث خطأ أثناء الحذف:", error);
     }
@@ -353,7 +352,6 @@ function ProjectCard({ project }: { project: IProject }) {
   const handleDelete = async (id: number) => {
     try {
       const response = await axiosInstance.delete(`/projects/${id}`);
-      console.log("تم حذف المشروع بنجاح");
       // يمكنك تحديث الحالة (state) أو إعادة تحميل الصفحة هنا بعد الحذف
     } catch (error) {
       console.error("حدث خطأ أثناء الحذف:", error);

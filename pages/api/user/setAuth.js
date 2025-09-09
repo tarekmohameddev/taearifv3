@@ -13,7 +13,6 @@ export default async function handler(req, res) {
           error: "بيانات المستخدم أو التوكن غير موجودة",
         });
       }
-      console.log(`UserToken`, UserToken);
 
       let userData = user;
       if (!userData || Object.keys(userData).length === 0) {

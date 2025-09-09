@@ -132,7 +132,6 @@ export function FooterManagementPage() {
         const response = await axiosInstance.get(
           `${process.env.NEXT_PUBLIC_Backend_URL}/content/footer`,
         );
-        console.log("get response", response);
         if (response.data.status === "success") {
           setFooterData(response.data.data.settings);
         } else {
@@ -149,9 +148,6 @@ export function FooterManagementPage() {
     fetchFooterData();
   }, []);
 
-  useEffect(() => {
-    console.log("footerData", footerData);
-  }, [footerData]);
   function ColumnDndWrapper({ columnId, children, handleDragEnd }) {
     // 2. Initialize sensors at the component level
     const sensors = useSensors(

@@ -194,13 +194,11 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
   useEffect(() => {
     // Simplified logic: if counter > last processed, open dialog
     if (openCreateDialogCounter > 0 && openCreateDialogCounter > lastProcessedOpenCreateDialogCounter) {
-      console.log("✅ Opening Maintenance Dialog - Simple Logic", { openCreateDialogCounter, lastProcessedOpenCreateDialogCounter })
       setRentalMaintenance({ 
         isCreateRequestDialogOpen: true, 
         lastProcessedOpenCreateDialogCounter: openCreateDialogCounter 
       })
     } else if (lastProcessedOpenCreateDialogCounter === -1 && openCreateDialogCounter >= 0) {
-      console.log("🔧 Initializing maintenance counter without opening dialog", { openCreateDialogCounter })
       setRentalMaintenance({ lastProcessedOpenCreateDialogCounter: openCreateDialogCounter })
     }
   }, [openCreateDialogCounter, lastProcessedOpenCreateDialogCounter, setRentalMaintenance])
@@ -209,20 +207,15 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
   const fetchRentals = async () => {
     try {
       setRentalMaintenance({ rentalsLoading: true })
-      console.log("Fetching rentals...")
       
       const response = await axiosInstance.get<RentalsApiResponse>("/v1/rms/rentals")
-      console.log("Rentals API Response:", response.data)
       
       if (response.data.status) {
-        console.log("Setting rentals:", response.data.data.data)
         setRentalMaintenance({ rentals: response.data.data.data, rentalsInitialized: true })
       } else {
-        console.log("Rentals API returned error status")
         toast.error("فشل في تحميل العقارات المؤجرة")
       }
     } catch (error) {
-      console.error("Error fetching rentals:", error)
       toast.error("حدث خطأ في تحميل العقارات المؤجرة")
     } finally {
       setRentalMaintenance({ rentalsLoading: false })
@@ -233,13 +226,10 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
   const fetchRequests = async () => {
     try {
       setRentalMaintenance({ loading: true })
-      console.log("Fetching maintenance requests...")
       
       const response = await axiosInstance.get<ApiResponse>("/v1/rms/maintenance")
-      console.log("API Response:", response.data)
       
       if (response.data.status) {
-        console.log("Setting requests:", response.data.data)
         setRentalMaintenance({ requests: response.data.data, requestsInitialized: true })
         
         // Calculate stats
@@ -251,14 +241,11 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
           completed: data.filter(r => r.status === "completed").length,
           urgent: data.filter(r => r.priority === "urgent").length
         }
-        console.log("Setting stats:", newStats)
         setRentalMaintenance({ stats: newStats })
       } else {
-        console.log("API returned false status")
         toast.error("فشل في تحميل البيانات")
       }
     } catch (error) {
-      console.error("Error fetching maintenance requests:", error)
       toast.error("حدث خطأ في تحميل طلبات الصيانة")
     } finally {
       setRentalMaintenance({ loading: false })
@@ -311,12 +298,10 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
         notes: formData.notes
       }
 
-      console.log("Sending maintenance request:", requestData)
 
       const response = await axiosInstance.post("/v1/rms/maintenance", requestData)
       
       if (response.data.status) {
-        console.log("Maintenance request created:", response.data.data)
         
         // Add the new request to the state
        setRentalMaintenance({ requests: [response.data.data, ...requests] })
@@ -342,7 +327,6 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
         toast.error("فشل في إضافة طلب الصيانة")
       }
     } catch (error) {
-      console.error("Error creating maintenance request:", error)
       toast.error("حدث خطأ في إضافة طلب الصيانة")
     }
   }
@@ -516,7 +500,6 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
   }
 
   // Debug info
-  console.log("Current state:", { loading, requests: requests.length, filteredRequests: filteredRequests.length })
 
   return (
     <div className="space-y-6" dir="rtl">

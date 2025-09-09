@@ -61,7 +61,6 @@ export function WhatsappAiPage() {
         const data = res.data;
         if (data && data.status === "pending") {
           setIsPending(true);
-          console.log("Pending request found:", data);
         }
       })
       .catch(() => {});
@@ -93,7 +92,6 @@ export function WhatsappAiPage() {
         setIsSubmitting(false);
       }
     } catch {
-      console.log("Error linking WhatsApp");
       setSubmissionStatus("error");
       setIsSubmitting(false);
     }

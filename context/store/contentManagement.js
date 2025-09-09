@@ -31,8 +31,6 @@ module.exports = (set) => ({
       const response = await axiosInstance.get(
         `${process.env.NEXT_PUBLIC_Backend_URL}/content/sections`,
       );
-      console.log("response.data.data", response.data.data);
-      console.log(response.data.data.sections);
 
       // تعيين البيانات مع التحقق من وجودها
       set((state) => ({

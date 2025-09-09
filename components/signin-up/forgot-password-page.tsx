@@ -108,7 +108,6 @@ export function ForgotPasswordPage() {
         // إنشاء رابط إعادة التعيين
         const resetUrl = `app.taearif.com/reset?code=${data.code_for_testing}&identifier=${identifier}`;
         setResetUrl(resetUrl);
-        console.log("Reset URL:", resetUrl);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الاتصال بالخادم";

@@ -53,23 +53,11 @@ export default function ClientLayout({
 
   // مراقبة التغييرات في userData.message
   useEffect(() => {
-    console.log("Checking userData.message:", userData?.message);
     if (userData?.message && !showPopup) {
-      console.log("Message detected, showing popup:", userData.message);
       setShowPopup(true);
     }
   }, [userData?.message, showPopup]);
 
-  // إضافة logging للتأكد من حالة الـ popup
-  useEffect(() => {
-    if (userData?.message) {
-      console.log("Popup state:", {
-        showPopup,
-        hasMessage: !!userData?.message,
-        message: userData?.message
-      });
-    }
-  }, [showPopup, userData?.message]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -77,22 +65,6 @@ export default function ClientLayout({
   }, [fetchUserData]);
 
   useEffect(() => {
-    console.log("ClientLayout check:", {
-      isMounted,
-      IsLoading,
-      UserIslogged,
-      pathname,
-      shouldRedirect: isMounted &&
-        !IsLoading &&
-        !UserIslogged &&
-        !pathname?.startsWith("/oauth") &&
-        !pathname?.startsWith("/not-found") &&
-        !pathname?.startsWith("/forgot-password") &&
-        !pathname?.startsWith("/reset") &&
-        !pathname?.startsWith("/register") &&
-        !pathname?.startsWith("/login")
-    });
-
     if (
       isMounted &&
       !IsLoading &&
@@ -104,8 +76,6 @@ export default function ClientLayout({
       !pathname?.startsWith("/register") &&
       !pathname?.startsWith("/login")
     ) {
-      console.log("pathname:", pathname);
-      console.error("Redirecting to login");
       router.push("/login");
     }
   }, [isMounted, IsLoading, UserIslogged, pathname, router]);
@@ -132,7 +102,6 @@ export default function ClientLayout({
             if (completed == undefined) {
               router.push("/onboarding");
             } else {
-      console.warn("Redirecting to home page");
               router.push("/");
             }
           } catch (error) {
@@ -140,8 +109,6 @@ export default function ClientLayout({
           }
         }
       } else {
-        console.log("onboardingCompleted", onboardingCompleted);
-        console.log("UserIslogged", UserIslogged);
       }
     }
     fetchUser();
@@ -150,7 +117,6 @@ export default function ClientLayout({
   useEffect(() => {
     if (pathname?.startsWith("/login")) {
       if (userData && userData.email) {
-      console.log("Redirecting to home page");
       router.push("/");
       }
     }

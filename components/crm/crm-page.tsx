@@ -910,8 +910,6 @@ export default function CrmPage() {
               setFilterUrgency={setFilterUrgency}
               pipelineStages={pipelineStages}
               onSearchResults={(results) => {
-                console.log("نتائج البحث:", results);
-                // نتائج البحث يتم تحديثها تلقائياً في الـ store
               }}
             />
 

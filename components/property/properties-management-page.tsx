@@ -70,6 +70,7 @@ import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import EmptyState from "@/components/empty-state";
+import { ErrorDisplay } from "@/components/ui/error-display";
 
 // Share Dialog Component
 function ShareDialog({
@@ -538,10 +539,6 @@ export function PropertiesManagementPage() {
     }
   }, [fetchProperties, isInitialized, loading]);
 
-  useEffect(() => {
-    // Log pagination data for debugging
-    console.log("Pagination data:", pagination);
-  }, [pagination]);
 
   const renderSkeletons = () => (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -758,7 +755,11 @@ export function PropertiesManagementPage() {
             {loading ? (
               renderSkeletons()
             ) : error ? (
-              <div className="text-center text-red-500 py-10">{error}</div>
+              <ErrorDisplay 
+                error={error}
+                onRetry={() => fetchProperties(currentPage)}
+                title="خطأ في تحميل العقارات"
+              />
             ) : (
               <Tabs defaultValue="all">
                 {/* <TabsList>

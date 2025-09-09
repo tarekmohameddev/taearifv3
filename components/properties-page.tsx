@@ -662,7 +662,7 @@ function PropertyCard({
           </div>
         </div>
         <div className="flex flex-wrap gap-1 pt-2">
-          {property.features
+          {Array.isArray(property.features) && property.features
             .slice(0, 3)
             .map((feature: string, index: number) => (
               <span
@@ -672,7 +672,7 @@ function PropertyCard({
                 {feature}
               </span>
             ))}
-          {property.features.length > 3 && (
+          {Array.isArray(property.features) && property.features.length > 3 && (
             <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
               +{property.features.length - 3} more
             </span>
@@ -756,7 +756,7 @@ function PropertyListItem({
             </div>
           </div>
           <div className="mt-2 flex flex-wrap gap-1">
-            {property.features.map((feature: string, index: number) => (
+            {Array.isArray(property.features) && property.features.map((feature: string, index: number) => (
               <span
                 key={index}
                 className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"

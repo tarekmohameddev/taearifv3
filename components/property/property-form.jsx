@@ -376,10 +376,8 @@ export default function PropertyForm({ mode }) {
     const fetchSuggestedFaqs = async () => {
       try {
         const response = await axiosInstance.get("/property-faqs");
-        console.log("Suggested FAQs response:", response.data.data);
         setSuggestedFaqsList(response.data.data.suggestedFaqs || []);
       } catch (error) {
-        console.error("Error fetching suggested FAQs:", error);
       }
     };
     fetchSuggestedFaqs();
@@ -497,14 +495,9 @@ export default function PropertyForm({ mode }) {
           const galleryUrls = property.gallery ? (Array.isArray(property.gallery) ? property.gallery.filter(img => img && img !== "") : [property.gallery].filter(img => img && img !== "")) : [];
           const floorPlanUrls = property.floor_planning_image ? (Array.isArray(property.floor_planning_image) ? property.floor_planning_image.filter(img => img && img !== "") : [property.floor_planning_image].filter(img => img && img !== "")) : [];
           
-          console.log("Setting previews:", { thumbnailUrl, galleryUrls, floorPlanUrls });
-          console.log("Property featured_image:", property.featured_image);
-          console.log("Thumbnail URL type:", typeof thumbnailUrl);
-          console.log("Thumbnail URL value:", thumbnailUrl);
           
           // تأكد من أن الـ URL صحيح
           if (thumbnailUrl && !thumbnailUrl.startsWith('http')) {
-            console.error("Invalid thumbnail URL:", thumbnailUrl);
           }
           
           setPreviews({
@@ -516,7 +509,6 @@ export default function PropertyForm({ mode }) {
           toast.error(
             "حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى.",
           );
-          console.error("Error fetching property:", error);
         }
       };
       fetchProperty();
@@ -595,7 +587,6 @@ export default function PropertyForm({ mode }) {
         const response = await axiosInstance.get("/user/projects");
         setProjects(response.data.data.user_projects);
       } catch (error) {
-        console.error("Error fetching projects:", error);
         toast.error("حدث خطأ أثناء جلب المشاريع.");
       }
     };

@@ -138,31 +138,20 @@ export function RegisterPage() {
 
   // جلب رابط Google OAuth عند فتح الصفحة
   useEffect(() => {
-    console.log("🔍 useEffect triggered for Google auth URL");
     const loadGoogleAuthUrl = async () => {
-      console.log("📡 loadGoogleAuthUrl function started");
       try {
-        console.log("⏳ Setting googleUrlLoading to true");
         setGoogleUrlLoading(true);
-        console.log("🌐 Calling fetchGoogleAuthUrl from store...");
         const url = await fetchGoogleAuthUrl();
-        console.log("📥 URL received from store:", url);
         if (url) {
-          console.log("✅ Setting googleAuthUrl to:", url);
           setGoogleAuthUrl(url);
         } else {
-          console.log("❌ No URL received from store");
         }
       } catch (error) {
-        console.log("💥 Error occurred:", error);
       } finally {
-        console.log("🏁 Setting googleUrlLoading to false");
         setGoogleUrlLoading(false);
       }
     };
-    console.log("🚀 Calling loadGoogleAuthUrl function");
     loadGoogleAuthUrl();
-    console.log("✅ useEffect completed");
   }, [fetchGoogleAuthUrl]);
 
   // Handle input change
@@ -253,7 +242,6 @@ export function RegisterPage() {
           payload.referral_code = formData.referral_code;
         }
 
-        console.log("🚀 Sending registration request...");
 
         const response = await axios.post(link, payload, {
           headers: { "Content-Type": "application/json" },
@@ -277,7 +265,6 @@ export function RegisterPage() {
         if (!setAuthResponse.ok) {
           const errorData = await setAuthResponse.json().catch(() => ({}));
           const errorMsg = errorData.error || "فشل في تعيين التوكن";
-          console.error("❌ Error setting auth:", errorMsg);
           setErrors((prevErrors) => ({
             ...prevErrors,
             api: errorMsg,
@@ -286,7 +273,6 @@ export function RegisterPage() {
           return;
         }
 
-        console.log("✅ Auth token set successfully");
         if (setAuthResponse.ok) {
           await useAuthStore.getState().fetchUserData();
           useAuthStore.setState({
@@ -307,7 +293,6 @@ export function RegisterPage() {
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const errorMessage = error.response?.data?.message || error.message;
-          console.error("❌ Axios error:", errorMessage);
 
           if (errorMessage === "Invalid referral code.") {
             setErrors((prevErrors) => ({
@@ -338,7 +323,6 @@ export function RegisterPage() {
             }));
           }
         } else {
-          console.error("❌ Unexpected error:", error);
           setErrors((prevErrors) => ({
             ...prevErrors,
             general: "حدث خطأ غير متوقع. يرجى المحاولة لاحقًا.",

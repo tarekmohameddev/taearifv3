@@ -62,7 +62,6 @@ const useAuthStore = create((set, get) => ({
       if (get().userData.is_free_plan == null) {
         const ress = await axiosInstance.get("/user");
         const subscriptionDATA = ress.data.data;
-        console.log("subscriptionDATA", subscriptionDATA);
         set({
           authenticated: true,
           userData: {
@@ -99,7 +98,6 @@ const useAuthStore = create((set, get) => ({
   },
   
   clearMessage: () => {
-    console.log("Clearing message from AuthContext");
     set((state) => ({
       userData: {
         ...state.userData,
@@ -109,7 +107,6 @@ const useAuthStore = create((set, get) => ({
   },
 
   setMessage: (message) => {
-    console.log("Setting message in AuthContext:", message);
     set((state) => ({
       userData: {
         ...state.userData,

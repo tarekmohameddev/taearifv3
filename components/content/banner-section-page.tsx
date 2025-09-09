@@ -523,7 +523,6 @@ export function BannerSectionPage() {
                       id="show-cta"
                       checked={bannerData?.static?.showButton || false}
                       onCheckedChange={(checked) => {
-                        console.log(checked);
                         setBannerData((prev) => ({
                           ...prev!,
                           static: {

@@ -465,7 +465,6 @@ export default function CrmSettingsDialog({
   };
 
   const handleMoveItem = (itemId: string, direction: "up" | "down") => {
-    console.log(`نقل العنصر ${direction === "up" ? "لأعلى" : "لأسفل"}:`, itemId);
     // TODO: Implement move functionality
   };
 

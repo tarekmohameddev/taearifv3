@@ -169,13 +169,11 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
   useEffect(() => {
     // Simplified logic: if counter > last processed, open dialog
     if (openAddDialogCounter > 0 && openAddDialogCounter > lastProcessedOpenAddDialogCounter) {
-      console.log("✅ Opening Add Rental Dialog - Simple Logic", { openAddDialogCounter, lastProcessedOpenAddDialogCounter })
       setRentalApplications({ 
         isAddRentalDialogOpen: true, 
         lastProcessedOpenAddDialogCounter: openAddDialogCounter 
       })
     } else if (lastProcessedOpenAddDialogCounter === -1 && openAddDialogCounter >= 0) {
-      console.log("🔧 Initializing counter without opening dialog", { openAddDialogCounter })
       setRentalApplications({ lastProcessedOpenAddDialogCounter: openAddDialogCounter })
     }
   }, [openAddDialogCounter, lastProcessedOpenAddDialogCounter, setRentalApplications])
@@ -247,7 +245,6 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
         setRentalApplications({ error: "فشل في جلب البيانات" })
       }
     } catch (err) {
-      console.error("Error fetching rentals:", err)
       setRentalApplications({ error: "حدث خطأ أثناء جلب البيانات" })
     } finally {
       setRentalApplications({ loading: false })
@@ -348,15 +345,12 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
   const handleCreateRental = async (formData: any) => {
     try {
       setRentalApplications({ isSubmitting: true })
-      console.log("Sending form data:", formData) // للتأكد من البيانات المرسلة
       
       const response = await axiosInstance.post("/v1/rms/rentals", formData)
-      console.log("API Response:", response.data) // للتأكد من الاستجابة
       
       if (response.data.status) {
         // إضافة الإيجار الجديد للقائمة في بداية المصفوفة
         const newRental = response.data.data
-        console.log("New rental to add:", newRental) // للتأكد من البيانات الجديدة
         
         // إضافة ID من response إلى formData
         const rentalWithId = {
@@ -368,15 +362,12 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
         }
         
         const updatedRentals = [rentalWithId, ...rentals]
-        console.log("Updated rentals list:", updatedRentals) // للتأكد من القائمة المحدثة
         setRentalApplications({ rentals: updatedRentals, isAddRentalDialogOpen: false })
         // يمكن إضافة toast notification هنا
       } else {
-        console.error("API returned false status:", response.data)
         alert("فشل في إضافة الإيجار: " + (response.data.message || "خطأ غير معروف"))
       }
     } catch (err: any) {
-      console.error("Error creating rental:", err)
       alert("خطأ في إضافة الإيجار: " + (err.response?.data?.message || err.message || "خطأ غير معروف"))
       // إغلاق النافذة المنبثقة في حالة الخطأ
       setRentalApplications({ isAddRentalDialogOpen: false })
@@ -397,7 +388,6 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
         // يمكن إضافة toast notification هنا
       }
     } catch (err) {
-      console.error("Error updating rental:", err)
       // يمكن إضافة toast error هنا
       // إغلاق النافذة المنبثقة في حالة الخطأ
       setRentalApplications({ isEditRentalDialogOpen: false, editingRental: null })
@@ -416,7 +406,6 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
         setRentalApplications({ rentals: updated, isDeleteDialogOpen: false, deletingRental: null })
       }
     } catch (err) {
-      console.error("Error deleting rental:", err)
       setRentalApplications({ isDeleteDialogOpen: false, deletingRental: null })
     } finally {
       setRentalApplications({ isDeleting: false })
@@ -1090,18 +1079,12 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
           axiosInstance.get("/properties"),
         ])
         
-        console.log("Projects response:", projectsRes.data)
-        console.log("Properties response:", propertiesRes.data)
-        console.log("Projects array:", projectsRes.data?.data?.projects)
-        console.log("Properties array:", propertiesRes.data?.data?.properties)
-        
         // معالجة بيانات المشاريع - البيانات في data.projects
         if (projectsRes.data?.data?.projects && Array.isArray(projectsRes.data.data.projects)) {
           setProjects(projectsRes.data.data.projects)
         } else if (projectsRes.data?.projects && Array.isArray(projectsRes.data.projects)) {
           setProjects(projectsRes.data.projects)
         } else {
-          console.warn("Projects data is not an array:", projectsRes.data)
           setProjects([])
         }
         
@@ -1111,11 +1094,9 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
         } else if (propertiesRes.data?.properties && Array.isArray(propertiesRes.data.properties)) {
           setProperties(propertiesRes.data.properties)
         } else {
-          console.warn("Properties data is not an array:", propertiesRes.data)
           setProperties([])
         }
       } catch (error) {
-        console.error("Error fetching data:", error)
         setErrors({ general: "حدث خطأ في جلب البيانات" })
         setProjects([])
         setProperties([])
@@ -1170,7 +1151,6 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
       deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
     }
     
-    console.log("Processed form data:", processedFormData)
     onSubmit(processedFormData)
   }
 
@@ -1562,18 +1542,12 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
           axiosInstance.get("/properties"),
         ])
         
-        console.log("Edit Form - Projects response:", projectsRes.data)
-        console.log("Edit Form - Properties response:", propertiesRes.data)
-        console.log("Edit Form - Projects array:", projectsRes.data?.data?.projects)
-        console.log("Edit Form - Properties array:", propertiesRes.data?.data?.properties)
-        
         // معالجة بيانات المشاريع - البيانات في data.projects
         if (projectsRes.data?.data?.projects && Array.isArray(projectsRes.data.data.projects)) {
           setProjects(projectsRes.data.data.projects)
         } else if (projectsRes.data?.projects && Array.isArray(projectsRes.data.projects)) {
           setProjects(projectsRes.data.projects)
         } else {
-          console.warn("Edit Form - Projects data is not an array:", projectsRes.data)
           setProjects([])
         }
         
@@ -1583,11 +1557,9 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
         } else if (propertiesRes.data?.properties && Array.isArray(propertiesRes.data.properties)) {
           setProperties(propertiesRes.data.properties)
         } else {
-          console.warn("Edit Form - Properties data is not an array:", propertiesRes.data)
           setProperties([])
         }
       } catch (error) {
-        console.error("Error fetching data:", error)
         setErrors({ general: "حدث خطأ في جلب البيانات" })
         setProjects([])
         setProperties([])
@@ -1642,7 +1614,6 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
       deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
     }
     
-    console.log("Processed form data:", processedFormData)
     onSubmit(processedFormData)
   }
 

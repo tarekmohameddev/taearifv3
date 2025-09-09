@@ -23,31 +23,26 @@ export default function InfoPopup({ message, isVisible, onClose }: InfoPopupProp
 
   useEffect(() => {
     if (isVisible && message) {
-      console.log("InfoPopup showing with message:", message);
       setIsAnimating(true)
     }
   }, [isVisible, message])
 
   const handleClose = async () => {
-    console.log("Closing popup and sending API");
     setIsAnimating(false)
     setIsLoading(true)
     
     try {
       // إرسال API لإعلام الخادم أن الرسالة تم قراءتها
-      console.log("Sending user-read-message API...");
       const response = await axiosInstance.post("/user-read-message", {}, {
         headers: {
           'Content-Type': 'application/json',
         }
       });
-      console.log("Message read API sent successfully:", response.data);
     } catch (error) {
       console.error("Error sending message read API:", error);
       // حتى لو فشل الـ API، نستمر في إغلاق الـ popup
     } finally {
       // مسح الرسالة من الـ context
-      console.log("Clearing message from context");
       clearMessage();
       setIsLoading(false);
       

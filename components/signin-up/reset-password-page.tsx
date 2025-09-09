@@ -31,17 +31,12 @@ export function ResetPasswordPage() {
       const code = urlParams.get("code");
       const identifierParam = urlParams.get("identifier");
       
-      console.log("Reset URL params:", { code, identifierParam });
-      console.log("Current pathname:", window.location.pathname);
-      console.log("Current search:", window.location.search);
       
       if (code && identifierParam) {
         setResetCode(code);
         setIdentifier(identifierParam);
-        console.log("Reset parameters set successfully");
       } else {
         // إذا لم تكن البيانات موجودة، توجيه إلى صفحة نسيان كلمة المرور
-        console.log("Missing reset parameters, redirecting to forgot-password");
         setTimeout(() => {
           router.push("/forgot-password");
         }, 1000);

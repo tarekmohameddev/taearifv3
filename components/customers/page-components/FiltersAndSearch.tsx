@@ -108,11 +108,9 @@ export const FiltersAndSearch = ({
       let response;
       // If there are any active filters or a search term, use the search endpoint.
       if (params.toString()) {
-        console.log('Searching with params:', `/customers/search?${params.toString()}`);
         response = await axiosInstance.get('/customers/search', { params });
       } else {
         // Otherwise, fetch all customers.
-        console.log('Fetching all customers');
         response = await axiosInstance.get("/customers");
       }
       

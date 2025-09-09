@@ -57,7 +57,6 @@ export function MapSection({ onLocationUpdate }) {
           if (event.latLng) {
             const lat = event.latLng.lat();
             const lng = event.latLng.lng();
-            console.log("Map clicked:", lat, lng); // للتتبع
             updateLocation(lat, lng, mapInstance);
           }
         });
@@ -100,11 +99,9 @@ export function MapSection({ onLocationUpdate }) {
   }, []); // إزالة onLocationUpdate من dependencies
 
   const updateLocation = (lat, lng, mapInstance) => {
-    console.log("updateLocation called:", lat, lng); // للتتبع
 
     // إزالة العلامة القديمة إذا كانت موجودة
     if (markerRef.current) {
-      console.log("Removing old marker"); // للتتبع
       markerRef.current.setMap(null);
       markerRef.current = null;
     }
@@ -118,14 +115,12 @@ export function MapSection({ onLocationUpdate }) {
       animation: window.google.maps.Animation.DROP,
     });
 
-    console.log("New marker created:", newMarker); // للتتبع
 
     // إضافة مستمع للسحب
     newMarker.addListener("dragend", (event) => {
       if (event.latLng) {
         const newLat = event.latLng.lat();
         const newLng = event.latLng.lng();
-        console.log("Marker dragged to:", newLat, newLng); // للتتبع
         reverseGeocode(newLat, newLng);
       }
     });
@@ -139,11 +134,9 @@ export function MapSection({ onLocationUpdate }) {
   };
 
   const reverseGeocode = (lat, lng) => {
-    console.log("reverseGeocode called:", lat, lng); // للتتبع
 
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-      console.log("Geocoding result:", status, results); // للتتبع
 
       if (status === "OK" && results && results[0]) {
         const address = results[0].formatted_address;
@@ -155,14 +148,12 @@ export function MapSection({ onLocationUpdate }) {
   };
 
   const getCurrentLocation = () => {
-    console.log("getCurrentLocation called"); // للتتبع
 
     if (navigator.geolocation && map) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          console.log("Current location:", lat, lng); // للتتبع
 
           updateLocation(lat, lng, map);
           map.setCenter({ lat, lng });

@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import { getErrorInfo, retryWithBackoff, logError, formatErrorMessage } from "@/utils/errorHandler";
 
 module.exports = (set) => ({
   propertiesManagement: {
@@ -32,9 +33,12 @@ module.exports = (set) => ({
     }));
 
     try {
-      const response = await axiosInstance.get(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/properties?page=${page}`,
-      );
+      // استخدام نظام إعادة المحاولة مع معالجة الأخطاء المحسنة
+      const response = await retryWithBackoff(async () => {
+        return await axiosInstance.get(
+          `${process.env.NEXT_PUBLIC_Backend_URL}/properties?page=${page}`,
+        );
+      }, 3, 1000);
 
       const propertiesList = response.data.data.properties || [];
       const pagination = response.data.data.pagination || null;
@@ -50,23 +54,29 @@ module.exports = (set) => ({
             : "للإيجار",
         status: property.status === 1 ? "منشور" : "مسودة",
         lastUpdated: new Date(property.updated_at).toLocaleDateString("ar-AE"),
+        // التأكد من أن features مصفوفة
+        features: Array.isArray(property.features) ? property.features : [],
       }));
 
       set((state) => ({
         propertiesManagement: {
           ...state.propertiesManagement,
           properties: mappedProperties,
-          pagination: pagination, // إضافة بيانات الـ pagination
-          propertiesAllData: propertiesAllData, // إضافة بيانات الـ propertiesAllData
+          pagination: pagination,
+          propertiesAllData: propertiesAllData,
           loading: false,
           isInitialized: true,
         },
       }));
     } catch (error) {
+      // تسجيل الخطأ مع السياق
+      const errorInfo = logError(error, 'fetchProperties');
+      
+      // تحديث الحالة مع رسالة خطأ مناسبة للمستخدم
       set((state) => ({
         propertiesManagement: {
           ...state.propertiesManagement,
-          error: error.message || "حدث خطأ أثناء جلب بيانات العقارات",
+          error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات العقارات"),
           loading: false,
           isInitialized: true,
         },

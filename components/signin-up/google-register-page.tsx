@@ -203,7 +203,6 @@ export function GoogleRegisterPage() {
           payload.referral_code = formData.referral_code;
         }
 
-        console.log("🚀 Sending Google registration request...");
 
         const response = await axios.post(link, payload, {
           headers: { "Content-Type": "application/json" },
@@ -213,7 +212,6 @@ export function GoogleRegisterPage() {
           throw new Error(response.data.message || "فشل إكمال التسجيل");
         }
 
-        console.log("✅ Google registration response:", response.data);
 
         const { user, token: UserToken } = response.data;
 
@@ -237,7 +235,6 @@ export function GoogleRegisterPage() {
           return;
         }
 
-        console.log("✅ Auth token set successfully");
         if (setAuthResponse.ok) {
           await useAuthStore.getState().fetchUserData();
           useAuthStore.setState({
