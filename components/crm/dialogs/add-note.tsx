@@ -40,7 +40,7 @@ export default function AddNoteDialog() {
         id: Date.now(),
         content: noteContent.trim(),
         author: "المستخدم الحالي", // يمكن استبداله بالمستخدم الحالي
-        date: new Date().toLocaleDateString("ar-SA"),
+        date: new Date().toLocaleDateString("ar-US"),
         timestamp: new Date().toISOString(),
       };
 

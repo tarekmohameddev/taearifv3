@@ -155,7 +155,7 @@ export default function AppointmentsList({
                           <Clock className="h-3 w-3" />
                           {appointment.datetime
                             ? new Date(appointment.datetime).toLocaleTimeString(
-                                "ar-SA",
+                                "ar-US",
                                 { hour: "2-digit", minute: "2-digit" },
                               )
                             : appointment.time}

@@ -102,7 +102,7 @@ function OngoingRentalsDialog() {
     if (!dateString) return 'غير محدد'
     try {
       const date = new Date(dateString)
-      return date.toLocaleDateString('ar-SA', {
+      return date.toLocaleDateString('ar-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -115,7 +115,7 @@ function OngoingRentalsDialog() {
   const formatCurrency = (amount: string | null, currency: string = 'SAR') => {
     if (!amount) return 'غير محدد'
     try {
-      return new Intl.NumberFormat('ar-SA', {
+      return new Intl.NumberFormat('ar-US', {
         style: 'currency',
         currency: currency
       }).format(parseFloat(amount))
@@ -261,7 +261,7 @@ function ExpiringContractsDialog() {
     if (!dateString) return 'غير محدد'
     try {
       const date = new Date(dateString)
-      return date.toLocaleDateString('ar-SA', {
+      return date.toLocaleDateString('ar-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -396,7 +396,7 @@ function PaymentsDueDialog() {
   const formatCurrency = (amount: number | string, currency: string = 'SAR') => {
     try {
       const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount
-      return new Intl.NumberFormat('ar-SA', {
+      return new Intl.NumberFormat('ar-US', {
         style: 'currency',
         currency: currency
       }).format(numAmount)
@@ -409,7 +409,7 @@ function PaymentsDueDialog() {
     if (!dateString) return 'غير محدد'
     try {
       const date = new Date(dateString)
-      return date.toLocaleDateString('ar-SA', {
+      return date.toLocaleDateString('ar-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -581,7 +581,7 @@ function PaymentsOverdueDialog() {
   const formatCurrency = (amount: string | null, currency: string = 'SAR') => {
     if (!amount) return 'غير محدد'
     try {
-      return new Intl.NumberFormat('ar-SA', {
+      return new Intl.NumberFormat('ar-US', {
         style: 'currency',
         currency: currency
       }).format(parseFloat(amount))
@@ -594,7 +594,7 @@ function PaymentsOverdueDialog() {
     if (!dateString) return 'غير محدد'
     try {
       const date = new Date(dateString)
-      return date.toLocaleDateString('ar-SA', {
+      return date.toLocaleDateString('ar-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -723,7 +723,7 @@ function MaintenanceOpenDialog() {
     if (!dateString) return 'غير محدد'
     try {
       const date = new Date(dateString)
-      return date.toLocaleDateString('ar-SA', {
+      return date.toLocaleDateString('ar-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -739,7 +739,7 @@ function MaintenanceOpenDialog() {
     try {
       const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount
       if (isNaN(numAmount)) return 'مبلغ غير صحيح'
-      return new Intl.NumberFormat('ar-SA', {
+      return new Intl.NumberFormat('ar-US', {
         style: 'currency',
         currency: 'SAR'
       }).format(numAmount)
@@ -885,7 +885,7 @@ function MaintenanceInProgressDialog() {
     if (!dateString) return 'غير محدد'
     try {
       const date = new Date(dateString)
-      return date.toLocaleDateString('ar-SA', {
+      return date.toLocaleDateString('ar-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -901,7 +901,7 @@ function MaintenanceInProgressDialog() {
     try {
       const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount
       if (isNaN(numAmount)) return 'مبلغ غير صحيح'
-      return new Intl.NumberFormat('ar-SA', {
+      return new Intl.NumberFormat('ar-US', {
         style: 'currency',
         currency: 'SAR'
       }).format(numAmount)
@@ -1089,7 +1089,7 @@ export function RentalDashboardStats() {
 
   const formatCurrency = (amount: number, currency: string = 'SAR') => {
     try {
-      return new Intl.NumberFormat('ar-SA', {
+      return new Intl.NumberFormat('ar-US', {
         style: 'currency',
         currency: currency
       }).format(amount)

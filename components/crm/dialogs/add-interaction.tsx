@@ -82,7 +82,7 @@ export default function AddInteractionDialog() {
         notes: interactionData.notes.trim(),
         duration: interactionData.duration || "غير محدد",
         agent: interactionData.agent || "المستخدم الحالي",
-        date: new Date().toLocaleDateString("ar-SA"),
+        date: new Date().toLocaleDateString("ar-US"),
         timestamp: new Date().toISOString(),
       };
 

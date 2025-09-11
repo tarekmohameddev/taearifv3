@@ -49,7 +49,7 @@ export const PropertyRequestDetailDialog = ({
                   <div className="text-xl">{selectedPropertyRequest.full_name}</div>
                   <div className="text-sm text-muted-foreground font-normal">
                     طلب عقار • منذ{" "}
-                    {new Date(selectedPropertyRequest.created_at).toLocaleDateString('ar-SA')}
+                    {new Date(selectedPropertyRequest.created_at).toLocaleDateString('ar-US')}
                   </div>
                 </div>
                 <div className="mr-auto flex items-center gap-2">

@@ -679,7 +679,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       {formatDate(rental.move_in_date)}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {new Date(rental.created_at).toLocaleDateString('ar-SA')}
+                      {new Date(rental.created_at).toLocaleDateString('ar-US')}
                     </div>
                   </td>
 

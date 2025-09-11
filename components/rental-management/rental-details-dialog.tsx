@@ -126,7 +126,7 @@ export function RentalDetailsDialog({ isOpen, onClose, rentalId }: RentalDetails
   }
 
   const formatCurrency = (amount: number, currency: string = "SAR") => {
-    return new Intl.NumberFormat('ar-SA', {
+    return new Intl.NumberFormat('ar-US', {
       style: 'currency',
       currency: currency,
       minimumFractionDigits: 0,
@@ -134,7 +134,7 @@ export function RentalDetailsDialog({ isOpen, onClose, rentalId }: RentalDetails
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
+    return new Date(dateString).toLocaleDateString('ar-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'

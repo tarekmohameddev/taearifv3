@@ -159,7 +159,7 @@ export default function RemindersList({
         timeZone: "Asia/Riyadh",
       });
 
-      const formattedTime = date.toLocaleTimeString("en-US", {
+      const formattedTime = date.toLocaleTimeString("ar-US", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,

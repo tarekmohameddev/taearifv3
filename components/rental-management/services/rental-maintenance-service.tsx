@@ -826,7 +826,7 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
             </span>
           </div>
           <div className="text-xs text-gray-600">
-            آخر تحديث: {new Date().toLocaleTimeString('ar-SA')}
+            آخر تحديث: {new Date().toLocaleTimeString('ar-US')}
           </div>
         </div>
       )}
