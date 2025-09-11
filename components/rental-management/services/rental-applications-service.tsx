@@ -66,6 +66,7 @@ import {
 import axiosInstance from "@/lib/axiosInstance"
 import useStore from "@/context/Store"
 import { RentalDetailsDialog } from "../rental-details-dialog"
+import { UpdatedAddRentalForm } from "./updated-rental-form"
 
 interface Property {
   id: number
@@ -468,7 +469,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
               <DialogTitle className="text-right" dir="rtl">إضافة عقد إيجار جديد</DialogTitle>
               <DialogDescription className="text-right" dir="rtl">أدخل تفاصيل طلب الإيجار الجديد</DialogDescription>
             </DialogHeader>
-            <AddRentalForm 
+            <UpdatedAddRentalForm 
               onSubmit={handleCreateRental}
               onCancel={() => setRentalApplications({ isAddRentalDialogOpen: false })}
               isSubmitting={isSubmitting}
@@ -1045,20 +1046,26 @@ interface AddRentalFormProps {
 function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps) {
   const [formData, setFormData] = useState({
     tenant_full_name: "",
+    contract_number: "",
     tenant_phone: "",
     tenant_email: "",
     tenant_job_title: "",
     tenant_social_status: "single",
     tenant_national_id: "",
+    office_commission_type: "percentage",
+    office_commission_value: "",
+    property_number: "",
     property_id: "",
     project_id: "",
     unit_label: "",
     move_in_date: "",
-    rental_period_months: 12,
+    rental_period: 12,
     paying_plan: "monthly",
     base_rent_amount: "",
     currency: "SAR",
     deposit_amount: "",
+    platform_fee: "",
+    water_fee: "",
     notes: ""
   })
 
@@ -1146,7 +1153,7 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
       ...formData,
       property_id: formData.property_id ? parseInt(formData.property_id) : null,
       project_id: formData.project_id ? parseInt(formData.project_id) : null,
-      rental_period_months: Number(formData.rental_period_months) || 12,
+      rental_period: Number(formData.rental_period) || 12,
       base_rent_amount: formData.base_rent_amount ? parseFloat(formData.base_rent_amount) : 0,
       deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
     }
@@ -1402,8 +1409,8 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
               <Input 
                 id="rental_period_months"
                 type="number"
-                value={formData.rental_period_months}
-                onChange={(e) => setFormData(prev => ({ ...prev, rental_period_months: parseInt(e.target.value) }))}
+                value={formData.rental_period}
+                onChange={(e) => setFormData(prev => ({ ...prev, rental_period: parseInt(e.target.value) }))}
                 min="1"
                 className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
               />
@@ -1517,7 +1524,7 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
     project_id: "",
     unit_label: rental.unit_label || "",
     move_in_date: rental.move_in_date ? rental.move_in_date.split('T')[0] : "",
-    rental_period_months: rental.rental_period_months || 12,
+    rental_period: rental.rental_period_months || 12,
     paying_plan: rental.paying_plan || "monthly",
     base_rent_amount: rental.base_rent_amount || "",
     currency: rental.currency || "SAR",
@@ -1609,7 +1616,7 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
       ...formData,
       property_id: formData.property_id ? parseInt(formData.property_id) : null,
       project_id: formData.project_id ? parseInt(formData.project_id) : null,
-      rental_period_months: Number(formData.rental_period_months) || 12,
+      rental_period: Number(formData.rental_period) || 12,
       base_rent_amount: formData.base_rent_amount ? parseFloat(formData.base_rent_amount) : 0,
       deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
     }
@@ -1865,8 +1872,8 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
             <Input 
               id="edit_rental_period_months"
               type="number"
-              value={formData.rental_period_months}
-              onChange={(e) => setFormData(prev => ({ ...prev, rental_period_months: parseInt(e.target.value) }))}
+              value={formData.rental_period}
+              onChange={(e) => setFormData(prev => ({ ...prev, rental_period: parseInt(e.target.value) }))}
               min="1"
               
             />
