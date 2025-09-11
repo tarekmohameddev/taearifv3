@@ -6,6 +6,7 @@ import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
 import { RentalApplicationsService } from "@/components/rental-management/services/rental-applications-service"
 import { RentalAgreementsService } from "@/components/rental-management/services/rental-agreements-service"
 import { RentalPaymentsService } from "@/components/rental-management/services/rental-payments-service"
+import { RentalDashboardStats } from "@/components/rental-management/dashboard-stats"
 // import { RentalMaintenanceService } from "@/components/rental-management/services/rental-maintenance-service"
 // import { RentalOverviewService } from "@/components/rental-management/services/rental-overview-service"
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -69,6 +70,10 @@ export function RentalManagementDashboard() {
               <p className="text-muted-foreground">نظام شامل لإدارة الإيجارات العقارية في المملكة العربية السعودية</p>
             </div>
 
+            {/* إحصائيات لوحة المعلومات */}
+            <div className="space-y-6">
+              <RentalDashboardStats />
+            </div>
 
             {/* طلبات الإيجار */}
             <div className="space-y-6">

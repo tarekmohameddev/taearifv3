@@ -506,7 +506,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -566,7 +566,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Modern Rentals Table */}
       <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden" dir="rtl">
