@@ -90,6 +90,9 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
     unit_label: "",
     move_in_date: "",
     rental_period: 12,
+    rental_period_type: "",
+    rental_period_multiplier: 1,
+    rental_period_value: 0,
     paying_plan: "monthly",
     base_rent_amount: "",
     currency: "SAR",
@@ -513,19 +516,51 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
             </div>
 
             {/* مدة الإيجار - تحت خطة الدفع */}
-            <div className="space-y-2">
-              <Label htmlFor="rental_period" className="text-sm font-medium text-gray-700">مدة الإيجار</Label>
-              <Select value={formData.rental_period.toString()} onValueChange={(value) => setFormData(prev => ({ ...prev, rental_period: parseInt(value) }))}>
-                <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">بالشهر</SelectItem>
-                  <SelectItem value="3">بالربع سنوي</SelectItem>
-                  <SelectItem value="6">بالنصف سنوي</SelectItem>
-                  <SelectItem value="12">سنوي</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="space-y-3">
+            
+              <Label htmlFor="rental_period" className="text-sm font-medium text-gray-700">
+                مدة الإيجار ({formData.paying_plan === 'monthly' ? 'بالشهور' : 
+                  formData.paying_plan === 'quarterly' ? 'بالأرباع' :
+                  formData.paying_plan === 'semi_annual' ? 'بالنصف سنوي' : 
+                  formData.paying_plan === 'annual' ? 'بالسنوات' : 'بالشهور'})
+              </Label>
+              <Input 
+                id="rental_period"
+                type="number"
+                value={formData.rental_period}
+                onChange={(e) => setFormData(prev => ({ ...prev, rental_period: parseInt(e.target.value) }))}
+                min="1"
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+                      {formData.rental_period && !isNaN(formData.rental_period) && formData.rental_period > 0 && (
+              <div className="text-sm bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 rounded-lg border border-gray-200 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="font-semibold text-gray-800">
+                      {formData.rental_period} {formData.paying_plan === 'monthly' ? 'شهر' : 
+                        formData.paying_plan === 'quarterly' ? 'ربع' :
+                        formData.paying_plan === 'semi_annual' ? 'نصف سنوي' : 
+                        formData.paying_plan === 'annual' ? 'سنة' : 'شهر'}
+                    </span>
+                    <span className="text-gray-500 text-xs">
+                      ({formData.paying_plan === 'monthly' ? 'شهري' : 
+                        formData.paying_plan === 'quarterly' ? 'ربع سنوي' :
+                        formData.paying_plan === 'semi_annual' ? 'نصف سنوي' : 
+                        formData.paying_plan === 'annual' ? 'سنوي' : 'شهري'})
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-600 bg-white px-2 py-1 rounded-md border">
+                    <span className="font-medium">
+                      {formData.paying_plan === 'monthly' ? formData.rental_period :
+                        formData.paying_plan === 'quarterly' ? formData.rental_period * 3 :
+                        formData.paying_plan === 'semi_annual' ? formData.rental_period * 6 :
+                        formData.paying_plan === 'annual' ? formData.rental_period * 12 : formData.rental_period} شهر إجمالي
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
             </div>
 
             <div className="space-y-2">
@@ -551,7 +586,9 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
                 className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
               />
             </div>
-          </div>
+    
+            </div>
+    
         </div>
 
         {/* قسم العمولة والرسوم */}
