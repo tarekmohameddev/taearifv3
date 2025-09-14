@@ -6,6 +6,45 @@
 import React, { useState, useRef, useEffect } from "react";
 import { uploadSingleFile } from "@/utils/uploadSingle";
 import { uploadMultipleFiles } from "@/utils/uploadMultiple";
+
+// دالة رفع الفيديوهات
+const uploadVideos = async (files: File[]) => {
+  const uploadedFiles = [];
+
+  for (let file of files) {
+    const formData = new FormData();
+    formData.append("context", "project"); // إضافة النص
+    formData.append("video", file); // إضافة الملف
+
+    try {
+      console.log("Uploading video:", file.name, "Size:", file.size);
+      const response = await axiosInstance.post("/video/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("Video upload response:", response.data);
+
+      // التحقق من بنية الاستجابة الصحيحة
+      if (
+        response.data &&
+        response.data.status === "success" &&
+        response.data.data
+      ) {
+        // إضافة البيانات مباشرة من response.data.data
+        uploadedFiles.push(response.data.data);
+      } else {
+        console.error("Unexpected response structure:", response.data);
+        throw new Error("Unexpected response structure from video upload API");
+      }
+    } catch (error: any) {
+      console.error("Video upload error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      throw error;
+    }
+  }
+
+  return uploadedFiles;
+};
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -15,6 +54,7 @@ import {
   Plus,
   ImageIcon,
   MapPin,
+  Video,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -83,6 +123,7 @@ export default function AddProjectPage(): JSX.Element {
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const plansInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const videosInputRef = useRef<HTMLInputElement>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const {
     homepage: { setupProgressData, fetchSetupProgressData },
@@ -106,10 +147,12 @@ export default function AddProjectPage(): JSX.Element {
   });
 
   const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(
-    null,
+    null
   );
   const [planImages, setPlanImages] = useState<ProjectImage[]>([]);
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
+  const [video, setVideo] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [mapLoaded, setMapLoaded] = useState<boolean>(false);
   const {
@@ -146,7 +189,7 @@ export default function AddProjectPage(): JSX.Element {
       projects.length >= useAuthStore.getState().userData?.project_limit_number
     ) {
       toast.error(
-        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.project_limit_number} مشروع`,
+        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.project_limit_number} مشروع`
       );
       hasReachedLimit =
         projects.length >=
@@ -160,7 +203,7 @@ export default function AddProjectPage(): JSX.Element {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
     if (id === "amenities") {
@@ -305,6 +348,46 @@ export default function AddProjectPage(): JSX.Element {
     setGalleryImages((prev) => prev.filter((image) => image.id !== id));
   };
 
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    if (!file.type.startsWith("video/")) {
+      toast.error("يجب أن يكون الفيديو بصيغة MP4 أو MOV أو AVI فقط");
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("يجب أن يكون حجم الملف أقل من 50 ميجابايت");
+      return;
+    }
+
+    // التحقق من طول الفيديو
+    const video = document.createElement("video");
+    video.preload = "metadata";
+
+    video.onloadedmetadata = () => {
+      window.URL.revokeObjectURL(video.src);
+      const duration = video.duration;
+
+      if (duration > 300) {
+        // 5 دقائق = 300 ثانية
+        toast.error("يجب أن يكون طول الفيديو أقل من 5 دقائق");
+        return;
+      }
+
+      setVideo(file);
+      setVideoPreview(URL.createObjectURL(file));
+    };
+
+    video.src = URL.createObjectURL(file);
+  };
+
+  const removeVideo = () => {
+    setVideo(null);
+    setVideoPreview(null);
+  };
+
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
     if (!newProject.name.trim()) {
@@ -360,7 +443,7 @@ export default function AddProjectPage(): JSX.Element {
   };
 
   const handleSaveProject = async (
-    status_publish: "منشور" | "مسودة" | "Pre-construction",
+    status_publish: "منشور" | "مسودة" | "Pre-construction"
   ) => {
     if (!validateForm()) {
       toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
@@ -399,7 +482,7 @@ export default function AddProjectPage(): JSX.Element {
       if (thumbnailImage) {
         const uploadResult = await uploadSingleFile(
           thumbnailImage.file,
-          "project",
+          "project"
         );
         featuredImagePath = uploadResult.path;
       }
@@ -428,6 +511,19 @@ export default function AddProjectPage(): JSX.Element {
         }
       }
 
+      let videoPath = "";
+      if (video) {
+        try {
+          const uploadedFiles = await uploadVideos([video]);
+          videoPath = uploadedFiles[0].url;
+          toast.success("تم رفع الفيديو بنجاح");
+        } catch (error) {
+          console.error("Failed to upload video:", error);
+          toast.error("فشل في رفع الفيديو. يرجى المحاولة مرة أخرى.");
+          throw error;
+        }
+      }
+
       let minPrice = 0;
       let maxPrice = 0;
       if (convertedPrice.includes("-")) {
@@ -449,7 +545,7 @@ export default function AddProjectPage(): JSX.Element {
       let formattedDate = "";
       if (newProject.completionDate) {
         const convertedDateStr = convertArabicToEnglishNumbers(
-          newProject.completionDate,
+          newProject.completionDate
         );
 
         if (isValidDate(convertedDateStr)) {
@@ -498,6 +594,7 @@ export default function AddProjectPage(): JSX.Element {
         ],
         gallery_images: galleryPaths,
         floorplan_images: floorplanPaths,
+        video_url: videoPath,
         specifications: [
           { key: "Bedrooms", label: "Number of Bedrooms", value: "3" },
           { key: "Bathrooms", label: "Number of Bathrooms", value: "2" },
@@ -528,7 +625,7 @@ export default function AddProjectPage(): JSX.Element {
 
       const response = await axiosInstance.post(
         `${process.env.NEXT_PUBLIC_Backend_URL}/projects`,
-        projectData,
+        projectData
       );
 
       const currentState = useStore.getState();
@@ -1121,6 +1218,75 @@ export default function AddProjectPage(): JSX.Element {
                       {formErrors.galleryImages}
                     </p>
                   )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Project Video Upload */}
+            <Card>
+              <CardHeader>
+                <CardTitle>فيديو المشروع</CardTitle>
+                <CardDescription>
+                  قم بتحميل فيديو واحد لعرض تفاصيل المشروع
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex flex-col md:flex-row items-center gap-6">
+                    <div className="border rounded-md p-2 flex-1 w-full">
+                      <div
+                        className="flex items-center justify-center bg-muted rounded-md relative"
+                        style={{
+                          height: "500px",
+                          maxWidth: "100%",
+                        }}
+                      >
+                        {videoPreview ? (
+                          <>
+                            <video
+                              src={videoPreview}
+                              className="max-h-full max-w-full object-contain rounded-md"
+                              controls
+                              style={{ width: "auto", height: "auto" }}
+                            />
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-2 right-2 h-8 w-8"
+                              onClick={removeVideo}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </>
+                        ) : (
+                          <Video className="h-12 w-12 text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-4 w-full md:w-1/3">
+                      <input
+                        ref={videosInputRef}
+                        type="file"
+                        accept="video/*"
+                        className="hidden"
+                        onChange={handleVideoUpload}
+                      />
+                      <Button
+                        variant="outline"
+                        className="h-12 w-full"
+                        onClick={() => videosInputRef.current?.click()}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Upload className="h-5 w-5" />
+                          <span>رفع فيديو</span>
+                        </div>
+                      </Button>
+                      <p className="text-sm text-muted-foreground">
+                        يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى
+                        لحجم الملف هو 50 ميجابايت والحد الأقصى للطول هو 5 دقائق.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

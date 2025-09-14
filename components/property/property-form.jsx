@@ -44,6 +44,45 @@ import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
 import { uploadMultipleFiles } from "@/utils/uploadMultiple";
+
+// دالة رفع الفيديوهات
+const uploadVideos = async (files) => {
+  const uploadedFiles = [];
+
+  for (let file of files) {
+    const formData = new FormData();
+    formData.append("context", "property"); // إضافة النص
+    formData.append("video", file); // إضافة الملف
+
+    try {
+      console.log("Uploading video:", file.name, "Size:", file.size);
+      const response = await axiosInstance.post("/video/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("Video upload response:", response.data);
+
+      // التحقق من بنية الاستجابة الصحيحة
+      if (
+        response.data &&
+        response.data.status === "success" &&
+        response.data.data
+      ) {
+        // إضافة البيانات مباشرة من response.data.data
+        uploadedFiles.push(response.data.data);
+      } else {
+        console.error("Unexpected response structure:", response.data);
+        throw new Error("Unexpected response structure from video upload API");
+      }
+    } catch (error) {
+      console.error("Video upload error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      throw error;
+    }
+  }
+
+  return uploadedFiles;
+};
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
 import CitySelector from "@/components/CitySelector";
@@ -155,6 +194,8 @@ export default function PropertyForm({ mode }) {
     gallery: [],
     floorPlans: [],
   });
+  const [videos, setVideos] = useState([]);
+  const [videoPreviews, setVideoPreviews] = useState([]);
 
   const [uploading, setUploading] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -165,6 +206,7 @@ export default function PropertyForm({ mode }) {
   const thumbnailInputRef = useRef(null);
   const galleryInputRef = useRef(null);
   const floorPlansInputRef = useRef(null);
+  const videosInputRef = useRef(null);
   const searchInputRef = useRef(null);
   const mapRef = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -227,7 +269,7 @@ export default function PropertyForm({ mode }) {
       (error) => {
         console.error("Error getting location:", error);
         toast.error("غير قادر على الحصول على موقعك الحالي");
-      },
+      }
     );
   };
 
@@ -276,7 +318,7 @@ export default function PropertyForm({ mode }) {
         // Initialize search box if search input exists
         if (searchInputRef.current) {
           const searchBoxInstance = new google.maps.places.SearchBox(
-            searchInputRef.current,
+            searchInputRef.current
           );
           setSearchBox(searchBoxInstance);
 
@@ -377,8 +419,7 @@ export default function PropertyForm({ mode }) {
       try {
         const response = await axiosInstance.get("/property-faqs");
         setSuggestedFaqsList(response.data.data.suggestedFaqs || []);
-      } catch (error) {
-      }
+      } catch (error) {}
     };
     fetchSuggestedFaqs();
   }, []);
@@ -395,7 +436,7 @@ export default function PropertyForm({ mode }) {
           setProjects(projects);
 
           const matchedProject = projects.find(
-            (p) => p.id === property.project_id,
+            (p) => p.id === property.project_id
           );
 
           // معالجة الميزات
@@ -417,7 +458,7 @@ export default function PropertyForm({ mode }) {
                 question: faq.question,
                 answer: faq.answer,
                 displayOnPage: faq.displayOnPage,
-              })),
+              }))
             );
           }
           // تحديد قيم transaction_type و PropertyType بناءً على البيانات المُستلمة
@@ -491,15 +532,27 @@ export default function PropertyForm({ mode }) {
           });
 
           // تعيين الصور الموجودة مسبقاً للعرض
-          const thumbnailUrl = property.featured_image && property.featured_image !== "" ? property.featured_image : null;
-          const galleryUrls = property.gallery ? (Array.isArray(property.gallery) ? property.gallery.filter(img => img && img !== "") : [property.gallery].filter(img => img && img !== "")) : [];
-          const floorPlanUrls = property.floor_planning_image ? (Array.isArray(property.floor_planning_image) ? property.floor_planning_image.filter(img => img && img !== "") : [property.floor_planning_image].filter(img => img && img !== "")) : [];
-          
-          
+          const thumbnailUrl =
+            property.featured_image && property.featured_image !== ""
+              ? property.featured_image
+              : null;
+          const galleryUrls = property.gallery
+            ? Array.isArray(property.gallery)
+              ? property.gallery.filter((img) => img && img !== "")
+              : [property.gallery].filter((img) => img && img !== "")
+            : [];
+          const floorPlanUrls = property.floor_planning_image
+            ? Array.isArray(property.floor_planning_image)
+              ? property.floor_planning_image.filter((img) => img && img !== "")
+              : [property.floor_planning_image].filter(
+                  (img) => img && img !== ""
+                )
+            : [];
+
           // تأكد من أن الـ URL صحيح
-          if (thumbnailUrl && !thumbnailUrl.startsWith('http')) {
+          if (thumbnailUrl && !thumbnailUrl.startsWith("http")) {
           }
-          
+
           setPreviews({
             thumbnail: thumbnailUrl,
             gallery: galleryUrls,
@@ -507,7 +560,7 @@ export default function PropertyForm({ mode }) {
           });
         } catch (error) {
           toast.error(
-            "حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى.",
+            "حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى."
           );
         }
       };
@@ -546,8 +599,8 @@ export default function PropertyForm({ mode }) {
   const handleToggleFaqDisplay = (id) => {
     setFaqs(
       faqs.map((faq) =>
-        faq.id === id ? { ...faq, displayOnPage: !faq.displayOnPage } : faq,
-      ),
+        faq.id === id ? { ...faq, displayOnPage: !faq.displayOnPage } : faq
+      )
     );
   };
   // جلب البيانات الأساسية
@@ -603,7 +656,7 @@ export default function PropertyForm({ mode }) {
         useAuthStore.getState().userData?.real_estate_limit_number
     ) {
       toast.error(
-        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.real_estate_limit_number} عقارات`,
+        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.real_estate_limit_number} عقارات`
       );
       hasReachedLimit =
         properties.length >=
@@ -636,6 +689,8 @@ export default function PropertyForm({ mode }) {
       galleryInputRef.current.click();
     } else if (type === "floorPlans" && floorPlansInputRef.current) {
       floorPlansInputRef.current.click();
+    } else if (type === "videos" && videosInputRef.current) {
+      videosInputRef.current.click();
     }
   };
 
@@ -658,6 +713,41 @@ export default function PropertyForm({ mode }) {
         ...prev,
         thumbnail: URL.createObjectURL(file),
       }));
+    } else if (type === "videos") {
+      const validFiles = Array.from(files).filter((file) => {
+        if (!file.type.startsWith("video/")) {
+          toast.error("يجب أن تكون الفيديوهات بصيغة MP4 أو MOV أو AVI فقط");
+          return false;
+        }
+        if (file.size > 50 * 1024 * 1024) {
+          toast.error("يجب أن يكون حجم الملف أقل من 50 ميجابايت");
+          return false;
+        }
+        return true;
+      });
+
+      // التحقق من طول كل فيديو
+      validFiles.forEach((file) => {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+
+        video.onloadedmetadata = () => {
+          window.URL.revokeObjectURL(video.src);
+          const duration = video.duration;
+
+          if (duration > 300) {
+            // 5 دقائق = 300 ثانية
+            toast.error(`الفيديو ${file.name} يجب أن يكون أقل من 5 دقائق`);
+            return;
+          }
+
+          // إضافة الفيديو إذا كان طوله مناسب
+          setVideos((prev) => [...prev, file]);
+          setVideoPreviews((prev) => [...prev, URL.createObjectURL(file)]);
+        };
+
+        video.src = URL.createObjectURL(file);
+      });
     } else {
       const validFiles = Array.from(files).filter((file) => {
         if (!file.type.startsWith("image/")) {
@@ -695,6 +785,9 @@ export default function PropertyForm({ mode }) {
     if (type === "thumbnail") {
       setImages((prev) => ({ ...prev, thumbnail: null }));
       setPreviews((prev) => ({ ...prev, thumbnail: null }));
+    } else if (type === "videos") {
+      setVideos((prev) => prev.filter((_, i) => i !== index));
+      setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
     } else {
       setImages((prev) => ({
         ...prev,
@@ -741,12 +834,13 @@ export default function PropertyForm({ mode }) {
         let thumbnailPath = null;
         let galleryPaths = [];
         let floorPlansPaths = [];
+        let videoPaths = [];
 
         // رفع الصور للإضافة أو إذا تم تغييرها في التعديل
         if (images.thumbnail) {
           const uploadedFile = await uploadSingleFile(
             images.thumbnail,
-            "property",
+            "property"
           );
           thumbnailPath =
             mode === "add"
@@ -757,12 +851,12 @@ export default function PropertyForm({ mode }) {
         if (images.gallery.length > 0) {
           const uploadedFiles = await uploadMultipleFiles(
             images.gallery,
-            "property",
+            "property"
           );
           galleryPaths =
             mode === "add"
               ? uploadedFiles.map((f) =>
-                  f.path.replace("https://taearif.com", ""),
+                  f.path.replace("https://taearif.com", "")
                 )
               : uploadedFiles.map((f) => f.url);
         }
@@ -770,14 +864,26 @@ export default function PropertyForm({ mode }) {
         if (images.floorPlans.length > 0) {
           const uploadedFiles = await uploadMultipleFiles(
             images.floorPlans,
-            "property",
+            "property"
           );
           floorPlansPaths =
             mode === "add"
               ? uploadedFiles.map((f) =>
-                  f.path.replace("https://taearif.com", ""),
+                  f.path.replace("https://taearif.com", "")
                 )
               : uploadedFiles.map((f) => f.url);
+        }
+
+        // رفع الفيديوهات
+        if (videos.length > 0) {
+          try {
+            const uploadedFiles = await uploadVideos(videos);
+            videoPaths = uploadedFiles.map((f) => f.url);
+          } catch (error) {
+            console.error("Failed to upload videos:", error);
+            toast.error("فشل في رفع الفيديوهات. يرجى المحاولة مرة أخرى.");
+            throw error;
+          }
         }
 
         const propertyData = {
@@ -833,7 +939,8 @@ export default function PropertyForm({ mode }) {
           pricePerMeter: formData.pricePerMeter || 0,
           type: formData.PropertyType || "",
           faqs: faqs,
-          video_url: formData.video_url || "",
+          video_url:
+            videoPaths.length > 0 ? videoPaths[0] : formData.video_url || "",
           virtual_tour: formData.virtual_tour || "",
         };
 
@@ -858,10 +965,10 @@ export default function PropertyForm({ mode }) {
         } else {
           response = await axiosInstance.post(
             `/properties/${id}`,
-            propertyData,
+            propertyData
           );
           toast.success(
-            publish ? "تم تحديث ونشر العقار بنجاح" : "تم حفظ التغييرات كمسودة",
+            publish ? "تم تحديث ونشر العقار بنجاح" : "تم حفظ التغييرات كمسودة"
           );
           const currentState = useStore.getState();
           const updatedProperty = response.data.property;
@@ -869,7 +976,7 @@ export default function PropertyForm({ mode }) {
             updatedProperty.status === 1 ? "منشور" : "مسودة";
           const updatedProperties =
             currentState.propertiesManagement.properties.map((prop) =>
-              prop.id === updatedProperty.id ? updatedProperty : prop,
+              prop.id === updatedProperty.id ? updatedProperty : prop
             );
           setPropertiesManagement({ properties: updatedProperties });
         }
@@ -950,7 +1057,9 @@ export default function PropertyForm({ mode }) {
                   </Button>
                 </div>
                 {submitError && (
-                  <div className="text-red-500 text-sm mt-2 text-right w-full">{submitError}</div>
+                  <div className="text-red-500 text-sm mt-2 text-right w-full">
+                    {submitError}
+                  </div>
                 )}
               </div>
             </div>
@@ -1328,7 +1437,7 @@ export default function PropertyForm({ mode }) {
                               setFormData((prev) => ({
                                 ...prev,
                                 features: prev.features.filter(
-                                  (_, i) => i !== index,
+                                  (_, i) => i !== index
                                 ),
                               }));
                             }}
@@ -1926,6 +2035,84 @@ export default function PropertyForm({ mode }) {
 
               <Card className="xl:col-span-2">
                 <CardHeader>
+                  <CardTitle>معرض فيديوهات العقار</CardTitle>
+                  <CardDescription>
+                    قم بتحميل فيديوهات متعددة لعرض تفاصيل العقار
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                      {videoPreviews.map((preview, index) => (
+                        <div
+                          key={index}
+                          className="border rounded-md p-2 relative"
+                        >
+                          <div
+                            className="bg-muted rounded-md overflow-hidden flex items-center justify-center"
+                            style={{
+                              height: "500px",
+                              maxWidth: "100%",
+                            }}
+                          >
+                            <video
+                              src={preview}
+                              className="max-h-full max-w-full object-contain"
+                              controls
+                              style={{ width: "auto", height: "auto" }}
+                            />
+                          </div>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-4 right-4 h-6 w-6"
+                            onClick={() => removeImage("videos", index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                          <p className="text-xs text-center mt-2 truncate">
+                            فيديو {index + 1}
+                          </p>
+                        </div>
+                      ))}
+                      <div
+                        className="border rounded-md p-2 h-[11rem] flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => triggerFileInput("videos")}
+                      >
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                          {uploading ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <Video className="h-5 w-5 text-muted-foreground" />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          إضافة فيديو
+                        </p>
+                      </div>
+                    </div>
+                    <input
+                      ref={videosInputRef}
+                      type="file"
+                      accept="video/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => handleFileChange(e, "videos")}
+                    />
+                    {errors.videos && (
+                      <p className="text-red-500 text-sm">{errors.videos}</p>
+                    )}
+                    <p className="text-sm text-muted-foreground">
+                      يمكنك رفع فيديوهات بصيغة MP4 أو MOV أو AVI. الحد الأقصى
+                      لعدد الفيديوهات هو 5. الحد الأقصى لحجم الملف هو 50
+                      ميجابايت والحد الأقصى للطول هو 5 دقائق.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="xl:col-span-2">
+                <CardHeader>
                   <CardTitle>مخططات الطوابق</CardTitle>
                   <CardDescription>
                     قم بتحميل مخططات الطوابق والتصاميم الهندسية للعقار
@@ -1993,37 +2180,13 @@ export default function PropertyForm({ mode }) {
 
               <Card className="xl:col-span-2">
                 <CardHeader>
-                  <CardTitle>الوسائط والجولات الافتراضية</CardTitle>
+                  <CardTitle> الجولات الافتراضية</CardTitle>
                   <CardDescription>
-                    أضف روابط الفيديو والجولة الافتراضية للعقار
+                    أضف رابط الجولة الافتراضية للعقار
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Video className="h-4 w-4 text-muted-foreground" />
-                        <Label htmlFor="videoUrl">رابط الفيديو (اختياري)</Label>
-                      </div>
-                      <Input
-                        id="video_url"
-                        name="video_url"
-                        type="url"
-                        placeholder="https://www.youtube.com/watch?v=..."
-                        value={formData.video_url}
-                        onChange={handleUrlChange}
-                        className={errors.video_url ? "border-red-500" : ""}
-                      />
-                      {errors.video_url && (
-                        <p className="text-sm text-red-500">
-                          {errors.video_url}
-                        </p>
-                      )}
-                      <p className="text-xs text-muted-foreground">
-                        يمكنك إضافة رابط فيديو من YouTube أو Vimeo أو أي منصة
-                        أخرى
-                      </p>
-                    </div>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Globe className="h-4 w-4 text-muted-foreground" />
@@ -2167,19 +2330,19 @@ export default function PropertyForm({ mode }) {
                       </h3>
                       <div className="space-y-3">
                         {faqs.map((faq) => (
-                                                      <div
-                              key={faq.id}
-                              className="p-4 border rounded-md bg-muted/30"
-                            >
-                              <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
-                                                              <div className="flex-1 min-w-0">
-                                  <p className="font-semibold text-primary break-words">
-                                    {faq.question}
-                                  </p>
-                                  <p className="text-sm text-muted-foreground mt-1 break-words">
-                                    {faq.answer}
-                                  </p>
-                                </div>
+                          <div
+                            key={faq.id}
+                            className="p-4 border rounded-md bg-muted/30"
+                          >
+                            <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-primary break-words">
+                                  {faq.question}
+                                </p>
+                                <p className="text-sm text-muted-foreground mt-1 break-words">
+                                  {faq.answer}
+                                </p>
+                              </div>
                               <div className="flex items-center gap-2 rtl:mr-auto ltr:ml-auto flex-shrink-0">
                                 <Button
                                   variant="ghost"
