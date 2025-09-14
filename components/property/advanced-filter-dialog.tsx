@@ -48,7 +48,7 @@ export function AdvancedFilterDialog({
 }: FilterDialogProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // State for filters
   const [selectedPurposes, setSelectedPurposes] = useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -61,15 +61,23 @@ export function AdvancedFilterDialog({
   // Initialize filters from URL params
   useEffect(() => {
     if (searchParams) {
-      const purposes = searchParams.get('purposes_filter')?.split(',') || [];
-      const types = searchParams.get('type')?.split(',') || [];
-      const features = searchParams.get('features')?.split(',') || [];
-      const priceFrom = searchParams.get('price_from') ? parseInt(searchParams.get('price_from')!) : 0;
-      const priceTo = searchParams.get('price_to') ? parseInt(searchParams.get('price_to')!) : 0;
-      const areaFrom = searchParams.get('area_from') ? parseInt(searchParams.get('area_from')!) : 0;
-      const areaTo = searchParams.get('area_to') ? parseInt(searchParams.get('area_to')!) : 0;
-      const beds = searchParams.get('beds')?.split(',').map(Number) || [];
-      const baths = searchParams.get('baths')?.split(',').map(Number) || [];
+      const purposes = searchParams.get("purposes_filter")?.split(",") || [];
+      const types = searchParams.get("type")?.split(",") || [];
+      const features = searchParams.get("features")?.split(",") || [];
+      const priceFrom = searchParams.get("price_from")
+        ? parseInt(searchParams.get("price_from")!)
+        : 0;
+      const priceTo = searchParams.get("price_to")
+        ? parseInt(searchParams.get("price_to")!)
+        : 0;
+      const areaFrom = searchParams.get("area_from")
+        ? parseInt(searchParams.get("area_from")!)
+        : 0;
+      const areaTo = searchParams.get("area_to")
+        ? parseInt(searchParams.get("area_to")!)
+        : 0;
+      const beds = searchParams.get("beds")?.split(",").map(Number) || [];
+      const baths = searchParams.get("baths")?.split(",").map(Number) || [];
 
       setSelectedPurposes(purposes);
       setSelectedTypes(types);
@@ -87,53 +95,55 @@ export function AdvancedFilterDialog({
       const minPrice = parseInt(filterData.specifics_filters.price_range.min);
       const maxPrice = parseInt(filterData.specifics_filters.price_range.max);
       const minArea = parseInt(filterData.specifics_filters.area_range.min);
-      
-      if (priceRange[0] === 0 && priceRange[1] === 0) {
-        setPriceRange([minPrice, maxPrice]);
-      }
-      if (areaRange[0] === 0 && areaRange[1] === 0) {
-        setAreaRange([minArea, maxPrice]); // Using maxPrice as max area for now
-      }
+
+      // استخدام useRef أو state منفصل لتجنب infinite loop
+      setPriceRange((prev) => {
+        if (prev[0] === 0 && prev[1] === 0) {
+          return [minPrice, maxPrice];
+        }
+        return prev;
+      });
+
+      setAreaRange((prev) => {
+        if (prev[0] === 0 && prev[1] === 0) {
+          return [minArea, maxPrice]; // Using maxPrice as max area for now
+        }
+        return prev;
+      });
     }
-  }, [filterData, priceRange, areaRange]);
+  }, [filterData]); // إزالة priceRange و areaRange من dependencies
 
   const handlePurposeToggle = (purpose: string) => {
-    setSelectedPurposes(prev => 
-      prev.includes(purpose) 
-        ? prev.filter(p => p !== purpose)
+    setSelectedPurposes((prev) =>
+      prev.includes(purpose)
+        ? prev.filter((p) => p !== purpose)
         : [...prev, purpose]
     );
   };
 
   const handleTypeToggle = (type: string) => {
-    setSelectedTypes(prev => 
-      prev.includes(type) 
-        ? prev.filter(t => t !== type)
-        : [...prev, type]
+    setSelectedTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     );
   };
 
   const handleFeatureToggle = (feature: string) => {
-    setSelectedFeatures(prev => 
-      prev.includes(feature) 
-        ? prev.filter(f => f !== feature)
+    setSelectedFeatures((prev) =>
+      prev.includes(feature)
+        ? prev.filter((f) => f !== feature)
         : [...prev, feature]
     );
   };
 
   const handleBedToggle = (bed: number) => {
-    setSelectedBeds(prev => 
-      prev.includes(bed) 
-        ? prev.filter(b => b !== bed)
-        : [...prev, bed]
+    setSelectedBeds((prev) =>
+      prev.includes(bed) ? prev.filter((b) => b !== bed) : [...prev, bed]
     );
   };
 
   const handleBathToggle = (bath: number) => {
-    setSelectedBaths(prev => 
-      prev.includes(bath) 
-        ? prev.filter(b => b !== bath)
-        : [...prev, bath]
+    setSelectedBaths((prev) =>
+      prev.includes(bath) ? prev.filter((b) => b !== bath) : [...prev, bath]
     );
   };
 
@@ -167,39 +177,41 @@ export function AdvancedFilterDialog({
 
     // Build URL params
     const params = new URLSearchParams();
-    
+
     if (selectedPurposes.length > 0) {
-      params.set('purposes_filter', selectedPurposes.join(','));
+      params.set("purposes_filter", selectedPurposes.join(","));
     }
     if (selectedTypes.length > 0) {
-      params.set('type', selectedTypes.join(','));
+      params.set("type", selectedTypes.join(","));
     }
     if (selectedFeatures.length > 0) {
-      params.set('features', selectedFeatures.join(','));
+      params.set("features", selectedFeatures.join(","));
     }
     if (priceRange[0] > 0) {
-      params.set('price_from', priceRange[0].toString());
+      params.set("price_from", priceRange[0].toString());
     }
     if (priceRange[1] > 0) {
-      params.set('price_to', priceRange[1].toString());
+      params.set("price_to", priceRange[1].toString());
     }
     if (areaRange[0] > 0) {
-      params.set('area_from', areaRange[0].toString());
+      params.set("area_from", areaRange[0].toString());
     }
     if (areaRange[1] > 0) {
-      params.set('area_to', areaRange[1].toString());
+      params.set("area_to", areaRange[1].toString());
     }
     if (selectedBeds.length > 0) {
-      params.set('beds', selectedBeds.join(','));
+      params.set("beds", selectedBeds.join(","));
     }
     if (selectedBaths.length > 0) {
-      params.set('baths', selectedBaths.join(','));
+      params.set("baths", selectedBaths.join(","));
     }
 
     // Update URL
-    const newUrl = params.toString() ? `/properties?${params.toString()}` : '/properties';
+    const newUrl = params.toString()
+      ? `/properties?${params.toString()}`
+      : "/properties";
     router.push(newUrl);
-    
+
     onApplyFilters(filters);
     onClose();
   };
@@ -211,10 +223,26 @@ export function AdvancedFilterDialog({
     if (selectedFeatures.length > 0) count++;
     if (selectedBeds.length > 0) count++;
     if (selectedBaths.length > 0) count++;
-    if (priceRange[0] > parseInt(filterData?.specifics_filters.price_range.min || '0')) count++;
-    if (priceRange[1] < parseInt(filterData?.specifics_filters.price_range.max || '0')) count++;
-    if (areaRange[0] > parseInt(filterData?.specifics_filters.area_range.min || '0')) count++;
-    if (areaRange[1] < parseInt(filterData?.specifics_filters.price_range.max || '0')) count++;
+    if (
+      priceRange[0] >
+      parseInt(filterData?.specifics_filters.price_range.min || "0")
+    )
+      count++;
+    if (
+      priceRange[1] <
+      parseInt(filterData?.specifics_filters.price_range.max || "0")
+    )
+      count++;
+    if (
+      areaRange[0] >
+      parseInt(filterData?.specifics_filters.area_range.min || "0")
+    )
+      count++;
+    if (
+      areaRange[1] <
+      parseInt(filterData?.specifics_filters.price_range.max || "0")
+    )
+      count++;
     return count;
   };
 
@@ -254,24 +282,28 @@ export function AdvancedFilterDialog({
             <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
               الهدف من العقار
             </h3>
-             <div className="grid grid-cols-2 gap-3">
-               {filterData.purposes_filter.map((purpose) => (
-                 <div key={purpose} className="flex items-center space-x-3">
-                   <Checkbox
-                     id={`purpose-${purpose}`}
-                     checked={selectedPurposes.includes(purpose)}
-                     onCheckedChange={() => handlePurposeToggle(purpose)}
-                     className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
-                   />
-                   <Label
-                     htmlFor={`purpose-${purpose}`}
-                     className="text-sm font-medium text-gray-700 cursor-pointer"
-                   >
-                     {purpose === 'rent' ? 'للإيجار' : purpose === 'sale' ? 'للبيع' : purpose}
-                   </Label>
-                 </div>
-               ))}
-             </div>
+            <div className="grid grid-cols-2 gap-3">
+              {filterData.purposes_filter.map((purpose) => (
+                <div key={purpose} className="flex items-center space-x-3">
+                  <Checkbox
+                    id={`purpose-${purpose}`}
+                    checked={selectedPurposes.includes(purpose)}
+                    onCheckedChange={() => handlePurposeToggle(purpose)}
+                    className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
+                  />
+                  <Label
+                    htmlFor={`purpose-${purpose}`}
+                    className="text-sm font-medium text-gray-700 cursor-pointer"
+                  >
+                    {purpose === "rent"
+                      ? "للإيجار"
+                      : purpose === "sale"
+                        ? "للبيع"
+                        : purpose}
+                  </Label>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* نوع العقار */}
@@ -279,27 +311,32 @@ export function AdvancedFilterDialog({
             <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
               نوع العقار
             </h3>
-             <div className="grid grid-cols-2 gap-3">
-               {filterData.specifics_filters.type.map((type) => (
-                 <div key={type} className="flex items-center space-x-3">
-                   <Checkbox
-                     id={`type-${type}`}
-                     checked={selectedTypes.includes(type)}
-                     onCheckedChange={() => handleTypeToggle(type)}
-                     className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
-                   />
-                   <Label
-                     htmlFor={`type-${type}`}
-                     className="text-sm font-medium text-gray-700 cursor-pointer"
-                   >
-                     {type === 'residential' ? 'سكني' : 
-                      type === 'commercial' ? 'تجاري' : 
-                      type === 'rent' ? 'للإيجار' : 
-                      type === 'sale' ? 'للبيع' : type}
-                   </Label>
-                 </div>
-               ))}
-             </div>
+            <div className="grid grid-cols-2 gap-3">
+              {filterData.specifics_filters.type.map((type) => (
+                <div key={type} className="flex items-center space-x-3">
+                  <Checkbox
+                    id={`type-${type}`}
+                    checked={selectedTypes.includes(type)}
+                    onCheckedChange={() => handleTypeToggle(type)}
+                    className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
+                  />
+                  <Label
+                    htmlFor={`type-${type}`}
+                    className="text-sm font-medium text-gray-700 cursor-pointer"
+                  >
+                    {type === "residential"
+                      ? "سكني"
+                      : type === "commercial"
+                        ? "تجاري"
+                        : type === "rent"
+                          ? "للإيجار"
+                          : type === "sale"
+                            ? "للبيع"
+                            : type}
+                  </Label>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* نطاق السعر */}
@@ -309,15 +346,17 @@ export function AdvancedFilterDialog({
             </h3>
             <div className="space-y-4">
               <div className="px-4">
-                 <Slider
-                   value={priceRange}
-                   onValueChange={(value) => setPriceRange(value as [number, number])}
-                   max={parseInt(filterData.specifics_filters.price_range.max)}
-                   min={parseInt(filterData.specifics_filters.price_range.min)}
-                   step={10000}
-                   className="w-full"
-                   dir="rtl"
-                 />
+                <Slider
+                  value={priceRange}
+                  onValueChange={(value) =>
+                    setPriceRange(value as [number, number])
+                  }
+                  max={parseInt(filterData.specifics_filters.price_range.max)}
+                  min={parseInt(filterData.specifics_filters.price_range.min)}
+                  step={10000}
+                  className="w-full"
+                  dir="rtl"
+                />
               </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <span>من {priceRange[0].toLocaleString()} ريال</span>
@@ -326,32 +365,30 @@ export function AdvancedFilterDialog({
             </div>
           </div>
 
-
           {/* عدد الغرف */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
               عدد الغرف
             </h3>
-             <div className="grid grid-cols-4 gap-3">
-               {[1, 2, 3, 4, 5, 6, 7, 8].map((bed) => (
-                 <div key={bed} className="flex items-center space-x-3">
-                   <Checkbox
-                     id={`bed-${bed}`}
-                     checked={selectedBeds.includes(bed)}
-                     onCheckedChange={() => handleBedToggle(bed)}
-                     className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
-                   />
-                   <Label
-                     htmlFor={`bed-${bed}`}
-                     className="text-sm font-medium text-gray-700 cursor-pointer"
-                   >
-                     {bed}+
-                   </Label>
-                 </div>
-               ))}
-             </div>
+            <div className="grid grid-cols-4 gap-3">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((bed) => (
+                <div key={bed} className="flex items-center space-x-3">
+                  <Checkbox
+                    id={`bed-${bed}`}
+                    checked={selectedBeds.includes(bed)}
+                    onCheckedChange={() => handleBedToggle(bed)}
+                    className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
+                  />
+                  <Label
+                    htmlFor={`bed-${bed}`}
+                    className="text-sm font-medium text-gray-700 cursor-pointer"
+                  >
+                    {bed}+
+                  </Label>
+                </div>
+              ))}
+            </div>
           </div>
-
 
           {/* نطاق المساحة */}
           <div className="space-y-4">
@@ -360,15 +397,17 @@ export function AdvancedFilterDialog({
             </h3>
             <div className="space-y-4">
               <div className="px-4">
-                 <Slider
-                   value={areaRange}
-                   onValueChange={(value) => setAreaRange(value as [number, number])}
-                   max={parseInt(filterData.specifics_filters.price_range.max)} // Using price max as area max for now
-                   min={parseInt(filterData.specifics_filters.area_range.min)}
-                   step={1000}
-                   className="w-full"
-                   dir="rtl"
-                 />
+                <Slider
+                  value={areaRange}
+                  onValueChange={(value) =>
+                    setAreaRange(value as [number, number])
+                  }
+                  max={parseInt(filterData.specifics_filters.price_range.max)} // Using price max as area max for now
+                  min={parseInt(filterData.specifics_filters.area_range.min)}
+                  step={1000}
+                  className="w-full"
+                  dir="rtl"
+                />
               </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <span>من {areaRange[0]} م²</span>
@@ -382,24 +421,24 @@ export function AdvancedFilterDialog({
             <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
               عدد الحمامات
             </h3>
-             <div className="grid grid-cols-4 gap-3">
-               {[1, 2, 3, 4, 5, 6].map((bath) => (
-                 <div key={bath} className="flex items-center space-x-3">
-                   <Checkbox
-                     id={`bath-${bath}`}
-                     checked={selectedBaths.includes(bath)}
-                     onCheckedChange={() => handleBathToggle(bath)}
-                     className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
-                   />
-                   <Label
-                     htmlFor={`bath-${bath}`}
-                     className="text-sm font-medium text-gray-700 cursor-pointer"
-                   >
-                     {bath}+
-                   </Label>
-                 </div>
-               ))}
-             </div>
+            <div className="grid grid-cols-4 gap-3">
+              {[1, 2, 3, 4, 5, 6].map((bath) => (
+                <div key={bath} className="flex items-center space-x-3">
+                  <Checkbox
+                    id={`bath-${bath}`}
+                    checked={selectedBaths.includes(bath)}
+                    onCheckedChange={() => handleBathToggle(bath)}
+                    className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
+                  />
+                  <Label
+                    htmlFor={`bath-${bath}`}
+                    className="text-sm font-medium text-gray-700 cursor-pointer"
+                  >
+                    {bath}+
+                  </Label>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -408,24 +447,24 @@ export function AdvancedFilterDialog({
           <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
             المميزات
           </h3>
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-48 overflow-y-auto">
-             {filterData.specifics_filters.features.map((feature) => (
-               <div key={feature} className="flex items-center space-x-3">
-                 <Checkbox
-                   id={`feature-${feature}`}
-                   checked={selectedFeatures.includes(feature)}
-                   onCheckedChange={() => handleFeatureToggle(feature)}
-                   className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
-                 />
-                 <Label
-                   htmlFor={`feature-${feature}`}
-                   className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
-                 >
-                   {feature}
-                 </Label>
-               </div>
-             ))}
-           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-48 overflow-y-auto">
+            {filterData.specifics_filters.features.map((feature) => (
+              <div key={feature} className="flex items-center space-x-3">
+                <Checkbox
+                  id={`feature-${feature}`}
+                  checked={selectedFeatures.includes(feature)}
+                  onCheckedChange={() => handleFeatureToggle(feature)}
+                  className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
+                />
+                <Label
+                  htmlFor={`feature-${feature}`}
+                  className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
+                >
+                  {feature}
+                </Label>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* أزرار التحكم */}

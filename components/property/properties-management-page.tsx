@@ -494,7 +494,7 @@ export function PropertiesManagementPage() {
 
       await axiosInstance.post(
         `/properties/${property.id}/duplicate`,
-        duplicateData,
+        duplicateData
       );
       toast.success("تم مضاعفة العقار بنجاح");
 
@@ -512,13 +512,13 @@ export function PropertiesManagementPage() {
 
       const newStatus = property.status === "منشور" ? "مسودة" : "منشور";
       toast.success(
-        `تم ${property.status === "منشور" ? "إلغاء النشر" : "النشر"} بنجاح`,
+        `تم ${property.status === "منشور" ? "إلغاء النشر" : "النشر"} بنجاح`
       );
 
       // تحديث حالة العقار في القائمة المحلية
       setPropertiesManagement({
         properties: properties.map((p: any) =>
-          p.id === property.id ? { ...p, status: newStatus } : p,
+          p.id === property.id ? { ...p, status: newStatus } : p
         ),
       });
     } catch (error) {
@@ -545,16 +545,18 @@ export function PropertiesManagementPage() {
 
   const handleRemoveFilter = (filterKey: string, filterValue?: any) => {
     const newFilters: Record<string, any> = { ...appliedFilters };
-    
+
     if (Array.isArray(newFilters[filterKey])) {
-      newFilters[filterKey] = newFilters[filterKey].filter((item: any) => item !== filterValue);
+      newFilters[filterKey] = newFilters[filterKey].filter(
+        (item: any) => item !== filterValue
+      );
       if (newFilters[filterKey].length === 0) {
         delete newFilters[filterKey];
       }
     } else {
       delete newFilters[filterKey];
     }
-    
+
     setAppliedFilters(newFilters);
     setCurrentPage(1);
     fetchProperties(1, newFilters);
@@ -571,7 +573,6 @@ export function PropertiesManagementPage() {
       fetchProperties(1);
     }
   }, [fetchProperties, isInitialized, loading]);
-
 
   const renderSkeletons = () => (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -760,11 +761,13 @@ export function PropertiesManagementPage() {
                   onClick={() => {
                     const propertiesLength = pagination?.total || 0;
                     const limit =
-                      useAuthStore.getState().userData
+                      useAuthStore.getState().userData?.package
                         ?.real_estate_limit_number;
                     if (propertiesLength >= limit) {
+                      console.error("error here 12");
                       setIsLimitReached(true);
                     } else {
+                      console.error("تمام");
                       router.push("/properties/add");
                     }
                   }}
@@ -808,7 +811,7 @@ export function PropertiesManagementPage() {
             {loading ? (
               renderSkeletons()
             ) : error ? (
-              <ErrorDisplay 
+              <ErrorDisplay
                 error={error}
                 onRetry={() => fetchProperties(currentPage)}
                 title="خطأ في تحميل العقارات"
@@ -820,9 +823,7 @@ export function PropertiesManagementPage() {
                 </TabsList> */}
                 <TabsContent value="all" className="mt-4">
                   {normalizedProperties.length === 0 ? (
-                    <EmptyState
-                      type="عقارات"
-                    />
+                    <EmptyState type="عقارات" />
                   ) : (
                     <>
                       {viewMode === "grid" ? (
@@ -832,7 +833,7 @@ export function PropertiesManagementPage() {
                               key={property.id}
                               property={property}
                               isFavorite={favorites.includes(
-                                property.id.toString(),
+                                property.id.toString()
                               )}
                               onToggleFavorite={toggleFavorite}
                               onDelete={handleDeleteProperty}
@@ -850,7 +851,7 @@ export function PropertiesManagementPage() {
                               key={property.id}
                               property={property}
                               isFavorite={favorites.includes(
-                                property.id.toString(),
+                                property.id.toString()
                               )}
                               onToggleFavorite={toggleFavorite}
                               onDelete={handleDeleteProperty}
@@ -948,7 +949,7 @@ export function PropertiesManagementPage() {
                                     type: reorderPopup.type,
                                   });
                                   const toastId = toast.loading(
-                                    "جاري تحديث الترتيب...",
+                                    "جاري تحديث الترتيب..."
                                   );
                                   try {
                                     if (reorderPopup.type === "featured") {
@@ -959,12 +960,12 @@ export function PropertiesManagementPage() {
                                             id: property.id,
                                             reorder_featured: i + 1,
                                           },
-                                        ],
+                                        ]
                                       );
                                     } else {
                                       await axiosInstance.post(
                                         "/properties/reorder",
-                                        [{ id: property.id, reorder: i + 1 }],
+                                        [{ id: property.id, reorder: i + 1 }]
                                       );
                                     }
                                     toast.success("تم تحديث الترتيب");
@@ -1327,7 +1328,7 @@ function PropertyListItem({
             </div>
             <div className="flex flex-row-reverse items-center gap-1">
               <Building className="h-4 w-4 text-muted-foreground" />
-              <span>{property.type || 'غير محدد'}</span>
+              <span>{property.type || "غير محدد"}</span>
             </div>
             <div className="flex flex-row-reverse items-center gap-1">
               <Bed className="h-4 w-4 text-muted-foreground" />
