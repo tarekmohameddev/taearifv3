@@ -46,42 +46,34 @@ import { uploadSingleFile } from "@/utils/uploadSingle";
 import { uploadMultipleFiles } from "@/utils/uploadMultiple";
 
 // دالة رفع الفيديوهات
-const uploadVideos = async (files) => {
-  const uploadedFiles = [];
+const uploadVideo = async (file) => {
+  const formData = new FormData();
+  formData.append("context", "property");
+  formData.append("video", file);
 
-  for (let file of files) {
-    const formData = new FormData();
-    formData.append("context", "property"); // إضافة النص
-    formData.append("video", file); // إضافة الملف
+  try {
+    console.log("Uploading video:", file.name, "Size:", file.size);
+    const response = await axiosInstance.post("/video/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    console.log("Video upload response:", response.data);
 
-    try {
-      console.log("Uploading video:", file.name, "Size:", file.size);
-      const response = await axiosInstance.post("/video/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      console.log("Video upload response:", response.data);
-
-      // التحقق من بنية الاستجابة الصحيحة
-      if (
-        response.data &&
-        response.data.status === "success" &&
-        response.data.data
-      ) {
-        // إضافة البيانات مباشرة من response.data.data
-        uploadedFiles.push(response.data.data);
-      } else {
-        console.error("Unexpected response structure:", response.data);
-        throw new Error("Unexpected response structure from video upload API");
-      }
-    } catch (error) {
-      console.error("Video upload error:", error);
-      console.error("Error response:", error.response?.data);
-      console.error("Error status:", error.response?.status);
-      throw error;
+    if (
+      response.data &&
+      response.data.status === "success" &&
+      response.data.data
+    ) {
+      return response.data.data;
+    } else {
+      console.error("Unexpected response structure:", response.data);
+      throw new Error("Unexpected response structure from video upload API");
     }
+  } catch (error) {
+    console.error("Video upload error:", error);
+    console.error("Error response:", error.response?.data);
+    console.error("Error status:", error.response?.status);
+    throw error;
   }
-
-  return uploadedFiles;
 };
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
@@ -194,8 +186,8 @@ export default function PropertyForm({ mode }) {
     gallery: [],
     floorPlans: [],
   });
-  const [videos, setVideos] = useState([]);
-  const [videoPreviews, setVideoPreviews] = useState([]);
+  const [video, setVideo] = useState(null);
+  const [videoPreview, setVideoPreview] = useState(null);
 
   const [uploading, setUploading] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -206,7 +198,7 @@ export default function PropertyForm({ mode }) {
   const thumbnailInputRef = useRef(null);
   const galleryInputRef = useRef(null);
   const floorPlansInputRef = useRef(null);
-  const videosInputRef = useRef(null);
+  const videoInputRef = useRef(null);
   const searchInputRef = useRef(null);
   const mapRef = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -689,8 +681,8 @@ export default function PropertyForm({ mode }) {
       galleryInputRef.current.click();
     } else if (type === "floorPlans" && floorPlansInputRef.current) {
       floorPlansInputRef.current.click();
-    } else if (type === "videos" && videosInputRef.current) {
-      videosInputRef.current.click();
+    } else if (type === "video" && videoInputRef.current) {
+      videoInputRef.current.click();
     }
   };
 
@@ -713,41 +705,38 @@ export default function PropertyForm({ mode }) {
         ...prev,
         thumbnail: URL.createObjectURL(file),
       }));
-    } else if (type === "videos") {
-      const validFiles = Array.from(files).filter((file) => {
-        if (!file.type.startsWith("video/")) {
-          toast.error("يجب أن تكون الفيديوهات بصيغة MP4 أو MOV أو AVI فقط");
-          return false;
+    } else if (type === "video") {
+      const file = files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("video/")) {
+        toast.error("يجب أن يكون الفيديو بصيغة MP4 أو MOV أو AVI فقط");
+        return;
+      }
+      if (file.size > 50 * 1024 * 1024) {
+        toast.error("يجب أن يكون حجم الملف أقل من 50 ميجابايت");
+        return;
+      }
+
+      // التحقق من طول الفيديو
+      const video = document.createElement("video");
+      video.preload = "metadata";
+
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        const duration = video.duration;
+
+        if (duration > 300) {
+          // 5 دقائق = 300 ثانية
+          toast.error("يجب أن يكون طول الفيديو أقل من 5 دقائق");
+          return;
         }
-        if (file.size > 50 * 1024 * 1024) {
-          toast.error("يجب أن يكون حجم الملف أقل من 50 ميجابايت");
-          return false;
-        }
-        return true;
-      });
 
-      // التحقق من طول كل فيديو
-      validFiles.forEach((file) => {
-        const video = document.createElement("video");
-        video.preload = "metadata";
+        setVideo(file);
+        setVideoPreview(URL.createObjectURL(file));
+      };
 
-        video.onloadedmetadata = () => {
-          window.URL.revokeObjectURL(video.src);
-          const duration = video.duration;
-
-          if (duration > 300) {
-            // 5 دقائق = 300 ثانية
-            toast.error(`الفيديو ${file.name} يجب أن يكون أقل من 5 دقائق`);
-            return;
-          }
-
-          // إضافة الفيديو إذا كان طوله مناسب
-          setVideos((prev) => [...prev, file]);
-          setVideoPreviews((prev) => [...prev, URL.createObjectURL(file)]);
-        };
-
-        video.src = URL.createObjectURL(file);
-      });
+      video.src = URL.createObjectURL(file);
     } else {
       const validFiles = Array.from(files).filter((file) => {
         if (!file.type.startsWith("image/")) {
@@ -785,9 +774,6 @@ export default function PropertyForm({ mode }) {
     if (type === "thumbnail") {
       setImages((prev) => ({ ...prev, thumbnail: null }));
       setPreviews((prev) => ({ ...prev, thumbnail: null }));
-    } else if (type === "videos") {
-      setVideos((prev) => prev.filter((_, i) => i !== index));
-      setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
     } else {
       setImages((prev) => ({
         ...prev,
@@ -798,6 +784,11 @@ export default function PropertyForm({ mode }) {
         [type]: prev[type].filter((_, i) => i !== index),
       }));
     }
+  };
+
+  const removeVideo = () => {
+    setVideo(null);
+    setVideoPreview(null);
   };
 
   const handleCounterChange = (name, value) => {
@@ -874,14 +865,14 @@ export default function PropertyForm({ mode }) {
               : uploadedFiles.map((f) => f.url);
         }
 
-        // رفع الفيديوهات
-        if (videos.length > 0) {
+        // رفع الفيديو
+        if (video) {
           try {
-            const uploadedFiles = await uploadVideos(videos);
-            videoPaths = uploadedFiles.map((f) => f.url);
+            const uploadedFile = await uploadVideo(video);
+            videoPaths = [uploadedFile.url];
           } catch (error) {
-            console.error("Failed to upload videos:", error);
-            toast.error("فشل في رفع الفيديوهات. يرجى المحاولة مرة أخرى.");
+            console.error("Failed to upload video:", error);
+            toast.error("فشل في رفع الفيديو. يرجى المحاولة مرة أخرى.");
             throw error;
           }
         }
@@ -2035,77 +2026,81 @@ export default function PropertyForm({ mode }) {
 
               <Card className="xl:col-span-2">
                 <CardHeader>
-                  <CardTitle>معرض فيديوهات العقار</CardTitle>
+                  <CardTitle>فيديو العقار</CardTitle>
                   <CardDescription>
-                    قم بتحميل فيديوهات متعددة لعرض تفاصيل العقار
+                    قم بتحميل فيديو واحد لعرض تفاصيل العقار
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {videoPreviews.map((preview, index) => (
-                        <div
-                          key={index}
-                          className="border rounded-md p-2 relative"
-                        >
+                    <div className="flex flex-col md:flex-row items-center gap-6">
+                      <div className="border rounded-md p-2 flex-1 w-full">
+                        {videoPreview ? (
+                          <>
+                            <div
+                              className="bg-muted rounded-md overflow-hidden flex items-center justify-center relative"
+                              style={{
+                                height: "500px",
+                                maxWidth: "100%",
+                              }}
+                            >
+                              <video
+                                src={videoPreview}
+                                className="max-h-full max-w-full object-contain rounded-md"
+                                controls
+                                style={{ width: "auto", height: "auto" }}
+                              />
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-2 right-2 h-8 w-8 rounded-full p-0"
+                                onClick={removeVideo}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </>
+                        ) : (
                           <div
-                            className="bg-muted rounded-md overflow-hidden flex items-center justify-center"
+                            className="flex items-center justify-center bg-muted rounded-md relative"
                             style={{
                               height: "500px",
                               maxWidth: "100%",
                             }}
                           >
-                            <video
-                              src={preview}
-                              className="max-h-full max-w-full object-contain"
-                              controls
-                              style={{ width: "auto", height: "auto" }}
-                            />
+                            <div className="text-center">
+                              <Video className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                              <p className="text-muted-foreground mb-4">
+                                لا يوجد فيديو
+                              </p>
+                              <Button
+                                variant="outline"
+                                onClick={() => triggerFileInput("video")}
+                                disabled={uploading}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Upload className="h-5 w-5" />
+                                  <span>رفع فيديو</span>
+                                </div>
+                              </Button>
+                            </div>
                           </div>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-4 right-4 h-6 w-6"
-                            onClick={() => removeImage("videos", index)}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                          <p className="text-xs text-center mt-2 truncate">
-                            فيديو {index + 1}
-                          </p>
-                        </div>
-                      ))}
-                      <div
-                        className="border rounded-md p-2 h-[11rem] flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
-                        onClick={() => triggerFileInput("videos")}
-                      >
-                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                          {uploading ? (
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                          ) : (
-                            <Video className="h-5 w-5 text-muted-foreground" />
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          إضافة فيديو
-                        </p>
+                        )}
                       </div>
                     </div>
                     <input
-                      ref={videosInputRef}
+                      ref={videoInputRef}
                       type="file"
                       accept="video/*"
-                      multiple
                       className="hidden"
-                      onChange={(e) => handleFileChange(e, "videos")}
+                      onChange={(e) => handleFileChange(e, "video")}
                     />
-                    {errors.videos && (
-                      <p className="text-red-500 text-sm">{errors.videos}</p>
+                    {errors.video && (
+                      <p className="text-red-500 text-sm">{errors.video}</p>
                     )}
                     <p className="text-sm text-muted-foreground">
-                      يمكنك رفع فيديوهات بصيغة MP4 أو MOV أو AVI. الحد الأقصى
-                      لعدد الفيديوهات هو 5. الحد الأقصى لحجم الملف هو 50
-                      ميجابايت والحد الأقصى للطول هو 5 دقائق.
+                      يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى لحجم
+                      الملف هو 50 ميجابايت والحد الأقصى للطول هو 5 دقائق.
                     </p>
                   </div>
                 </CardContent>
