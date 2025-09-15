@@ -17,11 +17,11 @@ export default function ClientLayout({
   const UserIslogged = useAuthStore((state) => state.UserIslogged);
   const IsLoading = useAuthStore((state) => state.IsLoading);
   const onboardingCompleted = useAuthStore(
-    (state) => state.onboarding_completed,
+    (state) => state.onboarding_completed
   );
   const userData = useAuthStore((state) => state.userData);
   const { setOnboardingCompleted } = useAuthStore();
-  const [showPopup, setShowPopup] = useState(false)
+  const [showPopup, setShowPopup] = useState(false);
   const clearMessage = useAuthStore((state) => state.clearMessage);
   const setMessage = useAuthStore((state) => state.setMessage);
 
@@ -34,22 +34,21 @@ export default function ClientLayout({
   //     onboarding_completed: userData.onboarding_completed || false,
   //   });
   // setUserIsLogged(true);
-  
 
   const handleShowPopup = () => {
-    setShowPopup(true)
-  }
+    setShowPopup(true);
+  };
 
   const handleClosePopup = () => {
-    setShowPopup(false)
+    setShowPopup(false);
     // لا نحتاج لمسح الرسالة هنا لأن InfoPopup سيقوم بذلك
-  }
+  };
 
   // function لاختبار الـ popup في development mode
   const testPopup = () => {
     setMessage("هذه رسالة اختبار للـ popup! 🎉");
     setShowPopup(true);
-  }
+  };
 
   // مراقبة التغييرات في userData.message
   useEffect(() => {
@@ -57,7 +56,6 @@ export default function ClientLayout({
       setShowPopup(true);
     }
   }, [userData?.message, showPopup]);
-
 
   useEffect(() => {
     setIsMounted(true);
@@ -84,10 +82,10 @@ export default function ClientLayout({
     async function fetchUser() {
       if (isMounted && !IsLoading && UserIslogged && !onboardingCompleted) {
         if (pathname !== "/onboarding") {
-      try {
+          try {
             const response = await axiosInstance.get("/user");
             const completed = response.data.data.onboarding_completed;
-            setOnboardingCompleted(completed); 
+            setOnboardingCompleted(completed);
             if (completed == undefined) {
               router.push("/onboarding");
             }
@@ -98,7 +96,7 @@ export default function ClientLayout({
           try {
             const response = await axiosInstance.get("/user");
             const completed = response.data.data.onboarding_completed;
-            setOnboardingCompleted(completed); 
+            setOnboardingCompleted(completed);
             if (completed == undefined) {
               router.push("/onboarding");
             } else {
@@ -117,7 +115,7 @@ export default function ClientLayout({
   useEffect(() => {
     if (pathname?.startsWith("/login")) {
       if (userData && userData.email) {
-      router.push("/");
+        router.push("/");
       }
     }
   }, [userData, router]);
@@ -129,12 +127,14 @@ export default function ClientLayout({
     "/forgot-password",
     "/reset",
     "/onboarding",
-    "/test-reset"
+    "/test-reset",
+    "/landing",
   ];
 
-  const isPublicPage = publicPages.some(page => pathname?.startsWith(page)) || 
-                      pathname?.startsWith("/oauth") || 
-                      pathname?.startsWith("/not-found");
+  const isPublicPage =
+    publicPages.some((page) => pathname?.startsWith(page)) ||
+    pathname?.startsWith("/oauth") ||
+    pathname?.startsWith("/not-found");
 
   if (!UserIslogged && !isPublicPage) {
     return null;
@@ -143,7 +143,7 @@ export default function ClientLayout({
   return (
     <>
       {children}
-      
+
       {showPopup && userData?.message && (
         <InfoPopup
           message={userData.message}
