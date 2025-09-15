@@ -72,7 +72,8 @@ export default function ClientLayout({
       !pathname?.startsWith("/forgot-password") &&
       !pathname?.startsWith("/reset") &&
       !pathname?.startsWith("/register") &&
-      !pathname?.startsWith("/login")
+      !pathname?.startsWith("/login") &&
+      !pathname?.startsWith("/landing")
     ) {
       router.push("/login");
     }
