@@ -34,7 +34,12 @@ interface Errors {
 }
 
 export function RegisterPage() {
-  const { UserIslogged, googleUrlFetched, setGoogleUrlFetched, fetchGoogleAuthUrl } = useAuthStore();
+  const {
+    UserIslogged,
+    googleUrlFetched,
+    setGoogleUrlFetched,
+    fetchGoogleAuthUrl,
+  } = useAuthStore();
   const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
@@ -59,7 +64,7 @@ export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [subdomainFocused, setSubdomainFocused] = useState(false);
   const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>(
-    [],
+    []
   );
   const [referralCodeLocked, setReferralCodeLocked] = useState(false);
   const [googleAuthUrl, setGoogleAuthUrl] = useState<string>("");
@@ -241,7 +246,6 @@ export function RegisterPage() {
         if (formData.referral_code) {
           payload.referral_code = formData.referral_code;
         }
-
 
         const response = await axios.post(link, payload, {
           headers: { "Content-Type": "application/json" },

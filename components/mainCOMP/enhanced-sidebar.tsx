@@ -28,7 +28,7 @@ export function EnhancedSidebar({
   const [isNewUser, setIsNewUser] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [internalActiveTab, setInternalActiveTab] = useState<string>(
-    activeTab || "dashboard",
+    activeTab || "dashboard"
   );
 
   const { sidebarData, fetchSideMenus } = useStore();
@@ -48,7 +48,7 @@ export function EnhancedSidebar({
           localStorage.setItem("hasVisitedBefore", "true");
           setIsNewUser(false);
         },
-        3 * 24 * 60 * 60 * 1000,
+        3 * 24 * 60 * 60 * 1000
       );
     }
   }, []);
@@ -61,7 +61,7 @@ export function EnhancedSidebar({
     : mainNavItems.find(
         (item) =>
           item.path === currentPath ||
-          (item.path !== "/" && currentPath.startsWith(item.path)),
+          (item.path !== "/" && currentPath.startsWith(item.path))
       )?.id || "dashboard";
 
   // تحديث العنصر النشط عند تغيير المسار
@@ -108,8 +108,7 @@ export function EnhancedSidebar({
             className={cn(
               "justify-start gap-3 h-auto py-2 px-3 w-full",
               isCollapsed && "justify-center px-2",
-              isActive &&
-                "bg-primary/10 text-primary border-r-2 border-primary",
+              isActive && "bg-primary/10 text-primary border-r-2 border-primary"
             )}
             asChild={!item.isAPP} // استخدام asChild فقط إذا لم يكن APP
           >
@@ -122,7 +121,7 @@ export function EnhancedSidebar({
                 <item.icon
                   className={cn(
                     "h-5 w-5",
-                    isActive ? "text-primary" : "text-muted-foreground",
+                    isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 />
                 {!isCollapsed && (
@@ -140,7 +139,7 @@ export function EnhancedSidebar({
                 <item.icon
                   className={cn(
                     "h-5 w-5",
-                    isActive ? "text-primary" : "text-muted-foreground",
+                    isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 />
                 {!isCollapsed && (
@@ -240,7 +239,7 @@ export function EnhancedSidebar({
       <div
         className={cn(
           "hidden md:flex flex-col border-l bg-background transition-all duration-300 z-40 sticky top-16 h-[calc(100vh-4rem)]",
-          isCollapsed ? "w-[70px]" : "w-[240px]",
+          isCollapsed ? "w-[70px]" : "w-[240px]"
         )}
       >
         <SidebarContent />
