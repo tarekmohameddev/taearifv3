@@ -161,11 +161,28 @@ export function LandingPage() {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       const screenHeight = window.innerHeight;
-      setIsScrolled(scrollPosition > screenHeight);
+      const isMobile = window.innerWidth < 768; // md breakpoint
+
+      if (isMobile) {
+        // On mobile, show header after scrolling past the form section
+        const formSection = document.getElementById("form-section");
+        if (formSection) {
+          const formSectionBottom =
+            formSection.offsetTop + formSection.offsetHeight;
+          setIsScrolled(scrollPosition > formSectionBottom);
+        }
+      } else {
+        // On desktop, use the original logic
+        setIsScrolled(scrollPosition > screenHeight);
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll); // Handle screen size changes
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -308,20 +325,27 @@ export function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
+    <div className="min-h-screen" dir="rtl">
       <Link
         href="/"
-        className="fixed top-0 w-full z-50 mx-4 md:mx-20 flex justify-center md:justify-start"
+        className={`fixed top-0 w-screen z-50 flex justify-center md:justify-start  backdrop-blur-md h-fit ${isScrolled ? "bg-white/40" : ""}`}
       >
-        <Image
-          src="/logo.png"
-          alt="Logo"
-          width={141}
-          height={100}
-          className={`transition-all duration-500 ${isScrolled ? "" : "brightness-0 invert"}`}
-        />
+        <div className="mx-4 sm:mx-20">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={141}
+            height={50}
+            className={`transition-all duration-500 ${isScrolled ? "" : "brightness-0 invert"}`}
+            //
+          />
+        </div>
       </Link>
-      <section className="h-screen py-[7rem] px-4 gradient-mesh text-white relative overflow-hidden">
+
+      <section
+        id="form-section"
+        className="h-fit sm:h-screen py-[9rem] px-4 gradient-mesh text-white relative overflow-hidden"
+      >
         <div className="absolute inset-0 bg-[url('/modern-buildings-skyline.jpg')] bg-cover bg-center opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40"></div>
         <div className="container mx-auto max-w-7xl relative z-10">
@@ -381,9 +405,9 @@ export function LandingPage() {
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative w-full max-w-md mx-auto lg:mx-0">
               <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent rounded-3xl blur-3xl"></div>
-              <Card className="w-full max-w-md mx-auto lg:mx-0 glass-effect border-white/20 shadow-2xl floating-animation">
+              <Card className="w-full glass-effect border-white/20 shadow-2xl floating-animation">
                 <CardHeader className="text-center pb-6">
                   <CardTitle className="text-3xl font-bold text-black">
                     ابدأ مجاناً الآن
