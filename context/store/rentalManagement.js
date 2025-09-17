@@ -46,6 +46,7 @@ module.exports = (set, get) => ({
   // Rental Applications slice
   rentalApplications: {
     rentals: [],
+    pagination: null,
     loading: false,
     error: null,
     searchTerm: "",

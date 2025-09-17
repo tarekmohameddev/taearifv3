@@ -39,6 +39,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+import {
   Users,
   Search,
   Filter,
@@ -136,6 +145,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
   const { rentalApplications, setRentalApplications } = useStore()
   const {
     rentals,
+    pagination,
     loading,
     error,
     searchTerm,
@@ -237,13 +247,27 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     }
   }
 
-  const fetchRentals = async () => {
+  const fetchRentals = async (page: number = 1) => {
     try {
       setRentalApplications({ loading: true, error: null })
-      const response = await axiosInstance.get<ApiResponse>("/v1/rms/rentals")
+      const response = await axiosInstance.get<ApiResponse>(`/v1/rms/rentals?page=${page}`)
       
       if (response.data.status) {
-        setRentalApplications({ rentals: response.data.data.data, isInitialized: true })
+        setRentalApplications({ 
+          rentals: response.data.data.data, 
+          pagination: {
+            current_page: response.data.data.current_page,
+            per_page: response.data.data.per_page,
+            total: response.data.data.total,
+            last_page: response.data.data.last_page,
+            from: response.data.data.from,
+            to: response.data.data.to,
+            has_more_pages: response.data.data.next_page_url !== null,
+            next_page_url: response.data.data.next_page_url,
+            prev_page_url: response.data.data.prev_page_url
+          },
+          isInitialized: true 
+        })
       } else {
         setRentalApplications({ error: "فشل في جلب البيانات" })
       }
@@ -252,6 +276,10 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     } finally {
       setRentalApplications({ loading: false })
     }
+  }
+
+  const handlePageChange = (page: number) => {
+    fetchRentals(page)
   }
 
   const filteredRentals = (rentals || []).filter((rental: RentalData) => {
@@ -447,7 +475,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
         <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
         <h3 className="text-lg font-medium mb-2">حدث خطأ</h3>
         <p className="text-muted-foreground mb-4">{error}</p>
-        <Button onClick={fetchRentals}>
+        <Button onClick={() => fetchRentals()}>
           <Loader2 className="ml-2 h-4 w-4" />
           إعادة المحاولة
         </Button>
@@ -1048,6 +1076,90 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
         onClose={closeRentalDetails}
         rentalId={selectedRentalId}
       />
+
+      {/* Pagination */}
+      {pagination && pagination.last_page > 1 && (
+        <div className="mt-6">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    if (pagination.current_page > 1) {
+                      handlePageChange(pagination.current_page - 1)
+                    }
+                  }}
+                  className={pagination.current_page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+              
+              {/* Page Numbers */}
+              {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map((page) => {
+                // Show first page, last page, current page, and pages around current page
+                const shouldShow = 
+                  page === 1 || 
+                  page === pagination.last_page || 
+                  (page >= pagination.current_page - 1 && page <= pagination.current_page + 1)
+                
+                if (!shouldShow) {
+                  // Show ellipsis for gaps
+                  if (page === 2 && pagination.current_page > 3) {
+                    return (
+                      <PaginationItem key={`ellipsis-${page}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )
+                  }
+                  if (page === pagination.last_page - 1 && pagination.current_page < pagination.last_page - 2) {
+                    return (
+                      <PaginationItem key={`ellipsis-${page}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )
+                  }
+                  return null
+                }
+                
+                return (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handlePageChange(page)
+                      }}
+                      isActive={page === pagination.current_page}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                )
+              })}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    if (pagination.current_page < pagination.last_page) {
+                      handlePageChange(pagination.current_page + 1)
+                    }
+                  }}
+                  className={pagination.current_page >= pagination.last_page ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+          
+          {/* Pagination Info */}
+          <div className="mt-4 text-center text-sm text-gray-500">
+            عرض {pagination.from} إلى {pagination.to} من {pagination.total} نتيجة
+          </div>
+        </div>
+      )}
     </div>
   )
 }
