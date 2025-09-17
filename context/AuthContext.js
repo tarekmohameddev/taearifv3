@@ -188,7 +188,7 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  logout: async () => {
+  logout: async (options = { redirect: true, clearStore: true }) => {
     try {
       const response = await fetch("/api/user/logout", {
         method: "POST",
@@ -199,8 +199,12 @@ const useAuthStore = create((set, get) => ({
       });
 
       if (response.ok) {
-        set({ UserIslogged: false, authenticated: false, userData: null });
-        window.location.href = "/login";
+        if (options.clearStore) {
+          set({ UserIslogged: false, authenticated: false, userData: null });
+        }
+        if (options.redirect) {
+          window.location.href = "/login";
+        }
       } else {
         console.error("فشل تسجيل الخروج");
       }
@@ -252,6 +256,7 @@ const useAuthStore = create((set, get) => ({
           ...state.userData,
           token,
         },
+        IsLoading: true,
       }));
 
       const response = await axiosInstance.get("/user");

@@ -75,6 +75,8 @@ export default function ClientLayout({
       !pathname?.startsWith("/login") &&
       !pathname?.startsWith("/landing")
     ) {
+      console.error("goooooo tooooooo looooooign");
+      console.warn("goooooo tooooooo looooooign");
       router.push("/login");
     }
   }, [isMounted, IsLoading, UserIslogged, pathname, router]);
@@ -101,6 +103,9 @@ export default function ClientLayout({
             if (completed == undefined) {
               router.push("/onboarding");
             } else {
+              console.error("testtttttttttttttt");
+              console.warn("testtttttttttttttt");
+        
               router.push("/");
             }
           } catch (error) {
@@ -115,7 +120,11 @@ export default function ClientLayout({
 
   useEffect(() => {
     if (pathname?.startsWith("/login")) {
-      if (userData && userData.email) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasToken = urlParams.get("token");
+      if (userData && userData.email && !hasToken) {
+        console.error("testtttttttttttttt 222222222222222");
+        console.warn("testtttttttttttttt 222222222222222");
         router.push("/");
       }
     }
