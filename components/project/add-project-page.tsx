@@ -357,8 +357,13 @@ export default function AddProjectPage(): JSX.Element {
       toast.error("يجب أن يكون الفيديو بصيغة MP4 أو MOV أو AVI فقط");
       return;
     }
-    if (file.size > 50 * 1024 * 1024) {
-      toast.error("يجب أن يكون حجم الملف أقل من 50 ميجابايت");
+    
+    // Get video size limit from user's package
+    const videoSizeLimit = useAuthStore.getState().userData?.membership?.package?.video_size_limit || 50;
+    const maxSizeInBytes = videoSizeLimit * 1024 * 1024; // Convert MB to bytes
+    
+    if (file.size > maxSizeInBytes) {
+      toast.error(`يجب أن يكون حجم الملف أقل من ${videoSizeLimit} ميجابايت`);
       return;
     }
 
@@ -1283,7 +1288,7 @@ export default function AddProjectPage(): JSX.Element {
                       </Button>
                       <p className="text-sm text-muted-foreground">
                         يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى
-                        لحجم الملف هو 50 ميجابايت والحد الأقصى للطول هو 5 دقائق.
+                        لحجم الملف هو {useAuthStore.getState().userData?.membership?.package?.video_size_limit || 50} ميجابايت والحد الأقصى للطول هو 5 دقائق.
                       </p>
                     </div>
                   </div>

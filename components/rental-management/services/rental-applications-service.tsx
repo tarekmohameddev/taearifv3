@@ -587,7 +587,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                   مدة الإيجار
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  تاريخ الانتقال
+                تاريخ الاستحقاق
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
                   الحالة
