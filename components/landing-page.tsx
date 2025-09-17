@@ -3,6 +3,7 @@
 import type React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Head from "next/head";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -325,7 +326,29 @@ export function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen" dir="rtl">
+    <>
+      <Head>
+        {/* Snap Pixel Code */}
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+              {a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+              a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
+              r.src=n;var u=t.getElementsByTagName(s)[0];
+              u.parentNode.insertBefore(r,u);})(window,document,
+              'https://sc-static.net/scevent.min.js');
+
+              snaptr('init', '12aec193-f115-47a4-a37d-deb2f0947c08', {});
+
+              snaptr('track', 'PAGE_VIEW');
+            `,
+          }}
+        />
+        {/* End Snap Pixel Code */}
+      </Head>
+      <div className="min-h-screen" dir="rtl">
       <Link
         href="/"
         className={`fixed top-0 w-screen z-50 flex justify-center md:justify-start  backdrop-blur-md h-fit ${isScrolled ? "bg-white/40" : ""}`}
@@ -906,6 +929,7 @@ export function LandingPage() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }
