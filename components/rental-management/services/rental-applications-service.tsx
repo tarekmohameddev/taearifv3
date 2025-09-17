@@ -116,24 +116,17 @@ interface RentalData {
 
 interface ApiResponse {
   status: boolean
-  data: {
+  data: RentalData[]
+  pagination: {
     current_page: number
-    data: RentalData[]
-    first_page_url: string
-    from: number
-    last_page: number
-    last_page_url: string
-    links: Array<{
-      url: string | null
-      label: string
-      active: boolean
-    }>
-    next_page_url: string | null
-    path: string
     per_page: number
-    prev_page_url: string | null
-    to: number
     total: number
+    last_page: number
+    from: number
+    to: number
+    has_more_pages: boolean
+    next_page_url: string | null
+    prev_page_url: string | null
   }
 }
 
@@ -254,18 +247,8 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
       
       if (response.data.status) {
         setRentalApplications({ 
-          rentals: response.data.data.data, 
-          pagination: {
-            current_page: response.data.data.current_page,
-            per_page: response.data.data.per_page,
-            total: response.data.data.total,
-            last_page: response.data.data.last_page,
-            from: response.data.data.from,
-            to: response.data.data.to,
-            has_more_pages: response.data.data.next_page_url !== null,
-            next_page_url: response.data.data.next_page_url,
-            prev_page_url: response.data.data.prev_page_url
-          },
+          rentals: response.data.data, 
+          pagination: (response.data as any).pagination,
           isInitialized: true 
         })
       } else {
