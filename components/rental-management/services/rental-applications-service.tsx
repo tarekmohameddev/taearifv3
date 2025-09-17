@@ -587,6 +587,9 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                   مدة الإيجار
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                تاريخ الانتقال
+                </th>
+                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
                 تاريخ الاستحقاق
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
@@ -683,6 +686,17 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                     </div>
                   </td>
 
+                  {/* تاريخ الاستحقاق */}
+                  <td className="px-6 py-5">
+                    <div className="text-sm font-semibold text-gray-900">
+                      {formatDate(rental.next_payment_due_date)}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {new Date(rental.next_payment_due_date).toLocaleDateString('ar-US')}
+                    </div>
+                  </td>
+
+                  
                   {/* الحالة */}
                   <td className="px-6 py-5">
                     <div className="flex items-center">

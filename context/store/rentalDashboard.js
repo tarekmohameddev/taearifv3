@@ -33,6 +33,9 @@ export const useRentalDashboardStore = create((set, get) => ({
   // الإيجارات الجارية
   ongoingRentals: [],
 
+  // العقود المنتهية خلال 30 يوم
+  expiringContractsNext30d: [],
+
   // التذكيرات
   reminders: [],
 
@@ -53,6 +56,7 @@ export const useRentalDashboardStore = create((set, get) => ({
     counts: data.counts || get().counts,
     rentalAmounts: data.rental_amounts || get().rentalAmounts,
     ongoingRentals: data.ongoing_rentals || [],
+    expiringContractsNext30d: data.expiring_contracts_next_30d || [],
     reminders: data.reminders || [],
     maintenance: data.maintenance || [],
     isInitialized: true
@@ -107,6 +111,7 @@ export const useRentalDashboardStore = create((set, get) => ({
       currency: "SAR"
     },
     ongoingRentals: [],
+    expiringContractsNext30d: [],
     reminders: [],
     maintenance: [],
     isOngoingRentalsDialogOpen: false,
