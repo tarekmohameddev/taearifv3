@@ -101,6 +101,8 @@ interface RentalData {
   created_at: string
   updated_at: string
   property: Property
+  next_payment_due_date?: string
+  next_payment_amount?: string
 }
 
 interface ApiResponse {
@@ -252,7 +254,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     }
   }
 
-  const filteredRentals = rentals.filter((rental: RentalData) => {
+  const filteredRentals = (rentals || []).filter((rental: RentalData) => {
     const matchesSearch =
       getTenantName(rental).toLowerCase().includes(searchTerm.toLowerCase()) ||
       getUnitLabel(rental).toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -692,7 +694,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       {formatDate(rental.next_payment_due_date)}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {rental.next_payment_amount} ريال سعودي
+                      {rental.next_payment_amount ? `${rental.next_payment_amount} ريال سعودي` : 'غير محدد'}
                     </div>
                   </td>
 
