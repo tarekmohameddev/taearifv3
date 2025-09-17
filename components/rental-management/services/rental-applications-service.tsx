@@ -692,7 +692,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       {formatDate(rental.next_payment_due_date)}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {new Date(rental.next_payment_due_date).toLocaleDateString('ar-US')}
+                      {rental.next_payment_amount} ريال سعودي
                     </div>
                   </td>
 
