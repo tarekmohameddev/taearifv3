@@ -6,6 +6,7 @@ const projectsManagement = require("./projectsManagement");
 const propertiesManagement = require("./propertiesManagement");
 const blogManagement = require("./blogManagement");
 const sidebar = require("./sidebar");
+const userAuth = require("./userAuth");
 
 const createStore = (set, get) => ({
   loading: false,
@@ -16,6 +17,7 @@ const createStore = (set, get) => ({
   ...propertiesManagement(set),
   ...blogManagement(set, get),
   ...sidebar(set, get),
+  ...userAuth(set),
 });
 
 module.exports = createStore;
