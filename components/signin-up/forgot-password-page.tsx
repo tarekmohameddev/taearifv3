@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AlertCircle, Mail, Phone, ArrowRight, ArrowLeft, Copy, Check, Eye, EyeOff, ExternalLink, Shield, Lock, Key } from "lucide-react";
@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import toast from "react-hot-toast";
 import useStore from "@/context/Store";
+import { countries } from "./countries";
 
 export function ForgotPasswordPage() {
   const router = useRouter();
@@ -51,6 +52,14 @@ export function ForgotPasswordPage() {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [resendCountdown, setResendCountdown] = useState(0);
   const [validationMessage, setValidationMessage] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState({
+    code: "sa",
+    dialCode: "+966",
+    name: "Saudi Arabia",
+  });
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // حساب قوة كلمة المرور
   useEffect(() => {
@@ -91,17 +100,35 @@ export function ForgotPasswordPage() {
     return () => clearInterval(interval);
   }, [resendCountdown]);
 
+  // إغلاق الـ dropdown عند الضغط خارجه
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
 
-  // Handle input change
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Handle input change for email only
   const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setIdentifier(value);
     
-    // Simple validation without changing input properties
+    // Simple validation for email only
     const trimmedValue = value.trim();
     
     if (!trimmedValue) {
       setValidationMessage("");
+      setPhoneNumber("");
+      setMethod("email");
       return;
     }
 
@@ -110,10 +137,11 @@ export function ForgotPasswordPage() {
     if (emailRegex.test(trimmedValue)) {
       setMethod("email");
       setValidationMessage("✓ بريد إلكتروني صحيح");
+      setPhoneNumber("");
       return;
     }
 
-    // Phone validation
+    // If not email, check if it's a phone number with country code
     const cleanPhone = trimmedValue.replace(/[\s-()]/g, '');
     const hasOnlyDigitsAndPlus = /^\+?[0-9]+$/.test(cleanPhone);
     const digitCount = cleanPhone.replace(/^\+/, '').length;
@@ -121,9 +149,24 @@ export function ForgotPasswordPage() {
     const hasValidFormat = !cleanPhone.startsWith('+0') && !cleanPhone.startsWith('00');
     
     if (hasOnlyDigitsAndPlus && isValidLength && hasValidFormat) {
-      setMethod("phone");
-      setValidationMessage("✓ رقم هاتف صحيح");
-      return;
+      // Check if phone number starts with country code
+      const foundCountry = countries.find(country => 
+        cleanPhone.startsWith(country.dialCode)
+      );
+      
+      if (foundCountry) {
+        // Phone number contains country code - show error
+        setValidationMessage("❌ يرجى إزالة كود الدولة واختيارها من القائمة المنسدلة");
+        setMethod("phone");
+        setPhoneNumber("");
+        return;
+      } else {
+        // Phone number without country code - switch to phone mode
+        setMethod("phone");
+        setValidationMessage("✓ رقم هاتف صحيح");
+        setPhoneNumber(cleanPhone);
+        return;
+      }
     }
 
     // Invalid input
@@ -144,6 +187,27 @@ export function ForgotPasswordPage() {
     }
   };
 
+  // Handle country selection
+  const handleCountrySelect = (country: typeof selectedCountry) => {
+    setSelectedCountry(country);
+    setIsDropdownOpen(false);
+  };
+
+  // Get flag component
+  const getFlagComponent = (countryCode: string) => (
+    <span
+      className="inline-block bg-cover bg-center"
+      style={{
+        backgroundImage: `url(https://flagcdn.com/24x18/${countryCode}.png)`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        display: "inline-block",
+        width: "20px",
+        height: "15px",
+      }}
+    />
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -155,14 +219,9 @@ export function ForgotPasswordPage() {
     // Simple validation
     const trimmedValue = identifier.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const cleanPhone = trimmedValue.replace(/[\s-()]/g, '');
-    const hasOnlyDigitsAndPlus = /^\+?[0-9]+$/.test(cleanPhone);
-    const digitCount = cleanPhone.replace(/^\+/, '').length;
-    const isValidLength = digitCount >= 7 && digitCount <= 15;
-    const hasValidFormat = !cleanPhone.startsWith('+0') && !cleanPhone.startsWith('00');
     
     const isValidEmail = emailRegex.test(trimmedValue);
-    const isValidPhone = hasOnlyDigitsAndPlus && isValidLength && hasValidFormat;
+    const isValidPhone = method === "phone" && phoneNumber && phoneNumber.length >= 7;
     
     if (!isValidEmail && !isValidPhone) {
       toast.error("يرجى إدخال بريد إلكتروني أو رقم هاتف صحيح");
@@ -178,6 +237,20 @@ export function ForgotPasswordPage() {
     try {
       const recaptchaToken = await executeRecaptcha("forgot_password");
 
+      // Prepare request body based on method
+      const requestBody = method === "phone" 
+        ? {
+            identifier: phoneNumber,
+            country_code: selectedCountry.dialCode,
+            method: method,
+            recaptcha_token: recaptchaToken,
+          }
+        : {
+            identifier: identifier.trim(),
+            method: method,
+            recaptcha_token: recaptchaToken,
+          };
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_Backend_URL}/auth/forgot-password`,
         {
@@ -185,11 +258,7 @@ export function ForgotPasswordPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            identifier: identifier.trim(),
-            method: method,
-            recaptcha_token: recaptchaToken,
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
 
@@ -310,6 +379,20 @@ export function ForgotPasswordPage() {
     try {
       const recaptchaToken = await executeRecaptcha("forgot_password");
 
+      // Prepare request body based on method
+      const requestBody = userMethod === "phone" 
+        ? {
+            identifier: phoneNumber,
+            country_code: selectedCountry.dialCode,
+            method: userMethod,
+            recaptcha_token: recaptchaToken,
+          }
+        : {
+            identifier: userIdentifier,
+            method: userMethod,
+            recaptcha_token: recaptchaToken,
+          };
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_Backend_URL}/auth/forgot-password`,
         {
@@ -317,11 +400,7 @@ export function ForgotPasswordPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            identifier: userIdentifier,
-            method: userMethod,
-            recaptcha_token: recaptchaToken,
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
 
@@ -704,33 +783,113 @@ export function ForgotPasswordPage() {
               </div>
             ) : (
               <>
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-5" dir="ltr">
                   {/* Smart Input Field */}
                   <div className="space-y-2">
                     <Label htmlFor="identifier" className="text-sm font-medium text-black">
                       البريد الإلكتروني أو رقم الهاتف
                     </Label>
-                    <div className="relative" dir="ltr">
-        <Input
-          id="identifier"
-          type="text"
-          placeholder=""
-          value={identifier}
-          onChange={handleIdentifierChange}
-          className={`py-5 text-left ${
-            validationMessage.includes('✓') 
-              ? 'border-green-500 bg-green-50' 
-              : validationMessage.includes('❌') 
-              ? 'border-red-500 bg-red-50' 
-              : ''
-          }`}
-          dir="ltr"
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck="false"
-        />
-                    </div>
+                    
+                    {method === "phone" ? (
+                      // Phone input with country selector
+                      <div className="flex relative" ref={dropdownRef}>
+                        {/* Phone Input */}
+                        <Input
+                          id="identifier"
+                          type="tel"
+                          placeholder="123456789"
+                          value={phoneNumber}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Allow only digits
+                            if (/^[\d]*$/.test(value)) {
+                              setPhoneNumber(value);
+                              setIdentifier(value);
+                              
+                              // If phone number is empty, reset to email mode
+                              if (value === "") {
+                                setMethod("email");
+                                setValidationMessage("");
+                                return;
+                              }
+                              
+                              // Validate phone number
+                              if (value.length >= 7 && value.length <= 15) {
+                                setValidationMessage("✓ رقم هاتف صحيح");
+                              } else if (value.length > 0) {
+                                setValidationMessage("❌ رقم الهاتف يجب أن يكون بين 7-15 رقم");
+                              } else {
+                                setValidationMessage("");
+                              }
+                            }
+                          }}
+                           className={`flex-1 py-5 text-left rounded-r-none border-r-0 focus:ring-0 focus:border-gray-300 focus:outline-none ${
+                             validationMessage.includes('✓') 
+                               ? 'border-green-500 bg-green-50' 
+                               : validationMessage.includes('❌') 
+                               ? 'border-red-500 bg-red-50' 
+                               : ''
+                           }`}
+                          autoComplete="off"
+                          autoCorrect="off"
+                          autoCapitalize="off"
+                          spellCheck="false"
+                        />
+
+                        {/* Country Selector Button */}
+                        <button
+                          type="button"
+                          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                          className="flex items-center justify-center px-3 py-2 bg-gray-50 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-gray-400 min-w-[80px]"
+                        >
+                          {getFlagComponent(selectedCountry.code)}
+                          <span className="text-xs ml-1 text-gray-600">▼</span>
+                        </button>
+
+                        {/* Dropdown */}
+                        {isDropdownOpen && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-48 overflow-y-auto">
+                            {countries.map((country) => (
+                              <button
+                                key={country.code}
+                                type="button"
+                                onClick={() => handleCountrySelect(country)}
+                                className="w-full px-3 py-2 text-left flex items-center space-x-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50"
+                              >
+                                {getFlagComponent(country.code)}
+                                <span className="text-sm text-gray-600 min-w-[45px]">
+                                  {country.dialCode}
+                                </span>
+                                <span className="text-sm flex-1">{country.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      // Email input
+                      <div className="relative" dir="ltr">
+                        <Input
+                          id="identifier"
+                          type="text"
+                          placeholder="example@gmail.com"
+                          value={identifier}
+                          onChange={handleIdentifierChange}
+                           className={`py-5 text-left focus:ring-0 focus:border-gray-300 focus:outline-none ${
+                             validationMessage.includes('✓') 
+                               ? 'border-green-500 bg-green-50' 
+                               : validationMessage.includes('❌') 
+                               ? 'border-red-500 bg-red-50' 
+                               : ''
+                           }`}
+                          dir="ltr"
+                          autoComplete="off"
+                          autoCorrect="off"
+                          autoCapitalize="off"
+                          spellCheck="false"
+                        />
+                      </div>
+                    )}
                     
                     {/* Validation Message */}
                     {validationMessage && (
@@ -745,14 +904,35 @@ export function ForgotPasswordPage() {
                       </div>
                     )}
                     
+                    {/* Phone Warning Message */}
+                    {method === "phone" && (
+                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                        <div className="flex items-start gap-2">
+                          <div className="flex-shrink-0">
+                            <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="text-sm text-yellow-800">
+                            <p className="font-medium">تنبيه مهم:</p>
+                            <p>يرجى كتابة رقم الهاتف فقط بدون كود الدولة (+966، +971، إلخ)</p>
+                            <p className="text-xs mt-1 text-yellow-700">سيتم إضافة كود الدولة تلقائياً من القائمة المنسدلة</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     {/* Input Type Indicator */}
-                    {identifier && (
+                    {(identifier || phoneNumber) && (
                       <div className="flex items-center gap-2 text-xs text-gray-500">
                         <div className={`w-2 h-2 rounded-full ${
                           method === "email" ? "bg-blue-500" : "bg-green-500"
                         }`}></div>
                         <span>
-                          {method === "email" ? "سيتم الإرسال عبر البريد الإلكتروني" : "سيتم الإرسال عبر الرسائل النصية"}
+                          {method === "email" 
+                            ? "سيتم الإرسال عبر البريد الإلكتروني" 
+                            : `سيتم الإرسال عبر الرسائل النصية إلى ${selectedCountry.dialCode}${phoneNumber}`
+                          }
                         </span>
                       </div>
                     )}
@@ -774,7 +954,7 @@ export function ForgotPasswordPage() {
                   <Button
                     type="submit"
                     className="w-full py-6 mt-2 bg-black hover:bg-gray-800 text-white"
-                    disabled={isLoading || countdown > 0 || !identifier.trim() || !validationMessage.includes('✓')}
+                    disabled={isLoading || countdown > 0 || (!identifier.trim() && !phoneNumber) || !validationMessage.includes('✓')}
                   >
                     {isLoading ? (
                       <div className="flex items-center justify-center">
