@@ -50,6 +50,7 @@ export function ForgotPasswordPage() {
   const [copied, setCopied] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [resendCountdown, setResendCountdown] = useState(0);
+  const [validationMessage, setValidationMessage] = useState("");
 
   // حساب قوة كلمة المرور
   useEffect(() => {
@@ -90,11 +91,81 @@ export function ForgotPasswordPage() {
     return () => clearInterval(interval);
   }, [resendCountdown]);
 
+
+  // Handle input change
+  const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setIdentifier(value);
+    
+    // Simple validation without changing input properties
+    const trimmedValue = value.trim();
+    
+    if (!trimmedValue) {
+      setValidationMessage("");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (emailRegex.test(trimmedValue)) {
+      setMethod("email");
+      setValidationMessage("✓ بريد إلكتروني صحيح");
+      return;
+    }
+
+    // Phone validation
+    const cleanPhone = trimmedValue.replace(/[\s-()]/g, '');
+    const hasOnlyDigitsAndPlus = /^\+?[0-9]+$/.test(cleanPhone);
+    const digitCount = cleanPhone.replace(/^\+/, '').length;
+    const isValidLength = digitCount >= 7 && digitCount <= 15;
+    const hasValidFormat = !cleanPhone.startsWith('+0') && !cleanPhone.startsWith('00');
+    
+    if (hasOnlyDigitsAndPlus && isValidLength && hasValidFormat) {
+      setMethod("phone");
+      setValidationMessage("✓ رقم هاتف صحيح");
+      return;
+    }
+
+    // Invalid input
+    if (trimmedValue.includes('@')) {
+      setValidationMessage("❌ البريد الإلكتروني غير صحيح");
+    } else if (/[0-9]/.test(trimmedValue)) {
+      if (digitCount < 7) {
+        setValidationMessage("❌ رقم الهاتف قصير جداً (يجب أن يكون 7 أرقام على الأقل)");
+      } else if (digitCount > 15) {
+        setValidationMessage("❌ رقم الهاتف طويل جداً (يجب أن يكون 15 رقم على الأكثر)");
+      } else if (cleanPhone.startsWith('+0') || cleanPhone.startsWith('00')) {
+        setValidationMessage("❌ رقم الهاتف غير صحيح (لا يمكن أن يبدأ بـ +0 أو 00)");
+      } else {
+        setValidationMessage("❌ رقم الهاتف غير صحيح");
+      }
+    } else {
+      setValidationMessage("❌ يرجى إدخال بريد إلكتروني أو رقم هاتف صحيح");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!identifier.trim()) {
       toast.error("يرجى إدخال البريد الإلكتروني أو رقم الهاتف");
+      return;
+    }
+
+    // Simple validation
+    const trimmedValue = identifier.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const cleanPhone = trimmedValue.replace(/[\s-()]/g, '');
+    const hasOnlyDigitsAndPlus = /^\+?[0-9]+$/.test(cleanPhone);
+    const digitCount = cleanPhone.replace(/^\+/, '').length;
+    const isValidLength = digitCount >= 7 && digitCount <= 15;
+    const hasValidFormat = !cleanPhone.startsWith('+0') && !cleanPhone.startsWith('00');
+    
+    const isValidEmail = emailRegex.test(trimmedValue);
+    const isValidPhone = hasOnlyDigitsAndPlus && isValidLength && hasValidFormat;
+    
+    if (!isValidEmail && !isValidPhone) {
+      toast.error("يرجى إدخال بريد إلكتروني أو رقم هاتف صحيح");
       return;
     }
 
@@ -381,28 +452,28 @@ export function ForgotPasswordPage() {
                   <div className="flex justify-center mt-4">
                     {resendCountdown > 0 ? (
                       <div className="relative">
-                        <div className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border border-blue-200 rounded-2xl shadow-lg backdrop-blur-sm">
+                        <div className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-300 rounded-2xl shadow-lg">
                           {/* Animated Spinner */}
                           <div className="relative">
-                            <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
-                            <div className="absolute inset-0 w-8 h-8 border-4 border-transparent border-t-blue-300 rounded-full animate-ping"></div>
+                            <div className="w-8 h-8 border-4 border-gray-200 border-t-black rounded-full animate-spin"></div>
+                            <div className="absolute inset-0 w-8 h-8 border-4 border-transparent border-t-gray-400 rounded-full animate-ping"></div>
                           </div>
                           
                           {/* Text */}
                           <div className="flex flex-col items-center">
-                            <span className="text-sm font-medium text-blue-700">
+                            <span className="text-sm font-medium text-black">
                               إعادة الإرسال متاحة خلال
                             </span>
                             <div className="flex items-center gap-2 mt-1">
                               {/* Countdown Timer */}
                               <div className="relative">
-                                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-lg">
+                                <div className="flex items-center justify-center w-12 h-12 bg-black text-white rounded-xl shadow-lg">
                                   <span className="text-xl font-bold">{resendCountdown}</span>
                                 </div>
                                 {/* Pulse Effect */}
-                                <div className="absolute inset-0 w-12 h-12 bg-blue-400 rounded-xl animate-ping opacity-30"></div>
+                                <div className="absolute inset-0 w-12 h-12 bg-gray-400 rounded-xl animate-ping opacity-30"></div>
                               </div>
-                              <span className="text-sm font-medium text-blue-600">ثانية</span>
+                              <span className="text-sm font-medium text-gray-600">ثانية</span>
                             </div>
                           </div>
                           
@@ -410,14 +481,14 @@ export function ForgotPasswordPage() {
                           <div className="relative w-8 h-8">
                             <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 36 36">
                               <path
-                                className="text-blue-200"
+                                className="text-gray-200"
                                 stroke="currentColor"
                                 strokeWidth="3"
                                 fill="none"
                                 d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                               />
                               <path
-                                className="text-blue-500"
+                                className="text-black"
                                 stroke="currentColor"
                                 strokeWidth="3"
                                 fill="none"
@@ -434,16 +505,16 @@ export function ForgotPasswordPage() {
                         variant="outline"
                         onClick={handleResendCode}
                         disabled={isLoading}
-                        className="group flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border border-green-200 text-green-700 hover:from-green-100 hover:via-emerald-100 hover:to-teal-100 hover:border-green-300 hover:shadow-lg transition-all duration-300 rounded-2xl shadow-md hover:scale-105"
+                        className="group flex items-center gap-3 px-8 py-3 bg-white border border-gray-300 text-black hover:bg-gray-50 hover:border-gray-400 hover:shadow-lg transition-all duration-300 rounded-2xl shadow-md hover:scale-105"
                       >
                         <div className="relative">
                           <svg className="w-5 h-5 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
-                          <div className="absolute inset-0 w-5 h-5 bg-green-400 rounded-full animate-ping opacity-20"></div>
+                          <div className="absolute inset-0 w-5 h-5 bg-gray-400 rounded-full animate-ping opacity-20"></div>
                         </div>
                         <span className="font-medium">إعادة إرسال الكود</span>
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-black rounded-full animate-pulse"></div>
                       </Button>
                     )}
                   </div>
@@ -634,50 +705,58 @@ export function ForgotPasswordPage() {
             ) : (
               <>
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  <Tabs value={method} onValueChange={(value) => setMethod(value as "email" | "phone")} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 bg-gray-100">
-                      <TabsTrigger value="email" className="flex items-center gap-2 data-[state=active]:bg-black data-[state=active]:text-white">
-                        <Mail className="h-4 w-4" />
-                        البريد الإلكتروني
-                      </TabsTrigger>
-                      <TabsTrigger value="phone" className="flex items-center gap-2 data-[state=active]:bg-black data-[state=active]:text-white">
-                        <Phone className="h-4 w-4" />
-                        رقم الهاتف
-                      </TabsTrigger>
-                    </TabsList>
+                  {/* Smart Input Field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="identifier" className="text-sm font-medium text-black">
+                      البريد الإلكتروني أو رقم الهاتف
+                    </Label>
+                    <div className="relative" dir="ltr">
+        <Input
+          id="identifier"
+          type="text"
+          placeholder=""
+          value={identifier}
+          onChange={handleIdentifierChange}
+          className={`py-5 text-left ${
+            validationMessage.includes('✓') 
+              ? 'border-green-500 bg-green-50' 
+              : validationMessage.includes('❌') 
+              ? 'border-red-500 bg-red-50' 
+              : ''
+          }`}
+          dir="ltr"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
+        />
+                    </div>
                     
-                    <TabsContent value="email" className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="text-sm font-medium text-black">
-                          البريد الإلكتروني
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="example@gmail.com"
-                          value={identifier}
-                          onChange={(e) => setIdentifier(e.target.value)}
-                          className="py-5 text-right"
-                        />
+                    {/* Validation Message */}
+                    {validationMessage && (
+                      <div className={`text-sm ${
+                        validationMessage.includes('✓') 
+                          ? 'text-green-600' 
+                          : 'text-red-600'
+                      }`}
+                      dir="ltr"
+                      >
+                        {validationMessage}
                       </div>
-                    </TabsContent>
+                    )}
                     
-                    <TabsContent value="phone" className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-sm font-medium text-black">
-                          رقم الهاتف
-                        </Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          placeholder="+966 50 123 4567"
-                          value={identifier}
-                          onChange={(e) => setIdentifier(e.target.value)}
-                          className="py-5 text-right"
-                        />
+                    {/* Input Type Indicator */}
+                    {identifier && (
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <div className={`w-2 h-2 rounded-full ${
+                          method === "email" ? "bg-blue-500" : "bg-green-500"
+                        }`}></div>
+                        <span>
+                          {method === "email" ? "سيتم الإرسال عبر البريد الإلكتروني" : "سيتم الإرسال عبر الرسائل النصية"}
+                        </span>
                       </div>
-                    </TabsContent>
-                  </Tabs>
+                    )}
+                  </div>
 
                   {resetAttempts < 3 && (
                     <div className="p-3 bg-blue-50 border border-blue-200 text-blue-700 rounded-md text-sm">
@@ -695,7 +774,7 @@ export function ForgotPasswordPage() {
                   <Button
                     type="submit"
                     className="w-full py-6 mt-2 bg-black hover:bg-gray-800 text-white"
-                    disabled={isLoading || countdown > 0 || !identifier.trim()}
+                    disabled={isLoading || countdown > 0 || !identifier.trim() || !validationMessage.includes('✓')}
                   >
                     {isLoading ? (
                       <div className="flex items-center justify-center">
@@ -727,41 +806,6 @@ export function ForgotPasswordPage() {
                   </Button>
                 </form>
 
-                {resetUrl && (
-                  <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-md">
-                    <p className="text-sm text-green-700 mb-2">تم إنشاء رابط إعادة التعيين:</p>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        value={resetUrl}
-                        readOnly
-                        className="text-sm cursor-pointer hover:bg-green-100 transition-colors"
-                        onClick={() => window.open(`http://${resetUrl}`, '_blank')}
-                        title="اضغط لفتح الرابط في tab جديدة"
-                      />
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={copyToClipboard}
-                        className="flex-shrink-0 border-gray-300 hover:bg-gray-100"
-                        title="نسخ الرابط"
-                      >
-                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={openResetLink}
-                        className="flex-shrink-0 border-gray-300 hover:bg-gray-100"
-                        title="فتح الرابط في tab جديدة"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <p className="text-xs text-green-600 mt-2">
-                      💡 اضغط على الرابط أو الزر الأزرق لفتحه في tab جديدة
-                    </p>
-                  </div>
-                )}
 
                 <div className="text-center mt-6">
                   <p className="text-sm text-gray-600">

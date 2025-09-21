@@ -11,38 +11,46 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import toast from "react-hot-toast";
+import useStore from "@/context/Store";
 
 export function ResetPasswordPage() {
   const router = useRouter();
-  const [identifier, setIdentifier] = useState("");
-  const [resetCode, setResetCode] = useState("");
+  const { executeRecaptcha } = useGoogleReCaptcha();
+  
+  // Zustand store
+  const {
+    userIdentifier,
+    userMethod,
+    resetCode,
+    setResetCode,
+    resetUserAuth,
+  } = useStore();
+
+  // Local state
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const [codeError, setCodeError] = useState("");
 
-  // استخراج البيانات من URL
+  // استخراج الكود من URL
   useEffect(() => {
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get("code");
-      const identifierParam = urlParams.get("identifier");
       
-      
-      if (code && identifierParam) {
+      if (code) {
         setResetCode(code);
-        setIdentifier(identifierParam);
       } else {
-        // إذا لم تكن البيانات موجودة، توجيه إلى صفحة نسيان كلمة المرور
+        // إذا لم يكن الكود موجود، توجيه إلى صفحة نسيان كلمة المرور
         setTimeout(() => {
           router.push("/forgot-password");
         }, 1000);
       }
     }
-  }, [router]);
+  }, [router, setResetCode]);
 
   // حساب قوة كلمة المرور
   useEffect(() => {
@@ -63,6 +71,9 @@ export function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // إعادة تعيين رسالة الخطأ
+    setCodeError("");
 
     if (!newPassword.trim()) {
       toast.error("يرجى إدخال كلمة المرور الجديدة");
@@ -96,7 +107,6 @@ export function ResetPasswordPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            identifier: identifier,
             code: resetCode,
             new_password: newPassword,
             new_password_confirmation: confirmPassword,
@@ -108,10 +118,17 @@ export function ResetPasswordPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "حدث خطأ أثناء إعادة تعيين كلمة المرور");
+        if (data.message === "Invalid or expired code") {
+          setCodeError("الكود غير صالح أو منتهي الصلاحية");
+          toast.error("الكود غير صالح أو منتهي الصلاحية");
+        } else {
+          throw new Error(data.message || "حدث خطأ أثناء إعادة تعيين كلمة المرور");
+        }
+        return;
       }
 
       toast.success("تم تغيير كلمة المرور بنجاح");
+      resetUserAuth(); // إعادة تعيين البيانات
       setTimeout(() => {
         router.push("/login");
       }, 2000);
@@ -123,20 +140,20 @@ export function ResetPasswordPage() {
     }
   };
 
-  // إذا لم يتم تحميل البيانات بعد، عرض loading
-  if (!resetCode || !identifier) {
+  // إذا لم يتم تحميل الكود بعد، عرض loading
+  if (!resetCode) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4" dir="rtl">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4" dir="rtl">
         <div className="w-full max-w-md text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground mx-auto mb-4"></div>
-          <p className="text-muted-foreground">جاري تحميل صفحة إعادة تعيين كلمة المرور...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
+          <p className="text-gray-600">جاري تحميل صفحة إعادة تعيين كلمة المرور...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4" dir="rtl">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4" dir="rtl">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
@@ -146,23 +163,23 @@ export function ResetPasswordPage() {
               alt="Website Builder Logo"
               width={200}
               height={142}
-              className="h-[7rem] md:h-[7rem] w-auto object-contain dark:invert"
+              className="h-[7rem] md:h-[7rem] w-auto object-contain invert"
             />
           </div>
         </div>
 
-        <Card className="border-0 shadow-lg">
+        <Card className="border-0 shadow-2xl bg-white">
           <CardHeader className="text-center pb-4">
             <Link href="/forgot-password" className="absolute right-4 top-4">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-black hover:bg-gray-100">
                 <ArrowLeft className="h-4 w-4 ml-1" />
                 رجوع
               </Button>
             </Link>
-            <CardTitle className="text-2xl font-bold text-foreground">
+            <CardTitle className="text-2xl font-bold text-black">
               إعادة تعيين كلمة المرور
             </CardTitle>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-600">
               أدخل كلمة المرور الجديدة
             </p>
             <div className="flex items-center justify-center gap-2 mt-2">
@@ -171,10 +188,29 @@ export function ResetPasswordPage() {
             </div>
           </CardHeader>
           <CardContent>
+            {/* Code Error Message */}
+            {codeError && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-red-500" />
+                  <span className="font-medium">{codeError}</span>
+                </div>
+                <p className="text-sm mt-1">
+                  يرجى طلب كود جديد من صفحة نسيان كلمة المرور
+                </p>
+                <Link 
+                  href="/forgot-password" 
+                  className="inline-block mt-2 text-sm text-red-600 hover:text-red-800 underline"
+                >
+                  طلب كود جديد
+                </Link>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* New Password */}
               <div className="space-y-2">
-                <Label htmlFor="newPassword" className="text-sm font-medium text-foreground">
+                <Label htmlFor="newPassword" className="text-sm font-medium text-black">
                   كلمة المرور الجديدة
                 </Label>
                 <div className="relative">
@@ -185,6 +221,10 @@ export function ResetPasswordPage() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="py-5 text-right"
+                    autoComplete="new-password"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck="false"
                   />
                   <button
                     type="button"
@@ -192,9 +232,9 @@ export function ResetPasswordPage() {
                     className="absolute inset-y-0 left-0 flex items-center pl-3"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-muted-foreground" />
+                      <EyeOff className="h-5 w-5 text-gray-400" />
                     ) : (
-                      <Eye className="h-5 w-5 text-muted-foreground" />
+                      <Eye className="h-5 w-5 text-gray-400" />
                     )}
                   </button>
                 </div>
@@ -216,7 +256,7 @@ export function ResetPasswordPage() {
                         />
                       ))}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-500">
                       {passwordStrength <= 2 && "ضعيف"}
                       {passwordStrength === 3 && "متوسط"}
                       {passwordStrength >= 4 && "قوي"}
@@ -227,7 +267,7 @@ export function ResetPasswordPage() {
 
               {/* Confirm Password */}
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-black">
                   تأكيد كلمة المرور
                 </Label>
                 <div className="relative">
@@ -238,6 +278,10 @@ export function ResetPasswordPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="py-5 text-right"
+                    autoComplete="new-password"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck="false"
                   />
                   <button
                     type="button"
@@ -245,9 +289,9 @@ export function ResetPasswordPage() {
                     className="absolute inset-y-0 left-0 flex items-center pl-3"
                   >
                     {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-muted-foreground" />
+                      <EyeOff className="h-5 w-5 text-gray-400" />
                     ) : (
-                      <Eye className="h-5 w-5 text-muted-foreground" />
+                      <Eye className="h-5 w-5 text-gray-400" />
                     )}
                   </button>
                 </div>
@@ -255,13 +299,13 @@ export function ResetPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full py-6 mt-2 bg-foreground hover:bg-foreground/90 text-background"
-                disabled={isLoading}
+                className="w-full py-6 mt-2 bg-black hover:bg-gray-800 text-white"
+                disabled={isLoading || !newPassword.trim() || !confirmPassword.trim() || !!codeError}
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-background"
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -289,11 +333,11 @@ export function ResetPasswordPage() {
             </form>
 
             <div className="text-center mt-6">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-600">
                 تذكر كلمة المرور؟{" "}
                 <Link
                   href="/login"
-                  className="text-foreground font-semibold hover:underline"
+                  className="text-black font-semibold hover:underline"
                 >
                   تسجيل الدخول
                 </Link>
