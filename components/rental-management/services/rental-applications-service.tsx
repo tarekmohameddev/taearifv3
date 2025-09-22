@@ -358,21 +358,14 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
       const response = await axiosInstance.post("/v1/rms/rentals", formData)
       
       if (response.data.status) {
-        // إضافة الإيجار الجديد للقائمة في بداية المصفوفة
-        const newRental = response.data.data
+        // إغلاق النافذة المنبثقة أولاً
+        setRentalApplications({ isAddRentalDialogOpen: false })
         
-        // إضافة ID من response إلى formData
-        const rentalWithId = {
-          ...formData,
-          id: newRental.id,
-          created_at: newRental.created_at,
-          updated_at: newRental.updated_at,
-          status: newRental.status || "active"
-        }
+        // إعادة جلب البيانات من API لضمان الحصول على أحدث البيانات
+        await fetchRentals(1)
         
-        const updatedRentals = [rentalWithId, ...rentals]
-        setRentalApplications({ rentals: updatedRentals, isAddRentalDialogOpen: false })
         // يمكن إضافة toast notification هنا
+        console.log("تم إضافة الإيجار بنجاح وإعادة تحميل البيانات")
       } else {
         alert("فشل في إضافة الإيجار: " + (response.data.message || "خطأ غير معروف"))
       }
@@ -1241,6 +1234,15 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
     if (!formData.tenant_phone.trim()) {
       newErrors.tenant_phone = "رقم الهاتف مطلوب"
     }
+    if (!formData.move_in_date.trim()) {
+      newErrors.move_in_date = "تاريخ الانتقال مطلوب"
+    }
+    if (!formData.rental_period || formData.rental_period <= 0) {
+      newErrors.rental_period = "مدة الإيجار مطلوبة ولا تقل عن شهر واحد"
+    }
+    if (!formData.base_rent_amount || parseFloat(formData.base_rent_amount) < 100) {
+      newErrors.base_rent_amount = "مبلغ الإيجار مطلوب ولا يقل عن 100 ريال"
+    }
 
     // التحقق من صحة رقم الهاتف
     if (formData.tenant_phone && !/^[0-9+\-\s()]+$/.test(formData.tenant_phone)) {
@@ -1250,6 +1252,27 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
     // التحقق من صحة البريد الإلكتروني (إذا تم إدخاله)
     if (formData.tenant_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.tenant_email)) {
       newErrors.tenant_email = "البريد الإلكتروني غير صحيح"
+    }
+
+    // التحقق من صحة تاريخ الانتقال
+    if (formData.move_in_date) {
+      const selectedDate = new Date(formData.move_in_date)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0) // إزالة الوقت للمقارنة الصحيحة
+      
+      if (selectedDate < today) {
+        newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي"
+      }
+    }
+
+    // التحقق من صحة مدة الإيجار
+    if (formData.rental_period && (isNaN(formData.rental_period) || formData.rental_period <= 0)) {
+      newErrors.rental_period = "مدة الإيجار يجب أن تكون رقم صحيح أكبر من 0"
+    }
+
+    // التحقق من صحة مبلغ الإيجار
+    if (formData.base_rent_amount && (isNaN(parseFloat(formData.base_rent_amount)) || parseFloat(formData.base_rent_amount) < 100)) {
+      newErrors.base_rent_amount = "مبلغ الإيجار يجب أن يكون رقم صحيح لا يقل عن 100 ريال"
     }
 
     setErrors(newErrors)
@@ -1509,26 +1532,57 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="move_in_date" className="text-sm font-medium text-gray-700">تاريخ الانتقال</Label>
+              <Label htmlFor="move_in_date" className="text-sm font-medium text-gray-700">
+                تاريخ الانتقال <span className="text-red-500">*</span>
+              </Label>
               <Input 
                 id="move_in_date"
                 type="date"
                 value={formData.move_in_date}
-                onChange={(e) => setFormData(prev => ({ ...prev, move_in_date: e.target.value }))}
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, move_in_date: e.target.value }))
+                  if (errors.move_in_date) {
+                    setErrors(prev => ({ ...prev, move_in_date: "" }))
+                  }
+                }}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.move_in_date ? 'border-red-500' : ''}`}
               />
+              {errors.move_in_date && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.move_in_date}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="rental_period_months" className="text-sm font-medium text-gray-700">مدة الإيجار (بالشهور)</Label>
+              <Label htmlFor="rental_period_months" className="text-sm font-medium text-gray-700">
+                مدة الإيجار (بالشهور) <span className="text-red-500">*</span>
+              </Label>
               <Input 
                 id="rental_period_months"
                 type="number"
                 value={formData.rental_period}
-                onChange={(e) => setFormData(prev => ({ ...prev, rental_period: parseInt(e.target.value) }))}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0
+                  setFormData(prev => ({ ...prev, rental_period: value }))
+                  
+                  // التحقق الفوري من القيمة
+                  if (value <= 0) {
+                    setErrors(prev => ({ ...prev, rental_period: "مدة الإيجار مطلوبة ولا تقل عن شهر واحد" }))
+                  } else {
+                    setErrors(prev => ({ ...prev, rental_period: "" }))
+                  }
+                }}
                 min="1"
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.rental_period ? 'border-red-500' : ''}`}
               />
+              {errors.rental_period && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.rental_period}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -1547,15 +1601,29 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="base_rent_amount" className="text-sm font-medium text-gray-700">مبلغ الإيجار</Label>
+              <Label htmlFor="base_rent_amount" className="text-sm font-medium text-gray-700">
+                مبلغ الإيجار <span className="text-red-500">*</span>
+              </Label>
               <Input 
                 id="base_rent_amount"
                 type="number"
                 value={formData.base_rent_amount}
-                onChange={(e) => setFormData(prev => ({ ...prev, base_rent_amount: e.target.value }))}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, base_rent_amount: e.target.value }))
+                  if (errors.base_rent_amount) {
+                    setErrors(prev => ({ ...prev, base_rent_amount: "" }))
+                  }
+                }}
                 placeholder="6500"
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                min="100"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.base_rent_amount ? 'border-red-500' : ''}`}
               />
+              {errors.base_rent_amount && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.base_rent_amount}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -1704,6 +1772,15 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
     if (!formData.tenant_phone.trim()) {
       newErrors.tenant_phone = "رقم الهاتف مطلوب"
     }
+    if (!formData.move_in_date.trim()) {
+      newErrors.move_in_date = "تاريخ الانتقال مطلوب"
+    }
+    if (!formData.rental_period || formData.rental_period <= 0) {
+      newErrors.rental_period = "مدة الإيجار مطلوبة ولا تقل عن شهر واحد"
+    }
+    if (!formData.base_rent_amount || parseFloat(formData.base_rent_amount) < 100) {
+      newErrors.base_rent_amount = "مبلغ الإيجار مطلوب ولا يقل عن 100 ريال"
+    }
 
     // التحقق من صحة رقم الهاتف
     if (formData.tenant_phone && !/^[0-9+\-\s()]+$/.test(formData.tenant_phone)) {
@@ -1713,6 +1790,27 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
     // التحقق من صحة البريد الإلكتروني (إذا تم إدخاله)
     if (formData.tenant_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.tenant_email)) {
       newErrors.tenant_email = "البريد الإلكتروني غير صحيح"
+    }
+
+    // التحقق من صحة تاريخ الانتقال
+    if (formData.move_in_date) {
+      const selectedDate = new Date(formData.move_in_date)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0) // إزالة الوقت للمقارنة الصحيحة
+      
+      if (selectedDate < today) {
+        newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي"
+      }
+    }
+
+    // التحقق من صحة مدة الإيجار
+    if (formData.rental_period && (isNaN(formData.rental_period) || formData.rental_period <= 0)) {
+      newErrors.rental_period = "مدة الإيجار يجب أن تكون رقم صحيح أكبر من 0"
+    }
+
+    // التحقق من صحة مبلغ الإيجار
+    if (formData.base_rent_amount && (isNaN(parseFloat(formData.base_rent_amount)) || parseFloat(formData.base_rent_amount) < 100)) {
+      newErrors.base_rent_amount = "مبلغ الإيجار يجب أن يكون رقم صحيح لا يقل عن 100 ريال"
     }
 
     setErrors(newErrors)

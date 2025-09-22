@@ -165,6 +165,15 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
     if (!formData.property_number.trim()) {
       newErrors.property_number = "رقم العقار مطلوب"
     }
+    if (!formData.move_in_date.trim()) {
+      newErrors.move_in_date = "تاريخ الانتقال مطلوب"
+    }
+    if (!formData.rental_period || formData.rental_period <= 0) {
+      newErrors.rental_period = "مدة الإيجار مطلوبة ولا تقل عن شهر واحد"
+    }
+    if (!formData.base_rent_amount || parseFloat(formData.base_rent_amount) < 100) {
+      newErrors.base_rent_amount = "مبلغ الإيجار مطلوب ولا يقل عن 100 ريال"
+    }
 
     // التحقق من صحة رقم الهاتف
     if (formData.tenant_phone && !/^[0-9+\-\s()]+$/.test(formData.tenant_phone)) {
@@ -179,6 +188,27 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
     // التحقق من قيمة العمولة
     if (formData.office_commission_value && isNaN(parseFloat(formData.office_commission_value))) {
       newErrors.office_commission_value = "قيمة العمولة يجب أن تكون رقماً"
+    }
+
+    // التحقق من صحة تاريخ الانتقال
+    if (formData.move_in_date) {
+      const selectedDate = new Date(formData.move_in_date)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0) // إزالة الوقت للمقارنة الصحيحة
+      
+      if (selectedDate < today) {
+        newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي"
+      }
+    }
+
+    // التحقق من صحة مدة الإيجار
+    if (formData.rental_period && (isNaN(formData.rental_period) || formData.rental_period <= 0)) {
+      newErrors.rental_period = "مدة الإيجار يجب أن تكون رقم صحيح أكبر من 0"
+    }
+
+    // التحقق من صحة مبلغ الإيجار
+    if (formData.base_rent_amount && (isNaN(parseFloat(formData.base_rent_amount)) || parseFloat(formData.base_rent_amount) < 100)) {
+      newErrors.base_rent_amount = "مبلغ الإيجار يجب أن يكون رقم صحيح لا يقل عن 100 ريال"
     }
 
     setErrors(newErrors)
@@ -489,14 +519,27 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="move_in_date" className="text-sm font-medium text-gray-700">تاريخ الانتقال</Label>
+              <Label htmlFor="move_in_date" className="text-sm font-medium text-gray-700">
+                تاريخ الانتقال <span className="text-red-500">*</span>
+              </Label>
               <Input 
                 id="move_in_date"
                 type="date"
                 value={formData.move_in_date}
-                onChange={(e) => setFormData(prev => ({ ...prev, move_in_date: e.target.value }))}
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, move_in_date: e.target.value }))
+                  if (errors.move_in_date) {
+                    setErrors(prev => ({ ...prev, move_in_date: "" }))
+                  }
+                }}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.move_in_date ? 'border-red-500' : ''}`}
               />
+              {errors.move_in_date && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.move_in_date}
+                </p>
+              )}
             </div>
 
             {/* خطة الدفع - في الأعلى */}
@@ -522,16 +565,32 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
                 مدة الإيجار ({formData.paying_plan === 'monthly' ? 'بالشهور' : 
                   formData.paying_plan === 'quarterly' ? 'بالأرباع' :
                   formData.paying_plan === 'semi_annual' ? 'بالنصف سنوي' : 
-                  formData.paying_plan === 'annual' ? 'بالسنوات' : 'بالشهور'})
+                  formData.paying_plan === 'annual' ? 'بالسنوات' : 'بالشهور'}) <span className="text-red-500">*</span>
               </Label>
               <Input 
                 id="rental_period"
                 type="number"
                 value={formData.rental_period}
-                onChange={(e) => setFormData(prev => ({ ...prev, rental_period: parseInt(e.target.value) }))}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0
+                  setFormData(prev => ({ ...prev, rental_period: value }))
+                  
+                  // التحقق الفوري من القيمة
+                  if (value <= 0) {
+                    setErrors(prev => ({ ...prev, rental_period: "مدة الإيجار مطلوبة ولا تقل عن شهر واحد" }))
+                  } else {
+                    setErrors(prev => ({ ...prev, rental_period: "" }))
+                  }
+                }}
                 min="1"
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.rental_period ? 'border-red-500' : ''}`}
               />
+              {errors.rental_period && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.rental_period}
+                </p>
+              )}
                       {formData.rental_period && !isNaN(formData.rental_period) && formData.rental_period > 0 && (
               <div className="text-sm bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 rounded-lg border border-gray-200 shadow-sm">
                 <div className="flex items-center justify-between">
@@ -564,15 +623,29 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="base_rent_amount" className="text-sm font-medium text-gray-700">مبلغ الإيجار</Label>
+              <Label htmlFor="base_rent_amount" className="text-sm font-medium text-gray-700">
+                مبلغ الإيجار <span className="text-red-500">*</span>
+              </Label>
               <Input 
                 id="base_rent_amount"
                 type="number"
                 value={formData.base_rent_amount}
-                onChange={(e) => setFormData(prev => ({ ...prev, base_rent_amount: e.target.value }))}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, base_rent_amount: e.target.value }))
+                  if (errors.base_rent_amount) {
+                    setErrors(prev => ({ ...prev, base_rent_amount: "" }))
+                  }
+                }}
                 placeholder="6500"
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                min="100"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.base_rent_amount ? 'border-red-500' : ''}`}
               />
+              {errors.base_rent_amount && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.base_rent_amount}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

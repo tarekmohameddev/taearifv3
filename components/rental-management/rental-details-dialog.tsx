@@ -194,10 +194,19 @@ export function RentalDetailsDialog() {
     }
   }
 
-  const getPaymentStatusColor = (status: string) => {
-    switch (status) {
-      case 'paid':
-        return 'bg-green-100 text-green-800 border-green-200'
+  const getPaymentStatusColor = (payment: any) => {
+    // إذا كان المبلغ المدفوع يساوي أو أكبر من المبلغ المطلوب، اعرضه باللون الأخضر
+    if (payment.paid_amount >= payment.amount) {
+      return 'bg-green-100 text-green-800 border-green-200'
+    }
+    
+    // إذا كان status هو paid أو paid_in_full، اعرضه باللون الأخضر
+    if (payment.status === 'paid' || payment.status === 'paid_in_full') {
+      return 'bg-green-100 text-green-800 border-green-200'
+    }
+    
+    // باقي الحالات حسب payment_status
+    switch (payment.payment_status) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200'
       case 'overdue':
@@ -209,10 +218,19 @@ export function RentalDetailsDialog() {
     }
   }
 
-  const getPaymentStatusText = (status: string) => {
-    switch (status) {
-      case 'paid':
-        return 'مدفوع'
+  const getPaymentStatusText = (payment: any) => {
+    // إذا كان المبلغ المدفوع يساوي أو أكبر من المبلغ المطلوب، اعرضه كمدفوع
+    if (payment.paid_amount >= payment.amount) {
+      return 'مدفوع'
+    }
+    
+    // إذا كان status هو paid أو paid_in_full، اعرضه كمدفوع
+    if (payment.status === 'paid' || payment.status === 'paid_in_full') {
+      return 'مدفوع'
+    }
+    
+    // باقي الحالات حسب payment_status
+    switch (payment.payment_status) {
       case 'pending':
         return 'في الانتظار'
       case 'overdue':
@@ -220,7 +238,7 @@ export function RentalDetailsDialog() {
       case 'not_due':
         return 'غير مستحق'
       default:
-        return status
+        return payment.payment_status
     }
   }
 
@@ -242,7 +260,7 @@ export function RentalDetailsDialog() {
               تفاصيل طلب الإيجار
             </DialogTitle>
             <div className="flex items-center gap-2">
-              {details && (
+              {details && details.rental && (
                 <Badge className={`${getStatusColor(details.rental.status)} border`}>
                   {getStatusIcon(details.rental.status)}
                   <span className="mr-1">{getStatusText(details.rental.status)}</span>
@@ -273,7 +291,7 @@ export function RentalDetailsDialog() {
           </div>
         )}
 
-        {details && !loading && (
+        {details && details.rental && details.property && !loading && (
           <div className="space-y-4 sm:space-y-6 text-right">
             {/* Custom Tabs Navigation */}
             <div className="w-full" dir="rtl">
@@ -345,16 +363,16 @@ export function RentalDetailsDialog() {
                     <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4" dir="rtl">
                       <div className="space-y-1 text-right" dir="rtl">
                         <h3 className="text-lg sm:text-xl font-bold text-gray-900 text-right">
-                          {details.rental.tenant_full_name}
+                          {details.rental.tenant_full_name || 'غير محدد'}
                         </h3>
-                        <p className="text-sm sm:text-base text-gray-600 text-right">{details.rental.tenant_job_title}</p>
+                        <p className="text-sm sm:text-base text-gray-600 text-right">{details.rental.tenant_job_title || 'غير محدد'}</p>
                         <Badge variant="outline" className="w-fit text-xs sm:text-sm">
                           {details.rental.tenant_social_status === 'married' ? 'متزوج' : 'أعزب'}
                         </Badge>
                       </div>
                       <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
                         <AvatarFallback className="bg-gradient-to-br from-gray-800 to-gray-600 text-white text-lg sm:text-xl font-bold">
-                          {details.rental.tenant_full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                          {details.rental.tenant_full_name ? details.rental.tenant_full_name.split(' ').map(n => n[0]).join('').slice(0, 2) : '??'}
                         </AvatarFallback>
                       </Avatar>
                     </div>
@@ -366,14 +384,14 @@ export function RentalDetailsDialog() {
                         <div className="flex items-center gap-2 sm:gap-3" dir="rtl">
                           <div className="text-right" dir="rtl">
                             <p className="text-xs sm:text-sm text-gray-500 text-right">رقم الهاتف</p>
-                            <p className="text-sm sm:text-base font-semibold text-right">{details.rental.tenant_phone}</p>
+                            <p className="text-sm sm:text-base font-semibold text-right">{details.rental.tenant_phone || 'غير محدد'}</p>
                           </div>
                           <Phone className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                         </div>
                         <div className="flex items-center gap-2 sm:gap-3" dir="rtl">
                           <div className="text-right" dir="rtl">
                             <p className="text-xs sm:text-sm text-gray-500 text-right">البريد الإلكتروني</p>
-                            <p className="text-sm sm:text-base font-semibold text-right break-all">{details.rental.tenant_email}</p>
+                            <p className="text-sm sm:text-base font-semibold text-right break-all">{details.rental.tenant_email || 'غير محدد'}</p>
                           </div>
                           <Mail className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                         </div>
@@ -382,7 +400,7 @@ export function RentalDetailsDialog() {
                         <div className="flex items-center gap-2 sm:gap-3" dir="rtl">
                           <div className="text-right" dir="rtl">
                             <p className="text-xs sm:text-sm text-gray-500 text-right">رقم الهوية</p>
-                            <p className="text-sm sm:text-base font-semibold text-right">{details.rental.tenant_national_id}</p>
+                            <p className="text-sm sm:text-base font-semibold text-right">{details.rental.tenant_national_id || 'غير محدد'}</p>
                           </div>
                           <Hash className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                         </div>
@@ -418,10 +436,10 @@ export function RentalDetailsDialog() {
                     <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4" dir="rtl">
                       <div className="space-y-1 text-right" dir="rtl">
                         <h3 className="text-lg sm:text-xl font-bold text-gray-900 text-right">
-                          {details.property.name}
+                          {details.property.name || 'غير محدد'}
                         </h3>
-                        <p className="text-sm sm:text-base text-gray-600 text-right">الوحدة: {details.property.unit_label}</p>
-                        <p className="text-xs sm:text-sm text-gray-500 text-right">رقم العقار: {details.property.property_number}</p>
+                        <p className="text-sm sm:text-base text-gray-600 text-right">الوحدة: {details.property.unit_label || 'غير محدد'}</p>
+                        <p className="text-xs sm:text-sm text-gray-500 text-right">رقم العقار: {details.property.property_number || 'غير محدد'}</p>
                       </div>
                       <div className="h-12 w-12 sm:h-16 sm:w-16 bg-gradient-to-br from-gray-800 to-gray-600 rounded-lg flex items-center justify-center">
                         <Home className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
@@ -435,20 +453,20 @@ export function RentalDetailsDialog() {
                         <div className="flex items-center gap-2 sm:gap-3" dir="rtl">
                           <div className="text-right" dir="rtl">
                             <p className="text-xs sm:text-sm text-gray-500 text-right">رقم العقار</p>
-                            <p className="text-sm sm:text-base font-semibold text-right">{details.property.property_number}</p>
+                            <p className="text-sm sm:text-base font-semibold text-right">{details.property.property_number || 'غير محدد'}</p>
                           </div>
                           <Hash className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                         </div>
                         <div className="flex items-center gap-2 sm:gap-3" dir="rtl">
                           <div className="text-right" dir="rtl">
                             <p className="text-xs sm:text-sm text-gray-500 text-right">الوحدة</p>
-                            <p className="text-sm sm:text-base font-semibold text-right">{details.property.unit_label}</p>
+                            <p className="text-sm sm:text-base font-semibold text-right">{details.property.unit_label || 'غير محدد'}</p>
                           </div>
                           <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                         </div>
                       </div>
                       <div className="space-y-2 sm:space-y-3">
-                        {details.property.project.name && (
+                        {details.property.project?.name && (
                           <div className="flex items-center gap-2 sm:gap-3" dir="rtl">
                             <div className="text-right" dir="rtl">
                               <p className="text-xs sm:text-sm text-gray-500 text-right">المشروع</p>
@@ -475,13 +493,13 @@ export function RentalDetailsDialog() {
                   </CardHeader>
                   <CardContent className="space-y-3 sm:space-y-4 text-right p-3 sm:p-6" dir="rtl">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4" dir="rtl">
-                      <Badge className={`${getStatusColor(details.contract.status)} border text-xs sm:text-sm`}>
-                        {getStatusIcon(details.contract.status)}
-                        <span className="mr-1">{getStatusText(details.contract.status)}</span>
+                      <Badge className={`${getStatusColor(details.contract?.status || 'unknown')} border text-xs sm:text-sm`}>
+                        {getStatusIcon(details.contract?.status || 'unknown')}
+                        <span className="mr-1">{getStatusText(details.contract?.status || 'unknown')}</span>
                       </Badge>
                       <div className="text-right" dir="rtl">
                         <h3 className="text-lg sm:text-xl font-bold text-gray-900 text-right">
-                          {details.contract.contract_number}
+                          {details.contract?.contract_number || 'غير محدد'}
                         </h3>
                         <p className="text-sm sm:text-base text-gray-600 text-right">رقم العقد</p>
                       </div>
@@ -494,13 +512,13 @@ export function RentalDetailsDialog() {
                         <div className="text-right" dir="rtl">
                           <p className="text-xs sm:text-sm text-gray-500 mb-1 text-right">مبلغ الإيجار الأساسي</p>
                           <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 text-right">
-                            {formatCurrency(details.rental.base_rent_amount, details.rental.currency)}
+                            {formatCurrency(details.rental.base_rent_amount || 0, details.rental.currency || 'SAR')}
                           </p>
                         </div>
                         <div className="text-right" dir="rtl">
                           <p className="text-xs sm:text-sm text-gray-500 mb-1 text-right">مبلغ الضمان</p>
                           <p className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 text-right">
-                            {formatCurrency(details.rental.deposit_amount, details.rental.currency)}
+                            {formatCurrency(details.rental.deposit_amount || 0, details.rental.currency || 'SAR')}
                           </p>
                         </div>
                         <div className="text-right" dir="rtl">
@@ -510,7 +528,7 @@ export function RentalDetailsDialog() {
                              details.rental.paying_plan === 'quarterly' ? 'ربع سنوي' :
                              details.rental.paying_plan === 'semi_annual' ? 'نصف سنوي' :
                              details.rental.paying_plan === 'annual' ? 'سنوي' : 
-                             details.rental.paying_plan}
+                             details.rental.paying_plan || 'غير محدد'}
                           </p>
                         </div>
                       </div>
@@ -518,19 +536,19 @@ export function RentalDetailsDialog() {
                         <div className="text-right" dir="rtl">
                           <p className="text-xs sm:text-sm text-gray-500 mb-1 text-right">مدة الإيجار</p>
                           <p className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 text-right">
-                            {details.rental.rental_period_months} شهر
+                            {details.rental.rental_period_months || 0} شهر
                           </p>
                         </div>
                         <div className="text-right" dir="rtl">
                           <p className="text-xs sm:text-sm text-gray-500 mb-1 text-right">تاريخ بداية العقد</p>
                           <p className="text-sm sm:text-base font-semibold text-gray-900 text-right">
-                            {formatDate(details.contract.start_date)}
+                            {details.contract?.start_date ? formatDate(details.contract.start_date) : 'غير محدد'}
                           </p>
                         </div>
                         <div className="text-right" dir="rtl">
                           <p className="text-xs sm:text-sm text-gray-500 mb-1 text-right">تاريخ انتهاء العقد</p>
                           <p className="text-sm sm:text-base font-semibold text-gray-900 text-right">
-                            {formatDate(details.contract.end_date)}
+                            {details.contract?.end_date ? formatDate(details.contract.end_date) : 'غير محدد'}
                           </p>
                         </div>
                       </div>
@@ -592,16 +610,16 @@ export function RentalDetailsDialog() {
                             <div className="flex items-center gap-3 sm:gap-4" dir="rtl">
                               <div className="text-right" dir="rtl">
                                 <p className="text-sm sm:text-base font-bold text-gray-900 text-right">
-                                  {formatCurrency(payment.amount, details.rental.currency)}
+                                  {formatCurrency(payment.amount, details.rental.currency || 'SAR')}
                                 </p>
                                 {payment.paid_amount > 0 && (
                                   <p className="text-xs sm:text-sm text-green-600 text-right">
-                                    مدفوع: {formatCurrency(payment.paid_amount, details.rental.currency)}
+                                    مدفوع: {formatCurrency(payment.paid_amount, details.rental.currency || 'SAR')}
                                   </p>
                                 )}
                               </div>
-                             <Badge className={`${getPaymentStatusColor(payment.payment_status)} border text-xs sm:text-sm`}>
-                               {getPaymentStatusText(payment.payment_status)}
+                             <Badge className={`${getPaymentStatusColor(payment)} border text-xs sm:text-sm`}>
+                               {getPaymentStatusText(payment)}
                              </Badge>
                             </div>
                           </div>
