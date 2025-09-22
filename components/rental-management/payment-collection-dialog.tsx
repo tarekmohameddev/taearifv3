@@ -66,7 +66,6 @@ interface PaymentCollectionData {
     platform_fee: number
     water_fee: number
     office_fee: number
-    office_commission_value: number
     total_fees: number
   }
   available_fees: Array<{
@@ -232,6 +231,28 @@ export function PaymentCollectionDialog() {
     })
   }
 
+  // Handle partial fee payment
+  const handlePartialFeePayment = (feeType: string, maxAmount: number, label: string) => {
+    const currentAmount = Number(paymentAmount) || 0
+    if (currentAmount > 0 && currentAmount < maxAmount) {
+      // Add partial payment
+      setSelectedFees(prev => {
+        const existingFee = prev.find(f => f.type === feeType)
+        if (existingFee) {
+          // Update existing fee amount
+          return prev.map(f => 
+            f.type === feeType 
+              ? { ...f, amount: currentAmount }
+              : f
+          )
+        } else {
+          // Add new partial fee
+          return [...prev, { type: feeType, amount: currentAmount, label }]
+        }
+      })
+    }
+  }
+
   // Calculate total amount from selected payments and fees
   const getTotalSelectedAmount = () => {
     const paymentsTotal = selectedPayments.reduce((sum, p) => sum + p.amount, 0)
@@ -241,20 +262,16 @@ export function PaymentCollectionDialog() {
 
   // Check if payment amount is valid
   const isPaymentAmountValid = () => {
-    const totalSelected = getTotalSelectedAmount()
     const enteredAmount = Number(paymentAmount) || 0
-    return enteredAmount >= totalSelected
+    return enteredAmount > 0
   }
 
   // Get validation message
   const getValidationMessage = () => {
-    const totalSelected = getTotalSelectedAmount()
     const enteredAmount = Number(paymentAmount) || 0
     
-    if (totalSelected === 0) return null
-    
-    if (enteredAmount < totalSelected) {
-      return `المبلغ المدخل (${formatCurrency(enteredAmount)}) أقل من المبلغ المحدد (${formatCurrency(totalSelected)}). يرجى إزالة بعض الدفعات أو الرسوم أو زيادة المبلغ المدخل.`
+    if (enteredAmount <= 0) {
+      return "يرجى إدخال مبلغ أكبر من صفر"
     }
     
     return null
@@ -274,23 +291,43 @@ export function PaymentCollectionDialog() {
       // Handle individual fees first
       if (selectedFees.length > 0) {
         for (const fee of selectedFees) {
+          const isPartialPayment = fee.amount < (data?.available_fees.find(f => f.fee_type === fee.type)?.remaining_amount || 0)
+          const notes = isPartialPayment 
+            ? `دفع جزئي - ${fee.label}`
+            : `دفع كامل - ${fee.label}`
+            
           payments.push({
-            installment_id: 0, // General fees not tied to specific installments
+            installment_id: null, // General fees not tied to specific installments
             payment_type: fee.type,
             amount: fee.amount,
-            notes: fee.label
+            notes: notes
           })
         }
       }
       
       // Handle selected payments (rent only)
       if (selectedPayments.length > 0) {
+        // Calculate amount per payment if partial payment
+        const totalSelectedAmount = selectedPayments.reduce((sum, p) => sum + p.amount, 0)
+        const enteredAmount = Number(paymentAmount) || 0
+        const isPartialPayment = enteredAmount < totalSelectedAmount
+        
         for (const selectedPayment of selectedPayments) {
+          let paymentAmount = selectedPayment.rent_amount
+          let notes = `دفع إيجار كامل - الدفعة رقم ${selectedPayment.sequence_no}`
+          
+          if (isPartialPayment) {
+            // Distribute the entered amount proportionally
+            const proportion = selectedPayment.amount / totalSelectedAmount
+            paymentAmount = enteredAmount * proportion
+            notes = `دفع جزئي - الدفعة رقم ${selectedPayment.sequence_no}`
+          }
+          
           payments.push({
             installment_id: selectedPayment.id,
             payment_type: 'rent',
-            amount: selectedPayment.rent_amount,
-            notes: `دفع إيجار - الدفعة رقم ${selectedPayment.sequence_no}`
+            amount: paymentAmount,
+            notes: notes
           })
         }
       }
@@ -299,8 +336,7 @@ export function PaymentCollectionDialog() {
         payments,
         payment_method: paymentMethod,
         payment_date: paymentDate,
-        reference: reference || `PAY-${Date.now()}`,
-        notes: notes || `دفع ${paymentType === 'rent' ? 'إيجار' : paymentType === 'fees' ? 'رسوم' : 'إيجار ورسوم'}`
+        reference: reference || `PAY-${Date.now()}`
       }
 
       const response = await axiosInstance.post(`/v1/rms/rentals/${selectedPaymentRentalId}/collect-payment`, requestBody)
@@ -562,7 +598,7 @@ export function PaymentCollectionDialog() {
                 {/* Fees Breakdown */}
                 <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-4">
                   <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">تفاصيل الرسوم</h3>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                     <div className="text-center">
                       <p className="text-sm text-gray-500 mb-1">إجمالي الإيجار</p>
                       <p className="text-base font-bold text-gray-900">{formatCurrency(data.payment_details.summary.total_rent_due)}</p>
@@ -579,15 +615,9 @@ export function PaymentCollectionDialog() {
                       <p className="text-sm text-gray-500 mb-1">رسوم المياه</p>
                       <p className="text-base font-bold text-gray-900">{formatCurrency(data.fees_breakdown.water_fee)}</p>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 mt-4">
                     <div className="text-center">
                       <p className="text-sm text-gray-500 mb-1">رسوم المكتب</p>
                       <p className="text-base font-bold text-gray-900">{formatCurrency(data.fees_breakdown.office_fee)}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-500 mb-1">عمولة المكتب</p>
-                      <p className="text-base font-bold text-gray-900">{formatCurrency(data.fees_breakdown.office_commission_value)}</p>
                     </div>
                   </div>
                   
@@ -984,7 +1014,7 @@ export function PaymentCollectionDialog() {
                       <div className="flex items-center gap-2 text-yellow-800">
                         <AlertCircle className="h-5 w-5" />
                         <p className="text-sm font-medium">
-                          يرجى اختيار دفعة أو أكثر من القائمة أعلاه لدفع {paymentType === 'rent' ? 'الإيجار' : paymentType === 'fees' ? 'الرسوم' : 'الإيجار والرسوم'} أو اختيار الرسوم الفردية أو إدخال المبلغ يدوياً
+                          يرجى اختيار دفعة أو أكثر من القائمة أعلاه لدفع {paymentType === 'rent' ? 'الإيجار' : paymentType === 'fees' ? 'الرسوم' : 'الإيجار والرسوم'} أو اختيار الرسوم الفردية أو إدخال المبلغ يدوياً. يمكنك إدخال مبلغ جزئي للدفع الجزئي.
                         </p>
                       </div>
                     </div>
@@ -1013,8 +1043,8 @@ export function PaymentCollectionDialog() {
                       onChange={(e) => setPaymentAmount(e.target.value)}
                       placeholder={
                         selectedPayments.length > 0 || selectedFees.length > 0 
-                          ? "يمكنك تعديل المبلغ" 
-                          : `أدخل مبلغ ${paymentType === 'rent' ? 'الإيجار' : paymentType === 'fees' ? 'الرسوم' : 'الإيجار والرسوم'}...`
+                          ? "يمكنك تعديل المبلغ أو إدخال مبلغ جزئي" 
+                          : `أدخل مبلغ ${paymentType === 'rent' ? 'الإيجار' : paymentType === 'fees' ? 'الرسوم' : 'الإيجار والرسوم'} (كامل أو جزئي)...`
                       }
                       className={`text-right border-2 focus:ring-2 ${
                         getValidationMessage() 
@@ -1035,6 +1065,9 @@ export function PaymentCollectionDialog() {
                           {selectedPayments.length > 0 && `${selectedPayments.length} دفعة`}
                           {selectedPayments.length > 0 && selectedFees.length > 0 && ' + '}
                           {selectedFees.length > 0 && `${selectedFees.length} رسوم`}
+                        </p>
+                        <p className="text-xs text-blue-600 mt-1">
+                          💡 يمكنك إدخال مبلغ أقل للدفع الجزئي
                         </p>
                       </div>
                     )}
