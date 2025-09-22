@@ -71,11 +71,13 @@ import {
   MoreVertical,
   Check,
   ChevronsUpDown,
+  CreditCard,
 } from "lucide-react"
 import axiosInstance from "@/lib/axiosInstance"
 import useStore from "@/context/Store"
 import { RentalDetailsDialog } from "../rental-details-dialog"
 import { UpdatedAddRentalForm } from "./updated-rental-form"
+import { PaymentCollectionDialog } from "../payment-collection-dialog"
 
 interface Property {
   id: number
@@ -135,7 +137,12 @@ interface RentalApplicationsServiceProps {
 }
 
 export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalApplicationsServiceProps) {
-  const { rentalApplications, setRentalApplications } = useStore()
+  const { 
+    rentalApplications, 
+    setRentalApplications,
+    openRentalDetailsDialog,
+    openPaymentCollectionDialog
+  } = useStore()
   const {
     rentals,
     pagination,
@@ -155,21 +162,9 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     lastProcessedOpenAddDialogCounter,
   } = rentalApplications
 
-  // State for rental details dialog
-  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
-  const [selectedRentalId, setSelectedRentalId] = useState<number | null>(null)
+  // Dialog states are now managed by Zustand store
 
-  // Function to open rental details dialog
-  const openRentalDetails = (rentalId: number) => {
-    setSelectedRentalId(rentalId)
-    setIsDetailsDialogOpen(true)
-  }
-
-  // Function to close rental details dialog
-  const closeRentalDetails = () => {
-    setIsDetailsDialogOpen(false)
-    setSelectedRentalId(null)
-  }
+  // Dialog functions are now managed by Zustand store
   
   // Open Add Rental dialog when the counter changes from parent
   useEffect(() => {
@@ -617,7 +612,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
               {filteredRentals.map((rental: RentalData, index: number) => (
                 <tr 
                   key={rental.id} 
-                  onClick={() => openRentalDetails(rental.id)}
+                  onClick={() => openRentalDetailsDialog(rental.id)}
                   className={`hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-300 hover:shadow-sm cursor-pointer ${
                     index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
                   }`}
@@ -738,12 +733,22 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                           <DropdownMenuItem 
                             onClick={(e) => {
                               e.stopPropagation()
-                              setRentalApplications({ selectedRental: rental })
+                              openRentalDetailsDialog(rental.id)
                             }}
                             className="cursor-pointer hover:bg-gray-100"
                           >
                             <Eye className="h-4 w-4 ml-2 text-gray-600" />
                             عرض التفاصيل
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              openPaymentCollectionDialog(rental.id)
+                            }}
+                            className="cursor-pointer hover:bg-gray-100"
+                          >
+                            <CreditCard className="h-4 w-4 ml-2 text-gray-600" />
+                            تحصيل المدفوعات
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={(e) => {
@@ -1054,11 +1059,10 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
       </Dialog>
 
       {/* Rental Details Dialog */}
-      <RentalDetailsDialog
-        isOpen={isDetailsDialogOpen}
-        onClose={closeRentalDetails}
-        rentalId={selectedRentalId}
-      />
+      <RentalDetailsDialog />
+
+      {/* Payment Collection Dialog */}
+      <PaymentCollectionDialog />
 
       {/* Pagination */}
       {pagination && pagination.last_page > 1 && (

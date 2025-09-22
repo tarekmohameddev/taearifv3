@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { PaymentCollectionDialog } from "./payment-collection-dialog"
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   User,
@@ -32,6 +34,7 @@ import {
   RefreshCw,
 } from "lucide-react"
 import axiosInstance from "@/lib/axiosInstance"
+import useStore from "@/context/Store"
 
 interface RentalDetails {
   rental: {
@@ -84,13 +87,18 @@ interface RentalDetails {
   }
 }
 
-interface RentalDetailsDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  rentalId: number | null
-}
+export function RentalDetailsDialog() {
+  const { 
+    rentalApplications, 
+    openPaymentCollectionDialog, 
+    closeRentalDetailsDialog 
+  } = useStore()
+  
+  const {
+    isRentalDetailsDialogOpen,
+    selectedRentalId
+  } = rentalApplications
 
-export function RentalDetailsDialog({ isOpen, onClose, rentalId }: RentalDetailsDialogProps) {
   const [details, setDetails] = useState<RentalDetails | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -98,19 +106,19 @@ export function RentalDetailsDialog({ isOpen, onClose, rentalId }: RentalDetails
 
   // Fetch rental details when dialog opens
   useEffect(() => {
-    if (isOpen && rentalId) {
+    if (isRentalDetailsDialogOpen && selectedRentalId) {
       fetchRentalDetails()
     }
-  }, [isOpen, rentalId])
+  }, [isRentalDetailsDialogOpen, selectedRentalId])
 
   const fetchRentalDetails = async () => {
-    if (!rentalId) return
+    if (!selectedRentalId) return
 
     setLoading(true)
     setError(null)
     
     try {
-      const response = await axiosInstance.get(`/v1/rms/rentals/${rentalId}/details`)
+      const response = await axiosInstance.get(`/v1/rms/rentals/${selectedRentalId}/details`)
       
       if (response.data.status) {
         setDetails(response.data.data)
@@ -216,10 +224,17 @@ export function RentalDetailsDialog({ isOpen, onClose, rentalId }: RentalDetails
     }
   }
 
-  if (!isOpen) return null
+  const handleOpenPaymentCollection = () => {
+    if (selectedRentalId) {
+      openPaymentCollectionDialog(selectedRentalId)
+    }
+  }
+
+  if (!isRentalDetailsDialogOpen) return null
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <>
+    <Dialog open={isRentalDetailsDialogOpen} onOpenChange={closeRentalDetailsDialog}>
       <DialogContent className="w-[95vw] max-w-6xl max-h-[95vh] overflow-y-auto text-right p-2 sm:p-4 md:p-6" dir="rtl">
         <DialogHeader className="space-y-2 sm:space-y-4 text-right">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
@@ -527,6 +542,25 @@ export function RentalDetailsDialog({ isOpen, onClose, rentalId }: RentalDetails
 
             {activeTab === "payments" && (
               <div className="space-y-3 sm:space-y-4 text-right" dir="rtl">
+                {/* Payment Collection Button */}
+                <div className="flex justify-center mb-4">
+                  <Button
+                    onClick={handleOpenPaymentCollection}
+                    className="bg-gradient-to-r from-gray-800 to-gray-600 hover:from-gray-900 hover:to-gray-700 text-white px-8 py-4 text-lg font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-2 border-gray-800 hover:border-gray-900"
+                    dir="rtl"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <CreditCard className="h-5 w-5 text-white" />
+                      </div>
+                      <span className="text-lg font-bold">دفع المستحقات</span>
+                      <div className="h-8 w-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <DollarSign className="h-5 w-5 text-white" />
+                      </div>
+                    </div>
+                  </Button>
+                </div>
+
                 <Card>
                   <CardHeader className="p-3 sm:p-6">
                     <CardTitle className="flex items-center gap-2 text-right text-base sm:text-lg" dir="rtl">
@@ -581,5 +615,9 @@ export function RentalDetailsDialog({ isOpen, onClose, rentalId }: RentalDetails
         )}
       </DialogContent>
     </Dialog>
+
+    {/* Payment Collection Dialog */}
+    <PaymentCollectionDialog />
+  </>
   )
 }

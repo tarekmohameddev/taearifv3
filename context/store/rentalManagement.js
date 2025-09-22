@@ -61,12 +61,57 @@ module.exports = (set, get) => ({
     isDeleting: false,
     isInitialized: false,
     lastProcessedOpenAddDialogCounter: -1,
+    // Dialog states
+    isRentalDetailsDialogOpen: false,
+    selectedRentalId: null,
+    isPaymentCollectionDialogOpen: false,
+    selectedPaymentRentalId: null,
   },
   setRentalApplications: (newState) =>
     set((state) => ({
       rentalApplications: {
         ...state.rentalApplications,
         ...newState,
+      },
+    })),
+
+  // Dialog control functions
+  openRentalDetailsDialog: (rentalId) =>
+    set((state) => ({
+      rentalApplications: {
+        ...state.rentalApplications,
+        isRentalDetailsDialogOpen: true,
+        selectedRentalId: rentalId,
+      },
+    })),
+
+  closeRentalDetailsDialog: () =>
+    set((state) => ({
+      rentalApplications: {
+        ...state.rentalApplications,
+        isRentalDetailsDialogOpen: false,
+        selectedRentalId: null,
+      },
+    })),
+
+  openPaymentCollectionDialog: (rentalId) =>
+    set((state) => ({
+      rentalApplications: {
+        ...state.rentalApplications,
+        isPaymentCollectionDialogOpen: true,
+        selectedPaymentRentalId: rentalId,
+        // Close rental details dialog when opening payment collection
+        isRentalDetailsDialogOpen: false,
+        selectedRentalId: null,
+      },
+    })),
+
+  closePaymentCollectionDialog: () =>
+    set((state) => ({
+      rentalApplications: {
+        ...state.rentalApplications,
+        isPaymentCollectionDialogOpen: false,
+        selectedPaymentRentalId: null,
       },
     })),
 
