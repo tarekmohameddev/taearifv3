@@ -538,7 +538,7 @@ export function PaymentCollectionDialog() {
         reference: reference || `PAY-${Date.now()}`
       }
 
-      const response = await axiosInstance.post(`/rms/rentals/${selectedPaymentRentalId}/collect-payment`, requestBody)
+      const response = await axiosInstance.post(`/v1/rms/rentals/${selectedPaymentRentalId}/collect-payment`, requestBody)
       
       if (response.data.status) {
         // Refresh data after successful payment
