@@ -510,7 +510,7 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Client Information */}
           <Card>
             <CardHeader>
@@ -601,39 +601,6 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
             </CardContent>
           </Card>
 
-          {/* Assigned Agent */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 space-x-reverse">
-                <UserCheck className="h-5 w-5" />
-                <span>الوكيل المسؤول</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-3 space-x-reverse">
-                <img
-                  src={request.assignedAgent.avatar || "/placeholder.svg"}
-                  alt={request.assignedAgent.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <p className="font-semibold">{request.assignedAgent.name}</p>
-                  <p className="text-sm text-gray-600">وكيل عقاري</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 space-x-reverse">
-                <Mail className="h-4 w-4 text-gray-400" />
-                <span className="text-sm">{request.assignedAgent.email}</span>
-              </div>
-              <div className="flex items-center space-x-2 space-x-reverse">
-                <Phone className="h-4 w-4 text-gray-400" />
-                <span className="text-sm">{request.assignedAgent.phone}</span>
-              </div>
-              <Button className="w-full bg-transparent" variant="outline">
-                تواصل مع الوكيل
-              </Button>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Stage Details */}

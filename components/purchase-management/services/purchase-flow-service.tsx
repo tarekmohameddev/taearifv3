@@ -601,18 +601,20 @@ export default function PurchaseFlowService() {
 
   function handleEditRequest(request: PurchaseRequest) {
     setEditingRequest(request)
+    // تعبئة النموذج ببيانات الطلب المحدد
+    console.log("Editing request:", request)
     setEditRequestForm({
-      clientName: request.client.name,
-      clientNameAr: request.client.nameAr || "",
-      clientEmail: request.client.email,
-      clientPhone: request.client.phone,
+      clientName: request.client.name || "",
+      clientNameAr: request.client.name || "",
+      clientEmail: request.client.email || "",
+      clientPhone: request.client.phone || "",
       clientNationalId: request.client.nationalId || "",
-      selectedPropertyId: "", // Will be set based on property data
-      propertyLocation: request.property.location,
+      selectedPropertyId: request.property?.id?.toString() || "", // معرف العقار
+      propertyLocation: request.property.location || "",
       propertyLocationAr: request.property.locationAr || "",
       propertyDeveloper: request.property.developer || "",
       propertyDeveloperAr: request.property.developerAr || "",
-      priority: request.priority,
+      priority: request.priority || "medium",
       notes: "",
     })
     setIsEditDialogOpen(true)
@@ -1082,18 +1084,6 @@ export default function PurchaseFlowService() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="editClientName">اسم العميل (بالإنجليزية)</Label>
-                <Input
-                  id="editClientName"
-                  value={editRequestForm.clientName}
-                  onChange={(e) => setEditRequestForm({ ...editRequestForm, clientName: e.target.value })}
-                  placeholder="Enter client name in English"
-                />
-                {editRequestErrors.clientName && (
-                  <p className="text-xs text-red-500 mt-1">{editRequestErrors.clientName}</p>
-                )}
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="editClientEmail">البريد الإلكتروني</Label>
@@ -1192,26 +1182,6 @@ export default function PurchaseFlowService() {
                     })()}
                   </div>
                 )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="editPropertyLocationAr">الموقع (بالعربية)</Label>
-                <Input
-                  id="editPropertyLocationAr"
-                  value={editRequestForm.propertyLocationAr}
-                  onChange={(e) => setEditRequestForm({ ...editRequestForm, propertyLocationAr: e.target.value })}
-                  placeholder="أدخل الموقع بالعربية"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="editPropertyLocation">الموقع (بالإنجليزية)</Label>
-                <Input
-                  id="editPropertyLocation"
-                  value={editRequestForm.propertyLocation}
-                  onChange={(e) => setEditRequestForm({ ...editRequestForm, propertyLocation: e.target.value })}
-                  placeholder="Enter location in English"
-                />
               </div>
 
               <div className="space-y-2">
