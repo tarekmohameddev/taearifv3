@@ -458,32 +458,24 @@ export function PropertiesManagementPage() {
       // بناء معاملات الفلترة
       const params = new URLSearchParams();
       params.set('page', page.toString());
-      console.log("🛠 Initial params with page only:", params.toString());
   
       Object.entries(filters).forEach(([key, value]) => {
-        console.log("⚙️ Processing filter:", key, value);
         if (value && value.length > 0) {
           if (Array.isArray(value)) {
-            console.log(`📌 Adding array filter for ${key}:`, value);
             params.set(key, value.join(','));
           } else {
-            console.log(`📌 Adding single filter for ${key}:`, value);
             params.set(key, value.toString());
           }
         }
       });
   
-      console.log("📝 Final params before request:", params.toString());
   
       // استخدام نظام إعادة المحاولة
-      console.log("📡 Sending request to API...");
       const response = await retryWithBackoff(async () => {
         const res = await axiosInstance.get(`/properties?${params.toString()}`);
-        console.log("✅ Response received:", res);
         return res;
       }, 3, 1000);
   
-      console.log("📦 Full response data:", response?.data);
   
       const propertiesList = response.data?.data?.properties || [];
       const pagination = response.data?.data?.pagination || null;
@@ -502,7 +494,6 @@ export function PropertiesManagementPage() {
         features: Array.isArray(property.features) ? property.features : [],
       }));
   
-      console.log("🎯 Final mappedProperties:", mappedProperties);
   
       setPropertiesManagement({
         properties: mappedProperties,
@@ -512,13 +503,10 @@ export function PropertiesManagementPage() {
         isInitialized: true,
       });
   
-      console.log("✅ fetchProperties FINISHED SUCCESSFULLY");
   
     } catch (error) {
-      console.log("❌ ERROR inside fetchProperties:", error);
   
       const errorInfo = logError(error, 'fetchProperties');
-      console.log("📌 Error info processed:", errorInfo);
   
       setPropertiesManagement({
         error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات العقارات"),
@@ -845,10 +833,8 @@ export function PropertiesManagementPage() {
                       useAuthStore.getState().userData?.package
                         ?.real_estate_limit_number;
                     if (propertiesLength >= limit) {
-                      console.error("error here 12");
                       setIsLimitReached(true);
                     } else {
-                      console.error("تمام");
                       router.push("/properties/add");
                     }
                   }}
