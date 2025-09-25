@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
+import { getErrorInfo, retryWithBackoff, logError, formatErrorMessage } from "@/utils/errorHandler";
 import toast from "react-hot-toast";
 import {
   Bath,
@@ -428,7 +429,6 @@ export function PropertiesManagementPage() {
       propertiesAllData,
     },
     setPropertiesManagement,
-    fetchProperties,
   } = useStore();
 
   const [reorderPopup, setReorderPopup] = useState<{
@@ -446,7 +446,87 @@ export function PropertiesManagementPage() {
     clickedONSubButton();
     router.push("/settings");
   };
-
+  const fetchProperties = async (page = 1, filters = {}) =>  {
+  
+    // تحديث حالة التحميل
+    setPropertiesManagement({
+      loading: true,
+      error: null,
+    });
+  
+    try {
+      // بناء معاملات الفلترة
+      const params = new URLSearchParams();
+      params.set('page', page.toString());
+      console.log("🛠 Initial params with page only:", params.toString());
+  
+      Object.entries(filters).forEach(([key, value]) => {
+        console.log("⚙️ Processing filter:", key, value);
+        if (value && value.length > 0) {
+          if (Array.isArray(value)) {
+            console.log(`📌 Adding array filter for ${key}:`, value);
+            params.set(key, value.join(','));
+          } else {
+            console.log(`📌 Adding single filter for ${key}:`, value);
+            params.set(key, value.toString());
+          }
+        }
+      });
+  
+      console.log("📝 Final params before request:", params.toString());
+  
+      // استخدام نظام إعادة المحاولة
+      console.log("📡 Sending request to API...");
+      const response = await retryWithBackoff(async () => {
+        const res = await axiosInstance.get(`/properties?${params.toString()}`);
+        console.log("✅ Response received:", res);
+        return res;
+      }, 3, 1000);
+  
+      console.log("📦 Full response data:", response?.data);
+  
+      const propertiesList = response.data?.data?.properties || [];
+      const pagination = response.data?.data?.pagination || null;
+      const propertiesAllData = response.data?.data || null;
+  
+      const mappedProperties = propertiesList.map((property, index) => ({
+        ...property,
+        thumbnail: property.featured_image,
+        listingType:
+          String(property.transaction_type) === "1" ||
+          property.transaction_type === "sale"
+            ? "للبيع"
+            : "للإيجار",
+        status: property.status === 1 ? "منشور" : "مسودة",
+        lastUpdated: new Date(property.updated_at).toLocaleDateString("ar-AE"),
+        features: Array.isArray(property.features) ? property.features : [],
+      }));
+  
+      console.log("🎯 Final mappedProperties:", mappedProperties);
+  
+      setPropertiesManagement({
+        properties: mappedProperties,
+        pagination,
+        propertiesAllData,
+        loading: false,
+        isInitialized: true,
+      });
+  
+      console.log("✅ fetchProperties FINISHED SUCCESSFULLY");
+  
+    } catch (error) {
+      console.log("❌ ERROR inside fetchProperties:", error);
+  
+      const errorInfo = logError(error, 'fetchProperties');
+      console.log("📌 Error info processed:", errorInfo);
+  
+      setPropertiesManagement({
+        error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات العقارات"),
+        loading: false,
+        isInitialized: true,
+      });
+    }
+  };
   const normalizedProperties = useMemo(() => {
     return properties.map((property: any) => ({
       ...property,
@@ -485,6 +565,7 @@ export function PropertiesManagementPage() {
     }
   };
 
+  
   const handleDuplicateProperty = async (property: any) => {
     try {
       const duplicateData = {
