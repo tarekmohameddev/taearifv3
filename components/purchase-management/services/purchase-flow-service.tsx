@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Plus, Search, Building2, Edit, Eye, Trash2, AlertTriangle } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useRouter } from "next/navigation"
-import { useToast } from "@/hooks/use-toast"
+import toast from "react-hot-toast";  
 
 interface PurchaseRequest {
   id: string
@@ -144,7 +144,6 @@ interface StageRequirement {
 export { PurchaseFlowService }
 export default function PurchaseFlowService() {
   const router = useRouter()
-  const { toast } = useToast()
   
   // Use store instead of local state
   const {
@@ -160,11 +159,14 @@ export default function PurchaseFlowService() {
       isDeletingRequest,
       deleteConfirmDialog,
       properties,
+      projects,
       loadingProperties,
+      loadingProjects,
       error
     },
     fetchPurchaseRequests,
     fetchProperties,
+    fetchProjects,
     createPurchaseRequest,
     updatePurchaseRequest,
     transitionToNextStage,
@@ -192,8 +194,10 @@ export default function PurchaseFlowService() {
     clientNameAr: z.string().min(1, "الاسم بالعربية مطلوب").or(z.literal("")),
     clientName: z.string().min(1, "الاسم بالإنجليزية مطلوب").or(z.literal("")),
     clientEmail: z.string().email("بريد إلكتروني غير صالح"),
-    // No validation for phone and national ID per request
-    clientPhone: z.string(),
+    
+    // رقم الهاتف مطلوب
+    clientPhone: z.string().min(1, "رقم الهاتف مطلوب"),
+  
     clientNationalId: z.string(),
     selectedPropertyId: z.string().min(1, "اختيار العقار مطلوب"),
     propertyLocationAr: z.string().optional(),
@@ -203,8 +207,8 @@ export default function PurchaseFlowService() {
   }).refine((data) => data.clientNameAr || data.clientName, {
     message: "الاسم مطلوب (العربية أو الإنجليزية)",
     path: ["clientNameAr"],
-  })
-
+  });
+  
   const editRequestSchema = addRequestSchema
 
   // Field-level errors
@@ -221,6 +225,7 @@ export default function PurchaseFlowService() {
     clientPhone: "",
     clientNationalId: "",
     selectedPropertyId: "",
+    selectedProjectId: "",
     propertyLocation: "",
     propertyLocationAr: "",
     propertyDeveloper: "",
@@ -235,6 +240,7 @@ export default function PurchaseFlowService() {
     clientPhone: "",
     clientNationalId: "",
     selectedPropertyId: "",
+    selectedProjectId: "",
     propertyLocation: "",
     propertyLocationAr: "",
     propertyDeveloper: "",
@@ -247,6 +253,13 @@ export default function PurchaseFlowService() {
   useEffect(() => {
     fetchProperties()
   }, [fetchProperties])
+
+    // Fetch properties
+    useEffect(() => {
+      fetchProjects()
+    }, [fetchProjects])
+  
+    
 
   useEffect(() => {
     fetchPurchaseRequests()
@@ -573,19 +586,12 @@ export default function PurchaseFlowService() {
       setTransitionForm({})
 
       // Show success message
-      toast({
-        title: "تم الانتقال إلى المرحلة التالية بنجاح",
-        description: `تم الانتقال من ${stageTransition.fromStage} إلى ${stageTransition.toStage} بنجاح`,
-      })
-      
+      toast.success(`تم الانتقال من ${stageTransition.fromStage} إلى ${stageTransition.toStage} بنجاح`);
+
     } catch (error) {
       console.error("Error transitioning stage:", error)
       // Show error message
-      toast({
-        title: "خطأ في الانتقال إلى المرحلة التالية",
-        description: "حدث خطأ أثناء الانتقال إلى المرحلة التالية. يرجى المحاولة مرة أخرى.",
-        variant: "destructive",
-      })
+      toast.success("حدث خطأ أثناء الانتقال إلى المرحلة التالية. يرجى المحاولة مرة أخرى");
     }
   }
 
@@ -620,6 +626,13 @@ export default function PurchaseFlowService() {
     setIsEditDialogOpen(true)
   }
 
+
+
+
+
+
+
+
   async function handleSaveEdit() {
     if (!editingRequest) return
 
@@ -637,21 +650,31 @@ export default function PurchaseFlowService() {
       }
       // Get selected property
       if (!Array.isArray(properties) || properties.length === 0) {
-        toast({
-          title: "خطأ في تحديث طلب الشراء",
-          description: "لا توجد عقارات متاحة",
-          variant: "destructive",
-        })
+        toast.error("لا توجد عقارات متاحة");
         return
       }
 
       const selectedProperty = properties.find(p => p.id.toString() === editRequestForm.selectedPropertyId)
       if (!selectedProperty) {
-        toast({
-          title: "خطأ في تحديث طلب الشراء",
-          description: "يرجى اختيار عقار صحيح",
-          variant: "destructive",
-        })
+        toast.error("يرجى اختيار عقار صحيح");
+        return
+      }
+    // عرّف المتغير خارج الشرط
+    let selectedProject: any = null;
+  
+    if (editRequestForm.selectedProjectId) {
+      selectedProject = projects.find(
+        (p) => p.id.toString() === editRequestForm.selectedProjectId
+      );
+
+      if (!selectedProject) {
+        toast.error("يرجى اختيار مشروع صحيح");
+        return;
+      }
+    }
+
+      if (!editRequestForm.clientPhone) {
+        toast.error("يرجى إدخال رقم هاتف العميل");
         return
       }
 
@@ -662,7 +685,7 @@ export default function PurchaseFlowService() {
         client_phone: editRequestForm.clientPhone,
         client_national_id: editRequestForm.clientNationalId,
         property_id: selectedProperty.id,
-        project_id: null,
+        project_id: selectedProject.id || null, // Default to null - you might want to make this selectable
         priority: editRequestForm.priority === "high" ? "عالية" : 
                  editRequestForm.priority === "medium" ? "متوسطة" : 
                  editRequestForm.priority === "urgent" ? "عاجل" : "منخفضة",
@@ -676,21 +699,21 @@ export default function PurchaseFlowService() {
 
       // Update the request via store
       await updatePurchaseRequest(editingRequest.id, requestData)
+      setIsEditDialogOpen(false)
+
       setEditingRequest(null)
-      
-      toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث طلب الشراء بنجاح",
-      })
+      toast.success("تم تحديث طلب الشراء بنجاح");
+
     } catch (error) {
       console.error("Error updating purchase request:", error)
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث طلب الشراء",
-        variant: "destructive",
-      })
+      toast.error("حدث خطأ أثناء تحديث طلب الشراء");
     }
   }
+
+
+
+
+
 
   async function handleAddNewRequest() {
     try {
@@ -699,32 +722,48 @@ export default function PurchaseFlowService() {
       if (!result.success) {
         const fe = result.error.flatten().fieldErrors as Record<string, string[]>
         const mapped: Record<string,string> = {}
-        ;(Object.keys(fe) as Array<keyof typeof fe>).forEach((k) => { if (fe[k]?.[0]) mapped[k as string] = fe[k]![0] })
+        ;(Object.keys(fe) as Array<keyof typeof fe>).forEach((k) => { 
+          if (fe[k]?.[0]) mapped[k as string] = fe[k]![0] 
+        })
         setNewRequestErrors(mapped)
         return
       } else {
         setNewRequestErrors({})
       }
+  
       // Get selected property
       if (!Array.isArray(properties) || properties.length === 0) {
-        toast({
-          title: "خطأ في إنشاء طلب الشراء",
-          description: "لا توجد عقارات متاحة",
-          variant: "destructive",
-        })
+        toast.error("لا توجد عقارات متاحة");
         return
       }
-
-      const selectedProperty = properties.find(p => p.id.toString() === newRequestForm.selectedPropertyId)
+  
+      const selectedProperty = properties.find(
+        (p) => p.id.toString() === newRequestForm.selectedPropertyId
+      )
       if (!selectedProperty) {
-        toast({
-          title: "خطأ في إنشاء طلب الشراء",
-          description: "يرجى اختيار عقار صحيح",
-          variant: "destructive",
-        })
+        toast.error("يرجى اختيار عقار صحيح");
         return
       }
-
+  
+      // عرّف المتغير خارج الشرط
+      let selectedProject: any = null;
+  
+      if (newRequestForm.selectedProjectId) {
+        selectedProject = projects.find(
+          (p) => p.id.toString() === newRequestForm.selectedProjectId
+        );
+  
+        if (!selectedProject) {
+          toast.error("يرجى اختيار مشروع صحيح");
+          return;
+        }
+      }
+  
+      if (!newRequestForm.clientPhone) {
+        toast.error("يرجى إدخال رقم هاتف العميل");
+        return
+      }
+  
       // Prepare data for API
       const requestData = {
         client_name: newRequestForm.clientNameAr || newRequestForm.clientName,
@@ -732,7 +771,7 @@ export default function PurchaseFlowService() {
         client_phone: newRequestForm.clientPhone,
         client_national_id: newRequestForm.clientNationalId,
         property_id: selectedProperty.id,
-        project_id: null, // Default to null - you might want to make this selectable
+        project_id: selectedProject ? selectedProject.id : null, // ✅ الآن آمن
         priority: newRequestForm.priority === "high" ? "عالية" : 
                  newRequestForm.priority === "medium" ? "متوسطة" : 
                  newRequestForm.priority === "urgent" ? "عاجل" : "منخفضة",
@@ -742,12 +781,10 @@ export default function PurchaseFlowService() {
         assigned_to: null,
         expected_completion_date: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
       }
-
+  
       // Create the request via store
       const response = await createPurchaseRequest(requestData)
-      
-      // Close/reset only on success (200/201)
-      console.log("response.status",response.status)
+  
       if (response && (response.status === 200 || response.status === 201)) {
         setIsAddDialogOpen(false)
         setNewRequestForm({
@@ -765,26 +802,16 @@ export default function PurchaseFlowService() {
           notes: "",
         })
         
-        toast({
-          title: "تم إنشاء طلب الشراء بنجاح",
-          description: "تم إنشاء طلب الشراء الجديد بنجاح",
-        })
+        toast.success("تم إنشاء طلب الشراء الجديد بنجاح");
       } else {
-        toast({
-          title: "خطأ في إنشاء طلب الشراء",
-          description: response?.data?.message || "فشل إنشاء الطلب",
-          variant: "destructive",
-        })
+        toast.error(response?.data?.message || "فشل إنشاء الطلب");
       }
     } catch (error: any) {
       console.error("Error creating purchase request:", error)
-      toast({
-        title: "خطأ",
-        description: error?.response?.data?.message || "حدث خطأ أثناء إنشاء طلب الشراء",
-        variant: "destructive",
-      })
+      toast.error(error?.response?.data?.message || "حدث خطأ أثناء إنشاء طلب الشراء");
     }
   }
+  
 
   const handleRowClick = (requestId: string) => {
     router.push(`/purchase-management/${requestId}`)
@@ -808,19 +835,12 @@ export default function PurchaseFlowService() {
       closeDeleteConfirmDialog()
 
       // Show success message
-      toast({
-        title: "تم حذف طلب الشراء بنجاح",
-        description: `تم حذف طلب الشراء ${deleteConfirmDialog.requestNumber} بنجاح`,
-      })
+        toast.success(`تم حذف طلب الشراء ${deleteConfirmDialog.requestNumber} بنجاح`);
       
     } catch (error) {
       console.error("Error deleting purchase request:", error)
       // Show error message
-      toast({
-        title: "خطأ في حذف طلب الشراء",
-        description: "حدث خطأ أثناء حذف طلب الشراء. يرجى المحاولة مرة أخرى.",
-        variant: "destructive",
-      })
+      toast.error( "حدث خطأ أثناء حذف طلب الشراء. يرجى المحاولة مرة أخرى.");
     }
   }
 
@@ -1072,7 +1092,7 @@ export default function PurchaseFlowService() {
               <h3 className="text-lg font-semibold">معلومات العميل</h3>
 
               <div className="space-y-2">
-                <Label htmlFor="editClientNameAr">اسم العميل (بالعربية)</Label>
+                <Label htmlFor="editClientNameAr">اسم العميل </Label>
                 <Input
                   id="editClientNameAr"
                   value={editRequestForm.clientNameAr}
@@ -1184,26 +1204,58 @@ export default function PurchaseFlowService() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="editPropertyDeveloperAr">المطور (بالعربية)</Label>
-                <Input
-                  id="editPropertyDeveloperAr"
-                  value={editRequestForm.propertyDeveloperAr}
-                  onChange={(e) => setEditRequestForm({ ...editRequestForm, propertyDeveloperAr: e.target.value })}
-                  placeholder="أدخل اسم المطور بالعربية"
-                />
+
+{/* project */}
+<div className="space-y-2">
+                <Label htmlFor="selectedProject">اختيار المشروع</Label>
+                <Select
+                  value={editRequestForm.selectedProjectId}
+                  onValueChange={(value) => setEditRequestForm({ ...editRequestForm, selectedProjectId: value })}
+                  disabled={loadingProjects}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={loadingProjects ? "جاري تحميل المشاريع..." : "اختر المشروع"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.isArray(projects) && projects.length > 0 ? (
+                      projects.map((Project) => (
+                        <SelectItem key={Project.id} value={Project.id.toString()}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {Project?.contents[0]?.title}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-projects" disabled>
+                        لا توجد عقارات متاحة
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                {newRequestErrors.selectedProjectId && (
+                  <p className="text-xs text-red-500 mt-1">{newRequestErrors.selectedProjectId}</p>
+                )}
+                {editRequestForm.selectedProjectId && Array.isArray(projects) && (
+                  <div className="text-sm text-gray-600">
+                    {(() => {
+                      const selectedProject = projects.find(p => p.id.toString() === editRequestForm.selectedProjectId)
+                      return selectedProject ? (
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <p><strong>المشروع:</strong> {selectedProject?.contents[0]?.title}</p>
+                          <p><strong>العنوان:</strong> {selectedProject?.contents[0]?.address}</p>
+                          <p><strong>الوصف:</strong> {selectedProject?.contents[0]?.description}</p>
+                          <p><strong>المطور:</strong> {selectedProject?.developer}</p>
+                          <p><strong>الأسعار المتفاوتة فيها:</strong> {selectedProject?.price_range}</p>
+                        </div>
+                      ) : null
+                    })()}
+                  </div>
+                )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="editPropertyDeveloper">المطور (بالإنجليزية)</Label>
-                <Input
-                  id="editPropertyDeveloper"
-                  value={editRequestForm.propertyDeveloper}
-                  onChange={(e) => setEditRequestForm({ ...editRequestForm, propertyDeveloper: e.target.value })}
-                  placeholder="Enter developer name in English"
-                />
-              </div>
-
+              {/* الاولوية */}
               <div className="space-y-2">
                 <Label htmlFor="editPriority">الأولوية</Label>
                 <Select
@@ -1220,7 +1272,11 @@ export default function PurchaseFlowService() {
                   </SelectContent>
                 </Select>
               </div>
+              
             </div>
+            
+            
+
           </div>
 
           <div className="flex justify-end space-x-2 space-x-reverse mt-6">
@@ -1246,30 +1302,18 @@ export default function PurchaseFlowService() {
               <h3 className="text-lg font-semibold">معلومات العميل</h3>
 
               <div className="space-y-2">
-                <Label htmlFor="clientNameAr">اسم العميل (بالعربية)</Label>
-                <Input
-                  id="clientNameAr"
-                  value={newRequestForm.clientNameAr}
-                  onChange={(e) => setNewRequestForm({ ...newRequestForm, clientNameAr: e.target.value })}
-                  placeholder="أدخل اسم العميل بالعربية"
-                />
-                {newRequestErrors.clientNameAr && (
-                  <p className="text-xs text-red-500 mt-1">{newRequestErrors.clientNameAr}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="clientName">اسم العميل (بالإنجليزية)</Label>
+                <Label htmlFor="clientName">اسم العميل </Label>
                 <Input
                   id="clientName"
                   value={newRequestForm.clientName}
                   onChange={(e) => setNewRequestForm({ ...newRequestForm, clientName: e.target.value })}
-                  placeholder="Enter client name in English"
+                  placeholder="أدخل اسم العميل بالعربية"
                 />
                 {newRequestErrors.clientName && (
                   <p className="text-xs text-red-500 mt-1">{newRequestErrors.clientName}</p>
                 )}
               </div>
+
 
               <div className="space-y-2">
                 <Label htmlFor="clientEmail">البريد الإلكتروني</Label>
@@ -1370,25 +1414,59 @@ export default function PurchaseFlowService() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="propertyLocationAr">الموقع (بالعربية)</Label>
-                <Input
-                  id="propertyLocationAr"
-                  value={newRequestForm.propertyLocationAr}
-                  onChange={(e) => setNewRequestForm({ ...newRequestForm, propertyLocationAr: e.target.value })}
-                  placeholder="الرياض - حي العليا"
-                />
-              </div>
 
+
+
+{/* project */}
               <div className="space-y-2">
-                <Label htmlFor="propertyDeveloperAr">المطور (بالعربية)</Label>
-                <Input
-                  id="propertyDeveloperAr"
-                  value={newRequestForm.propertyDeveloperAr}
-                  onChange={(e) => setNewRequestForm({ ...newRequestForm, propertyDeveloperAr: e.target.value })}
-                  placeholder="شركة التطوير العقاري"
-                />
+                <Label htmlFor="selectedProject">اختيار المشروع</Label>
+                <Select
+                  value={newRequestForm.selectedProjectId}
+                  onValueChange={(value) => setNewRequestForm({ ...newRequestForm, selectedProjectId: value })}
+                  disabled={loadingProjects}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={loadingProjects ? "جاري تحميل المشاريع..." : "اختر المشروع"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.isArray(projects) && projects.length > 0 ? (
+                      projects.map((Project) => (
+                        <SelectItem key={Project.id} value={Project.id.toString()}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {Project?.contents[0]?.title}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-projects" disabled>
+                        لا توجد عقارات متاحة
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                {newRequestErrors.selectedProjectId && (
+                  <p className="text-xs text-red-500 mt-1">{newRequestErrors.selectedProjectId}</p>
+                )}
+                {newRequestForm.selectedProjectId && Array.isArray(projects) && (
+                  <div className="text-sm text-gray-600">
+                    {(() => {
+                      const selectedProject = projects.find(p => p.id.toString() === newRequestForm.selectedProjectId)
+                      return selectedProject ? (
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <p><strong>المشروع:</strong> {selectedProject?.contents[0]?.title}</p>
+                          <p><strong>العنوان:</strong> {selectedProject?.contents[0]?.address}</p>
+                          <p><strong>الوصف:</strong> {selectedProject?.contents[0]?.description}</p>
+                          <p><strong>المطور:</strong> {selectedProject?.developer}</p>
+                          <p><strong>الأسعار المتفاوتة فيها:</strong> {selectedProject?.price_range}</p>
+                        </div>
+                      ) : null
+                    })()}
+                  </div>
+                )}
               </div>
+              
             </div>
           </div>
 

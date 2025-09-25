@@ -11,9 +11,14 @@ module.exports = (set, get) => ({
     // Properties Data
     properties: [],
     
+        // Properties Data
+        projects: [],
+
+
     // UI State
     loading: false,
     loadingProperties: false,
+    loadingProjects: false,
     loadingStats: false,
     error: null,
     isInitialized: false,
@@ -273,6 +278,50 @@ module.exports = (set, get) => ({
       throw error;
     }
   },
+
+  
+  // Fetch projects
+  fetchProjects: async () => {
+    set((state) => ({
+      purchaseManagement: {
+        ...state.purchaseManagement,
+        loadingProjects: true,
+        error: null,
+      },
+    }));
+
+    try {
+      const response = await retryWithBackoff(async () => {
+        return await axiosInstance.get("/projects");
+      }, 3, 1000);
+
+      const projectsList = response.data.data.projects || [];
+
+      set((state) => ({
+        purchaseManagement: {
+          ...state.purchaseManagement,
+          projects: projectsList,
+          loadingProjects: false,
+        },
+      }));
+
+      return projectsList;
+    } catch (error) {
+      const errorInfo = logError(error, 'fetchProjects');
+      
+      set((state) => ({
+        purchaseManagement: {
+          ...state.purchaseManagement,
+          error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات العقارات"),
+          loadingProjects: false,
+        },
+      }));
+      
+      throw error;
+    }
+  },
+
+
 
   // Create Purchase Request
   createPurchaseRequest: async (requestData) => {
