@@ -118,112 +118,130 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
     inspectionDate: "",
     completionDate: "",
   })
+  const [validationErrors, setValidationErrors] = useState<{
+    inspection_date?: string[];
+    expected_completion_date?: string[];
+    payment_amount?: string[];
+  }>({});
+
+  // Define fixed requirements
+  const FIXED_REQUIREMENTS = [
+    "تأكيد دفع العربون",
+    "توقيع عقد الحجز",
+    "تقديم الهوية الوطنية",
+    "تقديم إثبات الدخل"
+  ];
 
   // Fetch single purchase request details from API
-  useEffect(() => {
-    const fetchSingleRequest = async () => {
-      setIsLoading(true)
-      try {
-        const response = await axiosInstance.get(`/v1/pms/purchase-requests/${requestId}`)
-        const data = response.data?.data || response.data
+  const fetchSingleRequest = async () => {
+    setIsLoading(true)
+    try {
+      const response = await axiosInstance.get(`/v1/pms/purchase-requests/${requestId}`)
+      const data = response.data?.data || response.data
 
-        // Map API response to component interface
-        const mapped: PurchaseRequest = {
-          id: (data.id ?? "").toString(),
-          requestNumber: data.request_number ?? "-",
-          client: {
-            name: data.client?.name ?? "غير محدد",
-            email: data.client?.email ?? "",
-            phone: data.client?.phone ?? "",
-            nationalId: data.client?.national_id ?? "",
-            rating: data.client?.rating ?? 4.5,
-            totalPurchases: data.property?.total_purchases ?? 1,
+      // Map API response to component interface
+      const mapped: PurchaseRequest = {
+        id: (data.id ?? "").toString(),
+        requestNumber: data.request_number ?? "-",
+        client: {
+          name: data.client?.name ?? "غير محدد",
+          email: data.client?.email ?? "",
+          phone: data.client?.phone ?? "",
+          nationalId: data.client?.national_id ?? "",
+          rating: data.client?.rating ?? 4.5,
+          totalPurchases: data.property?.total_purchases ?? 1,
+        },
+        property: {
+          title: data.property?.title ?? "-",
+          type: data.property?.type ?? "-",
+          price: Number.parseFloat(data.property?.price ?? data.budget_amount ?? "0"),
+          area: Number.parseFloat(data.property?.area ?? "0"),
+          bedrooms: data.property?.beds ?? 0,
+          bathrooms: data.property?.bath ?? 0,
+          location: data.property?.location ?? "",
+          developer: data.property?.developer ?? (data.project?.developer ?? ""),
+          images: ["/placeholder.svg"],
+        },
+        currentStage: mapApiStatusToStage(data.overall_status),
+        priority: ((): "high" | "medium" | "low" => {
+          const p = data.priority
+          if (p === "عالية") return "high"
+          if (p === "منخفضة") return "low"
+          return "medium"
+        })(),
+        progress: data.progress_percentage ?? 0,
+        createdAt: data.request_date ?? data.created_at ?? new Date().toISOString(),
+        assignedAgent: data.assigned_user
+          ? {
+              name: data.assigned_user.name ?? "",
+              email: data.assigned_user.email ?? "",
+              phone: data.assigned_user.phone ?? "",
+              avatar: "/placeholder.svg",
+            }
+          : { name: "", email: "", phone: "", avatar: "/placeholder.svg" },
+        stages: {
+          reservation: {
+            status:
+              data.stages?.[0]?.status === "قيد التنفيذ"
+                ? "in-progress"
+                : data.stages?.[0]?.status === "الانتظار"
+                ? "pending"
+                : "completed",
+            completedAt: data.stages?.[0]?.completed_at ?? undefined,
+            documents: data.stages?.[0]?.documents ?? [],
+            notes: data.stages?.[0]?.notes ?? "",
           },
-          property: {
-            title: data.property?.title ?? "-",
-            type: data.property?.type ?? "-",
-            price: Number.parseFloat(data.property?.price ?? data.budget_amount ?? "0"),
-            area: Number.parseFloat(data.property?.area ?? "0"),
-            bedrooms: data.property?.beds ?? 0,
-            bathrooms: data.property?.bath ?? 0,
-            location: data.property?.location ?? "",
-            developer: data.property?.developer ?? (data.project?.developer ?? ""),
-            images: ["/placeholder.svg"],
+          contract: {
+            status:
+              data.stages?.[1]?.status === "قيد التنفيذ"
+                ? "in-progress"
+                : data.stages?.[1]?.status === "الانتظار"
+                ? "pending"
+                : "completed",
+            completedAt: data.stages?.[1]?.completed_at ?? undefined,
+            documents: data.stages?.[1]?.documents ?? [],
+            notes: data.stages?.[1]?.notes ?? "",
           },
-          currentStage: mapApiStatusToStage(data.overall_status),
-          priority: ((): "high" | "medium" | "low" => {
-            const p = data.priority
-            if (p === "عالية") return "high"
-            if (p === "منخفضة") return "low"
-            return "medium"
-          })(),
-          progress: data.progress_percentage ?? 0,
-          createdAt: data.request_date ?? data.created_at ?? new Date().toISOString(),
-          assignedAgent: data.assigned_user
-            ? {
-                name: data.assigned_user.name ?? "",
-                email: data.assigned_user.email ?? "",
-                phone: data.assigned_user.phone ?? "",
-                avatar: "/placeholder.svg",
-              }
-            : { name: "", email: "", phone: "", avatar: "/placeholder.svg" },
-          stages: {
-            reservation: {
-              status:
-                data.stages?.[0]?.status === "قيد التنفيذ"
-                  ? "in-progress"
-                  : data.stages?.[0]?.status === "الانتظار"
-                  ? "pending"
-                  : "completed",
-              completedAt: data.stages?.[0]?.completed_at ?? undefined,
-              documents: data.stages?.[0]?.documents ?? [],
-              notes: data.stages?.[0]?.notes ?? "",
-            },
-            contract: {
-              status:
-                data.stages?.[1]?.status === "قيد التنفيذ"
-                  ? "in-progress"
-                  : data.stages?.[1]?.status === "الانتظار"
-                  ? "pending"
-                  : "completed",
-              completedAt: data.stages?.[1]?.completed_at ?? undefined,
-              documents: data.stages?.[1]?.documents ?? [],
-              notes: data.stages?.[1]?.notes ?? "",
-            },
-            completion: {
-              status:
-                data.stages?.[2]?.status === "قيد التنفيذ"
-                  ? "in-progress"
-                  : data.stages?.[2]?.status === "الانتظار"
-                  ? "pending"
-                  : "completed",
-              completedAt: data.stages?.[2]?.completed_at ?? undefined,
-              documents: data.stages?.[2]?.documents ?? [],
-              notes: data.stages?.[2]?.notes ?? "",
-            },
-            receiving: {
-              status:
-                data.stages?.[3]?.status === "قيد التنفيذ"
-                  ? "in-progress"
-                  : data.stages?.[3]?.status === "الانتظار"
-                  ? "pending"
-                  : "completed",
-              completedAt: data.stages?.[3]?.completed_at ?? undefined,
-              documents: data.stages?.[3]?.documents ?? [],
-              notes: data.stages?.[3]?.notes ?? "",
-            },
+          completion: {
+            status:
+              data.stages?.[2]?.status === "قيد التنفيذ"
+                ? "in-progress"
+                : data.stages?.[2]?.status === "الانتظار"
+                ? "pending"
+                : "completed",
+            completedAt: data.stages?.[2]?.completed_at ?? undefined,
+            documents: data.stages?.[2]?.documents ?? [],
+            notes: data.stages?.[2]?.notes ?? "",
           },
-          notes: data.notes ?? "",
-        }
-
-        setRequest(mapped)
-      } catch (error) {
-        console.error("Error fetching purchase request details:", error)
-      } finally {
-        setIsLoading(false)
+          receiving: {
+            status:
+              data.stages?.[3]?.status === "قيد التنفيذ"
+                ? "in-progress"
+                : data.stages?.[3]?.status === "الانتظار"
+                ? "pending"
+                : "completed",
+            completedAt: data.stages?.[3]?.completed_at ?? undefined,
+            documents: data.stages?.[3]?.documents ?? [],
+            notes: data.stages?.[3]?.notes ?? "",
+          },
+        },
+        notes: data.notes ?? "",
       }
-    }
 
+      // Check if all stages are pending, then set reservation to in-progress
+      if (Object.values(mapped.stages).every(s => s.status === "pending")) {
+        mapped.stages.reservation.status = "in-progress"
+      }
+
+      setRequest(mapped)
+    } catch (error) {
+      console.error("Error fetching purchase request details:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchSingleRequest()
   }, [requestId])
 
@@ -238,17 +256,6 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
         return "receiving"
       default:
         return "reservation"
-    }
-  }
-
-  const mapApiPriorityToPriority = (priority: string): "high" | "medium" | "low" => {
-    switch (priority) {
-      case "عاجل":
-        return "high"
-      case "متوسطة":
-        return "medium"
-      default:
-        return "medium"
     }
   }
 
@@ -318,69 +325,86 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
     }
   }
 
-  const handleStageTransition = (from: string, to: string) => {
+  const handleStageTransition = (from: string) => {
+  
     const transitions = {
-      "reservation-contract": {
+      reservation: {
         from: "الحجز",
         to: "العقد",
         requirements: ["تأكيد دفع العربون", "توقيع عقد الحجز", "تقديم الهوية الوطنية", "تقديم إثبات الدخل"],
       },
-      "contract-completion": {
+      contract: {
         from: "العقد",
         to: "الإنجاز",
-        requirements: [
-          "توقيع العقد النهائي",
-          "دفع الدفعة الثانية",
-          "الحصول على موافقة البنك",
-          "تسليم المستندات المطلوبة",
-        ],
+        requirements: ["توقيع العقد النهائي", "دفع الدفعة الثانية", "الحصول على موافقة البنك", "تسليم المستندات المطلوبة"],
       },
-      "completion-receiving": {
+      completion: {
         from: "الإنجاز",
         to: "الاستلام",
         requirements: ["إنجاز البناء", "الحصول على شهادة الإنجاز", "دفع المبلغ المتبقي", "فحص الوحدة"],
       },
+      receiving: {
+        from: "الاستلام",
+        to: "الاستلام",
+        requirements: ["تسجيل الملكية", "دفع المبلغ النهائي", "تسليم المستندات النهائية", "تسليم المفاتيح"],
+      },
     }
-
-    const transitionKey = `${from}-${to}` as keyof typeof transitions
-    const transition = transitions[transitionKey]
-
+  
+    const transition = transitions[from as keyof typeof transitions]
+  
+  
+      console.log("11111 transition:", transition)
     if (transition) {
+      console.log("Initiating transition:", transition)
       setSelectedTransition(transition)
       setIsTransitionDialogOpen(true)
-    }
+    } 
   }
+  
 
-  const handleTransitionSubmit = () => {
+  const handleTransitionSubmit = async () => {
     if (!request || !selectedTransition) return
 
-    // Update the request stages
-    const updatedRequest = { ...request }
-    const stages = ["reservation", "contract", "completion", "receiving"]
-    const currentIndex = stages.indexOf(request.currentStage)
-    const nextStage = stages[currentIndex + 1]
+    // Reset validation errors
+    setValidationErrors({});
 
-    if (nextStage) {
-      updatedRequest.currentStage = nextStage as any
-      updatedRequest.progress = ((currentIndex + 2) / stages.length) * 100
-      updatedRequest.stages[nextStage as keyof typeof updatedRequest.stages] = {
-        ...updatedRequest.stages[nextStage as keyof typeof updatedRequest.stages],
-        status: "in-progress",
-      }
-      updatedRequest.stages[request.currentStage].status = "completed"
-      updatedRequest.stages[request.currentStage].completedAt = new Date().toISOString().split("T")[0]
+    // Prepare requirements_met as array of booleans
+    console.log("Selected requirements:", selectedTransition.requirements)
+    const requirementsMet = selectedTransition.requirements.map(req => transitionForm.documents.includes(req))
+
+    // Prepare body
+    const body = {
+      current_stage_name: selectedTransition.from, // Next stage name in Arabic
+      requirements_met: requirementsMet,
+      inspection_date: transitionForm.inspectionDate || null, // If empty, send null or handle as needed
+      payment_amount: transitionForm.paymentAmount ? Number(transitionForm.paymentAmount) : null,
+      expected_completion_date: transitionForm.completionDate || null,
+      additional_notes: transitionForm.notes || ""
     }
 
-    setRequest(updatedRequest)
-    setIsTransitionDialogOpen(false)
-    setSelectedTransition(null)
-    setTransitionForm({
-      documents: [],
-      notes: "",
-      paymentAmount: "",
-      inspectionDate: "",
-      completionDate: "",
-    })
+    try {
+      // Send API request
+      await axiosInstance.post(`/v1/pms/purchase-requests/${requestId}/simple-transition-stage`, body)
+
+      // On success, refetch data to update UI
+      await fetchSingleRequest()
+
+      setIsTransitionDialogOpen(false)
+      setSelectedTransition(null)
+      setTransitionForm({
+        documents: [],
+        notes: "",
+        paymentAmount: "",
+        inspectionDate: "",
+        completionDate: "",
+      })
+    } catch (error: any) {
+      if (error.response?.data?.errors) {
+        setValidationErrors(error.response.data.errors);
+      } else {
+        console.error("Error transitioning stage:", error);
+      }
+    }
   }
 
   if (isLoading) {
@@ -441,12 +465,25 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
     return <div className="p-6">لم يتم العثور على طلب الشراء</div>
   }
 
+  
+  const getStageStatus = (request: PurchaseRequest | null, stageName: string): "completed" | "in-progress" | "pending" => {
+    const stageMap: Record<string, keyof PurchaseRequest["stages"]> = {
+      "الحجز": "reservation",
+      "العقد": "contract",
+      "الإنجاز": "completion",
+      "الاستلام": "receiving"
+    };
+    const englishKey = stageMap[stageName];
+    if (!englishKey || !request) return "pending";
+    return request.stages[englishKey].status;
+  };
+  
   const stages = [
-    { key: "reservation", label: "الحجز", status: request.stages.reservation.status },
-    { key: "contract", label: "العقد", status: request.stages.contract.status },
-    { key: "completion", label: "الإنجاز", status: request.stages.completion.status },
-    { key: "receiving", label: "الاستلام", status: request.stages.receiving.status },
-  ]
+    { key: "reservation", label: "الحجز", status: getStageStatus(request, "الحجز") },
+    { key: "contract", label: "العقد", status: getStageStatus(request, "العقد") },
+    { key: "completion", label: "الإنجاز", status: getStageStatus(request, "الإنجاز") },
+    { key: "receiving", label: "الاستلام", status: getStageStatus(request, "الاستلام") },
+  ];
 
   const canTransition = (currentStage: string) => {
     const stageOrder = ["reservation", "contract", "completion", "receiving"]
@@ -654,15 +691,13 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
                   </div>
                 )}
 
-                {stage.status === "in-progress" && canTransition(stage.key) && (
+                {stage.status === "in-progress" && (
                   <Button
                     onClick={() => {
                       const stageOrder = ["reservation", "contract", "completion", "receiving"]
                       const currentIndex = stageOrder.indexOf(stage.key)
                       const nextStage = stageOrder[currentIndex + 1]
-                      if (nextStage) {
                         handleStageTransition(stage.key, nextStage)
-                      }
                     }}
                     className="w-full"
                   >
@@ -687,19 +722,19 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
         )}
         {/* Stage Transition Dialog */}
         <Dialog open={isTransitionDialogOpen} onOpenChange={setIsTransitionDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
-          <DialogHeader>
-            <DialogTitle>
-              الانتقال من {selectedTransition?.from} إلى {selectedTransition?.to}
-            </DialogTitle>
-          </DialogHeader>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
+            <DialogHeader>
+              <DialogTitle>
+                انتقال المرحلة
+              </DialogTitle>
+            </DialogHeader>
 
-          {selectedTransition && (
             <div className="space-y-6">
+              {/* المتطلبات المطلوبة - ثابتة دائماً */}
               <div>
                 <Label className="text-base font-semibold">المتطلبات المطلوبة:</Label>
                 <div className="mt-3 space-y-2">
-                  {selectedTransition.requirements.map((req, index) => (
+                  {selectedTransition?.requirements?.map((req, index) => (
                     <div key={index} className="flex items-center space-x-2 space-x-reverse">
                       <Checkbox
                         id={`req-${index}`}
@@ -726,6 +761,7 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
                 </div>
               </div>
 
+              {/* الحقول الأخرى - ظاهرة دائماً */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="paymentAmount">مبلغ الدفع (ريال)</Label>
@@ -740,7 +776,13 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
                       }))
                     }
                     placeholder="أدخل المبلغ"
+                    className={validationErrors.payment_amount ? "border-red-500" : ""}
                   />
+                  {validationErrors.payment_amount?.map((error, index) => (
+                    <p key={index} className="text-sm text-red-500 mt-1">
+                      {error}
+                    </p>
+                  ))}
                 </div>
                 <div>
                   <Label htmlFor="inspectionDate">تاريخ الفحص</Label>
@@ -754,7 +796,13 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
                         inspectionDate: e.target.value,
                       }))
                     }
+                    className={validationErrors.inspection_date ? "border-red-500" : ""}
                   />
+                  {validationErrors.inspection_date?.map((error, index) => (
+                    <p key={index} className="text-sm text-red-500 mt-1">
+                      {error}
+                    </p>
+                  ))}
                 </div>
               </div>
 
@@ -770,7 +818,13 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
                       completionDate: e.target.value,
                     }))
                   }
+                  className={validationErrors.expected_completion_date ? "border-red-500" : ""}
                 />
+                {validationErrors.expected_completion_date?.map((error, index) => (
+                  <p key={index} className="text-sm text-red-500 mt-1">
+                    {error}
+                  </p>
+                ))}
               </div>
 
               <div>
@@ -789,22 +843,19 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
                 />
               </div>
             </div>
-          )}
 
-          <DialogFooter className="flex space-x-2 space-x-reverse">
-            <Button variant="outline" onClick={() => setIsTransitionDialogOpen(false)}>
-              إلغاء
-            </Button>
-            <Button
-              onClick={handleTransitionSubmit}
-              disabled={
-                !selectedTransition || transitionForm.documents.length !== selectedTransition.requirements.length
-              }
-            >
-              تأكيد الانتقال
-            </Button>
-          </DialogFooter>
-        </DialogContent>
+            <DialogFooter className="flex space-x-2 space-x-reverse">
+              <Button variant="outline" onClick={() => setIsTransitionDialogOpen(false)}>
+                إلغاء
+              </Button>
+              <Button
+                onClick={handleTransitionSubmit}
+                disabled={transitionForm.documents.length !== selectedTransition?.requirements?.length}
+              >
+                تأكيد الانتقال
+              </Button>
+            </DialogFooter>
+          </DialogContent>
         </Dialog>
         </main>
       </div>
