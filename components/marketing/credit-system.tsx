@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import useStore from "@/context/Store"
 
 interface CreditPackage {
   id: string
@@ -57,79 +58,24 @@ interface CreditUsage {
 }
 
 export function CreditSystemComponent() {
-  const [currentCredits, setCurrentCredits] = useState(2450)
-  const [monthlyUsage, setMonthlyUsage] = useState(1250)
-  const [monthlyLimit, setMonthlyLimit] = useState(5000)
+  const { creditsSystem, updateCredits, addCreditTransaction } = useStore()
+
   const [isTopUpDialogOpen, setIsTopUpDialogOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<string>("")
 
-  const creditPackages: CreditPackage[] = [
-    { id: "1", name: "الباقة الأساسية", credits: 1000, price: 50, currency: "SAR" },
-    { id: "2", name: "الباقة المتوسطة", credits: 2500, price: 100, currency: "SAR", discount: 20 },
-    { id: "3", name: "الباقة المتقدمة", credits: 5000, price: 180, currency: "SAR", discount: 28, popular: true },
-    { id: "4", name: "الباقة الاحترافية", credits: 10000, price: 300, currency: "SAR", discount: 40 },
-  ]
-
-  const recentTransactions: CreditTransaction[] = [
-    {
-      id: "1",
-      type: "purchase",
-      amount: 2500,
-      description: "شراء الباقة المتوسطة",
-      date: "2024-01-20",
-      status: "completed",
-    },
-    {
-      id: "2",
-      type: "usage",
-      amount: -150,
-      description: "إرسال رسائل حملة العروض الشتوية",
-      date: "2024-01-19",
-      phoneNumber: "+966501234567",
-      campaignName: "العروض الشتوية",
-      status: "completed",
-    },
-    {
-      id: "3",
-      type: "usage",
-      amount: -75,
-      description: "رسائل خدمة العملاء",
-      date: "2024-01-18",
-      phoneNumber: "+966559876543",
-      status: "completed",
-    },
-    {
-      id: "4",
-      type: "bonus",
-      amount: 100,
-      description: "مكافأة العضوية الذهبية",
-      date: "2024-01-15",
-      status: "completed",
-    },
-  ]
-
-  const creditUsageByNumber: CreditUsage[] = [
-    {
-      phoneNumber: "+966501234567",
-      displayName: "الرقم الرئيسي للشركة",
-      messagesThisMonth: 850,
-      creditsUsed: 850,
-      lastUsed: "2024-01-20",
-    },
-    {
-      phoneNumber: "+966559876543",
-      displayName: "رقم خدمة العملاء",
-      messagesThisMonth: 400,
-      creditsUsed: 400,
-      lastUsed: "2024-01-19",
-    },
-  ]
-
   const handleTopUp = () => {
     // Simulate payment process
-    const selectedPkg = creditPackages.find((pkg) => pkg.id === selectedPackage)
+    const selectedPkg = creditsSystem.creditPackages.find((pkg) => pkg.id === selectedPackage)
     if (selectedPkg) {
-      setCurrentCredits((prev) => prev + selectedPkg.credits)
+      updateCredits(selectedPkg.credits)
+      addCreditTransaction({
+        id: Date.now().toString(),
+        type: "purchase",
+        amount: selectedPkg.credits,
+        description: `شراء ${selectedPkg.name}`,
+        date: new Date().toISOString().split("T")[0],
+        status: "completed",
+      })
       setIsTopUpDialogOpen(false)
       setSelectedPackage("")
     }
@@ -163,7 +109,7 @@ export function CreditSystemComponent() {
     }
   }
 
-  const usagePercentage = (monthlyUsage / monthlyLimit) * 100
+  const usagePercentage = (creditsSystem.monthlyUsage / creditsSystem.monthlyLimit) * 100
 
   return (
     <div className="space-y-6">
@@ -191,7 +137,7 @@ export function CreditSystemComponent() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-3">
-                {creditPackages.map((pkg) => (
+                {creditsSystem.creditPackages.map((pkg) => (
                   <div
                     key={pkg.id}
                     className={`relative cursor-pointer transition-all duration-200 ${
@@ -261,7 +207,7 @@ export function CreditSystemComponent() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-green-600">{currentCredits.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-green-600">{creditsSystem.currentCredits.toLocaleString()}</div>
                 <p className="text-xs text-muted-foreground">رسالة متاحة</p>
               </div>
               <div className="p-2 bg-green-100 rounded-lg">
@@ -278,8 +224,8 @@ export function CreditSystemComponent() {
           <CardContent>
             <div className="flex items-center justify-between mb-2">
               <div>
-                <div className="text-2xl font-bold text-blue-600">{monthlyUsage.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">من {monthlyLimit.toLocaleString()}</p>
+                <div className="text-2xl font-bold text-blue-600">{creditsSystem.monthlyUsage.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">من {creditsSystem.monthlyLimit.toLocaleString()}</p>
               </div>
               <div className="p-2 bg-blue-100 rounded-lg">
                 <MessageSquare className="h-5 w-5 text-blue-600" />
@@ -335,7 +281,7 @@ export function CreditSystemComponent() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentTransactions.map((transaction) => (
+                {creditsSystem.transactions.map((transaction) => (
                   <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
                       {getTransactionIcon(transaction.type)}
@@ -381,7 +327,7 @@ export function CreditSystemComponent() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {creditUsageByNumber.map((usage, index) => (
+                {creditsSystem.usageByNumber.map((usage, index) => (
                   <div key={index} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-3">
                       <div>

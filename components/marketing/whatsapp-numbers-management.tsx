@@ -31,7 +31,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { WhatsappIcon } from "@/components/icons"
-import axiosInstance from "@/lib/axiosInstance"
+import useStore from "@/context/Store"
 
 interface WhatsAppNumber {
   id: number
@@ -53,9 +53,12 @@ interface WhatsAppNumber {
 }
 
 export function WhatsAppNumbersManagement() {
-  const [numbers, setNumbers] = useState<WhatsAppNumber[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const {
+    marketingChannels,
+    fetchMarketingChannels,
+    addMarketingChannel,
+    removeMarketingChannel,
+  } = useStore()
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [newNumber, setNewNumber] = useState({
@@ -66,25 +69,10 @@ export function WhatsAppNumbersManagement() {
   const [isConnecting, setIsConnecting] = useState(false)
 
   useEffect(() => {
-    const fetchChannels = async () => {
-      try {
-        setLoading(true)
-        const response = await axiosInstance.get("/v1/marketing/channels")
-        if (response.data.status === "success") {
-          setNumbers(response.data.data)
-        } else {
-          setError("Failed to fetch marketing channels")
-        }
-      } catch (err) {
-        setError("Error fetching marketing channels")
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
+    if (!marketingChannels.isInitialized) {
+      fetchMarketingChannels()
     }
-
-    fetchChannels()
-  }, [])
+  }, [fetchMarketingChannels, marketingChannels.isInitialized])
 
   const handleAddNumber = () => {
     // Simulate Meta Cloud API popup
@@ -111,7 +99,7 @@ export function WhatsAppNumbersManagement() {
         updated_at: new Date().toISOString(),
       }
 
-      setNumbers([...numbers, newWhatsAppNumber])
+      addMarketingChannel(newWhatsAppNumber)
       setNewNumber({ phoneNumber: "", displayName: "", description: "" })
       setIsAddDialogOpen(false)
       setIsConnecting(false)
@@ -119,7 +107,7 @@ export function WhatsAppNumbersManagement() {
   }
 
   const handleRemoveNumber = (id: number) => {
-    setNumbers(numbers.filter((num) => num.id !== id))
+    removeMarketingChannel(id)
   }
 
   const getStatusColor = (number: WhatsAppNumber) => {
@@ -154,7 +142,7 @@ export function WhatsAppNumbersManagement() {
     }
   }
 
-  if (loading) {
+  if (marketingChannels.loading) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-center py-12">
@@ -165,12 +153,12 @@ export function WhatsAppNumbersManagement() {
     )
   }
 
-  if (error) {
+  if (marketingChannels.error) {
     return (
       <div className="space-y-6">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>{marketingChannels.error}</AlertDescription>
         </Alert>
       </div>
     )
@@ -263,7 +251,7 @@ export function WhatsAppNumbersManagement() {
 
       {/* Numbers Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {numbers.map((number) => (
+        {marketingChannels.channels.map((number) => (
           <Card key={number.id} className="relative">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
@@ -367,7 +355,7 @@ export function WhatsAppNumbersManagement() {
       </div>
 
       {/* Empty State */}
-      {numbers.length === 0 && (
+      {marketingChannels.channels.length === 0 && (
         <Card className="text-center py-12" >
           <CardContent>
             <WhatsappIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

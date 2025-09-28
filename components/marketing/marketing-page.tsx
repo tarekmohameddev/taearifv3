@@ -8,7 +8,7 @@ import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { WhatsAppNumbersManagement } from "@/components/marketing/whatsapp-numbers-management"
 import { CreditSystemComponent } from "@/components/marketing/credit-system"
 import { MarketingSettingsComponent } from "@/components/marketing/marketing-settings"
-import { CampaignsManagement } from "@/components/marketing/campaigns-management"
+import { CampaignsManagement } from "@/components/marketing/campaigns-management" // مخفي الان , سأستخدمه مستقبلا
 
 export function MarketingPage() {
   const [activeTab, setActiveTab] = useState("marketing")
@@ -29,15 +29,15 @@ export function MarketingPage() {
             </div>
 
             <Tabs defaultValue="whatsapp" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="whatsapp" className="flex items-center gap-2">
                   <MessageSquare className="h-4 w-4" />
                   <span className="hidden sm:inline">واتساب</span>
                 </TabsTrigger>
-                <TabsTrigger value="campaigns" className="flex items-center gap-2">
+                {/* <TabsTrigger value="campaigns" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden sm:inline">الحملات</span>
-                </TabsTrigger>
+                </TabsTrigger> */}
                 <TabsTrigger value="credits" className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
                   <span className="hidden sm:inline">الرصيد</span>
@@ -51,10 +51,10 @@ export function MarketingPage() {
               <TabsContent value="whatsapp">
                 <WhatsAppNumbersManagement />
               </TabsContent>
-
+{/* 
               <TabsContent value="campaigns">
                 <CampaignsManagement />
-              </TabsContent>
+              </TabsContent> */}
 
               <TabsContent value="credits">
                 <CreditSystemComponent />

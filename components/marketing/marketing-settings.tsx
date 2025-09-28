@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import useStore from "@/context/Store"
 
 interface MessageSettings {
   autoReply: boolean
@@ -57,61 +58,13 @@ interface SystemIntegrations {
 }
 
 export function MarketingSettingsComponent() {
-  const [messageSettings, setMessageSettings] = useState<MessageSettings>({
-    autoReply: true,
-    autoReplyMessage: "شكراً لتواصلك معنا! سنرد عليك في أقرب وقت ممكن.",
-    businessHours: {
-      enabled: true,
-      start: "09:00",
-      end: "18:00",
-      timezone: "Asia/Riyadh",
-    },
-    rateLimiting: {
-      enabled: true,
-      maxMessagesPerHour: 100,
-      maxMessagesPerDay: 1000,
-    },
-    templates: {
-      welcomeMessage: "مرحباً بك في {company_name}! نحن سعداء لخدمتك.",
-      thankYouMessage: "شكراً لك على اختيارك {company_name}. نقدر ثقتك بنا.",
-      orderConfirmation: "تم تأكيد طلبك رقم {order_id}. سيتم التوصيل خلال {delivery_time}.",
-      appointmentReminder: "تذكير: لديك موعد غداً في {appointment_time} مع {staff_name}.",
-    },
-  })
-
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
-    newMessage: true,
-    campaignComplete: true,
-    lowCredits: true,
-    systemUpdates: false,
-    emailNotifications: true,
-    smsNotifications: false,
-  })
-
-  const [systemIntegrations, setSystemIntegrations] = useState<SystemIntegrations>({
-    crm: true,
-    ecommerce: false,
-    appointments: true,
-    analytics: true,
-    webhooks: {
-      enabled: false,
-      url: "",
-      events: [],
-    },
-  })
-
-  const [isSaving, setIsSaving] = useState(false)
-  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle")
-
-  const handleSave = async () => {
-    setIsSaving(true)
-    // Simulate API call
-    setTimeout(() => {
-      setSaveStatus("success")
-      setIsSaving(false)
-      setTimeout(() => setSaveStatus("idle"), 3000)
-    }, 1000)
-  }
+  const {
+    marketingSettings,
+    updateMessageSettings,
+    updateNotificationSettings,
+    updateSystemIntegrations,
+    saveMarketingSettings,
+  } = useStore()
 
   const availableEvents = [
     { id: "message_received", label: "رسالة واردة" },
@@ -134,8 +87,8 @@ export function MarketingSettingsComponent() {
           <p className="text-sm text-muted-foreground">تكوين إعدادات الرسائل والإشعارات والتكاملات</p>
         </div>
 
-        <Button onClick={handleSave} disabled={isSaving} className="flex items-center gap-2">
-          {isSaving ? (
+        <Button onClick={saveMarketingSettings} disabled={marketingSettings.isSaving} className="flex items-center gap-2">
+          {marketingSettings.isSaving ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               جاري الحفظ...
@@ -150,7 +103,7 @@ export function MarketingSettingsComponent() {
       </div>
 
       {/* Save Status Alert */}
-      {saveStatus === "success" && (
+      {marketingSettings.saveStatus === "success" && (
         <Alert className="border-green-200 bg-green-50">
           <AlertCircle className="h-4 w-4 text-green-600" />
           <AlertDescription className="text-green-800">تم حفظ الإعدادات بنجاح!</AlertDescription>
@@ -196,18 +149,18 @@ export function MarketingSettingsComponent() {
                   <p className="text-sm text-muted-foreground">إرسال رد تلقائي عند استلام رسالة جديدة</p>
                 </div>
                 <Switch
-                  checked={messageSettings.autoReply}
-                  onCheckedChange={(checked) => setMessageSettings((prev) => ({ ...prev, autoReply: checked }))}
+                  checked={marketingSettings.messageSettings.autoReply}
+                  onCheckedChange={(checked) => updateMessageSettings({ autoReply: checked })}
                 />
               </div>
 
-              {messageSettings.autoReply && (
+              {marketingSettings.messageSettings.autoReply && (
                 <div className="space-y-2">
                   <Label htmlFor="autoReplyMessage">نص الرد التلقائي</Label>
                   <Textarea
                     id="autoReplyMessage"
-                    value={messageSettings.autoReplyMessage}
-                    onChange={(e) => setMessageSettings((prev) => ({ ...prev, autoReplyMessage: e.target.value }))}
+                    value={marketingSettings.messageSettings.autoReplyMessage}
+                    onChange={(e) => updateMessageSettings({ autoReplyMessage: e.target.value })}
                     placeholder="أدخل نص الرد التلقائي..."
                     rows={3}
                   />
@@ -222,29 +175,27 @@ export function MarketingSettingsComponent() {
                     <p className="text-sm text-muted-foreground">تحديد ساعات العمل لإرسال الرسائل</p>
                   </div>
                   <Switch
-                    checked={messageSettings.businessHours.enabled}
+                    checked={marketingSettings.messageSettings.businessHours.enabled}
                     onCheckedChange={(checked) =>
-                      setMessageSettings((prev) => ({
-                        ...prev,
-                        businessHours: { ...prev.businessHours, enabled: checked },
-                      }))
+                      updateMessageSettings({
+                        businessHours: { ...marketingSettings.messageSettings.businessHours, enabled: checked },
+                      })
                     }
                   />
                 </div>
 
-                {messageSettings.businessHours.enabled && (
+                {marketingSettings.messageSettings.businessHours.enabled && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="startTime">بداية العمل</Label>
                       <Input
                         id="startTime"
                         type="time"
-                        value={messageSettings.businessHours.start}
+                        value={marketingSettings.messageSettings.businessHours.start}
                         onChange={(e) =>
-                          setMessageSettings((prev) => ({
-                            ...prev,
-                            businessHours: { ...prev.businessHours, start: e.target.value },
-                          }))
+                          updateMessageSettings({
+                            businessHours: { ...marketingSettings.messageSettings.businessHours, start: e.target.value },
+                          })
                         }
                       />
                     </div>
@@ -253,24 +204,22 @@ export function MarketingSettingsComponent() {
                       <Input
                         id="endTime"
                         type="time"
-                        value={messageSettings.businessHours.end}
+                        value={marketingSettings.messageSettings.businessHours.end}
                         onChange={(e) =>
-                          setMessageSettings((prev) => ({
-                            ...prev,
-                            businessHours: { ...prev.businessHours, end: e.target.value },
-                          }))
+                          updateMessageSettings({
+                            businessHours: { ...marketingSettings.messageSettings.businessHours, end: e.target.value },
+                          })
                         }
                       />
                     </div>
                     <div>
                       <Label htmlFor="timezone">المنطقة الزمنية</Label>
                       <Select
-                        value={messageSettings.businessHours.timezone}
+                        value={marketingSettings.messageSettings.businessHours.timezone}
                         onValueChange={(value) =>
-                          setMessageSettings((prev) => ({
-                            ...prev,
-                            businessHours: { ...prev.businessHours, timezone: value },
-                          }))
+                          updateMessageSettings({
+                            businessHours: { ...marketingSettings.messageSettings.businessHours, timezone: value },
+                          })
                         }
                       >
                         <SelectTrigger>
@@ -295,29 +244,27 @@ export function MarketingSettingsComponent() {
                     <p className="text-sm text-muted-foreground">تحديد عدد الرسائل المسموح إرسالها</p>
                   </div>
                   <Switch
-                    checked={messageSettings.rateLimiting.enabled}
+                    checked={marketingSettings.messageSettings.rateLimiting.enabled}
                     onCheckedChange={(checked) =>
-                      setMessageSettings((prev) => ({
-                        ...prev,
-                        rateLimiting: { ...prev.rateLimiting, enabled: checked },
-                      }))
+                      updateMessageSettings({
+                        rateLimiting: { ...marketingSettings.messageSettings.rateLimiting, enabled: checked },
+                      })
                     }
                   />
                 </div>
 
-                {messageSettings.rateLimiting.enabled && (
+                {marketingSettings.messageSettings.rateLimiting.enabled && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="hourlyLimit">الحد الأقصى في الساعة</Label>
                       <Input
                         id="hourlyLimit"
                         type="number"
-                        value={messageSettings.rateLimiting.maxMessagesPerHour}
+                        value={marketingSettings.messageSettings.rateLimiting.maxMessagesPerHour}
                         onChange={(e) =>
-                          setMessageSettings((prev) => ({
-                            ...prev,
-                            rateLimiting: { ...prev.rateLimiting, maxMessagesPerHour: Number.parseInt(e.target.value) },
-                          }))
+                          updateMessageSettings({
+                            rateLimiting: { ...marketingSettings.messageSettings.rateLimiting, maxMessagesPerHour: Number.parseInt(e.target.value) },
+                          })
                         }
                       />
                     </div>
@@ -326,12 +273,11 @@ export function MarketingSettingsComponent() {
                       <Input
                         id="dailyLimit"
                         type="number"
-                        value={messageSettings.rateLimiting.maxMessagesPerDay}
+                        value={marketingSettings.messageSettings.rateLimiting.maxMessagesPerDay}
                         onChange={(e) =>
-                          setMessageSettings((prev) => ({
-                            ...prev,
-                            rateLimiting: { ...prev.rateLimiting, maxMessagesPerDay: Number.parseInt(e.target.value) },
-                          }))
+                          updateMessageSettings({
+                            rateLimiting: { ...marketingSettings.messageSettings.rateLimiting, maxMessagesPerDay: Number.parseInt(e.target.value) },
+                          })
                         }
                       />
                     </div>
@@ -352,12 +298,11 @@ export function MarketingSettingsComponent() {
                 <Label htmlFor="welcomeTemplate">رسالة الترحيب</Label>
                 <Textarea
                   id="welcomeTemplate"
-                  value={messageSettings.templates.welcomeMessage}
+                  value={marketingSettings.messageSettings.templates.welcomeMessage}
                   onChange={(e) =>
-                    setMessageSettings((prev) => ({
-                      ...prev,
-                      templates: { ...prev.templates, welcomeMessage: e.target.value },
-                    }))
+                    updateMessageSettings({
+                      templates: { ...marketingSettings.messageSettings.templates, welcomeMessage: e.target.value },
+                    })
                   }
                   placeholder="رسالة ترحيب للعملاء الجدد..."
                 />
@@ -370,12 +315,11 @@ export function MarketingSettingsComponent() {
                 <Label htmlFor="thankYouTemplate">رسالة الشكر</Label>
                 <Textarea
                   id="thankYouTemplate"
-                  value={messageSettings.templates.thankYouMessage}
+                  value={marketingSettings.messageSettings.templates.thankYouMessage}
                   onChange={(e) =>
-                    setMessageSettings((prev) => ({
-                      ...prev,
-                      templates: { ...prev.templates, thankYouMessage: e.target.value },
-                    }))
+                    updateMessageSettings({
+                      templates: { ...marketingSettings.messageSettings.templates, thankYouMessage: e.target.value },
+                    })
                   }
                   placeholder="رسالة شكر للعملاء..."
                 />
@@ -385,12 +329,11 @@ export function MarketingSettingsComponent() {
                 <Label htmlFor="orderTemplate">تأكيد الطلب</Label>
                 <Textarea
                   id="orderTemplate"
-                  value={messageSettings.templates.orderConfirmation}
+                  value={marketingSettings.messageSettings.templates.orderConfirmation}
                   onChange={(e) =>
-                    setMessageSettings((prev) => ({
-                      ...prev,
-                      templates: { ...prev.templates, orderConfirmation: e.target.value },
-                    }))
+                    updateMessageSettings({
+                      templates: { ...marketingSettings.messageSettings.templates, orderConfirmation: e.target.value },
+                    })
                   }
                   placeholder="رسالة تأكيد الطلب..."
                 />
@@ -403,12 +346,11 @@ export function MarketingSettingsComponent() {
                 <Label htmlFor="appointmentTemplate">تذكير الموعد</Label>
                 <Textarea
                   id="appointmentTemplate"
-                  value={messageSettings.templates.appointmentReminder}
+                  value={marketingSettings.messageSettings.templates.appointmentReminder}
                   onChange={(e) =>
-                    setMessageSettings((prev) => ({
-                      ...prev,
-                      templates: { ...prev.templates, appointmentReminder: e.target.value },
-                    }))
+                    updateMessageSettings({
+                      templates: { ...marketingSettings.messageSettings.templates, appointmentReminder: e.target.value },
+                    })
                   }
                   placeholder="رسالة تذكير بالموعد..."
                 />
@@ -441,8 +383,8 @@ export function MarketingSettingsComponent() {
                     <p className="text-sm text-muted-foreground">إشعار عند استلام رسالة جديدة</p>
                   </div>
                   <Switch
-                    checked={notificationSettings.newMessage}
-                    onCheckedChange={(checked) => setNotificationSettings((prev) => ({ ...prev, newMessage: checked }))}
+                    checked={marketingSettings.notificationSettings.newMessage}
+                    onCheckedChange={(checked) => updateNotificationSettings({ newMessage: checked })}
                   />
                 </div>
 
@@ -452,10 +394,8 @@ export function MarketingSettingsComponent() {
                     <p className="text-sm text-muted-foreground">إشعار عند انتهاء حملة تسويقية</p>
                   </div>
                   <Switch
-                    checked={notificationSettings.campaignComplete}
-                    onCheckedChange={(checked) =>
-                      setNotificationSettings((prev) => ({ ...prev, campaignComplete: checked }))
-                    }
+                    checked={marketingSettings.notificationSettings.campaignComplete}
+                    onCheckedChange={(checked) => updateNotificationSettings({ campaignComplete: checked })}
                   />
                 </div>
 
@@ -465,8 +405,8 @@ export function MarketingSettingsComponent() {
                     <p className="text-sm text-muted-foreground">تحذير عند انخفاض رصيد الرسائل</p>
                   </div>
                   <Switch
-                    checked={notificationSettings.lowCredits}
-                    onCheckedChange={(checked) => setNotificationSettings((prev) => ({ ...prev, lowCredits: checked }))}
+                    checked={marketingSettings.notificationSettings.lowCredits}
+                    onCheckedChange={(checked) => updateNotificationSettings({ lowCredits: checked })}
                   />
                 </div>
 
@@ -476,10 +416,8 @@ export function MarketingSettingsComponent() {
                     <p className="text-sm text-muted-foreground">إشعارات حول تحديثات وميزات جديدة</p>
                   </div>
                   <Switch
-                    checked={notificationSettings.systemUpdates}
-                    onCheckedChange={(checked) =>
-                      setNotificationSettings((prev) => ({ ...prev, systemUpdates: checked }))
-                    }
+                    checked={marketingSettings.notificationSettings.systemUpdates}
+                    onCheckedChange={(checked) => updateNotificationSettings({ systemUpdates: checked })}
                   />
                 </div>
               </div>
@@ -494,10 +432,8 @@ export function MarketingSettingsComponent() {
                     <p className="text-sm text-muted-foreground">إرسال إشعارات عبر البريد الإلكتروني</p>
                   </div>
                   <Switch
-                    checked={notificationSettings.emailNotifications}
-                    onCheckedChange={(checked) =>
-                      setNotificationSettings((prev) => ({ ...prev, emailNotifications: checked }))
-                    }
+                    checked={marketingSettings.notificationSettings.emailNotifications}
+                    onCheckedChange={(checked) => updateNotificationSettings({ emailNotifications: checked })}
                   />
                 </div>
 
@@ -507,10 +443,8 @@ export function MarketingSettingsComponent() {
                     <p className="text-sm text-muted-foreground">إرسال إشعارات عبر SMS</p>
                   </div>
                   <Switch
-                    checked={notificationSettings.smsNotifications}
-                    onCheckedChange={(checked) =>
-                      setNotificationSettings((prev) => ({ ...prev, smsNotifications: checked }))
-                    }
+                    checked={marketingSettings.notificationSettings.smsNotifications}
+                    onCheckedChange={(checked) => updateNotificationSettings({ smsNotifications: checked })}
                   />
                 </div>
               </div>
@@ -539,8 +473,8 @@ export function MarketingSettingsComponent() {
                     </div>
                   </div>
                   <Switch
-                    checked={systemIntegrations.crm}
-                    onCheckedChange={(checked) => setSystemIntegrations((prev) => ({ ...prev, crm: checked }))}
+                    checked={marketingSettings.systemIntegrations.crm}
+                    onCheckedChange={(checked) => updateSystemIntegrations({ crm: checked })}
                   />
                 </div>
 
@@ -553,8 +487,8 @@ export function MarketingSettingsComponent() {
                     </div>
                   </div>
                   <Switch
-                    checked={systemIntegrations.ecommerce}
-                    onCheckedChange={(checked) => setSystemIntegrations((prev) => ({ ...prev, ecommerce: checked }))}
+                    checked={marketingSettings.systemIntegrations.ecommerce}
+                    onCheckedChange={(checked) => updateSystemIntegrations({ ecommerce: checked })}
                   />
                 </div>
 
@@ -567,8 +501,8 @@ export function MarketingSettingsComponent() {
                     </div>
                   </div>
                   <Switch
-                    checked={systemIntegrations.appointments}
-                    onCheckedChange={(checked) => setSystemIntegrations((prev) => ({ ...prev, appointments: checked }))}
+                    checked={marketingSettings.systemIntegrations.appointments}
+                    onCheckedChange={(checked) => updateSystemIntegrations({ appointments: checked })}
                   />
                 </div>
 
@@ -581,8 +515,8 @@ export function MarketingSettingsComponent() {
                     </div>
                   </div>
                   <Switch
-                    checked={systemIntegrations.analytics}
-                    onCheckedChange={(checked) => setSystemIntegrations((prev) => ({ ...prev, analytics: checked }))}
+                    checked={marketingSettings.systemIntegrations.analytics}
+                    onCheckedChange={(checked) => updateSystemIntegrations({ analytics: checked })}
                   />
                 </div>
               </div>
@@ -595,17 +529,16 @@ export function MarketingSettingsComponent() {
                     <p className="text-sm text-muted-foreground">إرسال إشعارات إلى URL خارجي</p>
                   </div>
                   <Switch
-                    checked={systemIntegrations.webhooks.enabled}
+                    checked={marketingSettings.systemIntegrations.webhooks.enabled}
                     onCheckedChange={(checked) =>
-                      setSystemIntegrations((prev) => ({
-                        ...prev,
-                        webhooks: { ...prev.webhooks, enabled: checked },
-                      }))
+                      updateSystemIntegrations({
+                        webhooks: { ...marketingSettings.systemIntegrations.webhooks, enabled: checked },
+                      })
                     }
                   />
                 </div>
 
-                {systemIntegrations.webhooks.enabled && (
+                {marketingSettings.systemIntegrations.webhooks.enabled && (
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="webhookUrl">رابط Webhook</Label>
@@ -613,12 +546,11 @@ export function MarketingSettingsComponent() {
                         id="webhookUrl"
                         type="url"
                         placeholder="https://example.com/webhook"
-                        value={systemIntegrations.webhooks.url}
+                        value={marketingSettings.systemIntegrations.webhooks.url}
                         onChange={(e) =>
-                          setSystemIntegrations((prev) => ({
-                            ...prev,
-                            webhooks: { ...prev.webhooks, url: e.target.value },
-                          }))
+                          updateSystemIntegrations({
+                            webhooks: { ...marketingSettings.systemIntegrations.webhooks, url: e.target.value },
+                          })
                         }
                       />
                     </div>
@@ -631,15 +563,14 @@ export function MarketingSettingsComponent() {
                             <input
                               type="checkbox"
                               id={event.id}
-                              checked={systemIntegrations.webhooks.events.includes(event.id)}
+                              checked={marketingSettings.systemIntegrations.webhooks.events.includes(event.id)}
                               onChange={(e) => {
                                 const events = e.target.checked
-                                  ? [...systemIntegrations.webhooks.events, event.id]
-                                  : systemIntegrations.webhooks.events.filter((id) => id !== event.id)
-                                setSystemIntegrations((prev) => ({
-                                  ...prev,
-                                  webhooks: { ...prev.webhooks, events },
-                                }))
+                                  ? [...marketingSettings.systemIntegrations.webhooks.events, event.id]
+                                  : marketingSettings.systemIntegrations.webhooks.events.filter((id) => id !== event.id)
+                                updateSystemIntegrations({
+                                  webhooks: { ...marketingSettings.systemIntegrations.webhooks, events },
+                                })
                               }}
                               className="rounded border-gray-300"
                             />
