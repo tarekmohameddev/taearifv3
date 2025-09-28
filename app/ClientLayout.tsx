@@ -73,7 +73,10 @@ export default function ClientLayout({
       !pathname?.startsWith("/reset") &&
       !pathname?.startsWith("/register") &&
       !pathname?.startsWith("/login") &&
-      !pathname?.startsWith("/landing")
+      !pathname?.startsWith("/landing") &&
+      !pathname?.startsWith("/live-editor")&&
+      !pathname?.startsWith("en/live-editor")&&
+      !pathname?.startsWith("ar/live-editor")
     ) {
       console.error("goooooo tooooooo looooooign");
       console.warn("goooooo tooooooo looooooign");
@@ -139,10 +142,13 @@ export default function ClientLayout({
     "/onboarding",
     "/test-reset",
     "/landing",
+    "/live-editor",
   ];
 
   const isPublicPage =
     publicPages.some((page) => pathname?.startsWith(page)) ||
+    publicPages.some((page) => pathname?.startsWith("en/"+page)) ||
+    publicPages.some((page) => pathname?.startsWith("ar/"+page)) ||
     pathname?.startsWith("/oauth") ||
     pathname?.startsWith("/not-found");
 

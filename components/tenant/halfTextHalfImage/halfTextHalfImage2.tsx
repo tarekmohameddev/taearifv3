@@ -1,0 +1,509 @@
+"use client"
+
+import { useEffect } from "react"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import useStore from "@/context/Store"
+import { useAuth } from "@/context/AuthContext"
+import { useRouter, useParams } from "next/navigation"
+import useTenantStore from "@/context-liveeditor/tenantStore"
+import { useEditorStore } from "@/context-liveeditor/editorStore"
+
+// Default half text half image data for variant 2 (with stats)
+const getDefaulthalfTextHalfImageData = () => ({
+  visible: true,
+  layout: {
+    direction: "rtl",
+    maxWidth: "1600px",
+    gridCols: "md:grid-cols-10",
+    gap: {
+      x: "gap-x-10",
+      y: "gap-y-16",
+      yMd: "md:gap-y-10"
+    },
+  },
+  spacing: {
+    padding: {
+      x: "px-4",
+      y: "py-5",
+      smX: "sm:px-6",
+      smY: "sm:py-20",
+      lgX: "lg:px-8"
+    },
+  },
+  content: {
+    eyebrow: "تجربتك العقارية تبدأ هنا",
+    title: "إيجاد عقار مناسب هو هدفنا",
+    description: "يقدم لك دليل الجواء العقاري أفضل الحلول العقارية لتلبية كافة احتياجاتك في البيع والإيجار، مع ضمان تجربة مريحة ومضمونة.",
+    stats: {
+      stat1: { value: "+100", label: "عميل سعيد" },
+      stat2: { value: "+50", label: "عقار تم بيعه" },
+      stat3: { value: "+250", label: "عقار تم تأجيره" },
+      stat4: { value: "40", label: "تقييمات العملاء" },
+    },
+  },
+  typography: {
+    eyebrow: {
+      className: "section-title text-emerald-700",
+      marginBottom: "mb-3",
+    },
+    title: {
+      className: "section-title leading-[1.25] text-black",
+      textBalance: "text-balance",
+    },
+    description: {
+      className: "section-subtitle-large max-w-3xl",
+    },
+    stats: {
+      valueClassName: "text-2xl text-emerald-700",
+      labelClassName: "text-xl text-black",
+      labelMarginTop: "mt-1",
+    },
+  },
+  image: {
+    src: "https://dalel-lovat.vercel.app/images/experience-intro/CouterSectionImage.webp",
+    alt: "صورة داخلية لغرفة معيشة حديثة",
+    width: 800,
+    height: 600,
+    style: {
+      className: "w-full h-full object-cover rounded-[15px]",
+      borderRadius: "rounded-[15px]",
+    },
+    background: {
+      enabled: true,
+      color: "#059669",
+      className: "bg-emerald-600 rounded-[10px]",
+      positioning: {
+        pr: "pr-[15px]",
+        pb: "pb-[15px]",
+        xlPr: "xl:pr-[21px]",
+        xlPb: "xl:pb-[21px]",
+      },
+    },
+  },
+  responsive: {
+    grid: {
+      textCols: "md:col-span-5",
+      imageCols: "md:col-span-5",
+      textOrder: "order-2 md:order-2",
+      imageOrder: "order-2 md:order-2",
+    },
+    stats: {
+      gridCols: "grid-cols-2 sm:grid-cols-4",
+      gap: "gap-4",
+      marginTop: "mt-10",
+    },
+  },
+  animations: {
+    text: {
+      enabled: true,
+      type: "fade-up",
+      duration: 600,
+      delay: 200,
+    },
+    image: {
+      enabled: true,
+      type: "fade-up",
+      duration: 600,
+      delay: 400,
+    },
+    stats: {
+      enabled: true,
+      type: "fade-up",
+      duration: 600,
+      delay: 600,
+      stagger: 100,
+    },
+  },
+})
+
+interface halfTextHalfImageProps {
+  visible?: boolean;
+  layout?: {
+    direction?: string;
+    maxWidth?: string;
+    gridCols?: string;
+    gap?: {
+      x?: string;
+      y?: string;
+      yMd?: string;
+    };
+  };
+  spacing?: {
+    padding?: {
+      x?: string;
+      y?: string;
+      smX?: string;
+      smY?: string;
+      lgX?: string;
+    };
+  };
+  content?: {
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+    stats?: {
+      stat1?: { value: string; label: string; };
+      stat2?: { value: string; label: string; };
+      stat3?: { value: string; label: string; };
+      stat4?: { value: string; label: string; };
+    } | Array<{
+      value: string;
+      label: string;
+    }>;
+  };
+  typography?: {
+    eyebrow?: {
+      className?: string;
+      marginBottom?: string;
+    };
+    title?: {
+      className?: string;
+      textBalance?: string;
+    };
+    description?: {
+      className?: string;
+    };
+    stats?: {
+      valueClassName?: string;
+      labelClassName?: string;
+      labelMarginTop?: string;
+    };
+  };
+  image?: {
+    src?: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+    style?: {
+      className?: string;
+      borderRadius?: string;
+    };
+    background?: {
+      enabled?: boolean;
+      color?: string;
+      className?: string;
+      positioning?: {
+        pr?: string;
+        pb?: string;
+        xlPr?: string;
+        xlPb?: string;
+      };
+    };
+  };
+  responsive?: {
+    grid?: {
+      textCols?: string;
+      imageCols?: string;
+      textOrder?: string;
+      imageOrder?: string;
+    };
+    stats?: {
+      gridCols?: string;
+      gap?: string;
+      marginTop?: string;
+    };
+  };
+  animations?: {
+    text?: {
+      enabled?: boolean;
+      type?: string;
+      duration?: number;
+      delay?: number;
+    };
+    image?: {
+      enabled?: boolean;
+      type?: string;
+      duration?: number;
+      delay?: number;
+    };
+    stats?: {
+      enabled?: boolean;
+      type?: string;
+      duration?: number;
+      delay?: number;
+      stagger?: number;
+    };
+  };
+  // Editor props
+  variant?: string;
+  useStore?: boolean;
+  id?: string;
+}
+
+const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
+  // Initialize variant id early so hooks can depend on it
+  const variantId = props.variant || "halfTextHalfImage2"
+  // Subscribe to editor store updates for this half text half image variant
+  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant)
+  const getComponentData = useEditorStore((s) => s.getComponentData)
+
+  useEffect(() => {
+    if (props.useStore) {
+      // Use component.id as unique identifier instead of variantId
+      const uniqueId = props.id || variantId
+      ensureComponentVariant('halfTextHalfImage', uniqueId, props)
+    }
+  }, [variantId, props.useStore, props.id, ensureComponentVariant])
+
+  const { user, loading } = useAuth()
+  const params = useParams<{ tenantId: string }>()
+  const tenantId = params?.tenantId
+  const router = useRouter()
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
+  const tenantData = useTenantStore((s) => s.tenantData)
+  const loadingTenantData = useTenantStore((s) => s.loadingTenantData)
+  const error = useTenantStore((s) => s.error)
+
+  // Get data from store or tenantData with fallback logic
+  const uniqueId = props.id || variantId
+  const storeData = props.useStore ? (getComponentData('halfTextHalfImage', uniqueId) || {}) : {}
+  
+  // Subscribe to store updates to re-render when data changes
+  const halfTextHalfImageStates = useEditorStore((s) => s.halfTextHalfImageStates)
+  const currentStoreData = props.useStore ? (halfTextHalfImageStates[uniqueId] || {}) : {}
+  
+  // Get tenant data for this specific component variant
+  const getTenantComponentData = () => {
+    if (!tenantData?.componentSettings) return {}
+    
+    
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(tenantData.componentSettings)) {
+      
+      // Check if pageComponents is an object (not array)
+      if (typeof pageComponents === 'object' && !Array.isArray(pageComponents)) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(pageComponents as any)) {
+          
+          if ((component as any).type === 'halfTextHalfImage' && 
+              (component as any).componentName === variantId &&
+              componentId === props.id) {
+            return (component as any).data
+          }
+        }
+      }
+    }
+    return {}
+  }
+  
+  const tenantComponentData = getTenantComponentData()
+  
+  // Merge data with priority: storeData > tenantComponentData > props > default
+  const mergedData = { 
+    ...getDefaulthalfTextHalfImageData(), 
+    ...props, 
+    ...tenantComponentData,
+    ...currentStoreData 
+  }
+
+  useEffect(() => {
+    if (tenantId) {
+      fetchTenantData(tenantId)
+    }
+  }, [tenantId, fetchTenantData])
+
+  // Generate dynamic styles
+  const sectionStyles = {
+    maxWidth: mergedData.layout?.maxWidth || "1600px",
+  }
+
+  // Don't render if not visible
+  if (!mergedData.visible) {
+    return null
+  }
+
+  return (
+    <section 
+      className={cn(
+        "w-full bg-background",
+        mergedData.spacing?.padding?.x || "px-4",
+        mergedData.spacing?.padding?.y || "py-5",
+        mergedData.spacing?.padding?.smX || "sm:px-6",
+        mergedData.spacing?.padding?.smY || "sm:py-20",
+        mergedData.spacing?.padding?.lgX || "lg:px-8"
+      )}
+      style={{
+        backgroundColor: mergedData.background?.color || mergedData.styling?.bgColor || "transparent"
+      }}
+      data-debug="halfTextHalfImage2-component"
+    >
+      <div 
+        className={cn(
+          "mx-auto grid grid-cols-1 items-center",
+          mergedData.layout?.gridCols || "md:grid-cols-10",
+          mergedData.layout?.gap?.x || "gap-x-10",
+          mergedData.layout?.gap?.y || "gap-y-16",
+          mergedData.layout?.gap?.yMd || "md:gap-y-10"
+        )}
+        style={{ 
+          maxWidth: sectionStyles.maxWidth,
+          gridTemplateColumns: mergedData.grid?.columns?.desktop ? `repeat(${mergedData.grid.columns.desktop}, 1fr)` : undefined,
+          gap: mergedData.grid?.gapX || mergedData.grid?.gapY ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}` : undefined
+        }}
+        dir={mergedData.layout?.direction || "rtl"}
+      >
+        {/* النص */}
+        <div className={cn(
+          mergedData.responsive?.grid?.textCols || "md:col-span-5",
+          mergedData.responsive?.grid?.textOrder || "order-2 md:order-2"
+        )}>
+          {mergedData.content?.eyebrow && (
+            <p className={cn(
+              mergedData.typography?.eyebrow?.className || "section-title text-emerald-700",
+              mergedData.typography?.eyebrow?.marginBottom || "mb-3"
+            )}>
+              {mergedData.content.eyebrow}
+            </p>
+          )}
+          
+          <h2 className={cn(
+            mergedData.typography?.title?.className || "section-title leading-[1.25] text-black",
+            mergedData.typography?.title?.textBalance || "text-balance"
+          )}>
+            {mergedData.content?.title || "إيجاد عقار مناسب هو هدفنا"}
+          </h2>
+          
+          {mergedData.content?.description && (
+            <p className={mergedData.typography?.description?.className || "section-subtitle-large max-w-3xl"}>
+              {mergedData.content.description}
+            </p>
+          )}
+
+          {(() => {
+            // منطق fallback للتعامل مع البيانات القديمة والجديدة
+            const stats = mergedData.content?.stats;
+            if (!stats) return null;
+
+            // إذا كانت البيانات بالبنية الجديدة (object)
+            if (stats.stat1 || stats.stat2 || stats.stat3 || stats.stat4) {
+              return (
+                <ul className={cn(
+                  "grid text-center",
+                  mergedData.responsive?.stats?.gridCols || "grid-cols-2 sm:grid-cols-4",
+                  mergedData.responsive?.stats?.gap || "gap-4",
+                  mergedData.responsive?.stats?.marginTop || "mt-10"
+                )}>
+                  {stats.stat1 && (
+                    <li>
+                      <div className={mergedData.typography?.stats?.valueClassName || "text-2xl text-emerald-700"}>
+                        {stats.stat1.value}
+                      </div>
+                      <div className={cn(
+                        mergedData.typography?.stats?.labelClassName || "text-xl text-black",
+                        mergedData.typography?.stats?.labelMarginTop || "mt-1"
+                      )}>
+                        {stats.stat1.label}
+                      </div>
+                    </li>
+                  )}
+                  {stats.stat2 && (
+                    <li>
+                      <div className={mergedData.typography?.stats?.valueClassName || "text-2xl text-emerald-700"}>
+                        {stats.stat2.value}
+                      </div>
+                      <div className={cn(
+                        mergedData.typography?.stats?.labelClassName || "text-xl text-black",
+                        mergedData.typography?.stats?.labelMarginTop || "mt-1"
+                      )}>
+                        {stats.stat2.label}
+                      </div>
+                    </li>
+                  )}
+                  {stats.stat3 && (
+                    <li>
+                      <div className={mergedData.typography?.stats?.valueClassName || "text-2xl text-emerald-700"}>
+                        {stats.stat3.value}
+                      </div>
+                      <div className={cn(
+                        mergedData.typography?.stats?.labelClassName || "text-xl text-black",
+                        mergedData.typography?.stats?.labelMarginTop || "mt-1"
+                      )}>
+                        {stats.stat3.label}
+                      </div>
+                    </li>
+                  )}
+                  {stats.stat4 && (
+                    <li>
+                      <div className={mergedData.typography?.stats?.valueClassName || "text-2xl text-emerald-700"}>
+                        {stats.stat4.value}
+                      </div>
+                      <div className={cn(
+                        mergedData.typography?.stats?.labelClassName || "text-xl text-black",
+                        mergedData.typography?.stats?.labelMarginTop || "mt-1"
+                      )}>
+                        {stats.stat4.label}
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              );
+            }
+
+            // إذا كانت البيانات بالبنية القديمة (array)
+            if (Array.isArray(stats) && stats.length > 0) {
+              return (
+                <ul className={cn(
+                  "grid text-center",
+                  mergedData.responsive?.stats?.gridCols || "grid-cols-2 sm:grid-cols-4",
+                  mergedData.responsive?.stats?.gap || "gap-4",
+                  mergedData.responsive?.stats?.marginTop || "mt-10"
+                )}>
+                  {stats.map((stat: any, index: number) => (
+                    <li key={index}>
+                      <div className={mergedData.typography?.stats?.valueClassName || "text-2xl text-emerald-700"}>
+                        {stat.value}
+                      </div>
+                      <div className={cn(
+                        mergedData.typography?.stats?.labelClassName || "text-xl text-black",
+                        mergedData.typography?.stats?.labelMarginTop || "mt-1"
+                      )}>
+                        {stat.label}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              );
+            }
+
+            return null;
+          })()}
+        </div>
+
+        {/* الصورة */}
+        <div className={cn(
+          mergedData.responsive?.grid?.imageCols || "md:col-span-5",
+          mergedData.responsive?.grid?.imageOrder || "order-2 md:order-2"
+        )}>
+          <figure className={cn(
+            "relative flex-1",
+            mergedData.image?.background?.positioning?.pr || "pr-[15px]",
+            mergedData.image?.background?.positioning?.xlPr || "xl:pr-[21px]",
+            mergedData.image?.background?.positioning?.pb || "pb-[15px]",
+            mergedData.image?.background?.positioning?.xlPb || "xl:pb-[21px]",
+            mergedData.image?.background?.enabled && (
+              mergedData.image?.background?.className || "bg-emerald-600 rounded-[10px]"
+            )
+          )}
+          style={{
+            background: mergedData.image?.background?.enabled 
+              ? `linear-gradient(135deg, ${mergedData.image?.background?.color || "#059669"}, ${mergedData.image?.background?.color || "#059669"})`
+              : undefined
+          }}
+          >
+            <Image
+              src={mergedData.image?.src || "/placeholder.svg"}
+              alt={mergedData.image?.alt || "صورة داخلية لغرفة معيشة حديثة"}
+              width={mergedData.image?.width || 800}
+              height={mergedData.image?.height || 600}
+              className={mergedData.image?.style?.className || "w-full h-full object-cover rounded-[15px]"}
+            />
+          </figure>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default halfTextHalfImage

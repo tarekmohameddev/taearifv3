@@ -1,0 +1,737 @@
+import { create } from "zustand";
+
+// Helper function to find the first header in componentSettings
+const findFirstHeader = (componentSettings) => {
+  if (!componentSettings) return null;
+  
+  for (const pageName in componentSettings) {
+    const page = componentSettings[pageName];
+    for (const componentId in page) {
+      const component = page[componentId];
+      if (component.type === 'header' && component.componentName === 'header1') {
+        return { id: componentId, data: component.data };
+      }
+    }
+  }
+  return null;
+};
+
+// Helper function to find the first footer in componentSettings
+const findFirstFooter = (componentSettings) => {
+  if (!componentSettings) return null;
+  
+  for (const pageName in componentSettings) {
+    const page = componentSettings[pageName];
+    for (const componentId in page) {
+      const component = page[componentId];
+      if (component.type === 'footer' && component.componentName === 'footer1') {
+        return { id: componentId, data: component.data };
+      }
+    }
+  }
+  return null;
+};
+
+const useTenantStore = create((set) => ({
+  tenantData: null,
+  loadingTenantData: false,
+  error: null,
+  tenant: null,
+  setTenant: (tenant) => set({ tenant }),
+  updateHeader: (headerData) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              header: {
+                ...state.tenantData.componentSettings?.header,
+                data: headerData,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updateHeaderVariant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              header: {
+                ...state.tenantData.componentSettings?.header,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updateHero: (heroData) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              hero: {
+                ...state.tenantData.componentSettings?.hero,
+                data: heroData,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updateHeroVariant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              hero: {
+                ...state.tenantData.componentSettings?.hero,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  saveHeroChanges: (heroData) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              hero: {
+                ...state.tenantData.componentSettings?.hero,
+                data: heroData,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updateFooter: (footerData) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              footer: {
+                ...state.tenantData.componentSettings?.footer,
+                data: footerData,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updateFooterVariant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              footer: {
+                ...state.tenantData.componentSettings?.footer,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updatehalfTextHalfImage: (halfTextHalfImageData) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              halfTextHalfImage: {
+                ...state.tenantData.componentSettings?.halfTextHalfImage,
+                data: halfTextHalfImageData,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updatehalfTextHalfImageVariant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              halfTextHalfImage: {
+                ...state.tenantData.componentSettings?.halfTextHalfImage,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updatehalfTextHalfImage2: (halfTextHalfImage2Data) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              halfTextHalfImage2: {
+                ...state.tenantData.componentSettings?.halfTextHalfImage2,
+                data: halfTextHalfImage2Data,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updatehalfTextHalfImage2Variant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              halfTextHalfImage2: {
+                ...state.tenantData.componentSettings?.halfTextHalfImage2,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updatehalfTextHalfImage3: (halfTextHalfImage3Data) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              halfTextHalfImage3: {
+                ...state.tenantData.componentSettings?.halfTextHalfImage3,
+                data: halfTextHalfImage3Data,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updatehalfTextHalfImage3Variant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              halfTextHalfImage3: {
+                ...state.tenantData.componentSettings?.halfTextHalfImage3,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updateCtaValuation: (ctaValuationData) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              ctaValuation: {
+                ...state.tenantData.componentSettings?.ctaValuation,
+                data: ctaValuationData,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updateCtaValuationVariant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              ctaValuation: {
+                ...state.tenantData.componentSettings?.ctaValuation,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  fetchTenantData: async (websiteName) => {
+    const state = useTenantStore.getState();
+    // Prevent duplicate requests
+    if (
+      state.loadingTenantData ||
+      (state.tenantData && state.tenantData.username === websiteName)
+    ) {
+      return;
+    }
+
+    set({ loadingTenantData: true, error: null });
+    try {
+      const response = await fetch("/api/tenant/getTenant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ websiteName }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch tenant data");
+      }
+
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : {}; // If response is empty, use an empty object
+      
+      // Load global components data into editor store
+      const { useEditorStore } = await import("./editorStore");
+      const editorStore = useEditorStore.getState();
+      
+      // If globalComponentsData exists in backend, use it
+      if (data.globalComponentsData) {
+        editorStore.setGlobalComponentsData(data.globalComponentsData);
+        
+        // Also set individual global components for backward compatibility
+        if (data.globalComponentsData.header) {
+          editorStore.setGlobalHeaderData(data.globalComponentsData.header);
+        }
+        if (data.globalComponentsData.footer) {
+          editorStore.setGlobalFooterData(data.globalComponentsData.footer);
+        }
+      } else {
+        // If no globalComponentsData, use default data instead of creating from componentSettings
+        // Don't set anything - let the component use its default data
+      }
+      
+      set({ tenantData: data, loadingTenantData: false });
+    } catch (error) {
+      console.error("[tenantStore] Error fetching tenant data:", error);
+      set({ error: error.message, loadingTenantData: false });
+    }
+  },
+  saveHeaderChanges: async (tenantId, headerData, variant) => {
+    try {
+      const response = await fetch("/api/tenant/header", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          headerData,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save header changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save header error:", error);
+      return false;
+    }
+  },
+  saveHeroChanges: async (tenantId, heroData, variant) => {
+    try {
+      const response = await fetch("/api/tenant/hero", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          heroData,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save hero changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save hero error:", error);
+      return false;
+    }
+  },
+  saveFooterChanges: async (tenantId, footerData, variant) => {
+    try {
+      const response = await fetch("/api/tenant/footer", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          footerData,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save footer changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save footer error:", error);
+      return false;
+    }
+  },
+  savehalfTextHalfImageChanges: async (tenantId, halfTextHalfImageData, variant) => {
+    try {
+      const response = await fetch("/api/tenant/halfTextHalfImage", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          halfTextHalfImageData,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save half text half image changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save half text half image error:", error);
+      return false;
+    }
+  },
+  savehalfTextHalfImage2Changes: async (tenantId, halfTextHalfImage2Data, variant) => {
+    try {
+      const response = await fetch("/api/tenant/halfTextHalfImage2", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          halfTextHalfImage2Data,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save half text half image2 changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save half text half image2 error:", error);
+      return false;
+    }
+  },
+  savehalfTextHalfImage3Changes: async (tenantId, halfTextHalfImage3Data, variant) => {
+    try {
+      const response = await fetch("/api/tenant/halfTextHalfImage3", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          halfTextHalfImage3Data,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save half text half image3 changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save half text half image3 error:", error);
+      return false;
+    }
+  },
+
+  savePropertySliderChanges: async (tenantId, propertySliderData, variant) => {
+    try {
+      const response = await fetch("/api/tenant/propertySlider", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          propertySliderData,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save property slider changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save property slider error:", error);
+      return false;
+    }
+  },
+
+  saveCtaValuationChanges: async (tenantId, ctaValuationData, variant) => {
+    try {
+      const response = await fetch("/api/tenant/ctaValuation", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          ctaValuationData,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save cta valuation changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save cta valuation error:", error);
+      return false;
+    }
+  },
+
+  // Grid functions
+  updateGrid: (gridData) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              grid: {
+                ...state.tenantData.componentSettings?.grid,
+                data: gridData,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updateGridVariant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              grid: {
+                ...state.tenantData.componentSettings?.grid,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  saveGridChanges: async (tenantId, gridData, variant) => {
+    try {
+      const response = await fetch("/api/tenant/grid", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          gridData,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save grid changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save grid error:", error);
+      return false;
+    }
+  },
+
+  // Filter Buttons functions
+  updateFilterButtons: (filterButtonsData) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              filterButtons: {
+                ...state.tenantData.componentSettings?.filterButtons,
+                data: filterButtonsData,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updateFilterButtonsVariant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              filterButtons: {
+                ...state.tenantData.componentSettings?.filterButtons,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  saveFilterButtonsChanges: async (tenantId, filterButtonsData, variant) => {
+    try {
+      const response = await fetch("/api/tenant/filterButtons", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          filterButtonsData,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save filter buttons changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save filter buttons error:", error);
+      return false;
+    }
+  },
+
+  // Property Filter functions
+  updatePropertyFilter: (propertyFilterData) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              propertyFilter: {
+                ...state.tenantData.componentSettings?.propertyFilter,
+                data: propertyFilterData,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updatePropertyFilterVariant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              propertyFilter: {
+                ...state.tenantData.componentSettings?.propertyFilter,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  savePropertyFilterChanges: async (tenantId, propertyFilterData, variant) => {
+    try {
+      const response = await fetch("/api/tenant/propertyFilter", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tenantId,
+          propertyFilterData,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save property filter changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save property filter error:", error);
+      return false;
+    }
+  },
+}));
+
+export default useTenantStore;

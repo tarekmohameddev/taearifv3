@@ -1,0 +1,32 @@
+export const defaultComponents = {
+  homepage: {
+    header: "header1",
+    hero: "hero1",
+    "halfTextHalfImage": "halfTextHalfImage1",
+    "propertySlider": "propertySlider1",
+    "ctaValuation": "ctaValuation1",
+    "stepsSection": "stepsSection1",
+    "halfTextHalfImage": "halfTextHalfImage2",
+    "testimonials": "testimonials1",
+    "whyChooseUs": "whyChooseUs1",
+    "contactMapSection": "contactMapSection1",
+    "grid": "grid1",
+    "filterButtons": "filterButtons1",
+    "propertyFilter": "propertyFilter1",
+    "footer": "footer1",
+  },
+  about: {
+    header: "header1",
+    hero: "hero1",
+    "propertySlider": "propertySlider1",
+    "grid": "grid1",
+    "filterButtons": "filterButtons1",
+    "propertyFilter": "propertyFilter1",
+    "footer": "footer1",
+  },
+  contact: {
+    header: "header1",
+    hero: "hero1",
+    "footer": "footer1",
+  },
+};

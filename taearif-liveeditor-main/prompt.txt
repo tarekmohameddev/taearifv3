@@ -1,0 +1,1438 @@
+انت خبير لا يوجد مثلك في الfront end next.js developer وافضل شخص في العالم في الcaching system والbackend وانت افضل خبير في التاريخ ف يعمل الdebug العميق بشكل مبالغ فيه.
+يوجد لدي مشكلة واريدك ان تحلها.
+من فضلك اعمل تحليل و debug بشكل مبالغ فيه وممل لحل المشكلة ومعرفة استدعاءات كل نقطة واين يتم استخدامها ومتى.
+مشكلة : ("عندما انقل مكون من مكان لمكان اخر , يتم نقله للposition ألاقل منه 1 فقط , معنى انني مثلا نقلت شئ من 4 الى 0 ففعليا يتم تسجيله في الcache انه من 4 الى 3")
+اريد ان يمكنني نقل كل مكون من مكان الى اخر فيعدل على ترتيبهم في الobject وتغيير الposition الموجود في كل مكون.
+المشكلة موجودة مع انني عندما انقل مكون من مكان لاخر يظهر بداخل الiframe انه تم نقله في المكان الصحيح , ولكن فعليا لم يتم نقله في الcaching الذي يتم ارساله للapi الخاص بالحفظ هذا : "/api/tenant/save-pages" فهو يرسل state غير الstate الذي يظهر في الiframe , فانه يرسل الstate الذي ينقل الاشياء بشكل خطأ او لا ينقل اساسا.
+اعمل debug بشكل مبالف فيه.
+
+
+
+live editor old code with best "نظام ترتيب المكونات" : (""use client";
+import React, {
+  Suspense,
+  lazy,
+  useEffect,
+  useState,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
+import { useParams } from "next/navigation";
+import { defaultComponents } from "@/lib/defaultComponents";
+import { useAuth } from "@/context/AuthContext";
+import useTenantStore from "@/context/tenantStore";
+import { v4 as uuidv4 } from "uuid";
+import { ComponentData, ComponentInstance } from "@/lib/types";
+import {
+  EditorSidebar,
+  AVAILABLE_SECTIONS,
+  createDefaultData,
+} from "@/components/tenant/live-editor/EditorSidebar";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { useRouter } from "next/navigation";
+import { useEditorStore } from "@/context/editorStore";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+// ============================================================================
+// تعريفات الأنواع والبيانات
+// ============================================================================
+
+// تعريف الصفحات المتاحة وأقسامها
+const PAGE_DEFINITIONS: Record<string, ComponentInstance[]> = {
+  homepage: [
+    {
+      id: "header",
+      type: "header",
+      name: "Header",
+      componentName: "header1",
+      data: createDefaultData("header"),
+    },
+    {
+      id: "hero",
+      type: "hero",
+      name: "Hero",
+      componentName: "hero1",
+      data: createDefaultData("hero"),
+    },
+    {
+      id: "categories",
+      type: "categories",
+      name: "Categories",
+      componentName: "category1",
+      data: createDefaultData("categories"),
+    },
+    {
+      id: "products",
+      type: "products",
+      name: "Products",
+      componentName: "products1",
+      data: createDefaultData("products"),
+    },
+    {
+      id: "newsletter",
+      type: "newsletter",
+      name: "Newsletter",
+      componentName: "newsletter1",
+      data: createDefaultData("newsletter"),
+    },
+    {
+      id: "footer",
+      type: "footer",
+      name: "Footer",
+      componentName: "footer1",
+      data: createDefaultData("footer"),
+    },
+  ],
+  about: [
+    {
+      id: "header",
+      type: "header",
+      name: "Header",
+      componentName: "header1",
+      data: createDefaultData("header"),
+    },
+    {
+      id: "hero6",
+      type: "hero",
+      name: "About Hero",
+      componentName: "hero6",
+      data: createDefaultData("hero"),
+    },
+    {
+      id: "team",
+      type: "team",
+      name: "Team Section",
+      componentName: "team-grid1",
+      data: createDefaultData("team"),
+    },
+    {
+      id: "footer",
+      type: "footer",
+      name: "Footer",
+      componentName: "footer1",
+      data: createDefaultData("footer"),
+    },
+  ],
+  contact: [
+    {
+      id: "header",
+      type: "header",
+      name: "Header",
+      componentName: "header1",
+      data: createDefaultData("header"),
+    },
+    {
+      id: "contact-info",
+      type: "contact",
+      name: "Contact Info",
+      componentName: "contact-info1",
+      data: createDefaultData("contact"),
+    },
+    {
+      id: "contact-form",
+      type: "contact",
+      name: "Contact Form",
+      componentName: "contact-form1",
+      data: createDefaultData("contact"),
+    },
+    {
+      id: "footer",
+      type: "footer",
+      name: "Footer",
+      componentName: "footer1",
+      data: createDefaultData("footer"),
+    },
+  ],
+  products: [
+    {
+      id: "header",
+      type: "header",
+      name: "Header",
+      componentName: "header1",
+      data: createDefaultData("header"),
+    },
+    {
+      id: "Products-hero",
+      type: "hero",
+      name: "About Hero",
+      componentName: "hero6",
+      data: createDefaultData("hero"),
+    },
+    {
+      id: "filters",
+      type: "products",
+      name: "Product Filters",
+      componentName: "ClothingFilter1",
+      data: createDefaultData("products"),
+    },
+    {
+      id: "grid",
+      type: "products",
+      name: "Product Grid",
+      componentName: "grid1",
+      data: createDefaultData("products"),
+    },
+    {
+      id: "pagination",
+      type: "products",
+      name: "Pagination",
+      componentName: "Pagination1",
+      data: createDefaultData("products"),
+    },
+    {
+      id: "footer",
+      type: "footer",
+      name: "Footer",
+      componentName: "footer1",
+      data: createDefaultData("footer"),
+    },
+  ],
+  collections: [
+    {
+      id: "header",
+      type: "header",
+      name: "Header",
+      componentName: "header1",
+      data: createDefaultData("header"),
+    },
+    {
+      id: "filters",
+      type: "collections",
+      name: "Collection Filters",
+      componentName: "collection-filter1",
+      data: createDefaultData("collections"),
+    },
+    {
+      id: "sorting",
+      type: "collections",
+      name: "Sort Options",
+      componentName: "sort-dropdown1",
+      data: createDefaultData("collections"),
+    },
+    {
+      id: "footer",
+      type: "footer",
+      name: "Footer",
+      componentName: "footer1",
+      data: createDefaultData("footer"),
+    },
+  ],
+};
+
+// دالة للحصول على اسم عرض المكون
+const getComponentDisplayName = (type: string): string => {
+  const displayNames: Record<string, string> = {
+    header: "Header",
+    hero: "Hero",
+    products: "Products",
+    categories: "Categories",
+    newsletter: "Newsletter",
+    footer: "Footer",
+    team: "Team Section",
+    contact: "Contact",
+    collections: "Collections",
+  };
+  return displayNames[type] || type;
+};
+
+// دالة لإنشاء المكونات الافتراضية بناءً على الصفحة
+const createInitialComponents = (pageSlug: string): ComponentInstance[] => {
+  const pageDefinition = PAGE_DEFINITIONS[pageSlug];
+  if (pageDefinition) {
+    return pageDefinition.map((definition) => {
+      const defaultName =
+        (defaultComponents as any)?.[pageSlug]?.[definition.type] ||
+        `${definition.type}1`;
+      return {
+        id: uuidv4(),
+        type: definition.type,
+        name: definition.name,
+        componentName: defaultName,
+        data: createDefaultData(definition.type),
+      } as ComponentInstance;
+    });
+  }
+
+  // إذا لم تكن الصفحة معرفة، إرجاع مصفوفة فارغة
+  return [];
+};
+
+// ============================================================================
+// مكون الـ Item القابل للسحب
+// ============================================================================
+function SortableItem({
+  id,
+  children,
+  isDragging,
+  onEditClick,
+  onDeleteClick,
+}: {
+  id: string;
+  children: React.ReactNode;
+  isDragging: boolean;
+  onEditClick: () => void;
+  onDeleteClick: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative group touch-manipulation"
+    >
+      <div className="absolute top-2 right-2 z-[51] flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          className="bg-red-600 text-white px-3 py-1.5 rounded-md text-sm cursor-pointer hover:bg-red-700 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDeleteClick();
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          Delete
+        </button>
+        <button
+          className="bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm cursor-pointer hover:bg-blue-700 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEditClick();
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          Edit
+        </button>
+      </div>
+
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-move border-2 border-transparent group-hover:border-blue-300 rounded-lg transition-colors p-1"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// تحميل المكونات ديناميكياً
+// ============================================================================
+// Cache للمكونات المحملة - خارج المكون لتجنب إعادة الإنشاء
+const componentCache = new Map<string, React.LazyExoticComponent<any>>();
+
+// مكون مخصص لتجنب إعادة التحميل
+const CachedComponent = React.memo(
+  ({
+    componentName,
+    section,
+    data,
+  }: {
+    componentName: string;
+    section: string;
+    data: ComponentData;
+  }) => {
+    const LoadedComponent = useMemo(
+      () => loadComponent(section, componentName),
+      [section, componentName],
+    );
+
+    if (!LoadedComponent) {
+      return (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+          Error loading component: {componentName}
+        </div>
+      );
+    }
+
+    return (
+      <Suspense
+        fallback={
+          <div className="p-8 bg-white border border-red-200 rounded-lg shadow-sm ">
+            <div className="animate-pulse flex space-x-4">
+              <div className="rounded-full bg-gray-300 h-10 w-10"></div>
+              <div className="flex-1 space-y-2 py-1">
+                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-300 rounded"></div>
+                  <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      >
+        {/* Pass useStore & variant so components read live state from EditorStore */}
+        <LoadedComponent {...(data as any)} useStore variant={componentName} />
+      </Suspense>
+    );
+  },
+);
+
+CachedComponent.displayName = "CachedComponent";
+
+const loadComponent = (section: string, componentName: string) => {
+  if (!componentName) return null;
+
+  // إنشاء مفتاح فريد للمكون
+  const cacheKey = `${section}:${componentName}`;
+
+  // التحقق من وجود المكون في الـ cache
+  if (componentCache.has(cacheKey)) {
+    return componentCache.get(cacheKey);
+  }
+
+  const match = componentName?.match(/^(.*?)(\d+)$/);
+  let baseName, number;
+
+  if (!match) {
+    // إذا لم يكن هناك رقم، استخدم الاسم كما هو
+    baseName = componentName;
+    number = "1";
+  } else {
+    baseName = match[1];
+    number = match[2];
+  }
+
+  // Normalize legacy/wrong variant ids to actual file names
+  // e.g., persisted "categories1" should map to file "category1"
+  const normalizedComponentName =
+    baseName === "categories" ? `category${number}` : componentName;
+
+  const sectionPaths: Record<string, string> = {
+    homepage: "homepage",
+    about: "about-us",
+    auth: "auth",
+    collections: "collections",
+    products: "products",
+    policies: "policies",
+    product: "product",
+    contact: "contact",
+    "news-ticker": "news-ticker",
+    "policy-layout": "policy-layout",
+    shipping: "shipping",
+    filters: "filters",
+    grid: "grid",
+    pagination: "pagination",
+    search: "search",
+    sorting: "sorting",
+    view: "view",
+    categories: "categories",
+    newsletter: "newsletter",
+    "contact-form": "contact-form",
+    "contact-info": "contact-info",
+    team: "team",
+  };
+
+  // للصفحات المخصصة الجديدة، استخدم اسم الصفحة نفسه كمسار
+  const sectionPath = sectionPaths[section] || section;
+
+  if (!sectionPath) {
+    console.error("Invalid section:", section);
+    return null;
+  }
+
+  const componentSubPaths: Record<string, string> = {
+    header: "header",
+    hero: "hero",
+    category: "categories",
+    products: "products",
+    newsletter: "newsletter",
+    footer: "footer",
+    categories: "categories",
+    team: "team",
+    login: "auth",
+    signup: "auth",
+    account_redirect: "auth",
+    filters: "filters",
+    sorting: "sorting",
+    grid: "grid",
+    pagination: "pagination",
+    search: "search",
+    view: "view",
+    layout: "policy-layout",
+    shipping: "shipping",
+    card: "grid",
+    detail: "grid",
+    related: "grid",
+    "contact-info": "contact-info",
+    "contact-form": "contact-form",
+    "news-ticker": "news-ticker",
+    contact: "contact",
+    collections: "collections",
+    // إضافة mappings للمكونات الجديدة
+    "about-hero": "hero",
+    "team-grid": "team",
+    ClothingFilter: "filters",
+    ProductCard: "grid",
+    Pagination: "pagination",
+    "collection-filter": "filters",
+    "sort-dropdown": "sorting",
+    // إضافة mappings إضافية للمكونات المفقودة
+    "product-card": "grid",
+    "product-detail": "grid",
+    "product-related": "grid",
+    "product-filters": "filters",
+    "product-sorting": "sorting",
+    "product-pagination": "pagination",
+    "product-search": "search",
+    "product-view": "view",
+  };
+
+  const subPath = componentSubPaths[baseName];
+  if (!subPath) {
+    console.error("Invalid component type:", baseName);
+    // استخدام fallback للمكونات غير المعروفة
+    const fallbackPath = "hero"; // استخدام hero كـ fallback
+    const fallbackFullPath = `${fallbackPath}/${normalizedComponentName}`;
+
+    return lazy(() =>
+      import(`@/components/tenant/${fallbackFullPath}`).catch(() => ({
+        default: (props: any) => (
+          <div className="p-8 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-dashed border-yellow-300 rounded-lg text-center">
+            <div className="text-yellow-600 text-lg font-semibold mb-2">
+              Unknown Component: {baseName}
+            </div>
+            <div className="text-gray-600 text-sm mb-4">
+              Component file: {componentName} (fallback: {fallbackFullPath})
+            </div>
+            <div className="text-xs text-gray-500">
+              This component type is not recognized. Using fallback.
+            </div>
+          </div>
+        ),
+      })),
+    );
+  }
+
+  // جميع المكونات الآن مستقلة في مجلدات خاصة بها
+  const fullPath = `${subPath}/${normalizedComponentName}`;
+  // إنشاء المكون الجديد وحفظه في الـ cache
+  const LazyComponent = lazy(() =>
+    import(`@/components/tenant/${fullPath}`).catch(() => ({
+      default: (props: any) => (
+        <div className="p-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-dashed border-blue-300 rounded-lg text-center">
+          <div className="text-blue-600 text-lg font-semibold mb-2">
+            {AVAILABLE_SECTIONS.find((s) => s.component === baseName)?.name ||
+              baseName}{" "}
+            Component
+          </div>
+          <div className="text-gray-600 text-sm mb-4">
+            Component file: {componentName} ({fullPath})
+          </div>
+          <div className="text-xs text-gray-500">
+            This is a placeholder showing that the component structure is
+            working
+          </div>
+          {props.texts?.title && (
+            <div className="mt-4 p-3 bg-white rounded border">
+              <div
+                className="font-medium"
+                style={{ color: props.colors?.textColor || "#1F2937" }}
+              >
+                {props.texts.title}
+              </div>
+              {props.texts.subtitle && (
+                <div
+                  className="text-sm mt-1"
+                  style={{ color: props.colors?.textColor || "#6B7280" }}
+                >
+                  {props.texts.subtitle}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ),
+    })),
+  );
+
+  // حفظ المكون في الـ cache
+  componentCache.set(cacheKey, LazyComponent);
+
+  return LazyComponent;
+};
+
+// ============================================================================
+// المكون الرئيسي لمحرر الصفحات (يعمل مع جميع الصفحات)
+// ============================================================================
+export default function LiveEditor() {
+  const params = useParams<{ tenantId: string; slug?: string }>();
+  const tenantId = params?.tenantId;
+  const slug = params?.slug || "homepage"; // Default to homepage if no slug
+  const { user, loading: authLoading } = useAuth();
+  const {
+    fetchTenantData,
+    loading: tenantLoading,
+    tenant,
+    tenantData,
+  } = useTenantStore();
+
+  const [sidebarWidth, setSidebarWidth] = useState(600);
+  const [initialized, setInitialized] = useState(false);
+
+  // تهيئة المكونات فوراً بالبيانات الافتراضية
+  const [pageComponents, setPageComponents] = useState<ComponentInstance[]>(
+    () => {
+      return createInitialComponents(slug);
+    },
+  );
+
+  const [registeredComponents, setRegisteredComponents] = useState<
+    Record<string, any>
+  >({});
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarView, setSidebarView] = useState<
+    "main" | "add-section" | "edit-component"
+  >("main");
+  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
+    null,
+  );
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [componentToDelete, setComponentToDelete] = useState<string | null>(
+    null,
+  );
+  const [deletePageDialogOpen, setDeletePageDialogOpen] = useState(false);
+  const [deletePageConfirmation, setDeletePageConfirmation] = useState("");
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor),
+  );
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, authLoading, router]);
+
+  // تحميل بيانات التينانت (اختياري)
+  useEffect(() => {
+    if (tenantId) {
+      fetchTenantData(tenantId as string);
+    }
+  }, [tenantId, fetchTenantData]);
+
+  // Load components from database into editorStore and pageComponents
+  useEffect(() => {
+    if (!initialized && !authLoading && !tenantLoading && tenantData) {
+      // Load data into editorStore
+      useEditorStore.getState().loadFromDatabase(tenantData);
+
+      // Load page components from database or use defaults
+      if (
+        tenantData?.componentSettings?.[slug] &&
+        Object.keys(tenantData.componentSettings[slug]).length > 0
+      ) {
+        const pageSettings = tenantData.componentSettings[slug];
+        const dbComponents = Object.entries(pageSettings).map(([id, comp]: [string, any]) => {
+          // استعادة النوع الصحيح من componentName أو id إذا كان type غير صحيح
+          let correctType = comp.type;
+          if (comp.type === "unknown" || !comp.type) {
+            // محاولة استخراج النوع من componentName أولاً
+            if (comp.componentName && comp.componentName !== "undefined") {
+              const componentName = comp.componentName.replace(/^\d+$/, ""); // إزالة الأرقام من البداية
+              if (componentName.startsWith("header")) correctType = "header";
+              else if (componentName.startsWith("hero")) correctType = "hero";
+              else if (componentName.startsWith("products"))
+                correctType = "products";
+              else if (
+                componentName.startsWith("categories") ||
+                componentName.startsWith("category")
+              )
+                correctType = "categories";
+              else if (componentName.startsWith("newsletter"))
+                correctType = "newsletter";
+              else if (componentName.startsWith("footer"))
+                correctType = "footer";
+              else if (componentName.startsWith("team")) correctType = "team";
+              else if (componentName.startsWith("contact"))
+                correctType = "contact";
+              else if (componentName.startsWith("about-hero"))
+                correctType = "hero";
+              else if (componentName.startsWith("collection-filter"))
+                correctType = "collections";
+              else if (componentName.startsWith("sort-dropdown"))
+                correctType = "collections";
+              else if (componentName.startsWith("ClothingFilter"))
+                correctType = "products";
+              else if (componentName.startsWith("grid"))
+                correctType = "products";
+              else if (componentName.startsWith("Pagination"))
+                correctType = "products";
+            }
+
+            // إذا لم نتمكن من استخراج النوع من componentName، جرب من id
+            if (!correctType || correctType === "unknown") {
+              const idParts = comp.id.split("-");
+              if (idParts.length > 0) {
+                const idType = idParts[0];
+                if (idType === "header") correctType = "header";
+                else if (idType === "hero") correctType = "hero";
+                else if (idType === "products") correctType = "products";
+                else if (idType === "categories") correctType = "categories";
+                else if (idType === "newsletter") correctType = "newsletter";
+                else if (idType === "footer") correctType = "footer";
+                else if (idType === "team") correctType = "team";
+                else if (idType === "contact") correctType = "contact";
+                else if (idType === "22821795") {
+                  // هذا يبدو أنه UUID، نحتاج إلى تحديد النوع بناءً على position والصفحة
+                  const position = comp.position || 0;
+
+                  // تحديد النوع بناءً على الصفحة والموقع
+                  if (slug === "about") {
+                    if (position === 0) correctType = "header";
+                    else if (position === 1) correctType = "header";
+                    else if (position === 2) correctType = "hero";
+                    else if (position === 3) correctType = "team";
+                    else if (position === 4) correctType = "footer";
+                    else correctType = "header";
+                  } else {
+                    // للصفحات الأخرى، استخدم الترتيب الافتراضي
+                    if (position === 0) correctType = "header";
+                    else if (position === 1) correctType = "header";
+                    else if (position === 2) correctType = "hero";
+                    else if (position === 3) correctType = "products";
+                    else if (position === 4) correctType = "categories";
+                    else if (position === 5) correctType = "newsletter";
+                    else if (position === 6) correctType = "footer";
+                    else correctType = "header";
+                  }
+                }
+              }
+            }
+          }
+
+          return {
+            id: id,
+            type: correctType,
+            name:
+              comp.name || getComponentDisplayName(correctType) || "Component",
+            componentName: (() => {
+              // إذا كان componentName undefined أو "undefined"، أنشئ واحد جديد
+              if (!comp.componentName || comp.componentName === "undefined") {
+                if (correctType && correctType !== "unknown") {
+                  // استخدم النوع الصحيح مع رقم 1، مع مراعاة الصفحة
+                  if (slug === "about" && correctType === "hero") {
+                    return "about-hero1";
+                  } else if (slug === "about" && correctType === "team") {
+                    return "team-grid1";
+                  } else {
+                    return `${correctType}1`;
+                  }
+                } else {
+                  // إذا لم نتمكن من تحديد النوع، استخدم "unknown1"
+                  return "unknown1";
+                }
+              }
+              if (
+                typeof comp.componentName === "string" &&
+                comp.componentName.startsWith("categories")
+              ) {
+                return comp.componentName.replace(/^categories/, "category");
+              }
+              return comp.componentName;
+            })(),
+            data:
+              comp.data && Object.keys(comp.data).length > 0
+                ? comp.data
+                : correctType && correctType !== "unknown"
+                  ? createDefaultData(correctType)
+                  : {
+                      texts: {
+                        title: "Component Title",
+                        subtitle: "This is a component description.",
+                      },
+                      colors: {
+                        background: "#FFFFFF",
+                        textColor: "#1F2937",
+                      },
+                    },
+            position: comp.position || 0,
+          };
+        });
+        setPageComponents(dbComponents);
+      } else {
+        setPageComponents(createInitialComponents(slug));
+      }
+
+      setInitialized(true);
+    }
+  }, [initialized, authLoading, tenantLoading, tenantData, slug]);
+
+  // تحديث المكونات المسجلة عند توفر بيانات التينانت
+  useEffect(() => {
+    const componentsMap: Record<string, any> = {};
+
+    Object.entries(defaultComponents).forEach(([section, components]) => {
+      componentsMap[section] = components;
+    });
+
+    if (tenant?.componentSettings) {
+      Object.entries(tenant.componentSettings).forEach(
+        ([section, components]) => {
+          if (typeof components === "object" && components !== null) {
+            componentsMap[section] = {
+              ...(componentsMap[section] || {}),
+              ...components,
+            };
+          }
+        },
+      );
+    }
+
+    setRegisteredComponents(componentsMap);
+  }, [tenant]);
+
+  // تحديث أسماء المكونات بناءً على البيانات المتاحة
+  useEffect(() => {
+    if (Object.keys(registeredComponents).length > 0) {
+      setPageComponents((current) =>
+        current.map((component) => {
+          const definition = AVAILABLE_SECTIONS.find(
+            (s) => s.type === component.type,
+          );
+          if (definition) {
+            const componentName =
+              registeredComponents[slug]?.[definition.component] ||
+              (defaultComponents as any)[slug]?.[definition.component] ||
+              `${definition.component}1`;
+            return { ...component, componentName };
+          }
+          return component;
+        }),
+      );
+    }
+  }, [registeredComponents, slug]);
+
+  const componentOrderIds = useMemo(
+    () => pageComponents.map((c) => c.id),
+    [pageComponents],
+  );
+  const selectedComponent = useMemo(
+    () => pageComponents.find((c) => c.id === selectedComponentId),
+    [selectedComponentId, pageComponents],
+  );
+
+  // Get page title for display
+  const pageTitle = useMemo(() => {
+    if (slug === "homepage") return "Homepage";
+    return slug.charAt(0).toUpperCase() + slug.slice(1);
+  }, [slug]);
+
+  // Check if this is a predefined page
+  const isPredefinedPage = useMemo(() => {
+    return Object.keys(PAGE_DEFINITIONS).includes(slug);
+  }, [slug]);
+
+  const openMainSidebar = () => {
+    setSidebarView("main");
+    setSelectedComponentId(null);
+    setSidebarOpen(true);
+  };
+
+  const handleEditClick = (componentId: string) => {
+    setSelectedComponentId(componentId);
+    setSidebarView("edit-component");
+    setSidebarOpen(true);
+  };
+
+  const handleDeleteClick = (componentId: string) => {
+    setComponentToDelete(componentId);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (componentToDelete) {
+      setPageComponents((currentComponents) =>
+        currentComponents.filter((c) => c.id !== componentToDelete),
+      );
+    }
+    setDeleteDialogOpen(false);
+    setComponentToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setComponentToDelete(null);
+  };
+
+  const handleDeletePage = () => {
+    setDeletePageDialogOpen(true);
+  };
+
+  const confirmDeletePage = () => {
+    if (deletePageConfirmation === "I am sure I want to delete this page") {
+      // Remove page from editorStore
+      const store = useEditorStore.getState();
+      store.deletePage(slug);
+      
+      // Remove page from tenantStore componentSettings
+      const { tenantData } = useTenantStore.getState();
+      if (tenantData?.componentSettings) {
+        const updatedComponentSettings = { ...tenantData.componentSettings };
+        delete updatedComponentSettings[slug];
+        
+        useTenantStore.setState({
+          tenantData: {
+            ...tenantData,
+            componentSettings: updatedComponentSettings,
+          },
+        });
+      }
+      
+      // Clear page components
+      setPageComponents([]);
+      
+      // Close dialog and reset confirmation
+      setDeletePageDialogOpen(false);
+      setDeletePageConfirmation("");
+      
+      // Navigate to homepage in live editor
+      router.push(`/tenant/${tenantId}/live-editor/homepage`);
+    }
+  };
+
+  const cancelDeletePage = () => {
+    setDeletePageDialogOpen(false);
+    setDeletePageConfirmation("");
+  };
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
+
+  const handleComponentUpdate = (id: string, newData: ComponentData) => {
+    setPageComponents((currentComponents) =>
+      currentComponents.map((c) => (c.id === id ? { ...c, data: newData } : c)),
+    );
+  };
+
+  const handleComponentThemeChange = (id: string, newTheme: string) => {
+    setPageComponents((currentComponents) =>
+      currentComponents.map((c) =>
+        c.id === id ? { ...c, componentName: newTheme } : c,
+      ),
+    );
+  };
+
+  const handleComponentReset = (id: string) => {
+    setPageComponents((currentComponents) =>
+      currentComponents.map((c) => {
+        if (c.id === id) {
+          // Get default data for this component type
+          const defaultData = createDefaultData(c.type);
+          return {
+            ...c,
+            data: defaultData,
+            // Reset to default theme for this component type
+            componentName: getDefaultThemeForType(c.type),
+          };
+        }
+        return c;
+      }),
+    );
+
+    // Clear component state from store
+    const store = useEditorStore.getState();
+    const resetComponent = pageComponents.find((c) => c.id === id);
+    if (resetComponent) {
+      const defaultData = createDefaultData(resetComponent.type);
+      switch (resetComponent.type) {
+        case "hero":
+          store.setHeroData(resetComponent.componentName, defaultData);
+          break;
+        case "header":
+          store.setHeaderData(resetComponent.componentName, defaultData);
+          break;
+        case "products":
+          store.setProductsGridData(resetComponent.componentName, defaultData);
+          break;
+        case "categories":
+          store.setCategoriesData(resetComponent.componentName, defaultData);
+          break;
+        case "footer":
+          store.setFooterData(resetComponent.componentName, defaultData);
+          break;
+      }
+    }
+
+    // Clear temp data and close sidebar
+    store.setTempData({});
+    closeSidebar();
+  };
+
+  // Helper function to get default theme for component type
+  const getDefaultThemeForType = (type: string): string => {
+    switch (type) {
+      case "header":
+        return "header1";
+      case "hero":
+        return "hero1";
+      case "products":
+        return "products1";
+      case "categories":
+        return "category1";
+      case "newsletter":
+        return "newsletter1";
+      case "news-ticker":
+        return "news-ticker1";
+      case "footer":
+        return "footer1";
+      default:
+        return `${type}1`;
+    }
+  };
+
+  const handlePageThemeChange = (
+    themeId: string,
+    components: Record<string, string>,
+  ) => {
+    setPageComponents((currentComponents) =>
+      currentComponents.map((component) => {
+        const newComponentName =
+          components[component.type as keyof typeof components];
+        if (newComponentName) {
+          return { ...component, componentName: newComponentName };
+        }
+        return component;
+      }),
+    );
+  };
+
+  const handleAddSection = (type: string) => {
+    const definition = AVAILABLE_SECTIONS.find((s) => s.type === type);
+    if (!definition) return;
+
+    // للصفحات الجديدة، استخدم المكونات الافتراضية من homepage
+    const componentName =
+      registeredComponents?.[slug]?.[definition.component] ||
+      (defaultComponents as any)[slug]?.[definition.component] ||
+      (defaultComponents as any)?.homepage?.[definition.component] ||
+      `${definition.component}1`;
+
+    const newSection: ComponentInstance = {
+      id: uuidv4(),
+      type: definition.type,
+      name: definition.name,
+      componentName,
+      data: createDefaultData(type),
+    };
+
+    setPageComponents((current) => [...current, newSection]);
+    setSidebarView("main");
+  };
+
+  const handleDragStart = (event: any) => setActiveId(event.active.id);
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (over && active.id !== over.id) {
+      setPageComponents((components) => {
+        const oldIndex = components.findIndex((c) => c.id === active.id);
+        const newIndex = components.findIndex((c) => c.id === over.id);
+        const newOrder = arrayMove(components, oldIndex, newIndex);
+        return newOrder;
+      });
+    }
+  };
+
+  // Keep store in sync with current page components and their positions
+  useEffect(() => {
+    useEditorStore.getState().setPageComponentsForPage(slug, pageComponents);
+  }, [pageComponents, slug]);
+
+  const activeComponentForOverlay = useMemo(() => {
+    return pageComponents.find((c) => c.id === activeId);
+  }, [activeId, pageComponents]);
+
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <div className="flex h-full bg-gray-50">
+      <div
+        className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 transition-all duration-500"
+        style={{ marginRight: sidebarOpen ? `${sidebarWidth}px` : "0px" }}
+      >
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800">
+              {pageTitle} Builder
+            </h2>
+            <p className="text-gray-600 mt-1">
+              {isPredefinedPage
+                ? "Drag and drop components to build your page"
+                : "Custom page - Add components to start building"}
+            </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => {
+                setSidebarView("add-section");
+                setSidebarOpen(true);
+              }}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add New Section
+            </button>
+            <button
+              onClick={handleDeletePage}
+              className="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 transition-colors"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+              Delete Page
+            </button>
+            <button
+              onClick={openMainSidebar}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
+                />
+              </svg>
+              Open Editor
+            </button>
+          </div>
+        </div>
+
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={componentOrderIds}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-6">
+              {pageComponents.map((component) => (
+                <SortableItem
+                  key={component.id}
+                  id={component.id}
+                  isDragging={activeId === component.id}
+                  onEditClick={() => handleEditClick(component.id)}
+                  onDeleteClick={() => handleDeleteClick(component.id)}
+                >
+                  <CachedComponent
+                    componentName={component.componentName}
+                    section={slug}
+                    data={
+                      {
+                        ...component.data,
+                        useStore: true,
+                        variant: component.componentName,
+                      } as any
+                    }
+                  />
+                </SortableItem>
+              ))}
+            </div>
+          </SortableContext>
+
+          <DragOverlay>
+            {activeId && activeComponentForOverlay ? (
+              <div
+                className="bg-white p-2 rounded-lg shadow-xl opacity-90 border-2 border-blue-300"
+                style={{ transform: "scale(0.5)", transformOrigin: "top left" }}
+              >
+                <CachedComponent
+                  componentName={activeComponentForOverlay.componentName}
+                  section={slug}
+                  data={activeComponentForOverlay.data}
+                />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+
+        {pageComponents.length === 0 && (
+          <div className="flex items-center justify-center min-h-[400px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border-2 border-dashed border-gray-300">
+            <div className="text-center max-w-md mx-auto px-6">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-10 h-10 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Empty Page
+              </h3>
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                This page doesn't have any components yet. Start building your
+                page by adding components from the sidebar.
+              </p>
+              <button
+                onClick={() => {
+                  setSidebarView("add-section");
+                  setSidebarOpen(true);
+                }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Add Component
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <EditorSidebar
+        isOpen={sidebarOpen}
+        onClose={closeSidebar}
+        view={sidebarView}
+        setView={setSidebarView}
+        selectedComponent={selectedComponent || null}
+        onComponentUpdate={handleComponentUpdate}
+        onComponentThemeChange={handleComponentThemeChange}
+        onPageThemeChange={handlePageThemeChange}
+        onSectionAdd={handleAddSection}
+        onComponentReset={handleComponentReset}
+        width={sidebarWidth}
+        setWidth={setSidebarWidth}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-6 h-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <AlertDialogTitle className="text-xl font-bold text-gray-900">
+                  Delete Section Permanently
+                </AlertDialogTitle>
+              </div>
+            </div>
+            <div className="text-gray-600 leading-relaxed space-y-3">
+              <p className="font-medium text-red-700">
+                ⚠️ Warning: This action cannot be undone!
+              </p>
+              <p>
+                This section will be completely removed from your website along
+                with all associated data.
+              </p>
+              <p className="text-sm text-gray-500">
+                If you are sure you want to proceed, click "Delete Permanently".
+              </p>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-3">
+            <AlertDialogCancel
+              onClick={cancelDelete}
+              className="flex-1 sm:flex-none bg-gray-100 text-gray-700 hover:bg-gray-200 border-0"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="flex-1 sm:flex-none bg-red-600 text-white hover:bg-red-700 border-0"
+            >
+              Delete Permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Page Confirmation Dialog */}
+      <AlertDialog open={deletePageDialogOpen} onOpenChange={setDeletePageDialogOpen}>
+        <AlertDialogContent className="max-w-lg">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <AlertDialogTitle className="text-2xl font-bold text-gray-900">
+                  Delete Page Permanently
+                </AlertDialogTitle>
+                <p className="text-sm text-gray-500 mt-1">
+                  This action will remove the entire page and all its components
+                </p>
+              </div>
+            </div>
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center mt-0.5">
+                  <svg
+                    className="w-3 h-3 text-white"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-lg font-semibold text-red-800 mb-2">
+                    ⚠️ CRITICAL WARNING: This action cannot be undone!
+                  </h4>
+                  <ul className="text-red-700 space-y-1 text-sm">
+                    <li>• The entire page "{pageTitle}" will be permanently deleted</li>
+                    <li>• All components and their data will be lost forever</li>
+                    <li>• This action will affect your live website immediately</li>
+                    <li>• No backup will be created automatically</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <p className="text-gray-700 font-medium">
+                To confirm deletion, please type the following text exactly:
+              </p>
+              <div className="bg-gray-100 p-3 rounded-lg border">
+                <p className="text-sm font-mono text-gray-800">
+                  "I am sure I want to delete this page"
+                </p>
+              </div>
+              <input
+                type="text"
+                value={deletePageConfirmation}
+                onChange={(e) => setDeletePageConfirmation(e.target.value)}
+                placeholder="Type the confirmation text here..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+              />
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-3 pt-4">
+            <AlertDialogCancel
+              onClick={cancelDeletePage}
+              className="flex-1 sm:flex-none bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 px-6 py-3"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeletePage}
+              disabled={deletePageConfirmation !== "I am sure I want to delete this page"}
+              className="flex-1 sm:flex-none bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 border-0 px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            >
+              Yes, I'm Sure
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}")

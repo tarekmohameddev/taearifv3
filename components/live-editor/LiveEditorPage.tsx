@@ -1,0 +1,35 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import LiveEditor from "@/components/tenant/live-editor/LiveEditor";
+import { EditorProvider } from "@/context-liveeditor/EditorProvider";
+import { AuthProvider } from "@/context-liveeditor/AuthContext";
+
+export function LiveEditorPage() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-lg text-gray-600">جاري تحميل محرر الموقع...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <AuthProvider>
+      <EditorProvider>
+                <LiveEditor />
+      </EditorProvider>
+    </AuthProvider>
+  );
+}

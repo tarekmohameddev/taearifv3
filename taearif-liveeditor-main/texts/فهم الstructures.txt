@@ -1,0 +1,234 @@
+{
+  "menu": [
+    {
+      "id": "home",
+      "type": "link",
+      "text": "الرئيسية",
+      "icon": "home",
+      "url": "/",
+      "dynamicData": {
+        "enabled": false,
+        "source": "",
+        "mapping": {
+          "label": "",
+          "url": ""
+        }
+      },
+      "submenu": []
+    },
+    {
+      "id": "properties",
+      "type": "mega_menu",
+      "text": "العقارات",
+      "icon": "building",
+      "url": "#",
+      "dynamicData": {
+        "enabled": false,
+        "source": "",
+        "mapping": {
+          "label": "",
+          "url": ""
+        }
+      },
+      "submenu": [
+        {
+          "id": "for-rent",
+          "type": "section",
+          "title": "للإيجار",
+          "items": [
+            {
+              "id": "apartments-rent",
+              "text": "شقق للإيجار",
+              "url": "/for-rent/apartments"
+            },
+            {
+              "id": "villas-rent",
+              "text": "فلل للإيجار",
+              "url": "/for-rent/villas"
+            },
+            {
+              "id": "offices-rent",
+              "text": "مكاتب للإيجار",
+              "url": "/for-rent/offices"
+            }
+          ]
+        },
+        {
+          "id": "for-sale",
+          "type": "section",
+          "title": "للبيع",
+          "items": [
+            {
+              "id": "apartments-sale",
+              "text": "شقق للبيع",
+              "url": "/for-sale/apartments"
+            },
+            {
+              "id": "villas-sale",
+              "text": "فلل للبيع",
+              "url": "/for-sale/villas"
+            },
+            {
+              "id": "land-sale",
+              "text": "أراضي للبيع",
+              "url": "/for-sale/land"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "services",
+      "type": "dropdown",
+      "text": "الخدمات",
+      "icon": "services",
+      "url": "#",
+      "dynamicData": {
+        "enabled": false,
+        "source": "",
+        "mapping": {
+          "label": "",
+          "url": ""
+        }
+      },
+      "submenu": [
+        {
+          "id": "property-valuation",
+          "type": "links",
+          "title": "تقييم العقارات",
+          "items": [
+            {
+              "id": "free-valuation",
+              "text": "تقييم مجاني",
+              "url": "/services/free-valuation"
+            },
+            {
+              "id": "detailed-valuation",
+              "text": "تقييم مفصل",
+              "url": "/services/detailed-valuation"
+            }
+          ]
+        },
+        {
+          "id": "legal-services",
+          "type": "links",
+          "title": "الخدمات القانونية",
+          "items": [
+            {
+              "id": "contract-review",
+              "text": "مراجعة العقود",
+              "url": "/services/contract-review"
+            },
+            {
+              "id": "legal-consultation",
+              "text": "استشارة قانونية",
+              "url": "/services/legal-consultation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "about",
+      "type": "link",
+      "text": "من نحن",
+      "icon": "info",
+      "url": "/about",
+      "dynamicData": {
+        "enabled": false,
+        "source": "",
+        "mapping": {
+          "label": "",
+          "url": ""
+        }
+      },
+      "submenu": []
+    },
+    {
+      "id": "contact",
+      "type": "button",
+      "text": "اتصل بنا",
+      "icon": "phone",
+      "url": "/contact",
+      "dynamicData": {
+        "enabled": false,
+        "source": "",
+        "mapping": {
+          "label": "",
+          "url": ""
+        }
+      },
+      "submenu": []
+    }
+  ]
+}
+
+// Global Footer Quick Links Structure
+{
+  "quickLinks": {
+    "enabled": true,
+    "title": "روابط سريعة",
+    "links": [
+      {
+        "text": "الرئيسية",
+        "url": "/"
+      },
+      {
+        "text": "عقارات للإيجار",
+        "url": "/for-rent"
+      },
+      {
+        "text": "عقارات للبيع",
+        "url": "/for-sale"
+      },
+      {
+        "text": "تقييم العقارات",
+        "url": "/services/valuation"
+      },
+      {
+        "text": "من نحن",
+        "url": "/about"
+      },
+      {
+        "text": "اتصل بنا",
+        "url": "/contact"
+      },
+      {
+        "text": "سياسة الخصوصية",
+        "url": "/privacy-policy"
+      },
+      {
+        "text": "شروط الاستخدام",
+        "url": "/terms-of-service"
+      },
+      {
+        "text": "الأسئلة الشائعة",
+        "url": "/faq"
+      },
+      {
+        "text": "المدونة",
+        "url": "/blog"
+      },
+      {
+        "text": "أخبار العقارات",
+        "url": "/news"
+      },
+      {
+        "text": "دليل المشتري",
+        "url": "/buyer-guide"
+      },
+      {
+        "text": "دليل البائع",
+        "url": "/seller-guide"
+      },
+      {
+        "text": "حاسبة الرهن العقاري",
+        "url": "/mortgage-calculator"
+      },
+      {
+        "text": "خريطة الموقع",
+        "url": "/sitemap"
+      }
+    ]
+  }
+}

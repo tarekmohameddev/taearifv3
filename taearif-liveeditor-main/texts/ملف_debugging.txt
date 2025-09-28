@@ -1,0 +1,5 @@
+=== DEBUG LOG STARTED ===
+
+This file is now managed by the browser-based debug system.
+Use the Debug Controls in the bottom-right corner to view, download, or clear logs.
+

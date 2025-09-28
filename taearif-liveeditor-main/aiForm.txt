@@ -1,0 +1,343 @@
+Project Overview
+This project is a multi-tenant e-commerce platform developed using Next.js v15, Tailwind CSS for styling, MongoDB as the database, and Zustand for state management. It enables brand owners or merchants to register on the platform, create their own customized websites, and manage them through a dashboard. Below is a comprehensive breakdown of the project, including its architecture, functionalities, and file structure.
+
+Core Features
+
+Multi-Tenancy
+
+The platform supports multiple tenants (brands/merchants), each with their own unique website.
+Upon registration, a brand owner provides their brand name, and a fully functional website is generated under the URL /tenant/[brandName].
+The brand name in the URL is dynamic and updates if the owner changes it via the dashboard.
+
+
+Website Customization
+
+Brand owners can customize their website’s components (e.g., Header, Footer, Products) through a dashboard accessible at /dashboard.
+Components have multiple variants (e.g., footer1, footer2), and owners can select their preferred variant and modify properties like text or color.
+
+
+Dynamic Routing
+
+Next.js’s dynamic routing ([tenantId]) is used to serve tenant-specific pages based on the brand name or tenant ID in the URL.
+
+
+Fixed Components
+
+Certain components on the main /page.jsx (likely the platform’s homepage or shared pages) cannot be modified by tenants to maintain consistency and branding across the platform.
+
+
+Dashboard Functionality
+
+The dashboard at /dashboard provides tools for managing the tenant’s website, including content, products, settings, and analytics.
+
+
+
+
+Technology Stack
+
+Next.js v15: Provides the framework for server-side rendering, dynamic routing, and API routes.
+Tailwind CSS: Used for responsive and customizable styling across the application.
+MongoDB: Stores tenant data, component selections, products, and other configurations.
+Zustand: Manages application state, particularly tenant data and component selections.
+
+
+Project Workflow
+
+Registration
+
+A brand owner registers on the platform, submitting their brand name.
+A tenant entry is created in MongoDB, and a website is generated at /tenant/[brandName].
+
+
+Website Generation
+
+The tenant’s website includes sections like Header, Footer, About, Products, Collections, etc.
+Default component variants are assigned (e.g., header1, footer1).
+
+
+Customization via Dashboard
+
+From /dashboard, the owner can:
+Select component variants (e.g., switch from footer1 to footer2).
+Update content (e.g., text, colors).
+Manage products (add, edit, delete).
+Change the brand name, which updates the URL.
+
+
+
+
+Rendering
+
+When a user visits /tenant/[brandName], the app fetches the tenant’s data from MongoDB and renders the site using the selected component variants and content.
+
+
+
+
+File Structure
+Tenant-Specific Files
+Tenant-related pages and components are organized to support dynamic routing and customization.
+Tenant Pages
+Located under app/tenant/[tenantId]/, these files define the structure of each tenant’s website:
+
+app/tenant/[tenantId]/page.tsx: Main page for the tenant’s website.
+app/tenant/[tenantId]/about/page.tsx: About page.
+app/tenant/[tenantId]/collections/page.tsx: Collections page.
+app/tenant/[tenantId]/contact/page.tsx: Contact page.
+app/tenant/[tenantId]/products/page.tsx: Products listing page.
+app/tenant/[tenantId]/products/[slug]/page.tsx: Individual product page.
+app/tenant/[tenantId]/privacy-policy/page.tsx: Privacy policy page.
+app/tenant/[tenantId]/returns-policy/page.tsx: Returns policy page.
+app/tenant/[tenantId]/shipping-policy/page.tsx: Shipping policy page.
+app/tenant/[tenantId]/terms-conditions/page.tsx: Terms and conditions page.
+app/tenant/[tenantId]/loading.tsx: Loading state for tenant pages.
+app/tenant/[tenantId]/not-found.tsx: 404 page for tenant routes.
+app/tenant/[tenantId]/pageWITH_DATABASE.tsx: Alternative main page with database integration.
+app/tenant/[tenantId]/auth/signin/page.tsx: Tenant-specific sign-in page.
+app/tenant/[tenantId]/auth/error/page.tsx: Authentication error page.
+app/tenant/[tenantId]/collections/[slug]/page.tsx: Individual collection page.
+
+Tenant API Routes
+Located under app/tenant/[tenantId]/api/, these handle backend operations:
+
+app/tenant/[tenantId]/api/products/route.ts: Fetches or manages product data.
+app/tenant/[tenantId]/api/auth/magic-link/route.ts: Handles magic link authentication.
+app/tenant/[tenantId]/api/auth/signup/route.ts: Manages tenant signup.
+app/tenant/[tenantId]/api/auth/[...nextauth]/route.ts: NextAuth.js integration for authentication.
+
+Tenant Components
+Located under components/tenant/, these are reusable UI elements with multiple variants:
+
+About Us:
+components/tenant/about-us/hero/about-hero1.tsx
+components/tenant/about-us/hero/about-hero2.tsx
+components/tenant/about-us/team/team-grid1.tsx
+
+
+Authentication:
+components/tenant/auth/account-redirect/AuthRedirect1.tsx
+components/tenant/auth/login/LoginForm1.tsx
+components/tenant/auth/signup/SignupForm1.tsx
+components/tenant/auth/signup/PasswordStrengthMeter.tsx
+
+
+Collections:
+components/tenant/collections/filters/collection-filter1.tsx
+components/tenant/collections/filters/collection-filter2.tsx
+components/tenant/collections/sorting/sort-dropdown1.tsx
+
+
+Homepage:
+components/tenant/homepage/categories/category1.tsx
+components/tenant/homepage/footer/footer1.tsx
+components/tenant/homepage/header/header1.tsx
+components/tenant/homepage/hero/hero1.tsx
+components/tenant/homepage/newsletter/newsletter1.tsx
+components/tenant/homepage/products/products1.tsx
+
+
+Policies:
+components/tenant/policies/policy-layout/policy-container1.tsx
+components/tenant/policies/shipping/shipping-calculator1.tsx
+
+
+Products:
+components/tenant/product/card/product-card1.tsx
+components/tenant/product/detail/product-detail1.tsx
+components/tenant/product/related/related-products1.tsx
+components/tenant/products/filters/ClothingFilter1.tsx
+components/tenant/products/filters/MobileFilterDrawer1.tsx
+components/tenant/products/grid/ProductCard1.tsx
+components/tenant/products/pagination/Pagination1.tsx
+components/tenant/products/search/SearchBar1.tsx
+components/tenant/products/sorting/SortDropdown1.tsx
+components/tenant/products/view/ViewToggle1.tsx
+
+
+
+Dashboard Files
+The dashboard is isolated under app/(dashboard)/ and components/ for managing tenant websites.
+Dashboard Pages
+Located under app/(dashboard)/dashboard/:
+
+app/(dashboard)/dashboard/page.tsx: Main dashboard page.
+app/(dashboard)/dashboard/analytics/page.tsx: Analytics overview.
+app/(dashboard)/dashboard/content/page.tsx: Content management.
+app/(dashboard)/dashboard/products/page.tsx: Product management.
+app/(dashboard)/dashboard/settings/page.tsx: Settings management.
+app/(dashboard)/dashboard/products/add/page.tsx: Add new product?.
+app/(dashboard)/dashboard/products/edit/[id]/page.tsx: Edit existing product?.
+app/(dashboard)/dashboard/loading.tsx: Loading state for dashboard.
+app/(dashboard)/dashboard/products/loading.tsx: Loading state for products section.
+
+Dashboard Components
+Located under components/:
+
+Accounts:
+components/accounts/account-activity.tsx
+components/accounts/account-balances.tsx
+components/accounts/accounts-list.tsx
+
+
+Analytics:
+components/analytics/device-analytics.tsx
+components/analytics/income-analytics.tsx
+components/analytics/page-views-analytics.tsx
+components/analytics/referrer-analytics.tsx
+components/analytics/savings-analytics.tsx
+components/analytics/spending-analytics.tsx
+components/analytics/visitor-analytics.tsx
+
+
+Budget:
+components/budget/budget-categories.tsx
+components/budget/budget-overview.tsx
+components/budget/budget-progress.tsx
+
+
+Content:
+components/content/about-company.tsx
+components/content/achievements.tsx
+components/content/brands.tsx
+components/content/categories.tsx
+components/content/customer-reviews.tsx
+components/content/footer.tsx
+components/content/general-settings.tsx
+components/content/image-gallery.tsx
+components/content/loading-skeleton.tsx
+components/content/main-banner.tsx
+components/content/our-services.tsx
+components/content/skills-section.tsx
+components/content/why-choose-us.tsx
+
+
+Dashboard:
+components/dashboard/account-summary.tsx
+components/dashboard/dashboard-header.tsx
+components/dashboard/dashboard-nav.tsx
+components/dashboard/dashboard-shell.tsx
+components/dashboard/overview.tsx
+components/dashboard/recent-activity.tsx
+components/dashboard/recent-transactions.tsx
+components/dashboard/upcoming-bills.tsx
+
+
+Landing:
+components/landing/about-section.tsx
+components/landing/brands-section.tsx
+components/landing/footer.tsx
+components/landing/hero-section.tsx
+components/landing/portfolio-section.tsx
+components/landing/services-section.tsx
+components/landing/testimonials-section.tsx
+components/landing/why-choose-us-section.tsx
+
+
+Reports:
+components/reports/income-expense-report.tsx
+components/reports/net-worth-report.tsx
+components/reports/spending-trends-report.tsx
+
+
+Settings:
+components/settings/account-settings.tsx
+components/settings/domains-settings.tsx
+components/settings/notification-settings.tsx
+components/settings/profile-settings.tsx
+components/settings/subscription-settings.tsx
+components/settings/themes-settings.tsx
+
+
+Transactions:
+components/transactions/transaction-filters.tsx
+components/transactions/transaction-stats.tsx
+components/transactions/transactions-list.tsx
+
+
+
+State Management
+Located at context/tenantStore.jsx, Zustand manages tenant data and component selections:
+import { create } from "zustand";
+
+const useTenantStore = create((set) => ({
+  tenantData: null,
+  loadingTenantData: false,
+  error: null,
+  tenant: null,
+  components: {}, // e.g., { footer: { selectedVariant: "footer1", text: "Some text", color: "blue" } }
+  setTenant: (tenant) => set({ tenant }),
+  setComponents: (components) => set({ components }),
+  updateComponent: (componentType, data) =>
+    set((state) => ({
+      components: {
+        ...state.componentSettings,
+        [componentType]: data,
+      },
+    })),
+  fetchTenantData: async (websiteName) => {
+    set({ loadingTenantData: true, error: null });
+    try {
+      const response = await fetch("/api/tenant/getTenant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ websiteName }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch tenant data");
+      }
+      const data = await response.json();
+      set({ tenantData: data, loadingTenantData: false });
+    } catch (error) {
+      set({ error: error.message, loadingTenantData: false });
+    }
+  },
+}));
+
+export default useTenantStore;
+
+
+Key States:
+tenantData: Stores fetched tenant data.
+components: Tracks selected variants and customizations (e.g., { footer: { selectedVariant: "footer1", text: "Some text", color: "blue" } }).
+
+
+Actions:
+setTenant: Sets the current tenant.
+setComponents: Updates all component selections.
+updateComponent: Modifies a specific component’s data.
+fetchTenantData: Retrieves tenant data from the API.
+
+
+
+
+Component Customization
+
+Variants: Each component type (e.g., Footer, Header) has multiple variants (e.g., footer1.tsx, footer2.tsx).
+Selection Process: In the dashboard, brand owners choose a variant for each section and customize its properties (e.g., text, color).
+Storage: Selections are saved in MongoDB and managed via Zustand’s components state.
+Rendering: The tenant’s website dynamically loads the selected variants when visited.
+
+Example components state:
+{
+  "footer": {
+    "selectedVariant": "footer2",
+    "text": "Custom footer text",
+    "color": "blue"
+  },
+  "header": {
+    "selectedVariant": "header1",
+    "text": "Welcome to [brandName]"
+  }
+}
+
+
+Database (MongoDB)
+
+Tenants Collection: Stores tenant details (e.g., brand name, component selections).
+Products Collection: Stores tenant-specific products with a tenantId reference.
+Other Data: User authentication, content, and settings are likely stored in separate collections.
+
+
+Summary
+This multi-tenant e-commerce platform empowers brand owners to create and manage their own websites with ease. Using Next.js for dynamic routing, Tailwind CSS for styling, MongoDB for data storage, and Zustand for state management, the project offers a scalable and customizable solution. The tenant-specific pages and components are housed under app/tenant/[tenantId]/ and components/tenant/, while the dashboard functionality resides under app/(dashboard)/ and components/. Fixed components ensure platform consistency, while extensive customization options provide flexibility for each tenant.

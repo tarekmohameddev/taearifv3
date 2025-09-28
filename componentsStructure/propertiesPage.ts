@@ -1,0 +1,134 @@
+import { ComponentStructure } from "./types";
+
+export const propertiesPageStructure: ComponentStructure = {
+  componentType: "propertiesPage",
+  variants: [
+    {
+      id: "propertiesPage1",
+      name: "Properties Page 1 - Complete Properties Listing",
+      fields: [
+        {
+          key: "visible",
+          label: "Visible",
+          type: "boolean",
+        },
+        {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            {
+              key: "title",
+              label: "Page Title",
+              type: "text",
+            },
+            {
+              key: "subtitle",
+              label: "Page Subtitle",
+              type: "text",
+            },
+            {
+              key: "defaultTransactionType",
+              label: "Default Transaction Type",
+              type: "select",
+              options: ["rent", "sale"],
+            },
+          ],
+        },
+        {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "bgColor",
+              label: "Background Color",
+              type: "text",
+            },
+            {
+              key: "textColor",
+              label: "Text Color",
+              type: "text",
+            },
+            {
+              key: "titleColor",
+              label: "Title Color",
+              type: "text",
+            },
+            {
+              key: "subtitleColor",
+              label: "Subtitle Color",
+              type: "text",
+            },
+            {
+              key: "containerMaxWidth",
+              label: "Container Max Width",
+              type: "text",
+            },
+            {
+              key: "padding",
+              label: "Page Padding",
+              type: "text",
+            },
+          ],
+        },
+        {
+          key: "layout",
+          label: "Layout Settings",
+          type: "object",
+          fields: [
+            {
+              key: "showFilter",
+              label: "Show Property Filter",
+              type: "boolean",
+            },
+            {
+              key: "showFilterButtons",
+              label: "Show Filter Buttons",
+              type: "boolean",
+            },
+            {
+              key: "showGrid",
+              label: "Show Property Grid",
+              type: "boolean",
+            },
+            {
+              key: "spacing",
+              label: "Spacing",
+              type: "object",
+              fields: [
+                {
+                  key: "betweenSections",
+                  label: "Spacing Between Sections",
+                  type: "text",
+                },
+                {
+                  key: "pagePadding",
+                  label: "Page Padding",
+                  type: "text",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      simpleFields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "content.title", label: "Page Title", type: "text" },
+        { key: "content.subtitle", label: "Page Subtitle", type: "text" },
+        { key: "content.defaultTransactionType", label: "Default Transaction Type", type: "select" },
+        { key: "styling.bgColor", label: "Background Color", type: "text" },
+        { key: "styling.textColor", label: "Text Color", type: "text" },
+        { key: "styling.titleColor", label: "Title Color", type: "text" },
+        { key: "styling.subtitleColor", label: "Subtitle Color", type: "text" },
+        { key: "styling.containerMaxWidth", label: "Container Max Width", type: "text" },
+        { key: "styling.padding", label: "Page Padding", type: "text" },
+        { key: "layout.showFilter", label: "Show Property Filter", type: "boolean" },
+        { key: "layout.showFilterButtons", label: "Show Filter Buttons", type: "boolean" },
+        { key: "layout.showGrid", label: "Show Property Grid", type: "boolean" },
+        { key: "layout.spacing.betweenSections", label: "Spacing Between Sections", type: "text" },
+        { key: "layout.spacing.pagePadding", label: "Page Padding", type: "text" },
+      ],
+    },
+  ],
+};

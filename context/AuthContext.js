@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { serialize as serializeCookie } from "cookie";
 import axiosInstance, { unlockAxios } from "@/lib/axiosInstance";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const useAuthStore = create((set, get) => ({
   UserIslogged: false,
@@ -297,6 +299,326 @@ const useAuthStore = create((set, get) => ({
       return { success: false, error: error.message || "خطأ غير معروف" };
     }
   },
+
+  // Live Editor Auth Functions
+  liveEditorUser: null,
+  liveEditorLoading: false,
+  liveEditorError: null,
+
+  // Live Editor Login
+  liveEditorLogin: async (email, password) => {
+    try {
+      set({ liveEditorLoading: true, liveEditorError: null });
+      const response = await axios.post(`/api/users/login`, {
+        email,
+        password,
+      });
+
+      const userData = response.data;
+      set({ liveEditorUser: userData });
+      localStorage.setItem("liveEditorUser", JSON.stringify(userData));
+      
+      // Set cookie for backend APIs
+      try {
+        document.cookie = `user=${encodeURIComponent(
+          JSON.stringify(userData),
+        )}; path=/`;
+      } catch {}
+
+      toast.success("تم تسجيل الدخول بنجاح!");
+      return { success: true, user: userData };
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "فشل تسجيل الدخول";
+      set({ liveEditorError: errorMessage });
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      set({ liveEditorLoading: false });
+    }
+  },
+
+  // Live Editor Register
+  liveEditorRegister: async (username, websiteName, email, password, firstName, lastName, phoneNumber) => {
+    try {
+      set({ liveEditorLoading: true, liveEditorError: null });
+      const response = await axios.post(`/api/users/register`, {
+        username,
+        websiteName,
+        email,
+        password,
+        firstName,
+        lastName,
+        phoneNumber,
+      });
+      
+      const userData = response.data;
+      set({ liveEditorUser: userData });
+      localStorage.setItem("liveEditorUser", JSON.stringify(userData));
+      
+      // Set cookie for backend APIs
+      try {
+        document.cookie = `user=${encodeURIComponent(
+          JSON.stringify(userData),
+        )}; path=/`;
+      } catch {}
+
+      toast.success("تم التسجيل بنجاح!");
+      return { success: true, user: userData };
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "فشل التسجيل";
+      set({ liveEditorError: errorMessage });
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      set({ liveEditorLoading: false });
+    }
+  },
+
+  // Live Editor Fetch User
+  liveEditorFetchUser: async (username, options = {}) => {
+    try {
+      set({ liveEditorLoading: true, liveEditorError: null });
+      const response = await axios.post(
+        `/api/users/fetchUsername`,
+        { username },
+        { signal: options.signal }
+      );
+      
+      const userData = response.data;
+      set({ liveEditorUser: userData });
+      localStorage.setItem("liveEditorUser", JSON.stringify(userData));
+      return userData;
+    } catch (err) {
+      if (!axios.isCancel(err)) {
+        const errorMessage = err.response?.data?.message || "فشل تحميل البيانات";
+        set({ liveEditorError: errorMessage });
+        throw err;
+      }
+    } finally {
+      set({ liveEditorLoading: false });
+    }
+  },
+
+  // Live Editor Logout
+  liveEditorLogout: async () => {
+    try {
+      set({ liveEditorLoading: true });
+      await axios.post(`/api/users/logout`);
+    } catch {
+      // Ignore errors
+    } finally {
+      set({ liveEditorUser: null });
+      localStorage.removeItem("liveEditorUser");
+      try {
+        document.cookie = `user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      } catch {}
+      set({ liveEditorLoading: false });
+    }
+  },
+
+  // Live Editor Toggle Image
+  liveEditorToggleImage: async () => {
+    const { liveEditorUser } = get();
+    if (!liveEditorUser) return;
+
+    try {
+      set({ liveEditorLoading: true });
+      const response = await axios.put(`/api/images/toggle-image`, {
+        username: liveEditorUser.username,
+      });
+      
+      const updatedUser = { ...liveEditorUser, imageToggle: response.data.imageToggle };
+      set({ liveEditorUser: updatedUser });
+      localStorage.setItem("liveEditorUser", JSON.stringify(updatedUser));
+      return { success: true, user: updatedUser };
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "Failed to toggle image";
+      set({ liveEditorError: errorMessage });
+      return { success: false, error: errorMessage };
+    } finally {
+      set({ liveEditorLoading: false });
+    }
+  },
+
+  // Initialize Live Editor User from localStorage
+  initializeLiveEditorUser: () => {
+    try {
+      const storedUser = localStorage.getItem("liveEditorUser");
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        set({ liveEditorUser: userData });
+      }
+    } catch (error) {
+      console.error("Error initializing live editor user:", error);
+    }
+  },
 }));
 
 export default useAuthStore;
+
+// Live Editor React Context (for backward compatibility)
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
+    setLoading(false);
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      setLoading(true);
+      const response = await axios.post(`/api/users/login`, {
+        email,
+        password,
+      });
+
+      const userData = response.data;
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      // also set cookie for backend APIs to read
+      try {
+        document.cookie = `user=${encodeURIComponent(
+          JSON.stringify(userData),
+        )}; path=/`;
+      } catch {}
+
+      toast.success("تم تسجيل الدخول بنجاح!");
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "فشل تسجيل الدخول";
+      toast.error(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (
+    username,
+    websiteName,
+    email,
+    password,
+    firstName,
+    lastName,
+    phoneNumber,
+  ) => {
+    try {
+      setLoading(true);
+      const response = await axios.post(`/api/users/register`, {
+        username,
+        websiteName,
+        email,
+        password,
+        firstName,
+        lastName,
+        phoneNumber,
+      });
+      const userData = response.data;
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      try {
+        document.cookie = `user=${encodeURIComponent(
+          JSON.stringify(userData),
+        )}; path=/`;
+      } catch {}
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "فشل التسجيل";
+      toast.error(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUser = useCallback(
+    async (username, options = {}) => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await axios.post(
+          `/api/users/fetchUsername`,
+          { username },
+          { signal: options.signal }, // إضافة الـ signal هنا
+        );
+        const userData = response.data;
+        setUser(userData);
+        localStorage.setItem("user", JSON.stringify(userData));
+        return userData; // إرجاع البيانات للاستخدام في المكونات الأخرى
+      } catch (err) {
+        if (!axios.isCancel(err)) {
+          // التحقق من أن الخطأ ليس بسبب إلغاء الطلب
+          setError(err.response?.data?.message || "فشل تحميل البيانات");
+          throw err;
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  const logout = async () => {
+    try {
+      setLoading(true);
+      await axios.post(`/api/users/logout`);
+    } catch {
+    } finally {
+      setUser(null);
+      localStorage.removeItem("user");
+      try {
+        document.cookie = `user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      } catch {}
+      setLoading(false);
+    }
+  };
+
+  const toggleImage = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const response = await axios.put(`/api/images/toggle-image`, {
+        username: user.username,
+      });
+      const updatedUser = { ...user, imageToggle: response.data.imageToggle };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to toggle image");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        login,
+        register,
+        logout,
+        toggleImage,
+        fetchUser,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

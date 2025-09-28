@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
   }
 
   return (
-    <html lang="ar" dir="rtl" className="light" suppressHydrationWarning>
+    <html lang="ar" dir="ltr" className="light" suppressHydrationWarning>
       <head>
         {/* Google Tag Manager */}
         <script
