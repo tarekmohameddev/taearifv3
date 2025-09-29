@@ -5,8 +5,8 @@ import useTenantStore from "@/context-liveeditor/tenantStore";
 import Loading from "@/app/loading";
 import { notFound } from "next/navigation";
 import { getSectionPath, getComponentSubPath } from "@/lib-liveeditor/ComponentsList";
-import Header1I18n from "@/components/tenant/header/header1-i18n";
-import Footer1I18n from "@/components/tenant/footer/footer1-i18n";
+import Header1 from "@/components/tenant/header/header1";
+import Footer1 from "@/components/tenant/footer/footer1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/LanguageDropdown";
 
@@ -156,7 +156,7 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
       <div className="min-h-screen flex flex-col">
         {/* Header with i18n support */}
         <div className="relative">
-          <Header1I18n />
+          <Header1 />
           {/* لا اريد ازالة هذا  , فقط اريده ككومنت */}
           {/* <div className="absolute top-4 right-4 z-50"> 
             <LanguageDropdown />
@@ -187,7 +187,7 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
         </main>
 
         {/* Footer with i18n support */}
-        <Footer1I18n />
+        <Footer1 />
       </div>
     </I18nProvider>
   );

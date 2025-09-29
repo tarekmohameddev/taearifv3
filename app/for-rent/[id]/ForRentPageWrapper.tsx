@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
-import Header1I18n from "@/components/tenant/header/header1-i18n";
-import Footer1I18n from "@/components/tenant/footer/footer1-i18n";
+import Header1 from "@/components/tenant/header/header1";
+import Footer1 from "@/components/tenant/footer/footer1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import PropertyDetail from "@/components/property-detail";
 
@@ -35,11 +35,11 @@ export default function ForRentPageWrapper({ tenantId, propertyId }: ForRentPage
   return (
     <I18nProvider>
       <div className="min-h-screen flex flex-col">
-        <Header1I18n />
+        <Header1 />
         <main className="flex-1">
           <PropertyDetail propertyId={propertyId} />
         </main>
-        <Footer1I18n />
+        <Footer1 />
       </div>
     </I18nProvider>
   );
