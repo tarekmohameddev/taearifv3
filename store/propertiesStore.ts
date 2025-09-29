@@ -117,6 +117,12 @@ export const usePropertiesStore = create<PropertiesStore>()(
         const state = get()
         console.log('Store: fetchAllProperties called')
         
+        // منع الـ duplicate calls
+        if (state.loading) {
+          console.log('Store: Already loading, skipping fetchAllProperties')
+          return;
+        }
+        
         set({ loading: true, error: null })
         
         try {

@@ -144,7 +144,7 @@ function AddPageDialog({
       onPageCreated?.(formData.slug);
 
       // إعادة توجيه إلى الصفحة الجديدة
-      router.push(`/tenant/${tenantId}/live-editor/${formData.slug}`);
+      router.push(`/live-editor/${formData.slug}`);
 
       // إعادة تعيين النموذج
       setFormData({
@@ -614,7 +614,7 @@ function EditorNavBar() {
   const t = useEditorT();
 
   const tenantId = userData?.username || "";
-  const basePath = `/tenant/${tenantId}/live-editor`;
+  const basePath = `/live-editor`;
   const currentPath = (pathname || "").replace(basePath, "") || "";
   const { fetchTenantData, tenantData, loadingTenantData, error } =
     useTenantStore();
@@ -760,7 +760,7 @@ function EditorNavBar() {
               {t("editor.save_changes")}
             </button>
             <Link
-              href={`/tenant/${tenantId}${currentPath}`}
+              href={`${currentPath}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-[calc(1.02)]"
@@ -781,7 +781,7 @@ function EditorNavBar() {
               {t("editor.preview")}
             </Link>
             <Link
-              href={`/tenant/${tenantId}`}
+              href={`/`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-[calc(1.02)]"

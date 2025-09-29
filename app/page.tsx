@@ -1,23 +1,9 @@
-import { WelcomeDashboard } from "@/components/homepage/welcome-dashboard";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { GuidedTour } from "@/components/mainCOMP/guided-tour";
+import { headers } from 'next/headers';
+import HomePageWrapper from './HomePageWrapper';
 
-export const metadata = {
-  title: "لوحة تحكم تعاريف",
-};
-
-export default function Page() {
-  return (
-    <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="websites" />
-        <main className="flex-1 p-4 md:p-6">
-          <WelcomeDashboard />
-        </main>
-      </div>
-      <GuidedTour />
-    </div>
-  );
+export default async function HomePage() {
+  const headersList = await headers();
+  const tenantId = headersList.get('x-tenant-id');
+  
+  return <HomePageWrapper tenantId={tenantId} />;
 }

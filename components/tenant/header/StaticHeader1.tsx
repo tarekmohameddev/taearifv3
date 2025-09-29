@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
-import useAuthStore from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
@@ -185,8 +184,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
   // Get global components data from tenantData
   const tenantGlobalComponentsData = tenantData?.globalComponentsData;
   const tenantGlobalHeaderData = tenantGlobalComponentsData?.header;
-  const { userData } = useAuthStore();
-  const tenantId = userData?.username;
+  const tenantId = useTenantStore((s) => s.tenantId);
   const router = useRouter();
 
   useEffect(() => {
@@ -464,7 +462,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
               mergedData.logo?.url?.startsWith("http")
                 ? mergedData.logo.url
                 : tenantId
-                  ? `/tenant/${tenantId}${mergedData.logo?.url === "/" ? "" : mergedData.logo?.url || ""}`
+                  ? `${mergedData.logo?.url === "/" ? "" : mergedData.logo?.url || ""}`
                   : mergedData.logo?.url || "/"
             }
             className="flex items-center gap-2"
@@ -505,7 +503,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                 href: item.url?.startsWith("http")
                   ? item.url
                   : tenantId
-                    ? `/tenant/${tenantId}${item.url === "/" ? "" : item.url}`
+                    ? `${item.url === "/" ? "" : item.url}`
                     : item.url || "/",
                 type: item.type,
                 id: item.id,
@@ -602,7 +600,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
             {/* User Profile */}
             {mergedData.actions?.user?.showProfile && (
               <Link
-                href={tenantId ? `/tenant/${tenantId}/account` : "/account"}
+                href="/account"
                 className="p-1.5 md:p-2 transition-colors hover:opacity-80"
                 style={{
                   color:
@@ -630,7 +628,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
             {/* Cart */}
             {mergedData.actions?.user?.showCart && (
               <Link
-                href={tenantId ? `/tenant/${tenantId}/cart` : "/cart"}
+                href="/cart"
                 className="p-1.5 md:p-2 transition-colors hover:opacity-80 relative"
                 style={{
                   color:
@@ -663,7 +661,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
             {/* Wishlist */}
             {mergedData.actions?.user?.showWishlist && (
               <Link
-                href={tenantId ? `/tenant/${tenantId}/wishlist` : "/wishlist"}
+                href="/wishlist"
                 className="p-1.5 md:p-2 transition-colors hover:opacity-80"
                 style={{
                   color:
@@ -831,7 +829,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                       href: item.url?.startsWith("http")
                         ? item.url
                         : tenantId
-                          ? `/tenant/${tenantId}${item.url === "/" ? "" : item.url}`
+                          ? `${item.url === "/" ? "" : item.url}`
                           : item.url || "/",
                       type: item.type,
                       id: item.id,

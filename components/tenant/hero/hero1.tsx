@@ -9,7 +9,6 @@ import { ChevronDown, CircleDollarSign, Home, MapPin, Search } from "lucide-reac
 import { cn } from "@/lib/utils"
 import useStore from "@/context/Store"
 import { useAuth } from "@/context/AuthContext"
-import useAuthStore from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
 import useTenantStore from "@/context-liveeditor/tenantStore"
 import { useEditorStore } from "@/context-liveeditor/editorStore"
@@ -679,8 +678,7 @@ const Hero1 = (props: HeroProps = {}) => {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData)
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const { userData } = useAuthStore()
-  const tenantId = userData?.username
+  const tenantId = useTenantStore((s) => s.tenantId)
 
   useEffect(() => {
     if (tenantId) {

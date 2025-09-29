@@ -1,14 +1,10 @@
 "use client";
 
 import { Suspense, lazy, Fragment, useMemo, useEffect } from "react";
-import { useParams } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
-import useAuthStore from "@/context/AuthContext";
 import Loading from "@/app/loading";
 import { notFound } from "next/navigation";
 import { getSectionPath, getComponentSubPath } from "@/lib-liveeditor/ComponentsList";
-import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
-import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import Header1I18n from "@/components/tenant/header/header1-i18n";
 import Footer1I18n from "@/components/tenant/footer/footer1-i18n";
 import { I18nProvider } from "@/components/providers/I18nProvider";
@@ -66,22 +62,32 @@ const loadComponent = (section: string, componentName: string) => {
   );
 };
 
-export default function TenantPageBySlug() {
-  console.log("📄 TenantPageBySlug - Component rendered");
+interface TenantPageWrapperProps {
+  tenantId: string | null;
+  slug: string;
+}
 
-  const { userData } = useAuthStore();
-  const tenantId = userData?.username;
-  const slug = useParams<{ slug: string }>()?.slug;
+export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperProps) {
+  console.log("📄 TenantPageWrapper - Component rendered");
+
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const setTenantId = useTenantStore((s) => s.setTenantId);
 
-  console.log("📄 TenantPageBySlug - Initial state:", {
+  console.log("📄 TenantPageWrapper - Initial state:", {
     tenantId,
     slug,
     hasTenantData: !!tenantData,
     loadingTenantData,
   });
+
+  // Set tenantId in store when component mounts
+  useEffect(() => {
+    if (tenantId) {
+      setTenantId(tenantId);
+    }
+  }, [tenantId, setTenantId]);
 
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {

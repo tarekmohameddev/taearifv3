@@ -1,0 +1,131 @@
+# خطة التحويل إلى Subdomain-Based Multi-Tenancy
+
+## الخطوات الـ 18 المطلوبة:
+
+### **المرحلة الأولى: تحديث Middleware والـ Store**
+
+#### **الخطوة 1: تحديث Middleware** ✅
+- تعديل `middleware.ts` لاستخراج `tenantId` من الـ subdomain
+- إضافة header جديد: `x-tenant-id: {tenantId}`
+- الحفاظ على منطق الـ locale الحالي (`ar/en`)
+
+#### **الخطوة 2: تحديث Tenant Store** ✅
+- إضافة `tenantId` field في `tenantStore.jsx`
+- إضافة `setTenantId` method
+- إزالة الاعتماد على `userData?.username`
+
+### **المرحلة الثانية: تحديث Server Components**
+
+#### **الخطوة 3: تحديث Server Components** ✅
+- إضافة `headers().get("x-tenant-id")` في الصفحات الرئيسية
+- تمرير `tenantId` إلى `tenantStore.setTenantId()`
+- تحديث `app/[slug]/page.tsx` و `app/live-editor/page.tsx`
+
+#### **الخطوة 4: تحديث Client Components** ✅
+- استبدال `userData?.username` بـ `useTenantStore((s) => s.tenantId)`
+- تحديث جميع المكونات في `components/tenant/`
+- إضافة logic للتمييز بين Live Editor والـ subdomain
+
+### **المرحلة الثالثة: تحديث Route Structure**
+
+#### **الخطوة 5: إزالة [tenantId] Routes** ✅
+- حذف `app/tenant/[tenantId]/` بالكامل
+- نقل الصفحات إلى `app/[slug]/`
+- تحديث جميع الـ imports
+
+#### **الخطوة 6: تحديث Live Editor Routes** ✅
+- تحديث `app/live-editor/` ليعمل مع النظام الجديد
+- تحديث جميع الـ navigation في Live Editor
+- تحديث `router.push` statements
+
+### **المرحلة الرابعة: تحديث Navigation Links**
+
+#### **الخطوة 7: تحديث Header Navigation (5 روابط)** ✅
+- تحديث `components/tenant/header/StaticHeader1.tsx`
+- تحديث `/tenant/${tenantId}/account`
+- تحديث `/tenant/${tenantId}/cart`
+- تحديث `/tenant/${tenantId}/wishlist`
+
+#### **الخطوة 8: تحديث Header Navigation (3 روابط)** ✅
+- تحديث `components/tenant/header/header1.tsx`
+- تحديث جميع الـ menu links
+- تحديث logo navigation
+
+#### **الخطوة 9: تحديث Property Cards** ✅
+- تحديث `components/property-card.tsx`
+- تحديث `router.push(/tenant/${tenantId}/property/${p.id})`
+- تحديث جميع الـ property links
+
+#### **الخطوة 10: تحديث Live Editor Navigation** ✅
+- تحديث `components/tenant/live-editor/LiveEditorHandlers.tsx`
+- تحديث `router.push(/tenant/${tenantId}/live-editor/${formData.slug})`
+- تحديث `basePath` في Live Editor
+
+### **المرحلة الخامسة: تحديث Logo Links**
+
+#### **الخطوة 11: تحديث Logo Navigation** ✅
+- تحديث `/tenant/${tenantId}${logo.url}`
+- تحديث جميع الـ logo links في Header
+- تحديث navigation في StaticHeader1
+
+#### **الخطوة 12: تحديث Menu Links** ✅
+- تحديث جميع الـ menu items
+- تحديث navigation في header components
+- تحديث footer links إذا لزم الأمر
+
+### **المرحلة السادسة: تحديث Route Structure بالكامل**
+
+#### **الخطوة 13: تحديث 39 ملف Route** ✅
+- تحديث جميع الـ imports في `app/tenant/[tenantId]/`
+- نقل الصفحات إلى `app/[slug]/`
+- تحديث جميع الـ component imports
+
+#### **الخطوة 14: تحديث Live Editor Layout** ✅
+- تحديث `app/live-editor/layout.tsx`
+- تحديث `app/tenant/[tenantId]/live-editor/layout.tsx`
+- تحديث جميع الـ navigation paths
+
+#### **الخطوة 15: تحديث Property Pages** ✅
+- تحديث `app/tenant/[tenantId]/property/[id]/page.tsx`
+- تحديث `app/tenant/[tenantId]/for-sale/[id]/page.tsx`
+- تحديث `app/tenant/[tenantId]/for-rent/[id]/page.tsx`
+
+### **المرحلة السابعة: تحديث Authentication**
+
+#### **الخطوة 16: تحديث Auth Pages** ✅
+- تحديث `app/tenant/[tenantId]/auth/signin/page.tsx`
+- تحديث `app/tenant/[tenantId]/auth/error/page.tsx`
+- تحديث جميع الـ auth redirects
+
+#### **الخطوة 17: تحديث Properties Pages** ✅
+- تحديث `app/tenant/[tenantId]/properties/page.tsx`
+- تحديث جميع الـ property-related pages
+- تحديث navigation في property components
+
+### **المرحلة الثامنة: اختبار التكامل**
+
+#### **الخطوة 18: اختبار التكامل الكامل** ✅
+- اختبار `http://localhost:3000/en/live-editor`
+- اختبار `http://tenant1.localhost:3000/en/`
+- اختبار جميع الـ navigation
+- اختبار جميع الـ property links
+- اختبار جميع الـ menu links
+- اختبار Live Editor navigation
+- اختبار authentication flow
+- اختبار logo navigation
+
+## **ملاحظات مهمة:**
+
+1. **Hybrid Approach**: Live Editor يستخدم `userData.username`، الصفحات العامة تستخدم subdomain
+2. **Local Development**: إضافة `127.0.0.1 tenant1.localhost` في hosts file
+3. **Testing**: اختبار جميع الـ navigation والـ links
+4. **Backup**: عمل backup قبل البدء في التطبيق
+5. **Gradual Implementation**: تطبيق الخطوات تدريجياً واختبار كل خطوة
+
+## **النتيجة النهائية:**
+- الصفحات العامة: `http://tenant1.localhost:3000/en/[slug]`
+- Live Editor: `http://localhost:3000/en/live-editor`
+- جميع الـ navigation يعمل بشكل صحيح
+- جميع الـ property links تعمل
+- جميع الـ menu links تعمل
+- Live Editor navigation يعمل

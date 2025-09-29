@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import useAuthStore from "@/context/AuthContext";
+;
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { ComponentInstance, ComponentData } from "@/lib-liveeditor/types";
 import { DropIndicator } from "@/services-liveeditor/live-editor";
@@ -16,8 +16,7 @@ import {
 // ============================================================================
 
 export function useLiveEditorState() {
-  const { userData } = useAuthStore();
-  const tenantId = userData?.username;
+  const tenantId = useTenantStore((s) => s.tenantId);
   const slug = useParams<{ slug?: string }>()?.slug || "homepage";
 
   const { user, loading: authLoading } = useAuth();

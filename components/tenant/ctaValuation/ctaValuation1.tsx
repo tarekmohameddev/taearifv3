@@ -4,7 +4,6 @@ import { useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import useAuthStore from "@/context/AuthContext"
 import useTenantStore from "@/context-liveeditor/tenantStore"
 import { useEditorStore } from "@/context-liveeditor/editorStore"
 
@@ -82,8 +81,7 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData)
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const { userData } = useAuthStore()
-  const tenantId = userData?.username
+  const tenantId = useTenantStore((s) => s.tenantId)
   const router = useRouter()
 
   useEffect(() => {

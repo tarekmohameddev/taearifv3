@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
-import useAuthStore from "@/context/AuthContext";
+;
 import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
@@ -271,8 +271,7 @@ const Header1 = (props: HeaderProps = {}) => {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
-  const { userData } = useAuthStore();
-  const tenantId = userData?.username;
+  const tenantId = useTenantStore((s) => s.tenantId);
   const router = useRouter();
 
   useEffect(() => {
@@ -374,7 +373,7 @@ const Header1 = (props: HeaderProps = {}) => {
       href: item.url?.startsWith("http")
         ? item.url
         : tenantId
-          ? `/tenant/${tenantId}${item.url}`
+          ? `${item.url}`
           : item.url || "/",
       type: item.type,
       id: item.id,
@@ -425,7 +424,7 @@ const Header1 = (props: HeaderProps = {}) => {
           <Link 
             href={
               mergedData.logo?.url || 
-              (tenantId ? `/tenant/${tenantId}` : "/")
+              "/"
             }
             className="flex items-center gap-2"
             style={{ color: mergedData.colors?.text || mergedData.styling?.textColor || "#1f2937" }}
@@ -484,7 +483,7 @@ const Header1 = (props: HeaderProps = {}) => {
             {/* User Profile */}
             {mergedData.actions?.user?.showProfile && (
               <Link
-                href={tenantId ? `/tenant/${tenantId}/account` : "/account"}
+                href="/account"
                 className="p-1.5 md:p-2 transition-colors hover:opacity-80"
                 style={{ color: mergedData.colors?.icon || mergedData.styling?.textColor || "#374151" }}
               >
@@ -507,7 +506,7 @@ const Header1 = (props: HeaderProps = {}) => {
             {/* Cart */}
             {mergedData.actions?.user?.showCart && (
               <Link
-                href={tenantId ? `/tenant/${tenantId}/cart` : "/cart"}
+                href="/cart"
                 className="p-1.5 md:p-2 transition-colors hover:opacity-80 relative"
                 style={{ color: mergedData.colors?.icon || mergedData.styling?.textColor || "#374151" }}
               >

@@ -3,7 +3,6 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import useAuthStore from "@/context/AuthContext"
 import { useEditorStore } from "@/context-liveeditor/editorStore"
 import useTenantStore from "@/context-liveeditor/tenantStore"
 import { logComponentRender, logTenantStore } from "@/lib-liveeditor/debugLogger"
@@ -149,8 +148,7 @@ export default function VisionSection(props: VisionSectionProps = {}) {
   // Get tenant data
   const tenantData = useTenantStore((s: any) => s.tenantData)
   const fetchTenantData = useTenantStore((s: any) => s.fetchTenantData)
-  const { userData } = useAuthStore()
-  const tenantId = userData?.username
+  const tenantId = useTenantStore((s) => s.tenantId)
   const router = useRouter()
 
   useEffect(() => {

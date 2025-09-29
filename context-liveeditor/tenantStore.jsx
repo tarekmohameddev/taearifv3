@@ -37,7 +37,10 @@ const useTenantStore = create((set) => ({
   loadingTenantData: false,
   error: null,
   tenant: null,
+  tenantId: null,
+  lastFetchedWebsite: null,
   setTenant: (tenant) => set({ tenant }),
+  setTenantId: (tenantId) => set({ tenantId }),
   updateHeader: (headerData) =>
     set((state) => ({
       tenantData: state.tenantData
@@ -267,14 +270,23 @@ const useTenantStore = create((set) => ({
     
   fetchTenantData: async (websiteName) => {
     const state = useTenantStore.getState();
-    // Prevent duplicate requests
+    
+    // Prevent duplicate requests - تحقق من أن البيانات موجودة ونفس الـ username
     if (
       state.loadingTenantData ||
       (state.tenantData && state.tenantData.username === websiteName)
     ) {
+      console.log("[tenantStore] Skipping fetch - data already exists for:", websiteName);
+      return;
+    }
+    
+    // منع الـ duplicate calls إذا كان نفس الـ websiteName
+    if (state.lastFetchedWebsite === websiteName) {
+      console.log("[tenantStore] Skipping fetch - same website as last fetch:", websiteName);
       return;
     }
 
+    console.log("[tenantStore] Starting fetch for:", websiteName);
     set({ loadingTenantData: true, error: null });
     try {
       const response = await fetch("/api/tenant/getTenant", {
@@ -311,7 +323,8 @@ const useTenantStore = create((set) => ({
         // Don't set anything - let the component use its default data
       }
       
-      set({ tenantData: data, loadingTenantData: false });
+      console.log("[tenantStore] Successfully fetched data for:", websiteName);
+      set({ tenantData: data, loadingTenantData: false, lastFetchedWebsite: websiteName });
     } catch (error) {
       console.error("[tenantStore] Error fetching tenant data:", error);
       set({ error: error.message, loadingTenantData: false });

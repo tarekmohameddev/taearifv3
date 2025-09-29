@@ -66,6 +66,7 @@ export default function ClientLayout({
   // دالة للتحقق من الصفحات العامة مع دعم الـ locale
   const isPublicPageWithLocale = (pathname: string) => {
     const publicPages = [
+      "/", // الصفحة الرئيسية
       "/oauth",
       "/not-found", 
       "/forgot-password",
@@ -73,7 +74,11 @@ export default function ClientLayout({
       "/register",
       "/login",
       "/landing",
-      "/live-editor"
+      "/live-editor",
+      "/properties",
+      "/property",
+      "/for-sale",
+      "/for-rent"
     ];
     
     // التحقق من الصفحات العامة بدون locale
@@ -86,6 +91,12 @@ export default function ClientLayout({
     if (localePattern.test(pathname)) {
       const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}\//, '/');
       return publicPages.some(page => pathWithoutLocale.startsWith(page));
+    }
+    
+    // التحقق من الصفحات العامة مع locale فقط (مثل /en, /ar)
+    const localeOnlyPattern = /^\/[a-z]{2}$/;
+    if (localeOnlyPattern.test(pathname)) {
+      return true; // الصفحة الرئيسية مع locale
     }
     
     return false;

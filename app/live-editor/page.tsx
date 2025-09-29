@@ -1,7 +1,9 @@
-"use client";
-import React from "react";
-import LiveEditor from "@/components/tenant/live-editor/LiveEditor";
+import { headers } from 'next/headers';
+import LiveEditorWrapper from './LiveEditorWrapper';
 
-export default function Page() {
-  return <LiveEditor />;
+export default async function Page() {
+  const headersList = await headers();
+  const tenantId = headersList.get('x-tenant-id');
+  
+  return <LiveEditorWrapper tenantId={tenantId} />;
 }

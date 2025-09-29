@@ -3,7 +3,6 @@
 import { useEffect } from "react"
 import SwiperCarousel from "@/components/ui/swiper-carousel"
 import { TestimonialCard } from "@/components/testimonial-card"
-import useAuthStore from "@/context/AuthContext"
 import useTenantStore from "@/context-liveeditor/tenantStore"
 import { useEditorStore } from "@/context-liveeditor/editorStore"
 
@@ -295,8 +294,7 @@ export default function TestimonialsSection(props: TestimonialsProps = {}) {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData)
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const { userData } = useAuthStore()
-  const tenantId = userData?.username
+  const tenantId = useTenantStore((s) => s.tenantId)
 
   useEffect(() => {
     if (tenantId) {

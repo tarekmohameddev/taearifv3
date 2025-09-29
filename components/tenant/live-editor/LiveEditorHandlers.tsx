@@ -115,7 +115,7 @@ export function useLiveEditorHandlers(state: any) {
       setDeletePageConfirmation("");
 
       // Navigate to homepage in live editor
-      router.push(`/tenant/${tenantId}/live-editor/homepage`);
+      router.push(`/live-editor/homepage`);
     }
   };
 

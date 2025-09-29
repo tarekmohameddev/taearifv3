@@ -24,7 +24,7 @@ export function PropertyCard({ p }: { p: Property }) {
 
   const handleClick = () => {
     if (!isUnavailable && tenantId) {
-      router.push(`/tenant/${tenantId}/property/${p.id}`)
+      router.push(`/property/${p.id}`)
     }
   }
 
