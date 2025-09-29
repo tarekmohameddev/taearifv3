@@ -1,5 +1,6 @@
 // context/store/affiliate.js
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 module.exports = (set, get) => ({
   affiliateData: {
@@ -10,6 +11,13 @@ module.exports = (set, get) => ({
   },
 
   fetchAffiliateData: async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      console.log("No token available, skipping fetchAffiliateData");
+      return;
+    }
+
     const { affiliateData } = get();
     if (affiliateData.isFetched) return;
     set((state) => ({

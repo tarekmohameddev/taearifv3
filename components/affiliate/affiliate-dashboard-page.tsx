@@ -45,12 +45,14 @@ import { toast, Toaster } from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import { Skeleton } from "@/components/ui/skeleton";
 import useStore from "@/context/Store";
+import useAuthStore from "@/context/AuthContext";
 
 export function AffiliateDashboardPage() {
   const {
     affiliateData: { data: dashboardData, loading },
     fetchAffiliateData,
   } = useStore();
+  const { userData } = useAuthStore();
 
   // UI states
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,8 +61,13 @@ export function AffiliateDashboardPage() {
   const [sortOrder, setSortOrder] = useState("desc");
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchAffiliateData");
+      return;
+    }
     fetchAffiliateData();
-  }, [fetchAffiliateData]);
+  }, [fetchAffiliateData, userData?.token]);
 
   // معالجة البيانات
   const referrals = dashboardData?.referrals || [];
@@ -252,6 +259,25 @@ export function AffiliateDashboardPage() {
       <div className="flex min-h-screen items-center justify-center">
         <Toaster position="top-center" />
         <span className="text-lg text-destructive">تعذر تحميل البيانات</span>
+      </div>
+    );
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     );
   }

@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 
 module.exports = (set) => ({
@@ -17,6 +18,13 @@ module.exports = (set) => ({
   },
 
   fetchContentSections: async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      console.log("No token available, skipping fetchContentSections");
+      return;
+    }
+
     set((state) => ({
       contentManagement: {
         ...state.contentManagement,

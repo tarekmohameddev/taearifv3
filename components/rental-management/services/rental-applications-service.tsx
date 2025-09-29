@@ -78,6 +78,7 @@ import useStore from "@/context/Store"
 import { RentalDetailsDialog } from "../rental-details-dialog"
 import { UpdatedAddRentalForm } from "./updated-rental-form"
 import { PaymentCollectionDialog } from "../payment-collection-dialog"
+import useAuthStore from "@/context/AuthContext"
 
 interface Property {
   id: number
@@ -161,6 +162,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     isInitialized,
     lastProcessedOpenAddDialogCounter,
   } = rentalApplications
+  const { userData } = useAuthStore()
 
   // Dialog states are now managed by Zustand store
 
@@ -180,10 +182,10 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
   }, [openAddDialogCounter, lastProcessedOpenAddDialogCounter, setRentalApplications])
 
   useEffect(() => {
-    if (!isInitialized) {
+    if (!isInitialized && userData?.token) {
       fetchRentals()
     }
-  }, [isInitialized])
+  }, [isInitialized, userData?.token])
 
   // دالة مساعدة للتعامل مع البيانات المفقودة
   const getSafeValue = (value: any, fallback: string = 'غير محدد') => {
@@ -236,6 +238,13 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
   }
 
   const fetchRentals = async (page: number = 1) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchRentals")
+      setRentalApplications({ loading: false, error: "Authentication required. Please login." })
+      return
+    }
+
     try {
       setRentalApplications({ loading: true, error: null })
       const response = await axiosInstance.get<ApiResponse>(`/v1/rms/rentals?page=${page}`)
@@ -412,6 +421,17 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     } finally {
       setRentalApplications({ isDeleting: false })
     }
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

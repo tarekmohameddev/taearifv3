@@ -11,9 +11,11 @@ import { RentalDashboardStats } from "@/components/rental-management/dashboard-s
 // import { RentalOverviewService } from "@/components/rental-management/services/rental-overview-service"
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FileText, CreditCard, Wrench, Users, Home } from "lucide-react"
+import useAuthStore from "@/context/AuthContext"
 
 export function RentalManagementDashboard() {
   const [openAddDialogCounter, setOpenAddDialogCounter] = useState(0)
+  const { userData } = useAuthStore()
 
   console.log("🏗️ Dashboard State:", { 
     openAddDialogCounter
@@ -57,6 +59,25 @@ export function RentalManagementDashboard() {
   //     description: "طلبات الصيانة والخدمات",
   //   },
   // ]
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">

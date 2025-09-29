@@ -43,6 +43,7 @@ import {
 } from "lucide-react"
 import axiosInstance from "@/lib/axiosInstance"
 import { toast } from "sonner"
+import useAuthStore from "@/context/AuthContext"
 
 interface MaintenanceRequest {
   id: number
@@ -189,6 +190,7 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
     rentalsInitialized,
     lastProcessedOpenCreateDialogCounter,
   } = rentalMaintenance
+  const { userData } = useAuthStore()
 
   // Open Create Maintenance Request dialog when requested by parent
   useEffect(() => {
@@ -205,6 +207,13 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
 
   // Fetch rentals from API
   const fetchRentals = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchRentals in RentalMaintenanceService")
+      setRentalMaintenance({ rentalsLoading: false })
+      return
+    }
+
     try {
       setRentalMaintenance({ rentalsLoading: true })
       
@@ -224,6 +233,13 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
 
   // Fetch maintenance requests from API
   const fetchRequests = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchRequests in RentalMaintenanceService")
+      setRentalMaintenance({ loading: false })
+      return
+    }
+
     try {
       setRentalMaintenance({ loading: true })
       
@@ -332,10 +348,10 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
   }
 
   useEffect(() => {
-    if (!requestsInitialized) {
+    if (!requestsInitialized && userData?.token) {
       fetchRequests()
     }
-  }, [requestsInitialized])
+  }, [requestsInitialized, userData?.token])
 
   const filteredRequests = requests.filter((request: MaintenanceRequest) => {
     const matchesSearch =
@@ -473,6 +489,19 @@ export function RentalMaintenanceService({ openCreateDialogCounter = 0 }: Rental
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

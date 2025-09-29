@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { BarChart3, TrendingUp, TrendingDown, DollarSign, Download, Target } from "lucide-react"
+import useAuthStore from "@/context/AuthContext"
 
 interface FinancialData {
   revenue: {
@@ -52,8 +53,15 @@ export function FinancialReportingService() {
   const [loading, setLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState("12months")
   const [selectedProperty, setSelectedProperty] = useState("all")
+  const { userData } = useAuthStore()
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchFinancialData")
+      return
+    }
+
     // Simulate API call to financial reporting microservice
     const fetchFinancialData = async () => {
       setLoading(true)
@@ -109,7 +117,20 @@ export function FinancialReportingService() {
     }
 
     fetchFinancialData()
-  }, [selectedPeriod, selectedProperty])
+  }, [selectedPeriod, selectedProperty, userData?.token])
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (

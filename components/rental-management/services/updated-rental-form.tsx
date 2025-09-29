@@ -65,6 +65,7 @@ import {
 } from "lucide-react"
 import axiosInstance from "@/lib/axiosInstance"
 import useStore from "@/context/Store"
+import useAuthStore from "@/context/AuthContext"
 
 // مكون إضافة إيجار جديد محدث
 interface AddRentalFormProps {
@@ -74,6 +75,8 @@ interface AddRentalFormProps {
 }
 
 export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps) {
+  const { userData } = useAuthStore()
+  
   const [formData, setFormData] = useState({
     tenant_full_name: "",
     contract_number: "",
@@ -111,6 +114,14 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
 
   // جلب البيانات عند فتح النموذج
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchData in UpdatedAddRentalForm")
+      setLoading(false)
+      setErrors({ general: "Authentication required. Please login." })
+      return
+    }
+
     const fetchData = async () => {
       try {
         setLoading(true)
@@ -146,7 +157,7 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
     }
 
     fetchData()
-  }, [])
+  }, [userData?.token])
 
   // دالة التحقق من البيانات
   const validateForm = () => {
@@ -236,6 +247,19 @@ export function UpdatedAddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRe
     }
     
     onSubmit(processedFormData)
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

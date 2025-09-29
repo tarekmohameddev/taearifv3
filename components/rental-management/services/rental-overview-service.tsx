@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Building2, Users, FileText, DollarSign, TrendingUp, AlertCircle, Clock, Wrench } from "lucide-react"
+import useAuthStore from "@/context/AuthContext"
 
 interface OverviewStats {
   totalProperties: number
@@ -45,8 +46,16 @@ interface RentalOverviewServiceProps {
 export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceClick }: RentalOverviewServiceProps) {
   const { rentalOverview, setRentalOverview } = useStore()
   const { stats, recentActivity, loading, isInitialized } = rentalOverview
+  const { userData } = useAuthStore()
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchOverviewData")
+      setRentalOverview({ loading: false })
+      return
+    }
+
     const fetchOverviewData = async () => {
       setRentalOverview({ loading: true })
       await new Promise((resolve) => setTimeout(resolve, 800))
@@ -133,7 +142,7 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
     if (!isInitialized) {
       fetchOverviewData()
     }
-  }, [isInitialized, setRentalOverview])
+  }, [isInitialized, setRentalOverview, userData?.token])
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -183,6 +192,19 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
               </CardContent>
             </Card>
           ))}
+        </div>
+      </div>
+    )
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
         </div>
       </div>
     )

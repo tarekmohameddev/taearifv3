@@ -1,6 +1,7 @@
 "use client"
 
 import axiosInstance from "@/lib/axiosInstance"
+import useAuthStore from "@/context/AuthContext"
 
 export interface Property {
   id: number
@@ -46,6 +47,12 @@ export class PropertiesService {
    * Get all properties
    */
   static async getProperties(): Promise<PropertiesResponse> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping getProperties")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.get("/properties")
       return response.data
@@ -59,6 +66,12 @@ export class PropertiesService {
    * Get a single property by ID
    */
   static async getProperty(id: number): Promise<{ success: boolean; data: Property; message: string }> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping getProperty")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.get(`/properties/${id}`)
       return response.data

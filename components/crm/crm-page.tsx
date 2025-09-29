@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import type { Customer, PipelineStage, Appointment } from "@/types/crm";
 import useCrmStore from "@/context/store/crm";
+import useAuthStore from "@/context/AuthContext";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -288,6 +289,7 @@ export default function CrmPage() {
     setPipelineStages,
     setCustomers,
   } = useCrmStore();
+  const { userData } = useAuthStore();
 
   // Ensure pipelineStages is always an array
   const pipelineStages = Array.isArray(rawPipelineStages)
@@ -807,6 +809,13 @@ export default function CrmPage() {
   };
 
   const handleCompleteReminder = async (reminder: any) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleCompleteReminder");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     try {
       const response = await axiosInstance.put(
         `/crm/customer-reminders/${reminder.id}`,
@@ -873,6 +882,25 @@ export default function CrmPage() {
           >
             إعادة المحاولة
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
         </div>
       </div>
     );

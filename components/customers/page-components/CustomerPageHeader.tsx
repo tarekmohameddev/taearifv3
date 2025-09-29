@@ -24,6 +24,7 @@ import DistrictSelector from "@/components/DistrictSelector";
 import axiosInstance from "@/lib/axiosInstance";
 import { useState, useEffect } from "react";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
+import useAuthStore from "@/context/AuthContext";
 import { z } from "zod";
 import toast from "react-hot-toast";
 
@@ -92,13 +93,25 @@ export const CustomerPageHeader = ({
   
   // Get filter data from store
   const { filterData } = useCustomersFiltersStore();
+  const { userData } = useAuthStore();
 
   // جلب المراحل من الAPI عند تحميل المكون
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchStages");
+      return;
+    }
     fetchStages();
-  }, []);
+  }, [userData?.token]);
 
   const fetchStages = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchStages");
+      return;
+    }
+
     setFetchingStages(true);
     try {
       const response = await axiosInstance.get("/crm/stages");
@@ -137,6 +150,13 @@ export const CustomerPageHeader = ({
 
   // Enhanced add customer function with validation
   const handleAddCustomerWithValidation = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleAddCustomerWithValidation");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     // Clear previous errors
     setFormErrors({});
     setValidationErrors({});

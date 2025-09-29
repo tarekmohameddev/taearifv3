@@ -40,13 +40,14 @@ export default async function handler(req, res) {
       const cookieOptions = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax", // تغيير من strict إلى lax لضمان العمل في جميع الحالات
         maxAge: 30 * 24 * 60 * 60,
         path: "/",
       };
 
       const authCookie = serialize("authToken", token1, cookieOptions);
       res.setHeader("Set-Cookie", authCookie);
+      console.log("🍪 Cookie set successfully:", authCookie);
 
       return res.status(200).json({
         success: true,

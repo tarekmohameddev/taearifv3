@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import useAuthStore from "@/context/AuthContext";
 import {
   AreaChart,
   XAxis,
@@ -23,18 +24,33 @@ function VisitorChart() {
     },
     loading,
   } = useStore();
+  const { userData } = useAuthStore();
 
   useEffect(() => {
-    const dataForSelectedRange = visitorData[selectedTimeRange];
-    if (!dataForSelectedRange || !dataForSelectedRange.fetched) {
-      fetchVisitorData(selectedTimeRange);
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (userData?.token) {
+      const dataForSelectedRange = visitorData[selectedTimeRange];
+      if (!dataForSelectedRange || !dataForSelectedRange.fetched) {
+        fetchVisitorData(selectedTimeRange);
+      }
     }
-  }, [selectedTimeRange, visitorData, fetchVisitorData]);
+  }, [userData?.token, selectedTimeRange, visitorData, fetchVisitorData]);
 
   const chartData = visitorData[selectedTimeRange]?.data || [];
   const totalVisits = visitorData[selectedTimeRange]?.totalVisits || 0;
   const totalUniqueVisitors =
     visitorData[selectedTimeRange]?.totalUniqueVisitors || 0;
+
+  // إذا لم يكن هناك token، لا نعرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="w-full">
+        <div className="text-center text-gray-500 py-8">
+          يرجى تسجيل الدخول لعرض البيانات
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">

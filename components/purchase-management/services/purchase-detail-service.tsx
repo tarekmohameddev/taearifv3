@@ -1,6 +1,7 @@
 "use client"
 
 import axiosInstance from "@/lib/axiosInstance"
+import useAuthStore from "@/context/AuthContext"
 
 // Types for single purchase request response
 export interface Client {
@@ -83,6 +84,12 @@ export class PurchaseDetailService {
    * Get single purchase request details by ID
    */
   static async getPurchaseRequestDetail(requestId: string | number): Promise<PurchaseDetailResponse> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping getPurchaseRequestDetail")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.get(`/v1/pms/purchase-requests/${requestId}`)
       return response.data
@@ -100,6 +107,12 @@ export class PurchaseDetailService {
     status: string, 
     notes?: string
   ): Promise<any> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping updateRequestStatus")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.put(`/v1/pms/purchase-requests/${requestId}/status`, {
         status,
@@ -126,6 +139,12 @@ export class PurchaseDetailService {
       completed_at?: string
     }
   ): Promise<any> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping updateStageProgress")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.put(
         `/v1/pms/purchase-requests/${requestId}/stages/${stageId}`,

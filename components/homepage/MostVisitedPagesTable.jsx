@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 import {
   Card,
   CardHeader,
@@ -22,9 +23,17 @@ export function MostVisitedPagesTable() {
   const [pagesData, setPagesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { userData } = useAuthStore();
 
   // دالة جلب البيانات من API
   const fetchMostVisitedPages = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchMostVisitedPages");
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -41,8 +50,33 @@ export function MostVisitedPagesTable() {
   };
 
   useEffect(() => {
-    fetchMostVisitedPages();
-  }, []);
+    // إعادة المحاولة عند تغيير التوكن
+    if (userData?.token) {
+      fetchMostVisitedPages();
+    } else {
+      // إعادة تعيين البيانات عند فقدان التوكن
+      setPagesData([]);
+      setError(null);
+      setLoading(false);
+    }
+  }, [userData?.token]);
+
+  // إذا لم يكن هناك token، لا نعرض المحتوى
+  if (!userData?.token) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>أكثر الصفحات زيارة</CardTitle>
+          <CardDescription>تحليل أداء صفحات الموقع</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-gray-500 py-8">
+            يرجى تسجيل الدخول لعرض البيانات
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (loading || error) {
     return (

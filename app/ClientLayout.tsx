@@ -20,6 +20,7 @@ export default function ClientLayout({
   const onboardingCompleted = useAuthStore(
     (state) => state.onboarding_completed
   );
+  
   const userData = useAuthStore((state) => state.userData);
   const { setOnboardingCompleted } = useAuthStore();
   const [showPopup, setShowPopup] = useState(false);
@@ -60,7 +61,8 @@ export default function ClientLayout({
 
   useEffect(() => {
     setIsMounted(true);
-    fetchUserData();
+    // إزالة fetchUserData من هنا لأنه يتم استدعاؤه في layout.tsx
+    // fetchUserData();
   }, [fetchUserData]);
 
   // دالة للتحقق من الصفحات العامة مع دعم الـ locale
@@ -109,8 +111,8 @@ export default function ClientLayout({
       !UserIslogged &&
       !isPublicPageWithLocale(pathname || "")
     ) {
-      console.error("goooooo tooooooo looooooign");
-      console.warn("goooooo tooooooo looooooign");
+      console.log("🔄 Redirecting to login - User not logged in");
+      console.log("🔍 Auth state:", { isMounted, IsLoading, UserIslogged, pathname });
       router.push("/login");
     }
   }, [isMounted, IsLoading, UserIslogged, pathname, router]);

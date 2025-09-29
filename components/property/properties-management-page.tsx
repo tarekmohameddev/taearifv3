@@ -413,7 +413,7 @@ export function PropertiesManagementPage() {
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
-  const { clickedONSubButton } = useAuthStore();
+  const { clickedONSubButton, userData } = useAuthStore();
 
   const router = useRouter();
   const {
@@ -447,7 +447,17 @@ export function PropertiesManagementPage() {
     router.push("/settings");
   };
   const fetchProperties = async (page = 1, filters = {}) =>  {
-  
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const { userData } = useAuthStore.getState();
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchProperties");
+      setPropertiesManagement({
+        loading: false,
+        error: "Authentication required. Please login.",
+      });
+      return;
+    }
+
     // تحديث حالة التحميل
     setPropertiesManagement({
       loading: true,
@@ -538,6 +548,14 @@ export function PropertiesManagementPage() {
   };
 
   const handleDeleteProperty = async (id: string) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const { userData } = useAuthStore.getState();
+    if (!userData?.token) {
+      console.log("No token available, skipping handleDeleteProperty");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا العقار؟");
     if (confirmDelete) {
       try {
@@ -555,6 +573,14 @@ export function PropertiesManagementPage() {
 
   
   const handleDuplicateProperty = async (property: any) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const { userData } = useAuthStore.getState();
+    if (!userData?.token) {
+      console.log("No token available, skipping handleDuplicateProperty");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     try {
       const duplicateData = {
         title: property.title || property.contents[0].title,
@@ -576,6 +602,14 @@ export function PropertiesManagementPage() {
   };
 
   const handleToggleStatus = async (property: any) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const { userData } = useAuthStore.getState();
+    if (!userData?.token) {
+      console.log("No token available, skipping handleToggleStatus");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     try {
       await axiosInstance.post(`/properties/${property.id}/toggle-status`);
 
@@ -638,6 +672,13 @@ export function PropertiesManagementPage() {
   };
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const { userData } = useAuthStore.getState();
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchProperties in useEffect");
+      return;
+    }
+    
     if (!isInitialized && !loading) {
       fetchProperties(1);
     }
@@ -655,6 +696,25 @@ export function PropertiesManagementPage() {
     reorderPopup.type === "featured"
       ? normalizedProperties.filter((p: any) => p.featured)
       : normalizedProperties;
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">

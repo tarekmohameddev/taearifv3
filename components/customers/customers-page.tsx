@@ -15,6 +15,7 @@ import { CustomerTable } from "./page-components/CustomerTable";
 import { CrmLinkCard } from "./page-components/CrmLinkCard";
 import { CustomerDetailDialog } from "./page-components/CustomerDetailDialog";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
+import useAuthStore from "@/context/AuthContext";
 
 
 
@@ -161,9 +162,16 @@ export default function CustomersPage() {
 
   // Get filter states from store
   const { searchTerm, filterType, filterCity } = useCustomersFiltersStore();
+  const { userData } = useAuthStore();
 
   // Function to fetch customers with current filters and pagination
   const fetchCustomersWithFilters = useCallback(async (page = 1) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchCustomersWithFilters");
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await axiosInstance.get(`/customers?page=${page}`);
@@ -177,7 +185,7 @@ export default function CustomersPage() {
     } finally {
       setLoading(false);
     }
-  }, [setLoading, setError]);
+  }, [setLoading, setError, userData?.token]);
 
   useEffect(() => {
     fetchCustomersWithFilters(1);
@@ -288,6 +296,25 @@ export default function CustomersPage() {
     });
     setOpen(true);
   };
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -446,6 +473,13 @@ export default function CustomersPage() {
   if (error) return <p>{error}</p>;
 
   const handleUpdateCustomer = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleUpdateCustomer");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     try {
       await axiosInstance.put(`/customers/${editingCustomerId}`, formData);
 
@@ -533,6 +567,13 @@ export default function CustomersPage() {
   ).length;
 
   const handleDelete = async (customerId: number) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleDelete");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     try {
       await axiosInstance.delete(`/customers/${customerId}`);
       // Refresh the current page to update pagination

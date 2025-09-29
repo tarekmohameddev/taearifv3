@@ -1,6 +1,7 @@
 "use client"
 
 import axiosInstance from "@/lib/axiosInstance"
+import useAuthStore from "@/context/AuthContext"
 
 export interface Property {
   id: number
@@ -204,6 +205,12 @@ export class PurchaseRequestsService {
       search?: string
     }
   ): Promise<PurchaseRequestsResponse> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping getPurchaseRequests")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const params: any = {
         page,
@@ -235,6 +242,12 @@ export class PurchaseRequestsService {
     completed: number
     by_priority: Record<string, number>
   }> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping getPurchaseRequestStats")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.get("/v1/pms/purchase-requests")
       const data = response.data.data
@@ -263,6 +276,12 @@ export class PurchaseRequestsService {
   static async createPurchaseRequest(
     requestData: CreatePurchaseRequestData
   ): Promise<CreatePurchaseRequestResponse> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping createPurchaseRequest")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.post("/v1/pms/purchase-requests", requestData)
       return response.data
@@ -279,6 +298,12 @@ export class PurchaseRequestsService {
     id: string,
     requestData: UpdatePurchaseRequestData
   ): Promise<UpdatePurchaseRequestResponse> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping updatePurchaseRequest")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.patch(`/v1/pms/purchase-requests/${id}`, requestData)
       return response.data
@@ -295,6 +320,12 @@ export class PurchaseRequestsService {
     id: string,
     transitionData: StageTransitionData
   ): Promise<StageTransitionResponse> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping transitionToNextStage")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.post(`/v1/pms/purchase-requests/${id}/simple-transition-stage`, transitionData)
       return response.data
@@ -308,6 +339,12 @@ export class PurchaseRequestsService {
    * Delete a purchase request
    */
   static async deletePurchaseRequest(id: string): Promise<DeletePurchaseRequestResponse> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping deletePurchaseRequest")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.delete(`/v1/pms/purchase-requests/${id}`)
       return response.data

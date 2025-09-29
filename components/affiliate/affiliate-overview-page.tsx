@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import useStore from "@/context/Store";
 import { toast, Toaster } from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import useAuthStore from "@/context/AuthContext";
 
 export function AffiliateOverviewPage() {
   const {
@@ -38,10 +39,16 @@ export function AffiliateOverviewPage() {
   } = useStore();
   const router = useRouter();
   const isAffiliate = !!data;
+  const { userData } = useAuthStore();
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchAffiliateData");
+      return;
+    }
     fetchAffiliateData();
-  }, [fetchAffiliateData]);
+  }, [fetchAffiliateData, userData?.token]);
 
   useEffect(() => {
     if (data) {
@@ -166,6 +173,25 @@ export function AffiliateOverviewPage() {
       </div>
     );
   }
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader />

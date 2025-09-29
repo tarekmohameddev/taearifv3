@@ -14,6 +14,7 @@ import { Search, Move, Calendar, BarChart3, Bell, User, Loader2 } from "lucide-r
 import { PipelineStage } from "@/types/crm";
 import axiosInstance from "@/lib/axiosInstance";
 import useCrmStore from "@/context/store/crm";
+import useAuthStore from "@/context/AuthContext";
 
 // Helper function to get priority label
 const getPriorityLabel = (priority: number) => {
@@ -54,12 +55,19 @@ export default function CrmFilters({
   pipelineStages,
   onSearchResults,
 }: CrmFiltersProps) {
+  const { userData } = useAuthStore();
   const [isSearching, setIsSearching] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const { setCustomers, setPipelineStages } = useCrmStore();
 
   // Debounced search function
   const performSearch = useCallback(async (query: string, stageId: string, priority: string) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping performSearch");
+      return;
+    }
+
     setIsSearching(true);
     try {
       // If no search query and no filters, load all customers from /crm
@@ -234,7 +242,7 @@ export default function CrmFilters({
     } finally {
       setIsSearching(false);
     }
-  }, [setCustomers, setPipelineStages, onSearchResults]);
+  }, [setCustomers, setPipelineStages, onSearchResults, userData?.token]);
 
   // Handle search input changes with debouncing
   const handleSearchChange = (value: string) => {

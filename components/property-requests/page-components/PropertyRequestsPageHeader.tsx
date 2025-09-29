@@ -24,6 +24,7 @@ import { Separator } from "@/components/ui/separator";
 import axiosInstance from "@/lib/axiosInstance";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import useAuthStore from "@/context/AuthContext";
 
 interface FieldSetting {
   is_visible: boolean;
@@ -53,6 +54,7 @@ export const PropertyRequestsPageHeader = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [allowedKeys, setAllowedKeys] = useState<string[]>([]);
+  const { userData } = useAuthStore();
 
   // Field labels in Arabic
   const fieldLabels: { [key: string]: string } = {
@@ -76,12 +78,18 @@ export const PropertyRequestsPageHeader = () => {
 
   // Fetch settings when dialog opens
   useEffect(() => {
-    if (showSettingsDialog) {
+    if (showSettingsDialog && userData?.token) {
       fetchSettings();
     }
-  }, [showSettingsDialog]);
+  }, [showSettingsDialog, userData?.token]);
 
   const fetchSettings = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchSettings");
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axiosInstance.get("/v1/property-request-settings?merged=true");
@@ -108,6 +116,12 @@ export const PropertyRequestsPageHeader = () => {
   };
 
   const handleSaveSettings = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleSaveSettings");
+      return;
+    }
+
     setSaving(true);
     try {
       const items = allowedKeys.map(key => ({

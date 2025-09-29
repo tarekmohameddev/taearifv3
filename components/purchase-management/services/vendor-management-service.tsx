@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import useAuthStore from "@/context/AuthContext"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -83,8 +84,15 @@ export function VendorManagementService() {
   const [filterStatus, setFilterStatus] = useState("all")
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const { userData } = useAuthStore()
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchVendors")
+      return
+    }
+
     const fetchVendors = async () => {
       setLoading(true)
       await new Promise((resolve) => setTimeout(resolve, 800))
@@ -288,7 +296,7 @@ export function VendorManagementService() {
     }
 
     fetchVendors()
-  }, [])
+  }, [userData?.token])
 
   const filteredVendors = vendors.filter((vendor) => {
     const matchesSearch =
@@ -338,6 +346,19 @@ export function VendorManagementService() {
         className={`h-3 w-3 ${i < Math.floor(rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
       />
     ))
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

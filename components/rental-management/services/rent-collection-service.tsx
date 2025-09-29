@@ -31,6 +31,7 @@ import {
   Send,
   CreditCard,
 } from "lucide-react"
+import useAuthStore from "@/context/AuthContext"
 
 interface RentPayment {
   id: string
@@ -72,8 +73,15 @@ export function RentCollectionService() {
   const [filterStatus, setFilterStatus] = useState("all")
   const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false)
   const [selectedPayment, setSelectedPayment] = useState<RentPayment | null>(null)
+  const { userData } = useAuthStore()
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchRentData")
+      return
+    }
+
     // Simulate API call to rent collection microservice
     const fetchRentData = async () => {
       setLoading(true)
@@ -183,7 +191,7 @@ export function RentCollectionService() {
     }
 
     fetchRentData()
-  }, [])
+  }, [userData?.token])
 
   const filteredPayments = payments.filter((payment) => {
     const matchesSearch =
@@ -222,6 +230,19 @@ export function RentCollectionService() {
       default:
         return <Clock className="h-4 w-4" />
     }
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

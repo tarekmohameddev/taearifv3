@@ -1,5 +1,6 @@
 // context/store/blogManagement.js
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 module.exports = (set, get) => ({
   blogsData: {
@@ -11,6 +12,13 @@ module.exports = (set, get) => ({
   },
 
   fetchBlogs: async (page = 1) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      console.log("No token available, skipping fetchBlogs");
+      return;
+    }
+
     set((state) => ({
       blogsData: {
         ...state.blogsData,

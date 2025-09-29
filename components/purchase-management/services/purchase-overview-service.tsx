@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Building2, Users, FileText, DollarSign, TrendingUp, AlertCircle, Clock, Search } from "lucide-react"
+import useAuthStore from "@/context/AuthContext"
 
 interface OverviewStats {
   totalRequests: number
@@ -39,8 +40,15 @@ export function PurchaseOverviewService() {
   const [stats, setStats] = useState<OverviewStats | null>(null)
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
   const [loading, setLoading] = useState(true)
+  const { userData } = useAuthStore()
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchOverviewData")
+      return
+    }
+
     const fetchOverviewData = async () => {
       setLoading(true)
       try {
@@ -107,7 +115,7 @@ export function PurchaseOverviewService() {
     }
 
     fetchOverviewData()
-  }, [])
+  }, [userData?.token])
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -142,6 +150,19 @@ export function PurchaseOverviewService() {
       default:
         return "bg-gray-100 text-gray-800"
     }
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

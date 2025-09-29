@@ -5,6 +5,7 @@ import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
+import useAuthStore from "@/context/AuthContext";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -96,9 +97,17 @@ export default function PropertyRequestsPage() {
     contact_on_whatsapp: false,
     notes: ""
   });
+  const { userData } = useAuthStore();
 
   useEffect(() => {
     const fetchPropertyRequests = async () => {
+      // التحقق من وجود التوكن قبل إجراء الطلب
+      if (!userData?.token) {
+        console.log("No token available, skipping fetchPropertyRequests");
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await axiosInstance.get("/v1/property-requests");
         const { property_requests, pagination } = response.data.data;
@@ -113,7 +122,7 @@ export default function PropertyRequestsPage() {
     };
 
     fetchPropertyRequests();
-  }, []);
+  }, [userData?.token]);
 
   const handleNewPropertyRequestChange = (field: keyof typeof newPropertyRequest) => (
     value: any,
@@ -128,6 +137,12 @@ export default function PropertyRequestsPage() {
   };
 
   const handleAddPropertyRequest = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleAddPropertyRequest");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const response = await axiosInstance.post("/v1/property-requests", newPropertyRequest);
@@ -352,6 +367,12 @@ export default function PropertyRequestsPage() {
   if (error) return <p>{error}</p>;
 
   const handleUpdatePropertyRequest = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleUpdatePropertyRequest");
+      return;
+    }
+
     try {
       await axiosInstance.put(`/v1/property-requests/${editingPropertyRequestId}`, formData);
 
@@ -458,6 +479,13 @@ export default function PropertyRequestsPage() {
   ).length;
 
   const handleDelete = async (propertyRequestId: number) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleDelete");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     try {
       await axiosInstance.delete(`/v1/property-requests/${propertyRequestId}`);
       // احذف طلب العقار من الواجهة

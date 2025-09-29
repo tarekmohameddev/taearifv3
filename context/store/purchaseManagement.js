@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 import { getErrorInfo, retryWithBackoff, logError, formatErrorMessage } from "@/utils/errorHandler";
 
 module.exports = (set, get) => ({
@@ -56,6 +57,13 @@ module.exports = (set, get) => ({
 
   // Fetch Purchase Requests
   fetchPurchaseRequests: async (page = 1, filters = {}) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      console.log("No token available, skipping fetchPurchaseRequests");
+      return;
+    }
+
     set((state) => ({
       purchaseManagement: {
         ...state.purchaseManagement,
@@ -186,6 +194,13 @@ module.exports = (set, get) => ({
 
   // Fetch Purchase Request Stats
   fetchPurchaseRequestStats: async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      console.log("No token available, skipping fetchPurchaseRequestStats");
+      return;
+    }
+
     set((state) => ({
       purchaseManagement: {
         ...state.purchaseManagement,
@@ -240,6 +255,13 @@ module.exports = (set, get) => ({
 
   // Fetch Properties
   fetchProperties: async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      console.log("No token available, skipping fetchProperties");
+      return;
+    }
+
     set((state) => ({
       purchaseManagement: {
         ...state.purchaseManagement,
@@ -282,6 +304,13 @@ module.exports = (set, get) => ({
   
   // Fetch projects
   fetchProjects: async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      console.log("No token available, skipping fetchProjects");
+      return;
+    }
+
     set((state) => ({
       purchaseManagement: {
         ...state.purchaseManagement,

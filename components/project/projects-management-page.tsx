@@ -128,6 +128,7 @@ function SkeletonProjectCard() {
 export function ProjectsManagementPage() {
   const [isLimitReached, setIsLimitReached] = useState(false);
   const router = useRouter();
+  const { userData } = useAuthStore();
   const {
     projectsManagement: {
       viewMode,
@@ -147,6 +148,13 @@ export function ProjectsManagementPage() {
   };
 
   const handleDelete = async (id: number) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleDelete");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     try {
       const response = await axiosInstance.delete(`/projects/${id}`);
     } catch (error) {
@@ -155,10 +163,16 @@ export function ProjectsManagementPage() {
   };
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchProjects");
+      return;
+    }
+
     if (!isInitialized) {
       fetchProjects();
     }
-  }, [fetchProjects, isInitialized]);
+  }, [fetchProjects, isInitialized, userData?.token]);
 
   const renderSkeletons = () => (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -182,6 +196,25 @@ export function ProjectsManagementPage() {
         ))}
       </div>
     );
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
@@ -349,7 +382,16 @@ export function ProjectsManagementPage() {
 
 function ProjectCard({ project }: { project: IProject }) {
   const router = useRouter();
+  const { userData } = useAuthStore();
+  
   const handleDelete = async (id: number) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleDelete");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     try {
       const response = await axiosInstance.delete(`/projects/${id}`);
       // يمكنك تحديث الحالة (state) أو إعادة تحميل الصفحة هنا بعد الحذف

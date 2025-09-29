@@ -1,6 +1,7 @@
 "use client"
 
 import axiosInstance from "@/lib/axiosInstance"
+import useAuthStore from "@/context/AuthContext"
 
 // Types for API responses
 export interface PurchaseDashboardStatistics {
@@ -138,6 +139,12 @@ export class PurchaseDashboardService {
    * Get purchase management dashboard data
    */
   static async getDashboardData(): Promise<PurchaseDashboardResponse> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping getDashboardData")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.get("/v1/pms/dashboard")
       return response.data
@@ -151,6 +158,12 @@ export class PurchaseDashboardService {
    * Get recent purchase requests with pagination
    */
   static async getRecentRequests(page: number = 1, perPage: number = 10): Promise<RecentRequestsData> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping getRecentRequests")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.get("/v1/pms/dashboard", {
         params: {
@@ -169,6 +182,12 @@ export class PurchaseDashboardService {
    * Get purchase statistics
    */
   static async getStatistics(): Promise<PurchaseDashboardStatistics> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping getStatistics")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.get("/v1/pms/dashboard")
       return response.data.data.statistics
@@ -182,6 +201,12 @@ export class PurchaseDashboardService {
    * Get priority breakdown
    */
   static async getPriorityBreakdown(): Promise<PriorityBreakdown> {
+    const token = useAuthStore.getState().userData?.token
+    if (!token) {
+      console.log("No token available, skipping getPriorityBreakdown")
+      throw new Error("Authentication required. Please login.")
+    }
+
     try {
       const response = await axiosInstance.get("/v1/pms/dashboard")
       return response.data.data.priority_breakdown

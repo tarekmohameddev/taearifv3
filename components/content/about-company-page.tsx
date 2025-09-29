@@ -16,6 +16,7 @@ import { uploadSingleFile } from "@/utils/uploadSingle";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
 import useStore from "@/context/Store";
+import useAuthStore from "@/context/AuthContext";
 
 export function AboutCompanyPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +39,7 @@ export function AboutCompanyPage() {
   const {
     homepage: { setupProgressData, fetchSetupProgressData },
   } = useStore();
+  const { userData } = useAuthStore();
 
   const handleImageUploadClick = () => {
     fileInputRef.current.click();
@@ -65,6 +67,12 @@ export function AboutCompanyPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      // التحقق من وجود التوكن قبل إجراء الطلب
+      if (!userData?.token) {
+        console.log("No token available, skipping fetchData");
+        return;
+      }
+
       try {
         const response = await axiosInstance.get(
           `${process.env.NEXT_PUBLIC_Backend_URL}/content/about`,
@@ -84,7 +92,7 @@ export function AboutCompanyPage() {
     };
 
     fetchData();
-  }, []);
+  }, [userData?.token]);
 
   const addNewFeature = () => {
     const newId =
@@ -128,6 +136,13 @@ export function AboutCompanyPage() {
   };
 
   const handleSave = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleSave");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     setIsSaving(true);
     toast.loading("جاري حفظ التغييرات..."); // إشعار تحميل
     try {
@@ -193,6 +208,25 @@ export function AboutCompanyPage() {
               <AlertTitle>خطأ</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <DashboardHeader />
+        <div className="flex flex-1">
+          <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
           </main>
         </div>
       </div>

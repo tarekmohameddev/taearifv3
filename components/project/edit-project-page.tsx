@@ -155,6 +155,12 @@ export default function EditProjectPage(): JSX.Element {
   };
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchProjectData");
+      return;
+    }
+
     const fetchProjectData = async () => {
       try {
         const response = await axiosInstance.get(
@@ -273,7 +279,7 @@ export default function EditProjectPage(): JSX.Element {
     if (id) {
       fetchProjectData();
     }
-  }, [id, router]);
+  }, [id, router, userData?.token]);
 
   useEffect(() => {
     setMapLoaded(true);
@@ -481,6 +487,13 @@ export default function EditProjectPage(): JSX.Element {
   const handleUpdateProject = async (
     status: "منشور" | "مسودة" | "Pre-construction"
   ) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleUpdateProject");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     if (!validateForm()) {
       toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
       setSubmitError("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
@@ -658,6 +671,25 @@ export default function EditProjectPage(): JSX.Element {
       setIsLoading(false);
     }
   };
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

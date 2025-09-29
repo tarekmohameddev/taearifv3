@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import useStore from "@/context/Store";
+import useAuthStore from "@/context/AuthContext";
 import {
   Card,
   CardHeader,
@@ -23,12 +24,33 @@ export function SetupProgressCard() {
     },
     loading,
   } = useStore();
+  const { userData } = useAuthStore();
 
   useEffect(() => {
-    if (!isSetupProgressDataUpdated) {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (userData?.token && !isSetupProgressDataUpdated) {
       fetchSetupProgressData();
     }
-  }, [isSetupProgressDataUpdated, fetchSetupProgressData]);
+  }, [userData?.token, isSetupProgressDataUpdated, fetchSetupProgressData]);
+
+  // إذا لم يكن هناك token، لا نعرض المحتوى
+  if (!userData?.token) {
+    return (
+      <Card className="col-span-3">
+        <CardHeader>
+          <CardTitle>تقدم الإعداد</CardTitle>
+          <CardDescription>
+            أكمل إعداد موقعك للحصول على أفضل النتائج
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-gray-500 py-8">
+            يرجى تسجيل الدخول لعرض البيانات
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // عرض Skeleton أثناء التحميل
   if (!isSetupProgressDataUpdated) {
@@ -131,7 +153,7 @@ export function SetupProgressCard() {
         {/* عرض الزر فقط إذا كان هناك رابط صحيح */}
         {setupProgressData.continue_path && (
           <Button size="sm" className="w-full gap-1 " asChild>
-            <Link href={setupProgressData.continue_path}>
+            <Link href={`/dashboard${setupProgressData.continue_path}`}>
               <span>اضغط هنا لإكمال بياناتك</span>
               <ArrowRight className="h-3.5 w-3.5 mr-0 ml-1" />
             </Link>

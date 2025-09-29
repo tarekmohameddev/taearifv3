@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Bell, Calendar, Clock, AlertTriangle } from "lucide-react";
 import useCrmStore from "@/context/store/crm";
+import useAuthStore from "@/context/AuthContext";
 import axiosInstance from "@/lib/axiosInstance";
 
 interface AddReminderDialogProps {
@@ -34,6 +35,7 @@ export default function AddReminderDialog({
     setShowAddReminderDialog,
     customers,
   } = useCrmStore();
+  const { userData } = useAuthStore();
 
   const [reminderData, setReminderData] = useState({
     customer_id: "",
@@ -67,6 +69,13 @@ export default function AddReminderDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleSubmit");
+      alert("Authentication required. Please login.");
+      return;
+    }
 
     // Validation
     const customerId = selectedCustomer

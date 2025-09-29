@@ -32,6 +32,7 @@ import {
   Eye,
   Phone,
 } from "lucide-react"
+import useAuthStore from "@/context/AuthContext"
 
 interface PropertyInspection {
   id: string
@@ -87,12 +88,19 @@ export function PurchaseInspectionsService() {
   const [inspections, setInspections] = useState<PropertyInspection[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const { userData } = useAuthStore()
   const [filterStatus, setFilterStatus] = useState("all")
   const [filterType, setFilterType] = useState("all")
   const [selectedInspection, setSelectedInspection] = useState<PropertyInspection | null>(null)
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false)
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchInspections")
+      return
+    }
+
     const fetchInspections = async () => {
       setLoading(true)
       await new Promise((resolve) => setTimeout(resolve, 800))
@@ -272,7 +280,7 @@ export function PurchaseInspectionsService() {
     }
 
     fetchInspections()
-  }, [])
+  }, [userData?.token])
 
   const filteredInspections = inspections.filter((inspection) => {
     const matchesSearch =
@@ -332,6 +340,19 @@ export function PurchaseInspectionsService() {
       default:
         return "bg-gray-100 text-gray-800"
     }
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

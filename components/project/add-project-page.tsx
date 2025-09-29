@@ -128,6 +128,7 @@ export default function AddProjectPage(): JSX.Element {
   const {
     homepage: { setupProgressData, fetchSetupProgressData },
   } = useStore();
+  const { userData } = useAuthStore();
   const [newProject, setNewProject] = useState({
     id: "",
     name: "",
@@ -177,10 +178,16 @@ export default function AddProjectPage(): JSX.Element {
   };
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchProjects");
+      return;
+    }
+
     if (!isInitialized) {
       fetchProjects();
     }
-  }, [fetchProjects, isInitialized]);
+  }, [fetchProjects, isInitialized, userData?.token]);
 
   let hasReachedLimit;
 
@@ -450,6 +457,13 @@ export default function AddProjectPage(): JSX.Element {
   const handleSaveProject = async (
     status_publish: "منشور" | "مسودة" | "Pre-construction"
   ) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleSaveProject");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     if (!validateForm()) {
       toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
       setSubmitError("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
@@ -661,6 +675,25 @@ export default function AddProjectPage(): JSX.Element {
       setIsLoading(false);
     }
   };
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
       <DashboardHeader />

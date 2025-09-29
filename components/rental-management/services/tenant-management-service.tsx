@@ -34,6 +34,7 @@ import {
   MoreHorizontal,
 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import useAuthStore from "@/context/AuthContext"
 
 interface Tenant {
   id: string
@@ -74,8 +75,15 @@ export function TenantManagementService() {
   const [filterNationality, setFilterNationality] = useState("all")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null)
+  const { userData } = useAuthStore()
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchTenants")
+      return
+    }
+
     // Simulate API call to tenant management microservice
     const fetchTenants = async () => {
       setLoading(true)
@@ -207,7 +215,7 @@ export function TenantManagementService() {
     }
 
     fetchTenants()
-  }, [])
+  }, [userData?.token])
 
   const filteredTenants = tenants.filter((tenant) => {
     const matchesSearch =
@@ -246,6 +254,19 @@ export function TenantManagementService() {
       default:
         return "bg-gray-100 text-gray-800"
     }
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

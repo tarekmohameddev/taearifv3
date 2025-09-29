@@ -1216,6 +1216,13 @@ export function RentalDashboardStats() {
 
   // جلب البيانات من API
   const fetchDashboardData = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      console.log("No token available, skipping fetchDashboardData");
+      return;
+    }
+
     try {
       setLoading(true)
       setError(null)

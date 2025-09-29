@@ -65,9 +65,13 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
   const { mainNavItems, loading, error } = sidebarData;
 
   useEffect(() => {
-    fetchUserData();
-    fetchSideMenus();
-  }, [fetchUserData, fetchSideMenus]);
+    // إزالة fetchUserData من هنا لأنه يتم استدعاؤه في layout.tsx
+    // fetchUserData();
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (userData?.token) {
+      fetchSideMenus();
+    }
+  }, [fetchSideMenus, userData?.token]);
 
   const clickedONButton = async () => {
     clickedONSubButton();
@@ -160,7 +164,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                               className="justify-start gap-2"
                               asChild
                             >
-                              <Link href={item.path}>
+                              <Link href={`dashboard/${item.path}`}>
                                 <item.icon className="h-4 w-4" />
                                 {item.label}
                               </Link>

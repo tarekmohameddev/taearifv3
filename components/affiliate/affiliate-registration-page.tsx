@@ -22,6 +22,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import useAuthStore from "@/context/AuthContext";
 
 export function AffiliateRegistrationPage() {
   const {
@@ -29,6 +30,7 @@ export function AffiliateRegistrationPage() {
     fetchAffiliateData,
   } = useStore();
   const router = useRouter();
+  const { userData } = useAuthStore();
   const [formData, setFormData] = useState({
     fullName: "",
     bankName: "",
@@ -42,8 +44,13 @@ export function AffiliateRegistrationPage() {
   const [isFormDisabled, setIsFormDisabled] = useState(false);
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchAffiliateData");
+      return;
+    }
     fetchAffiliateData();
-  }, [fetchAffiliateData]);
+  }, [fetchAffiliateData, userData?.token]);
 
   useEffect(() => {
     if (data) {
@@ -111,6 +118,13 @@ export function AffiliateRegistrationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleSubmit");
+      alert("Authentication required. Please login.");
+      return;
+    }
 
     if (!validateForm()) {
       toast.error("الرجاء تصحيح الأخطاء المذكورة أدناه");
@@ -181,6 +195,26 @@ export function AffiliateRegistrationPage() {
               </div>
               <Skeleton className="h-10 w-1/4 mb-2" />
               <Skeleton className="h-32 w-full" />
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Toaster position="top-center" />
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
             </div>
           </main>
         </div>

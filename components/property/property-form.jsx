@@ -407,6 +407,12 @@ export default function PropertyForm({ mode }) {
     });
   };
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchSuggestedFaqs");
+      return;
+    }
+
     const fetchSuggestedFaqs = async () => {
       try {
         const response = await axiosInstance.get("/property-faqs");
@@ -414,10 +420,16 @@ export default function PropertyForm({ mode }) {
       } catch (error) {}
     };
     fetchSuggestedFaqs();
-  }, []);
+  }, [userData?.token]);
   // تحديث useEffect لجلب بيانات العقار للتعديل
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchProperty");
+      return;
+    }
+
     if (mode === "edit" && id) {
       const fetchProperty = async () => {
         try {
@@ -603,6 +615,12 @@ export default function PropertyForm({ mode }) {
   }, [fetchProperties, isInitialized, loading, properties, mode]);
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchCategories");
+      return;
+    }
+
     const fetchCategories = async () => {
       try {
         const response = await axiosInstance.get("/properties/categories");
@@ -613,9 +631,15 @@ export default function PropertyForm({ mode }) {
       }
     };
     fetchCategories();
-  }, []);
+  }, [userData?.token]);
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchFacades");
+      return;
+    }
+
     axiosInstance
       .get("/property/facades")
       .then((response) => {
@@ -624,9 +648,15 @@ export default function PropertyForm({ mode }) {
       .catch((error) => {
         console.error("خطأ في جلب الواجهات:", error);
       });
-  }, []);
+  }, [userData?.token]);
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchProjects");
+      return;
+    }
+
     const fetchProjects = async () => {
       try {
         const response = await axiosInstance.get("/user/projects");
@@ -638,7 +668,7 @@ export default function PropertyForm({ mode }) {
     if (mode === "add") {
       fetchProjects();
     }
-  }, [mode]);
+  }, [userData?.token, mode]);
 
   // فحص الحد الأقصى للعقارات (للإضافة فقط)
   React.useEffect(() => {
@@ -821,6 +851,13 @@ export default function PropertyForm({ mode }) {
   };
 
   const handleSubmit = async (publish) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleSubmit");
+      alert("Authentication required. Please login.");
+      return;
+    }
+
     setSubmitError(null);
     if (validateForm()) {
       setIsLoading(true);
@@ -999,6 +1036,25 @@ export default function PropertyForm({ mode }) {
   const submitButtonText = mode === "add" ? "نشر العقار" : "حفظ ونشر التغييرات";
   const draftButtonText =
     mode === "add" ? "حفظ كمسودة" : "حفظ التغييرات كمسودة";
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">

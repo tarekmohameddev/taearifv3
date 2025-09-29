@@ -32,6 +32,7 @@ import {
   MoreHorizontal,
 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import useAuthStore from "@/context/AuthContext"
 
 interface Property {
   id: string
@@ -66,8 +67,15 @@ export function PropertyListingService() {
   const [filterStatus, setFilterStatus] = useState("all")
   const [filterCity, setFilterCity] = useState("all")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const { userData } = useAuthStore()
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchProperties")
+      return
+    }
+
     // Simulate API call to property listing microservice
     const fetchProperties = async () => {
       setLoading(true)
@@ -179,7 +187,7 @@ export function PropertyListingService() {
     }
 
     fetchProperties()
-  }, [])
+  }, [userData?.token])
 
   const filteredProperties = properties.filter((property) => {
     const matchesSearch =
@@ -204,6 +212,19 @@ export function PropertyListingService() {
       default:
         return "bg-gray-100 text-gray-800"
     }
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

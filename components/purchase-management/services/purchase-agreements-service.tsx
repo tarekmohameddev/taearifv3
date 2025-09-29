@@ -34,6 +34,7 @@ import {
   AlertTriangle,
   MapPin,
 } from "lucide-react"
+import useAuthStore from "@/context/AuthContext"
 
 interface PurchaseAgreement {
   id: string
@@ -104,8 +105,15 @@ export function PurchaseAgreementsService() {
   const [filterStatus, setFilterStatus] = useState("all")
   const [selectedAgreement, setSelectedAgreement] = useState<PurchaseAgreement | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const { userData } = useAuthStore()
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchAgreements")
+      return
+    }
+
     const fetchAgreements = async () => {
       setLoading(true)
       await new Promise((resolve) => setTimeout(resolve, 800))
@@ -299,7 +307,7 @@ export function PurchaseAgreementsService() {
     }
 
     fetchAgreements()
-  }, [])
+  }, [userData?.token])
 
   const filteredAgreements = agreements.filter((agreement) => {
     const matchesSearch =
@@ -349,6 +357,19 @@ export function PurchaseAgreementsService() {
     const total = Object.keys(documents).length
     const completed = Object.values(documents).filter(Boolean).length
     return Math.round((completed / total) * 100)
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

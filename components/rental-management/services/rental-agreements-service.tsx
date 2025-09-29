@@ -34,6 +34,7 @@ import {
   Clock,
   Edit,
 } from "lucide-react"
+import useAuthStore from "@/context/AuthContext"
 
 interface RentalAgreement {
   id: string
@@ -107,6 +108,7 @@ export function RentalAgreementsService() {
   const [filterStatus, setFilterStatus] = useState("all")
   const [selectedAgreement, setSelectedAgreement] = useState<RentalAgreement | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const { userData } = useAuthStore()
 
   // Available approved rental requests for creating contracts
   const approvedRequests = [
@@ -116,6 +118,12 @@ export function RentalAgreementsService() {
   ]
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchAgreements")
+      return
+    }
+
     const fetchAgreements = async () => {
       setLoading(true)
       await new Promise((resolve) => setTimeout(resolve, 800))
@@ -345,7 +353,7 @@ export function RentalAgreementsService() {
     }
 
     fetchAgreements()
-  }, [])
+  }, [userData?.token])
 
   const filteredAgreements = agreements.filter((agreement) => {
     const matchesSearch =
@@ -396,6 +404,19 @@ export function RentalAgreementsService() {
     const diffTime = expiry.getTime() - today.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     return diffDays
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

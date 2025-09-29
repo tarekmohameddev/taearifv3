@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 import {
   DialogTrigger,
   Dialog,
@@ -61,6 +62,7 @@ import useStore from "@/context/Store";
 export function ContentManagementPage() {
   const { contentManagement, fetchContentSections, setContentManagement } =
     useStore();
+  const { userData } = useAuthStore();
   const {
     newSectionDialogOpen,
     statusFilter,
@@ -104,10 +106,15 @@ export function ContentManagementPage() {
   };
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchContentSections");
+      return;
+    }
     if (sections.length === 0) {
       fetchContentSections();
     }
-  }, [sections, fetchContentSections]);
+  }, [sections, fetchContentSections, userData?.token]);
 
   const availableIcons = {
     FileText: FileText,
@@ -184,6 +191,25 @@ export function ContentManagementPage() {
     "bg-violet-100 text-violet-800",
   ];
   const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <DashboardHeader />
+        <div className="flex flex-1">
+          <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col">

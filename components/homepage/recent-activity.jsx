@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import useStore from "@/context/Store";
+import useAuthStore from "@/context/AuthContext";
 import {
   Card,
   CardHeader,
@@ -34,12 +35,31 @@ export function RecentActivity() {
     fetchRecentActivityData,
     loading,
   } = useStore();
+  const { userData } = useAuthStore();
 
   useEffect(() => {
-    if (!isRecentActivityUpdated) {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (userData?.token && !isRecentActivityUpdated) {
       fetchRecentActivityData();
     }
-  }, [isRecentActivityUpdated, fetchRecentActivityData]);
+  }, [userData?.token, isRecentActivityUpdated, fetchRecentActivityData]);
+
+  // إذا لم يكن هناك token، لا نعرض المحتوى
+  if (!userData?.token) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>النشاط الأخير</CardTitle>
+          <CardDescription>آخر الإجراءات التي تمت على موقعك</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-gray-500 py-8">
+            يرجى تسجيل الدخول لعرض البيانات
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

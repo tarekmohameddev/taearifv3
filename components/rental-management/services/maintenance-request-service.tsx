@@ -33,6 +33,7 @@ import {
   MessageSquare,
   Upload,
 } from "lucide-react"
+import useAuthStore from "@/context/AuthContext"
 
 interface MaintenanceRequest {
   id: string
@@ -77,8 +78,15 @@ export function MaintenanceRequestService() {
   const [filterPriority, setFilterPriority] = useState("all")
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<MaintenanceRequest | null>(null)
+  const { userData } = useAuthStore()
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchMaintenanceRequests")
+      return
+    }
+
     // Simulate API call to maintenance request microservice
     const fetchMaintenanceRequests = async () => {
       setLoading(true)
@@ -205,7 +213,7 @@ export function MaintenanceRequestService() {
     }
 
     fetchMaintenanceRequests()
-  }, [])
+  }, [userData?.token])
 
   const filteredRequests = requests.filter((request) => {
     const matchesSearch =
@@ -261,6 +269,19 @@ export function MaintenanceRequestService() {
       default:
         return <Clock className="h-4 w-4" />
     }
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

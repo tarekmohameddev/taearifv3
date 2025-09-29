@@ -38,7 +38,9 @@ export function useLiveEditorEffects(state: any) {
 
   // Authentication Effect
   useEffect(() => {
+    console.log("🔍 LiveEditorEffects - Auth check:", { user, authLoading });
     if (!authLoading && !user) {
+      console.log("🔄 LiveEditorEffects - Redirecting to login, user:", user);
       router.push("/login");
     }
   }, [user, authLoading, router]);

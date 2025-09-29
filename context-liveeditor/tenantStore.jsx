@@ -271,6 +271,23 @@ const useTenantStore = create((set) => ({
   fetchTenantData: async (websiteName) => {
     const state = useTenantStore.getState();
     
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping fetchTenantData");
+        set({ error: "Authentication required. Please login.", loadingTenantData: false });
+        return;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      set({ error: "Authentication required. Please login.", loadingTenantData: false });
+      return;
+    }
+    
     // Prevent duplicate requests - تحقق من أن البيانات موجودة ونفس الـ username
     if (
       state.loadingTenantData ||
@@ -289,13 +306,17 @@ const useTenantStore = create((set) => ({
     console.log("[tenantStore] Starting fetch for:", websiteName);
     set({ loadingTenantData: true, error: null });
     try {
+      console.log("[tenantStore] Making request to /api/tenant/getTenant with:", { websiteName, token: userData.token });
       const response = await fetch("/api/tenant/getTenant", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({ websiteName }),
       });
+      console.log("[tenantStore] Response status:", response.status);
+      console.log("[tenantStore] Response headers:", response.headers);
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error("Tenant not found");
@@ -307,11 +328,33 @@ const useTenantStore = create((set) => ({
       }
 
       const text = await response.text();
+      console.log("[tenantStore] Response text:", text);
       const data = text ? JSON.parse(text) : {}; // If response is empty, use an empty object
+      console.log("[tenantStore] Parsed data:", data);
       
       // تحقق من أن البيانات ليست فارغة
       if (!data || Object.keys(data).length === 0) {
-        throw new Error("No data available for this tenant");
+        console.log("[tenantStore] No data available, but continuing anyway...");
+        // بدلاً من رمي خطأ، استخدم بيانات افتراضية
+        const defaultData = {
+          username: websiteName,
+          globalComponentsData: {
+            header: {},
+            footer: {},
+            hero: {},
+            halfTextHalfImage: {},
+            halfTextHalfImage2: {},
+            halfTextHalfImage3: {},
+            propertySlider: {},
+            ctaValuation: {},
+            grid: {},
+            filterButtons: {},
+            propertyFilter: {}
+          }
+        };
+        console.log("[tenantStore] Using default data:", defaultData);
+        set({ tenantData: defaultData, loadingTenantData: false, lastFetchedWebsite: websiteName });
+        return;
       }
       
       // Load global components data into editor store
@@ -344,11 +387,27 @@ const useTenantStore = create((set) => ({
 
   
   saveHeaderChanges: async (tenantId, headerData, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping saveHeaderChanges");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/header", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -373,11 +432,27 @@ const useTenantStore = create((set) => ({
     }
   },
   saveHeroChanges: async (tenantId, heroData, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping saveHeroChanges");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/hero", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -402,11 +477,27 @@ const useTenantStore = create((set) => ({
     }
   },
   saveFooterChanges: async (tenantId, footerData, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping saveFooterChanges");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/footer", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -431,11 +522,27 @@ const useTenantStore = create((set) => ({
     }
   },
   savehalfTextHalfImageChanges: async (tenantId, halfTextHalfImageData, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping savehalfTextHalfImageChanges");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/halfTextHalfImage", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -460,11 +567,27 @@ const useTenantStore = create((set) => ({
     }
   },
   savehalfTextHalfImage2Changes: async (tenantId, halfTextHalfImage2Data, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping savehalfTextHalfImage2Changes");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/halfTextHalfImage2", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -489,11 +612,27 @@ const useTenantStore = create((set) => ({
     }
   },
   savehalfTextHalfImage3Changes: async (tenantId, halfTextHalfImage3Data, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping savehalfTextHalfImage3Changes");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/halfTextHalfImage3", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -519,11 +658,27 @@ const useTenantStore = create((set) => ({
   },
 
   savePropertySliderChanges: async (tenantId, propertySliderData, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping savePropertySliderChanges");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/propertySlider", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -549,11 +704,27 @@ const useTenantStore = create((set) => ({
   },
 
   saveCtaValuationChanges: async (tenantId, ctaValuationData, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping saveCtaValuationChanges");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/ctaValuation", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -610,11 +781,27 @@ const useTenantStore = create((set) => ({
         : state.tenantData,
     })),
   saveGridChanges: async (tenantId, gridData, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping saveGridChanges");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/grid", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -671,11 +858,27 @@ const useTenantStore = create((set) => ({
         : state.tenantData,
     })),
   saveFilterButtonsChanges: async (tenantId, filterButtonsData, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping saveFilterButtonsChanges");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/filterButtons", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -732,11 +935,27 @@ const useTenantStore = create((set) => ({
         : state.tenantData,
     })),
   savePropertyFilterChanges: async (tenantId, propertyFilterData, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        console.log("[tenantStore] No token available, skipping savePropertyFilterChanges");
+        return false;
+      }
+    } catch (error) {
+      console.log("[tenantStore] Error importing AuthContext:", error);
+      return false;
+    }
+
     try {
       const response = await fetch("/api/tenant/propertyFilter", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,

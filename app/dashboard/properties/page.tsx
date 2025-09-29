@@ -1,9 +1,7 @@
-import { headers } from 'next/headers';
-import PropertiesPageWrapper from './PropertiesPageWrapper';
-
-export default async function PropertiesPage() {
-  const headersList = await headers();
-  const tenantId = headersList.get('x-tenant-id');
-  
-  return <PropertiesPageWrapper tenantId={tenantId} />;
+import { PropertiesManagementPage } from "@/components/property/properties-management-page";
+export const metadata = {
+  title: "إدارة العقارات",
+};
+export default function Page() {
+  return <PropertiesManagementPage />;
 }

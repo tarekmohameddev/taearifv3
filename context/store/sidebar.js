@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 import {
   Building2,
   FileText,
@@ -57,6 +58,13 @@ module.exports = (set, get) => ({
   },
 
   fetchSideMenus: async (app) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      console.log("No token available, skipping fetchSideMenus");
+      return;
+    }
+
     const { sidebarData } = get();
     if (!app) {
       if (sidebarData.isSidebarFetched) return;

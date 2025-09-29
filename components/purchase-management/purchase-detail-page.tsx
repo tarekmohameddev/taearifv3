@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import useStore from "@/context/Store"
 import axiosInstance from "@/lib/axiosInstance"
+import useAuthStore from "@/context/AuthContext"
 import { Skeleton } from "@/components/ui/skeleton"
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
@@ -102,6 +103,7 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
   
   // Use store instead of local state
   const { clearError } = useStore()
+  const { userData } = useAuthStore()
   
   const [request, setRequest] = useState<PurchaseRequest | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -134,6 +136,13 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
 
   // Fetch single purchase request details from API
   const fetchSingleRequest = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchSingleRequest")
+      setIsLoading(false)
+      return
+    }
+
     setIsLoading(true)
     try {
       const response = await axiosInstance.get(`/v1/pms/purchase-requests/${requestId}`)
@@ -243,7 +252,7 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
 
   useEffect(() => {
     fetchSingleRequest()
-  }, [requestId])
+  }, [requestId, userData?.token])
 
   // Helper functions to map API data to component interface
   const mapApiStatusToStage = (status: string): "reservation" | "contract" | "completion" | "receiving" => {
@@ -405,6 +414,25 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
         console.error("Error transitioning stage:", error);
       }
     }
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="flex min-h-screen flex-col bg-gray-50" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    )
   }
 
   if (isLoading) {

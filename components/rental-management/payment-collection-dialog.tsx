@@ -35,6 +35,7 @@ import {
 } from "lucide-react"
 import axiosInstance from "@/lib/axiosInstance"
 import useStore from "@/context/Store"
+import useAuthStore from "@/context/AuthContext"
 
 interface PaymentCollectionData {
   rental_info: {
@@ -112,6 +113,8 @@ export function PaymentCollectionDialog() {
     selectedPaymentRentalId
   } = rentalApplications
 
+  const { userData } = useAuthStore()
+
   const [data, setData] = useState<PaymentCollectionData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -145,10 +148,10 @@ export function PaymentCollectionDialog() {
 
   // Fetch payment collection data when dialog opens
   useEffect(() => {
-    if (isPaymentCollectionDialogOpen && selectedPaymentRentalId) {
+    if (isPaymentCollectionDialogOpen && selectedPaymentRentalId && userData?.token) {
       fetchPaymentCollectionData()
     }
-  }, [isPaymentCollectionDialogOpen, selectedPaymentRentalId])
+  }, [isPaymentCollectionDialogOpen, selectedPaymentRentalId, userData?.token])
 
   // Auto-update payment type based on selections
   useEffect(() => {
@@ -163,6 +166,12 @@ export function PaymentCollectionDialog() {
 
   const fetchPaymentCollectionData = async () => {
     if (!selectedPaymentRentalId) return
+
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchPaymentCollectionData")
+      return
+    }
 
     setLoading(true)
     setError(null)

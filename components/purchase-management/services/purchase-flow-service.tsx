@@ -15,7 +15,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Plus, Search, Building2, Edit, Eye, Trash2, AlertTriangle } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useRouter } from "next/navigation"
-import toast from "react-hot-toast";  
+import toast from "react-hot-toast"
+import useAuthStore from "@/context/AuthContext"  
 
 interface PurchaseRequest {
   id: string
@@ -144,6 +145,7 @@ interface StageRequirement {
 export { PurchaseFlowService }
 export default function PurchaseFlowService() {
   const router = useRouter()
+  const { userData } = useAuthStore()
   
   // Use store instead of local state
   const {
@@ -892,6 +894,19 @@ export default function PurchaseFlowService() {
       default:
         return "secondary"
     }
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

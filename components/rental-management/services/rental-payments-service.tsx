@@ -34,6 +34,7 @@ import {
   CreditCard,
   Receipt,
 } from "lucide-react"
+import useAuthStore from "@/context/AuthContext"
 
 interface RentalPayment {
   id: string
@@ -79,6 +80,7 @@ export function RentalPaymentsService() {
   const [filterType, setFilterType] = useState("all")
   const [selectedPayment, setSelectedPayment] = useState<RentalPayment | null>(null)
   const [isRecordPaymentDialogOpen, setIsRecordPaymentDialogOpen] = useState(false)
+  const { userData } = useAuthStore()
 
   // Active contracts for creating payment records
   const activeContracts = [
@@ -106,6 +108,12 @@ export function RentalPaymentsService() {
   ]
 
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchPayments")
+      return
+    }
+
     const fetchPayments = async () => {
       setLoading(true)
       await new Promise((resolve) => setTimeout(resolve, 800))
@@ -275,7 +283,7 @@ export function RentalPaymentsService() {
     }
 
     fetchPayments()
-  }, [])
+  }, [userData?.token])
 
   const filteredPayments = payments.filter((payment) => {
     const matchesSearch =
@@ -357,6 +365,19 @@ export function RentalPaymentsService() {
             }
           : payment,
       ),
+    )
+  }
+
+  // التحقق من وجود التوكن قبل عرض المحتوى
+  if (!userData?.token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          </div>
+        </div>
+      </div>
     )
   }
 

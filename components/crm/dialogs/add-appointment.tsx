@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Calendar, Clock, AlertTriangle, CalendarCheck } from "lucide-react";
 import useCrmStore from "@/context/store/crm";
+import useAuthStore from "@/context/AuthContext";
 import axiosInstance from "@/lib/axiosInstance";
 
 interface AddAppointmentDialogProps {
@@ -35,6 +36,7 @@ export default function AddAppointmentDialog({
     setShowAddAppointmentDialog,
     customers,
   } = useCrmStore();
+  const { userData } = useAuthStore();
   const [appointmentData, setAppointmentData] = useState({
     customer_id: "",
     title: "",
@@ -73,6 +75,13 @@ export default function AddAppointmentDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleSubmit");
+      alert("Authentication required. Please login.");
+      return;
+    }
 
     // Validation
     const customerId = selectedCustomer

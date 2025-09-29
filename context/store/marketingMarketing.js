@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 module.exports = (set, get) => ({
   // Marketing Channels
@@ -136,6 +137,13 @@ module.exports = (set, get) => ({
     })),
 
   fetchMarketingChannels: async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      console.log("No token available, skipping fetchMarketingChannels");
+      return;
+    }
+
     set((state) => ({
       marketingChannels: {
         ...state.marketingChannels,

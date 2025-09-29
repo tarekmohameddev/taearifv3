@@ -41,15 +41,23 @@ const useAuthStore = create((set, get) => ({
     set({ IsLoading: true, error: null });
     if (get().IsDone === true) return;
     set({ IsDone: true, error: null });
+    
+    // فتح axios قبل جلب البيانات لضمان عدم حظر الطلبات
+    unlockAxios();
+    
     try {
+      console.log("[AuthContext] Fetching user info...");
       const userInfoResponse = await fetch("/api/user/getUserInfo");
+      console.log("[AuthContext] getUserInfo response status:", userInfoResponse.status);
 
       if (!userInfoResponse.ok) {
+        console.log("[AuthContext] getUserInfo failed with status:", userInfoResponse.status);
         set({ authenticated: false });
         throw new Error("فشل في جلب بيانات المستخدم");
       }
 
       const userData = await userInfoResponse.json();
+      console.log("[AuthContext] getUserInfo response data:", userData);
       const currentState = get();
       set({
         UserIslogged: true,
@@ -61,6 +69,14 @@ const useAuthStore = create((set, get) => ({
         IsLoading: true,
         error: null,
       });
+      
+      // تحديث localStorage للتوافق مع AuthProvider
+      try {
+        localStorage.setItem("user", JSON.stringify(userData));
+        console.log("[AuthContext] Updated localStorage with user data");
+      } catch (error) {
+        console.log("[AuthContext] Error updating localStorage:", error);
+      }
       if (get().userData.is_free_plan == null) {
         const ress = await axiosInstance.get("/user");
         const subscriptionDATA = ress.data.data;
@@ -87,6 +103,7 @@ const useAuthStore = create((set, get) => ({
 
       set({ IsDone: false, error: null });
     } catch (error) {
+      console.log("[AuthContext] Error in fetchUserData:", error);
       set({
         error: error.message || "خطأ في جلب بيانات المستخدم",
         authenticated: false,
@@ -94,6 +111,7 @@ const useAuthStore = create((set, get) => ({
       });
       set({ IsDone: false, error: null });
     } finally {
+      console.log("[AuthContext] Setting IsLoading to false");
       set({ IsLoading: false });
       set({ IsDone: false, error: null });
     }
@@ -120,6 +138,10 @@ const useAuthStore = create((set, get) => ({
     
   login: async (email, password, recaptchaToken) => {
     set({ IsLoading: true, errorLogin: null, errorLoginATserver: null });
+    
+    // فتح axios قبل تسجيل الدخول لضمان عدم حظر الطلبات
+    unlockAxios();
+    
     try {
       const externalResponse = await fetch(
         `${process.env.NEXT_PUBLIC_Backend_URL}/login`,
@@ -177,6 +199,14 @@ const useAuthStore = create((set, get) => ({
         onboarding_completed: user.onboarding_completed || false,
       };
       set({ UserIslogged: true, userData: safeUserData });
+      
+      // تحديث localStorage للتوافق مع AuthProvider
+      try {
+        localStorage.setItem("user", JSON.stringify(safeUserData));
+        console.log("[AuthContext] Updated localStorage with user data from login");
+      } catch (error) {
+        console.log("[AuthContext] Error updating localStorage from login:", error);
+      }
 
       unlockAxios(); // ✅ إعادة تفعيل axios
 
@@ -268,15 +298,25 @@ const useAuthStore = create((set, get) => ({
         response.data.user ||
         response.data;
 
+      const userData = {
+        ...user,
+        token,
+        onboarding_completed: user.onboarding_completed || false,
+      };
+      
       set({
         UserIslogged: true,
         authenticated: true,
-        userData: {
-          ...user,
-          token,
-          onboarding_completed: user.onboarding_completed || false,
-        },
+        userData,
       });
+      
+      // تحديث localStorage للتوافق مع AuthProvider
+      try {
+        localStorage.setItem("user", JSON.stringify(userData));
+        console.log("[AuthContext] Updated localStorage with user data from loginWithToken");
+      } catch (error) {
+        console.log("[AuthContext] Error updating localStorage from loginWithToken:", error);
+      }
 
       unlockAxios(); // ✅ إعادة تفعيل axios
 
@@ -467,8 +507,14 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log("🔍 AuthProvider - Checking localStorage for user");
     const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
+    console.log("🔍 AuthProvider - Stored user:", storedUser);
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      console.log("🔍 AuthProvider - Parsed user:", parsedUser);
+      setUser(parsedUser);
+    }
     setLoading(false);
   }, []);
 

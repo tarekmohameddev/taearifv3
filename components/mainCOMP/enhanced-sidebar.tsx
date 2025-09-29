@@ -34,9 +34,14 @@ export function EnhancedSidebar({
   const { sidebarData, fetchSideMenus } = useStore();
   const { mainNavItems, loading, error } = sidebarData;
 
+  const { userData } = useAuthStore();
+
   useEffect(() => {
-    fetchSideMenus();
-  }, [fetchSideMenus]);
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (userData?.token) {
+      fetchSideMenus();
+    }
+  }, [fetchSideMenus, userData?.token]);
 
   useEffect(() => {
     const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");
@@ -138,7 +143,19 @@ export function EnhancedSidebar({
               </div>
             ) : (
               // إذا لم يكن APP، استخدام Link العادي
-              <Link href={item.path}>
+              <Link href={(() => {
+                // التحقق من وجود dashboard في بداية المسار
+                if (item.path.startsWith('/dashboard')) {
+                  // إذا كان موجود، إزالته
+                  return item.path;
+                } else if (item.path.startsWith('/')) {
+                  // إذا كان يبدأ بـ /، إضافة dashboard قبل /
+                  return `/dashboard${item.path}`;
+                } else {
+                  // إذا لم يكن يبدأ بـ /، إضافة dashboard/
+                  return `/dashboard/${item.path}`;
+                }
+              })()}>
                 <item.icon
                   className={cn(
                     "h-5 w-5",

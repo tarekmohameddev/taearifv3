@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle, User, ArrowRight, Loader2 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
+import useAuthStore from "@/context/AuthContext";
 
 interface Stage {
   id: number;
@@ -51,13 +52,14 @@ export const PropertyRequestStageAssignmentDialog = ({
   const [selectedStageId, setSelectedStageId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [fetchingStages, setFetchingStages] = useState(false);
+  const { userData } = useAuthStore();
 
   // جلب المراحل من الAPI
   useEffect(() => {
-    if (open) {
+    if (open && userData?.token) {
       fetchStages();
     }
-  }, [open]);
+  }, [open, userData?.token]);
 
   // تعيين المرحلة الافتراضية عند فتح الDialog
   useEffect(() => {
@@ -71,6 +73,12 @@ export const PropertyRequestStageAssignmentDialog = ({
   }, [stages, customer]);
 
   const fetchStages = async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchStages");
+      return;
+    }
+
     setFetchingStages(true);
     try {
       const response = await axiosInstance.get("/crm/stages");
@@ -92,6 +100,12 @@ export const PropertyRequestStageAssignmentDialog = ({
 
   const handleSave = async () => {
     if (!customer || !selectedStageId) return;
+
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping handleSave");
+      return;
+    }
 
     setLoading(true);
     try {

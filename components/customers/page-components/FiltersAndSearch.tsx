@@ -11,6 +11,7 @@ import { Search, RefreshCw, Loader2 } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
+import useAuthStore from "@/context/AuthContext";
 
 // Interface for filter data from API
 interface FilterData {
@@ -31,6 +32,7 @@ export const FiltersAndSearch = ({
 }: any) => {
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+  const { userData } = useAuthStore();
   
   // Get filter states and actions from the Zustand store
   const {
@@ -54,6 +56,12 @@ export const FiltersAndSearch = ({
 
   // Effect to fetch initial filter data from the API
   useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchFilters");
+      return;
+    }
+
     const fetchFilters = async () => {
       try {
         setLoadingFilters(true);
@@ -74,10 +82,16 @@ export const FiltersAndSearch = ({
     };
 
     fetchFilters();
-  }, [setFilterData, setLoadingFilters]);
+  }, [setFilterData, setLoadingFilters, userData?.token]);
 
   // The core search function, rewritten for correctness and clarity
   const performSearch = useCallback(async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping performSearch");
+      return;
+    }
+
     setIsSearching(true);
     setLoading(true);
     setError(null); // Reset error on new search
@@ -131,7 +145,7 @@ export const FiltersAndSearch = ({
       setIsSearching(false);
       setLoading(false);
     }
-  }, [setCustomersData, setTotalCustomers, setLoading, setError]);
+  }, [setCustomersData, setTotalCustomers, setLoading, setError, userData?.token]);
 
 
   // Debounced search on input change

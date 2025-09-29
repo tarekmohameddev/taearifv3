@@ -35,6 +35,7 @@ import {
 } from "lucide-react"
 import axiosInstance from "@/lib/axiosInstance"
 import useStore from "@/context/Store"
+import useAuthStore from "@/context/AuthContext"
 
 interface RentalDetails {
   rental: {
@@ -99,6 +100,8 @@ export function RentalDetailsDialog() {
     selectedRentalId
   } = rentalApplications
 
+  const { userData } = useAuthStore()
+
   const [details, setDetails] = useState<RentalDetails | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -106,13 +109,19 @@ export function RentalDetailsDialog() {
 
   // Fetch rental details when dialog opens
   useEffect(() => {
-    if (isRentalDetailsDialogOpen && selectedRentalId) {
+    if (isRentalDetailsDialogOpen && selectedRentalId && userData?.token) {
       fetchRentalDetails()
     }
-  }, [isRentalDetailsDialogOpen, selectedRentalId])
+  }, [isRentalDetailsDialogOpen, selectedRentalId, userData?.token])
 
   const fetchRentalDetails = async () => {
     if (!selectedRentalId) return
+
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchRentalDetails")
+      return
+    }
 
     setLoading(true)
     setError(null)
