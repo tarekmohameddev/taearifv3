@@ -1,5 +1,6 @@
 import { RegisterPage } from "@/components/signin-up/register-page";
 import Script from "next/script";
+import WhatsAppFloatingBubble from "@/components/WhatsAppFloatingBubble";
 
 export const metadata = {
   title: "تسجيل حساب جديد",
@@ -28,6 +29,7 @@ export default function Register() {
         }}
       />
       <RegisterPage />
+      <WhatsAppFloatingBubble />
     </>
   );
 }

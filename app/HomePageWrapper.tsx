@@ -9,6 +9,8 @@ import useTenantStore from "@/context-liveeditor/tenantStore";
 import { getSectionPath, getComponentSubPath } from "@/lib-liveeditor/ComponentsList";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageSwitcher } from "@/components/tenant/LanguageSwitcher";
+import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
+import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 
 // دالة لتحميل المكونات ديناميكيًا بناءً على الاسم والرقم الأخير
 const loadComponent = (section: string, componentName: string) => {
@@ -74,6 +76,7 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
   const router = useRouter();
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
+  const error = useTenantStore((s) => s.error);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const setTenantId = useTenantStore((s) => s.setTenantId);
   
@@ -86,6 +89,7 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
     tenantId,
     hasTenantData: !!tenantData,
     loadingTenantData,
+    error,
   });
 
   // Set tenantId in store when component mounts
@@ -151,6 +155,27 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
     return <Loading />;
   }
 
+  // إذا كان هناك خطأ أو لم توجد بيانات للـ tenant، اعرض not-found
+  if (error || (!loadingTenantData && !tenantData && tenantId)) {
+    console.log("🏠 HomePageWrapper - Showing not-found due to:", { error, hasTenantData: !!tenantData, tenantId });
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+        <h1 className="text-6xl font-bold text-red-600 mb-4">404</h1>
+        <h2 className="text-2xl font-semibold mb-6">Tenant Not Found</h2>
+        <p className="text-gray-600 mb-8 text-center max-w-md">
+          The tenant "{tenantId}" you are looking for might have been removed, 
+          had its name changed, or is temporarily unavailable.
+        </p>
+        <button 
+          onClick={() => window.location.href = '/'} 
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Return to Homepage
+        </button>
+      </div>
+    );
+  }
+
   // Filter out header and footer components since they are now global
   const filteredComponentsList = memoizedComponentsList.filter((comp: any) => {
     if (comp.componentName?.startsWith("header")) {
@@ -165,10 +190,9 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
   return (
     <I18nProvider>
       <div className="min-h-screen flex flex-col">
+        {/* Header from globalComponentsData */}
         <div className="relative">
-          <div className="absolute top-4 right-4 z-50">
-            <LanguageSwitcher />
-          </div>
+          <StaticHeader1 />
         </div>
 
         {/* Page Content */}
@@ -193,6 +217,8 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
           )}
         </main>
 
+        {/* Footer from globalComponentsData */}
+        <StaticFooter1 />
       </div>
     </I18nProvider>
   );

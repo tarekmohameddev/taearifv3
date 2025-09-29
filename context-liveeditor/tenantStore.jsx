@@ -297,11 +297,22 @@ const useTenantStore = create((set) => ({
         body: JSON.stringify({ websiteName }),
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch tenant data");
+        if (response.status === 404) {
+          throw new Error("Tenant not found");
+        } else if (response.status === 204) {
+          throw new Error("No content available for this tenant");
+        } else {
+          throw new Error(`Failed to fetch tenant data: ${response.status}`);
+        }
       }
 
       const text = await response.text();
       const data = text ? JSON.parse(text) : {}; // If response is empty, use an empty object
+      
+      // تحقق من أن البيانات ليست فارغة
+      if (!data || Object.keys(data).length === 0) {
+        throw new Error("No data available for this tenant");
+      }
       
       // Load global components data into editor store
       const { useEditorStore } = await import("./editorStore");

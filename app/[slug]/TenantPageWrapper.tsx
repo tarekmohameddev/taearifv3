@@ -157,9 +157,10 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
         {/* Header with i18n support */}
         <div className="relative">
           <Header1I18n />
-          <div className="absolute top-4 right-4 z-50">
+          {/* لا اريد ازالة هذا  , فقط اريده ككومنت */}
+          {/* <div className="absolute top-4 right-4 z-50"> 
             <LanguageDropdown />
-          </div>
+          </div> */}
         </div>
 
         {/* Page Content */}
