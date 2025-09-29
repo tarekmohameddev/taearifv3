@@ -3,6 +3,7 @@
 import { Suspense, lazy, Fragment, useMemo, useEffect } from "react";
 import { useParams } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
+import useAuthStore from "@/context/AuthContext";
 import Loading from "@/app/loading";
 import { notFound } from "next/navigation";
 import { getSectionPath, getComponentSubPath } from "@/lib-liveeditor/ComponentsList";
@@ -68,9 +69,9 @@ const loadComponent = (section: string, componentName: string) => {
 export default function TenantPageBySlug() {
   console.log("📄 TenantPageBySlug - Component rendered");
 
-  const params = useParams<{ tenantId: string; slug: string }>();
-  const tenantId = params?.tenantId;
-  const slug = params?.slug;
+  const { userData } = useAuthStore();
+  const tenantId = userData?.username;
+  const slug = useParams<{ slug: string }>()?.slug;
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -97,12 +98,6 @@ export default function TenantPageBySlug() {
 
   // Get components from componentSettings
   const componentsList = useMemo(() => {
-    console.log("📄 TenantPageBySlug - Building componentsList");
-    console.log(
-      "📄 TenantPageBySlug - tenantData?.componentSettings:",
-      tenantData?.componentSettings
-    );
-    console.log("📄 TenantPageBySlug - slug:", slug);
 
     if (
       tenantData?.componentSettings &&
@@ -110,7 +105,6 @@ export default function TenantPageBySlug() {
       tenantData.componentSettings[slug]
     ) {
       const pageSettings = tenantData.componentSettings[slug];
-      console.log("📄 TenantPageBySlug - pageSettings:", pageSettings);
 
       // تحويل componentSettings إلى قائمة مكونات
       const components = Object.entries(pageSettings)
@@ -150,12 +144,6 @@ export default function TenantPageBySlug() {
     return true;
   });
 
-  console.log(
-    "📄 Page - Original components:",
-    componentsList.length,
-    "Filtered components:",
-    filteredComponentsList.length
-  );
 
   return (
     <I18nProvider>
@@ -173,7 +161,6 @@ export default function TenantPageBySlug() {
           {Array.isArray(filteredComponentsList) &&
           filteredComponentsList.length > 0 ? (
             filteredComponentsList.map((comp: any) => {
-              console.log("📄 Page - Processing component:", comp);
 
               const Cmp = loadComponent(slug as string, comp.componentName);
               if (!Cmp) {
@@ -181,12 +168,6 @@ export default function TenantPageBySlug() {
                 return <Fragment key={comp.id} />;
               }
 
-              console.log(
-                "✅ Page - Rendering component:",
-                comp.componentName,
-                "with variant:",
-                comp.id
-              );
               return (
                 <Suspense key={comp.id} fallback={<Loading />}>
                   <Cmp {...(comp.data as any)} useStore variant={comp.id} />

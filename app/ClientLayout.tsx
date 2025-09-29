@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import InfoPopup from "@/components/ui/popup";
@@ -62,21 +63,40 @@ export default function ClientLayout({
     fetchUserData();
   }, [fetchUserData]);
 
+  // دالة للتحقق من الصفحات العامة مع دعم الـ locale
+  const isPublicPageWithLocale = (pathname: string) => {
+    const publicPages = [
+      "/oauth",
+      "/not-found", 
+      "/forgot-password",
+      "/reset",
+      "/register",
+      "/login",
+      "/landing",
+      "/live-editor"
+    ];
+    
+    // التحقق من الصفحات العامة بدون locale
+    if (publicPages.some(page => pathname?.startsWith(page))) {
+      return true;
+    }
+    
+    // التحقق من الصفحات العامة مع locale (en/ar/أو أي locale آخر)
+    const localePattern = /^\/[a-z]{2}\//;
+    if (localePattern.test(pathname)) {
+      const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}\//, '/');
+      return publicPages.some(page => pathWithoutLocale.startsWith(page));
+    }
+    
+    return false;
+  };
+
   useEffect(() => {
     if (
       isMounted &&
       !IsLoading &&
       !UserIslogged &&
-      !pathname?.startsWith("/oauth") &&
-      !pathname?.startsWith("/not-found") &&
-      !pathname?.startsWith("/forgot-password") &&
-      !pathname?.startsWith("/reset") &&
-      !pathname?.startsWith("/register") &&
-      !pathname?.startsWith("/login") &&
-      !pathname?.startsWith("/landing") &&
-      !pathname?.startsWith("/live-editor")&&
-      !pathname?.startsWith("en/live-editor")&&
-      !pathname?.startsWith("ar/live-editor")
+      !isPublicPageWithLocale(pathname || "")
     ) {
       console.error("goooooo tooooooo looooooign");
       console.warn("goooooo tooooooo looooooign");
@@ -145,10 +165,7 @@ export default function ClientLayout({
     "/live-editor",
   ];
 
-  const isPublicPage =
-    publicPages.some((page) => pathname?.startsWith(page)) ||
-    publicPages.some((page) => pathname?.startsWith("en/"+page)) ||
-    publicPages.some((page) => pathname?.startsWith("ar/"+page)) ||
+  const isPublicPage = isPublicPageWithLocale(pathname || "") ||
     pathname?.startsWith("/oauth") ||
     pathname?.startsWith("/not-found");
 
@@ -157,7 +174,7 @@ export default function ClientLayout({
   }
 
   return (
-    <>
+    <AuthProvider>
       {children}
 
       {showPopup && userData?.message && (
@@ -167,6 +184,6 @@ export default function ClientLayout({
           onClose={handleClosePopup}
         />
       )}
-    </>
+    </AuthProvider>
   );
 }

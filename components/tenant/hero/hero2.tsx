@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
+import useAuthStore from "@/context/AuthContext"
 import { useEditorStore } from "@/context-liveeditor/editorStore"
 import useTenantStore from "@/context-liveeditor/tenantStore"
 
@@ -33,8 +34,8 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
   // Get tenant data
   const tenantData = useTenantStore((s: any) => s.tenantData)
   const fetchTenantData = useTenantStore((s: any) => s.fetchTenantData)
-  const params = useParams<{ tenantId: string }>()
-  const tenantId = params?.tenantId
+  const { userData } = useAuthStore()
+  const tenantId = userData?.username
   const router = useRouter()
 
   useEffect(() => {

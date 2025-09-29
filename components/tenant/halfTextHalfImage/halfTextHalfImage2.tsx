@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import useStore from "@/context/Store"
 import { useAuth } from "@/context/AuthContext"
-import { useRouter, useParams } from "next/navigation"
+import useAuthStore from "@/context/AuthContext"
+import { useRouter } from "next/navigation"
 import useTenantStore from "@/context-liveeditor/tenantStore"
 import { useEditorStore } from "@/context-liveeditor/editorStore"
 
@@ -248,8 +249,8 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   }, [variantId, props.useStore, props.id, ensureComponentVariant])
 
   const { user, loading } = useAuth()
-  const params = useParams<{ tenantId: string }>()
-  const tenantId = params?.tenantId
+  const { userData } = useAuthStore()
+  const tenantId = userData?.username
   const router = useRouter()
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
   const tenantData = useTenantStore((s) => s.tenantData)

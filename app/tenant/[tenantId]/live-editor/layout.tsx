@@ -50,12 +50,17 @@ function AddPageDialog({
   const t = useEditorT();
 
   const { tenantData } = useTenantStore();
-  const params = useParams<{ tenantId: string }>();
+  const { userData } = useAuthStore();
   const router = useRouter();
+  const { locale } = useEditorLocale();
 
-  // التأكد من وجود tenantId
-  const tenantId = params?.tenantId;
-  if (!tenantId) return null;
+  // التأكد من وجود tenantId من userData.username
+  const tenantId = userData?.username;
+
+  // إذا لم يكن هناك tenantId، لا نعرض المكون
+  if (!tenantId) {
+    return null;
+  }
 
   // التحقق من صحة البيانات
   const validateForm = () => {
@@ -170,7 +175,6 @@ function AddPageDialog({
         .trim(),
     }));
   };
-  const { locale } = useEditorLocale();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -602,15 +606,14 @@ function AddPageDialog({
 
 // مكون الشريط العلوي الجديد ليستطيع الوصول للسياق
 function EditorNavBar() {
-  const params = useParams<{ tenantId: string }>();
   const pathname = usePathname();
   const requestSave = useEditorStore((state) => state.requestSave);
-  const { liveEditorUser: user, liveEditorLoading: loading } = useAuthStore();
+  const { liveEditorUser: user, liveEditorLoading: loading, userData } = useAuthStore();
   const router = useRouter();
   const [recentlyAddedPages, setRecentlyAddedPages] = useState<string[]>([]);
   const t = useEditorT();
 
-  const tenantId = params?.tenantId || "";
+  const tenantId = userData?.username || "";
   const basePath = `/tenant/${tenantId}/live-editor`;
   const currentPath = (pathname || "").replace(basePath, "") || "";
   const { fetchTenantData, tenantData, loadingTenantData, error } =

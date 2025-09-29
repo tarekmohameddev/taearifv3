@@ -5,7 +5,6 @@ import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import LiveEditor from "@/components/tenant/live-editor/LiveEditor";
 import { EditorProvider } from "@/context-liveeditor/EditorProvider";
-import { AuthProvider } from "@/context-liveeditor/AuthContext";
 
 export function LiveEditorPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -26,10 +25,8 @@ export function LiveEditorPage() {
   }
 
   return (
-    <AuthProvider>
       <EditorProvider>
                 <LiveEditor />
       </EditorProvider>
-    </AuthProvider>
   );
 }

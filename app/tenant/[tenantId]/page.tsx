@@ -1,9 +1,10 @@
 "use client"; // صفحة تعمل على جانب العميل فقط
 
 import { Suspense, lazy, useEffect, useMemo, Fragment } from "react";
-import { useRouter, useParams } from "next/navigation"; // لإعادة التوجيه إذا لم يكن المستخدم موجودًا
+import { useRouter } from "next/navigation"; // لإعادة التوجيه إذا لم يكن المستخدم موجودًا
 import { defaultComponents } from "@/lib-liveeditor/defaultComponents";
 import { useAuth } from "@/context/AuthContext";
+import useAuthStore from "@/context/AuthContext";
 import Loading from "./loading";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { getSectionPath, getComponentSubPath } from "@/lib-liveeditor/ComponentsList";
@@ -43,14 +44,14 @@ const loadComponent = (section: string, componentName: string) => {
 
 export default function Home() {
   // Always call hooks in the same order
-  const paramsObj = useParams<{ tenantId: string }>();
   const { user, loading } = useAuth();
+  const { userData } = useAuthStore();
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const error = useTenantStore((s) => s.error);
 
-  const tenantId = paramsObj?.tenantId;
+  const tenantId = userData?.username;
 
   // Compute selected component names first (no early returns before hooks)
   const getComponent = (section: string, component: string) => {

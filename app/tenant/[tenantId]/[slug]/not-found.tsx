@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import useAuthStore from "@/context/AuthContext";
 
 export default function SlugNotFound() {
-  const params = useParams<{ tenantId: string; slug: string }>();
-  const tenantId = params?.tenantId;
-  const slug = params?.slug;
+  const { userData } = useAuthStore();
+  const tenantId = userData?.username;
+  const slug = useParams<{ slug: string }>()?.slug;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4">

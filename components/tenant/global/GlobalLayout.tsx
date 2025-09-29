@@ -2,6 +2,7 @@
 
 import { Suspense, lazy, Fragment, useMemo, useEffect } from "react";
 import { useParams } from "next/navigation";
+import useAuthStore from "@/context/AuthContext";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import Loading from "@/app/loading";
@@ -38,9 +39,9 @@ interface GlobalLayoutProps {
 export default function GlobalLayout({ children }: GlobalLayoutProps) {
   console.log('🌍 GlobalLayout - Component rendered');
   
-  const params = useParams<{ tenantId: string; slug: string }>();
-  const tenantId = params?.tenantId;
-  const slug = params?.slug;
+  const { userData } = useAuthStore();
+  const tenantId = userData?.username;
+  const slug = useParams<{ slug: string }>()?.slug;
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);

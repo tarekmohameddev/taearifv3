@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter, useParams } from "next/navigation";
+import useAuthStore from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { getDefaultHeaderData as getDefaultHeaderDataFromFunctions } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
@@ -180,12 +181,12 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
-  const params = useParams<{ tenantId: string }>();
   
   // Get global components data from tenantData
   const tenantGlobalComponentsData = tenantData?.globalComponentsData;
   const tenantGlobalHeaderData = tenantGlobalComponentsData?.header;
-  const tenantId = params?.tenantId;
+  const { userData } = useAuthStore();
+  const tenantId = userData?.username;
   const router = useRouter();
 
   useEffect(() => {

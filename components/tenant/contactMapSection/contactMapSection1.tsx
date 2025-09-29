@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Star } from "lucide-react"
-import { useParams } from "next/navigation"
+import useAuthStore from "@/context/AuthContext"
 import useTenantStore from "@/context-liveeditor/tenantStore"
 import { useEditorStore } from "@/context-liveeditor/editorStore"
 
@@ -332,8 +332,8 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData)
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const params = useParams<{ tenantId: string }>()
-  const tenantId = params?.tenantId
+  const { userData } = useAuthStore()
+  const tenantId = userData?.username
 
   useEffect(() => {
     if (tenantId) {

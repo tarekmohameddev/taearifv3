@@ -6,7 +6,7 @@ import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useEditorStore } from "@/context-liveeditor/editorStore"
 import useTenantStore from "@/context-liveeditor/tenantStore"
-import { useParams } from "next/navigation"
+import useAuthStore from "@/context/AuthContext"
 
 type Step = {
   title: string
@@ -269,8 +269,8 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData)
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const params = useParams<{ tenantId: string }>()
-  const tenantId = params?.tenantId
+  const { userData } = useAuthStore()
+  const tenantId = userData?.username
 
   useEffect(() => {
     if (tenantId) {

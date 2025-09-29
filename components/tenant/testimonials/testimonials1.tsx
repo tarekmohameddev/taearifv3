@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect } from "react"
-import { useParams } from "next/navigation"
 import SwiperCarousel from "@/components/ui/swiper-carousel"
 import { TestimonialCard } from "@/components/testimonial-card"
+import useAuthStore from "@/context/AuthContext"
 import useTenantStore from "@/context-liveeditor/tenantStore"
 import { useEditorStore } from "@/context-liveeditor/editorStore"
 
@@ -295,8 +295,8 @@ export default function TestimonialsSection(props: TestimonialsProps = {}) {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData)
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const params = useParams<{ tenantId: string }>()
-  const tenantId = params?.tenantId
+  const { userData } = useAuthStore()
+  const tenantId = userData?.username
 
   useEffect(() => {
     if (tenantId) {

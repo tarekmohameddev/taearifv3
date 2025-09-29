@@ -1,12 +1,13 @@
 "use client";
 
 import React, { ReactNode, useEffect } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
+import useAuthStore from "@/context/AuthContext";
 
 export default function TenantLayout({ children }: { children: ReactNode }) {
-  const params = useParams<{ tenantId: string }>();
-  const tenantId = params?.tenantId;
+  const { userData } = useAuthStore();
+  const tenantId = userData?.username;
   const pathname = usePathname();
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantData = useTenantStore((s) => s.tenantData);

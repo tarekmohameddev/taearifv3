@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import useAuthStore from "@/context/AuthContext";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import SwiperCarousel from "@/components/ui/swiper-carousel";
@@ -183,8 +184,8 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData)
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const params = useParams<{ tenantId: string }>()
-  const tenantId = params?.tenantId
+  const { userData } = useAuthStore()
+  const tenantId = userData?.username
   const router = useRouter()
 
   useEffect(() => {

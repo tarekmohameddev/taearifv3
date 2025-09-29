@@ -2,15 +2,15 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useParams } from "next/navigation";
 import toast from "react-hot-toast";
 import SaveConfirmationDialog from "@/components/SaveConfirmationDialog";
 import { useEditorStore } from "./editorStore";
+import useAuthStore from "@/context/AuthContext";
 
 export function EditorProvider({ children }: { children: ReactNode }) {
   const { showDialog, closeDialog, openSaveDialogFn } = useEditorStore();
-  const params = useParams<{ tenantId: string }>();
-  const tenantId = params?.tenantId;
+  const { userData } = useAuthStore();
+  const tenantId = userData?.username;
 
   const confirmSave = () => {
     // Execute any page-provided save logic first (if set)
@@ -34,18 +34,6 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       globalComponentsData: state.globalComponentsData,
     };
 
-    console.log("🚀 [API SAVE] Sending payload to save-pages:", {
-      tenantId: payload.tenantId,
-      pagesKeys: Object.keys(payload.pages),
-      pages: Object.entries(payload.pages).map(([page, components]) => ({
-        page,
-        componentsCount: (components as any[]).length,
-        components: (components as any[]).map((c, i) => ({ index: i, id: c.id, componentName: c.componentName, position: c.position }))
-      })),
-      globalComponentsData: payload.globalComponentsData,
-      hasGlobalHeader: !!payload.globalComponentsData?.header,
-      hasGlobalFooter: !!payload.globalComponentsData?.footer
-    });
 
     
 

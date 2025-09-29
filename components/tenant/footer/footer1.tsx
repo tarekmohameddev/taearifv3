@@ -5,7 +5,7 @@ import Link from "next/link"
 import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
 import { FaWhatsapp } from "react-icons/fa"
 import { useEffect } from "react"
-import { useParams } from "next/navigation"
+import useAuthStore from "@/context/AuthContext"
 import useTenantStore from "@/context-liveeditor/tenantStore"
 import { useEditorStore } from "@/context-liveeditor/editorStore"
 import { logChange } from "@/lib-liveeditor/debugLogger"
@@ -226,8 +226,8 @@ export default function Footer(props: FooterProps = {}) {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData)
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const params = useParams<{ tenantId: string }>()
-  const tenantId = params?.tenantId
+  const { userData } = useAuthStore()
+  const tenantId = userData?.username
 
   useEffect(() => {
     if (tenantId) {

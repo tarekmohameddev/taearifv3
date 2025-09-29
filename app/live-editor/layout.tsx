@@ -50,12 +50,17 @@ function AddPageDialog({
   const t = useEditorT();
 
   const { tenantData } = useTenantStore();
-  const params = useParams<{ tenantId: string }>();
+  const { userData } = useAuthStore();
   const router = useRouter();
+  const { locale } = useEditorLocale();
 
-  // التأكد من وجود tenantId
-  const tenantId = params?.tenantId;
-  if (!tenantId) return null;
+  // التأكد من وجود tenantId من userData.username
+  const tenantId = userData?.username;
+
+  // إذا لم يكن هناك tenantId، لا نعرض المكون
+  if (!tenantId) {
+    return null;
+  }
 
   // التحقق من صحة البيانات
   const validateForm = () => {
@@ -170,7 +175,6 @@ function AddPageDialog({
         .trim(),
     }));
   };
-  const { locale } = useEditorLocale();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -602,15 +606,14 @@ function AddPageDialog({
 
 // مكون الشريط العلوي الجديد ليستطيع الوصول للسياق
 function EditorNavBar() {
-  const params = useParams<{ tenantId: string }>();
   const pathname = usePathname();
   const requestSave = useEditorStore((state) => state.requestSave);
-  const { liveEditorUser: user, liveEditorLoading: loading } = useAuthStore();
+  const { liveEditorUser: user, liveEditorLoading: loading, userData } = useAuthStore();
   const router = useRouter();
   const [recentlyAddedPages, setRecentlyAddedPages] = useState<string[]>([]);
   const t = useEditorT();
 
-  const tenantId = params?.tenantId || "";
+  const tenantId = userData?.username || "";
   const basePath = `/tenant/${tenantId}/live-editor`;
   const currentPath = (pathname || "").replace(basePath, "") || "";
   const { fetchTenantData, tenantData, loadingTenantData, error } =
@@ -697,20 +700,17 @@ function EditorNavBar() {
     if (tenantId && !tenantData && !loadingTenantData) {
       fetchTenantData(tenantId);
     }
-
-    if (tenantData) {
-    }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
+  // useEffect(() => {
+  //   if (!loading && !user) {
+  //     router.push("/login");
+  //   }
+  // }, [user, loading, router]);
 
-  if (!user) {
-    return null;
-  }
+  // if (!user) {
+  //   return null;
+  // }
 
   return (
     <nav className="bg-white border-b-[1.5px] border-red-300 sticky top-0 z-[9999]">
@@ -828,23 +828,22 @@ export default function LiveEditorLayout({
   }, [pathname, setLocale]);
 
   return (
-    // إضافة I18nProvider و EditorProvider لتوفير السياق لكل الأبناء
+    // إضافة I18nProvider و EditorProvider و AuthProvider لتوفير السياق لكل الأبناء
     <I18nProvider>
-      <EditorProvider>
       <AuthProvider>
+        <EditorProvider>
+          <div className="min-h-screen bg-gray-50 flex flex-col">
+            {/* إضافة Toaster هنا ليعمل في كل مكان */}
+            <Toaster position="top-center" reverseOrder={false} />
 
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-          {/* إضافة Toaster هنا ليعمل في كل مكان */}
-          <Toaster position="top-center" reverseOrder={false} />
+            {/* Translation Test Component - Remove in production */}
 
-          {/* Translation Test Component - Remove in production */}
+            <EditorNavBar />
 
-          <EditorNavBar />
-
-          <main className="flex-1">{children}</main>
-        </div>
+            <main className="flex-1">{children}</main>
+          </div>
+        </EditorProvider>
       </AuthProvider>
-      </EditorProvider>
     </I18nProvider>
   );
 }

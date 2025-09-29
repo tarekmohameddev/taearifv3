@@ -330,30 +330,16 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   
   // Initialize data immediately if not exists
   if (!globalHeaderData || Object.keys(globalHeaderData).length === 0) {
-    console.log("🚀 [LiveEditorUI] Setting default header data immediately");
     const { getDefaultHeaderData } = require("@/context-liveeditor/editorStoreFunctions/headerFunctions");
     const defaultHeaderData = getDefaultHeaderData();
     setGlobalHeaderData(defaultHeaderData);
   }
   
   if (!globalFooterData || Object.keys(globalFooterData).length === 0) {
-    console.log("🚀 [LiveEditorUI] Setting default footer data immediately");
     const { getDefaultFooterData } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
     const defaultFooterData = getDefaultFooterData();
     setGlobalFooterData(defaultFooterData);
   }
-  
-  
-  // Monitor global data changes
-  useEffect(() => {
-    console.log("🔍 [LiveEditorUI] globalHeaderData changed:", {
-      globalHeaderData,
-      menuItems: globalHeaderData?.menu?.length || 0,
-      menuTexts: globalHeaderData?.menu?.map((item: any) => item.text),
-      logo: globalHeaderData?.logo,
-      colors: globalHeaderData?.colors
-    });
-  }, [globalHeaderData]);
   
   
 
@@ -446,7 +432,6 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       index: number;
       data?: any;
     }) => {
-      console.log('🔍 [ADD COMPONENT] handleAddComponent called:', componentData);
       // تحويل componentType إلى camelCase
       const normalizedComponentType = componentData.type
         .replace(/\s+/g, "")
@@ -470,7 +455,6 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         },
       };
 
-      console.log('🔍 [ADD COMPONENT] New component created:', newComponent);
 
       // إضافة المكون في الموضع المحدد مع تحديث محسن
       const updatedComponents = [...pageComponents];
@@ -481,7 +465,6 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       updatedComponents.splice(targetIndex, 0, newComponent);
 
       // تحديث الحالة مع تنشيط الحدث
-      console.log('🔍 [ADD COMPONENT] Updating page components:', updatedComponents);
       state.setPageComponents(updatedComponents);
 
       // تحديد المكون الجديد تلقائياً

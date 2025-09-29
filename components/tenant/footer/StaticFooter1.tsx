@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useEffect, useMemo, useCallback } from "react";
-import { useParams } from "next/navigation";
+import useAuthStore from "@/context/AuthContext";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 
@@ -220,12 +220,12 @@ export default function StaticFooter({ overrideData }: { overrideData?: any } = 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
-  const params = useParams<{ tenantId: string }>();
   
   // Get global components data from tenantData
   const tenantGlobalComponentsData = tenantData?.globalComponentsData;
   const tenantGlobalFooterData = tenantGlobalComponentsData?.footer;
-  const tenantId = params?.tenantId;
+  const { userData } = useAuthStore();
+  const tenantId = userData?.username;
 
   useEffect(() => {
     if (tenantId) {

@@ -263,6 +263,8 @@ const useTenantStore = create((set) => ({
           }
         : state.tenantData,
     })),
+
+    
   fetchTenantData: async (websiteName) => {
     const state = useTenantStore.getState();
     // Prevent duplicate requests
@@ -315,6 +317,8 @@ const useTenantStore = create((set) => ({
       set({ error: error.message, loadingTenantData: false });
     }
   },
+
+  
   saveHeaderChanges: async (tenantId, headerData, variant) => {
     try {
       const response = await fetch("/api/tenant/header", {
