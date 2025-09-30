@@ -617,6 +617,18 @@ function EditorNavBar() {
   const tenantId = userData?.username || "";
   const basePath = `/live-editor`;
   const currentPath = (pathname || "").replace(basePath, "") || "";
+  
+  // إنشاء URL كامل مع tenantId.domain.com
+  const getTenantUrl = (path: string = "") => {
+    if (!tenantId) return path;
+    
+    // في التطوير: tenantId.localhost:3000
+    // في الإنتاج: tenantId.domain.com
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const domain = isDevelopment ? 'localhost:3000' : 'taearif.com';
+    
+    return `http${isDevelopment ? '' : 's'}://${tenantId}.${domain}${path}`;
+  };
   const { fetchTenantData, tenantData, loadingTenantData, error } =
     useTenantStore();
 
@@ -703,6 +715,55 @@ function EditorNavBar() {
     }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
 
+  // تحميل جميع البيانات من componentSettings أو البيانات الافتراضية
+  useEffect(() => {
+    if (!tenantData) return;
+
+    const { setPageComponentsForPage } = useEditorStore.getState();
+    
+    // التحقق من وجود componentSettings وأنها ليست فارغة
+    const hasComponentSettings = tenantData.componentSettings && 
+                                  typeof tenantData.componentSettings === 'object' && 
+                                  !Array.isArray(tenantData.componentSettings) &&
+                                  Object.keys(tenantData.componentSettings).length > 0;
+
+    if (hasComponentSettings) {
+      // تحميل جميع الصفحات من componentSettings
+      Object.entries(tenantData.componentSettings).forEach(([pageSlug, pageData]: [string, any]) => {
+        const components = Object.entries(pageData).map(([id, component]: [string, any]) => ({
+          id,
+          type: component.type,
+          name: component.name,
+          componentName: component.componentName,
+          data: component.data || {},
+          position: component.position || 0,
+          layout: component.layout || { row: 0, col: 0, span: 2 }
+        }));
+        
+        // تحديث كل صفحة في الـ store
+        setPageComponentsForPage(pageSlug, components);
+      });
+    } else {
+      // تحميل البيانات الافتراضية من PAGE_DEFINITIONS
+      const { PAGE_DEFINITIONS } = require("@/lib-liveeditor/defaultComponents");
+      
+      Object.entries(PAGE_DEFINITIONS).forEach(([pageSlug, pageData]: [string, any]) => {
+        const components = Object.entries(pageData).map(([id, component]: [string, any]) => ({
+          id,
+          type: component.type,
+          name: component.name,
+          componentName: component.componentName,
+          data: component.data || {},
+          position: component.position || 0,
+          layout: component.layout || { row: 0, col: 0, span: 2 }
+        }));
+        
+        // تحديث كل صفحة في الـ store
+        setPageComponentsForPage(pageSlug, components);
+      });
+    }
+  }, [tenantData]);
+
   // useEffect(() => {
   //   if (!loading && !user) {
   //     router.push("/login");
@@ -761,7 +822,7 @@ function EditorNavBar() {
               {t("editor.save_changes")}
             </button>
             <Link
-              href={`${currentPath}`}
+              href={getTenantUrl(currentPath)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-[calc(1.02)]"
@@ -782,7 +843,7 @@ function EditorNavBar() {
               {t("editor.preview")}
             </Link>
             <Link
-              href={`/`}
+              href={getTenantUrl('/')}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-[calc(1.02)]"

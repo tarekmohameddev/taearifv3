@@ -795,14 +795,14 @@ export function LoginPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">الاسم:</span>
                     <span className="text-sm text-muted-foreground">
-                      {userData.first_name} {userData.last_name}
+                      {userData?.first_name} {userData?.last_name}
                     </span>
                   </div>
                 )}
                 {userData?.username && (
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">اسم المستخدم:</span>
-                    <span className="text-sm text-muted-foreground">{userData.username}</span>
+                    <span className="text-sm text-muted-foreground">{userData?.username}</span>
                   </div>
                 )}
               </div>

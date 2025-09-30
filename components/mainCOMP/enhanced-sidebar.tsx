@@ -191,15 +191,25 @@ export function EnhancedSidebar({
     </TooltipProvider>
   );
 
-  const SidebarContent = () => (
-    <div className="flex h-full flex-col gap-2">
-      <div className="flex h-14 items-center border-b px-4 md:h-[60px]">
-        <div className="flex flex-col w-full">
-          <span className="text-lg font-semibold truncate">
-            {useAuthStore.getState().userData?.company_name}
-          </span>
+  const SidebarContent = () => {
+    const userData = useAuthStore.getState().userData;
+    console.log("🔗 SidebarContent - userData:", userData);
+    console.log("🔗 SidebarContent - domain:", userData?.domain);
+    
+    return (
+      <div className="flex h-full flex-col gap-2">
+        <div className="flex h-14 items-center border-b px-4 md:h-[60px]">
+          <div className="flex flex-col w-full">
+            <span className="text-lg font-semibold truncate">
+              {userData?.company_name}
+            </span>
+            {userData?.domain && userData.domain.trim() !== "" && (
+              <span className="text-xs text-gray-500 truncate">
+                {userData.domain}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
 
       <div className="px-3">
         <TooltipProvider delayDuration={300}>
@@ -210,11 +220,54 @@ export function EnhancedSidebar({
                 size="sm"
                 className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
                 onClick={() => {
-                  const domain = useAuthStore.getState().userData?.domain || "";
-                  const url = domain.startsWith("http")
-                    ? domain
-                    : `https://${domain}`;
-                  window.open(url, "_blank");
+                  const userData = useAuthStore.getState().userData;
+                  console.log("🔗 Full userData:", userData);
+                  console.log("🔗 Domain from userData:", userData?.domain);
+                  
+                  // التحقق من وجود userData
+                  if (!userData) {
+                    console.warn("userData is null or undefined");
+                    alert("يرجى تسجيل الدخول أولاً");
+                    return;
+                  }
+                  
+                  const domain = userData?.domain || "";
+                  console.log("🔗 Domain after fallback:", domain);
+                  console.log("🔗 Domain type:", typeof domain);
+                  console.log("🔗 Domain length:", domain.length);
+                  
+                  // التحقق من صحة الـ domain
+                  if (!domain || domain.trim() === "") {
+                    console.warn("Domain is empty or invalid");
+                    console.warn("Domain value:", domain);
+                    console.warn("Domain trimmed:", domain.trim());
+                    alert("يرجى إعداد domain صحيح في إعدادات الحساب");
+                    return;
+                  }
+                  
+                  // تنظيف الـ domain من المسافات
+                  const cleanDomain = domain.trim();
+                  
+                  // التحقق من أن الـ domain يحتوي على نقطة أو يكون URL صحيح
+                  if (!cleanDomain.includes(".") && !cleanDomain.startsWith("http")) {
+                    console.warn("Invalid domain format:", cleanDomain);
+                    alert("تنسيق الـ domain غير صحيح. يجب أن يحتوي على نقطة (مثل: example.com) أو يكون URL صحيح");
+                    return;
+                  }
+                  
+                  const url = cleanDomain.startsWith("http")
+                    ? cleanDomain
+                    : `https://${cleanDomain}`;
+                  
+                  // التحقق من صحة الـ URL قبل فتحه
+                  try {
+                    new URL(url);
+                    console.log("Opening URL:", url);
+                    window.open(url, "_blank");
+                  } catch (error) {
+                    console.error("Invalid URL:", url, error);
+                    alert("URL غير صحيح. يرجى التحقق من إعدادات الـ domain");
+                  }
                 }}
               >
                 <ExternalLink className="h-4 w-4 text-primary" />
@@ -286,7 +339,8 @@ export function EnhancedSidebar({
         )}
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <>

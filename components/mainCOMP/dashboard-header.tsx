@@ -289,23 +289,23 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                 undefined && (
                 <Button
                   variant={
-                    useAuthStore.getState().userData.is_free_plan
+                    useAuthStore.getState().userData?.is_free_plan
                       ? "outline"
                       : "secondary"
                   }
                   size="sm"
                   className={
-                    useAuthStore.getState().userData.is_free_plan
+                    useAuthStore.getState().userData?.is_free_plan
                       ? "hidden md:flex gap-1"
                       : "bg-amber-100 text-amber-800 hidden md:flex"
                   }
                   onClick={clickedONButton}
                 >
                   <Link href="/settings">
-                    {useAuthStore.getState().userData.is_free_plan
+                    {useAuthStore.getState().userData?.is_free_plan
                       ? `الباقة المجانية`
-                      : useAuthStore.getState().userData.package_title}
-                    {!useAuthStore.getState().userData.is_free_plan &&
+                      : useAuthStore.getState().userData?.package_title}
+                    {!useAuthStore.getState().userData?.is_free_plan &&
                       useAuthStore.getState().userData?.days_remaining && (
                         <span className="mr-2 text-xs opacity-75">
                           ({useAuthStore.getState().userData?.days_remaining}{" "}
@@ -313,7 +313,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                         </span>
                       )}
                   </Link>
-                  {useAuthStore.getState().userData.is_free_plan ? (
+                  {useAuthStore.getState().userData?.is_free_plan ? (
                     ""
                   ) : (
                     <Star className="h-3 w-3 ml-1" />
@@ -426,23 +426,23 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
             {useAuthStore.getState().userData?.package_title !== undefined && (
               <Button
                 variant={
-                  useAuthStore.getState().userData.is_free_plan
+                  useAuthStore.getState().userData?.is_free_plan
                     ? "outline"
                     : "secondary"
                 }
                 size="sm"
                 className={
-                  useAuthStore.getState().userData.is_free_plan
+                  useAuthStore.getState().userData?.is_free_plan
                     ? "mb-10"
                     : "bg-amber-100 text-amber-800 mb-10"
                 }
                 onClick={clickedONButton}
               >
                 <Link href="/settings">
-                  {useAuthStore.getState().userData.is_free_plan
+                  {useAuthStore.getState().userData?.is_free_plan
                     ? `الباقة المجانية `
-                    : useAuthStore.getState().userData.package_title}
-                  {!useAuthStore.getState().userData.is_free_plan &&
+                    : useAuthStore.getState().userData?.package_title}
+                  {!useAuthStore.getState().userData?.is_free_plan &&
                     useAuthStore.getState().userData?.days_remaining && (
                       <span className="mr-2 text-xs opacity-75">
                         ({useAuthStore.getState().userData?.days_remaining} يوم
@@ -450,7 +450,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                       </span>
                     )}
                 </Link>
-                {!useAuthStore.getState().userData.is_free_plan && (
+                {!useAuthStore.getState().userData?.is_free_plan && (
                   <Star className="h-3 w-3 ml-1" />
                 )}
               </Button>

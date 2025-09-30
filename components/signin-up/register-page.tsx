@@ -115,7 +115,7 @@ export function RegisterPage() {
 
   useEffect(() => {
     if (UserIslogged == true) {
-      router.push("/");
+      router.push("/dashboard");
     }
   }, [UserIslogged]);
 

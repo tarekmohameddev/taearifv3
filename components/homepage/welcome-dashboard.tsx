@@ -106,7 +106,7 @@ export function WelcomeDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          مرحباً بك في {userData.username}!
+          مرحباً بك في {userData?.username || 'لوحة التحكم'}!
         </h1>
         <p className="text-muted-foreground">هذه نظرة عامة على موقعك وأدائه.</p>
       </div>

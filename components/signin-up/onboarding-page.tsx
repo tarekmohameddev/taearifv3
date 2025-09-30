@@ -90,7 +90,7 @@ const OnboardingPage: React.FC = () => {
   // إذا كانت onboarding مفعلة (أي اكتملت)، يتم نقلك إلى الصفحة الرئيسية
   useEffect(() => {
     if (onboarding_completed) {
-      router.push("/");
+      router.push("/dashboard");
     }
   }, [onboarding_completed, router]);
 
@@ -175,7 +175,7 @@ const OnboardingPage: React.FC = () => {
 
   const SkipSetup = async () => {
     await setOnboardingCompleted(true);
-    router.push("/");
+    router.push("/dashboard");
   };
 
   const validateForm = (): boolean => {
@@ -273,7 +273,7 @@ const OnboardingPage: React.FC = () => {
       setOnboardingCompleted(true);
       setIsLoading(false);
       setTimeout(() => {
-        router.push("/");
+        router.push("/dashboard");
       }, 2000);
     } catch (error: any) {
       setIsLoading(false);

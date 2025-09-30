@@ -2,7 +2,7 @@
 
 import { Suspense, lazy, useEffect, useMemo, Fragment, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { defaultComponents } from "@/lib-liveeditor/defaultComponents";
+import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
 import { useAuth } from "@/context/AuthContext";
 import Loading from "./loading";
 import useTenantStore from "@/context-liveeditor/tenantStore";
@@ -14,11 +14,23 @@ import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 
 // دالة لتحميل المكونات ديناميكيًا بناءً على الاسم والرقم الأخير
 const loadComponent = (section: string, componentName: string) => {
-  if (!componentName) return null;
-  const match = componentName?.match(/^(.*?)(\d+)$/);
-  if (!match) return null;
+  console.log("🏠 HomePageWrapper - loadComponent called with:", { section, componentName });
+  
+  // التحقق من صحة componentName
+  if (!componentName || typeof componentName !== 'string') {
+    console.warn("🏠 HomePageWrapper - Invalid componentName:", componentName);
+    return null;
+  }
+  
+  const match = componentName.match(/^(.*?)(\d+)$/);
+  if (!match) {
+    console.warn("🏠 HomePageWrapper - No match found for componentName:", componentName);
+    return null;
+  }
+  
   const baseName = match[1];
   const number = match[2];
+  console.log("🏠 HomePageWrapper - Parsed component:", { baseName, number });
 
   // استخدام القائمة المركزية للحصول على مسارات الأقسام
   const sectionPath = getSectionPath(section) || section;
@@ -57,6 +69,7 @@ const loadComponent = (section: string, componentName: string) => {
 
   // جميع المكونات الآن مستقلة في مجلدات خاصة بها
   const fullPath = `${subPath}/${componentName}`;
+  console.log("🏠 HomePageWrapper - Loading component from path:", fullPath);
 
   return lazy(() =>
     import(`@/components/tenant/${fullPath}`).catch(() => ({
@@ -118,26 +131,68 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
 
   // Get components from defaultComponents or tenantData
   const componentsList = useMemo(() => {
-    if (tenantData?.componentSettings?.homepage) {
+    console.log("🏠 HomePageWrapper - Building componentsList");
+    console.log("🏠 HomePageWrapper - tenantData:", tenantData);
+    console.log("🏠 HomePageWrapper - componentSettings type:", typeof tenantData?.componentSettings);
+    console.log("🏠 HomePageWrapper - componentSettings value:", tenantData?.componentSettings);
+    
+    // التحقق من أن componentSettings موجود وأنه object وليس array فارغ
+    if (tenantData?.componentSettings && 
+        typeof tenantData.componentSettings === 'object' && 
+        !Array.isArray(tenantData.componentSettings) &&
+        tenantData.componentSettings.homepage &&
+        Object.keys(tenantData.componentSettings.homepage).length > 0) {
+      console.log("🏠 HomePageWrapper - Using componentSettings");
       const pageSettings = tenantData.componentSettings.homepage;
+      console.log("🏠 HomePageWrapper - pageSettings:", pageSettings);
+      
       const components = Object.entries(pageSettings)
-        .map(([id, component]: [string, any]) => ({
-          id,
-          componentName: component.componentName,
-          data: component.data,
-          position: component.position,
-        }))
+        .map(([id, component]: [string, any]) => {
+          console.log("🏠 HomePageWrapper - Processing component:", { id, component });
+          
+          // التحقق من وجود componentName
+          if (!component.componentName || typeof component.componentName !== 'string') {
+            console.warn("🏠 HomePageWrapper - Invalid componentName in component:", component.componentName);
+            // استخدام fallback
+            const fallbackName = `${component.type || 'hero'}1`;
+            console.warn("🏠 HomePageWrapper - Using fallback name:", fallbackName);
+            return {
+              id,
+              componentName: fallbackName,
+              data: component.data,
+              position: component.position,
+            };
+          }
+          
+          return {
+            id,
+            componentName: component.componentName,
+            data: component.data,
+            position: component.position,
+          };
+        })
         .sort((a, b) => (a.position || 0) - (b.position || 0));
+      
+      console.log("🏠 HomePageWrapper - Components from componentSettings:", components);
       return components;
     }
 
-    // Fallback to default components
-    return Object.entries(defaultComponents.homepage).map(([key, componentName], index) => ({
-      id: `default-${index}`,
-      componentName,
-      data: {},
-      position: index,
-    }));
+    console.log("🏠 HomePageWrapper - Using default components");
+    console.log("🏠 HomePageWrapper - componentSettings is empty or invalid, falling back to default components");
+    console.log("🏠 HomePageWrapper - PAGE_DEFINITIONS.homepage:", PAGE_DEFINITIONS.homepage);
+    
+    const defaultComponentsList = Object.entries(PAGE_DEFINITIONS.homepage).map(([key, component], index) => {
+      console.log("🏠 HomePageWrapper - Processing default component:", { key, component, index });
+      return {
+        id: `default-${index}`,
+        componentName: component.componentName, // استخراج componentName من object
+        data: component.data || {},
+        position: component.position || index,
+      };
+    });
+    
+    console.log("🏠 HomePageWrapper - Default components:", defaultComponentsList);
+    return defaultComponentsList;
   }, [tenantData?.componentSettings?.homepage]);
 
   // منع إعادة render عند تغيير loadingTenantData
@@ -171,14 +226,26 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
 
   // Filter out header and footer components since they are now global
   const filteredComponentsList = memoizedComponentsList.filter((comp: any) => {
-    if (comp.componentName?.startsWith("header")) {
+    console.log("🏠 HomePageWrapper - Filtering component:", comp);
+    
+    // التحقق من أن componentName موجود وأنه string
+    if (!comp.componentName || typeof comp.componentName !== 'string') {
+      console.warn("🏠 HomePageWrapper - Invalid componentName:", comp.componentName);
+      return true; // احتفظ بالمكون إذا كان componentName غير صحيح
+    }
+    
+    if (comp.componentName.startsWith("header")) {
+      console.log("🏠 HomePageWrapper - Filtering out header component:", comp.componentName);
       return false;
     }
-    if (comp.componentName?.startsWith("footer")) {
+    if (comp.componentName.startsWith("footer")) {
+      console.log("🏠 HomePageWrapper - Filtering out footer component:", comp.componentName);
       return false;
     }
     return true;
   });
+  
+  console.log("🏠 HomePageWrapper - Filtered components:", filteredComponentsList);
 
   return (
     <I18nProvider>
@@ -193,12 +260,14 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
           {Array.isArray(filteredComponentsList) &&
           filteredComponentsList.length > 0 ? (
             filteredComponentsList.map((comp: any) => {
+              console.log("🏠 HomePageWrapper - Rendering component:", comp);
               const Cmp = loadComponent("homepage", comp.componentName);
               if (!Cmp) {
                 console.log("❌ HomePage - Component not found:", comp.componentName);
                 return <Fragment key={comp.id} />;
               }
 
+              console.log("✅ HomePageWrapper - Component loaded successfully:", comp.componentName);
               return (
                 <Suspense key={comp.id} fallback={<Loading />}>
                   <Cmp {...(comp.data as any)} useStore variant={comp.id} />

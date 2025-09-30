@@ -113,6 +113,22 @@ export const useTokenValidation = () => {
 
   useEffect(() => {
     const initializeTokenValidation = async () => {
+      // التحقق من أن المستخدم ليس في صفحة register
+      const currentPath = window.location.pathname;
+      // فحص register مع أو بدون locale (مثل /register أو /en/register أو /ar/register)
+      const isRegisterPage = currentPath === '/register' || 
+                             currentPath.startsWith('/register/') ||
+                             /^\/[a-z]{2}\/register(\/|$)/.test(currentPath);
+      
+      if (isRegisterPage) {
+        setTokenValidation({
+          isValid: null,
+          message: "تخطي التحقق - صفحة التسجيل",
+          loading: false,
+        });
+        return;
+      }
+
       // جلب بيانات المستخدم من API
       const userInfo = await fetchUserInfo();
       
@@ -134,6 +150,17 @@ export const useTokenValidation = () => {
   }, []);
 
   useEffect(() => {
+    // التحقق من أن المستخدم ليس في صفحة register قبل إعادة التوجيه
+    const currentPath = window.location.pathname;
+    // فحص register مع أو بدون locale (مثل /register أو /en/register أو /ar/register)
+    const isRegisterPage = currentPath === '/register' || 
+                           currentPath.startsWith('/register/') ||
+                           /^\/[a-z]{2}\/register(\/|$)/.test(currentPath);
+    
+    if (isRegisterPage) {
+      return;
+    }
+
     if (tokenValidation.isValid === false && !tokenValidation.loading) {
       handleInvalidToken();
     }
