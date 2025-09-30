@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '@/lib/axiosInstance';
+import useAuthStore from '@/context/AuthContext';
 
 interface TokenValidation {
   isValid: boolean | null;
@@ -16,15 +17,20 @@ export const useTokenValidation = () => {
   });
   const [isSameAccount, setIsSameAccount] = useState(false);
   const [newUserData, setNewUserData] = useState<any>(null);
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserDataState] = useState<any>(null);
   
   const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+  const setUserData = useAuthStore((state) => state.setUserData);
+  const setUserIsLogged = useAuthStore((state) => state.setUserIsLogged);
+  const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
+  const setIsLoading = useAuthStore((state) => state.setIsLoading);
 
   const fetchUserInfo = async () => {
     try {
       const userInfoResponse = await fetch("/api/user/getUserInfo");
       const userData = await userInfoResponse.json();
-      setUserData(userData);
+      setUserDataState(userData);
       return userData;
     } catch (error) {
       console.error("Error fetching user info:", error);
@@ -73,9 +79,21 @@ export const useTokenValidation = () => {
       
       if (error.response?.status === 401) {
         errorMessage = "الـ token منتهي الصلاحية أو غير صحيح";
+        
         // حذف authToken cookie عند الحصول على 401
         clearAuthCookie();
         console.log("🍪 authToken cookie cleared due to 401 error");
+        
+        // حذف جميع البيانات من AuthContext مباشرة
+        clearAuthContextData();
+        
+        // تسجيل الخروج من AuthContext (كإجراء إضافي)
+        try {
+          await logout({ redirect: false, clearStore: true });
+          console.log("🚪 AuthContext logout completed due to 401 error");
+        } catch (logoutError) {
+          console.error("❌ Error during AuthContext logout:", logoutError);
+        }
       } else if (error.response?.status === 500) {
         errorMessage = "خطأ في الخادم";
       } else if (error.response?.data?.message) {
@@ -96,6 +114,30 @@ export const useTokenValidation = () => {
     // حذف authToken cookie المحدد
     document.cookie = "authToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
     document.cookie = `authToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+  };
+
+  const clearAuthContextData = () => {
+    // حذف جميع البيانات من AuthContext مباشرة
+    setUserData({
+      email: null,
+      token: null,
+      username: null,
+      domain: null,
+      first_name: null,
+      last_name: null,
+      is_free_plan: null,
+      days_remaining: null,
+      package_title: null,
+      package_features: [],
+      project_limit_number: null,
+      real_estate_limit_number: null,
+      message: null,
+      company_name: null,
+    });
+    setUserIsLogged(false);
+    setAuthenticated(false);
+    setIsLoading(false);
+    console.log("🧹 AuthContext data cleared directly");
   };
 
   const clearAllCookies = () => {
@@ -184,6 +226,7 @@ export const useTokenValidation = () => {
     newUserData,
     validateToken,
     clearAuthCookie,
+    clearAuthContextData,
     clearAllCookies,
     handleInvalidToken
   };
