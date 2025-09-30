@@ -9,6 +9,7 @@ import { ReactNode, useEffect, useMemo, useState } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import useAuthStore from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useTokenValidation } from "@/hooks/useTokenValidation";
 import { LanguageSwitcher } from "@/components/tenant/live-editor/LanguageSwitcher";
 import { useEditorT, useEditorLocale } from "@/context-liveeditor/editorI18nStore";
 import { I18nProvider } from "@/components/providers/I18nProvider";
@@ -818,6 +819,9 @@ export default function LiveEditorLayout({
 }) {
   const { setLocale } = useEditorLocale();
   const pathname = usePathname();
+  
+  // Token validation
+  const { tokenValidation } = useTokenValidation();
 
   // تحديث الـ store عند تحميل الصفحة
   useEffect(() => {
@@ -826,6 +830,18 @@ export default function LiveEditorLayout({
       setLocale(currentLang as any);
     }
   }, [pathname, setLocale]);
+
+  // Show loading while validating token
+  if (tokenValidation.loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">جاري التحقق من صحة الجلسة...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     // إضافة I18nProvider و EditorProvider و AuthProvider لتوفير السياق لكل الأبناء

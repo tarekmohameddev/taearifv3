@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import axiosInstance from "@/lib/axiosInstance";
 
 // Helper function to find the first header in componentSettings
 const findFirstHeader = (componentSettings) => {
@@ -286,26 +287,15 @@ const useTenantStore = create((set) => ({
 
     set({ loadingTenantData: true, error: null });
     try {
-      const response = await fetch("/api/tenant/getTenant", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ websiteName }),
-      });
+      const response = await axiosInstance.post("/v1/tenant-website/getTenant", { websiteName });
       console.log("[tenantStore] Response status:", response.status);
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error("Tenant not found");
-        } else if (response.status === 204) {
-          throw new Error("No content available for this tenant");
-        } else {
-          throw new Error(`Failed to fetch tenant data: ${response.status}`);
-        }
+      if (response.status === 404) {
+        throw new Error("Tenant not found");
+      } else if (response.status === 204) {
+        throw new Error("No content available for this tenant");
       }
 
-      const text = await response.text();
-      const data = text ? JSON.parse(text) : {}; // If response is empty, use an empty object
+      const data = response.data || {}; // If response is empty, use an empty object
       
       // تحقق من أن البيانات ليست فارغة
       if (!data || Object.keys(data).length === 0) {

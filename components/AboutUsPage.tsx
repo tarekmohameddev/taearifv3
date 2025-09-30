@@ -75,8 +75,8 @@ export default function AboutUsPage() {
                   <path d="M1380 180 l0 -80 95 0 95 0 0 80 0 80 -95 0 -95 0 0 -80z"></path>
                 </g>
               </svg>
+              </div>
             </div>
-          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
@@ -184,9 +184,9 @@ export default function AboutUsPage() {
                 </p>
                 <p>
                   اليوم، نفخر بخدمة أكثر من <strong className="text-black">67+ عميل</strong> في المملكة العربية السعودية ودول الخليج.
-                </p>
-              </div>
-            </div>
+                    </p>
+                  </div>
+                </div>
             <div className="opacity-100 transform translate-y-0 transition-all duration-700 ease-out">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-cyan-400 rounded-2xl blur-xl opacity-20"></div>
@@ -195,15 +195,15 @@ export default function AboutUsPage() {
                     <div className="text-center">
                       <div className="text-3xl font-bold text-black mb-2">67+</div>
                       <div className="text-gray-600">عميل راضٍ</div>
-                    </div>
+                  </div>
                     <div className="text-center">
                       <div className="text-3xl font-bold text-black mb-2">2+</div>
                       <div className="text-gray-600">سنوات خبرة</div>
-                    </div>
+                  </div>
                     <div className="text-center">
                       <div className="text-3xl font-bold text-black mb-2">24/7</div>
                       <div className="text-gray-600">دعم فني</div>
-                    </div>
+            </div>
                   <div className="text-center">
                       <div className="text-3xl font-bold text-black mb-2">99%</div>
                       <div className="text-gray-600">وقت تشغيل</div>
@@ -238,18 +238,18 @@ export default function AboutUsPage() {
             <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center transition-all duration-300 hover:border-black hover:-translate-y-1 hover:shadow-lg">
               <div className="w-16 h-16 mx-auto mb-6 bg-purple-100 rounded-full flex items-center justify-center">
                 <Lightbulb className="h-8 w-8 text-purple-600" />
-              </div>
+                </div>
               <h3 className="text-xl font-bold mb-4">الابتكار</h3>
               <p className="text-gray-600">
                 نسعى دائماً لتطوير حلول مبتكرة تواكب احتياجات السوق العقاري المتغيرة
               </p>
-                </div>
+              </div>
 
             {/* Value 2: Quality */}
             <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center transition-all duration-300 hover:border-black hover:-translate-y-1 hover:shadow-lg">
               <div className="w-16 h-16 mx-auto mb-6 bg-cyan-100 rounded-full flex items-center justify-center">
                 <Award className="h-8 w-8 text-cyan-600" />
-              </div>
+          </div>
               <h3 className="text-xl font-bold mb-4">الجودة</h3>
               <p className="text-gray-600">
                 نلتزم بأعلى معايير الجودة في كل منتج نطوره وكل خدمة نقدمها
@@ -271,18 +271,18 @@ export default function AboutUsPage() {
             <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center transition-all duration-300 hover:border-black hover:-translate-y-1 hover:shadow-lg">
               <div className="w-16 h-16 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
                 <Eye className="h-8 w-8 text-blue-600" />
-              </div>
+                </div>
               <h3 className="text-xl font-bold mb-4">الشفافية</h3>
               <p className="text-gray-600">
                 نؤمن بالشفافية الكاملة في التعامل مع عملائنا وشركائنا
               </p>
-        </div>
+              </div>
 
             {/* Value 5: Continuous Learning */}
             <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center transition-all duration-300 hover:border-black hover:-translate-y-1 hover:shadow-lg">
               <div className="w-16 h-16 mx-auto mb-6 bg-orange-100 rounded-full flex items-center justify-center">
                 <TrendingUp className="h-8 w-8 text-orange-600" />
-              </div>
+          </div>
               <h3 className="text-xl font-bold mb-4">التعلم المستمر</h3>
               <p className="text-gray-600">
                 نستثمر في التطوير المستمر لفريقنا ومنتجاتنا لنبقى في المقدمة
@@ -298,7 +298,7 @@ export default function AboutUsPage() {
               <p className="text-gray-600">
                 نسعى لإحداث تأثير إيجابي في المجتمع من خلال تمكين رواد الأعمال
               </p>
-            </div>
+              </div>
           </div>
         </div>
       </section>
@@ -408,7 +408,7 @@ export default function AboutUsPage() {
                 </li>
               </ul>
             </div>
-          </div>
+              </div>
           
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
             <p>&copy; 2025 تعاريف. جميع الحقوق محفوظة.</p>
