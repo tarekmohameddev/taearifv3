@@ -73,6 +73,9 @@ export const useTokenValidation = () => {
       
       if (error.response?.status === 401) {
         errorMessage = "الـ token منتهي الصلاحية أو غير صحيح";
+        // حذف authToken cookie عند الحصول على 401
+        clearAuthCookie();
+        console.log("🍪 authToken cookie cleared due to 401 error");
       } else if (error.response?.status === 500) {
         errorMessage = "خطأ في الخادم";
       } else if (error.response?.data?.message) {
@@ -89,8 +92,17 @@ export const useTokenValidation = () => {
     }
   };
 
+  const clearAuthCookie = () => {
+    // حذف authToken cookie المحدد
+    document.cookie = "authToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    document.cookie = `authToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+  };
+
   const clearAllCookies = () => {
-    // حذف جميع الـ cookies
+    // حذف authToken cookie أولاً
+    clearAuthCookie();
+    
+    // حذف جميع الـ cookies الأخرى
     document.cookie.split(";").forEach((cookie) => {
       const eqPos = cookie.indexOf("=");
       const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
@@ -171,6 +183,7 @@ export const useTokenValidation = () => {
     isSameAccount,
     newUserData,
     validateToken,
+    clearAuthCookie,
     clearAllCookies,
     handleInvalidToken
   };
