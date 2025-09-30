@@ -666,10 +666,10 @@ function EditorNavBar() {
 
     // إضافة الصفحات الافتراضية فقط إذا كانت componentSettings فارغة
     const defaultPages = [
-      { slug: "about", name: "About", path: "/about-us" },
-      { slug: "contact", name: "Contact", path: "/contact-us" },
-      { slug: "products", name: "Products", path: "/products" },
-      { slug: "collections", name: "Collections", path: "/collections" },
+      { slug: "for-rent", name: "For-rent", path: "/for-rent" },
+      { slug: "for-sale", name: "For-sale", path: "/for-sale" },
+      { slug: "about-us", name: "About-us", path: "/about-us" },
+      { slug: "Contact-us", name: "Contact-us", path: "/contact-us" },
     ];
 
     // تحويل componentSettings للاستخدام في التحقق

@@ -1,35 +1,46 @@
 import { v4 as uuidv4 } from "uuid";
 import { ComponentInstance } from "@/lib-liveeditor/types";
 import { createDefaultData } from "@/components/tenant/live-editor/EditorSidebar/utils";
-import { defaultComponents } from "@/lib-liveeditor/defaultComponents";
+import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
 import { getPageDefinition } from "./pageDefinitionService";
 
 // دالة إنشاء المكونات الافتراضية بناءً على الصفحة
 export const createInitialComponents = (
   pageSlug: string,
 ): ComponentInstance[] => {
+  console.log("🔧 createInitialComponents - Creating components for page:", pageSlug);
   const pageDefinition = getPageDefinition(pageSlug);
+  console.log("🔧 createInitialComponents - Page definition:", pageDefinition);
+  
   if (pageDefinition) {
-    return pageDefinition.map((definition, index) => {
-      const defaultName =
-        (defaultComponents as any)?.[pageSlug]?.[definition.type] ||
-        `${definition.type}1`;
+    const components = pageDefinition.map((definition, index) => {
+      console.log("🔧 createInitialComponents - Processing component:", {
+        type: definition.type,
+        componentName: definition.componentName,
+        name: definition.name
+      });
+      
+      // استخدام componentName من البيانات الافتراضية بدلاً من إنشاء اسم افتراضي
       return {
         id: uuidv4(),
         type: definition.type,
         name: definition.name,
-        componentName: defaultName,
-        data: createDefaultData(definition.type),
-        position: index, // إضافة خاصية position
-        layout: {
-          row: index, // كل مكون في صف منفصل
+        componentName: definition.componentName, // ✅ استخدام componentName الصحيح من البيانات
+        data: definition.data || createDefaultData(definition.type), // استخدام البيانات من PAGE_DEFINITIONS
+        position: definition.position || index,
+        layout: definition.layout || {
+          row: index,
           col: 0,
-          span: 2, // يأخذ عرض العمودين
+          span: 2,
         },
       } as ComponentInstance;
     });
+    
+    console.log("🔧 createInitialComponents - Created components:", components);
+    return components;
   }
 
+  console.log("🔧 createInitialComponents - No page definition found for:", pageSlug);
   // إذا لم تكن الصفحة معرفة، إرجاع مصفوفة فارغة
   return [];
 };
@@ -95,16 +106,16 @@ export const createComponentsFromTemplate = (
   }>,
 ): ComponentInstance[] => {
   return template.map((item, index) => {
-    const defaultName =
-      (defaultComponents as any)?.[item.type] || `${item.type}1`;
+    // استخدام componentName المحدد أو إنشاء اسم افتراضي
+    const defaultName = item.componentName || `${item.type}1`;
 
     return {
       id: uuidv4(),
       type: item.type,
       name: item.name || item.type.charAt(0).toUpperCase() + item.type.slice(1),
-      componentName: item.componentName || defaultName,
+      componentName: defaultName,
       data: createDefaultData(item.type),
-      position: item.layout?.row ?? index, // إضافة خاصية position
+      position: item.layout?.row ?? index,
       layout: {
         row: item.layout?.row ?? index,
         col: item.layout?.col ?? 0,
@@ -120,10 +131,19 @@ export const createCustomPageComponents = (
   componentTypes: string[],
 ): ComponentInstance[] => {
   return componentTypes.map((type, index) => {
-    const defaultName =
-      (defaultComponents as any)?.[pageSlug]?.[type] ||
-      (defaultComponents as any)?.homepage?.[type] ||
-      `${type}1`;
+    // استخدام PAGE_DEFINITIONS للبحث عن componentName الصحيح
+    const pageData = (PAGE_DEFINITIONS as any)[pageSlug];
+    let defaultName = `${type}1`; // افتراضي
+    
+    if (pageData) {
+      // البحث عن المكون في البيانات الافتراضية
+      const componentEntry = Object.entries(pageData).find(([id, comp]: [string, any]) => 
+        comp.type === type
+      );
+      if (componentEntry) {
+        defaultName = componentEntry[1].componentName;
+      }
+    }
 
     return {
       id: uuidv4(),
@@ -131,7 +151,7 @@ export const createCustomPageComponents = (
       name: type.charAt(0).toUpperCase() + type.slice(1),
       componentName: defaultName,
       data: createDefaultData(type),
-      position: index, // إضافة خاصية position
+      position: index,
       layout: {
         row: index,
         col: 0,

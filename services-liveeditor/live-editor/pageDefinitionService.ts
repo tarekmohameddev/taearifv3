@@ -1,62 +1,58 @@
-import { ComponentInstance } from "@/lib/types";
+import { ComponentInstance } from "@/lib-liveeditor/types";
 import { createDefaultData } from "@/components/tenant/live-editor/EditorSidebar/utils";
+import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
 
-// تعريف الصفحات المتاحة وأقسامها
-export const PAGE_DEFINITIONS: Record<string, ComponentInstance[]> = {
-  homepage: [
-    {
-      id: "header",
-      type: "header",
-      name: "Header",
-      componentName: "header1",
-      data: createDefaultData("header"),
-    },
-    {
-      id: "hero",
-      type: "hero",
-      name: "Hero",
-      componentName: "hero1",
-      data: createDefaultData("hero"),
-    },
-    {
-      id: "halfTextHalfImage",
-      type: "halfTextHalfImage",
-      name: "Half Text Half Image",
-      componentName: "halfTextHalfImage1",
-      data: createDefaultData("halfTextHalfImage"),
-    },
-    {
-      id: "propertySlider",
-      type: "propertySlider",
-      name: "Property Slider",
-      componentName: "propertySlider1",
-      data: createDefaultData("propertySlider"),
-    },
-    {
-      id: "ctaValuation",
-      type: "ctaValuation",
-      name: "CTA Valuation",
-      componentName: "ctaValuation1",
-      data: createDefaultData("ctaValuation"),
-    },
-  ],
+// إعادة تصدير PAGE_DEFINITIONS من defaultComponents.js
+export { PAGE_DEFINITIONS };
+
+// دالة مساعدة لتحويل البيانات من object إلى array
+const convertObjectToArray = (pageData: Record<string, any>): ComponentInstance[] => {
+  return Object.entries(pageData).map(([id, component]: [string, any]) => ({
+    id,
+    type: component.type,
+    name: component.name,
+    componentName: component.componentName,
+    data: component.data,
+    position: component.position || 0,
+    layout: component.layout || { row: 0, col: 0, span: 2 }
+  }));
+};
+
+// دالة مساعدة لتحويل البيانات من array إلى object
+const convertArrayToObject = (components: ComponentInstance[]): Record<string, any> => {
+  const pageData: Record<string, any> = {};
+  components.forEach((component, index) => {
+    const id = component.id || `${component.type}-${Date.now()}-${index}`;
+    pageData[id] = {
+      type: component.type,
+      name: component.name,
+      componentName: component.componentName,
+      data: component.data,
+      position: (component as any).position || index,
+      layout: (component as any).layout || { row: index, col: 0, span: 2 }
+    };
+  });
+  return pageData;
 };
 
 // دالة الحصول على تعريف صفحة معينة
 export const getPageDefinition = (
   pageSlug: string,
 ): ComponentInstance[] | undefined => {
-  return PAGE_DEFINITIONS[pageSlug];
+  const pageData = (PAGE_DEFINITIONS as any)[pageSlug];
+  if (!pageData) return undefined;
+  
+  return convertObjectToArray(pageData);
 };
 
 // دالة التحقق من وجود تعريف للصفحة
 export const hasPageDefinition = (pageSlug: string): boolean => {
-  return !!PAGE_DEFINITIONS[pageSlug];
+  return !!(PAGE_DEFINITIONS as any)[pageSlug];
 };
 
 // دالة الحصول على جميع أسماء الصفحات المعرفة
 export const getDefinedPageNames = (): string[] => {
-  return Object.keys(PAGE_DEFINITIONS);
+  return Object.keys(PAGE_DEFINITIONS as any);
 };
 
 // دالة إنشاء تعريف صفحة جديد
@@ -64,13 +60,13 @@ export const createPageDefinition = (
   pageSlug: string,
   components: ComponentInstance[],
 ): void => {
-  PAGE_DEFINITIONS[pageSlug] = components;
+  (PAGE_DEFINITIONS as any)[pageSlug] = convertArrayToObject(components);
 };
 
 // دالة حذف تعريف صفحة
 export const removePageDefinition = (pageSlug: string): boolean => {
-  if (PAGE_DEFINITIONS[pageSlug]) {
-    delete PAGE_DEFINITIONS[pageSlug];
+  if ((PAGE_DEFINITIONS as any)[pageSlug]) {
+    delete (PAGE_DEFINITIONS as any)[pageSlug];
     return true;
   }
   return false;
@@ -81,8 +77,9 @@ export const updatePageDefinition = (
   pageSlug: string,
   components: ComponentInstance[],
 ): boolean => {
-  if (PAGE_DEFINITIONS[pageSlug]) {
-    PAGE_DEFINITIONS[pageSlug] = components;
+  const pageDefs = PAGE_DEFINITIONS as any;
+  if (pageDefs[pageSlug]) {
+    pageDefs[pageSlug] = convertArrayToObject(components);
     return true;
   }
   return false;
