@@ -459,32 +459,32 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                   {(mergedData.form?.fields?.name?.enabled !== false) && (
                     <div>
                       <label htmlFor="name" className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
-                        {mergedData.form.fields.name.label}
+                        {mergedData.form?.fields?.name?.label || "اسمك"}
                       </label>
                       <Input
                         id="name"
-                        type={mergedData.form.fields.name.type || "text"}
-                        placeholder={mergedData.form.fields.name.placeholder}
+                        type={mergedData.form?.fields?.name?.type || "text"}
+                        placeholder={mergedData.form?.fields?.name?.placeholder || "أدخل اسمك"}
                         value={formData.name}
                         onChange={(e) => handleInputChange("name", e.target.value)}
-                        className={mergedData.form.fields.name.height || "h-12"}
-                        required={mergedData.form.fields.name.required}
+                        className={mergedData.form?.fields?.name?.height || "h-12"}
+                        required={mergedData.form?.fields?.name?.required || true}
                       />
                     </div>
                   )}
                   {(mergedData.form?.fields?.country?.enabled !== false) && (
                     <div>
                       <label htmlFor="country" className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
-                        {mergedData.form.fields.country.label}
+                        {mergedData.form?.fields?.country?.label || "بلدك"}
                       </label>
                       <Input
                         id="country"
-                        type={mergedData.form.fields.country.type || "text"}
-                        placeholder={mergedData.form.fields.country.placeholder}
+                        type={mergedData.form?.fields?.country?.type || "text"}
+                        placeholder={mergedData.form?.fields?.country?.placeholder || "أدخل بلدك"}
                         value={formData.country}
                         onChange={(e) => handleInputChange("country", e.target.value)}
-                        className={mergedData.form.fields.country.height || "h-12"}
-                        required={mergedData.form.fields.country.required}
+                        className={mergedData.form?.fields?.country?.height || "h-12"}
+                        required={mergedData.form?.fields?.country?.required || true}
                       />
                     </div>
                   )}
@@ -493,15 +493,15 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                 {(mergedData.form?.fields?.feedback?.enabled !== false) && (
                   <div>
                     <label htmlFor="feedback" className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
-                      {mergedData.form.fields.feedback.label}
+                      {mergedData.form?.fields?.feedback?.label || "تعليقك"}
                     </label>
                     <Textarea
                       id="feedback"
-                      placeholder={mergedData.form.fields.feedback.placeholder}
+                      placeholder={mergedData.form?.fields?.feedback?.placeholder || "أدخل تعليقك"}
                       value={formData.feedback}
                       onChange={(e) => handleInputChange("feedback", e.target.value)}
-                      className={`${mergedData.form.fields.feedback.minHeight || "min-h-[120px]"} ${mergedData.form.fields.feedback.resize || "resize-none"}`}
-                      required={mergedData.form.fields.feedback.required}
+                      className={`${mergedData.form?.fields?.feedback?.minHeight || "min-h-[120px]"} ${mergedData.form?.fields?.feedback?.resize || "resize-none"}`}
+                      required={mergedData.form?.fields?.feedback?.required || true}
                     />
                   </div>
                 )}
@@ -510,7 +510,7 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                 {(mergedData.form?.rating?.enabled !== false) && (
                   <div>
                     <label className={`${mergedData.labels?.labelMarginBottom || "mb-3"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
-                      {mergedData.form.rating?.label}
+                      {mergedData.form?.rating?.label || "التقييم"}
                     </label>
                     <div className="flex items-center gap-2">
                       {Array.from({ length: mergedData.form.rating?.maxStars || 5 }).map((_, i) => (
@@ -542,14 +542,14 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
 
                 {(mergedData.form?.submitButton?.enabled !== false) && (
                   <Button
-                    type={mergedData.form.submitButton.type as any || "submit"}
-                    className={`${mergedData.form.submitButton.width || "w-full"} rounded-xl ${mergedData.form.submitButton.height || "py-6"} ${mergedData.form.submitButton.fontSize || "text-lg"} ${mergedData.form.submitButton.fontWeight || "font-semibold"} ${mergedData.form.submitButton.borderRadius || "rounded-xl"}`}
+                    type={mergedData.form?.submitButton?.type as any || "submit"}
+                    className={`${mergedData.form?.submitButton?.width || "w-full"} rounded-xl ${mergedData.form?.submitButton?.height || "py-6"} ${mergedData.form?.submitButton?.fontSize || "text-lg"} ${mergedData.form?.submitButton?.fontWeight || "font-semibold"} ${mergedData.form?.submitButton?.borderRadius || "rounded-xl"}`}
                     style={{
-                      backgroundColor: mergedData.form.submitButton.backgroundColor || "#059669",
-                      color: mergedData.form.submitButton.textColor || "#ffffff",
+                      backgroundColor: mergedData.form?.submitButton?.backgroundColor || "#059669",
+                      color: mergedData.form?.submitButton?.textColor || "#ffffff",
                     }}
                   >
-                    {mergedData.form.submitButton.text}
+                    {mergedData.form?.submitButton?.text || "إرسال"}
                   </Button>
                 )}
               </form>
