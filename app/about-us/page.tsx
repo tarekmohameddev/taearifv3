@@ -9,7 +9,7 @@ export default async function AboutUs({ params }: { params: { slug: string } }) 
   
   // إذا كان هناك tenantId، اعرض صفحة tenant-specific
   if (tenantId) {
-  return <TenantPageWrapper tenantId={tenantId} slug={params.slug} />;
+  return <TenantPageWrapper tenantId={tenantId} slug={"about-us"} />;
   }
   
   // إذا لم يكن هناك tenantId، اعرض صفحة الموقع الرئيسي

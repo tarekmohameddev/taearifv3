@@ -37,7 +37,6 @@ export function EditorProvider({ children }: { children: ReactNode }) {
 
 
     
-    console.error("[Save All] Error saving pages:", e);
 
     // Send to backend to persist
     await axiosInstance.post("/v1/tenant-website/save-pages", payload)
