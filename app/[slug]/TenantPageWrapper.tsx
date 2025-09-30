@@ -72,6 +72,7 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const setTenantId = useTenantStore((s) => s.setTenantId);
+  const error = useTenantStore((s) => s.error);
 
 
   // Set tenantId in store when component mounts
@@ -188,6 +189,25 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
   });
   
 
+  if (error || (!tenantId)) {
+    // console.log("🏠 HomePageWrapper - Showing not-found due to:", { error, hasTenantData: !!tenantData, tenantId });
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+        <h1 className="text-6xl font-bold text-red-600 mb-4">404</h1>
+        <h2 className="text-2xl font-semibold mb-6">Tenant Not Found</h2>
+        <p className="text-gray-600 mb-8 text-center max-w-md">
+          The tenant "{tenantId}" you are looking for might have been removed, 
+          had its name changed, or is temporarily unavailable.
+        </p>
+        <button 
+          onClick={() => window.location.href = '/'} 
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Return to Homepage
+        </button>
+      </div>
+    );
+  }
 
   return (
     <I18nProvider>

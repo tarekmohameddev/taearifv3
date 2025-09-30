@@ -344,7 +344,9 @@ const useTenantStore = create((set) => ({
       set({ tenantData: data, loadingTenantData: false, lastFetchedWebsite: websiteName });
     } catch (error) {
       console.error("[tenantStore] Error fetching tenant data:", error);
+      console.log("[tenantStore] Setting error in state:", error.message);
       set({ error: error.message, loadingTenantData: false });
+      console.log("[tenantStore] Error state updated");
     }
   },
 
