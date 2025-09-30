@@ -26,18 +26,24 @@ function removeLocaleFromPathname(pathname: string) {
 }
 
 function getTenantIdFromHost(host: string): string | null {
+  const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || 'localhost';
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'taearif.com';
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
   // For localhost development: tenant1.localhost:3000 -> tenant1
-  if (host.includes('localhost')) {
+  if (host.includes(localDomain)) {
     const parts = host.split('.');
-    if (parts.length > 1 && parts[0] !== 'localhost') {
+    if (parts.length > 1 && parts[0] !== localDomain) {
       return parts[0];
     }
   }
   
   // For production: tenant1.example.com -> tenant1
-  const parts = host.split('.');
-  if (parts.length > 2) {
-    return parts[0];
+  if (!isDevelopment && host.includes(productionDomain)) {
+    const parts = host.split('.');
+    if (parts.length > 2) {
+      return parts[0];
+    }
   }
   
   return null;
