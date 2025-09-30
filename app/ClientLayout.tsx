@@ -61,8 +61,7 @@ export default function ClientLayout({
 
   useEffect(() => {
     setIsMounted(true);
-    // إزالة fetchUserData من هنا لأنه يتم استدعاؤه في layout.tsx
-    // fetchUserData();
+    fetchUserData();
   }, [fetchUserData]);
 
   // دالة للتحقق من الصفحات العامة مع دعم الـ locale
