@@ -70,7 +70,6 @@ interface HomePageWrapperProps {
 }
 
 export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
-  console.log("🏠 HomePageWrapper - Component rendered");
 
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -85,12 +84,6 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
   const isInitializedRef = useRef(false);
   const lastTenantIdRef = useRef<string | null>(null);
 
-  console.log("🏠 HomePageWrapper - Initial state:", {
-    tenantId,
-    hasTenantData: !!tenantData,
-    loadingTenantData,
-    error,
-  });
 
   // Set tenantId in store when component mounts
   useEffect(() => {
@@ -104,8 +97,8 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
     if (tenantId && !tenantData && !loadingTenantData && !hasFetchedRef.current) {
-      console.log("🏠 HomePageWrapper - Fetching tenant data for:", tenantId);
-      hasFetchedRef.current = true;
+    console.warn("heyyyyyy333");
+    hasFetchedRef.current = true;
       fetchTenantData(tenantId);
     }
   }, [tenantId, tenantData, loadingTenantData]);
@@ -113,7 +106,7 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
   // Reset fetch flag when tenantId changes
   useEffect(() => {
     if (tenantId && tenantId !== lastTenantIdRef.current) {
-      console.log("🏠 HomePageWrapper - TenantId changed, resetting flags");
+      // console.log("🏠 HomePageWrapper - TenantId changed, resetting flags");
       hasFetchedRef.current = false;
       isInitializedRef.current = false;
       lastTenantIdRef.current = tenantId;
@@ -156,8 +149,8 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
   }
 
   // إذا كان هناك خطأ أو لم توجد بيانات للـ tenant، اعرض not-found
-  if (error || (!loadingTenantData && !tenantData && tenantId)) {
-    console.log("🏠 HomePageWrapper - Showing not-found due to:", { error, hasTenantData: !!tenantData, tenantId });
+  if (error || (!tenantId)) {
+    // console.log("🏠 HomePageWrapper - Showing not-found due to:", { error, hasTenantData: !!tenantData, tenantId });
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4">
         <h1 className="text-6xl font-bold text-red-600 mb-4">404</h1>

@@ -32,7 +32,7 @@ function getTenantIdFromHost(host: string): string | null {
   
   // For localhost development: tenant1.localhost:3000 -> tenant1
   if (host.includes(localDomain)) {
-    const parts = host.split('.');
+  const parts = host.split('.');
     if (parts.length > 1 && parts[0] !== localDomain) {
       return parts[0];
     }
@@ -40,7 +40,7 @@ function getTenantIdFromHost(host: string): string | null {
   
   // For production: tenant1.example.com -> tenant1
   if (!isDevelopment && host.includes(productionDomain)) {
-    const parts = host.split('.');
+  const parts = host.split('.');
     if (parts.length > 2) {
       return parts[0];
     }

@@ -271,52 +271,29 @@ const useTenantStore = create((set) => ({
   fetchTenantData: async (websiteName) => {
     const state = useTenantStore.getState();
     
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    let userData;
-    try {
-      const authModule = await import("../context/AuthContext");
-      const useAuthStore = authModule.default;
-      userData = useAuthStore.getState().userData;
-      if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping fetchTenantData");
-        set({ error: "Authentication required. Please login.", loadingTenantData: false });
-        return;
-      }
-    } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
-      set({ error: "Authentication required. Please login.", loadingTenantData: false });
-      return;
-    }
-    
     // Prevent duplicate requests - تحقق من أن البيانات موجودة ونفس الـ username
     if (
       state.loadingTenantData ||
       (state.tenantData && state.tenantData.username === websiteName)
     ) {
-      console.log("[tenantStore] Skipping fetch - data already exists for:", websiteName);
       return;
     }
     
     // منع الـ duplicate calls إذا كان نفس الـ websiteName
     if (state.lastFetchedWebsite === websiteName) {
-      console.log("[tenantStore] Skipping fetch - same website as last fetch:", websiteName);
       return;
     }
 
-    console.log("[tenantStore] Starting fetch for:", websiteName);
     set({ loadingTenantData: true, error: null });
     try {
-      console.log("[tenantStore] Making request to /api/tenant/getTenant with:", { websiteName, token: userData.token });
       const response = await fetch("/api/tenant/getTenant", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
         },
         body: JSON.stringify({ websiteName }),
       });
       console.log("[tenantStore] Response status:", response.status);
-      console.log("[tenantStore] Response headers:", response.headers);
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error("Tenant not found");
@@ -328,13 +305,10 @@ const useTenantStore = create((set) => ({
       }
 
       const text = await response.text();
-      console.log("[tenantStore] Response text:", text);
       const data = text ? JSON.parse(text) : {}; // If response is empty, use an empty object
-      console.log("[tenantStore] Parsed data:", data);
       
       // تحقق من أن البيانات ليست فارغة
       if (!data || Object.keys(data).length === 0) {
-        console.log("[tenantStore] No data available, but continuing anyway...");
         // بدلاً من رمي خطأ، استخدم بيانات افتراضية
         const defaultData = {
           username: websiteName,
@@ -352,7 +326,6 @@ const useTenantStore = create((set) => ({
             propertyFilter: {}
           }
         };
-        console.log("[tenantStore] Using default data:", defaultData);
         set({ tenantData: defaultData, loadingTenantData: false, lastFetchedWebsite: websiteName });
         return;
       }
