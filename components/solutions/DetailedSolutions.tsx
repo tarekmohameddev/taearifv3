@@ -54,7 +54,7 @@ export default function DetailedSolutions() {
                   <span className="text-gray-700">خرائط تفاعلية</span>
                 </div>
               </div>
-              <a href="https://app.taearif.com/register" className="btn btn-success">
+              <a href={`register/`} className="btn btn-success">
                 <Rocket className="ml-2 h-5 w-5" />
                 ابدأ إنشاء موقعك
               </a>
@@ -140,7 +140,7 @@ export default function DetailedSolutions() {
                   <span className="text-gray-700">تذكيرات تلقائية للمتابعة</span>
                 </div>
               </div>
-              <a href="https://app.taearif.com/register" className="btn btn-primary">
+              <a href={`register/`} className="btn btn-primary">
                 <Users className="ml-2 h-5 w-5" />
                 جرب نظام CRM
               </a>

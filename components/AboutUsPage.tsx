@@ -89,10 +89,10 @@ export default function AboutUsPage() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-4">
-            <a href="https://app.taearif.com/" className="hidden sm:inline-flex btn btn-outline text-sm">
+            <a href={`login/`} className="hidden sm:inline-flex btn btn-outline text-sm">
               تسجيل الدخول
             </a>
-            <a href="https://app.taearif.com/register" className="btn btn-success text-sm">
+            <a href={`register/`} className="btn btn-success text-sm">
               جرّب مجاناً الآن
             </a>
             <button 
@@ -126,7 +126,7 @@ export default function AboutUsPage() {
           </nav>
           <div className="mt-auto flex flex-col gap-4">
             <a href="https://app.taearif.com" className="btn btn-outline w-full py-3">تسجيل الدخول</a>
-            <a href="https://app.taearif.com/register" className="btn btn-success w-full py-3">جرّب مجاناً الآن</a>
+            <a href={`register/`} className="btn btn-success w-full py-3">جرّب مجاناً الآن</a>
           </div>
         </div>
       </div>

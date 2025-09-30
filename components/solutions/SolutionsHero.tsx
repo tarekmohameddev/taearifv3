@@ -36,7 +36,7 @@ export default function SolutionsHero() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-slide-up">
-            <a href="https://app.taearif.com/register" className="btn btn-success text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl">
+            <a href={`register/`} className="btn btn-success text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl">
               <Play className="ml-2 h-5 w-5" />
               ابدأ رحلتك الآن
             </a>

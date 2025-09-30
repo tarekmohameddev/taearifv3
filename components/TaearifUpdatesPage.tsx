@@ -99,10 +99,10 @@ export default function TaearifUpdatesPage() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-4">
-            <a href="https://app.taearif.com/" className="hidden sm:inline-flex items-center justify-center border-2 border-gray-200 bg-transparent text-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition-colors text-sm">
+            <a href={`login/`} className="hidden sm:inline-flex items-center justify-center border-2 border-gray-200 bg-transparent text-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition-colors text-sm">
               تسجيل الدخول
             </a>
-            <a href="https://app.taearif.com/register" className="inline-flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm">
+            <a href={`register/`} className="inline-flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm">
               جرّب مجاناً الآن
             </a>
             <button 
@@ -141,7 +141,7 @@ export default function TaearifUpdatesPage() {
             </nav>
             <div className="mt-auto flex flex-col gap-4">
               <a href="https://app.taearif.com" className="w-full py-3 px-4 border-2 border-gray-200 bg-transparent text-black rounded-lg hover:bg-black hover:text-white transition-colors text-center">تسجيل الدخول</a>
-              <a href="https://app.taearif.com/register" className="w-full py-3 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-center">جرّب الآن</a>
+              <a href={`register/`} className="w-full py-3 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-center">جرّب الآن</a>
             </div>
           </div>
         </div>
@@ -168,7 +168,7 @@ export default function TaearifUpdatesPage() {
                 <ArrowDown className="h-5 w-5 ml-2" />
                 شاهد التحديثات
               </a>
-              <a href="https://app.taearif.com/register" className="inline-flex items-center bg-black text-white px-8 py-4 rounded-lg hover:bg-gray-800 transition-all text-lg">
+              <a href={`register/`} className="inline-flex items-center bg-black text-white px-8 py-4 rounded-lg hover:bg-gray-800 transition-all text-lg">
                 <Rocket className="h-5 w-5 ml-2" />
                 جرّب الآن
               </a>

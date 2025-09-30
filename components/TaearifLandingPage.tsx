@@ -138,10 +138,10 @@ export default function TaearifLandingPage() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-4">
-            <a href="https://app.taearif.com/" className="hidden sm:inline-flex btn btn-outline text-sm">
+            <a href={`login/`} className="hidden sm:inline-flex btn btn-outline text-sm">
               تسجيل الدخول
             </a>
-            <a href="https://app.taearif.com/register" className="btn btn-success text-sm">
+            <a href={`register/`} className="btn btn-success text-sm">
               جرّب مجاناً الآن
             </a>
             <button 
@@ -180,7 +180,7 @@ export default function TaearifLandingPage() {
             </nav>
             <div className="mt-auto flex flex-col gap-4">
               <a href="https://app.taearif.com" className="btn btn-outline w-full py-3">تسجيل الدخول</a>
-              <a href="https://app.taearif.com/register" className="btn btn-success w-full py-3">جرّب مجاناً الآن</a>
+              <a href={`register/`} className="btn btn-success w-full py-3">جرّب مجاناً الآن</a>
             </div>
           </div>
         </div>
@@ -206,7 +206,7 @@ export default function TaearifLandingPage() {
 
               {/* Main Headline */}
               <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
-                <span className="text-black">غير معادلة</span>
+                <span className="text-black">غير معادلة </span>
                 <span className="gradient-success">شغلك العقاري</span>
                 <br />
                 <span className="text-black">وخلك دايم</span>
@@ -220,7 +220,7 @@ export default function TaearifLandingPage() {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-slide-up">
-                <a href="https://app.taearif.com/register" className="btn btn-success text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl">
+                <a href={`register/`} className="btn btn-success text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl">
                   <Rocket className="ml-2 h-5 w-5" />
                   جرّب مجاناً الآن
                 </a>

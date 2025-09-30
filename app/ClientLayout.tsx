@@ -141,7 +141,7 @@ export default function ClientLayout({
               console.error("testtttttttttttttt");
               console.warn("testtttttttttttttt");
         
-              router.push("/");
+              router.push("/dashboard");
             }
           } catch (error) {
             router.push("/onboarding");
@@ -160,7 +160,7 @@ export default function ClientLayout({
       if (userData && userData.email && !hasToken) {
         console.error("testtttttttttttttt 222222222222222");
         console.warn("testtttttttttttttt 222222222222222");
-        router.push("/");
+        router.push("/dashboard");
       }
     }
   }, [userData, router]);

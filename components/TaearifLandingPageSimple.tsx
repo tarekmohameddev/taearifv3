@@ -135,10 +135,10 @@ export default function TaearifLandingPageSimple() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-4">
-            <a href="https://app.taearif.com/" className="hidden sm:inline-flex items-center justify-center border-2 border-gray-200 bg-transparent text-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition-colors text-sm">
+            <a href={`login/`} className="hidden sm:inline-flex items-center justify-center border-2 border-gray-200 bg-transparent text-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition-colors text-sm">
               تسجيل الدخول
             </a>
-            <a href="https://app.taearif.com/register" className="inline-flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm">
+            <a href={`register/`} className="inline-flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm">
               جرّب مجاناً الآن
             </a>
             <button 
@@ -177,7 +177,7 @@ export default function TaearifLandingPageSimple() {
             </nav>
             <div className="mt-auto flex flex-col gap-4">
               <a href="https://app.taearif.com" className="w-full py-3 px-4 border-2 border-gray-200 bg-transparent text-black rounded-lg hover:bg-black hover:text-white transition-colors text-center">تسجيل الدخول</a>
-              <a href="https://app.taearif.com/register" className="w-full py-3 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-center">جرّب مجاناً الآن</a>
+              <a href={`register/`} className="w-full py-3 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-center">جرّب مجاناً الآن</a>
             </div>
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function TaearifLandingPageSimple() {
 
             {/* Main Headline */}
             <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
-              <span className="text-black">غير معادلة</span>
+              <span className="text-black">غير معادلة </span>
               <span className="bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">شغلك العقاري</span>
               <br />
               <span className="text-black">وخلك دايم </span>
@@ -216,7 +216,7 @@ export default function TaearifLandingPageSimple() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-slide-up">
-              <a href="https://app.taearif.com/register" className="inline-flex items-center bg-black text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl hover:bg-gray-800 transition-all text-lg">
+              <a href={`register/`} className="inline-flex items-center bg-black text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl hover:bg-gray-800 transition-all text-lg">
                 <Rocket className="ml-2 h-5 w-5" />
                 جرّب مجاناً الآن
               </a>

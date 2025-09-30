@@ -89,7 +89,7 @@ export function LoginPage() {
     
     if (userData && userData.email && !showLogoutDialog && !hasToken) {
       
-      router.push("/");
+      router.push("/dashboard");
     }
   }, [userData, router, showLogoutDialog]);
 
@@ -246,7 +246,7 @@ export function LoginPage() {
     setIsLoading(false);
     
     if (result.success) {
-      router.push("/");
+      router.push("/dashboard");
     } else {
       setErrors((prev) => ({
         ...prev,
@@ -373,7 +373,7 @@ export function LoginPage() {
     if (typeof window !== "undefined") {
       window.history.replaceState({}, document.title, "/login");
     }
-    router.push("/");
+    router.push("/dashboard");
   };
 
   // تسجيل الدخول بالطريقة التقليدية
@@ -413,7 +413,7 @@ export function LoginPage() {
           general: result.error || "فشل تسجيل الدخول",
         }));
       } else {
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (error) {
       const errorMessage =
