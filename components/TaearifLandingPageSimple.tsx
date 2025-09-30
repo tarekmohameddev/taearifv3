@@ -84,7 +84,7 @@ export default function TaearifLandingPageSimple() {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden" dir="rtl">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
+      <header className="fixed top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
@@ -205,7 +205,7 @@ export default function TaearifLandingPageSimple() {
               <span className="text-black">غير معادلة</span>
               <span className="bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">شغلك العقاري</span>
               <br />
-              <span className="text-black">وخلك دايم</span>
+              <span className="text-black">وخلك دايم </span>
               <span className="bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">سابق غيرك</span>
             </h1>
 

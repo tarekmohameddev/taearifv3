@@ -100,7 +100,7 @@ export default function TenantAboutUsPage({ tenantId }: TenantAboutUsPageProps) 
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden" dir="rtl">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
+      <header className="fixed top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
