@@ -377,6 +377,15 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
     ...storeData 
   }
 
+  // Debug: Log the merged data to see what's happening
+  console.log("🔍 contactMapSection1 - mergedData:", {
+    formEnabled: mergedData.form?.enabled,
+    mapEnabled: mergedData.map?.enabled,
+    tenantComponentData,
+    storeData,
+    props
+  });
+
   // Local state for form
   const [rating, setRating] = useState(0)
   const [hoveredRating, setHoveredRating] = useState(0)
@@ -443,11 +452,11 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
           }}
         >
           {/* النموذج - الجانب الأيمن */}
-          {mergedData.form?.enabled && (
+          {(mergedData.form?.enabled !== false) && (
             <div className={mergedData.layout?.formOrder || "order-1 lg:order-1"}>
               <form onSubmit={handleSubmit} className={mergedData.spacing?.formGap || "space-y-6"}>
                 <div className={`grid grid-cols-1 ${mergedData.spacing?.inputGap || "gap-4"} sm:grid-cols-2`}>
-                  {mergedData.form?.fields?.name?.enabled && (
+                  {(mergedData.form?.fields?.name?.enabled !== false) && (
                     <div>
                       <label htmlFor="name" className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
                         {mergedData.form.fields.name.label}
@@ -463,7 +472,7 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                       />
                     </div>
                   )}
-                  {mergedData.form?.fields?.country?.enabled && (
+                  {(mergedData.form?.fields?.country?.enabled !== false) && (
                     <div>
                       <label htmlFor="country" className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
                         {mergedData.form.fields.country.label}
@@ -481,7 +490,7 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                   )}
                 </div>
 
-                {mergedData.form?.fields?.feedback?.enabled && (
+                {(mergedData.form?.fields?.feedback?.enabled !== false) && (
                   <div>
                     <label htmlFor="feedback" className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
                       {mergedData.form.fields.feedback.label}
@@ -498,7 +507,7 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                 )}
 
                 {/* تقييم بالنجوم */}
-                {mergedData.form?.rating?.enabled && (
+                {(mergedData.form?.rating?.enabled !== false) && (
                   <div>
                     <label className={`${mergedData.labels?.labelMarginBottom || "mb-3"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
                       {mergedData.form.rating?.label}
@@ -531,7 +540,7 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                   </div>
                 )}
 
-                {mergedData.form?.submitButton?.enabled && (
+                {(mergedData.form?.submitButton?.enabled !== false) && (
                   <Button
                     type={mergedData.form.submitButton.type as any || "submit"}
                     className={`${mergedData.form.submitButton.width || "w-full"} rounded-xl ${mergedData.form.submitButton.height || "py-6"} ${mergedData.form.submitButton.fontSize || "text-lg"} ${mergedData.form.submitButton.fontWeight || "font-semibold"} ${mergedData.form.submitButton.borderRadius || "rounded-xl"}`}
