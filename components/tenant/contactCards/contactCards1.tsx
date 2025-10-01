@@ -266,7 +266,6 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
     },
   ];
 
-
   return (
     <div className="py-[48px] md:py-[104px] px-4 sm:px-10" dir="rtl">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px] rounded-[10px]">

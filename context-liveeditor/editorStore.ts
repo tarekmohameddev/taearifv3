@@ -19,21 +19,25 @@ import { contactCardsStructure } from "@/componentsStructure/contactCards";
 
 // Deep merge function for nested objects
 const deepMerge = (target: any, source: any): any => {
-  if (!source || typeof source !== 'object') return target || source;
-  if (!target || typeof target !== 'object') return source;
-  
+  if (!source || typeof source !== "object") return target || source;
+  if (!target || typeof target !== "object") return source;
+
   const result = { ...target };
-  
+
   for (const key in source) {
     if (source.hasOwnProperty(key)) {
-      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      if (
+        source[key] &&
+        typeof source[key] === "object" &&
+        !Array.isArray(source[key])
+      ) {
         result[key] = deepMerge(target[key], source[key]);
       } else {
         result[key] = source[key];
       }
     }
   }
-  
+
   return result;
 };
 
@@ -89,7 +93,7 @@ interface EditorStore {
   updateTempField: (
     field: "texts" | "colors" | "settings",
     key: string,
-    value: string | boolean | number
+    value: string | boolean | number,
   ) => void;
   updateByPath: (path: string, value: any) => void;
 
@@ -106,8 +110,15 @@ interface EditorStore {
     header: ComponentData;
     footer: ComponentData;
   };
-  setGlobalComponentsData: (data: { header: ComponentData; footer: ComponentData }) => void;
-  updateGlobalComponentByPath: (componentType: 'header' | 'footer', path: string, value: any) => void;
+  setGlobalComponentsData: (data: {
+    header: ComponentData;
+    footer: ComponentData;
+  }) => void;
+  updateGlobalComponentByPath: (
+    componentType: "header" | "footer",
+    path: string,
+    value: any,
+  ) => void;
 
   // Structures registry
   structures: Record<string, any>;
@@ -122,19 +133,19 @@ interface EditorStore {
   ensureComponentVariant: (
     componentType: string,
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getComponentData: (componentType: string, variantId: string) => ComponentData;
   setComponentData: (
     componentType: string,
     variantId: string,
-    data: ComponentData
+    data: ComponentData,
   ) => void;
   updateComponentByPath: (
     componentType: string,
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Legacy specific component states (للتوافق مع الكود الحالي)
@@ -154,98 +165,98 @@ interface EditorStore {
   halfTextHalfImageStates: Record<string, ComponentData>;
   ensurehalfTextHalfImageVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   gethalfTextHalfImageData: (variantId: string) => ComponentData;
   sethalfTextHalfImageData: (variantId: string, data: ComponentData) => void;
   updatehalfTextHalfImageByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Property Slider states
   propertySliderStates: Record<string, ComponentData>;
   ensurePropertySliderVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getPropertySliderData: (variantId: string) => ComponentData;
   setPropertySliderData: (variantId: string, data: ComponentData) => void;
   updatePropertySliderByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // CTA Valuation states
   ctaValuationStates: Record<string, ComponentData>;
   ensureCtaValuationVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getCtaValuationData: (variantId: string) => ComponentData;
   setCtaValuationData: (variantId: string, data: ComponentData) => void;
   updateCtaValuationByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Steps Section states
   stepsSectionStates: Record<string, ComponentData>;
   ensureStepsSectionVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getStepsSectionData: (variantId: string) => ComponentData;
   setStepsSectionData: (variantId: string, data: ComponentData) => void;
   updateStepsSectionByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Testimonials states
   testimonialsStates: Record<string, ComponentData>;
   ensureTestimonialsVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getTestimonialsData: (variantId: string) => ComponentData;
   setTestimonialsData: (variantId: string, data: ComponentData) => void;
   updateTestimonialsByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Why Choose Us states
   whyChooseUsStates: Record<string, ComponentData>;
   ensureWhyChooseUsVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getWhyChooseUsData: (variantId: string) => ComponentData;
   setWhyChooseUsData: (variantId: string, data: ComponentData) => void;
   updateWhyChooseUsByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Contact Map Section states
   contactMapSectionStates: Record<string, ComponentData>;
   ensureContactMapSectionVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getContactMapSectionData: (variantId: string) => ComponentData;
   setContactMapSectionData: (variantId: string, data: ComponentData) => void;
   updateContactMapSectionByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Footer states
@@ -266,28 +277,28 @@ interface EditorStore {
   filterButtonsStates: Record<string, ComponentData>;
   ensureFilterButtonsVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getFilterButtonsData: (variantId: string) => ComponentData;
   setFilterButtonsData: (variantId: string, data: ComponentData) => void;
   updateFilterButtonsByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Property Filter states
   propertyFilterStates: Record<string, ComponentData>;
   ensurePropertyFilterVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getPropertyFilterData: (variantId: string) => ComponentData;
   setPropertyFilterData: (variantId: string, data: ComponentData) => void;
   updatePropertyFilterByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Map Section states
@@ -301,28 +312,28 @@ interface EditorStore {
   contactFormSectionStates: Record<string, ComponentData>;
   ensureContactFormSectionVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getContactFormSectionData: (variantId: string) => ComponentData;
   setContactFormSectionData: (variantId: string, data: ComponentData) => void;
   updateContactFormSectionByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Contact Cards states
   contactCardsStates: Record<string, ComponentData>;
   ensureContactCardsVariant: (
     variantId: string,
-    initial?: ComponentData
+    initial?: ComponentData,
   ) => void;
   getContactCardsData: (variantId: string) => ComponentData;
   setContactCardsData: (variantId: string, data: ComponentData) => void;
   updateContactCardsByPath: (
     variantId: string,
     path: string,
-    value: any
+    value: any,
   ) => void;
 
   // Page-wise components aggregation (for saving all pages)
@@ -335,7 +346,7 @@ interface EditorStore {
       name: string;
       componentName: string;
       data: ComponentData;
-    }[]
+    }[],
   ) => void;
 
   // Load data from database into editor stores
@@ -365,7 +376,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   showDialog: false,
   openSaveDialogFn: () => {},
   tempData: {},
-  currentPage: 'homepage',
+  currentPage: "homepage",
 
   // Initialize Global Components with default data
   globalHeaderData: getDefaultHeaderData(),
@@ -382,7 +393,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       acc[componentType] = COMPONENTS[componentType];
       return acc;
     },
-    {} as Record<string, any>
+    {} as Record<string, any>,
   ),
   heroStates: {},
   headerStates: {},
@@ -413,7 +424,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       };
       return acc;
     },
-    {} as Record<string, (variantId: string) => ComponentData>
+    {} as Record<string, (variantId: string) => ComponentData>,
   ),
 
   // Aggregated page components with positions
@@ -428,16 +439,17 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setTempData: (data) => set(() => ({ tempData: data })),
 
   // Global Components management
-  setGlobalHeaderData: (data) => set(() => {
-    return { globalHeaderData: data };
-  }),
-  setGlobalFooterData: (data) => set(() => {
-    return { globalFooterData: data };
-  }),
+  setGlobalHeaderData: (data) =>
+    set(() => {
+      return { globalHeaderData: data };
+    }),
+  setGlobalFooterData: (data) =>
+    set(() => {
+      return { globalFooterData: data };
+    }),
 
   updateGlobalHeaderByPath: (path, value) =>
     set((state) => {
-
       const segments = path
         .replace(/\[(\d+)\]/g, ".$1")
         .split(".")
@@ -478,7 +490,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       const lastKey = segments[segments.length - 1]!;
       cursor[lastKey] = value;
 
-
       // Force a new reference to ensure React re-renders
       const result = {
         globalHeaderData: JSON.parse(JSON.stringify(newData)),
@@ -488,7 +499,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   updateGlobalFooterByPath: (path, value) =>
     set((state) => {
-
       const segments = path
         .replace(/\[(\d+)\]/g, ".$1")
         .split(".")
@@ -529,7 +539,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       const lastKey = segments[segments.length - 1]!;
       cursor[lastKey] = value;
 
-
       // Force a new reference to ensure React re-renders
       const result = {
         globalFooterData: JSON.parse(JSON.stringify(newData)),
@@ -538,9 +547,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     }),
 
   // Global Components Data management
-  setGlobalComponentsData: (data) => set(() => {
-    return { globalComponentsData: data };
-  }),
+  setGlobalComponentsData: (data) =>
+    set(() => {
+      return { globalComponentsData: data };
+    }),
 
   updateGlobalComponentByPath: (componentType, path, value) =>
     set((state) => {
@@ -552,7 +562,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       // Get current data or initialize with defaults
       let currentData = state.globalComponentsData[componentType];
       if (!currentData || Object.keys(currentData).length === 0) {
-        currentData = componentType === 'header' ? getDefaultHeaderData() : getDefaultFooterData();
+        currentData =
+          componentType === "header"
+            ? getDefaultHeaderData()
+            : getDefaultFooterData();
       }
 
       // Create a deep copy to avoid mutations
@@ -615,7 +628,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         .split(".")
         .filter(Boolean);
 
-
       // Initialize tempData with current component data if it's empty
       let newData: any = { ...(state.tempData || {}) };
 
@@ -626,10 +638,17 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       // If tempData is empty, try to get current component data
       else if (!state.tempData || Object.keys(state.tempData).length === 0) {
         // For global components, use the global data as base
-        if (state.currentPage === "global-header" || path.includes("menu") || path.includes("logo")) {
+        if (
+          state.currentPage === "global-header" ||
+          path.includes("menu") ||
+          path.includes("logo")
+        ) {
           // This is likely a global header component, use globalHeaderData as base
           newData = { ...state.globalHeaderData };
-        } else if (state.currentPage === "global-footer" || path.includes("footer")) {
+        } else if (
+          state.currentPage === "global-footer" ||
+          path.includes("footer")
+        ) {
           // This is likely a global footer component, use globalFooterData as base
           newData = { ...state.globalFooterData };
         } else {
@@ -638,18 +657,24 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         }
       } else {
         // If tempData exists, use it as base and merge with global data for missing fields
-        if (state.currentPage === "global-header" || path.includes("menu") || path.includes("logo")) {
+        if (
+          state.currentPage === "global-header" ||
+          path.includes("menu") ||
+          path.includes("logo")
+        ) {
           // Merge tempData with globalHeaderData to ensure all fields are present
           // Use deep merge to preserve nested objects like menu arrays
           // Priority: tempData > globalHeaderData (tempData should override)
           newData = deepMerge(state.globalHeaderData, state.tempData);
-        } else if (state.currentPage === "global-footer" || path.includes("footer")) {
+        } else if (
+          state.currentPage === "global-footer" ||
+          path.includes("footer")
+        ) {
           // Merge tempData with globalFooterData to ensure all fields are present
           // Use deep merge to preserve nested objects
           newData = deepMerge(state.globalFooterData, state.tempData);
         }
       }
-
 
       let cursor: any = newData;
       for (let i = 0; i < segments.length - 1; i++) {
@@ -678,7 +703,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       }
       const lastKey = segments[segments.length - 1]!;
       cursor[lastKey] = value;
-
 
       // Only update tempData, don't update global data until Save Changes is pressed
 
@@ -736,13 +760,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return halfTextHalfImageFunctions.ensureVariant(
             state,
             variantId,
-            initial
+            initial,
           );
         case "propertySlider":
           return propertySliderFunctions.ensureVariant(
             state,
             variantId,
-            initial
+            initial,
           );
         case "ctaValuation":
           return ctaValuationFunctions.ensureVariant(state, variantId, initial);
@@ -756,7 +780,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return contactMapSectionFunctions.ensureVariant(
             state,
             variantId,
-            initial
+            initial,
           );
         case "grid":
           return gridFunctions.ensureVariant(state, variantId, initial);
@@ -764,13 +788,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return filterButtonsFunctions.ensureVariant(
             state,
             variantId,
-            initial
+            initial,
           );
         case "propertyFilter":
           return propertyFilterFunctions.ensureVariant(
             state,
             variantId,
-            initial
+            initial,
           );
         case "mapSection":
           return mapSectionFunctions.ensureVariant(state, variantId, initial);
@@ -778,7 +802,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return contactFormSectionFunctions.ensureVariant(
             state,
             variantId,
-            initial
+            initial,
           );
         case "contactCards":
           return contactCardsFunctions.ensureVariant(state, variantId, initial);
@@ -911,7 +935,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           newState = contactFormSectionFunctions.setData(
             state,
             variantId,
-            data
+            data,
           );
           break;
         case "contactCards":
@@ -969,7 +993,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "footer":
@@ -977,7 +1001,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "halfTextHalfImage":
@@ -985,7 +1009,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "propertySlider":
@@ -993,7 +1017,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "ctaValuation":
@@ -1001,7 +1025,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "stepsSection":
@@ -1009,7 +1033,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "testimonials":
@@ -1017,7 +1041,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "whyChooseUs":
@@ -1025,7 +1049,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "contactMapSection":
@@ -1033,7 +1057,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "grid":
@@ -1044,7 +1068,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "propertyFilter":
@@ -1052,7 +1076,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "mapSection":
@@ -1060,7 +1084,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "contactFormSection":
@@ -1068,7 +1092,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         case "contactCards":
@@ -1076,7 +1100,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             state,
             variantId,
             path,
-            value
+            value,
           );
           break;
         default:
@@ -1159,7 +1183,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   // Half Text Half Image functions using modular approach
   ensurehalfTextHalfImageVariant: (variantId, initial) =>
     set((state) =>
-      halfTextHalfImageFunctions.ensureVariant(state, variantId, initial)
+      halfTextHalfImageFunctions.ensureVariant(state, variantId, initial),
     ),
   gethalfTextHalfImageData: (variantId) => {
     const state = get();
@@ -1169,13 +1193,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => halfTextHalfImageFunctions.setData(state, variantId, data)),
   updatehalfTextHalfImageByPath: (variantId, path, value) =>
     set((state) =>
-      halfTextHalfImageFunctions.updateByPath(state, variantId, path, value)
+      halfTextHalfImageFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Property Slider functions using modular approach
   ensurePropertySliderVariant: (variantId, initial) =>
     set((state) =>
-      propertySliderFunctions.ensureVariant(state, variantId, initial)
+      propertySliderFunctions.ensureVariant(state, variantId, initial),
     ),
   getPropertySliderData: (variantId) => {
     const state = get();
@@ -1185,13 +1209,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => propertySliderFunctions.setData(state, variantId, data)),
   updatePropertySliderByPath: (variantId, path, value) =>
     set((state) =>
-      propertySliderFunctions.updateByPath(state, variantId, path, value)
+      propertySliderFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // CTA Valuation functions using modular approach
   ensureCtaValuationVariant: (variantId, initial) =>
     set((state) =>
-      ctaValuationFunctions.ensureVariant(state, variantId, initial)
+      ctaValuationFunctions.ensureVariant(state, variantId, initial),
     ),
   getCtaValuationData: (variantId) => {
     const state = get();
@@ -1201,13 +1225,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => ctaValuationFunctions.setData(state, variantId, data)),
   updateCtaValuationByPath: (variantId, path, value) =>
     set((state) =>
-      ctaValuationFunctions.updateByPath(state, variantId, path, value)
+      ctaValuationFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Steps Section functions using modular approach
   ensureStepsSectionVariant: (variantId, initial) =>
     set((state) =>
-      stepsSectionFunctions.ensureVariant(state, variantId, initial)
+      stepsSectionFunctions.ensureVariant(state, variantId, initial),
     ),
   getStepsSectionData: (variantId) => {
     const state = get();
@@ -1217,13 +1241,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => stepsSectionFunctions.setData(state, variantId, data)),
   updateStepsSectionByPath: (variantId, path, value) =>
     set((state) =>
-      stepsSectionFunctions.updateByPath(state, variantId, path, value)
+      stepsSectionFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Testimonials functions using modular approach
   ensureTestimonialsVariant: (variantId, initial) =>
     set((state) =>
-      testimonialsFunctions.ensureVariant(state, variantId, initial)
+      testimonialsFunctions.ensureVariant(state, variantId, initial),
     ),
   getTestimonialsData: (variantId) => {
     const state = get();
@@ -1233,13 +1257,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => testimonialsFunctions.setData(state, variantId, data)),
   updateTestimonialsByPath: (variantId, path, value) =>
     set((state) =>
-      testimonialsFunctions.updateByPath(state, variantId, path, value)
+      testimonialsFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Why Choose Us functions using modular approach
   ensureWhyChooseUsVariant: (variantId, initial) =>
     set((state) =>
-      whyChooseUsFunctions.ensureVariant(state, variantId, initial)
+      whyChooseUsFunctions.ensureVariant(state, variantId, initial),
     ),
   getWhyChooseUsData: (variantId) => {
     const state = get();
@@ -1249,13 +1273,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => whyChooseUsFunctions.setData(state, variantId, data)),
   updateWhyChooseUsByPath: (variantId, path, value) =>
     set((state) =>
-      whyChooseUsFunctions.updateByPath(state, variantId, path, value)
+      whyChooseUsFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Contact Map Section functions using modular approach
   ensureContactMapSectionVariant: (variantId, initial) =>
     set((state) =>
-      contactMapSectionFunctions.ensureVariant(state, variantId, initial)
+      contactMapSectionFunctions.ensureVariant(state, variantId, initial),
     ),
   getContactMapSectionData: (variantId) => {
     const state = get();
@@ -1265,7 +1289,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => contactMapSectionFunctions.setData(state, variantId, data)),
   updateContactMapSectionByPath: (variantId, path, value) =>
     set((state) =>
-      contactMapSectionFunctions.updateByPath(state, variantId, path, value)
+      contactMapSectionFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Grid functions using modular approach
@@ -1283,7 +1307,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   // Filter Buttons functions using modular approach
   ensureFilterButtonsVariant: (variantId, initial) =>
     set((state) =>
-      filterButtonsFunctions.ensureVariant(state, variantId, initial)
+      filterButtonsFunctions.ensureVariant(state, variantId, initial),
     ),
   getFilterButtonsData: (variantId) => {
     const state = get();
@@ -1293,13 +1317,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => filterButtonsFunctions.setData(state, variantId, data)),
   updateFilterButtonsByPath: (variantId, path, value) =>
     set((state) =>
-      filterButtonsFunctions.updateByPath(state, variantId, path, value)
+      filterButtonsFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Property Filter functions using modular approach
   ensurePropertyFilterVariant: (variantId, initial) =>
     set((state) =>
-      propertyFilterFunctions.ensureVariant(state, variantId, initial)
+      propertyFilterFunctions.ensureVariant(state, variantId, initial),
     ),
   getPropertyFilterData: (variantId) => {
     const state = get();
@@ -1309,13 +1333,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => propertyFilterFunctions.setData(state, variantId, data)),
   updatePropertyFilterByPath: (variantId, path, value) =>
     set((state) =>
-      propertyFilterFunctions.updateByPath(state, variantId, path, value)
+      propertyFilterFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Map Section functions using modular approach
   ensureMapSectionVariant: (variantId, initial) =>
     set((state) =>
-      mapSectionFunctions.ensureVariant(state, variantId, initial)
+      mapSectionFunctions.ensureVariant(state, variantId, initial),
     ),
   getMapSectionData: (variantId) => {
     const state = get();
@@ -1325,13 +1349,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => mapSectionFunctions.setData(state, variantId, data)),
   updateMapSectionByPath: (variantId, path, value) =>
     set((state) =>
-      mapSectionFunctions.updateByPath(state, variantId, path, value)
+      mapSectionFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Contact Form Section functions using modular approach
   ensureContactFormSectionVariant: (variantId, initial) =>
     set((state) =>
-      contactFormSectionFunctions.ensureVariant(state, variantId, initial)
+      contactFormSectionFunctions.ensureVariant(state, variantId, initial),
     ),
   getContactFormSectionData: (variantId) => {
     const state = get();
@@ -1341,13 +1365,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => contactFormSectionFunctions.setData(state, variantId, data)),
   updateContactFormSectionByPath: (variantId, path, value) =>
     set((state) =>
-      contactFormSectionFunctions.updateByPath(state, variantId, path, value)
+      contactFormSectionFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Contact Cards functions using modular approach
   ensureContactCardsVariant: (variantId, initial) =>
     set((state) =>
-      contactCardsFunctions.ensureVariant(state, variantId, initial)
+      contactCardsFunctions.ensureVariant(state, variantId, initial),
     ),
   getContactCardsData: (variantId) => {
     const state = get();
@@ -1357,14 +1381,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => contactCardsFunctions.setData(state, variantId, data)),
   updateContactCardsByPath: (variantId, path, value) =>
     set((state) =>
-      contactCardsFunctions.updateByPath(state, variantId, path, value)
+      contactCardsFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Page components management
   setPageComponentsForPage: (page, components) =>
     set((state) => {
       const withPositions: ComponentInstanceWithPosition[] = components.map(
-        (c, index) => ({ ...c, position: index })
+        (c, index) => ({ ...c, position: index }),
       );
       return {
         pageComponentsByPage: {
@@ -1390,7 +1414,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         newState.globalHeaderData = tenantData.globalHeaderData;
       } else {
         // Only initialize with default header data if not already set in editorStore
-        if (!state.globalHeaderData || Object.keys(state.globalHeaderData).length === 0) {
+        if (
+          !state.globalHeaderData ||
+          Object.keys(state.globalHeaderData).length === 0
+        ) {
           const defaultHeaderData = getDefaultHeaderData();
           newState.globalHeaderData = defaultHeaderData;
         } else {
@@ -1406,7 +1433,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         newState.globalFooterData = tenantData.globalFooterData;
       } else {
         // Only initialize with default footer data if not already set in editorStore
-        if (!state.globalFooterData || Object.keys(state.globalFooterData).length === 0) {
+        if (
+          !state.globalFooterData ||
+          Object.keys(state.globalFooterData).length === 0
+        ) {
           const defaultFooterData = getDefaultFooterData();
           newState.globalFooterData = defaultFooterData;
         } else {
@@ -1423,7 +1453,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         newState.globalComponentsData = tenantData.globalComponentsData;
       } else {
         // Only initialize with default data if not already set in editorStore
-        if (!state.globalComponentsData || Object.keys(state.globalComponentsData).length === 0) {
+        if (
+          !state.globalComponentsData ||
+          Object.keys(state.globalComponentsData).length === 0
+        ) {
           const defaultHeaderData = getDefaultHeaderData();
           const defaultFooterData = getDefaultFooterData();
           newState.globalComponentsData = {
@@ -1445,11 +1478,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 id,
                 ...comp,
                 position: comp.position ?? 0,
-              })
+              }),
             );
             newState.pageComponentsByPage[page] = components;
           }
-        }
+        },
       );
 
       // Load component data into respective stores using modular functions
@@ -1464,14 +1497,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.headerStates = headerFunctions.setData(
                         newState,
                         comp.componentName,
-                        comp.data
+                        comp.data,
                       ).headerStates;
                       break;
                     case "hero":
                       newState.heroStates = heroFunctions.setData(
                         newState,
                         comp.componentName,
-                        comp.data
+                        comp.data,
                       ).heroStates;
                       break;
                     case "halfTextHalfImage":
@@ -1479,7 +1512,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         halfTextHalfImageFunctions.setData(
                           newState,
                           comp.componentName,
-                          comp.data
+                          comp.data,
                         ).halfTextHalfImageStates;
                       break;
                     case "propertySlider":
@@ -1487,7 +1520,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         propertySliderFunctions.setData(
                           newState,
                           comp.componentName,
-                          comp.data
+                          comp.data,
                         ).propertySliderStates;
                       break;
                     case "ctaValuation":
@@ -1495,7 +1528,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         ctaValuationFunctions.setData(
                           newState,
                           comp.componentName,
-                          comp.data
+                          comp.data,
                         ).ctaValuationStates;
                       break;
                     case "stepsSection":
@@ -1503,7 +1536,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         stepsSectionFunctions.setData(
                           newState,
                           comp.componentName,
-                          comp.data
+                          comp.data,
                         ).stepsSectionStates;
                       break;
                     case "testimonials":
@@ -1511,14 +1544,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         testimonialsFunctions.setData(
                           newState,
                           comp.componentName,
-                          comp.data
+                          comp.data,
                         ).testimonialsStates;
                       break;
                     case "whyChooseUs":
                       newState.whyChooseUsStates = whyChooseUsFunctions.setData(
                         newState,
                         comp.componentName,
-                        comp.data
+                        comp.data,
                       ).whyChooseUsStates;
                       break;
                     case "contactMapSection":
@@ -1526,21 +1559,21 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         contactMapSectionFunctions.setData(
                           newState,
                           comp.componentName,
-                          comp.data
+                          comp.data,
                         ).contactMapSectionStates;
                       break;
                     case "footer":
                       newState.footerStates = footerFunctions.setData(
                         newState,
                         comp.componentName,
-                        comp.data
+                        comp.data,
                       ).footerStates;
                       break;
                     case "grid":
                       newState.gridStates = gridFunctions.setData(
                         newState,
                         comp.componentName,
-                        comp.data
+                        comp.data,
                       ).gridStates;
                       break;
                     case "filterButtons":
@@ -1548,7 +1581,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         filterButtonsFunctions.setData(
                           newState,
                           comp.componentName,
-                          comp.data
+                          comp.data,
                         ).filterButtonsStates;
                       break;
                     case "propertyFilter":
@@ -1556,14 +1589,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         propertyFilterFunctions.setData(
                           newState,
                           comp.componentName,
-                          comp.data
+                          comp.data,
                         ).propertyFilterStates;
                       break;
                     case "mapSection":
                       newState.mapSectionStates = mapSectionFunctions.setData(
                         newState,
                         comp.componentName,
-                        comp.data
+                        comp.data,
                       ).mapSectionStates;
                       break;
                     case "contactFormSection":
@@ -1571,7 +1604,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         contactFormSectionFunctions.setData(
                           newState,
                           comp.componentName,
-                          comp.data
+                          comp.data,
                         ).contactFormSectionStates;
                       break;
                     case "contactCards":
@@ -1579,15 +1612,15 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         contactCardsFunctions.setData(
                           newState,
                           comp.componentName,
-                          comp.data
+                          comp.data,
                         ).contactCardsStates;
                       break;
                   }
                 }
-              }
+              },
             );
           }
-        }
+        },
       );
 
       return newState;
@@ -1607,14 +1640,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
               newState.headerStates = headerFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).headerStates;
               break;
             case "hero":
               newState.heroStates = heroFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).heroStates;
               break;
             case "halfTextHalfImage":
@@ -1622,42 +1655,42 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 halfTextHalfImageFunctions.setData(
                   newState,
                   comp.componentName,
-                  comp.data
+                  comp.data,
                 ).halfTextHalfImageStates;
               break;
             case "propertySlider":
               newState.propertySliderStates = propertySliderFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).propertySliderStates;
               break;
             case "ctaValuation":
               newState.ctaValuationStates = ctaValuationFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).ctaValuationStates;
               break;
             case "stepsSection":
               newState.stepsSectionStates = stepsSectionFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).stepsSectionStates;
               break;
             case "testimonials":
               newState.testimonialsStates = testimonialsFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).testimonialsStates;
               break;
             case "whyChooseUs":
               newState.whyChooseUsStates = whyChooseUsFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).whyChooseUsStates;
               break;
             case "contactMapSection":
@@ -1665,42 +1698,42 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 contactMapSectionFunctions.setData(
                   newState,
                   comp.componentName,
-                  comp.data
+                  comp.data,
                 ).contactMapSectionStates;
               break;
             case "footer":
               newState.footerStates = footerFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).footerStates;
               break;
             case "grid":
               newState.gridStates = gridFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).gridStates;
               break;
             case "filterButtons":
               newState.filterButtonsStates = filterButtonsFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).filterButtonsStates;
               break;
             case "propertyFilter":
               newState.propertyFilterStates = propertyFilterFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).propertyFilterStates;
               break;
             case "mapSection":
               newState.mapSectionStates = mapSectionFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).mapSectionStates;
               break;
             case "contactFormSection":
@@ -1708,14 +1741,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 contactFormSectionFunctions.setData(
                   newState,
                   comp.componentName,
-                  comp.data
+                  comp.data,
                 ).contactFormSectionStates;
               break;
             case "contactCards":
               newState.contactCardsStates = contactCardsFunctions.setData(
                 newState,
                 comp.componentName,
-                comp.data
+                comp.data,
               ).contactCardsStates;
               break;
           }
@@ -1739,7 +1772,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   forceUpdatePageComponents: (slug, components) =>
     set((state) => {
-      
       return {
         pageComponentsByPage: {
           ...state.pageComponentsByPage,

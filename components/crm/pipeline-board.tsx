@@ -25,7 +25,10 @@ interface PipelineBoardProps {
   onAddNote: (customer: Customer) => void;
   onAddReminder: (customer: Customer) => void;
   onAddInteraction: (customer: Customer) => void;
-  onUpdateCustomerStage: (customerId: string, stageId: string) => Promise<boolean>;
+  onUpdateCustomerStage: (
+    customerId: string,
+    stageId: string,
+  ) => Promise<boolean>;
 }
 
 export default function PipelineBoard({

@@ -36,7 +36,7 @@ export const useLiveEditorSensors = (
   } = {
     touch: touchDefault,
     other: otherDefault,
-  }
+  },
 ) => {
   const [sensors] = useState(() => {
     return [
@@ -63,4 +63,3 @@ export const useLiveEditorSensors = (
   });
   return sensors;
 };
-

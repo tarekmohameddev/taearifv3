@@ -5,6 +5,7 @@ import { FieldDefinition } from "@/componentsStructure/types";
 import { DynamicFieldsRendererProps } from "../types";
 import { normalizePath } from "../utils";
 import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 import {
   ColorFieldRenderer,
   ImageFieldRenderer,
@@ -27,7 +28,7 @@ export function DynamicFieldsRenderer({
   onUpdateByPath,
   currentData,
 }: DynamicFieldsRendererProps) {
-  
+  const t = useEditorT();
   const {
     tempData,
     updateByPath,
@@ -41,31 +42,40 @@ export function DynamicFieldsRenderer({
     updateGlobalHeaderByPath,
     updateGlobalFooterByPath,
     updateGlobalComponentByPath,
-    globalComponentsData
+    globalComponentsData,
   } = useEditorStore();
-
 
   // Initialize variant data if needed
   useEffect(() => {
     if (variantId && componentType && COMPONENTS[componentType]) {
       ensureComponentVariant(componentType, variantId);
-      
+
       // For non-global components, ensure tempData is initialized with current component data
       if (variantId !== "global-header" && variantId !== "global-footer") {
         const componentData = getComponentData(componentType, variantId);
-        
-        if (componentData && (!tempData || Object.keys(tempData).length === 0)) {
+
+        if (
+          componentData &&
+          (!tempData || Object.keys(tempData).length === 0)
+        ) {
           // Initialize tempData with current component data for live editing
           setComponentData(componentType, variantId, componentData);
         }
       }
     }
-  }, [componentType, variantId, ensureComponentVariant, getComponentData, setComponentData, tempData]);
+  }, [
+    componentType,
+    variantId,
+    ensureComponentVariant,
+    getComponentData,
+    setComponentData,
+    tempData,
+  ]);
 
   const getValueByPath = useCallback(
     (path: string) => {
       // Validate path
-      if (!path || typeof path !== 'string') {
+      if (!path || typeof path !== "string") {
         console.warn("⚠️ [DynamicFieldsRenderer] Invalid path provided:", path);
         return undefined;
       }
@@ -76,63 +86,93 @@ export function DynamicFieldsRenderer({
         return undefined;
       }
 
-
       // Use currentData first, then fall back to other sources
       let cursor: any = {};
-      
+
       // Use currentData if provided (unified system)
       if (currentData && Object.keys(currentData).length > 0) {
         cursor = currentData;
       } else if (variantId === "global-header") {
         // Use globalComponentsData for global header
         cursor = globalComponentsData?.header || tempData || {};
-        
+
         // Validate global component data structure
-        if (cursor && typeof cursor === 'object') {
-          const requiredFields = ['visible', 'menu', 'logo', 'colors'];
-          const missingFields = requiredFields.filter(field => !(field in cursor));
+        if (cursor && typeof cursor === "object") {
+          const requiredFields = ["visible", "menu", "logo", "colors"];
+          const missingFields = requiredFields.filter(
+            (field) => !(field in cursor),
+          );
           if (missingFields.length > 0) {
-            console.warn("⚠️ [DynamicFieldsRenderer] Missing required header fields:", missingFields);
+            console.warn(
+              "⚠️ [DynamicFieldsRenderer] Missing required header fields:",
+              missingFields,
+            );
           }
         }
       } else if (variantId === "global-footer") {
         // Use globalComponentsData for global footer
         cursor = globalComponentsData?.footer || tempData || {};
-        
+
         // Validate global component data structure
-        if (cursor && typeof cursor === 'object') {
-          const requiredFields = ['visible', 'content', 'styling'];
-          const missingFields = requiredFields.filter(field => !(field in cursor));
+        if (cursor && typeof cursor === "object") {
+          const requiredFields = ["visible", "content", "styling"];
+          const missingFields = requiredFields.filter(
+            (field) => !(field in cursor),
+          );
           if (missingFields.length > 0) {
-            console.warn("⚠️ [DynamicFieldsRenderer] Missing required footer fields:", missingFields);
+            console.warn(
+              "⚠️ [DynamicFieldsRenderer] Missing required footer fields:",
+              missingFields,
+            );
           }
         }
-      } else if (variantId === "global-header" || variantId === "global-footer") {
+      } else if (
+        variantId === "global-header" ||
+        variantId === "global-footer"
+      ) {
         // For global components, always use tempData for editing (not global data)
         cursor = tempData || {};
-        
+
         // Validate global component data structure
-        if (variantId === "global-header" && cursor && typeof cursor === 'object') {
-          const requiredFields = ['visible', 'menu', 'logo', 'colors'];
-          const missingFields = requiredFields.filter(field => !(field in cursor));
+        if (
+          variantId === "global-header" &&
+          cursor &&
+          typeof cursor === "object"
+        ) {
+          const requiredFields = ["visible", "menu", "logo", "colors"];
+          const missingFields = requiredFields.filter(
+            (field) => !(field in cursor),
+          );
           if (missingFields.length > 0) {
-            console.warn("⚠️ [DynamicFieldsRenderer] Missing required header fields:", missingFields);
+            console.warn(
+              "⚠️ [DynamicFieldsRenderer] Missing required header fields:",
+              missingFields,
+            );
           }
-        } else if (variantId === "global-footer" && cursor && typeof cursor === 'object') {
-          const requiredFields = ['visible', 'content', 'styling'];
-          const missingFields = requiredFields.filter(field => !(field in cursor));
+        } else if (
+          variantId === "global-footer" &&
+          cursor &&
+          typeof cursor === "object"
+        ) {
+          const requiredFields = ["visible", "content", "styling"];
+          const missingFields = requiredFields.filter(
+            (field) => !(field in cursor),
+          );
           if (missingFields.length > 0) {
-            console.warn("⚠️ [DynamicFieldsRenderer] Missing required footer fields:", missingFields);
+            console.warn(
+              "⚠️ [DynamicFieldsRenderer] Missing required footer fields:",
+              missingFields,
+            );
           }
         }
       } else if (componentType && variantId && COMPONENTS[componentType]) {
         // For regular components, prioritize tempData for live editing
         const componentData = getComponentData(componentType, variantId);
-        
+
         // Always use tempData if it has data (for live editing)
         if (tempData && Object.keys(tempData).length > 0) {
           cursor = tempData;
-        } 
+        }
         // If tempData is empty but currentData is provided, use currentData (initial load)
         else if (currentData && Object.keys(currentData).length > 0) {
           cursor = currentData;
@@ -154,7 +194,12 @@ export function DynamicFieldsRenderer({
       }
 
       // Special handling for halfTextHalfImage3 layout.direction
-      if (path === "layout.direction" && cursor && cursor.layout && cursor.layout.direction) {
+      if (
+        path === "layout.direction" &&
+        cursor &&
+        cursor.layout &&
+        cursor.layout.direction
+      ) {
         return cursor.layout.direction;
       }
 
@@ -162,45 +207,76 @@ export function DynamicFieldsRenderer({
         if (cursor == null) return undefined;
         cursor = cursor[seg as any];
       }
-      
-      
+
       return cursor;
     },
-    [currentData, tempData, componentType, variantId, getComponentData, globalHeaderData, globalFooterData, globalComponentsData],
+    [
+      currentData,
+      tempData,
+      componentType,
+      variantId,
+      getComponentData,
+      globalHeaderData,
+      globalFooterData,
+      globalComponentsData,
+    ],
   );
 
   const updateValue = useCallback(
     (path: string, value: any) => {
-      
-      
       // Special handling for halfTextHalfImage3 imagePosition
-      if (path === "content.imagePosition" && componentType === "halfTextHalfImage") {
+      if (
+        path === "content.imagePosition" &&
+        componentType === "halfTextHalfImage"
+      ) {
         // Update both content.imagePosition and top-level imagePosition for consistency
         if (onUpdateByPath) {
           onUpdateByPath("content.imagePosition", value);
           onUpdateByPath("imagePosition", value);
         } else if (componentType && variantId) {
-          updateComponentByPath(componentType, variantId, "content.imagePosition", value);
-          updateComponentByPath(componentType, variantId, "imagePosition", value);
+          updateComponentByPath(
+            componentType,
+            variantId,
+            "content.imagePosition",
+            value,
+          );
+          updateComponentByPath(
+            componentType,
+            variantId,
+            "imagePosition",
+            value,
+          );
         }
         return;
       }
 
       // Special handling for halfTextHalfImage3 layout.direction
-      if (path === "layout.direction" && componentType === "halfTextHalfImage") {
+      if (
+        path === "layout.direction" &&
+        componentType === "halfTextHalfImage"
+      ) {
         // Update layout.direction
         if (onUpdateByPath) {
           onUpdateByPath("layout.direction", value);
         } else if (componentType && variantId) {
-          updateComponentByPath(componentType, variantId, "layout.direction", value);
+          updateComponentByPath(
+            componentType,
+            variantId,
+            "layout.direction",
+            value,
+          );
         }
         return;
       }
-      
 
       if (onUpdateByPath) {
         // For regular components, prioritize tempData updates for immediate UI feedback
-        if (componentType && variantId && variantId !== "global-header" && variantId !== "global-footer") {
+        if (
+          componentType &&
+          variantId &&
+          variantId !== "global-header" &&
+          variantId !== "global-footer"
+        ) {
           // Use updateByPath to update tempData for immediate UI feedback
           updateByPath(path, value);
         } else {
@@ -224,7 +300,18 @@ export function DynamicFieldsRenderer({
         }
       }
     },
-    [onUpdateByPath, updateByPath, updateComponentByPath, updateGlobalHeaderByPath, updateGlobalFooterByPath, componentType, variantId, globalHeaderData, globalFooterData, updateGlobalComponentByPath],
+    [
+      onUpdateByPath,
+      updateByPath,
+      updateComponentByPath,
+      updateGlobalHeaderByPath,
+      updateGlobalFooterByPath,
+      componentType,
+      variantId,
+      globalHeaderData,
+      globalFooterData,
+      updateGlobalComponentByPath,
+    ],
   );
 
   const hasFrom = fields.some((f) => f.key === "colors.from");
@@ -238,7 +325,7 @@ export function DynamicFieldsRenderer({
     if (!def) {
       return null;
     }
-    
+
     // إصلاح مشكلة تكرار المفاتيح في المسار
     let path: string;
     if (basePath) {
@@ -251,13 +338,13 @@ export function DynamicFieldsRenderer({
     } else {
       path = def.key;
     }
-    
+
     const normalizedPath = normalizePath(path);
     const value = getValueByPath(normalizedPath);
 
     switch (def.type) {
       case "array": {
-          return (
+        return (
           <ArrayFieldRenderer
             def={def}
             normalizedPath={normalizedPath}
@@ -301,29 +388,39 @@ export function DynamicFieldsRenderer({
                 type="text"
                 value={value || ""}
                 onChange={(e) => updateValue(normalizedPath, e.target.value)}
-                placeholder={def.placeholder || "Enter text..."}
+                placeholder={def.placeholder || t("editor_sidebar.enter_text")}
                 className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-700 ${
-                  value && value.length > 0 
-                    ? "border-green-300 bg-green-50" 
+                  value && value.length > 0
+                    ? "border-green-300 bg-green-50"
                     : "border-slate-200"
                 }`}
               />
               {value && value.length > 0 && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  <svg
+                    className="w-4 h-4 text-green-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               )}
             </div>
             {def.min && value && value.length < def.min && (
               <p className="text-xs text-red-500 mt-2">
-                Minimum {def.min} characters required ({value?.length || 0}/{def.min})
+                Minimum {def.min} characters required ({value?.length || 0}/
+                {def.min})
               </p>
             )}
             {def.max && value && value.length > def.max && (
               <p className="text-xs text-red-500 mt-2">
-                Maximum {def.max} characters allowed ({value?.length || 0}/{def.max})
+                Maximum {def.max} characters allowed ({value?.length || 0}/
+                {def.max})
               </p>
             )}
             {def.max && value && value.length <= def.max && (
@@ -368,29 +465,39 @@ export function DynamicFieldsRenderer({
                 value={value || ""}
                 onChange={(e) => updateValue(normalizedPath, e.target.value)}
                 className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 text-slate-700 resize-none ${
-                  value && value.length > 0 
-                    ? "border-green-300 bg-green-50" 
+                  value && value.length > 0
+                    ? "border-green-300 bg-green-50"
                     : "border-slate-200"
                 }`}
                 rows={4}
-                placeholder={def.placeholder || "Enter your text here..."}
+                placeholder={def.placeholder || t("editor_sidebar.enter_your_text")}
               />
               {value && value.length > 0 && (
                 <div className="absolute right-3 top-3">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  <svg
+                    className="w-4 h-4 text-green-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               )}
             </div>
             {def.min && value && value.length < def.min && (
               <p className="text-xs text-red-500 mt-2">
-                Minimum {def.min} characters required ({value?.length || 0}/{def.min})
+                Minimum {def.min} characters required ({value?.length || 0}/
+                {def.min})
               </p>
             )}
             {def.max && value && value.length > def.max && (
               <p className="text-xs text-red-500 mt-2">
-                Maximum {def.max} characters allowed ({value?.length || 0}/{def.max})
+                Maximum {def.max} characters allowed ({value?.length || 0}/
+                {def.max})
               </p>
             )}
             {def.max && value && value.length <= def.max && (
@@ -462,8 +569,8 @@ export function DynamicFieldsRenderer({
                 value={value || (def.options?.[0]?.value ?? "")}
                 onChange={(e) => updateValue(normalizedPath, e.target.value)}
                 className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500 transition-all duration-200 text-slate-700 font-medium appearance-none cursor-pointer pr-10 ${
-                  value && value.length > 0 
-                    ? "border-green-300 bg-green-50" 
+                  value && value.length > 0
+                    ? "border-green-300 bg-green-50"
                     : "border-slate-200"
                 }`}
                 style={{
@@ -497,23 +604,31 @@ export function DynamicFieldsRenderer({
               </div>
               {value && value.length > 0 && (
                 <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  <svg
+                    className="w-4 h-4 text-green-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               )}
             </div>
             {def.options && def.options.length === 0 && (
               <p className="text-xs text-amber-500 mt-2">
-                No options available
+                {t("editor_sidebar.no_options_available")}
               </p>
             )}
             {/* Debug info for select fields */}
-            {process.env.NODE_ENV === 'development' && (
+            {process.env.NODE_ENV === "development" && (
               <div className="mt-2 text-xs text-gray-500">
-                <div>Current value: {value || 'undefined'}</div>
-                <div>Options: {JSON.stringify(def.options || [])}</div>
-                <div>Path: {normalizedPath}</div>
+                <div>{t("editor_sidebar.current_value_debug", { value: value || "undefined" })}</div>
+                <div>{t("editor_sidebar.options_debug", { options: JSON.stringify(def.options || []) })}</div>
+                <div>{t("editor_sidebar.path_debug", { path: normalizedPath })}</div>
               </div>
             )}
           </div>
@@ -524,7 +639,7 @@ export function DynamicFieldsRenderer({
             def={def}
             normalizedPath={normalizedPath}
             value={value}
-                          updateValue={updateValue}
+            updateValue={updateValue}
             getValueByPath={getValueByPath}
             renderField={renderField}
           />
@@ -542,7 +657,7 @@ export function DynamicFieldsRenderer({
         <BackgroundFieldRenderer
           backgroundField={backgroundField}
           getValueByPath={getValueByPath}
-                updateValue={updateValue}
+          updateValue={updateValue}
           renderField={renderField}
         />
       )}
@@ -552,7 +667,7 @@ export function DynamicFieldsRenderer({
         <SimpleBackgroundFieldRenderer
           fields={fields}
           getValueByPath={getValueByPath}
-                      updateValue={updateValue}
+          updateValue={updateValue}
           renderField={renderField}
         />
       )}

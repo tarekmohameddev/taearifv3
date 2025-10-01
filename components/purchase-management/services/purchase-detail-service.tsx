@@ -1,81 +1,81 @@
-"use client"
+"use client";
 
-import axiosInstance from "@/lib/axiosInstance"
-import useAuthStore from "@/context/AuthContext"
+import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 // Types for single purchase request response
 export interface Client {
-  name: string
-  email: string
-  phone: string
-  national_id: string
-  rating: number
+  name: string;
+  email: string;
+  phone: string;
+  national_id: string;
+  rating: number;
 }
 
 export interface PropertyDetail {
-  id: number
-  title: string
-  type: string
-  area: string
-  beds: number
-  bath: number
-  price: string
-  developer: string
-  location: string
-  total_purchases: number
+  id: number;
+  title: string;
+  type: string;
+  area: string;
+  beds: number;
+  bath: number;
+  price: string;
+  developer: string;
+  location: string;
+  total_purchases: number;
 }
 
 export interface ProjectDetail {
-  id: number
-  title: string
-  min_price: number
-  max_price: number
-  developer: string
-  completion_date: string
+  id: number;
+  title: string;
+  min_price: number;
+  max_price: number;
+  developer: string;
+  completion_date: string;
 }
 
 export interface UpdatedBy {
-  id: number
-  name: string
-  email: string
+  id: number;
+  name: string;
+  email: string;
 }
 
 export interface Stage {
-  id: number
-  name: string
-  order: number
-  status: string
-  notes: string | null
-  started_at: string | null
-  completed_at: string | null
-  updated_by: UpdatedBy | null
-  documents: any[]
+  id: number;
+  name: string;
+  order: number;
+  status: string;
+  notes: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  updated_by: UpdatedBy | null;
+  documents: any[];
 }
 
 export interface PurchaseRequestDetail {
-  id: number
-  request_number: string
-  request_date: string
-  overall_status: string
-  progress_percentage: number
-  priority: string
-  expected_completion_date: string
-  client: Client
-  property: PropertyDetail
-  project: ProjectDetail | null
-  stages: Stage[]
-  budget_amount: string
-  notes: string
-  additional_notes: string
-  assigned_user: any | null
-  created_at: string
-  updated_at: string
+  id: number;
+  request_number: string;
+  request_date: string;
+  overall_status: string;
+  progress_percentage: number;
+  priority: string;
+  expected_completion_date: string;
+  client: Client;
+  property: PropertyDetail;
+  project: ProjectDetail | null;
+  stages: Stage[];
+  budget_amount: string;
+  notes: string;
+  additional_notes: string;
+  assigned_user: any | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PurchaseDetailResponse {
-  success: boolean
-  data: PurchaseRequestDetail
-  message: string
+  success: boolean;
+  data: PurchaseRequestDetail;
+  message: string;
 }
 
 // Service functions
@@ -83,19 +83,23 @@ export class PurchaseDetailService {
   /**
    * Get single purchase request details by ID
    */
-  static async getPurchaseRequestDetail(requestId: string | number): Promise<PurchaseDetailResponse> {
-    const token = useAuthStore.getState().userData?.token
+  static async getPurchaseRequestDetail(
+    requestId: string | number,
+  ): Promise<PurchaseDetailResponse> {
+    const token = useAuthStore.getState().userData?.token;
     if (!token) {
-      console.log("No token available, skipping getPurchaseRequestDetail")
-      throw new Error("Authentication required. Please login.")
+      console.log("No token available, skipping getPurchaseRequestDetail");
+      throw new Error("Authentication required. Please login.");
     }
 
     try {
-      const response = await axiosInstance.get(`/v1/pms/purchase-requests/${requestId}`)
-      return response.data
+      const response = await axiosInstance.get(
+        `/v1/pms/purchase-requests/${requestId}`,
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error fetching purchase request detail:", error)
-      throw error
+      console.error("Error fetching purchase request detail:", error);
+      throw error;
     }
   }
 
@@ -103,25 +107,28 @@ export class PurchaseDetailService {
    * Update purchase request status
    */
   static async updateRequestStatus(
-    requestId: string | number, 
-    status: string, 
-    notes?: string
+    requestId: string | number,
+    status: string,
+    notes?: string,
   ): Promise<any> {
-    const token = useAuthStore.getState().userData?.token
+    const token = useAuthStore.getState().userData?.token;
     if (!token) {
-      console.log("No token available, skipping updateRequestStatus")
-      throw new Error("Authentication required. Please login.")
+      console.log("No token available, skipping updateRequestStatus");
+      throw new Error("Authentication required. Please login.");
     }
 
     try {
-      const response = await axiosInstance.put(`/v1/pms/purchase-requests/${requestId}/status`, {
-        status,
-        notes
-      })
-      return response.data
+      const response = await axiosInstance.put(
+        `/v1/pms/purchase-requests/${requestId}/status`,
+        {
+          status,
+          notes,
+        },
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error updating request status:", error)
-      throw error
+      console.error("Error updating request status:", error);
+      throw error;
     }
   }
 
@@ -132,28 +139,28 @@ export class PurchaseDetailService {
     requestId: string | number,
     stageId: number,
     progressData: {
-      status?: string
-      notes?: string
-      documents?: any[]
-      started_at?: string
-      completed_at?: string
-    }
+      status?: string;
+      notes?: string;
+      documents?: any[];
+      started_at?: string;
+      completed_at?: string;
+    },
   ): Promise<any> {
-    const token = useAuthStore.getState().userData?.token
+    const token = useAuthStore.getState().userData?.token;
     if (!token) {
-      console.log("No token available, skipping updateStageProgress")
-      throw new Error("Authentication required. Please login.")
+      console.log("No token available, skipping updateStageProgress");
+      throw new Error("Authentication required. Please login.");
     }
 
     try {
       const response = await axiosInstance.put(
         `/v1/pms/purchase-requests/${requestId}/stages/${stageId}`,
-        progressData
-      )
-      return response.data
+        progressData,
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error updating stage progress:", error)
-      throw error
+      console.error("Error updating stage progress:", error);
+      throw error;
     }
   }
 
@@ -162,16 +169,19 @@ export class PurchaseDetailService {
    */
   static async assignUser(
     requestId: string | number,
-    userId: number
+    userId: number,
   ): Promise<any> {
     try {
-      const response = await axiosInstance.put(`/v1/pms/purchase-requests/${requestId}/assign`, {
-        assigned_to: userId
-      })
-      return response.data
+      const response = await axiosInstance.put(
+        `/v1/pms/purchase-requests/${requestId}/assign`,
+        {
+          assigned_to: userId,
+        },
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error assigning user:", error)
-      throw error
+      console.error("Error assigning user:", error);
+      throw error;
     }
   }
 
@@ -181,17 +191,20 @@ export class PurchaseDetailService {
   static async updateNotes(
     requestId: string | number,
     notes: string,
-    additionalNotes?: string
+    additionalNotes?: string,
   ): Promise<any> {
     try {
-      const response = await axiosInstance.put(`/v1/pms/purchase-requests/${requestId}/notes`, {
-        notes,
-        additional_notes: additionalNotes
-      })
-      return response.data
+      const response = await axiosInstance.put(
+        `/v1/pms/purchase-requests/${requestId}/notes`,
+        {
+          notes,
+          additional_notes: additionalNotes,
+        },
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error updating notes:", error)
-      throw error
+      console.error("Error updating notes:", error);
+      throw error;
     }
   }
 
@@ -200,18 +213,21 @@ export class PurchaseDetailService {
    */
   static async updateCompletionDate(
     requestId: string | number,
-    expectedCompletionDate: string
+    expectedCompletionDate: string,
   ): Promise<any> {
     try {
-      const response = await axiosInstance.put(`/v1/pms/purchase-requests/${requestId}/completion-date`, {
-        expected_completion_date: expectedCompletionDate
-      })
-      return response.data
+      const response = await axiosInstance.put(
+        `/v1/pms/purchase-requests/${requestId}/completion-date`,
+        {
+          expected_completion_date: expectedCompletionDate,
+        },
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error updating completion date:", error)
-      throw error
+      console.error("Error updating completion date:", error);
+      throw error;
     }
   }
 }
 
-export default PurchaseDetailService
+export default PurchaseDetailService;

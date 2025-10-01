@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -120,10 +119,7 @@ export const PropertyRequestsTable = ({
                   تصدير البيانات المحددة
                 </Button>
                 <Separator />
-                <Button
-                  className="w-full justify-start"
-                  variant="destructive"
-                >
+                <Button className="w-full justify-start" variant="destructive">
                   <Trash2 className="ml-2 h-4 w-4" />
                   حذف طلبات العقارات المحددة
                 </Button>
@@ -184,8 +180,12 @@ export const PropertyRequestsTable = ({
                 <TableRow key={propertyRequest.id}>
                   <TableCell>
                     <Checkbox
-                      checked={selectedPropertyRequests.includes(propertyRequest.id)}
-                      onCheckedChange={() => handleSelectPropertyRequest(propertyRequest.id)}
+                      checked={selectedPropertyRequests.includes(
+                        propertyRequest.id,
+                      )}
+                      onCheckedChange={() =>
+                        handleSelectPropertyRequest(propertyRequest.id)
+                      }
                     />
                   </TableCell>
                   <TableCell>
@@ -203,7 +203,9 @@ export const PropertyRequestsTable = ({
                       {propertyRequest.phone ? (
                         <div className="flex items-center text-sm">
                           <Phone className="ml-2 h-3 w-3 text-green-600" />
-                          <span className="font-medium">{propertyRequest.phone}</span>
+                          <span className="font-medium">
+                            {propertyRequest.phone}
+                          </span>
                         </div>
                       ) : (
                         <div className="flex items-center text-sm text-muted-foreground">
@@ -211,7 +213,7 @@ export const PropertyRequestsTable = ({
                           <span className="italic">لا يوجد رقم</span>
                         </div>
                       )}
-                      
+
                       {/* WhatsApp */}
                       {propertyRequest.contact_on_whatsapp ? (
                         <div className="flex items-center text-sm text-muted-foreground">
@@ -228,12 +230,12 @@ export const PropertyRequestsTable = ({
                         propertyRequest.property_type === "سكني"
                           ? "border-blue-500 text-blue-700"
                           : propertyRequest.property_type === "تجاري"
-                          ? "border-green-500 text-green-700"
-                          : propertyRequest.property_type === "صناعي"
-                          ? "border-purple-500 text-purple-700"
-                          : propertyRequest.property_type === "أرض"
-                          ? "border-orange-500 text-orange-700"
-                          : "border-red-500 text-red-700"
+                            ? "border-green-500 text-green-700"
+                            : propertyRequest.property_type === "صناعي"
+                              ? "border-purple-500 text-purple-700"
+                              : propertyRequest.property_type === "أرض"
+                                ? "border-orange-500 text-orange-700"
+                                : "border-red-500 text-red-700"
                       }
                     >
                       {propertyRequest.property_type}
@@ -242,7 +244,11 @@ export const PropertyRequestsTable = ({
                   <TableCell>
                     <div className="space-y-1">
                       <div className="font-medium text-right">
-                        {propertyRequest.region || <span className="text-muted-foreground text-sm italic">غير محددة</span>}
+                        {propertyRequest.region || (
+                          <span className="text-muted-foreground text-sm italic">
+                            غير محددة
+                          </span>
+                        )}
                       </div>
                     </div>
                   </TableCell>
@@ -250,7 +256,9 @@ export const PropertyRequestsTable = ({
                     <div className="flex items-center text-sm">
                       <Clock className="ml-2 h-3 w-3 text-blue-500" />
                       <span className="font-medium">
-                        {new Date(propertyRequest.created_at).toLocaleDateString('ar-US')}
+                        {new Date(
+                          propertyRequest.created_at,
+                        ).toLocaleDateString("ar-US")}
                       </span>
                     </div>
                   </TableCell>
@@ -287,7 +295,9 @@ export const PropertyRequestsTable = ({
                             <Dialog open={open} onOpenChange={setOpen}>
                               <DialogContent>
                                 <DialogHeader>
-                                  <DialogTitle>تعديل بيانات طلب العقار</DialogTitle>
+                                  <DialogTitle>
+                                    تعديل بيانات طلب العقار
+                                  </DialogTitle>
                                 </DialogHeader>
                                 <div className="grid gap-4">
                                   <Input
@@ -313,7 +323,9 @@ export const PropertyRequestsTable = ({
                                     >
                                       إلغاء
                                     </Button>
-                                    <Button onClick={handleUpdatePropertyRequest}>
+                                    <Button
+                                      onClick={handleUpdatePropertyRequest}
+                                    >
                                       تعديل
                                     </Button>
                                   </div>
@@ -353,8 +365,6 @@ export const PropertyRequestsTable = ({
           </Table>
         </CardContent>
       </Card>
-
-             
     </div>
   );
-}; 
+};

@@ -13,16 +13,16 @@ export const footerStructure: ComponentStructure = {
           label: "Background",
           type: "object",
           fields: [
-            { 
-              key: "type", 
-              label: "Background Type", 
-              type: "select", 
+            {
+              key: "type",
+              label: "Background Type",
+              type: "select",
               options: [
                 { label: "Image", value: "image" },
                 { label: "Color", value: "color" },
                 { label: "Gradient", value: "gradient" },
-                { label: "None", value: "none" }
-              ] 
+                { label: "None", value: "none" },
+              ],
             },
             { key: "image", label: "Image URL", type: "image" },
             { key: "alt", label: "Alt Text", type: "text" },
@@ -33,10 +33,10 @@ export const footerStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { 
-                  key: "direction", 
-                  label: "Direction", 
-                  type: "select", 
+                {
+                  key: "direction",
+                  label: "Direction",
+                  type: "select",
                   options: [
                     { label: "To Right", value: "to-r" },
                     { label: "To Left", value: "to-l" },
@@ -45,12 +45,16 @@ export const footerStructure: ComponentStructure = {
                     { label: "To Top Right", value: "to-tr" },
                     { label: "To Top Left", value: "to-tl" },
                     { label: "To Bottom Right", value: "to-br" },
-                    { label: "To Bottom Left", value: "to-bl" }
-                  ] 
+                    { label: "To Bottom Left", value: "to-bl" },
+                  ],
                 },
                 { key: "startColor", label: "Start Color", type: "color" },
                 { key: "endColor", label: "End Color", type: "color" },
-                { key: "middleColor", label: "Middle Color (Optional)", type: "color" },
+                {
+                  key: "middleColor",
+                  label: "Middle Color (Optional)",
+                  type: "color",
+                },
               ],
             },
             {
@@ -59,20 +63,25 @@ export const footerStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { key: "opacity", label: "Opacity", type: "text", placeholder: "0.7" },
+                {
+                  key: "opacity",
+                  label: "Opacity",
+                  type: "text",
+                  placeholder: "0.7",
+                },
                 { key: "color", label: "Color", type: "color" },
-                { 
-                  key: "blendMode", 
-                  label: "Blend Mode", 
-                  type: "select", 
+                {
+                  key: "blendMode",
+                  label: "Blend Mode",
+                  type: "select",
                   options: [
                     { label: "Multiply", value: "multiply" },
                     { label: "Overlay", value: "overlay" },
                     { label: "Soft Light", value: "soft-light" },
                     { label: "Hard Light", value: "hard-light" },
                     { label: "Color Burn", value: "color-burn" },
-                    { label: "Color Dodge", value: "color-dodge" }
-                  ] 
+                    { label: "Color Dodge", value: "color-dodge" },
+                  ],
                 },
               ],
             },
@@ -83,20 +92,35 @@ export const footerStructure: ComponentStructure = {
           label: "Layout",
           type: "object",
           fields: [
-            { 
-              key: "columns", 
-              label: "Number of Columns", 
-              type: "select", 
+            {
+              key: "columns",
+              label: "Number of Columns",
+              type: "select",
               options: [
                 { label: "1 Column", value: "1" },
                 { label: "2 Columns", value: "2" },
                 { label: "3 Columns", value: "3" },
-                { label: "4 Columns", value: "4" }
-              ] 
+                { label: "4 Columns", value: "4" },
+              ],
             },
-            { key: "spacing", label: "Column Spacing", type: "text", placeholder: "8" },
-            { key: "padding", label: "Padding", type: "text", placeholder: "16" },
-            { key: "maxWidth", label: "Max Width", type: "text", placeholder: "7xl" },
+            {
+              key: "spacing",
+              label: "Column Spacing",
+              type: "text",
+              placeholder: "8",
+            },
+            {
+              key: "padding",
+              label: "Padding",
+              type: "text",
+              placeholder: "16",
+            },
+            {
+              key: "maxWidth",
+              label: "Max Width",
+              type: "text",
+              placeholder: "7xl",
+            },
           ],
         },
         {
@@ -203,8 +227,16 @@ export const footerStructure: ComponentStructure = {
               label: "Colors",
               type: "object",
               fields: [
-                { key: "textPrimary", label: "Primary Text Color", type: "color" },
-                { key: "textSecondary", label: "Secondary Text Color", type: "color" },
+                {
+                  key: "textPrimary",
+                  label: "Primary Text Color",
+                  type: "color",
+                },
+                {
+                  key: "textSecondary",
+                  label: "Secondary Text Color",
+                  type: "color",
+                },
                 { key: "textMuted", label: "Muted Text Color", type: "color" },
                 { key: "accent", label: "Accent Color", type: "color" },
                 { key: "border", label: "Border Color", type: "color" },
@@ -215,10 +247,30 @@ export const footerStructure: ComponentStructure = {
               label: "Typography",
               type: "object",
               fields: [
-                { key: "titleSize", label: "Title Font Size", type: "text", placeholder: "xl" },
-                { key: "titleWeight", label: "Title Font Weight", type: "text", placeholder: "bold" },
-                { key: "bodySize", label: "Body Font Size", type: "text", placeholder: "sm" },
-                { key: "bodyWeight", label: "Body Font Weight", type: "text", placeholder: "normal" },
+                {
+                  key: "titleSize",
+                  label: "Title Font Size",
+                  type: "text",
+                  placeholder: "xl",
+                },
+                {
+                  key: "titleWeight",
+                  label: "Title Font Weight",
+                  type: "text",
+                  placeholder: "bold",
+                },
+                {
+                  key: "bodySize",
+                  label: "Body Font Size",
+                  type: "text",
+                  placeholder: "sm",
+                },
+                {
+                  key: "bodyWeight",
+                  label: "Body Font Weight",
+                  type: "text",
+                  placeholder: "normal",
+                },
               ],
             },
             {
@@ -226,9 +278,24 @@ export const footerStructure: ComponentStructure = {
               label: "Spacing",
               type: "object",
               fields: [
-                { key: "sectionPadding", label: "Section Padding", type: "text", placeholder: "16" },
-                { key: "columnGap", label: "Column Gap", type: "text", placeholder: "8" },
-                { key: "itemGap", label: "Item Gap", type: "text", placeholder: "3" },
+                {
+                  key: "sectionPadding",
+                  label: "Section Padding",
+                  type: "text",
+                  placeholder: "16",
+                },
+                {
+                  key: "columnGap",
+                  label: "Column Gap",
+                  type: "text",
+                  placeholder: "8",
+                },
+                {
+                  key: "itemGap",
+                  label: "Item Gap",
+                  type: "text",
+                  placeholder: "3",
+                },
               ],
             },
             {
@@ -236,9 +303,24 @@ export const footerStructure: ComponentStructure = {
               label: "Effects",
               type: "object",
               fields: [
-                { key: "hoverTransition", label: "Hover Transition", type: "text", placeholder: "0.3s" },
-                { key: "shadow", label: "Shadow", type: "text", placeholder: "none" },
-                { key: "borderRadius", label: "Border Radius", type: "text", placeholder: "none" },
+                {
+                  key: "hoverTransition",
+                  label: "Hover Transition",
+                  type: "text",
+                  placeholder: "0.3s",
+                },
+                {
+                  key: "shadow",
+                  label: "Shadow",
+                  type: "text",
+                  placeholder: "none",
+                },
+                {
+                  key: "borderRadius",
+                  label: "Border Radius",
+                  type: "text",
+                  placeholder: "none",
+                },
               ],
             },
           ],
@@ -246,37 +328,65 @@ export const footerStructure: ComponentStructure = {
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
-        { 
-          key: "background.type", 
-          label: "Background Type", 
-          type: "select", 
+        {
+          key: "background.type",
+          label: "Background Type",
+          type: "select",
           options: [
             { label: "Image", value: "image" },
             { label: "Color", value: "color" },
             { label: "Gradient", value: "gradient" },
-            { label: "None", value: "none" }
-          ] 
+            { label: "None", value: "none" },
+          ],
         },
         { key: "background.image", label: "Background Image", type: "image" },
         { key: "background.color", label: "Background Color", type: "color" },
-        { key: "background.gradient.enabled", label: "Enable Gradient", type: "boolean" },
-        { key: "background.overlay.enabled", label: "Enable Overlay", type: "boolean" },
-        { 
-          key: "layout.columns", 
-          label: "Number of Columns", 
-          type: "select", 
+        {
+          key: "background.gradient.enabled",
+          label: "Enable Gradient",
+          type: "boolean",
+        },
+        {
+          key: "background.overlay.enabled",
+          label: "Enable Overlay",
+          type: "boolean",
+        },
+        {
+          key: "layout.columns",
+          label: "Number of Columns",
+          type: "select",
           options: [
             { label: "1 Column", value: "1" },
             { label: "2 Columns", value: "2" },
             { label: "3 Columns", value: "3" },
-            { label: "4 Columns", value: "4" }
-          ] 
+            { label: "4 Columns", value: "4" },
+          ],
         },
-        { key: "content.companyInfo.enabled", label: "Show Company Info", type: "boolean" },
-        { key: "content.quickLinks.enabled", label: "Show Quick Links", type: "boolean" },
-        { key: "content.contactInfo.enabled", label: "Show Contact Info", type: "boolean" },
-        { key: "content.socialMedia.enabled", label: "Show Social Media", type: "boolean" },
-        { key: "footerBottom.enabled", label: "Show Footer Bottom", type: "boolean" },
+        {
+          key: "content.companyInfo.enabled",
+          label: "Show Company Info",
+          type: "boolean",
+        },
+        {
+          key: "content.quickLinks.enabled",
+          label: "Show Quick Links",
+          type: "boolean",
+        },
+        {
+          key: "content.contactInfo.enabled",
+          label: "Show Contact Info",
+          type: "boolean",
+        },
+        {
+          key: "content.socialMedia.enabled",
+          label: "Show Social Media",
+          type: "boolean",
+        },
+        {
+          key: "footerBottom.enabled",
+          label: "Show Footer Bottom",
+          type: "boolean",
+        },
       ],
     },
   ],

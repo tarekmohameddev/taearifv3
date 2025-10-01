@@ -33,7 +33,8 @@ export const getDefaultFooterData = (): ComponentData => ({
     companyInfo: {
       enabled: true,
       name: "مكتب دليل الجواء",
-      description: "دليل الجواء العقاري يقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
+      description:
+        "دليل الجواء العقاري يقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
       tagline: "للخدمات العقارية",
       logo: "",
     },
@@ -114,13 +115,13 @@ export const footerFunctions = {
 
     const defaultData = getDefaultFooterData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
-    return { 
-      footerStates: { ...state.footerStates, [variantId]: data } 
+
+    return {
+      footerStates: { ...state.footerStates, [variantId]: data },
     } as any;
   },
 
-  getData: (state: any, variantId: string) => 
+  getData: (state: any, variantId: string) =>
     state.footerStates[variantId] || {},
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
@@ -130,7 +131,7 @@ export const footerFunctions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.footerStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
       footerStates: { ...state.footerStates, [variantId]: newData },
     } as any;

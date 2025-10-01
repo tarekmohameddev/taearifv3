@@ -1,6 +1,17 @@
-'use client';
+"use client";
 
-import { Globe, Users, Palette, Image, Search, Map, Database, Activity, Bell, Rocket } from 'lucide-react';
+import {
+  Globe,
+  Users,
+  Palette,
+  Image,
+  Search,
+  Map,
+  Database,
+  Activity,
+  Bell,
+  Rocket,
+} from "lucide-react";
 
 export default function DetailedSolutions() {
   return (
@@ -24,9 +35,13 @@ export default function DetailedSolutions() {
                 <Globe className="h-4 w-4" />
                 <span>منشئ المواقع</span>
               </div>
-              <h3 className="text-3xl font-bold mb-6">موقعك العقاري الاحترافي في دقائق</h3>
+              <h3 className="text-3xl font-bold mb-6">
+                موقعك العقاري الاحترافي في دقائق
+              </h3>
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                لا تحتاج لخبرة تقنية لإنشاء موقع عقاري متميز. اختر من بين قوالبنا المصممة خصيصاً للسوق السعودي وخصص موقعك ليعكس هويتك التجارية.
+                لا تحتاج لخبرة تقنية لإنشاء موقع عقاري متميز. اختر من بين
+                قوالبنا المصممة خصيصاً للسوق السعودي وخصص موقعك ليعكس هويتك
+                التجارية.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                 <div className="flex items-center gap-3">
@@ -66,7 +81,9 @@ export default function DetailedSolutions() {
                     <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
                       <Globe className="h-8 w-8 text-purple-600" />
                     </div>
-                    <h4 className="text-xl font-bold text-gray-800 mb-2">موقعك العقاري</h4>
+                    <h4 className="text-xl font-bold text-gray-800 mb-2">
+                      موقعك العقاري
+                    </h4>
                     <p className="text-gray-600">جاهز للعرض والتسويق</p>
                   </div>
                 </div>
@@ -87,7 +104,9 @@ export default function DetailedSolutions() {
                     </div>
                     <div>
                       <div className="font-semibold">أحمد محمد</div>
-                      <div className="text-sm text-gray-500">مهتم بشقة في الرياض</div>
+                      <div className="text-sm text-gray-500">
+                        مهتم بشقة في الرياض
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 p-4 bg-green-50 rounded-lg">
@@ -96,7 +115,9 @@ export default function DetailedSolutions() {
                     </div>
                     <div>
                       <div className="font-semibold">مكالمة مجدولة</div>
-                      <div className="text-sm text-gray-500">غداً الساعة 2:00 م</div>
+                      <div className="text-sm text-gray-500">
+                        غداً الساعة 2:00 م
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-lg">
@@ -105,7 +126,9 @@ export default function DetailedSolutions() {
                     </div>
                     <div>
                       <div className="font-semibold">موعد معاينة</div>
-                      <div className="text-sm text-gray-500">الأحد الساعة 10:00 ص</div>
+                      <div className="text-sm text-gray-500">
+                        الأحد الساعة 10:00 ص
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -118,26 +141,33 @@ export default function DetailedSolutions() {
               </div>
               <h3 className="text-3xl font-bold mb-6">إدارة العملاء بذكاء</h3>
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                احتفظ بجميع بيانات عملائك في مكان واحد، تابع تفاعلاتهم، وجدول مواعيدك بكفاءة. نظام CRM المصمم خصيصاً للوسطاء العقاريين.
+                احتفظ بجميع بيانات عملائك في مكان واحد، تابع تفاعلاتهم، وجدول
+                مواعيدك بكفاءة. نظام CRM المصمم خصيصاً للوسطاء العقاريين.
               </p>
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                     <Database className="h-4 w-4 text-blue-600" />
                   </div>
-                  <span className="text-gray-700">قاعدة بيانات شاملة للعملاء</span>
+                  <span className="text-gray-700">
+                    قاعدة بيانات شاملة للعملاء
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                     <Activity className="h-4 w-4 text-blue-600" />
                   </div>
-                  <span className="text-gray-700">تتبع نشاط العملاء والتفاعلات</span>
+                  <span className="text-gray-700">
+                    تتبع نشاط العملاء والتفاعلات
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                     <Bell className="h-4 w-4 text-blue-600" />
                   </div>
-                  <span className="text-gray-700">تذكيرات تلقائية للمتابعة</span>
+                  <span className="text-gray-700">
+                    تذكيرات تلقائية للمتابعة
+                  </span>
                 </div>
               </div>
               <a href={`register/`} className="btn btn-primary">

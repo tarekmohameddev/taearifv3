@@ -74,10 +74,38 @@ module.exports = (set, get) => ({
       },
     ],
     creditPackages: [
-      { id: "1", name: "الباقة الأساسية", credits: 1000, price: 50, currency: "SAR" },
-      { id: "2", name: "الباقة المتوسطة", credits: 2500, price: 100, currency: "SAR", discount: 20 },
-      { id: "3", name: "الباقة المتقدمة", credits: 5000, price: 180, currency: "SAR", discount: 28, popular: true },
-      { id: "4", name: "الباقة الاحترافية", credits: 10000, price: 300, currency: "SAR", discount: 40 },
+      {
+        id: "1",
+        name: "الباقة الأساسية",
+        credits: 1000,
+        price: 50,
+        currency: "SAR",
+      },
+      {
+        id: "2",
+        name: "الباقة المتوسطة",
+        credits: 2500,
+        price: 100,
+        currency: "SAR",
+        discount: 20,
+      },
+      {
+        id: "3",
+        name: "الباقة المتقدمة",
+        credits: 5000,
+        price: 180,
+        currency: "SAR",
+        discount: 28,
+        popular: true,
+      },
+      {
+        id: "4",
+        name: "الباقة الاحترافية",
+        credits: 10000,
+        price: 300,
+        currency: "SAR",
+        discount: 40,
+      },
     ],
   },
 
@@ -100,8 +128,10 @@ module.exports = (set, get) => ({
       templates: {
         welcomeMessage: "مرحباً بك في {company_name}! نحن سعداء لخدمتك.",
         thankYouMessage: "شكراً لك على اختيارك {company_name}. نقدر ثقتك بنا.",
-        orderConfirmation: "تم تأكيد طلبك رقم {order_id}. سيتم التوصيل خلال {delivery_time}.",
-        appointmentReminder: "تذكير: لديك موعد غداً في {appointment_time} مع {staff_name}.",
+        orderConfirmation:
+          "تم تأكيد طلبك رقم {order_id}. سيتم التوصيل خلال {delivery_time}.",
+        appointmentReminder:
+          "تذكير: لديك موعد غداً في {appointment_time} مع {staff_name}.",
       },
     },
     notificationSettings: {
@@ -158,7 +188,8 @@ module.exports = (set, get) => ({
       set((state) => ({
         marketingChannels: {
           ...state.marketingChannels,
-          channels: response.data.status === "success" ? response.data.data : [],
+          channels:
+            response.data.status === "success" ? response.data.data : [],
           loading: false,
           isInitialized: true,
         },
@@ -188,7 +219,9 @@ module.exports = (set, get) => ({
     set((state) => ({
       marketingChannels: {
         ...state.marketingChannels,
-        channels: state.marketingChannels.channels.filter((channel) => channel.id !== channelId),
+        channels: state.marketingChannels.channels.filter(
+          (channel) => channel.id !== channelId,
+        ),
       },
     }));
   },
@@ -276,7 +309,7 @@ module.exports = (set, get) => ({
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       set((state) => ({
         marketingSettings: {

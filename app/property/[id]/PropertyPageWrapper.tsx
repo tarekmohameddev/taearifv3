@@ -12,7 +12,10 @@ interface PropertyPageWrapperProps {
   propertyId: string;
 }
 
-export default function PropertyPageWrapper({ tenantId, propertyId }: PropertyPageWrapperProps) {
+export default function PropertyPageWrapper({
+  tenantId,
+  propertyId,
+}: PropertyPageWrapperProps) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);

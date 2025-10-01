@@ -1,20 +1,21 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import useTenantStore from "@/context-liveeditor/tenantStore"
-import { useEditorStore } from "@/context-liveeditor/editorStore"
+import { useEffect } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context-liveeditor/editorStore";
 
 // Default data for the component
 const getDefaultCtaValuationData = () => ({
   visible: true,
   content: {
-  title: "تقييم عقارك",
-  description1: "لو لديك عقار ترغب في عرضه، اطلب معاينته الآن ليتم تقييمه بشكل دقيق وتحضيره لعرضه",
-  description2: "بأفضل طريقة",
-  buttonText: "طلب معاينة",
+    title: "تقييم عقارك",
+    description1:
+      "لو لديك عقار ترغب في عرضه، اطلب معاينته الآن ليتم تقييمه بشكل دقيق وتحضيره لعرضه",
+    description2: "بأفضل طريقة",
+    buttonText: "طلب معاينة",
     buttonUrl: "#",
   },
   image: {
@@ -29,7 +30,7 @@ const getDefaultCtaValuationData = () => ({
     buttonBgColor: "bg-white",
     buttonTextColor: "text-emerald-700",
   },
-})
+});
 
 interface CtaValuationSectionProps {
   visible?: boolean;
@@ -60,72 +61,85 @@ interface CtaValuationSectionProps {
 
 const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
   // Initialize variant id early so hooks can depend on it
-  const variantId = props.variant || "ctaValuation1"
-  const uniqueId = props.id || variantId
-  
+  const variantId = props.variant || "ctaValuation1";
+  const uniqueId = props.id || variantId;
+
   // Subscribe to editor store updates for this ctaValuation variant
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant)
-  const getComponentData = useEditorStore((s) => s.getComponentData)
-  const ctaValuationStates = useEditorStore((s) => s.ctaValuationStates)
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+  const ctaValuationStates = useEditorStore((s) => s.ctaValuationStates);
 
   useEffect(() => {
     if (props.useStore) {
       const initialData = {
         ...getDefaultCtaValuationData(),
-        ...props
-      }
-      ensureComponentVariant('ctaValuation', uniqueId, initialData)
+        ...props,
+      };
+      ensureComponentVariant("ctaValuation", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant])
+  }, [uniqueId, props.useStore, ensureComponentVariant]);
 
   // Get tenant data
-  const tenantData = useTenantStore((s) => s.tenantData)
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const tenantId = useTenantStore((s) => s.tenantId)
-  const router = useRouter()
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+  const router = useRouter();
 
   useEffect(() => {
     if (tenantId) {
-      fetchTenantData(tenantId)
+      fetchTenantData(tenantId);
     }
-  }, [tenantId, fetchTenantData])
+  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore ? (getComponentData('ctaValuation', uniqueId) || {}) : {}
-  const currentStoreData = props.useStore ? (ctaValuationStates[uniqueId] || {}) : {}
-  
-  
+  const storeData = props.useStore
+    ? getComponentData("ctaValuation", uniqueId) || {}
+    : {};
+  const currentStoreData = props.useStore
+    ? ctaValuationStates[uniqueId] || {}
+    : {};
+
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
-      return {}
+      return {};
     }
-    
+
     // Search through all pages for this component variant
-    for (const [pageSlug, pageComponents] of Object.entries(tenantData.componentSettings)) {
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
       // Check if pageComponents is an object (not array)
-      if (typeof pageComponents === 'object' && !Array.isArray(pageComponents)) {
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
         // Search through all components in this page
-        for (const [componentId, component] of Object.entries(pageComponents as any)) {
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
           // Check if this is the exact component we're looking for by type and componentName
-          if ((component as any).type === 'ctaValuation' && 
-              (component as any).componentName === variantId) {
-            return (component as any).data
+          if (
+            (component as any).type === "ctaValuation" &&
+            (component as any).componentName === variantId
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-    return {}
-  }
-  
-  const tenantComponentData = getTenantComponentData()
-  
-  
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
+
   // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
-  const defaultData = getDefaultCtaValuationData()
-  const mergedData = { 
-    ...defaultData, 
-    ...props, 
+  const defaultData = getDefaultCtaValuationData();
+  const mergedData = {
+    ...defaultData,
+    ...props,
     ...tenantComponentData,
     ...storeData,
     ...currentStoreData,
@@ -135,62 +149,70 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
       ...(props.content || {}),
       ...(tenantComponentData?.content || {}),
       ...(storeData?.content || {}),
-      ...(currentStoreData?.content || {})
+      ...(currentStoreData?.content || {}),
     },
     texts: {
       ...(defaultData as any).texts,
       ...((props as any).texts || {}),
       ...((tenantComponentData as any)?.texts || {}),
       ...((storeData as any)?.texts || {}),
-      ...((currentStoreData as any)?.texts || {})
+      ...((currentStoreData as any)?.texts || {}),
     },
     colors: {
       ...(defaultData as any).colors,
       ...((props as any).colors || {}),
       ...((tenantComponentData as any)?.colors || {}),
       ...((storeData as any)?.colors || {}),
-      ...((currentStoreData as any)?.colors || {})
+      ...((currentStoreData as any)?.colors || {}),
     },
     image: {
       ...defaultData.image,
       ...(props.image || {}),
       ...(tenantComponentData?.image || {}),
       ...(storeData?.image || {}),
-      ...(currentStoreData?.image || {})
-    }
-  }
+      ...(currentStoreData?.image || {}),
+    },
+  };
 
   // Don't render if not visible
   if (!mergedData.visible) {
-    return null
+    return null;
   }
 
   // Ensure imageSrc is never empty string to prevent console error
-  const safeImageSrc = mergedData.image?.src && mergedData.image.src.trim() !== "" ? mergedData.image.src : getDefaultCtaValuationData().image.src;
+  const safeImageSrc =
+    mergedData.image?.src && mergedData.image.src.trim() !== ""
+      ? mergedData.image.src
+      : getDefaultCtaValuationData().image.src;
   return (
-    <section className="w-full bg-background py-14 sm:py-16" data-debug="ctaValuation-component">
+    <section
+      className="w-full bg-background py-14 sm:py-16"
+      data-debug="ctaValuation-component"
+    >
       <div className="mx-auto w-full max-w-9xl px-4">
         {/* المستطيل الأخضر داخل القسم - ليس بعرض الشاشة بالكامل */}
-        <div 
+        <div
           className="mx-auto max-w-7xl rounded-2xl px-6 py-10 shadow-md sm:px-10 sm:py-12"
           style={{
-            backgroundColor: mergedData.styling?.bgColor || mergedData.colors?.background || "#059669"
+            backgroundColor:
+              mergedData.styling?.bgColor ||
+              mergedData.colors?.background ||
+              "#059669",
           }}
         >
-          <div 
-            className="grid grid-cols-1 items-center gap-8 md:grid-cols-12" 
+          <div
+            className="grid grid-cols-1 items-center gap-8 md:grid-cols-12"
             dir="rtl"
             style={{
               gridTemplateColumns: `repeat(${mergedData.grid?.columns?.desktop || 12}, 1fr)`,
               gap: `${mergedData.grid?.gapY || "32px"} ${mergedData.grid?.gapX || "32px"}`,
             }}
           >
-
             {/* الصورة - على اليسار في الديسكتوب وعلى الموبايل تحت النص order-2 */}
             <div className="order-1 mx-auto md:order-1 md:col-span-5 md:justify-self-start w-32 md:w-[20rem] lg:w-[20rem]">
               {/* نستخدم عرض/ارتفاع لضمان نسبة الأبعاد وتجنب تغيّر التخطيط [^1][^2][^3] */}
               <Image
-                src={safeImageSrc} 
+                src={safeImageSrc}
                 alt={mergedData.image?.alt || "منزل صغير داخل يدين"}
                 width={mergedData.image?.width || 320}
                 height={mergedData.image?.height || 160}
@@ -199,10 +221,13 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
                 priority={false}
               />
             </div>
-            <div 
+            <div
               className="order-2 text-center md:order-2 md:col-span-7 md:text-center"
               style={{
-                color: mergedData.styling?.textColor || mergedData.colors?.textColor || "#ffffff"
+                color:
+                  mergedData.styling?.textColor ||
+                  mergedData.colors?.textColor ||
+                  "#ffffff",
               }}
             >
               {mergedData.texts?.title && (
@@ -211,26 +236,35 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
                 </h2>
               )}
               <p className="text-lg font-semibold opacity-95">
-                {mergedData.texts?.description || mergedData.content?.description1 || "لو لديك عقار ترغب في عرضه، اطلب معاينته الآن ليتم تقييمه بشكل دقيق وتحضيره لعرضه"}
+                {mergedData.texts?.description ||
+                  mergedData.content?.description1 ||
+                  "لو لديك عقار ترغب في عرضه، اطلب معاينته الآن ليتم تقييمه بشكل دقيق وتحضيره لعرضه"}
               </p>
               <p className="mt-2 text-lg font-semibold opacity-95">
-                {mergedData.texts?.subtitle || mergedData.content?.description2 || "بأفضل طريقة"}
+                {mergedData.texts?.subtitle ||
+                  mergedData.content?.description2 ||
+                  "بأفضل طريقة"}
               </p>
               <div className="mt-6">
                 <Button
                   variant="secondary"
                   className="rounded-xl px-6 py-5 hover:bg-white/90"
                   style={{
-                    backgroundColor: mergedData.styling?.buttonBgColor || mergedData.colors?.buttonColor || "#ffffff",
-                    color: mergedData.styling?.buttonTextColor || "#059669"
+                    backgroundColor:
+                      mergedData.styling?.buttonBgColor ||
+                      mergedData.colors?.buttonColor ||
+                      "#ffffff",
+                    color: mergedData.styling?.buttonTextColor || "#059669",
                   }}
                   onClick={() => {
                     if (mergedData.content?.buttonUrl) {
-                      router.push(mergedData.content.buttonUrl)
+                      router.push(mergedData.content.buttonUrl);
                     }
                   }}
                 >
-                  {mergedData.texts?.buttonText || mergedData.content?.buttonText || "طلب معاينة"}
+                  {mergedData.texts?.buttonText ||
+                    mergedData.content?.buttonText ||
+                    "طلب معاينة"}
                 </Button>
               </div>
             </div>
@@ -238,7 +272,7 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default CtaValuationSection
+export default CtaValuationSection;

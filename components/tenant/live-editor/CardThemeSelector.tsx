@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Palette, Sparkles } from "lucide-react";
+import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 
 interface CardThemeOption {
   id: string;
@@ -113,6 +114,7 @@ export function CardThemeSelector({
   onThemeChange,
   className = "",
 }: CardThemeSelectorProps) {
+  const t = useEditorT();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState(currentTheme);
 
@@ -143,7 +145,7 @@ export function CardThemeSelector({
           className={`w-full inline-flex items-center gap-2 bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200 hover:from-pink-100 hover:to-purple-100 hover:border-pink-300 transition-all duration-200 ${className}`}
         >
           <Palette className="w-4 h-4 text-pink-600" />
-          <span className="text-pink-700 font-medium">Card Theme</span>
+          <span className="text-pink-700 font-medium">{t("card_theme.card_theme")}</span>
           <Sparkles className="w-3 h-3 text-pink-500" />
         </Button>
       </DialogTrigger>
@@ -152,11 +154,10 @@ export function CardThemeSelector({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-800">
             <Palette className="w-5 h-5 text-pink-600" />
-            Choose Card Theme
+            {t("card_theme.choose_card_theme")}
           </DialogTitle>
           <DialogDescription className="text-gray-600">
-            Select a card theme to customize the appearance of your product
-            cards. Current theme: {currentThemeData?.name || "Default"}
+            {t("card_theme.card_theme_description")} {t("card_theme.current_theme")}: {currentThemeData?.name || "Default"}
           </DialogDescription>
         </DialogHeader>
 
@@ -210,7 +211,7 @@ export function CardThemeSelector({
                         variant="default"
                         className="bg-pink-500 text-white"
                       >
-                        Selected
+                        {t("theme_selector.selected")}
                       </Badge>
                     )}
                     {currentTheme === theme.id &&
@@ -219,7 +220,7 @@ export function CardThemeSelector({
                           variant="outline"
                           className="border-pink-300 text-pink-600"
                         >
-                          Current
+                          {t("theme_selector.active")}
                         </Badge>
                       )}
                   </div>
@@ -232,14 +233,14 @@ export function CardThemeSelector({
 
         <div className="flex justify-end gap-3 pt-4 border-t">
           <Button variant="outline" onClick={handleCancel}>
-            Cancel
+            {t("theme_selector.cancel")}
           </Button>
           <Button
             onClick={handleConfirm}
             className="bg-pink-600 hover:bg-pink-700 text-white"
             disabled={selectedTheme === currentTheme}
           >
-            Apply Theme
+            {t("card_theme.apply_theme")}
           </Button>
         </div>
       </DialogContent>

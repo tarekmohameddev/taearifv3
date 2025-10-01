@@ -9,7 +9,9 @@ interface AuthErrorPageWrapperProps {
   tenantId: string | null;
 }
 
-export default function AuthErrorPageWrapper({ tenantId }: AuthErrorPageWrapperProps) {
+export default function AuthErrorPageWrapper({
+  tenantId,
+}: AuthErrorPageWrapperProps) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -34,8 +36,12 @@ export default function AuthErrorPageWrapper({ tenantId }: AuthErrorPageWrapperP
       <Header1 />
       <main className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Authentication Error</h1>
-          <p className="text-gray-600">There was an error with your authentication. Please try again.</p>
+          <h1 className="text-2xl font-bold text-red-600 mb-4">
+            Authentication Error
+          </h1>
+          <p className="text-gray-600">
+            There was an error with your authentication. Please try again.
+          </p>
         </div>
       </main>
       <Footer1 />

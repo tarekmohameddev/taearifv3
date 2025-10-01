@@ -26,7 +26,7 @@ import { useTokenValidation } from "@/hooks/useTokenValidation";
 export function LoginPage() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const router = useRouter();
-  
+
   // Token validation
   const { tokenValidation: tokenValidationHook } = useTokenValidation();
   const [formData, setFormData] = useState({
@@ -47,7 +47,8 @@ export function LoginPage() {
   const [redirectUrl, setRedirectUrl] = useState<string>("");
   const [googleToken, setGoogleToken] = useState<string>("");
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const { googleUrlFetched, setGoogleUrlFetched, fetchGoogleAuthUrl } = useAuthStore();
+  const { googleUrlFetched, setGoogleUrlFetched, fetchGoogleAuthUrl } =
+    useAuthStore();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [pendingToken, setPendingToken] = useState<string>("");
@@ -90,9 +91,8 @@ export function LoginPage() {
     // التحقق من وجود token في الـ URL
     const urlParams = new URLSearchParams(window.location.search);
     const hasToken = urlParams.get("token");
-    
+
     if (userData && userData.email && !showLogoutDialog && !hasToken) {
-      
       router.push("/dashboard");
     }
   }, [userData, router, showLogoutDialog]);
@@ -145,7 +145,7 @@ export function LoginPage() {
           } catch (error) {
             console.log("No existing user session");
           }
-          
+
           // عرض dialog للتحقق من الـ token إذا لم يكن هناك مستخدم مسجل دخول
           setPendingToken(cleanToken);
           setShowLoginDialog(true);
@@ -169,26 +169,29 @@ export function LoginPage() {
   // دالة التحقق من صحة الـ token
   const validateToken = async (token: string) => {
     setTokenValidation({ isValid: null, message: "", loading: true });
-    
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_Backend_URL}/user`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_Backend_URL}/user`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const userData = await response.json();
         const newUser = userData.data || userData;
         setNewUserData(newUser);
-        
+
         // التحقق من تطابق الحساب
         const currentUser = useAuthStore.getState().userData;
         const isSame = currentUser && currentUser.email === newUser.email;
         setIsSameAccount(isSame);
-        
+
         if (isSame) {
           setTokenValidation({
             isValid: true,
@@ -205,7 +208,7 @@ export function LoginPage() {
       } else {
         const errorData = await response.json().catch(() => ({}));
         let errorMessage = "الـ token غير صالح";
-        
+
         if (response.status === 401) {
           errorMessage = "الـ token منتهي الصلاحية أو غير صحيح";
         } else if (response.status === 500) {
@@ -213,7 +216,7 @@ export function LoginPage() {
         } else if (errorData.message) {
           errorMessage = errorData.message;
         }
-        
+
         setTokenValidation({
           isValid: false,
           message: errorMessage,
@@ -233,22 +236,23 @@ export function LoginPage() {
   const handleTokenLogin = async (token: string) => {
     setIsLoading(true);
     setErrors({ email: "", password: "", general: "" });
-    
+
     // تنظيف الكوكيز
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const cookies = document.cookie.split(";");
       for (let i = 0; i < cookies.length; i++) {
         const cookie = cookies[i];
         const eqPos = cookie.indexOf("=");
         const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-        document.cookie = name.trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        document.cookie =
+          name.trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
       }
     }
-    
+
     const { loginWithToken } = useAuthStore.getState();
     const result = await loginWithToken(token);
     setIsLoading(false);
-    
+
     if (result.success) {
       router.push("/dashboard");
     } else {
@@ -263,33 +267,39 @@ export function LoginPage() {
   const handleLogoutAndLogin = async () => {
     setShowLogoutDialog(false);
     setIsLoading(true);
-    
+
     try {
       // 1. تنظيف جميع الكوكيز
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const cookies = document.cookie.split(";");
         for (let i = 0; i < cookies.length; i++) {
           const cookie = cookies[i];
           const eqPos = cookie.indexOf("=");
           const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
           // حذف الكوكي من جميع المسارات والنطاقات
-          document.cookie = name.trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-          document.cookie = name.trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
-          document.cookie = name.trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=." + window.location.hostname;
+          document.cookie =
+            name.trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+          document.cookie =
+            name.trim() +
+            "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" +
+            window.location.hostname;
+          document.cookie =
+            name.trim() +
+            "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=." +
+            window.location.hostname;
         }
       }
 
       // 2. تنظيف الـ localStorage والـ sessionStorage
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         localStorage.clear();
         sessionStorage.clear();
         // استخدام تسجيل الخروج الصامت بدون إعادة توجيه
         await useAuthStore.getState().logout({ redirect: false });
-
       }
 
       // 3. إعادة تعيين الـ AuthStore إلى الحالة الافتراضية
-      
+
       useAuthStore.setState({
         UserIslogged: false,
         IsLoading: false,
@@ -324,7 +334,7 @@ export function LoginPage() {
       if (typeof window !== "undefined") {
         window.history.replaceState({}, document.title, "/login");
       }
-      
+
       // 5. انتظار قليل للتأكد من اكتمال التنظيف
       setTimeout(() => {
         handleTokenLogin(pendingToken);
@@ -526,7 +536,10 @@ export function LoginPage() {
   // Show loading while validating token
   if (tokenValidationHook.loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+      <div
+        className="min-h-screen flex items-center justify-center bg-gray-50"
+        dir="rtl"
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">جاري التحقق من صحة الجلسة...</p>
@@ -781,15 +794,21 @@ export function LoginPage() {
               أنت مسجل دخول بالفعل على الحساب التالي:
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="py-4">
             {/* الحساب الحالي المسجل دخول */}
             <div className="bg-muted/50 p-4 rounded-lg border">
-              <h4 className="text-sm font-semibold mb-3 text-foreground">الحساب الحالي المسجل دخول:</h4>
+              <h4 className="text-sm font-semibold mb-3 text-foreground">
+                الحساب الحالي المسجل دخول:
+              </h4>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-sm">البريد الإلكتروني:</span>
-                  <span className="text-sm text-muted-foreground">{userData?.email}</span>
+                  <span className="font-medium text-sm">
+                    البريد الإلكتروني:
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    {userData?.email}
+                  </span>
                 </div>
                 {userData?.first_name && (
                   <div className="flex items-center gap-2">
@@ -802,70 +821,110 @@ export function LoginPage() {
                 {userData?.username && (
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">اسم المستخدم:</span>
-                    <span className="text-sm text-muted-foreground">{userData?.username}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {userData?.username}
+                    </span>
                   </div>
                 )}
               </div>
             </div>
-            
+
             {/* حالة التحقق من الـ token */}
             <div className="mt-4 p-3 rounded-lg border">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm font-medium">حالة الـ Token الجديد:</span>
+                <span className="text-sm font-medium">
+                  حالة الـ Token الجديد:
+                </span>
                 {tokenValidation.loading && (
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                 )}
               </div>
-              
+
               {tokenValidation.loading ? (
-                <p className="text-sm text-muted-foreground">جاري التحقق من صحة الـ token...</p>
+                <p className="text-sm text-muted-foreground">
+                  جاري التحقق من صحة الـ token...
+                </p>
               ) : tokenValidation.isValid === true ? (
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <p className="text-sm text-green-700 dark:text-green-300">{tokenValidation.message}</p>
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    {tokenValidation.message}
+                  </p>
                 </div>
               ) : tokenValidation.isValid === false ? (
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <p className="text-sm text-red-700 dark:text-red-300">{tokenValidation.message}</p>
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    {tokenValidation.message}
+                  </p>
                 </div>
               ) : null}
             </div>
 
             {/* بيانات الحساب الجديد */}
             {tokenValidation.isValid === true && newUserData && (
-              <div className={`mt-4 p-4 rounded-lg border ${
-                isSameAccount 
-                  ? "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800"
-                  : "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800"
-              }`}>
-                <h4 className={`text-sm font-semibold mb-3 ${
-                  isSameAccount 
-                    ? "text-yellow-800 dark:text-yellow-200"
-                    : "text-green-800 dark:text-green-200"
-                }`}>
-                  {isSameAccount ? "نفس الحساب المسجل دخول بالفعل:" : "الحساب الجديد (من الـ Token):"}
+              <div
+                className={`mt-4 p-4 rounded-lg border ${
+                  isSameAccount
+                    ? "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800"
+                    : "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800"
+                }`}
+              >
+                <h4
+                  className={`text-sm font-semibold mb-3 ${
+                    isSameAccount
+                      ? "text-yellow-800 dark:text-yellow-200"
+                      : "text-green-800 dark:text-green-200"
+                  }`}
+                >
+                  {isSameAccount
+                    ? "نفس الحساب المسجل دخول بالفعل:"
+                    : "الحساب الجديد (من الـ Token):"}
                 </h4>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm">البريد الإلكتروني:</span>
-                    <span className={`text-sm ${
-                      isSameAccount 
-                        ? "text-yellow-700 dark:text-yellow-300"
-                        : "text-green-700 dark:text-green-300"
-                    }`}>{newUserData.email}</span>
+                    <span className="font-medium text-sm">
+                      البريد الإلكتروني:
+                    </span>
+                    <span
+                      className={`text-sm ${
+                        isSameAccount
+                          ? "text-yellow-700 dark:text-yellow-300"
+                          : "text-green-700 dark:text-green-300"
+                      }`}
+                    >
+                      {newUserData.email}
+                    </span>
                   </div>
                   {newUserData.first_name && (
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">الاسم:</span>
-                      <span className={`text-sm ${
-                        isSameAccount 
-                          ? "text-yellow-700 dark:text-yellow-300"
-                          : "text-green-700 dark:text-green-300"
-                      }`}>
+                      <span
+                        className={`text-sm ${
+                          isSameAccount
+                            ? "text-yellow-700 dark:text-yellow-300"
+                            : "text-green-700 dark:text-green-300"
+                        }`}
+                      >
                         {newUserData.first_name} {newUserData.last_name}
                       </span>
                     </div>
@@ -873,21 +932,29 @@ export function LoginPage() {
                   {newUserData.username && (
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">اسم المستخدم:</span>
-                      <span className={`text-sm ${
-                        isSameAccount 
-                          ? "text-yellow-700 dark:text-yellow-300"
-                          : "text-green-700 dark:text-green-300"
-                      }`}>{newUserData.username}</span>
+                      <span
+                        className={`text-sm ${
+                          isSameAccount
+                            ? "text-yellow-700 dark:text-yellow-300"
+                            : "text-green-700 dark:text-green-300"
+                        }`}
+                      >
+                        {newUserData.username}
+                      </span>
                     </div>
                   )}
                   {newUserData.company_name && (
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">اسم الشركة:</span>
-                      <span className={`text-sm ${
-                        isSameAccount 
-                          ? "text-yellow-700 dark:text-yellow-300"
-                          : "text-green-700 dark:text-green-300"
-                      }`}>{newUserData.company_name}</span>
+                      <span
+                        className={`text-sm ${
+                          isSameAccount
+                            ? "text-yellow-700 dark:text-yellow-300"
+                            : "text-green-700 dark:text-green-300"
+                        }`}
+                      >
+                        {newUserData.company_name}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -896,7 +963,8 @@ export function LoginPage() {
 
             <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
               <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
-                هل تريد تسجيل الخروج من هذا الحساب وتسجيل الدخول على الحساب الجديد؟
+                هل تريد تسجيل الخروج من هذا الحساب وتسجيل الدخول على الحساب
+                الجديد؟
               </p>
             </div>
           </div>
@@ -911,15 +979,25 @@ export function LoginPage() {
               <X className="h-4 w-4" />
               إلغاء
             </Button>
-            
+
             {isSameAccount ? (
               <Button
                 type="button"
                 onClick={handleGoToHome}
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
               >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  />
                 </svg>
                 الذهاب إلى الصفحة الرئيسية
               </Button>
@@ -928,7 +1006,11 @@ export function LoginPage() {
                 type="button"
                 onClick={handleLogoutAndLogin}
                 className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
-                disabled={isLoading || tokenValidation.isValid === false || tokenValidation.loading}
+                disabled={
+                  isLoading ||
+                  tokenValidation.isValid === false ||
+                  tokenValidation.loading
+                }
               >
                 <LogOut className="h-4 w-4" />
                 {isLoading ? "جاري المعالجة..." : "تسجيل الخروج والدخول"}
@@ -950,31 +1032,53 @@ export function LoginPage() {
               تم العثور على token في الرابط. هل تريد تسجيل الدخول بهذا الحساب؟
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="py-4">
             {/* حالة التحقق من الـ token */}
             <div className="p-3 rounded-lg border">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-sm font-medium">حالة الـ Token:</span>
                 {tokenValidation.loading && (
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                 )}
               </div>
-              
+
               {tokenValidation.loading ? (
-                <p className="text-sm text-muted-foreground">جاري التحقق من صحة الـ token...</p>
+                <p className="text-sm text-muted-foreground">
+                  جاري التحقق من صحة الـ token...
+                </p>
               ) : tokenValidation.isValid === true ? (
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <p className="text-sm text-green-700 dark:text-green-300">{tokenValidation.message}</p>
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    {tokenValidation.message}
+                  </p>
                 </div>
               ) : tokenValidation.isValid === false ? (
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <p className="text-sm text-red-700 dark:text-red-300">{tokenValidation.message}</p>
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    {tokenValidation.message}
+                  </p>
                 </div>
               ) : null}
             </div>
@@ -982,11 +1086,17 @@ export function LoginPage() {
             {/* بيانات الحساب من الـ token */}
             {tokenValidation.isValid === true && newUserData && (
               <div className="mt-4 bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                <h4 className="text-sm font-semibold mb-3 text-blue-800 dark:text-blue-200">بيانات الحساب:</h4>
+                <h4 className="text-sm font-semibold mb-3 text-blue-800 dark:text-blue-200">
+                  بيانات الحساب:
+                </h4>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm">البريد الإلكتروني:</span>
-                    <span className="text-sm text-blue-700 dark:text-blue-300">{newUserData.email}</span>
+                    <span className="font-medium text-sm">
+                      البريد الإلكتروني:
+                    </span>
+                    <span className="text-sm text-blue-700 dark:text-blue-300">
+                      {newUserData.email}
+                    </span>
                   </div>
                   {newUserData.first_name && (
                     <div className="flex items-center gap-2">
@@ -999,13 +1109,17 @@ export function LoginPage() {
                   {newUserData.username && (
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">اسم المستخدم:</span>
-                      <span className="text-sm text-blue-700 dark:text-blue-300">{newUserData.username}</span>
+                      <span className="text-sm text-blue-700 dark:text-blue-300">
+                        {newUserData.username}
+                      </span>
                     </div>
                   )}
                   {newUserData.company_name && (
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">اسم الشركة:</span>
-                      <span className="text-sm text-blue-700 dark:text-blue-300">{newUserData.company_name}</span>
+                      <span className="text-sm text-blue-700 dark:text-blue-300">
+                        {newUserData.company_name}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -1033,7 +1147,11 @@ export function LoginPage() {
               type="button"
               onClick={handleConfirmTokenLogin}
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-              disabled={isLoading || tokenValidation.isValid === false || tokenValidation.loading}
+              disabled={
+                isLoading ||
+                tokenValidation.isValid === false ||
+                tokenValidation.loading
+              }
             >
               <LogOut className="h-4 w-4" />
               {isLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}

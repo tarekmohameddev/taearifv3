@@ -87,13 +87,18 @@ export default function CrmFormDialog({
   useEffect(() => {
     if (initialData && mode === "edit") {
       setFormData({
-        name: initialData.stage_name || initialData.procedure_name || initialData.name || "",
+        name:
+          initialData.stage_name ||
+          initialData.procedure_name ||
+          initialData.name ||
+          "",
         value: initialData.value || "",
         color: initialData.color || "#2196f3",
         icon: initialData.icon || "fa fa-check-circle",
         order: initialData.order || 1,
         description: initialData.description || "",
-        is_active: initialData.is_active === 1 || initialData.is_active === true,
+        is_active:
+          initialData.is_active === 1 || initialData.is_active === true,
       });
     } else {
       setFormData({
@@ -110,7 +115,7 @@ export default function CrmFormDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     let submitData: any = {
       color: formData.color,
       icon: formData.icon,
@@ -173,14 +178,20 @@ export default function CrmFormDialog({
           {/* الاسم */}
           <div className="space-y-2">
             <Label htmlFor="name">
-              {type === "stages" ? "اسم المرحلة" : 
-               type === "procedures" ? "اسم الإجراء" : 
-               type === "priorities" ? "اسم الأولوية" : "اسم النوع"}
+              {type === "stages"
+                ? "اسم المرحلة"
+                : type === "procedures"
+                  ? "اسم الإجراء"
+                  : type === "priorities"
+                    ? "اسم الأولوية"
+                    : "اسم النوع"}
             </Label>
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               placeholder="أدخل الاسم"
               required
               className={fieldErrors.name ? "border-red-500" : ""}
@@ -203,7 +214,9 @@ export default function CrmFormDialog({
                 id="value"
                 type={type === "priorities" ? "number" : "text"}
                 value={formData.value}
-                onChange={(e) => setFormData({ ...formData, value: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, value: e.target.value })
+                }
                 placeholder={type === "priorities" ? "1" : "Rent"}
                 required
                 className={fieldErrors.value ? "border-red-500" : ""}
@@ -220,7 +233,12 @@ export default function CrmFormDialog({
           {/* اللون */}
           <div className="space-y-2">
             <Label>اللون</Label>
-            <Select value={formData.color} onValueChange={(value) => setFormData({ ...formData, color: value })}>
+            <Select
+              value={formData.color}
+              onValueChange={(value) =>
+                setFormData({ ...formData, color: value })
+              }
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -228,8 +246,8 @@ export default function CrmFormDialog({
                 {colorOptions.map((color) => (
                   <SelectItem key={color.value} value={color.value}>
                     <div className="flex items-center gap-2">
-                      <div 
-                        className="w-4 h-4 rounded-full border" 
+                      <div
+                        className="w-4 h-4 rounded-full border"
                         style={{ backgroundColor: color.color }}
                       />
                       {color.label}
@@ -243,7 +261,12 @@ export default function CrmFormDialog({
           {/* الأيقونة */}
           <div className="space-y-2">
             <Label>الأيقونة</Label>
-            <Select value={formData.icon} onValueChange={(value) => setFormData({ ...formData, icon: value })}>
+            <Select
+              value={formData.icon}
+              onValueChange={(value) =>
+                setFormData({ ...formData, icon: value })
+              }
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -264,7 +287,12 @@ export default function CrmFormDialog({
               id="order"
               type="number"
               value={formData.order}
-              onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 1 })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  order: parseInt(e.target.value) || 1,
+                })
+              }
               min="1"
               required
             />
@@ -277,7 +305,9 @@ export default function CrmFormDialog({
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="أدخل وصفاً مختصراً"
                 rows={3}
                 className={fieldErrors.description ? "border-red-500" : ""}
@@ -297,7 +327,9 @@ export default function CrmFormDialog({
             <Switch
               id="is_active"
               checked={formData.is_active}
-              onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, is_active: checked })
+              }
             />
           </div>
 
@@ -313,11 +345,7 @@ export default function CrmFormDialog({
               <X className="h-4 w-4 ml-2" />
               إلغاء
             </Button>
-            <Button
-              type="submit"
-              className="flex-1"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="flex-1" disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className="h-4 w-4 ml-2 animate-spin" />
               ) : (

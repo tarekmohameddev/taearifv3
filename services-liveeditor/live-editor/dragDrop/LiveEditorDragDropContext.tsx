@@ -15,11 +15,7 @@ import { AutoScroller, defaultPreset, DragDropManager } from "@dnd-kit/dom";
 import { DragDropEvents } from "@dnd-kit/abstract";
 import type { Draggable, Droppable } from "@dnd-kit/dom";
 import { useDebouncedCallback } from "use-debounce";
-import { 
-  createZoneStore, 
-  ZoneStoreType, 
-  Preview 
-} from "./zoneStore";
+import { createZoneStore, ZoneStoreType, Preview } from "./zoneStore";
 import {
   DropZoneContext,
   ZoneStoreProvider,
@@ -46,7 +42,7 @@ type EventKeys = keyof Events;
 export function useDragListener(
   type: EventKeys,
   fn: Events[EventKeys],
-  deps: any[] = []
+  deps: any[] = [],
 ) {
   const { setDragListeners } = useContext(dragListenerContext);
 
@@ -71,11 +67,17 @@ type LiveEditorDragDropContextProps = {
   children: ReactNode;
   disableAutoScroll?: boolean;
   onComponentAdd?: (componentData: any) => void;
-  onComponentMove?: (sourceIndex: number, sourceZone: string, destinationIndex: number, destinationZone: string) => void;
+  onComponentMove?: (
+    sourceIndex: number,
+    sourceZone: string,
+    destinationIndex: number,
+    destinationZone: string,
+  ) => void;
 };
 
 // Utility to generate unique IDs
-const generateId = () => `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+const generateId = () =>
+  `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
 const LiveEditorDragDropContextClient = ({
   children,
@@ -114,7 +116,7 @@ const LiveEditorDragDropContextClient = ({
 
       return { zoneChanged, areaChanged };
     },
-    [zoneStore]
+    [zoneStore],
   );
 
   const setDeepestAndCollide = useCallback(
@@ -135,12 +137,12 @@ const LiveEditorDragDropContextClient = ({
 
       debouncedParamsRef.current = null;
     },
-    [zoneStore]
+    [zoneStore],
   );
 
   const setDeepestDb = useDebouncedCallback(
     setDeepestAndCollide,
-    AREA_CHANGE_DEBOUNCE_MS
+    AREA_CHANGE_DEBOUNCE_MS,
   );
 
   const cancelDb = () => {
@@ -150,14 +152,16 @@ const LiveEditorDragDropContextClient = ({
 
   const [plugins] = useState(() => {
     const basePlugins = [];
-    
+
     // إضافة plugins الأساسية من defaultPreset بحذر
     try {
       if (defaultPreset?.plugins) {
         const filteredPlugins = disableAutoScroll
-          ? defaultPreset.plugins.filter((plugin) => plugin && plugin !== AutoScroller)
+          ? defaultPreset.plugins.filter(
+              (plugin) => plugin && plugin !== AutoScroller,
+            )
           : defaultPreset.plugins.filter((plugin) => plugin); // تصفية plugins null/undefined
-        
+
         basePlugins.push(...filteredPlugins);
       }
     } catch (error) {
@@ -166,7 +170,7 @@ const LiveEditorDragDropContextClient = ({
 
     // إضافة plugin مخصص مبسط (مؤقتاً)
     // سنضيف createNestedDroppablePlugin لاحقاً عندما نتأكد من أنه يعمل
-    
+
     return basePlugins;
   });
 
@@ -184,7 +188,7 @@ const LiveEditorDragDropContextClient = ({
       areaId: "root",
       depth: 0,
     }),
-    []
+    [],
   );
 
   return (
@@ -199,54 +203,69 @@ const LiveEditorDragDropContextClient = ({
           plugins={plugins}
           sensors={sensors}
           onDragEnd={(event, manager) => {
-            console.log('🔍 [LIVE-EDITOR-DND] onDragEnd called');
+            console.log("🔍 [LIVE-EDITOR-DND] onDragEnd called");
             const { source, target } = event.operation;
-            console.log('🔍 [LIVE-EDITOR-DND] Source:', source?.id, 'Target:', target?.id);
+            console.log(
+              "🔍 [LIVE-EDITOR-DND] Source:",
+              source?.id,
+              "Target:",
+              target?.id,
+            );
 
             // تنظيف الحالة دائماً
-            zoneStore.setState({ 
+            zoneStore.setState({
               draggedItem: null,
-              previewIndex: {}
+              previewIndex: {},
             });
 
             if (!source || event.canceled) {
-              console.log('🔍 [LIVE-EDITOR-DND] No source or event canceled');
+              console.log("🔍 [LIVE-EDITOR-DND] No source or event canceled");
               return;
             }
 
             // تحديد نوع العنصر المسحوب
-            const isNewComponent = source.type === "drawer" || source.id.toString().includes("drawer-item");
+            const isNewComponent =
+              source.type === "drawer" ||
+              source.id.toString().includes("drawer-item");
             const sourceData = source.data as any;
 
-
             if (target) {
-              console.log('🔍 [LIVE-EDITOR-DND] Target exists, processing...');
+              console.log("🔍 [LIVE-EDITOR-DND] Target exists, processing...");
               let targetZone = "root";
               let targetIndex = 0;
 
               if (target.type === "component") {
-                console.log('🔍 [LIVE-EDITOR-DND] Target is component');
+                console.log("🔍 [LIVE-EDITOR-DND] Target is component");
                 const targetData = target.data as any;
                 targetZone = targetData.zone || "root";
                 targetIndex = targetData.index || 0;
-                
+
                 // تحديد موقع الإفلات (قبل أو بعد العنصر)
                 // بشكل مبسط - سنضع العنصر بعد الهدف
                 targetIndex = targetIndex + 1;
-                console.log('🔍 [LIVE-EDITOR-DND] Component target - zone:', targetZone, 'index:', targetIndex);
+                console.log(
+                  "🔍 [LIVE-EDITOR-DND] Component target - zone:",
+                  targetZone,
+                  "index:",
+                  targetIndex,
+                );
               } else if (target.type === "dropzone") {
-                console.log('🔍 [LIVE-EDITOR-DND] Target is dropzone');
+                console.log("🔍 [LIVE-EDITOR-DND] Target is dropzone");
                 targetZone = target.id.toString();
                 targetIndex = 0; // في بداية المنطقة
-                console.log('🔍 [LIVE-EDITOR-DND] Dropzone target - zone:', targetZone, 'index:', targetIndex);
+                console.log(
+                  "🔍 [LIVE-EDITOR-DND] Dropzone target - zone:",
+                  targetZone,
+                  "index:",
+                  targetIndex,
+                );
               }
 
-
               if (isNewComponent) {
-                console.log('🔍 [LIVE-EDITOR-DND] Adding new component:', {
+                console.log("🔍 [LIVE-EDITOR-DND] Adding new component:", {
                   componentType: sourceData.componentType,
                   zone: targetZone,
-                  index: targetIndex
+                  index: targetIndex,
                 });
                 // إضافة مكون جديد
                 onComponentAdd?.({
@@ -256,21 +275,21 @@ const LiveEditorDragDropContextClient = ({
                   data: sourceData.data || {},
                 });
               } else {
-                console.log('🔍 [LIVE-EDITOR-DND] Moving existing component:', {
+                console.log("🔍 [LIVE-EDITOR-DND] Moving existing component:", {
                   sourceIndex: sourceData.index || 0,
                   sourceZone: sourceData.zone || "root",
                   targetIndex,
-                  targetZone
+                  targetZone,
                 });
                 // نقل مكون موجود
                 const sourceIndex = sourceData.index || 0;
                 const sourceZone = sourceData.zone || "root";
-                
+
                 onComponentMove?.(
                   sourceIndex,
                   sourceZone,
                   targetIndex,
-                  targetZone
+                  targetZone,
                 );
               }
             } else {
@@ -278,7 +297,7 @@ const LiveEditorDragDropContextClient = ({
 
             // تنظيف المراجع
             initialSelector.current = undefined;
-            
+
             dragListeners.dragend?.forEach((fn) => {
               fn(event, manager);
             });
@@ -286,13 +305,14 @@ const LiveEditorDragDropContextClient = ({
           onDragOver={(event, manager) => {
             // مبسط جداً لتجنب المشاكل
             const { source, target } = event.operation;
-            
-            if (!source || !target) return;
 
+            if (!source || !target) return;
 
             // فقط لإظهار visual feedback - بدون منطق معقد
             const sourceData = source.data as any;
-            const isNewComponent = source.type === "drawer" || source.id.toString().includes("drawer-item");
+            const isNewComponent =
+              source.type === "drawer" ||
+              source.id.toString().includes("drawer-item");
 
             if (isNewComponent) {
               dragMode.current = "new";
@@ -313,11 +333,11 @@ const LiveEditorDragDropContextClient = ({
           onDragStart={(event, manager) => {
             const { source } = event.operation;
 
-
             if (source) {
               const sourceData = source.data as any;
-              const isNewComponent = source.type === "drawer" || source.id.toString().includes("drawer-item");
-              
+              const isNewComponent =
+                source.type === "drawer" ||
+                source.id.toString().includes("drawer-item");
             }
 
             dragListeners.dragstart?.forEach((fn) => {
@@ -326,15 +346,16 @@ const LiveEditorDragDropContextClient = ({
           }}
           onBeforeDragStart={(event) => {
             const source = event.operation.source;
-            const isNewComponent = source?.type === "drawer" || source?.id.toString().includes("drawer-item");
-
+            const isNewComponent =
+              source?.type === "drawer" ||
+              source?.id.toString().includes("drawer-item");
 
             dragMode.current = isNewComponent ? "new" : "existing";
             initialSelector.current = undefined;
 
-            zoneStore.setState({ 
+            zoneStore.setState({
               draggedItem: source,
-              previewIndex: {} // تنظيف أي preview قديم
+              previewIndex: {}, // تنظيف أي preview قديم
             });
           }}
         >
@@ -356,7 +377,7 @@ export const LiveEditorDragDropContext = ({
   onComponentMove,
 }: LiveEditorDragDropContextProps) => {
   return (
-    <LiveEditorDragDropContextClient 
+    <LiveEditorDragDropContextClient
       disableAutoScroll={disableAutoScroll}
       onComponentAdd={onComponentAdd}
       onComponentMove={onComponentMove}

@@ -1,8 +1,20 @@
 "use client";
 
-import { AlertTriangle, RefreshCw, Wifi, Server, AlertCircle } from "lucide-react";
+import {
+  AlertTriangle,
+  RefreshCw,
+  Wifi,
+  Server,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface ErrorDisplayProps {
   error: string;
@@ -12,19 +24,25 @@ interface ErrorDisplayProps {
   className?: string;
 }
 
-export function ErrorDisplay({ 
-  error, 
-  onRetry, 
-  title = "حدث خطأ", 
+export function ErrorDisplay({
+  error,
+  onRetry,
+  title = "حدث خطأ",
   showRetry = true,
-  className = ""
+  className = "",
 }: ErrorDisplayProps) {
   // تحديد نوع الخطأ بناءً على المحتوى
   const getErrorType = (errorMessage: string) => {
-    if (errorMessage.includes("خطأ في الخادم") || errorMessage.includes("500")) {
+    if (
+      errorMessage.includes("خطأ في الخادم") ||
+      errorMessage.includes("500")
+    ) {
       return "server";
     }
-    if (errorMessage.includes("خطأ في الاتصال") || errorMessage.includes("الشبكة")) {
+    if (
+      errorMessage.includes("خطأ في الاتصال") ||
+      errorMessage.includes("الشبكة")
+    ) {
       return "network";
     }
     if (errorMessage.includes("غير مصرح") || errorMessage.includes("401")) {
@@ -64,9 +82,7 @@ export function ErrorDisplay({
   return (
     <Card className={`border-red-200 bg-red-50 ${className}`}>
       <CardHeader className="text-center">
-        <div className="flex justify-center mb-2">
-          {getErrorIcon()}
-        </div>
+        <div className="flex justify-center mb-2">{getErrorIcon()}</div>
         <CardTitle className="text-red-800">{title}</CardTitle>
         <CardDescription className="text-red-600">
           {getErrorDescription()}
@@ -74,13 +90,11 @@ export function ErrorDisplay({
       </CardHeader>
       <CardContent className="text-center space-y-4">
         <div className="bg-red-100 border border-red-200 rounded-lg p-3">
-          <p className="text-sm text-red-700 font-medium">
-            {error}
-          </p>
+          <p className="text-sm text-red-700 font-medium">{error}</p>
         </div>
-        
+
         {showRetry && onRetry && (
-          <Button 
+          <Button
             onClick={onRetry}
             variant="outline"
             className="border-red-300 text-red-700 hover:bg-red-100"
@@ -95,13 +109,13 @@ export function ErrorDisplay({
 }
 
 // مكون مبسط لعرض الأخطاء في قوائم
-export function ErrorMessage({ 
-  error, 
-  onRetry, 
-  className = "" 
-}: { 
-  error: string; 
-  onRetry?: () => void; 
+export function ErrorMessage({
+  error,
+  onRetry,
+  className = "",
+}: {
+  error: string;
+  onRetry?: () => void;
   className?: string;
 }) {
   return (

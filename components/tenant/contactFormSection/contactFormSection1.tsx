@@ -132,7 +132,6 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
     },
   ];
 
-
   return (
     <section
       className="container mx-auto px-4 py-8 lg:w-full sm:max-w-[1600px]"

@@ -19,27 +19,22 @@ export function EditorProvider({ children }: { children: ReactNode }) {
 
     // Collect all component states from the editor store
     const state = useEditorStore.getState();
-    
-    
+
     // Log detailed component info for each page
     Object.entries(state.pageComponentsByPage).forEach(([page, components]) => {
-      
       // Log detailed data for each component
-      components.forEach(component => {
-      });
+      components.forEach((component) => {});
     });
-    
+
     const payload = {
       tenantId: tenantId || "",
       pages: state.pageComponentsByPage,
       globalComponentsData: state.globalComponentsData,
     };
 
-
-    
-
     // Send to backend to persist
-    await axiosInstance.post("/v1/tenant-website/save-pages", payload)
+    await axiosInstance
+      .post("/v1/tenant-website/save-pages", payload)
       .then(() => {
         closeDialog();
         toast.success("Changes saved successfully!");
@@ -47,7 +42,9 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       .catch((e) => {
         console.error("[Save All] Error saving pages:", e);
         closeDialog();
-        toast.error(e.response?.data?.message || e.message || "Failed to save changes");
+        toast.error(
+          e.response?.data?.message || e.message || "Failed to save changes",
+        );
       });
   };
 

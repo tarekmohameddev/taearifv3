@@ -1,6 +1,9 @@
 // خدمة إدارة أسماء عرض المكونات
 
-import { getComponentDisplayName as getDisplayNameFromList, COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import {
+  getComponentDisplayName as getDisplayNameFromList,
+  COMPONENTS,
+} from "@/lib-liveeditor/ComponentsList";
 
 // دالة الحصول على اسم عرض المكون
 export const getComponentDisplayName = (type: string): string => {
@@ -13,7 +16,9 @@ export const addComponentDisplayName = (
   displayName: string,
 ): void => {
   // يمكن تطبيق التحديث في القائمة المركزية إذا لزم الأمر
-  console.warn(`addComponentDisplayName is deprecated. Update the central ComponentsList instead.`);
+  console.warn(
+    `addComponentDisplayName is deprecated. Update the central ComponentsList instead.`,
+  );
 };
 
 // دالة تحديث اسم عرض موجود (محفوظة للتوافق العكسي)
@@ -21,13 +26,17 @@ export const updateComponentDisplayName = (
   type: string,
   displayName: string,
 ): boolean => {
-  console.warn(`updateComponentDisplayName is deprecated. Update the central ComponentsList instead.`);
+  console.warn(
+    `updateComponentDisplayName is deprecated. Update the central ComponentsList instead.`,
+  );
   return COMPONENTS[type] !== undefined;
 };
 
 // دالة حذف اسم عرض (محفوظة للتوافق العكسي)
 export const removeComponentDisplayName = (type: string): boolean => {
-  console.warn(`removeComponentDisplayName is deprecated. Update the central ComponentsList instead.`);
+  console.warn(
+    `removeComponentDisplayName is deprecated. Update the central ComponentsList instead.`,
+  );
   return false;
 };
 

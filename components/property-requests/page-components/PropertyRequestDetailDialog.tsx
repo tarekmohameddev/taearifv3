@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -27,16 +26,17 @@ export const PropertyRequestDetailDialog = ({
   selectedPropertyRequest,
 }: any) => {
   return (
-    <Dialog open={showPropertyRequestDialog} onOpenChange={setShowPropertyRequestDialog}>
+    <Dialog
+      open={showPropertyRequestDialog}
+      onOpenChange={setShowPropertyRequestDialog}
+    >
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         {selectedPropertyRequest && (
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-3">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage
-                    src="/placeholder.svg"
-                  />
+                  <AvatarImage src="/placeholder.svg" />
                   <AvatarFallback>
                     {selectedPropertyRequest.full_name
                       .split(" ")
@@ -46,10 +46,14 @@ export const PropertyRequestDetailDialog = ({
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="text-xl">{selectedPropertyRequest.full_name}</div>
+                  <div className="text-xl">
+                    {selectedPropertyRequest.full_name}
+                  </div>
                   <div className="text-sm text-muted-foreground font-normal">
                     طلب عقار • منذ{" "}
-                    {new Date(selectedPropertyRequest.created_at).toLocaleDateString('ar-US')}
+                    {new Date(
+                      selectedPropertyRequest.created_at,
+                    ).toLocaleDateString("ar-US")}
                   </div>
                 </div>
                 <div className="mr-auto flex items-center gap-2">
@@ -59,18 +63,26 @@ export const PropertyRequestDetailDialog = ({
                       selectedPropertyRequest.property_type === "سكني"
                         ? "border-blue-500 text-blue-700"
                         : selectedPropertyRequest.property_type === "تجاري"
-                        ? "border-green-500 text-green-700"
-                        : selectedPropertyRequest.property_type === "صناعي"
-                        ? "border-purple-500 text-purple-700"
-                        : selectedPropertyRequest.property_type === "أرض"
-                        ? "border-orange-500 text-orange-700"
-                        : "border-red-500 text-red-700"
+                          ? "border-green-500 text-green-700"
+                          : selectedPropertyRequest.property_type === "صناعي"
+                            ? "border-purple-500 text-purple-700"
+                            : selectedPropertyRequest.property_type === "أرض"
+                              ? "border-orange-500 text-orange-700"
+                              : "border-red-500 text-red-700"
                     }
                   >
                     {selectedPropertyRequest.property_type}
                   </Badge>
-                  <Badge variant={selectedPropertyRequest.is_active === 1 ? "default" : "secondary"}>
-                    {selectedPropertyRequest.is_active === 1 ? "نشط" : "غير نشط"}
+                  <Badge
+                    variant={
+                      selectedPropertyRequest.is_active === 1
+                        ? "default"
+                        : "secondary"
+                    }
+                  >
+                    {selectedPropertyRequest.is_active === 1
+                      ? "نشط"
+                      : "غير نشط"}
                   </Badge>
                 </div>
               </DialogTitle>
@@ -93,7 +105,9 @@ export const PropertyRequestDetailDialog = ({
                         {selectedPropertyRequest.phone}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير متوفر</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير متوفر
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
@@ -104,7 +118,9 @@ export const PropertyRequestDetailDialog = ({
                         متاح
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير متوفر</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير متوفر
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
@@ -147,7 +163,8 @@ export const PropertyRequestDetailDialog = ({
                     <span>الميزانية:</span>
                     <span className="font-medium flex items-center">
                       <Target className="ml-1 h-3 w-3 text-purple-500" />
-                      {selectedPropertyRequest.budget_from.toLocaleString()} - {selectedPropertyRequest.budget_to.toLocaleString()} ريال
+                      {selectedPropertyRequest.budget_from.toLocaleString()} -{" "}
+                      {selectedPropertyRequest.budget_to.toLocaleString()} ريال
                     </span>
                   </div>
                 </CardContent>
@@ -176,19 +193,23 @@ export const PropertyRequestDetailDialog = ({
                   <div className="flex items-center justify-between">
                     <span>عروض مشابهة:</span>
                     {selectedPropertyRequest.wants_similar_offers ? (
-                      <Badge variant="default">
-                        نعم
-                      </Badge>
+                      <Badge variant="default">نعم</Badge>
                     ) : (
-                      <Badge variant="secondary">
-                        لا
-                      </Badge>
+                      <Badge variant="secondary">لا</Badge>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
                     <span>الحالة:</span>
-                    <Badge variant={selectedPropertyRequest.is_active === 1 ? "default" : "secondary"}>
-                      {selectedPropertyRequest.is_active === 1 ? "نشط" : "غير نشط"}
+                    <Badge
+                      variant={
+                        selectedPropertyRequest.is_active === 1
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {selectedPropertyRequest.is_active === 1
+                        ? "نشط"
+                        : "غير نشط"}
                     </Badge>
                   </div>
                 </CardContent>
@@ -233,4 +254,4 @@ export const PropertyRequestDetailDialog = ({
       </DialogContent>
     </Dialog>
   );
-}; 
+};

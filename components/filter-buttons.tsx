@@ -1,37 +1,41 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-type FilterType = "all" | "available" | "sold" | "rented"
+type FilterType = "all" | "available" | "sold" | "rented";
 
 interface FilterButtonsProps {
-  transactionType: "rent" | "sale"
-  activeFilter: FilterType
-  onFilterChange: (filter: FilterType) => void
+  transactionType: "rent" | "sale";
+  activeFilter: FilterType;
+  onFilterChange: (filter: FilterType) => void;
 }
 
-export default function FilterButtons({ transactionType, activeFilter, onFilterChange }: FilterButtonsProps) {
+export default function FilterButtons({
+  transactionType,
+  activeFilter,
+  onFilterChange,
+}: FilterButtonsProps) {
   const getFilterButtons = () => {
     if (transactionType === "rent") {
       return [
         { key: "all" as FilterType, label: "الكل" },
         { key: "available" as FilterType, label: "المتاحة للإيجار" },
-        { key: "rented" as FilterType, label: "تم تأجيرها" }
-      ]
+        { key: "rented" as FilterType, label: "تم تأجيرها" },
+      ];
     } else {
       return [
         { key: "all" as FilterType, label: "الكل" },
         { key: "available" as FilterType, label: "المتاحة للبيع" },
-        { key: "sold" as FilterType, label: "تم بيعها" }
-      ]
+        { key: "sold" as FilterType, label: "تم بيعها" },
+      ];
     }
-  }
+  };
 
   return (
     <div className="flex flex-col md:flex-row justify-between">
       {/* زر طلب المعاينة */}
-      <Link 
+      <Link
         href="/application-form"
         className="w-[80%] mb-[20px] md:w-fit md:mx-0 flex items-center justify-center text-[12px] md:text-[14px] lg:text-[20px] relative transition-all duration-300 ease-in-out text-nowrap rounded-[10px] px-[20px] py-[8px] bg-emerald-600 text-white mx-auto hover:bg-emerald-700"
       >
@@ -55,45 +59,5 @@ export default function FilterButtons({ transactionType, activeFilter, onFilterC
         ))}
       </div>
     </div>
-  )
+  );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

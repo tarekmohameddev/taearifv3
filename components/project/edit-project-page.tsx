@@ -131,7 +131,7 @@ export default function EditProjectPage(): JSX.Element {
   });
 
   const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(
-    null
+    null,
   );
   const [planImages, setPlanImages] = useState<ProjectImage[]>([]);
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
@@ -164,7 +164,7 @@ export default function EditProjectPage(): JSX.Element {
     const fetchProjectData = async () => {
       try {
         const response = await axiosInstance.get(
-          `${process.env.NEXT_PUBLIC_Backend_URL}/projects/${id}`
+          `${process.env.NEXT_PUBLIC_Backend_URL}/projects/${id}`,
         );
         const projectData = response.data.data.project;
 
@@ -215,12 +215,12 @@ export default function EditProjectPage(): JSX.Element {
               amenitiesArray[0].name
             ) {
               setAmenities(
-                amenitiesArray.map((amenity) => amenity.name.trim())
+                amenitiesArray.map((amenity) => amenity.name.trim()),
               );
             } else {
               // إذا كانت المرافق نصوص
               setAmenities(
-                amenitiesArray.map((amenity) => amenity.toString().trim())
+                amenitiesArray.map((amenity) => amenity.toString().trim()),
               );
             }
           }
@@ -244,7 +244,7 @@ export default function EditProjectPage(): JSX.Element {
               id: `existing-gallery-${index}`,
               url: img,
               file: new File([], img.split("/").pop() || "image.jpg"),
-            }))
+            })),
           );
         }
 
@@ -257,7 +257,7 @@ export default function EditProjectPage(): JSX.Element {
               id: `existing-plan-${index}`,
               url: img,
               file: new File([], img.split("/").pop() || "plan.jpg"),
-            }))
+            })),
           );
         }
 
@@ -286,7 +286,7 @@ export default function EditProjectPage(): JSX.Element {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
     setNewProject((prev) => ({
@@ -436,11 +436,13 @@ export default function EditProjectPage(): JSX.Element {
       toast.error("يجب أن يكون الفيديو بصيغة MP4 أو MOV أو AVI فقط");
       return;
     }
-    
+
     // Get video size limit from user's package
-    const videoSizeLimit = useAuthStore.getState().userData?.membership?.package?.video_size_limit || 50;
+    const videoSizeLimit =
+      useAuthStore.getState().userData?.membership?.package?.video_size_limit ||
+      50;
     const maxSizeInBytes = videoSizeLimit * 1024 * 1024; // Convert MB to bytes
-    
+
     if (file.size > maxSizeInBytes) {
       toast.error(`يجب أن يكون حجم الملف أقل من ${videoSizeLimit} ميجابايت`);
       return;
@@ -485,7 +487,7 @@ export default function EditProjectPage(): JSX.Element {
   };
 
   const handleUpdateProject = async (
-    status: "منشور" | "مسودة" | "Pre-construction"
+    status: "منشور" | "مسودة" | "Pre-construction",
   ) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
@@ -526,7 +528,7 @@ export default function EditProjectPage(): JSX.Element {
         if (!thumbnailImage.url.startsWith("https://taearif.com/")) {
           const uploadResult = await uploadSingleFile(
             thumbnailImage.file,
-            "project"
+            "project",
           );
           featuredImagePath = uploadResult.path;
         } else {
@@ -540,7 +542,7 @@ export default function EditProjectPage(): JSX.Element {
         .map((img) => img.url);
 
       const newPlanImages = planImages.filter(
-        (img) => !img.url.startsWith("https://taearif.com/")
+        (img) => !img.url.startsWith("https://taearif.com/"),
       );
       if (newPlanImages.length > 0) {
         const files = newPlanImages.map((image) => image.file);
@@ -560,7 +562,7 @@ export default function EditProjectPage(): JSX.Element {
         .map((img) => img.url);
 
       const newGalleryImages = galleryImages.filter(
-        (img) => !img.url.startsWith("https://taearif.com/")
+        (img) => !img.url.startsWith("https://taearif.com/"),
       );
       if (newGalleryImages.length > 0) {
         const files = newGalleryImages.map((image) => image.file);
@@ -658,7 +660,7 @@ export default function EditProjectPage(): JSX.Element {
 
       const response = await axiosInstance.post(
         `${process.env.NEXT_PUBLIC_Backend_URL}/projects/${id}`,
-        projectData
+        projectData,
       );
 
       toast.success("تم تحديث المشروع بنجاح");
@@ -682,7 +684,9 @@ export default function EditProjectPage(): JSX.Element {
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+                <p className="text-lg text-gray-500">
+                  يرجى تسجيل الدخول لعرض المحتوى
+                </p>
               </div>
             </div>
           </main>
@@ -1391,7 +1395,10 @@ export default function EditProjectPage(): JSX.Element {
                       </Button>
                       <p className="text-sm text-muted-foreground">
                         يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى
-                        لحجم الملف هو {useAuthStore.getState().userData?.membership?.package?.video_size_limit || 50} ميجابايت والحد الأقصى للطول هو 5 دقائق.
+                        لحجم الملف هو{" "}
+                        {useAuthStore.getState().userData?.membership?.package
+                          ?.video_size_limit || 50}{" "}
+                        ميجابايت والحد الأقصى للطول هو 5 دقائق.
                       </p>
                     </div>
                   </div>

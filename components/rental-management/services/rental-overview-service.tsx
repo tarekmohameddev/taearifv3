@@ -1,64 +1,82 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import useStore from "@/context/Store"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Building2, Users, FileText, DollarSign, TrendingUp, AlertCircle, Clock, Wrench } from "lucide-react"
-import useAuthStore from "@/context/AuthContext"
+import { useEffect } from "react";
+import useStore from "@/context/Store";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Building2,
+  Users,
+  FileText,
+  DollarSign,
+  TrendingUp,
+  AlertCircle,
+  Clock,
+  Wrench,
+} from "lucide-react";
+import useAuthStore from "@/context/AuthContext";
 
 interface OverviewStats {
-  totalProperties: number
-  availableProperties: number
-  occupiedProperties: number
-  maintenanceProperties: number
-  totalRequests: number
-  pendingRequests: number
-  approvedRequests: number
-  rejectedRequests: number
-  activeContracts: number
-  expiringContracts: number
-  totalRevenue: number
-  monthlyRevenue: number
-  pendingPayments: number
-  maintenanceRequests: number
+  totalProperties: number;
+  availableProperties: number;
+  occupiedProperties: number;
+  maintenanceProperties: number;
+  totalRequests: number;
+  pendingRequests: number;
+  approvedRequests: number;
+  rejectedRequests: number;
+  activeContracts: number;
+  expiringContracts: number;
+  totalRevenue: number;
+  monthlyRevenue: number;
+  pendingPayments: number;
+  maintenanceRequests: number;
 }
 
 interface RecentActivity {
-  id: string
-  type: "request" | "payment" | "maintenance" | "contract"
-  typeAr: string
-  description: string
-  descriptionAr: string
-  date: string
-  dateHijri: string
-  status: string
-  statusAr: string
-  amount?: number
+  id: string;
+  type: "request" | "payment" | "maintenance" | "contract";
+  typeAr: string;
+  description: string;
+  descriptionAr: string;
+  date: string;
+  dateHijri: string;
+  status: string;
+  statusAr: string;
+  amount?: number;
 }
 
 interface RentalOverviewServiceProps {
-  onAddRentalClick?: () => void
-  onCreateMaintenanceClick?: () => void
+  onAddRentalClick?: () => void;
+  onCreateMaintenanceClick?: () => void;
 }
 
-export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceClick }: RentalOverviewServiceProps) {
-  const { rentalOverview, setRentalOverview } = useStore()
-  const { stats, recentActivity, loading, isInitialized } = rentalOverview
-  const { userData } = useAuthStore()
+export function RentalOverviewService({
+  onAddRentalClick,
+  onCreateMaintenanceClick,
+}: RentalOverviewServiceProps) {
+  const { rentalOverview, setRentalOverview } = useStore();
+  const { stats, recentActivity, loading, isInitialized } = rentalOverview;
+  const { userData } = useAuthStore();
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchOverviewData")
-      setRentalOverview({ loading: false })
-      return
+      console.log("No token available, skipping fetchOverviewData");
+      setRentalOverview({ loading: false });
+      return;
     }
 
     const fetchOverviewData = async () => {
-      setRentalOverview({ loading: true })
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      setRentalOverview({ loading: true });
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       const newStats: OverviewStats = {
         totalProperties: 25,
@@ -75,7 +93,7 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
         monthlyRevenue: 67500,
         pendingPayments: 5,
         maintenanceRequests: 8,
-      }
+      };
 
       const activity: RecentActivity[] = [
         {
@@ -134,47 +152,52 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
           status: "approved",
           statusAr: "موافق عليه",
         },
-      ]
+      ];
 
-      setRentalOverview({ stats: newStats, recentActivity: activity, loading: false, isInitialized: true })
-    }
+      setRentalOverview({
+        stats: newStats,
+        recentActivity: activity,
+        loading: false,
+        isInitialized: true,
+      });
+    };
 
     if (!isInitialized) {
-      fetchOverviewData()
+      fetchOverviewData();
     }
-  }, [isInitialized, setRentalOverview, userData?.token])
+  }, [isInitialized, setRentalOverview, userData?.token]);
 
   const getActivityIcon = (type: string) => {
     switch (type) {
       case "request":
-        return <Users className="h-4 w-4" />
+        return <Users className="h-4 w-4" />;
       case "payment":
-        return <DollarSign className="h-4 w-4" />
+        return <DollarSign className="h-4 w-4" />;
       case "maintenance":
-        return <Wrench className="h-4 w-4" />
+        return <Wrench className="h-4 w-4" />;
       case "contract":
-        return <FileText className="h-4 w-4" />
+        return <FileText className="h-4 w-4" />;
       default:
-        return <AlertCircle className="h-4 w-4" />
+        return <AlertCircle className="h-4 w-4" />;
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "approved":
       case "completed":
       case "active":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "rejected":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       case "in_progress":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -194,7 +217,7 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   // التحقق من وجود التوكن قبل عرض المحتوى
@@ -203,14 +226,16 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+            <p className="text-lg text-gray-500">
+              يرجى تسجيل الدخول لعرض المحتوى
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!stats) return null
+  if (!stats) return null;
 
   return (
     <div className="space-y-6">
@@ -225,7 +250,9 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
         {/* Properties Stats */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي العقارات</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              إجمالي العقارات
+            </CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -268,11 +295,15 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">الإيرادات الشهرية</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              الإيرادات الشهرية
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.monthlyRevenue.toLocaleString()} ر.س</div>
+            <div className="text-2xl font-bold">
+              {stats.monthlyRevenue.toLocaleString()} ر.س
+            </div>
             <div className="flex items-center space-x-2 space-x-reverse text-xs text-muted-foreground">
               <span>مدفوعات معلقة: {stats.pendingPayments}</span>
               <TrendingUp className="h-3 w-3 text-green-500" />
@@ -301,5 +332,5 @@ export function RentalOverviewService({ onAddRentalClick, onCreateMaintenanceCli
         </CardContent>
       </Card> */}
     </div>
-  )
+  );
 }

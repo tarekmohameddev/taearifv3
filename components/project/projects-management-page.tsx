@@ -207,7 +207,9 @@ export function ProjectsManagementPage() {
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+                <p className="text-lg text-gray-500">
+                  يرجى تسجيل الدخول لعرض المحتوى
+                </p>
               </div>
             </div>
           </main>
@@ -329,7 +331,7 @@ export function ProjectsManagementPage() {
                   ? renderSkeletons()
                   : renderProjectCards(
                       projects.filter((project: IProject) => {
-                        if (typeof project.published === 'boolean') {
+                        if (typeof project.published === "boolean") {
                           return project.published === true;
                         } else {
                           return project.published === 1;
@@ -342,7 +344,7 @@ export function ProjectsManagementPage() {
                   ? renderSkeletons()
                   : renderProjectCards(
                       projects.filter((project: IProject) => {
-                        if (typeof project.published === 'boolean') {
+                        if (typeof project.published === "boolean") {
                           return project.published === false;
                         } else {
                           return project.published === 0;
@@ -355,7 +357,7 @@ export function ProjectsManagementPage() {
                   ? renderSkeletons()
                   : renderProjectCards(
                       projects.filter((project: IProject) => {
-                        if (typeof project.featured === 'boolean') {
+                        if (typeof project.featured === "boolean") {
                           return project.featured === true;
                         } else {
                           return project.featured === 1;
@@ -383,7 +385,7 @@ export function ProjectsManagementPage() {
 function ProjectCard({ project }: { project: IProject }) {
   const router = useRouter();
   const { userData } = useAuthStore();
-  
+
   const handleDelete = async (id: number) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
@@ -513,9 +515,9 @@ function ProjectCard({ project }: { project: IProject }) {
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
-        <div className="text-lg font-semibold">{project.price_range || ''}</div>
+        <div className="text-lg font-semibold">{project.price_range || ""}</div>
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {project.contents?.[0]?.description || ''}
+          {project.contents?.[0]?.description || ""}
         </p>
         <div className="grid grid-cols-4 gap-2 text-sm">
           <div className="flex flex-col">
@@ -533,14 +535,14 @@ function ProjectCard({ project }: { project: IProject }) {
           <div className="flex flex-col">
             <span className="text-muted-foreground">الإنجاز</span>
             <span className="font-medium flex items-center gap-1">
-              <Calendar className="h-3 w-3" /> {project.completion_date || ''}
+              <Calendar className="h-3 w-3" /> {project.completion_date || ""}
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground">المطور</span>
             <span className="font-medium flex items-center gap-1">
               <Building2 className="h-3 w-3" />{" "}
-              {project.developer?.split(" ")[0] || '' }
+              {project.developer?.split(" ")[0] || ""}
             </span>
           </div>
         </div>
@@ -584,10 +586,7 @@ function ProjectListItem({ project }: { project: IProject }) {
         <div className="relative sm:w-1/3 md:w-1/4">
           <div className="aspect-[16/9] sm:aspect-auto sm:h-full w-full overflow-hidden">
             <img
-              src={
-                project.featured_image ||
-                "/placeholder.svg"
-              }
+              src={project.featured_image || "/placeholder.svg"}
               alt={project.contents?.[0]?.title}
               className="h-full w-full object-cover"
             />

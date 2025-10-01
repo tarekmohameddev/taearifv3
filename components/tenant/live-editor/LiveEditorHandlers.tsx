@@ -8,7 +8,11 @@ import {
   applyAutoExpandLogic,
 } from "@/services-liveeditor/live-editor";
 import { createDefaultData } from "./EditorSidebar/utils";
-import { logComponentAdd, logComponentChange, logUserAction } from "@/lib-liveeditor/debugLogger";
+import {
+  logComponentAdd,
+  logComponentChange,
+  logUserAction,
+} from "@/lib-liveeditor/debugLogger";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 
@@ -126,27 +130,28 @@ export function useLiveEditorHandlers(state: any) {
 
   // Component Update Handlers
   const handleComponentUpdate = (id: string, newData: ComponentData) => {
-    
     // Handle global components - save them separately, not in pageComponentsByPage
     if (id === "global-header" || id === "global-footer") {
-      
       // Get current store state
       const store = useEditorStore.getState();
-      
-      console.log("🔍 [LiveEditorHandlers] Saving global component separately:", {
-        id,
-        newData,
-        globalHeaderData: store.globalHeaderData,
-        globalFooterData: store.globalFooterData
-      });
-      
+
+      console.log(
+        "🔍 [LiveEditorHandlers] Saving global component separately:",
+        {
+          id,
+          newData,
+          globalHeaderData: store.globalHeaderData,
+          globalFooterData: store.globalFooterData,
+        },
+      );
+
       // Global components are already saved in their respective stores (globalHeaderData, globalFooterData)
       // No need to save them to pageComponentsByPage
       // They will be sent to API separately via save-changes endpoint
-      
+
       return; // Don't proceed with regular component update
     }
-    
+
     setPageComponents((currentComponents: any[]) =>
       currentComponents.map((c) => (c.id === id ? { ...c, data: newData } : c)),
     );
@@ -154,56 +159,62 @@ export function useLiveEditorHandlers(state: any) {
 
   const handleComponentThemeChange = (id: string, newTheme: string) => {
     // Log user action
-    logUserAction('CHANGE_COMPONENT_THEME', id, newTheme, {
+    logUserAction("CHANGE_COMPONENT_THEME", id, newTheme, {
       id,
       newTheme,
-      reason: 'User changed component theme'
+      reason: "User changed component theme",
     });
-    
+
     setPageComponents((currentComponents: any[]) =>
       currentComponents.map((c) => {
         if (c.id === id) {
           const oldTheme = c.componentName;
-          
+
           // Log component change
           logComponentChange(id, oldTheme, newTheme, {
             oldComponent: c,
             newTheme,
-            reason: 'Component theme changed'
+            reason: "Component theme changed",
           });
-          
+
           // Get new default data for the new theme
           const newDefaultData = createDefaultData(c.type, newTheme);
-          
+
           // Defer store update to avoid render cycle issues
           setTimeout(() => {
             const store = useEditorStore.getState();
             const currentPage = store.currentPage;
-            
+
             // Update pageComponentsByPage in the store with new data
-            const updatedPageComponents = store.pageComponentsByPage[currentPage] || [];
-            const updatedStoreComponents = updatedPageComponents.map((comp: any) => {
-              if (comp.id === id) {
-                return { 
-                  ...comp, 
-                  componentName: newTheme,
-                  data: newDefaultData
-                };
-              }
-              return comp;
-            });
-            
+            const updatedPageComponents =
+              store.pageComponentsByPage[currentPage] || [];
+            const updatedStoreComponents = updatedPageComponents.map(
+              (comp: any) => {
+                if (comp.id === id) {
+                  return {
+                    ...comp,
+                    componentName: newTheme,
+                    data: newDefaultData,
+                  };
+                }
+                return comp;
+              },
+            );
+
             // Update the store
-            store.forceUpdatePageComponents(currentPage, updatedStoreComponents);
-            
+            store.forceUpdatePageComponents(
+              currentPage,
+              updatedStoreComponents,
+            );
+
             // Also update the component data in the store
             store.setComponentData(c.type, id, newDefaultData);
           }, 0);
-          
-          return { 
-            ...c, 
+
+          return {
+            ...c,
             componentName: newTheme,
-            data: newDefaultData
+            data: newDefaultData,
           };
         }
         return c;
@@ -217,32 +228,38 @@ export function useLiveEditorHandlers(state: any) {
         if (c.id === id) {
           // Get default data for this component type and current theme
           const defaultData = createDefaultData(c.type, c.componentName);
-          
+
           // Also reset data in the editor store using component.id as unique identifier
           const store = useEditorStore.getState();
           store.setComponentData(c.type, id, defaultData);
-          
+
           // Defer store update to avoid render cycle issues
           setTimeout(() => {
             const currentPage = store.currentPage;
-            
+
             // Update pageComponentsByPage in the store
-            const updatedPageComponents = store.pageComponentsByPage[currentPage] || [];
-            const updatedStoreComponents = updatedPageComponents.map((comp: any) => {
-              if (comp.id === id) {
-                return {
-                  ...comp,
-                  data: defaultData,
-                  componentName: c.componentName, // Keep current theme
-                };
-              }
-              return comp;
-            });
-            
+            const updatedPageComponents =
+              store.pageComponentsByPage[currentPage] || [];
+            const updatedStoreComponents = updatedPageComponents.map(
+              (comp: any) => {
+                if (comp.id === id) {
+                  return {
+                    ...comp,
+                    data: defaultData,
+                    componentName: c.componentName, // Keep current theme
+                  };
+                }
+                return comp;
+              },
+            );
+
             // Update the store
-            store.forceUpdatePageComponents(currentPage, updatedStoreComponents);
+            store.forceUpdatePageComponents(
+              currentPage,
+              updatedStoreComponents,
+            );
           }, 0);
-          
+
           return {
             ...c,
             data: defaultData,
@@ -266,36 +283,42 @@ export function useLiveEditorHandlers(state: any) {
         if (newTheme) {
           // Get new default data for the new theme
           const newDefaultData = createDefaultData(c.type, newTheme);
-          
+
           // Defer store update to avoid render cycle issues
           setTimeout(() => {
             const store = useEditorStore.getState();
             const currentPage = store.currentPage;
-            
+
             // Update pageComponentsByPage in the store with new data
-            const updatedPageComponents = store.pageComponentsByPage[currentPage] || [];
-            const updatedStoreComponents = updatedPageComponents.map((comp: any) => {
-              if (comp.id === c.id) {
-                return { 
-                  ...comp, 
-                  componentName: newTheme,
-                  data: newDefaultData
-                };
-              }
-              return comp;
-            });
-            
+            const updatedPageComponents =
+              store.pageComponentsByPage[currentPage] || [];
+            const updatedStoreComponents = updatedPageComponents.map(
+              (comp: any) => {
+                if (comp.id === c.id) {
+                  return {
+                    ...comp,
+                    componentName: newTheme,
+                    data: newDefaultData,
+                  };
+                }
+                return comp;
+              },
+            );
+
             // Update the store
-            store.forceUpdatePageComponents(currentPage, updatedStoreComponents);
-            
+            store.forceUpdatePageComponents(
+              currentPage,
+              updatedStoreComponents,
+            );
+
             // Also update the component data in the store
             store.setComponentData(c.type, c.id, newDefaultData);
           }, 0);
-          
-          return { 
-            ...c, 
+
+          return {
+            ...c,
             componentName: newTheme,
-            data: newDefaultData
+            data: newDefaultData,
           };
         }
         return c;
@@ -308,18 +331,17 @@ export function useLiveEditorHandlers(state: any) {
     // إضافة رقم 1 لكل مكون
     const componentName = getComponentNameWithOne(type);
     const componentId = uuidv4();
-    
-    
+
     // Log user action
-    logUserAction('ADD_COMPONENT', componentId, componentName, {
+    logUserAction("ADD_COMPONENT", componentId, componentName, {
       type,
       componentName,
       componentId,
-      reason: 'User clicked add component'
+      reason: "User clicked add component",
     });
-    
+
     const defaultData = createDefaultData(type, componentName);
-    
+
     const newSection = {
       id: componentId,
       type,
@@ -332,25 +354,28 @@ export function useLiveEditorHandlers(state: any) {
         span: 2,
       },
     };
-    
+
     // Log component addition
     logComponentAdd(componentId, componentName, type, {
       newSection,
       defaultData,
       currentComponents: state.pageComponents,
-      reason: 'Component added to page'
+      reason: "Component added to page",
     });
-    
+
     setPageComponents((current: any[]) => [...current, newSection]);
-    
+
     // Defer store update to avoid render cycle issues
     setTimeout(() => {
       const store = useEditorStore.getState();
       const currentPage = store.currentPage;
-      const updatedPageComponents = [...(store.pageComponentsByPage[currentPage] || []), newSection];
+      const updatedPageComponents = [
+        ...(store.pageComponentsByPage[currentPage] || []),
+        newSection,
+      ];
       store.forceUpdatePageComponents(currentPage, updatedPageComponents);
     }, 0);
-    
+
     setSidebarView("main");
   };
 
@@ -364,23 +389,25 @@ export function useLiveEditorHandlers(state: any) {
       handleDragEnd,
       manageDragState,
     } = require("@/services-liveeditor/live-editor");
-    
+
     // Create a custom setPageComponents that also updates the store
-    const setPageComponentsWithStore = (updater: (components: any[]) => any[]) => {
+    const setPageComponentsWithStore = (
+      updater: (components: any[]) => any[],
+    ) => {
       setPageComponents((currentComponents: any[]) => {
         const newComponents = updater(currentComponents);
-        
+
         // Update pageComponentsByPage in the store
         setTimeout(() => {
           const store = useEditorStore.getState();
           const currentPage = store.currentPage;
           store.forceUpdatePageComponents(currentPage, newComponents);
         }, 0);
-        
+
         return newComponents;
       });
     };
-    
+
     handleDragEnd(
       event,
       state.pageComponents,

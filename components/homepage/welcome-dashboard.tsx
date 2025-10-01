@@ -90,23 +90,36 @@ export function WelcomeDashboard() {
   ]);
 
   // تحويل بيانات العقارات إلى التنسيق المطلوب للرسم البياني
-  const propertyChartData = dashboardSummary?.properties?.properties_purposes?.map((item: any) => ({
-    name: item.purpose === 'rent' ? 'للإيجار' : 
-          item.purpose === 'sale' ? 'للبيع' : 
-          item.purpose === 'rented' ? 'مؤجرة' : 
-          item.purpose === 'sold' ? 'مباعة' : item.purpose || 'غير محدد',
-    value: item.total || 0,
-    color: item.purpose === 'rent' ? '#10B981' : 
-           item.purpose === 'sale' ? '#EF4444' : 
-           item.purpose === 'rented' ? '#8B5CF6' : 
-           item.purpose === 'sold' ? '#F59E0B' : '#3B82F6'
-  })) || [];
+  const propertyChartData =
+    dashboardSummary?.properties?.properties_purposes?.map((item: any) => ({
+      name:
+        item.purpose === "rent"
+          ? "للإيجار"
+          : item.purpose === "sale"
+            ? "للبيع"
+            : item.purpose === "rented"
+              ? "مؤجرة"
+              : item.purpose === "sold"
+                ? "مباعة"
+                : item.purpose || "غير محدد",
+      value: item.total || 0,
+      color:
+        item.purpose === "rent"
+          ? "#10B981"
+          : item.purpose === "sale"
+            ? "#EF4444"
+            : item.purpose === "rented"
+              ? "#8B5CF6"
+              : item.purpose === "sold"
+                ? "#F59E0B"
+                : "#3B82F6",
+    })) || [];
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          مرحباً بك في {userData?.username || 'لوحة التحكم'}!
+          مرحباً بك في {userData?.username || "لوحة التحكم"}!
         </h1>
         <p className="text-muted-foreground">هذه نظرة عامة على موقعك وأدائه.</p>
       </div>
@@ -200,7 +213,8 @@ export function WelcomeDashboard() {
                 }
               >
                 {(dashboardSummary?.bounce_rate_change || 0) > 0 ? "↑" : "↓"}{" "}
-                {Math.abs(dashboardSummary?.bounce_rate_change || 0).toFixed(2)}%
+                {Math.abs(dashboardSummary?.bounce_rate_change || 0).toFixed(2)}
+                %
               </span>{" "}
               من الشهر الماضي
             </p>
@@ -212,7 +226,9 @@ export function WelcomeDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي العقارات</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              إجمالي العقارات
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
@@ -231,7 +247,9 @@ export function WelcomeDashboard() {
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
               <Home className="h-6 w-6 text-green-600" />
-              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose === 'rent')?.total || 0}
+              {dashboardSummary?.properties?.properties_purposes?.find(
+                (p: any) => p.purpose === "rent",
+              )?.total || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               عقارات متاحة للإيجار
@@ -245,11 +263,11 @@ export function WelcomeDashboard() {
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
               <TrendingUp className="h-6 w-6 text-red-600" />
-              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose === 'sale')?.total || 0}
+              {dashboardSummary?.properties?.properties_purposes?.find(
+                (p: any) => p.purpose === "sale",
+              )?.total || 0}
             </div>
-            <p className="text-xs text-muted-foreground">
-              عقارات متاحة للبيع
-            </p>
+            <p className="text-xs text-muted-foreground">عقارات متاحة للبيع</p>
           </CardContent>
         </Card>
         <Card>
@@ -259,7 +277,9 @@ export function WelcomeDashboard() {
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
               <TrendingDown className="h-6 w-6 text-purple-600" />
-              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose?.toLowerCase() === 'rented')?.total || 0}
+              {dashboardSummary?.properties?.properties_purposes?.find(
+                (p: any) => p.purpose?.toLowerCase() === "rented",
+              )?.total || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               عقارات تم تأجيرها بالفعل
@@ -273,7 +293,9 @@ export function WelcomeDashboard() {
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
               <TrendingDown className="h-6 w-6 text-orange-600" />
-              {dashboardSummary?.properties?.properties_purposes?.find((p: any) => p.purpose?.toLowerCase() === 'sold')?.total || 0}
+              {dashboardSummary?.properties?.properties_purposes?.find(
+                (p: any) => p.purpose?.toLowerCase() === "sold",
+              )?.total || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               عقارات تم بيعها بالفعل

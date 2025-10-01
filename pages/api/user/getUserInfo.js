@@ -1,10 +1,8 @@
 import { authenticateToken } from "../../../middleware/authMiddleware";
 
 export default function handler(req, res) {
-  
   authenticateToken(req, res, () => {
     try {
-      
       if (req.user && req.user.email) {
         const responseData = {
           email: req.user.email,
@@ -14,7 +12,7 @@ export default function handler(req, res) {
           last_name: req.user.last_name,
           responseNumber: Math.floor(Math.random() * 1e20) + 1,
         };
-        
+
         return res.status(200).json(responseData);
       } else {
         return res

@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,11 +20,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 import {
   DollarSign,
   Plus,
@@ -30,62 +36,64 @@ import {
   Download,
   Send,
   CreditCard,
-} from "lucide-react"
-import useAuthStore from "@/context/AuthContext"
+} from "lucide-react";
+import useAuthStore from "@/context/AuthContext";
 
 interface RentPayment {
-  id: string
-  tenantId: string
-  tenantName: string
-  tenantNameAr: string
-  tenantAvatar: string
-  unit: string
-  property: string
-  propertyAr: string
-  amount: number
-  dueDate: string
-  dueDateHijri: string
-  paidDate?: string
-  paidDateHijri?: string
-  status: "paid" | "pending" | "overdue" | "partial"
-  statusAr: string
-  paymentMethod?: string
-  paymentMethodAr?: string
-  lateFee?: number
-  notes?: string
-  notesAr?: string
+  id: string;
+  tenantId: string;
+  tenantName: string;
+  tenantNameAr: string;
+  tenantAvatar: string;
+  unit: string;
+  property: string;
+  propertyAr: string;
+  amount: number;
+  dueDate: string;
+  dueDateHijri: string;
+  paidDate?: string;
+  paidDateHijri?: string;
+  status: "paid" | "pending" | "overdue" | "partial";
+  statusAr: string;
+  paymentMethod?: string;
+  paymentMethodAr?: string;
+  lateFee?: number;
+  notes?: string;
+  notesAr?: string;
 }
 
 interface CollectionSummary {
-  totalExpected: number
-  totalCollected: number
-  totalOverdue: number
-  collectionRate: number
-  pendingPayments: number
-  overduePayments: number
+  totalExpected: number;
+  totalCollected: number;
+  totalOverdue: number;
+  collectionRate: number;
+  pendingPayments: number;
+  overduePayments: number;
 }
 
 export function RentCollectionService() {
-  const [payments, setPayments] = useState<RentPayment[]>([])
-  const [summary, setSummary] = useState<CollectionSummary | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false)
-  const [selectedPayment, setSelectedPayment] = useState<RentPayment | null>(null)
-  const { userData } = useAuthStore()
+  const [payments, setPayments] = useState<RentPayment[]>([]);
+  const [summary, setSummary] = useState<CollectionSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<RentPayment | null>(
+    null,
+  );
+  const { userData } = useAuthStore();
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchRentData")
-      return
+      console.log("No token available, skipping fetchRentData");
+      return;
     }
 
     // Simulate API call to rent collection microservice
     const fetchRentData = async () => {
-      setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       const mockPayments: RentPayment[] = [
         {
@@ -165,72 +173,81 @@ export function RentCollectionService() {
           notes: "Partial payment of 2000 SAR",
           notesAr: "دفعة جزئية بقيمة 2000 ر.س",
         },
-      ]
+      ];
 
-      setPayments(mockPayments)
+      setPayments(mockPayments);
 
       // Calculate summary
-      const totalExpected = mockPayments.reduce((sum, payment) => sum + payment.amount, 0)
+      const totalExpected = mockPayments.reduce(
+        (sum, payment) => sum + payment.amount,
+        0,
+      );
       const totalCollected = mockPayments
         .filter((p) => p.status === "paid")
-        .reduce((sum, payment) => sum + payment.amount, 0)
+        .reduce((sum, payment) => sum + payment.amount, 0);
       const totalOverdue = mockPayments
         .filter((p) => p.status === "overdue")
-        .reduce((sum, payment) => sum + payment.amount + (payment.lateFee || 0), 0)
+        .reduce(
+          (sum, payment) => sum + payment.amount + (payment.lateFee || 0),
+          0,
+        );
 
       setSummary({
         totalExpected,
         totalCollected,
         totalOverdue,
         collectionRate: (totalCollected / totalExpected) * 100,
-        pendingPayments: mockPayments.filter((p) => p.status === "pending").length,
-        overduePayments: mockPayments.filter((p) => p.status === "overdue").length,
-      })
+        pendingPayments: mockPayments.filter((p) => p.status === "pending")
+          .length,
+        overduePayments: mockPayments.filter((p) => p.status === "overdue")
+          .length,
+      });
 
-      setLoading(false)
-    }
+      setLoading(false);
+    };
 
-    fetchRentData()
-  }, [userData?.token])
+    fetchRentData();
+  }, [userData?.token]);
 
   const filteredPayments = payments.filter((payment) => {
     const matchesSearch =
       payment.tenantNameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.unit.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.propertyAr.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesFilter = filterStatus === "all" || payment.status === filterStatus
-    return matchesSearch && matchesFilter
-  })
+      payment.propertyAr.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      filterStatus === "all" || payment.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "paid":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "overdue":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       case "partial":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 text-orange-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "paid":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "pending":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       case "overdue":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
       case "partial":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       default:
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
     }
-  }
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
@@ -238,11 +255,13 @@ export function RentCollectionService() {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+            <p className="text-lg text-gray-500">
+              يرجى تسجيل الدخول لعرض المحتوى
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -263,7 +282,7 @@ export function RentCollectionService() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -273,45 +292,65 @@ export function RentCollectionService() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي المتوقع</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                إجمالي المتوقع
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{summary.totalExpected.toLocaleString()} ر.س</div>
+              <div className="text-2xl font-bold">
+                {summary.totalExpected.toLocaleString()} ر.س
+              </div>
               <p className="text-xs text-muted-foreground">هذا الشهر</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي المحصل</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                إجمالي المحصل
+              </CardTitle>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{summary.totalCollected.toLocaleString()} ر.س</div>
-              <p className="text-xs text-muted-foreground">معدل التحصيل {summary.collectionRate.toFixed(1)}%</p>
+              <div className="text-2xl font-bold text-green-600">
+                {summary.totalCollected.toLocaleString()} ر.س
+              </div>
+              <p className="text-xs text-muted-foreground">
+                معدل التحصيل {summary.collectionRate.toFixed(1)}%
+              </p>
               <Progress value={summary.collectionRate} className="mt-2" />
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">المبلغ المتأخر</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                المبلغ المتأخر
+              </CardTitle>
               <AlertTriangle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{summary.totalOverdue.toLocaleString()} ر.س</div>
-              <p className="text-xs text-muted-foreground">{summary.overduePayments} دفعة متأخرة</p>
+              <div className="text-2xl font-bold text-red-600">
+                {summary.totalOverdue.toLocaleString()} ر.س
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {summary.overduePayments} دفعة متأخرة
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">الدفعات المعلقة</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                الدفعات المعلقة
+              </CardTitle>
               <Clock className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{summary.pendingPayments}</div>
+              <div className="text-2xl font-bold text-yellow-600">
+                {summary.pendingPayments}
+              </div>
               <p className="text-xs text-muted-foreground">مستحقة هذا الشهر</p>
             </CardContent>
           </Card>
@@ -329,7 +368,10 @@ export function RentCollectionService() {
             <Download className="ml-2 h-4 w-4" />
             تصدير
           </Button>
-          <Dialog open={isRecordPaymentOpen} onOpenChange={setIsRecordPaymentOpen}>
+          <Dialog
+            open={isRecordPaymentOpen}
+            onOpenChange={setIsRecordPaymentOpen}
+          >
             <DialogTrigger asChild>
               <Button>
                 <Plus className="ml-2 h-4 w-4" />
@@ -339,7 +381,9 @@ export function RentCollectionService() {
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>تسجيل دفعة إيجار</DialogTitle>
-                <DialogDescription>تسجيل دفعة إيجار جديدة من مستأجر</DialogDescription>
+                <DialogDescription>
+                  تسجيل دفعة إيجار جديدة من مستأجر
+                </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="space-y-2">
@@ -349,10 +393,18 @@ export function RentCollectionService() {
                       <SelectValue placeholder="اختر المستأجر" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">أحمد الراشد - الوحدة أ-204</SelectItem>
-                      <SelectItem value="2">محمد العتيبي - الوحدة ب-105</SelectItem>
-                      <SelectItem value="3">سارة المنصوري - الوحدة ج-301</SelectItem>
-                      <SelectItem value="4">خالد الحربي - الوحدة د-102</SelectItem>
+                      <SelectItem value="1">
+                        أحمد الراشد - الوحدة أ-204
+                      </SelectItem>
+                      <SelectItem value="2">
+                        محمد العتيبي - الوحدة ب-105
+                      </SelectItem>
+                      <SelectItem value="3">
+                        سارة المنصوري - الوحدة ج-301
+                      </SelectItem>
+                      <SelectItem value="4">
+                        خالد الحربي - الوحدة د-102
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -388,10 +440,15 @@ export function RentCollectionService() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsRecordPaymentOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsRecordPaymentOpen(false)}
+                >
                   إلغاء
                 </Button>
-                <Button onClick={() => setIsRecordPaymentOpen(false)}>تسجيل الدفعة</Button>
+                <Button onClick={() => setIsRecordPaymentOpen(false)}>
+                  تسجيل الدفعة
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -432,7 +489,10 @@ export function RentCollectionService() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4 space-x-reverse">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={payment.tenantAvatar || "/placeholder.svg"} alt={payment.tenantNameAr} />
+                    <AvatarImage
+                      src={payment.tenantAvatar || "/placeholder.svg"}
+                      alt={payment.tenantNameAr}
+                    />
                     <AvatarFallback>
                       {payment.tenantNameAr
                         .split(" ")
@@ -453,18 +513,30 @@ export function RentCollectionService() {
                         {payment.propertyAr} - الوحدة {payment.unit}
                       </span>
                       <span>مستحق: {payment.dueDateHijri}</span>
-                      {payment.paidDateHijri && <span>دُفع: {payment.paidDateHijri}</span>}
+                      {payment.paidDateHijri && (
+                        <span>دُفع: {payment.paidDateHijri}</span>
+                      )}
                     </div>
-                    {payment.notesAr && <p className="text-sm text-muted-foreground">{payment.notesAr}</p>}
+                    {payment.notesAr && (
+                      <p className="text-sm text-muted-foreground">
+                        {payment.notesAr}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="text-left">
                   <div className="text-2xl font-bold">
                     {payment.amount.toLocaleString()} ر.س
-                    {payment.lateFee && <span className="text-sm text-red-600 mr-2">+{payment.lateFee} ر.س غرامة</span>}
+                    {payment.lateFee && (
+                      <span className="text-sm text-red-600 mr-2">
+                        +{payment.lateFee} ر.س غرامة
+                      </span>
+                    )}
                   </div>
                   {payment.paymentMethodAr && (
-                    <p className="text-sm text-muted-foreground">{payment.paymentMethodAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {payment.paymentMethodAr}
+                    </p>
                   )}
                   <div className="flex gap-2 mt-2">
                     {payment.status === "overdue" && (
@@ -503,5 +575,5 @@ export function RentCollectionService() {
         </div>
       )}
     </div>
-  )
+  );
 }

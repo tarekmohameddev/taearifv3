@@ -13,7 +13,6 @@ export default async function handler(req, res) {
 
     const { tenantId, pages, globalComponentsData } = req.body || {};
 
-
     if (!tenantId || typeof tenantId !== "string") {
       return res.status(400).json({ message: "tenantId is required" });
     }
@@ -94,7 +93,6 @@ export default async function handler(req, res) {
         unsetOps[`componentSettings.${pageName}`] = "";
       }
     });
-
 
     // Update existing tenant by username (tenantId corresponds to username)
     const updateOperation = {

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 export default function SolutionsStyles() {
   return (
@@ -30,7 +30,7 @@ export default function SolutionsStyles() {
       body {
         background-color: hsl(var(--background));
         color: hsl(var(--foreground));
-        font-family: 'Tajawal', sans-serif;
+        font-family: "Tajawal", sans-serif;
       }
 
       /* Animation Classes */
@@ -98,7 +98,7 @@ export default function SolutionsStyles() {
       }
 
       .btn-outline {
-        border: 2px solid #E5E7EB;
+        border: 2px solid #e5e7eb;
         background-color: transparent;
         color: #000000;
         padding: 0.75rem 1.5rem;
@@ -128,7 +128,7 @@ export default function SolutionsStyles() {
       /* Solution cards hover effect */
       .solution-card {
         transition: all 300ms ease;
-        border: 1px solid #E5E7EB;
+        border: 1px solid #e5e7eb;
         background: white;
       }
 

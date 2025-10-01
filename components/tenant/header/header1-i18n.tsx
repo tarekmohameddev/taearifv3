@@ -26,7 +26,7 @@ export default function Header1I18n({
   logo = "/placeholder-logo.png",
   logoText = {
     ar: "شركة العقارات",
-    en: "Real Estate Company"
+    en: "Real Estate Company",
   },
   navigation = [
     { label: { ar: "الرئيسية", en: "Home" }, href: "/" },
@@ -36,7 +36,7 @@ export default function Header1I18n({
   ],
   contactInfo = {
     phone: "+966 50 123 4567",
-    email: "info@company.com"
+    email: "info@company.com",
   },
   className = "",
 }: Header1I18nProps) {
@@ -72,8 +72,8 @@ export default function Header1I18n({
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <img 
-              src={logo} 
+            <img
+              src={logo}
               alt={getTranslatedText(logoText)}
               className="h-12 w-12 object-contain"
             />
@@ -136,7 +136,10 @@ export default function Header1I18n({
                 <Button variant="outline" size="sm" className="w-full">
                   {t("navigation.login")}
                 </Button>
-                <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700">
+                <Button
+                  size="sm"
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
                   {t("navigation.register")}
                 </Button>
               </div>

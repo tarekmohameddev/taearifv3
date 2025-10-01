@@ -112,7 +112,9 @@ export function SettingsPage() {
   const [subscriptionPlans, setSubscriptionPlans] = useState<any>({});
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
   const [allFeatures, setAllFeatures] = useState<string[]>([]);
-  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
+    "monthly",
+  );
   const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [selectedMonths, setSelectedMonths] = useState([1]);
@@ -128,11 +130,13 @@ export function SettingsPage() {
         const featuresSet = new Set();
         const allPlans = [
           ...(response.data.plans.plans_monthly || []),
-          ...(response.data.plans.plans_yearly || [])
+          ...(response.data.plans.plans_yearly || []),
         ];
         allPlans.forEach((plan: any) => {
-          if (plan.features && typeof plan.features === 'object') {
-            Object.values(plan.features).flat().forEach((feature: any) => featuresSet.add(feature));
+          if (plan.features && typeof plan.features === "object") {
+            Object.values(plan.features)
+              .flat()
+              .forEach((feature: any) => featuresSet.add(feature));
           }
         });
         setAllFeatures(Array.from(featuresSet) as string[]);
@@ -155,21 +159,23 @@ export function SettingsPage() {
 
   const handleConfirmUpgrade = async () => {
     if (!selectedPlan) return;
-    
+
     setIsProcessingPayment(true);
     try {
       const periods = selectedMonths[0];
       const periodPrice = parseFloat(selectedPlan.price);
       // إذا كانت الخطة سنوية، احسب المبلغ بناءً على السنوات
-      const totalAmount = isYearlyPlan(selectedPlan) ? periodPrice * periods : periodPrice * periods;
-      
+      const totalAmount = isYearlyPlan(selectedPlan)
+        ? periodPrice * periods
+        : periodPrice * periods;
+
       const response = await axiosInstance.post("/make-payment", {
         package_id: selectedPlan.id,
         price: totalAmount,
         period: periods,
         total_amount: totalAmount,
       });
-      
+
       if (response.data.status === "success") {
         setPaymentUrl(response.data.payment_url);
         setIsUpgradeDialogOpen(false);
@@ -346,7 +352,9 @@ export function SettingsPage() {
     const loadingToast = toast.loading("جاري حذف النطاق...");
     try {
       await axiosInstance.delete(`/settings/domain/${deleteDomainId}`);
-      setDomains(domains.filter((domain: any) => domain.id !== deleteDomainId) as any[]);
+      setDomains(
+        domains.filter((domain: any) => domain.id !== deleteDomainId) as any[],
+      );
       toast.dismiss(loadingToast);
       toast.success("تم حذف النطاق بنجاح");
     } catch (error: any) {
@@ -425,8 +433,7 @@ export function SettingsPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader>
-      </DashboardHeader>
+      <DashboardHeader></DashboardHeader>
       <div className="flex flex-1 flex-col md:flex-row">
         <EnhancedSidebar activeTab="settings" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
@@ -764,10 +771,10 @@ export function SettingsPage() {
                         </AccordionTrigger>
                         <AccordionContent>
                           <div className="space-y-4">
-                                                          <p className="text-sm text-muted-foreground">
-                                {dnsInstructions?.description ||
-                                  "لربط نطاقك، ستحتاج إلى تحديث سجلات DNS الخاصة بك لدى مسجل النطاق."}
-                              </p>
+                            <p className="text-sm text-muted-foreground">
+                              {dnsInstructions?.description ||
+                                "لربط نطاقك، ستحتاج إلى تحديث سجلات DNS الخاصة بك لدى مسجل النطاق."}
+                            </p>
                             <div className="rounded-lg border overflow-hidden">
                               <div className="grid grid-cols-12 gap-4 p-3 bg-muted/50 text-sm font-medium">
                                 <div className="col-span-2">النوع</div>
@@ -775,23 +782,27 @@ export function SettingsPage() {
                                 <div className="col-span-5">القيمة</div>
                                 <div className="col-span-2">TTL</div>
                               </div>
-                              {dnsInstructions?.records?.map((record: any, index: any) => (
-                                <div
-                                  key={index}
-                                  className="grid grid-cols-12 gap-4 p-3 border-t"
-                                >
-                                  <div className="col-span-2 font-medium">
-                                    {record.type}
+                              {dnsInstructions?.records?.map(
+                                (record: any, index: any) => (
+                                  <div
+                                    key={index}
+                                    className="grid grid-cols-12 gap-4 p-3 border-t"
+                                  >
+                                    <div className="col-span-2 font-medium">
+                                      {record.type}
+                                    </div>
+                                    <div className="col-span-3">
+                                      {record.name}
+                                    </div>
+                                    <div className="col-span-5 font-mono text-sm">
+                                      {record.value}
+                                    </div>
+                                    <div className="col-span-2">
+                                      {record.ttl}
+                                    </div>
                                   </div>
-                                  <div className="col-span-3">
-                                    {record.name}
-                                  </div>
-                                  <div className="col-span-5 font-mono text-sm">
-                                    {record.value}
-                                  </div>
-                                  <div className="col-span-2">{record.ttl}</div>
-                                </div>
-                              ))}
+                                ),
+                              )}
                             </div>
                             <div className="flex items-center p-3 rounded-lg bg-gray-100 text-gray-800">
                               <AlertCircle className="h-5 w-5 ml-2 flex-shrink-0" />
@@ -808,7 +819,11 @@ export function SettingsPage() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="subscription" className="space-y-4 pt-4" dir="rtl">
+              <TabsContent
+                value="subscription"
+                className="space-y-4 pt-4"
+                dir="rtl"
+              >
                 <div className="flex flex-col items-center gap-6 mb-6">
                   <div className="text-center">
                     <h2 className="text-xl font-semibold">إدارة الاشتراك</h2>
@@ -816,7 +831,7 @@ export function SettingsPage() {
                       عرض وتحديث خطة الاشتراك الخاصة بك
                     </p>
                   </div>
-                  
+
                   {/* Toggle مذهل للتبديل بين الخطط الشهرية والسنوية */}
                   <div className="flex flex-col items-center gap-3">
                     <div className="relative">
@@ -837,7 +852,7 @@ export function SettingsPage() {
                             <span>شهريًا</span>
                           </div>
                         </button>
-                        
+
                         <button
                           onClick={() => setBillingPeriod("yearly")}
                           className={`relative px-6 py-3 rounded-xl font-medium text-sm transition-all duration-300 ease-in-out ${
@@ -856,180 +871,200 @@ export function SettingsPage() {
                         </button>
                       </div>
                     </div>
-                    
-                    {billingPeriod === "yearly" && subscriptionPlans.plans_monthly && subscriptionPlans.plans_yearly && (
-                      <div className="flex items-center gap-2 text-sm text-gray-700 font-medium bg-gray-100 px-3 py-2 rounded-lg border border-gray-300">
-                        <Sparkles className="h-4 w-4" />
-                        <span>
-                          وفر {calculateSavings(
-                            subscriptionPlans.plans_monthly[0]?.price || "0",
-                            subscriptionPlans.plans_yearly[0]?.price || "0"
-                          ).savings.toFixed(0)} ريال سنويًا
-                        </span>
-                      </div>
-                    )}
+
+                    {billingPeriod === "yearly" &&
+                      subscriptionPlans.plans_monthly &&
+                      subscriptionPlans.plans_yearly && (
+                        <div className="flex items-center gap-2 text-sm text-gray-700 font-medium bg-gray-100 px-3 py-2 rounded-lg border border-gray-300">
+                          <Sparkles className="h-4 w-4" />
+                          <span>
+                            وفر{" "}
+                            {calculateSavings(
+                              subscriptionPlans.plans_monthly[0]?.price || "0",
+                              subscriptionPlans.plans_yearly[0]?.price || "0",
+                            ).savings.toFixed(0)}{" "}
+                            ريال سنويًا
+                          </span>
+                        </div>
+                      )}
                   </div>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-3">
-                  {isLoadingPlans
-                    ? [1, 2, 3, 4].map((i) => (
-                        <Card key={i}>
-                          <CardHeader>
-                            <Skeleton className="h-6 w-3/4" />
-                            <Skeleton className="h-4 w-1/2" />
-                          </CardHeader>
-                          <CardContent>
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-full mt-2" />
-                            <Skeleton className="h-4 w-full mt-2" />
-                          </CardContent>
-                          <CardFooter>
-                            <Skeleton className="h-10 w-full" />
-                          </CardFooter>
-                        </Card>
-                      ))
-                    : !getCurrentPlans() || getCurrentPlans().length === 0
-                    ? (
-                        <div className="col-span-3 flex flex-col items-center justify-center p-8 text-center">
-                          <div className="rounded-full bg-muted p-3 mb-4">
-                            <CreditCardIcon className="h-6 w-6 text-muted-foreground" />
-                          </div>
-                          <h3 className="text-lg font-medium mb-1">
-                            لا توجد خطط اشتراك متاحة
-                          </h3>
-                          <p className="text-muted-foreground mb-4">
-                            لم يتم العثور على خطط الاشتراك أو حدث خطأ في التحميل
-                          </p>
-                          <Button
-                            variant="outline"
-                            onClick={() => window.location.reload()}
-                          >
-                            <RefreshCw className="h-4 w-4 ml-1" />
-                            إعادة المحاولة
-                          </Button>
-                        </div>
-                      )
-                    : getCurrentPlans().map((plan: any) => {
-                        const isCurrentPlan = plan.cta !== "الترقية";
-                        const features = plan.features && typeof plan.features === 'object' 
-                          ? Object.values(plan.features).flat() 
+                  {isLoadingPlans ? (
+                    [1, 2, 3, 4].map((i) => (
+                      <Card key={i}>
+                        <CardHeader>
+                          <Skeleton className="h-6 w-3/4" />
+                          <Skeleton className="h-4 w-1/2" />
+                        </CardHeader>
+                        <CardContent>
+                          <Skeleton className="h-4 w-full" />
+                          <Skeleton className="h-4 w-full mt-2" />
+                          <Skeleton className="h-4 w-full mt-2" />
+                        </CardContent>
+                        <CardFooter>
+                          <Skeleton className="h-10 w-full" />
+                        </CardFooter>
+                      </Card>
+                    ))
+                  ) : !getCurrentPlans() || getCurrentPlans().length === 0 ? (
+                    <div className="col-span-3 flex flex-col items-center justify-center p-8 text-center">
+                      <div className="rounded-full bg-muted p-3 mb-4">
+                        <CreditCardIcon className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <h3 className="text-lg font-medium mb-1">
+                        لا توجد خطط اشتراك متاحة
+                      </h3>
+                      <p className="text-muted-foreground mb-4">
+                        لم يتم العثور على خطط الاشتراك أو حدث خطأ في التحميل
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={() => window.location.reload()}
+                      >
+                        <RefreshCw className="h-4 w-4 ml-1" />
+                        إعادة المحاولة
+                      </Button>
+                    </div>
+                  ) : (
+                    getCurrentPlans().map((plan: any) => {
+                      const isCurrentPlan = plan.cta !== "الترقية";
+                      const features =
+                        plan.features && typeof plan.features === "object"
+                          ? Object.values(plan.features).flat()
                           : [];
-                        
-                        return (
-                          <Card
-                            key={plan.id}
-                            className={`relative flex flex-col transition-all duration-300 hover:shadow-lg ${
-                              isCurrentPlan ? "border-primary border-2 shadow-lg" : ""
-                            } ${
-                              billingPeriod === "yearly" ? "ring-2 ring-green-100" : ""
-                            }`}
-                          >
-                            {billingPeriod === "yearly" && (
-                              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                <div className="bg-gray-800 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg">
-                                  <div className="flex items-center gap-1">
-                                    <Star className="h-3 w-3" />
-                                    <span>الأكثر توفيرًا</span>
-                                  </div>
+
+                      return (
+                        <Card
+                          key={plan.id}
+                          className={`relative flex flex-col transition-all duration-300 hover:shadow-lg ${
+                            isCurrentPlan
+                              ? "border-primary border-2 shadow-lg"
+                              : ""
+                          } ${
+                            billingPeriod === "yearly"
+                              ? "ring-2 ring-green-100"
+                              : ""
+                          }`}
+                        >
+                          {billingPeriod === "yearly" && (
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                              <div className="bg-gray-800 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg">
+                                <div className="flex items-center gap-1">
+                                  <Star className="h-3 w-3" />
+                                  <span>الأكثر توفيرًا</span>
                                 </div>
                               </div>
-                            )}
-                            
-                            <CardHeader className="pb-4">
-                              <CardTitle className="flex items-center justify-between">
-                                <span>{plan.name}</span>
-                                {billingPeriod === "yearly" && (
-                                  <Badge className="bg-gray-100 text-gray-800 border-gray-300">
-                                    <Percent className="h-3 w-3 ml-1" />
-                                    توفير
-                                  </Badge>
-                                )}
-                              </CardTitle>
-                              <CardDescription className="flex items-end gap-1 mt-2">
-                                <div className="flex items-center gap-1">
-                                  <img
-                                    src="/Saudi_Riyal_Symbol.svg"
-                                    alt="ريال سعودي"
-                                    className="w-5 h-5 filter brightness-0 contrast-100"
-                                  />
-                                  <span className="text-2xl font-bold text-foreground">
-                                    {plan.price}
-                                  </span>
-                                </div>
-                                <span className="text-muted-foreground">
-                                  / {plan.billing}
+                            </div>
+                          )}
+
+                          <CardHeader className="pb-4">
+                            <CardTitle className="flex items-center justify-between">
+                              <span>{plan.name}</span>
+                              {billingPeriod === "yearly" && (
+                                <Badge className="bg-gray-100 text-gray-800 border-gray-300">
+                                  <Percent className="h-3 w-3 ml-1" />
+                                  توفير
+                                </Badge>
+                              )}
+                            </CardTitle>
+                            <CardDescription className="flex items-end gap-1 mt-2">
+                              <div className="flex items-center gap-1">
+                                <img
+                                  src="/Saudi_Riyal_Symbol.svg"
+                                  alt="ريال سعودي"
+                                  className="w-5 h-5 filter brightness-0 contrast-100"
+                                />
+                                <span className="text-2xl font-bold text-foreground">
+                                  {plan.price}
                                 </span>
-                              </CardDescription>
-                              
-                              {billingPeriod === "yearly" && subscriptionPlans.plans_monthly && (
+                              </div>
+                              <span className="text-muted-foreground">
+                                / {plan.billing}
+                              </span>
+                            </CardDescription>
+
+                            {billingPeriod === "yearly" &&
+                              subscriptionPlans.plans_monthly && (
                                 <div className="text-sm text-muted-foreground mt-1">
                                   <span className="line-through">
-                                    {subscriptionPlans.plans_monthly[0]?.price} شهريًا
+                                    {subscriptionPlans.plans_monthly[0]?.price}{" "}
+                                    شهريًا
                                   </span>
                                   <span className="text-gray-700 font-medium mr-2">
-                                    وفر {calculateSavings(
-                                      subscriptionPlans.plans_monthly[0]?.price || "0",
-                                      plan.price
-                                    ).savingsPercentage}%
+                                    وفر{" "}
+                                    {
+                                      calculateSavings(
+                                        subscriptionPlans.plans_monthly[0]
+                                          ?.price || "0",
+                                        plan.price,
+                                      ).savingsPercentage
+                                    }
+                                    %
                                   </span>
                                 </div>
                               )}
-                            </CardHeader>
+                          </CardHeader>
 
-                            <CardContent className="pb-4 flex-1">
-                              <ul className="space-y-2">
-                                {features.map((feature: any, index: any) => (
-                                  <li
-                                    key={index}
-                                    className="flex items-center gap-2"
-                                  >
-                                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
-                                      <Check className="h-3 w-3 text-gray-700" />
-                                    </div>
-                                    <span className="text-xs sm:text-sm text-gray-700">{feature}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </CardContent>
+                          <CardContent className="pb-4 flex-1">
+                            <ul className="space-y-2">
+                              {features.map((feature: any, index: any) => (
+                                <li
+                                  key={index}
+                                  className="flex items-center gap-2"
+                                >
+                                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <Check className="h-3 w-3 text-gray-700" />
+                                  </div>
+                                  <span className="text-xs sm:text-sm text-gray-700">
+                                    {feature}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </CardContent>
 
-                            <CardFooter className="mt-auto">
-                              {isCurrentPlan ? (
-                                <Button
-                                  variant="outline"
-                                  className="w-full"
-                                  disabled
-                                >
-                                  <Check className="h-4 w-4 ml-1" />
-                                  {plan.cta || "الخطة الحالية"}
-                                </Button>
-                              ) : (
-                                <Button
-                                  variant="default"
-                                  className="w-full transition-all duration-300 bg-gray-800 hover:bg-gray-700 text-white"
-                                  onClick={() => handleUpgradeClick(plan)}
-                                >
-                                  {billingPeriod === "yearly" ? (
-                                    <>
-                                      <Sparkles className="h-4 w-4 ml-1" />
-                                      {plan.cta || "الترقية السنوية"}
-                                    </>
-                                  ) : (
-                                    plan.cta || "الترقية"
-                                  )}
-                                </Button>
-                              )}
-                            </CardFooter>
-                          </Card>
-                        );
-                      })}
+                          <CardFooter className="mt-auto">
+                            {isCurrentPlan ? (
+                              <Button
+                                variant="outline"
+                                className="w-full"
+                                disabled
+                              >
+                                <Check className="h-4 w-4 ml-1" />
+                                {plan.cta || "الخطة الحالية"}
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="default"
+                                className="w-full transition-all duration-300 bg-gray-800 hover:bg-gray-700 text-white"
+                                onClick={() => handleUpgradeClick(plan)}
+                              >
+                                {billingPeriod === "yearly" ? (
+                                  <>
+                                    <Sparkles className="h-4 w-4 ml-1" />
+                                    {plan.cta || "الترقية السنوية"}
+                                  </>
+                                ) : (
+                                  plan.cta || "الترقية"
+                                )}
+                              </Button>
+                            )}
+                          </CardFooter>
+                        </Card>
+                      );
+                    })
+                  )}
                 </div>
               </TabsContent>
 
               <TabsContent value="themes" className="space-y-4 pt-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-4">
                   <div>
-                    <h2 className="text-xl font-semibold text-right">ثيمات الموقع</h2>
+                    <h2 className="text-xl font-semibold text-right">
+                      ثيمات الموقع
+                    </h2>
                     <p className="text-muted-foreground  text-right">
                       اختر وتخصيص ثيم موقعك
                     </p>
@@ -1037,112 +1072,110 @@ export function SettingsPage() {
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {isLoadingThemes
-                    ? [1, 2, 3, 4].map((i) => (
-                        <Card key={i} className="overflow-hidden">
-                          <Skeleton className="aspect-video w-full rounded-none" />
-                          <CardHeader className="pb-2">
-                            <div className="space-y-2">
-                              <Skeleton className="h-6 w-3/4" />
-                              <Skeleton className="h-4 w-full" />
-                              <Skeleton className="h-4 w-1/2" />
-                            </div>
-                          </CardHeader>
-                          <CardContent className="pb-2">
-                            <Skeleton className="h-6 w-24" />
-                          </CardContent>
-                          <CardFooter>
-                            <Skeleton className="h-9 w-full" />
-                          </CardFooter>
-                        </Card>
-                      ))
-                    : !themes || themes.length === 0
-                    ? (
-                        <div className="col-span-3 flex flex-col items-center justify-center p-8 text-center">
-                          <div className="rounded-full bg-muted p-3 mb-4">
-                            <Palette className="h-6 w-6 text-muted-foreground" />
+                  {isLoadingThemes ? (
+                    [1, 2, 3, 4].map((i) => (
+                      <Card key={i} className="overflow-hidden">
+                        <Skeleton className="aspect-video w-full rounded-none" />
+                        <CardHeader className="pb-2">
+                          <div className="space-y-2">
+                            <Skeleton className="h-6 w-3/4" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-1/2" />
                           </div>
-                          <h3 className="text-lg font-medium mb-1">
-                            لا توجد ثيمات متاحة
-                          </h3>
-                          <p className="text-muted-foreground mb-4">
-                            لم يتم العثور على الثيمات أو حدث خطأ في التحميل
-                          </p>
-                          <Button
-                            variant="outline"
-                            onClick={() => window.location.reload()}
-                          >
-                            <RefreshCw className="h-4 w-4 ml-1" />
-                            إعادة المحاولة
-                          </Button>
+                        </CardHeader>
+                        <CardContent className="pb-2">
+                          <Skeleton className="h-6 w-24" />
+                        </CardContent>
+                        <CardFooter>
+                          <Skeleton className="h-9 w-full" />
+                        </CardFooter>
+                      </Card>
+                    ))
+                  ) : !themes || themes.length === 0 ? (
+                    <div className="col-span-3 flex flex-col items-center justify-center p-8 text-center">
+                      <div className="rounded-full bg-muted p-3 mb-4">
+                        <Palette className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <h3 className="text-lg font-medium mb-1">
+                        لا توجد ثيمات متاحة
+                      </h3>
+                      <p className="text-muted-foreground mb-4">
+                        لم يتم العثور على الثيمات أو حدث خطأ في التحميل
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={() => window.location.reload()}
+                      >
+                        <RefreshCw className="h-4 w-4 ml-1" />
+                        إعادة المحاولة
+                      </Button>
+                    </div>
+                  ) : (
+                    themes.map((theme: any) => (
+                      <Card
+                        key={theme.id}
+                        className={`overflow-hidden ${theme.active ? "border-primary border-2" : ""}`}
+                      >
+                        <div className="aspect-video w-full overflow-hidden">
+                          <img
+                            src={theme.thumbnail || "/placeholder.svg"}
+                            alt={theme.name}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                      )
-                    : themes.map((theme: any) => (
-                        <Card
-                          key={theme.id}
-                          className={`overflow-hidden ${theme.active ? "border-primary border-2" : ""}`}
-                        >
-                          <div className="aspect-video w-full overflow-hidden">
-                            <img
-                              src={theme.thumbnail || "/placeholder.svg"}
-                              alt={theme.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <CardHeader className="pb-2">
-                            <div className="flex items-center justify-between">
-                              <CardTitle className="text-lg">
-                                {theme.name}
-                              </CardTitle>
-                              {theme.popular && (
-                                <Badge
-                                  variant="secondary"
-                                  className="bg-gray-100 text-gray-800"
-                                >
-                                  <Star className="h-3 w-3 ml-1" />
-                                  شائع
-                                </Badge>
-                              )}
-                            </div>
-                            <CardDescription>
-                              {theme.description}
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent className="pb-2">
-                            <Badge
-                              variant="outline"
-                              className="bg-gray-100 text-gray-700 border-gray-300"
-                            >
-                              {theme.category === "business" && "أعمال"}
-                              {theme.category === "portfolio" && "معرض أعمال"}
-                              {theme.category === "restaurant" && "مطاعم"}
-                              {theme.category === "ecommerce" &&
-                                "متاجر إلكترونية"}
-                            </Badge>
-                          </CardContent>
-                          <CardFooter>
-                            {theme.active ? (
-                              <Button
-                                variant="outline"
-                                className="w-full"
-                                disabled
+                        <CardHeader className="pb-2">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-lg">
+                              {theme.name}
+                            </CardTitle>
+                            {theme.popular && (
+                              <Badge
+                                variant="secondary"
+                                className="bg-gray-100 text-gray-800"
                               >
-                                <Check className="h-4 w-4 ml-1" />
-                                الثيم النشطة
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="default"
-                                className="w-full"
-                                onClick={() => handleActivateTheme(theme.id)}
-                              >
-                                <Sparkles className="h-4 w-4 ml-1" />
-                                تنشيط الثيم
-                              </Button>
+                                <Star className="h-3 w-3 ml-1" />
+                                شائع
+                              </Badge>
                             )}
-                          </CardFooter>
-                        </Card>
-                      ))}
+                          </div>
+                          <CardDescription>{theme.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="pb-2">
+                          <Badge
+                            variant="outline"
+                            className="bg-gray-100 text-gray-700 border-gray-300"
+                          >
+                            {theme.category === "business" && "أعمال"}
+                            {theme.category === "portfolio" && "معرض أعمال"}
+                            {theme.category === "restaurant" && "مطاعم"}
+                            {theme.category === "ecommerce" &&
+                              "متاجر إلكترونية"}
+                          </Badge>
+                        </CardContent>
+                        <CardFooter>
+                          {theme.active ? (
+                            <Button
+                              variant="outline"
+                              className="w-full"
+                              disabled
+                            >
+                              <Check className="h-4 w-4 ml-1" />
+                              الثيم النشطة
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="default"
+                              className="w-full"
+                              onClick={() => handleActivateTheme(theme.id)}
+                            >
+                              <Sparkles className="h-4 w-4 ml-1" />
+                              تنشيط الثيم
+                            </Button>
+                          )}
+                        </CardFooter>
+                      </Card>
+                    ))
+                  )}
                 </div>
               </TabsContent>
             </Tabs>
@@ -1180,25 +1213,34 @@ export function SettingsPage() {
 
       {/* Dialog مذهل للترقية */}
       <Dialog open={isUpgradeDialogOpen} onOpenChange={setIsUpgradeDialogOpen}>
-        <DialogContent className="w-[95vw] max-w-2xl h-[90vh] max-h-[800px] p-0 overflow-hidden overflow-x-hidden flex flex-col" dir="rtl">
-          <div className="relative flex flex-col h-full"  dir="rtl">
+        <DialogContent
+          className="w-[95vw] max-w-2xl h-[90vh] max-h-[800px] p-0 overflow-hidden overflow-x-hidden flex flex-col"
+          dir="rtl"
+        >
+          <div className="relative flex flex-col h-full" dir="rtl">
             {/* خلفية أبيض وأسود مذهلة */}
             <div className="absolute inset-0 bg-white"></div>
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gray-800 via-black to-gray-800"></div>
-            
+
             {/* تأثيرات بصرية */}
             <div className="absolute -top-10 -left-10 w-20 h-20 bg-gray-300 rounded-full opacity-20 animate-pulse"></div>
             <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gray-400 rounded-full opacity-20 animate-pulse delay-1000"></div>
-            
-            <div className="relative p-4 md:p-8 flex-1 overflow-y-auto overflow-x-hidden"  dir="rtl">
-              <DialogHeader className="text-center mb-3 sm:mb-4 md:mb-6 lg:mb-8" dir="rtl">
+
+            <div
+              className="relative p-4 md:p-8 flex-1 overflow-y-auto overflow-x-hidden"
+              dir="rtl"
+            >
+              <DialogHeader
+                className="text-center mb-3 sm:mb-4 md:mb-6 lg:mb-8"
+                dir="rtl"
+              >
                 <div className="relative mb-6">
                   <div className="absolute inset-0 bg-gray-200 rounded-full opacity-30 scale-150 animate-pulse"></div>
                   <div className="relative w-20 h-20 mx-auto rounded-full bg-gray-800 flex items-center justify-center shadow-2xl">
                     <Sparkles className="w-10 h-10 text-white" />
                   </div>
                 </div>
-                
+
                 <DialogTitle className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 text-right mb-2">
                   ترقية خطة الاشتراك
                 </DialogTitle>
@@ -1208,11 +1250,19 @@ export function SettingsPage() {
               </DialogHeader>
 
               {selectedPlan && (
-                <div className="space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8"  dir="rtl">
+                <div
+                  className="space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8"
+                  dir="rtl"
+                >
                   {/* معلومات الخطة */}
-                  <div className="bg-white rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 border border-gray-300 shadow-xl" dir="rtl">
+                  <div
+                    className="bg-white rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 border border-gray-300 shadow-xl"
+                    dir="rtl"
+                  >
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
-                      <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">{selectedPlan.name}</h3>
+                      <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">
+                        {selectedPlan.name}
+                      </h3>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-500">
                           {isYearlyPlan(selectedPlan) ? "سنة /" : "شهر /"}
@@ -1227,35 +1277,47 @@ export function SettingsPage() {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
-                      {selectedPlan.features && typeof selectedPlan.features === 'object' && 
-                        Object.values(selectedPlan.features).flat().slice(0, 4).map((feature: any, index: any) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <span className="text-xs sm:text-sm text-gray-700">{feature}</span>
-                            <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
-                              <Check className="w-3 h-3 text-gray-700" />
+                      {selectedPlan.features &&
+                        typeof selectedPlan.features === "object" &&
+                        Object.values(selectedPlan.features)
+                          .flat()
+                          .slice(0, 4)
+                          .map((feature: any, index: any) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2"
+                            >
+                              <span className="text-xs sm:text-sm text-gray-700">
+                                {feature}
+                              </span>
+                              <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
+                                <Check className="w-3 h-3 text-gray-700" />
+                              </div>
                             </div>
-                          </div>
-                        ))
-                      }
+                          ))}
                     </div>
                   </div>
 
                   {/* شريط تحديد المدة */}
-                  <div className="bg-white rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 border border-gray-300 shadow-xl" dir="rtl">
+                  <div
+                    className="bg-white rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 border border-gray-300 shadow-xl"
+                    dir="rtl"
+                  >
                     <div className="mb-3 sm:mb-4 md:mb-5 lg:mb-6">
                       <h4 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-2">
-                        {isYearlyPlan(selectedPlan) ? "مدة الاشتراك السنوي" : "مدة الاشتراك الشهري"}
+                        {isYearlyPlan(selectedPlan)
+                          ? "مدة الاشتراك السنوي"
+                          : "مدة الاشتراك الشهري"}
                       </h4>
                       <p className="text-gray-600 text-xs sm:text-sm">
-                        {isYearlyPlan(selectedPlan) 
-                          ? "اختر عدد السنوات التي تريد الاشتراك بها" 
-                          : "اختر عدد الشهور التي تريد الاشتراك بها"
-                        }
+                        {isYearlyPlan(selectedPlan)
+                          ? "اختر عدد السنوات التي تريد الاشتراك بها"
+                          : "اختر عدد الشهور التي تريد الاشتراك بها"}
                       </p>
                     </div>
-                    
+
                     <div className="space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6">
                       <div className="px-4">
                         <Slider
@@ -1267,7 +1329,7 @@ export function SettingsPage() {
                           className="w-full"
                         />
                       </div>
-                      
+
                       <div className="flex justify-between items-center">
                         <div className="text-xs sm:text-sm text-gray-500">
                           {isYearlyPlan(selectedPlan) ? "سنة 5" : "شهر 24"}
@@ -1277,10 +1339,13 @@ export function SettingsPage() {
                             {selectedMonths[0]}
                           </div>
                           <div className="text-xs sm:text-sm text-gray-500">
-                            {isYearlyPlan(selectedPlan) 
-                              ? (selectedMonths[0] === 1 ? "سنة" : "سنة")
-                              : (selectedMonths[0] === 1 ? "شهر" : "شهر")
-                            }
+                            {isYearlyPlan(selectedPlan)
+                              ? selectedMonths[0] === 1
+                                ? "سنة"
+                                : "سنة"
+                              : selectedMonths[0] === 1
+                                ? "شهر"
+                                : "شهر"}
                           </div>
                         </div>
                         <div className="text-xs sm:text-sm text-gray-500">
@@ -1291,33 +1356,46 @@ export function SettingsPage() {
                   </div>
 
                   {/* ملخص السعر */}
-                  <div className="bg-gray-800 rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 text-white shadow-2xl" dir="rtl">
+                  <div
+                    className="bg-gray-800 rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 text-white shadow-2xl"
+                    dir="rtl"
+                  >
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-sm sm:text-base md:text-lg font-semibold">المبلغ الإجمالي</h4>
+                      <h4 className="text-sm sm:text-base md:text-lg font-semibold">
+                        المبلغ الإجمالي
+                      </h4>
                       <div className="text-left">
                         <div className="text-xl sm:text-2xl md:text-3xl font-bold">
-                          {(parseFloat(selectedPlan.price) * selectedMonths[0]).toFixed(2)}
+                          {(
+                            parseFloat(selectedPlan.price) * selectedMonths[0]
+                          ).toFixed(2)}
                         </div>
-                        <div className="text-gray-300 text-xs sm:text-sm">ريال سعودي</div>
+                        <div className="text-gray-300 text-xs sm:text-sm">
+                          ريال سعودي
+                        </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between text-gray-300">
                       <span className="text-xs sm:text-sm">
-                        {selectedMonths[0] === 1 ? "دفعة واحدة" : `${selectedMonths[0]} دفعة`}
+                        {selectedMonths[0] === 1
+                          ? "دفعة واحدة"
+                          : `${selectedMonths[0]} دفعة`}
                       </span>
                       <span>
-                        {isYearlyPlan(selectedPlan) 
+                        {isYearlyPlan(selectedPlan)
                           ? `سنة ${selectedMonths[0]} × ${selectedPlan.price}`
-                          : `شهر ${selectedMonths[0]} × ${selectedPlan.price}`
-                        }
+                          : `شهر ${selectedMonths[0]} × ${selectedPlan.price}`}
                       </span>
                     </div>
                   </div>
                 </div>
               )}
 
-              <DialogFooter className="mt-3 sm:mt-4 md:mt-6 lg:mt-8 flex flex-col md:flex-row gap-3 sm:gap-4 flex-shrink-0" dir="rtl">
+              <DialogFooter
+                className="mt-3 sm:mt-4 md:mt-6 lg:mt-8 flex flex-col md:flex-row gap-3 sm:gap-4 flex-shrink-0"
+                dir="rtl"
+              >
                 <Button
                   variant="outline"
                   onClick={() => setIsUpgradeDialogOpen(false)}
@@ -1371,4 +1449,3 @@ function SearchIcon(props: any) {
     </svg>
   );
 }
-

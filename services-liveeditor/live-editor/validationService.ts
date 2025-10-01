@@ -141,7 +141,9 @@ export const validateLayout = (layout: any): ValidationError[] => {
 // دالة التحقق من صحة نوع المكون
 export const isValidComponentType = (type: string): boolean => {
   // استخدام القائمة المركزية للمكونات
-  const { isValidComponentType: isValidFromComponentsList } = require("@/lib-liveeditor/ComponentsList");
+  const {
+    isValidComponentType: isValidFromComponentsList,
+  } = require("@/lib-liveeditor/ComponentsList");
   return isValidFromComponentsList(type);
 };
 

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Plus,
   Phone,
@@ -14,10 +14,16 @@ import {
   Users,
   Calendar,
   Activity,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -25,31 +31,31 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { WhatsappIcon } from "@/components/icons"
-import useStore from "@/context/Store"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { WhatsappIcon } from "@/components/icons";
+import useStore from "@/context/Store";
 
 interface WhatsAppNumber {
-  id: number
-  user_id: number
-  name: string
-  description: string
-  type: string
-  number: string
-  business_id: string
-  phone_id: string
-  access_token: string
-  is_verified: boolean
-  is_connected: boolean
-  sent_messages_count: number
-  received_messages_count: number
-  additional_settings: any[]
-  created_at: string
-  updated_at: string
+  id: number;
+  user_id: number;
+  name: string;
+  description: string;
+  type: string;
+  number: string;
+  business_id: string;
+  phone_id: string;
+  access_token: string;
+  is_verified: boolean;
+  is_connected: boolean;
+  sent_messages_count: number;
+  received_messages_count: number;
+  additional_settings: any[];
+  created_at: string;
+  updated_at: string;
 }
 
 export function WhatsAppNumbersManagement() {
@@ -58,25 +64,25 @@ export function WhatsAppNumbersManagement() {
     fetchMarketingChannels,
     addMarketingChannel,
     removeMarketingChannel,
-  } = useStore()
+  } = useStore();
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newNumber, setNewNumber] = useState({
     phoneNumber: "",
     displayName: "",
     description: "",
-  })
-  const [isConnecting, setIsConnecting] = useState(false)
+  });
+  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
     if (!marketingChannels.isInitialized) {
-      fetchMarketingChannels()
+      fetchMarketingChannels();
     }
-  }, [fetchMarketingChannels, marketingChannels.isInitialized])
+  }, [fetchMarketingChannels, marketingChannels.isInitialized]);
 
   const handleAddNumber = () => {
     // Simulate Meta Cloud API popup
-    setIsConnecting(true)
+    setIsConnecting(true);
 
     // In real implementation, this would open Meta's OAuth popup
     setTimeout(() => {
@@ -97,50 +103,50 @@ export function WhatsAppNumbersManagement() {
         additional_settings: [],
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      }
+      };
 
-      addMarketingChannel(newWhatsAppNumber)
-      setNewNumber({ phoneNumber: "", displayName: "", description: "" })
-      setIsAddDialogOpen(false)
-      setIsConnecting(false)
-    }, 2000)
-  }
+      addMarketingChannel(newWhatsAppNumber);
+      setNewNumber({ phoneNumber: "", displayName: "", description: "" });
+      setIsAddDialogOpen(false);
+      setIsConnecting(false);
+    }, 2000);
+  };
 
   const handleRemoveNumber = (id: number) => {
-    removeMarketingChannel(id)
-  }
+    removeMarketingChannel(id);
+  };
 
   const getStatusColor = (number: WhatsAppNumber) => {
     if (number.is_connected) {
-      return "bg-green-100 text-green-800 border-green-200"
+      return "bg-green-100 text-green-800 border-green-200";
     } else {
-      return "bg-gray-100 text-gray-800 border-gray-200"
+      return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  }
+  };
 
   const getStatusIcon = (number: WhatsAppNumber) => {
     if (number.is_connected) {
-      return <CheckCircle className="h-4 w-4" />
+      return <CheckCircle className="h-4 w-4" />;
     } else {
-      return <XCircle className="h-4 w-4" />
+      return <XCircle className="h-4 w-4" />;
     }
-  }
+  };
 
   const getStatusText = (number: WhatsAppNumber) => {
     if (number.is_connected) {
-      return "متصل"
+      return "متصل";
     } else {
-      return "غير متصل"
+      return "غير متصل";
     }
-  }
+  };
 
   const getVerificationStatus = (number: WhatsAppNumber) => {
     if (number.is_verified) {
-      return "verified"
+      return "verified";
     } else {
-      return "pending"
+      return "pending";
     }
-  }
+  };
 
   if (marketingChannels.loading) {
     return (
@@ -150,7 +156,7 @@ export function WhatsAppNumbersManagement() {
           <span className="ml-2">جاري تحميل قنوات التسويق...</span>
         </div>
       </div>
-    )
+    );
   }
 
   if (marketingChannels.error) {
@@ -161,7 +167,7 @@ export function WhatsAppNumbersManagement() {
           <AlertDescription>{marketingChannels.error}</AlertDescription>
         </Alert>
       </div>
-    )
+    );
   }
 
   return (
@@ -173,7 +179,9 @@ export function WhatsAppNumbersManagement() {
             <WhatsappIcon className="h-5 w-5 ml-2 text-green-600" />
             أرقام الواتساب
           </h2>
-          <p className="text-sm text-muted-foreground">إدارة أرقام الواتساب المتصلة مع Meta Cloud API</p>
+          <p className="text-sm text-muted-foreground">
+            إدارة أرقام الواتساب المتصلة مع Meta Cloud API
+          </p>
         </div>
 
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -186,7 +194,9 @@ export function WhatsAppNumbersManagement() {
           <DialogContent className="sm:max-w-md" dir="rtl">
             <DialogHeader>
               <DialogTitle>إضافة رقم واتساب جديد</DialogTitle>
-              <DialogDescription>سيتم توجيهك إلى Meta Cloud API لربط رقم الواتساب</DialogDescription>
+              <DialogDescription>
+                سيتم توجيهك إلى Meta Cloud API لربط رقم الواتساب
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -195,7 +205,9 @@ export function WhatsAppNumbersManagement() {
                   id="phone"
                   placeholder="+966501234567"
                   value={newNumber.phoneNumber}
-                  onChange={(e) => setNewNumber({ ...newNumber, phoneNumber: e.target.value })}
+                  onChange={(e) =>
+                    setNewNumber({ ...newNumber, phoneNumber: e.target.value })
+                  }
                 />
               </div>
               <div>
@@ -204,7 +216,9 @@ export function WhatsAppNumbersManagement() {
                   id="displayName"
                   placeholder="مثل: الرقم الرئيسي للشركة"
                   value={newNumber.displayName}
-                  onChange={(e) => setNewNumber({ ...newNumber, displayName: e.target.value })}
+                  onChange={(e) =>
+                    setNewNumber({ ...newNumber, displayName: e.target.value })
+                  }
                 />
               </div>
               <div>
@@ -213,19 +227,28 @@ export function WhatsAppNumbersManagement() {
                   id="description"
                   placeholder="وصف مختصر لاستخدام هذا الرقم"
                   value={newNumber.description}
-                  onChange={(e) => setNewNumber({ ...newNumber, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewNumber({ ...newNumber, description: e.target.value })
+                  }
                 />
               </div>
 
               <Alert>
                 <ExternalLink className="h-4 w-4" />
-                <AlertDescription>سيتم فتح نافذة Meta Cloud API لإكمال عملية الربط والتحقق من الرقم</AlertDescription>
+                <AlertDescription>
+                  سيتم فتح نافذة Meta Cloud API لإكمال عملية الربط والتحقق من
+                  الرقم
+                </AlertDescription>
               </Alert>
 
               <div className="flex gap-2 pt-4">
                 <Button
                   onClick={handleAddNumber}
-                  disabled={!newNumber.phoneNumber || !newNumber.displayName || isConnecting}
+                  disabled={
+                    !newNumber.phoneNumber ||
+                    !newNumber.displayName ||
+                    isConnecting
+                  }
                   className="flex-1"
                 >
                   {isConnecting ? (
@@ -240,7 +263,10 @@ export function WhatsAppNumbersManagement() {
                     </>
                   )}
                 </Button>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsAddDialogOpen(false)}
+                >
                   إلغاء
                 </Button>
               </div>
@@ -289,7 +315,9 @@ export function WhatsAppNumbersManagement() {
                       <AlertCircle className="h-3 w-3 text-yellow-600" />
                     )}
                     <span className="text-xs">
-                      {getVerificationStatus(number) === "verified" ? "مُحقق" : "في الانتظار"}
+                      {getVerificationStatus(number) === "verified"
+                        ? "مُحقق"
+                        : "في الانتظار"}
                     </span>
                   </div>
                 </div>
@@ -298,7 +326,9 @@ export function WhatsAppNumbersManagement() {
                   <span className="text-muted-foreground">تاريخ الإضافة:</span>
                   <div className="flex items-center gap-1 mt-1">
                     <Calendar className="h-3 w-3" />
-                    <span className="text-xs">{new Date(number.created_at).toLocaleDateString()}</span>
+                    <span className="text-xs">
+                      {new Date(number.created_at).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -308,17 +338,25 @@ export function WhatsAppNumbersManagement() {
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1 text-blue-600">
                     <MessageSquare className="h-4 w-4" />
-                    <span className="font-semibold">{number.sent_messages_count}</span>
+                    <span className="font-semibold">
+                      {number.sent_messages_count}
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground">رسائل مُرسلة</span>
+                  <span className="text-xs text-muted-foreground">
+                    رسائل مُرسلة
+                  </span>
                 </div>
 
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1 text-green-600">
                     <Users className="h-4 w-4" />
-                    <span className="font-semibold">{number.received_messages_count}</span>
+                    <span className="font-semibold">
+                      {number.received_messages_count}
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground">رسائل مُستقبلة</span>
+                  <span className="text-xs text-muted-foreground">
+                    رسائل مُستقبلة
+                  </span>
                 </div>
               </div>
 
@@ -326,17 +364,27 @@ export function WhatsAppNumbersManagement() {
               {number.business_id && (
                 <div className="text-xs text-muted-foreground space-y-1">
                   <div>Business Account ID: {number.business_id}</div>
-                  {number.phone_id && <div>Phone Number ID: {number.phone_id}</div>}
+                  {number.phone_id && (
+                    <div>Phone Number ID: {number.phone_id}</div>
+                  )}
                 </div>
               )}
 
               {/* Actions */}
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 bg-transparent"
+                >
                   <Edit className="h-3 w-3 ml-1" />
                   تعديل
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 bg-transparent"
+                >
                   <Activity className="h-3 w-3 ml-1" />
                   الإحصائيات
                 </Button>
@@ -356,11 +404,13 @@ export function WhatsAppNumbersManagement() {
 
       {/* Empty State */}
       {marketingChannels.channels.length === 0 && (
-        <Card className="text-center py-12" >
+        <Card className="text-center py-12">
           <CardContent>
             <WhatsappIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">لا توجد أرقام واتساب</h3>
-            <p className="text-muted-foreground mb-4">ابدأ بإضافة رقم واتساب الأول لبدء إرسال الرسائل</p>
+            <p className="text-muted-foreground mb-4">
+              ابدأ بإضافة رقم واتساب الأول لبدء إرسال الرسائل
+            </p>
             <Button onClick={() => setIsAddDialogOpen(true)}>
               <Plus className="h-4 w-4 ml-2" />
               إضافة رقم واتساب
@@ -370,13 +420,14 @@ export function WhatsAppNumbersManagement() {
       )}
 
       {/* Info Alert */}
-      <Alert dir="rtl" >
+      <Alert dir="rtl">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          <strong>ملاحظة:</strong> يتطلب ربط أرقام الواتساب حساب Meta Business وموافقة على شروط استخدام WhatsApp
-          Business API. تأكد من أن رقمك مُحقق ومُعتمد من Meta قبل البدء في إرسال الرسائل.
+          <strong>ملاحظة:</strong> يتطلب ربط أرقام الواتساب حساب Meta Business
+          وموافقة على شروط استخدام WhatsApp Business API. تأكد من أن رقمك مُحقق
+          ومُعتمد من Meta قبل البدء في إرسال الرسائل.
         </AlertDescription>
       </Alert>
     </div>
-  )
+  );
 }

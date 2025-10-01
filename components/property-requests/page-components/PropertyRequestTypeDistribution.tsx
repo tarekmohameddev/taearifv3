@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const PropertyRequestTypeDistribution = ({
@@ -16,9 +15,7 @@ export const PropertyRequestTypeDistribution = ({
       <CardContent>
         <div className="grid grid-cols-5 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
-              {buyerCount}
-            </div>
+            <div className="text-2xl font-bold text-blue-600">{buyerCount}</div>
             <div className="text-sm text-muted-foreground">مشتري</div>
           </div>
           <div className="text-center">
@@ -49,4 +46,4 @@ export const PropertyRequestTypeDistribution = ({
       </CardContent>
     </Card>
   );
-}; 
+};

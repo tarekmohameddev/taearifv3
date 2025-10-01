@@ -135,13 +135,15 @@ export default function RemindersList({
 
   // Filter reminders based on search and filters
   const filteredReminders = remindersData.filter((reminder) => {
-    const matchesSearch = searchTerm === "" || 
+    const matchesSearch =
+      searchTerm === "" ||
       reminder.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       reminder.customer?.name.toLowerCase().includes(searchTerm.toLowerCase());
 
     // For reminders, we can't filter by stage since they don't have stage info
     // But we can filter by priority
-    const matchesUrgency = filterUrgency === "all" || 
+    const matchesUrgency =
+      filterUrgency === "all" ||
       getPriorityLabel(reminder.priority_label) === filterUrgency;
 
     return matchesSearch && matchesUrgency;
@@ -198,105 +200,107 @@ export default function RemindersList({
       <div className="space-y-4">
         {filteredReminders.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">لا توجد تذكيرات تطابق معايير البحث</p>
+            <p className="text-muted-foreground">
+              لا توجد تذكيرات تطابق معايير البحث
+            </p>
           </div>
         ) : (
           filteredReminders.map((reminder) => {
-          const { formattedDate, formattedTime } = formatSaudiDateTime(
-            reminder.datetime,
-          );
+            const { formattedDate, formattedTime } = formatSaudiDateTime(
+              reminder.datetime,
+            );
 
-          return (
-            <Card
-              key={reminder.id}
-              className="hover:shadow-md transition-shadow"
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-1 h-16 rounded-full ${getStatusColor()}`}
-                    />
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src="/placeholder.svg" />
-                        <AvatarFallback>
-                          {reminder.customer?.name
-                            ?.split(" ")
-                            ?.slice(0, 2)
-                            ?.map((n) => n[0])
-                            ?.join("") || "عميل"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold">{reminder.title}</h3>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
-                            {reminder.customer?.name || "عميل غير محدد"}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {formattedDate}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {formattedTime}
-                          </span>
+            return (
+              <Card
+                key={reminder.id}
+                className="hover:shadow-md transition-shadow"
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-1 h-16 rounded-full ${getStatusColor()}`}
+                      />
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src="/placeholder.svg" />
+                          <AvatarFallback>
+                            {reminder.customer?.name
+                              ?.split(" ")
+                              ?.slice(0, 2)
+                              ?.map((n) => n[0])
+                              ?.join("") || "عميل"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="font-semibold">{reminder.title}</h3>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Users className="h-3 w-3" />
+                              {reminder.customer?.name || "عميل غير محدد"}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {formattedDate}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {formattedTime}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className={getPriorityColor(reminder.priority_label)}
-                    >
-                      {getPriorityLabel(reminder.priority_label)}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="flex items-center gap-1"
-                    >
-                      {getStatusIcon()}
-                      {getStatusLabel()}
-                    </Badge>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onViewReminder(reminder)}
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className={getPriorityColor(reminder.priority_label)}
                       >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onEditReminder(reminder)}
+                        {getPriorityLabel(reminder.priority_label)}
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="flex items-center gap-1"
                       >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onCompleteReminder(reminder)}
-                        className="text-green-600 hover:text-green-700"
-                      >
-                        <CheckCircle className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Phone className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <MessageSquare className="h-4 w-4" />
-                      </Button>
+                        {getStatusIcon()}
+                        {getStatusLabel()}
+                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onViewReminder(reminder)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onEditReminder(reminder)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onCompleteReminder(reminder)}
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Phone className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })
+                </CardContent>
+              </Card>
+            );
+          })
         )}
 
         {remindersData.length === 0 && (

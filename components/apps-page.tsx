@@ -46,7 +46,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
@@ -89,7 +95,7 @@ export function AppsPage() {
   const [pixelsLoading, setPixelsLoading] = useState(false);
   const { sidebarData, fetchSideMenus } = useStore();
   const { mainNavItems, error } = sidebarData;
-  
+
   // Pixel management states
   const [isPixelDialogOpen, setIsPixelDialogOpen] = useState(false);
   const [isAddPixelDialogOpen, setIsAddPixelDialogOpen] = useState(false);
@@ -101,7 +107,9 @@ export function AppsPage() {
     pixel_id: "",
     is_active: true,
   });
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   const categories = [
     "الكل",
@@ -121,40 +129,52 @@ export function AppsPage() {
   // Helper functions for platform management
   const getPlatformDisplayName = (platform: string) => {
     switch (platform) {
-      case "facebook": return "Facebook";
-      case "snapchat": return "Snapchat";
-      case "tiktok": return "TikTok";
-      default: return platform;
+      case "facebook":
+        return "Facebook";
+      case "snapchat":
+        return "Snapchat";
+      case "tiktok":
+        return "TikTok";
+      default:
+        return platform;
     }
   };
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
-      case "facebook": return "F";
-      case "snapchat": return "S";
-      case "tiktok": return "T";
-      default: return platform.charAt(0).toUpperCase();
+      case "facebook":
+        return "F";
+      case "snapchat":
+        return "S";
+      case "tiktok":
+        return "T";
+      default:
+        return platform.charAt(0).toUpperCase();
     }
   };
 
   const getPlatformExamples = (platform: string) => {
     switch (platform) {
-      case "facebook": return "123456789012345";
-      case "snapchat": return "SC-4455667788";
-      case "tiktok": return "ABC123DEF456GHI789JKL";
-      default: return "";
+      case "facebook":
+        return "123456789012345";
+      case "snapchat":
+        return "SC-4455667788";
+      case "tiktok":
+        return "ABC123DEF456GHI789JKL";
+      default:
+        return "";
     }
   };
 
   const getPlatformDescription = (platform: string) => {
     switch (platform) {
-      case "facebook": 
+      case "facebook":
         return "Facebook Pixel: معرف مكون من 15 رقم بالضبط. يمكنك العثور عليه في Facebook Events Manager.";
-      case "snapchat": 
+      case "snapchat":
         return "Snapchat Pixel: معرف مخصص من Snapchat. انسخه من إعدادات Snapchat Ads Manager.";
-      case "tiktok": 
+      case "tiktok":
         return "TikTok Pixel: معرف مكون من 20-25 حرف وأرقام كبيرة. يمكنك العثور عليه في TikTok Events Manager.";
-      default: 
+      default:
         return "";
     }
   };
@@ -170,17 +190,25 @@ export function AppsPage() {
 
       if (data.platform === "facebook") {
         if (!/^[0-9]{15}$/.test(data.pixel_id)) {
-          setValidationErrors({ pixel_id: "Facebook Pixel يجب أن يكون 15 رقم بالضبط (مثال: 123456789012345)" });
+          setValidationErrors({
+            pixel_id:
+              "Facebook Pixel يجب أن يكون 15 رقم بالضبط (مثال: 123456789012345)",
+          });
           return false;
         }
       } else if (data.platform === "tiktok") {
         if (!/^[A-Z0-9]{20,25}$/.test(data.pixel_id)) {
-          setValidationErrors({ pixel_id: "TikTok Pixel يجب أن يكون 20-25 حرف وأرقام كبيرة (مثال: ABC123DEF456GHI789JKL)" });
+          setValidationErrors({
+            pixel_id:
+              "TikTok Pixel يجب أن يكون 20-25 حرف وأرقام كبيرة (مثال: ABC123DEF456GHI789JKL)",
+          });
           return false;
         }
       } else if (data.platform === "snapchat") {
         if (data.pixel_id.trim().length < 3) {
-          setValidationErrors({ pixel_id: "Snapchat Pixel يجب أن يكون 3 أحرف على الأقل" });
+          setValidationErrors({
+            pixel_id: "Snapchat Pixel يجب أن يكون 3 أحرف على الأقل",
+          });
           return false;
         }
       }
@@ -203,12 +231,14 @@ export function AppsPage() {
     const allPlatforms = [
       { value: "facebook", label: "Facebook" },
       { value: "tiktok", label: "TikTok" },
-      { value: "snapchat", label: "Snapchat" }
+      { value: "snapchat", label: "Snapchat" },
     ];
-    
+
     const usedPlatforms = new Set(pixels.map((pixel) => pixel.platform));
     if (includePlatform) usedPlatforms.delete(includePlatform);
-    return allPlatforms.filter((platform) => !usedPlatforms.has(platform.value));
+    return allPlatforms.filter(
+      (platform) => !usedPlatforms.has(platform.value),
+    );
   };
 
   // Add pixels app to the apps array
@@ -216,7 +246,8 @@ export function AppsPage() {
     const pixelsApp: App = {
       id: "pixels-app",
       name: "ربط Pixels",
-      description: "ربط pixels منصة التواصل الاجتماعي مع موقعك لتتبع الزوار والتحويلات",
+      description:
+        "ربط pixels منصة التواصل الاجتماعي مع موقعك لتتبع الزوار والتحويلات",
       category: "تسويق",
       developer: "نظام الموقع",
       rating: 5,
@@ -227,7 +258,7 @@ export function AppsPage() {
       installed: false,
       isPixelApp: true,
     };
-    
+
     return [pixelsApp, ...fetchedApps];
   };
 
@@ -239,7 +270,9 @@ export function AppsPage() {
         const appsWithPixels = addPixelsApp(fetchedApps);
         setApps(appsWithPixels);
 
-        const installed = appsWithPixels.filter((app) => app.installed === true);
+        const installed = appsWithPixels.filter(
+          (app) => app.installed === true,
+        );
         setInstalledApps(installed);
 
         toast.success("تم تحميل التطبيقات بنجاح");
@@ -356,12 +389,12 @@ export function AppsPage() {
 
   const handleEditPixel = async () => {
     if (!selectedPixel) return;
-    
+
     if (!validatePixelForm(pixelFormData)) {
       toast.error("يوجد أخطاء في إدخال البيانات. يرجى التأكد من صحة البيانات.");
       return;
     }
-    
+
     try {
       await axiosInstance.put(`/pixels/${selectedPixel.id}`, pixelFormData);
       toast.success("تم تعديل Pixel بنجاح");
@@ -377,7 +410,7 @@ export function AppsPage() {
 
   const handleDeletePixel = async () => {
     if (!selectedPixel) return;
-    
+
     try {
       await axiosInstance.delete(`/pixels/${selectedPixel.id}`);
       toast.success("تم حذف Pixel بنجاح");
@@ -689,20 +722,32 @@ export function AppsPage() {
               ربط وإدارة pixels منصات التواصل الاجتماعي مع موقعك
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Pixels المربوطة</h3>
-              <Button onClick={() => setIsAddPixelDialogOpen(true)} className="gap-2" disabled={getAvailablePlatforms().length === 0} title={getAvailablePlatforms().length === 0 ? "تم ربط جميع ال Pixels المتاحة" : undefined}>
+              <Button
+                onClick={() => setIsAddPixelDialogOpen(true)}
+                className="gap-2"
+                disabled={getAvailablePlatforms().length === 0}
+                title={
+                  getAvailablePlatforms().length === 0
+                    ? "تم ربط جميع ال Pixels المتاحة"
+                    : undefined
+                }
+              >
                 <Plus className="h-4 w-4" />
                 إضافة Pixel جديد
               </Button>
             </div>
-            
+
             {pixelsLoading ? (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <Skeleton className="h-10 w-10 rounded" />
                       <div className="space-y-2">
@@ -725,7 +770,10 @@ export function AppsPage() {
             ) : (
               <div className="space-y-3">
                 {pixels.map((pixel) => (
-                  <div key={pixel.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={pixel.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded bg-primary/10 flex items-center justify-center">
                         <span className="text-primary font-semibold text-sm">
@@ -733,12 +781,18 @@ export function AppsPage() {
                         </span>
                       </div>
                       <div>
-                        <p className="font-medium capitalize">{pixel.platform}</p>
-                        <p className="text-sm text-muted-foreground">{pixel.pixel_id}</p>
+                        <p className="font-medium capitalize">
+                          {pixel.platform}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {pixel.pixel_id}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant={pixel.is_active ? "default" : "secondary"}>
+                      <Badge
+                        variant={pixel.is_active ? "default" : "secondary"}
+                      >
                         {pixel.is_active ? "نشط" : "غير نشط"}
                       </Badge>
                       <Button
@@ -769,7 +823,10 @@ export function AppsPage() {
       </Dialog>
 
       {/* Add Pixel Dialog */}
-      <Dialog open={isAddPixelDialogOpen} onOpenChange={setIsAddPixelDialogOpen}>
+      <Dialog
+        open={isAddPixelDialogOpen}
+        onOpenChange={setIsAddPixelDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>إضافة Pixel جديد</DialogTitle>
@@ -780,7 +837,12 @@ export function AppsPage() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="platform">المنصة</Label>
-              <Select value={pixelFormData.platform} onValueChange={(value) => setPixelFormData({...pixelFormData, platform: value})}>
+              <Select
+                value={pixelFormData.platform}
+                onValueChange={(value) =>
+                  setPixelFormData({ ...pixelFormData, platform: value })
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر المنصة" />
                 </SelectTrigger>
@@ -803,15 +865,26 @@ export function AppsPage() {
               <Input
                 id="pixel_id"
                 value={pixelFormData.pixel_id}
-                onChange={(e) => setPixelFormData({...pixelFormData, pixel_id: e.target.value})}
+                onChange={(e) =>
+                  setPixelFormData({
+                    ...pixelFormData,
+                    pixel_id: e.target.value,
+                  })
+                }
                 placeholder="أدخل معرف Pixel"
               />
-                          {validationErrors.pixel_id && (
-                <p className="text-sm text-destructive mt-1">{validationErrors.pixel_id}</p>
+              {validationErrors.pixel_id && (
+                <p className="text-sm text-destructive mt-1">
+                  {validationErrors.pixel_id}
+                </p>
               )}
               <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
-                <div className="font-medium mb-2">📋 متطلبات {getPlatformDisplayName(pixelFormData.platform)}:</div>
-                <p className="mb-2">{getPlatformDescription(pixelFormData.platform)}</p>
+                <div className="font-medium mb-2">
+                  📋 متطلبات {getPlatformDisplayName(pixelFormData.platform)}:
+                </div>
+                <p className="mb-2">
+                  {getPlatformDescription(pixelFormData.platform)}
+                </p>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">مثال:</span>
                   <code className="bg-background px-2 py-1 rounded text-xs font-mono">
@@ -824,16 +897,24 @@ export function AppsPage() {
               <Switch
                 id="is_active"
                 checked={pixelFormData.is_active}
-                onCheckedChange={(checked) => setPixelFormData({...pixelFormData, is_active: checked})}
+                onCheckedChange={(checked) =>
+                  setPixelFormData({ ...pixelFormData, is_active: checked })
+                }
               />
               <Label htmlFor="is_active">تفعيل Pixel</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddPixelDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddPixelDialogOpen(false)}
+            >
               إلغاء
             </Button>
-            <Button onClick={handleAddPixel} disabled={getAvailablePlatforms().length === 0}>
+            <Button
+              onClick={handleAddPixel}
+              disabled={getAvailablePlatforms().length === 0}
+            >
               إضافة Pixel
             </Button>
           </DialogFooter>
@@ -841,27 +922,35 @@ export function AppsPage() {
       </Dialog>
 
       {/* Edit Pixel Dialog */}
-      <Dialog open={isEditPixelDialogOpen} onOpenChange={setIsEditPixelDialogOpen}>
+      <Dialog
+        open={isEditPixelDialogOpen}
+        onOpenChange={setIsEditPixelDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>تعديل Pixel</DialogTitle>
-            <DialogDescription>
-              تعديل معلومات Pixel المحدد
-            </DialogDescription>
+            <DialogDescription>تعديل معلومات Pixel المحدد</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="edit-platform">المنصة</Label>
-              <Select value={pixelFormData.platform} onValueChange={(value) => setPixelFormData({...pixelFormData, platform: value})}>
+              <Select
+                value={pixelFormData.platform}
+                onValueChange={(value) =>
+                  setPixelFormData({ ...pixelFormData, platform: value })
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر المنصة" />
                 </SelectTrigger>
                 <SelectContent>
-                  {getAvailablePlatforms(selectedPixel?.platform).map((platform) => (
-                    <SelectItem key={platform.value} value={platform.value}>
-                      {platform.label}
-                    </SelectItem>
-                  ))}
+                  {getAvailablePlatforms(selectedPixel?.platform).map(
+                    (platform) => (
+                      <SelectItem key={platform.value} value={platform.value}>
+                        {platform.label}
+                      </SelectItem>
+                    ),
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -870,16 +959,29 @@ export function AppsPage() {
               <Input
                 id="edit-pixel_id"
                 value={pixelFormData.pixel_id}
-                onChange={(e) => setPixelFormData({...pixelFormData, pixel_id: e.target.value})}
+                onChange={(e) =>
+                  setPixelFormData({
+                    ...pixelFormData,
+                    pixel_id: e.target.value,
+                  })
+                }
                 placeholder={`مثال: ${getPlatformExamples(pixelFormData.platform)}`}
-                className={validationErrors.pixel_id ? "border-destructive" : ""}
+                className={
+                  validationErrors.pixel_id ? "border-destructive" : ""
+                }
               />
               {validationErrors.pixel_id && (
-                <p className="text-sm text-destructive mt-1">{validationErrors.pixel_id}</p>
+                <p className="text-sm text-destructive mt-1">
+                  {validationErrors.pixel_id}
+                </p>
               )}
               <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
-                <div className="font-medium mb-2">📋 متطلبات {getPlatformDisplayName(pixelFormData.platform)}:</div>
-                <p className="mb-2">{getPlatformDescription(pixelFormData.platform)}</p>
+                <div className="font-medium mb-2">
+                  📋 متطلبات {getPlatformDisplayName(pixelFormData.platform)}:
+                </div>
+                <p className="mb-2">
+                  {getPlatformDescription(pixelFormData.platform)}
+                </p>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">مثال:</span>
                   <code className="bg-background px-2 py-1 rounded text-xs font-mono">
@@ -892,13 +994,18 @@ export function AppsPage() {
               <Switch
                 id="edit-is_active"
                 checked={pixelFormData.is_active}
-                onCheckedChange={(checked) => setPixelFormData({...pixelFormData, is_active: checked})}
+                onCheckedChange={(checked) =>
+                  setPixelFormData({ ...pixelFormData, is_active: checked })
+                }
               />
               <Label htmlFor="edit-is_active">تفعيل Pixel</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditPixelDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditPixelDialogOpen(false)}
+            >
               إلغاء
             </Button>
             <Button onClick={handleEditPixel}>حفظ التعديلات</Button>
@@ -907,7 +1014,10 @@ export function AppsPage() {
       </Dialog>
 
       {/* Delete Pixel Confirmation Dialog */}
-      <AlertDialog open={isDeletePixelDialogOpen} onOpenChange={setIsDeletePixelDialogOpen}>
+      <AlertDialog
+        open={isDeletePixelDialogOpen}
+        onOpenChange={setIsDeletePixelDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-destructive">
@@ -921,14 +1031,17 @@ export function AppsPage() {
                 </p>
                 <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/20">
                   <p className="text-sm">
-                    <span className="font-medium">المنصة:</span> {selectedPixel?.platform}
+                    <span className="font-medium">المنصة:</span>{" "}
+                    {selectedPixel?.platform}
                   </p>
                   <p className="text-sm">
-                    <span className="font-medium">معرف Pixel:</span> {selectedPixel?.pixel_id}
+                    <span className="font-medium">معرف Pixel:</span>{" "}
+                    {selectedPixel?.pixel_id}
                   </p>
                 </div>
                 <p className="text-destructive font-medium">
-                  ⚠️ هذا الإجراء لا يمكن التراجع عنه. سيتم حذف Pixel نهائياً من النظام.
+                  ⚠️ هذا الإجراء لا يمكن التراجع عنه. سيتم حذف Pixel نهائياً من
+                  النظام.
                 </p>
               </div>
             </AlertDialogDescription>
@@ -1162,7 +1275,7 @@ function AppsPageSkeleton() {
               {/* Installed Apps Section */}
               <div className="mb-6">
                 <Skeleton className="h-6 w-48 mb-4" />
-                
+
                 {/* Empty State for Installed Apps */}
                 <div className="rounded-lg border border-dashed p-8 text-center">
                   <Skeleton className="h-6 w-64 mx-auto mb-2" />
@@ -1173,7 +1286,7 @@ function AppsPageSkeleton() {
               {/* Apps Marketplace Section */}
               <div>
                 <Skeleton className="h-6 w-32 mb-4" />
-                
+
                 {/* Grid View Skeleton */}
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {Array.from({ length: 6 }).map((_, index) => (

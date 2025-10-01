@@ -4,12 +4,15 @@ import axiosInstance from "@/lib/axiosInstance";
 // Helper function to find the first header in componentSettings
 const findFirstHeader = (componentSettings) => {
   if (!componentSettings) return null;
-  
+
   for (const pageName in componentSettings) {
     const page = componentSettings[pageName];
     for (const componentId in page) {
       const component = page[componentId];
-      if (component.type === 'header' && component.componentName === 'header1') {
+      if (
+        component.type === "header" &&
+        component.componentName === "header1"
+      ) {
         return { id: componentId, data: component.data };
       }
     }
@@ -20,12 +23,15 @@ const findFirstHeader = (componentSettings) => {
 // Helper function to find the first footer in componentSettings
 const findFirstFooter = (componentSettings) => {
   if (!componentSettings) return null;
-  
+
   for (const pageName in componentSettings) {
     const page = componentSettings[pageName];
     for (const componentId in page) {
       const component = page[componentId];
-      if (component.type === 'footer' && component.componentName === 'footer1') {
+      if (
+        component.type === "footer" &&
+        component.componentName === "footer1"
+      ) {
         return { id: componentId, data: component.data };
       }
     }
@@ -268,10 +274,9 @@ const useTenantStore = create((set) => ({
         : state.tenantData,
     })),
 
-    
   fetchTenantData: async (websiteName) => {
     const state = useTenantStore.getState();
-    
+
     // Prevent duplicate requests - تحقق من أن البيانات موجودة ونفس الـ username
     if (
       state.loadingTenantData ||
@@ -279,7 +284,7 @@ const useTenantStore = create((set) => ({
     ) {
       return;
     }
-    
+
     // منع الـ duplicate calls إذا كان نفس الـ websiteName
     if (state.lastFetchedWebsite === websiteName) {
       return;
@@ -287,7 +292,10 @@ const useTenantStore = create((set) => ({
 
     set({ loadingTenantData: true, error: null });
     try {
-      const response = await axiosInstance.post("/v1/tenant-website/getTenant", { websiteName });
+      const response = await axiosInstance.post(
+        "/v1/tenant-website/getTenant",
+        { websiteName },
+      );
       console.log("[tenantStore] Response status:", response.status);
       if (response.status === 404) {
         throw new Error("Tenant not found");
@@ -296,7 +304,7 @@ const useTenantStore = create((set) => ({
       }
 
       const data = response.data || {}; // If response is empty, use an empty object
-      
+
       // تحقق من أن البيانات ليست فارغة
       if (!data || Object.keys(data).length === 0) {
         // بدلاً من رمي خطأ، استخدم بيانات افتراضية
@@ -313,21 +321,25 @@ const useTenantStore = create((set) => ({
             ctaValuation: {},
             grid: {},
             filterButtons: {},
-            propertyFilter: {}
-          }
+            propertyFilter: {},
+          },
         };
-        set({ tenantData: defaultData, loadingTenantData: false, lastFetchedWebsite: websiteName });
+        set({
+          tenantData: defaultData,
+          loadingTenantData: false,
+          lastFetchedWebsite: websiteName,
+        });
         return;
       }
-      
+
       // Load global components data into editor store
       const { useEditorStore } = await import("./editorStore");
       const editorStore = useEditorStore.getState();
-      
+
       // If globalComponentsData exists in backend, use it
       if (data.globalComponentsData) {
         editorStore.setGlobalComponentsData(data.globalComponentsData);
-        
+
         // Also set individual global components for backward compatibility
         if (data.globalComponentsData.header) {
           editorStore.setGlobalHeaderData(data.globalComponentsData.header);
@@ -339,9 +351,13 @@ const useTenantStore = create((set) => ({
         // If no globalComponentsData, use default data instead of creating from componentSettings
         // Don't set anything - let the component use its default data
       }
-      
+
       console.log("[tenantStore] Successfully fetched data for:", websiteName);
-      set({ tenantData: data, loadingTenantData: false, lastFetchedWebsite: websiteName });
+      set({
+        tenantData: data,
+        loadingTenantData: false,
+        lastFetchedWebsite: websiteName,
+      });
     } catch (error) {
       console.error("[tenantStore] Error fetching tenant data:", error);
       console.log("[tenantStore] Setting error in state:", error.message);
@@ -350,7 +366,6 @@ const useTenantStore = create((set) => ({
     }
   },
 
-  
   saveHeaderChanges: async (tenantId, headerData, variant) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     let userData;
@@ -359,7 +374,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping saveHeaderChanges");
+        console.log(
+          "[tenantStore] No token available, skipping saveHeaderChanges",
+        );
         return false;
       }
     } catch (error) {
@@ -372,7 +389,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -404,7 +421,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping saveHeroChanges");
+        console.log(
+          "[tenantStore] No token available, skipping saveHeroChanges",
+        );
         return false;
       }
     } catch (error) {
@@ -417,7 +436,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -449,7 +468,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping saveFooterChanges");
+        console.log(
+          "[tenantStore] No token available, skipping saveFooterChanges",
+        );
         return false;
       }
     } catch (error) {
@@ -462,7 +483,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -486,7 +507,11 @@ const useTenantStore = create((set) => ({
       return false;
     }
   },
-  savehalfTextHalfImageChanges: async (tenantId, halfTextHalfImageData, variant) => {
+  savehalfTextHalfImageChanges: async (
+    tenantId,
+    halfTextHalfImageData,
+    variant,
+  ) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     let userData;
     try {
@@ -494,7 +519,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping savehalfTextHalfImageChanges");
+        console.log(
+          "[tenantStore] No token available, skipping savehalfTextHalfImageChanges",
+        );
         return false;
       }
     } catch (error) {
@@ -507,7 +534,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -531,7 +558,11 @@ const useTenantStore = create((set) => ({
       return false;
     }
   },
-  savehalfTextHalfImage2Changes: async (tenantId, halfTextHalfImage2Data, variant) => {
+  savehalfTextHalfImage2Changes: async (
+    tenantId,
+    halfTextHalfImage2Data,
+    variant,
+  ) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     let userData;
     try {
@@ -539,7 +570,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping savehalfTextHalfImage2Changes");
+        console.log(
+          "[tenantStore] No token available, skipping savehalfTextHalfImage2Changes",
+        );
         return false;
       }
     } catch (error) {
@@ -552,7 +585,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -576,7 +609,11 @@ const useTenantStore = create((set) => ({
       return false;
     }
   },
-  savehalfTextHalfImage3Changes: async (tenantId, halfTextHalfImage3Data, variant) => {
+  savehalfTextHalfImage3Changes: async (
+    tenantId,
+    halfTextHalfImage3Data,
+    variant,
+  ) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     let userData;
     try {
@@ -584,7 +621,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping savehalfTextHalfImage3Changes");
+        console.log(
+          "[tenantStore] No token available, skipping savehalfTextHalfImage3Changes",
+        );
         return false;
       }
     } catch (error) {
@@ -597,7 +636,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -630,7 +669,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping savePropertySliderChanges");
+        console.log(
+          "[tenantStore] No token available, skipping savePropertySliderChanges",
+        );
         return false;
       }
     } catch (error) {
@@ -643,7 +684,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -676,7 +717,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping saveCtaValuationChanges");
+        console.log(
+          "[tenantStore] No token available, skipping saveCtaValuationChanges",
+        );
         return false;
       }
     } catch (error) {
@@ -689,7 +732,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -753,7 +796,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping saveGridChanges");
+        console.log(
+          "[tenantStore] No token available, skipping saveGridChanges",
+        );
         return false;
       }
     } catch (error) {
@@ -766,7 +811,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -830,7 +875,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping saveFilterButtonsChanges");
+        console.log(
+          "[tenantStore] No token available, skipping saveFilterButtonsChanges",
+        );
         return false;
       }
     } catch (error) {
@@ -843,7 +890,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,
@@ -907,7 +954,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log("[tenantStore] No token available, skipping savePropertyFilterChanges");
+        console.log(
+          "[tenantStore] No token available, skipping savePropertyFilterChanges",
+        );
         return false;
       }
     } catch (error) {
@@ -920,7 +969,7 @@ const useTenantStore = create((set) => ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userData.token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
         body: JSON.stringify({
           tenantId,

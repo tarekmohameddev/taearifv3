@@ -49,9 +49,9 @@ export const recordCollision = (id: string, type: string) => {
 export const cleanupCollisionHistory = (maxAge: number = 5000) => {
   const state = collisionStore.getState();
   const now = Date.now();
-  
+
   const filteredHistory = state.collisionHistory.filter(
-    entry => now - entry.timestamp < maxAge
+    (entry) => now - entry.timestamp < maxAge,
   );
 
   collisionStore.setState({

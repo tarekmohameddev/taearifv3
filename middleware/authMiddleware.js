@@ -2,14 +2,14 @@ import jwt from "jsonwebtoken";
 
 export function authenticateToken(req, res, next) {
   const token = req.cookies.authToken;
-  
+
   if (!token) {
     return res.status(401).json({ message: "UnAuthorized" });
   }
-  
+
   try {
     const secretKey = process.env.SECRET_KEY;
-    
+
     jwt.verify(token, secretKey, (err, user) => {
       if (err) {
         return res.status(403).json({ error: "Invalid Token", err });

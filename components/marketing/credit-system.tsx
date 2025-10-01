@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Plus,
   CreditCard,
@@ -11,11 +11,17 @@ import {
   CheckCircle,
   Clock,
   DollarSign,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -23,51 +29,53 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import useStore from "@/context/Store"
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import useStore from "@/context/Store";
 
 interface CreditPackage {
-  id: string
-  name: string
-  credits: number
-  price: number
-  currency: string
-  discount?: number
-  popular?: boolean
+  id: string;
+  name: string;
+  credits: number;
+  price: number;
+  currency: string;
+  discount?: number;
+  popular?: boolean;
 }
 
 interface CreditTransaction {
-  id: string
-  type: "purchase" | "usage" | "refund" | "bonus"
-  amount: number
-  description: string
-  date: string
-  phoneNumber?: string
-  campaignName?: string
-  status: "completed" | "pending" | "failed"
+  id: string;
+  type: "purchase" | "usage" | "refund" | "bonus";
+  amount: number;
+  description: string;
+  date: string;
+  phoneNumber?: string;
+  campaignName?: string;
+  status: "completed" | "pending" | "failed";
 }
 
 interface CreditUsage {
-  phoneNumber: string
-  displayName: string
-  messagesThisMonth: number
-  creditsUsed: number
-  lastUsed: string
+  phoneNumber: string;
+  displayName: string;
+  messagesThisMonth: number;
+  creditsUsed: number;
+  lastUsed: string;
 }
 
 export function CreditSystemComponent() {
-  const { creditsSystem, updateCredits, addCreditTransaction } = useStore()
+  const { creditsSystem, updateCredits, addCreditTransaction } = useStore();
 
-  const [isTopUpDialogOpen, setIsTopUpDialogOpen] = useState(false)
-  const [selectedPackage, setSelectedPackage] = useState<string>("")
+  const [isTopUpDialogOpen, setIsTopUpDialogOpen] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<string>("");
 
   const handleTopUp = () => {
     // Simulate payment process
-    const selectedPkg = creditsSystem.creditPackages.find((pkg) => pkg.id === selectedPackage)
+    const selectedPkg = creditsSystem.creditPackages.find(
+      (pkg) => pkg.id === selectedPackage,
+    );
     if (selectedPkg) {
-      updateCredits(selectedPkg.credits)
+      updateCredits(selectedPkg.credits);
       addCreditTransaction({
         id: Date.now().toString(),
         type: "purchase",
@@ -75,41 +83,42 @@ export function CreditSystemComponent() {
         description: `شراء ${selectedPkg.name}`,
         date: new Date().toISOString().split("T")[0],
         status: "completed",
-      })
-      setIsTopUpDialogOpen(false)
-      setSelectedPackage("")
+      });
+      setIsTopUpDialogOpen(false);
+      setSelectedPackage("");
     }
-  }
+  };
 
   const getTransactionIcon = (type: CreditTransaction["type"]) => {
     switch (type) {
       case "purchase":
-        return <Plus className="h-4 w-4 text-green-600" />
+        return <Plus className="h-4 w-4 text-green-600" />;
       case "usage":
-        return <MessageSquare className="h-4 w-4 text-blue-600" />
+        return <MessageSquare className="h-4 w-4 text-blue-600" />;
       case "refund":
-        return <TrendingUp className="h-4 w-4 text-green-600" />
+        return <TrendingUp className="h-4 w-4 text-green-600" />;
       case "bonus":
-        return <CheckCircle className="h-4 w-4 text-purple-600" />
+        return <CheckCircle className="h-4 w-4 text-purple-600" />;
       default:
-        return <Clock className="h-4 w-4 text-gray-600" />
+        return <Clock className="h-4 w-4 text-gray-600" />;
     }
-  }
+  };
 
   const getStatusColor = (status: CreditTransaction["status"]) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800 border-green-200"
+        return "bg-green-100 text-green-800 border-green-200";
       case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "failed":
-        return "bg-red-100 text-red-800 border-red-200"
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  }
+  };
 
-  const usagePercentage = (creditsSystem.monthlyUsage / creditsSystem.monthlyLimit) * 100
+  const usagePercentage =
+    (creditsSystem.monthlyUsage / creditsSystem.monthlyLimit) * 100;
 
   return (
     <div className="space-y-6">
@@ -120,7 +129,9 @@ export function CreditSystemComponent() {
             <CreditCard className="h-5 w-5 ml-2 text-primary" />
             نظام الرصيد
           </h2>
-          <p className="text-sm text-muted-foreground">إدارة رصيد الرسائل ومراقبة الاستخدام</p>
+          <p className="text-sm text-muted-foreground">
+            إدارة رصيد الرسائل ومراقبة الاستخدام
+          </p>
         </div>
 
         <Dialog open={isTopUpDialogOpen} onOpenChange={setIsTopUpDialogOpen}>
@@ -133,7 +144,9 @@ export function CreditSystemComponent() {
           <DialogContent className="sm:max-w-lg" dir="rtl">
             <DialogHeader>
               <DialogTitle>شحن رصيد الرسائل</DialogTitle>
-              <DialogDescription>اختر الباقة المناسبة لاحتياجاتك</DialogDescription>
+              <DialogDescription>
+                اختر الباقة المناسبة لاحتياجاتك
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-3">
@@ -141,7 +154,9 @@ export function CreditSystemComponent() {
                   <div
                     key={pkg.id}
                     className={`relative cursor-pointer transition-all duration-200 ${
-                      selectedPackage === pkg.id ? "ring-2 ring-primary shadow-md" : "hover:shadow-sm hover:bg-gray-50"
+                      selectedPackage === pkg.id
+                        ? "ring-2 ring-primary shadow-md"
+                        : "hover:shadow-sm hover:bg-gray-50"
                     }`}
                     onClick={() => setSelectedPackage(pkg.id)}
                   >
@@ -151,24 +166,38 @@ export function CreditSystemComponent() {
                           <div className="flex items-center gap-3">
                             <div
                               className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                selectedPackage === pkg.id ? "border-primary bg-primary" : "border-gray-300"
+                                selectedPackage === pkg.id
+                                  ? "border-primary bg-primary"
+                                  : "border-gray-300"
                               }`}
                             >
-                              {selectedPackage === pkg.id && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                              {selectedPackage === pkg.id && (
+                                <div className="w-2 h-2 bg-white rounded-full"></div>
+                              )}
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
                                 <h3 className="font-medium">{pkg.name}</h3>
-                                {pkg.popular && <Badge className="bg-primary text-white text-xs">الأكثر شعبية</Badge>}
+                                {pkg.popular && (
+                                  <Badge className="bg-primary text-white text-xs">
+                                    الأكثر شعبية
+                                  </Badge>
+                                )}
                               </div>
-                              <p className="text-sm text-muted-foreground">{pkg.credits.toLocaleString()} رسالة</p>
+                              <p className="text-sm text-muted-foreground">
+                                {pkg.credits.toLocaleString()} رسالة
+                              </p>
                             </div>
                           </div>
                           <div className="text-left">
                             <div className="font-semibold">
                               {pkg.price} {pkg.currency}
                             </div>
-                            {pkg.discount && <div className="text-xs text-green-600">وفر {pkg.discount}%</div>}
+                            {pkg.discount && (
+                              <div className="text-xs text-green-600">
+                                وفر {pkg.discount}%
+                              </div>
+                            )}
                           </div>
                         </div>
                       </CardContent>
@@ -180,16 +209,24 @@ export function CreditSystemComponent() {
               <Alert>
                 <CreditCard className="h-4 w-4" />
                 <AlertDescription>
-                  سيتم خصم المبلغ من طريقة الدفع المحفوظة. يمكنك تغيير طريقة الدفع من الإعدادات.
+                  سيتم خصم المبلغ من طريقة الدفع المحفوظة. يمكنك تغيير طريقة
+                  الدفع من الإعدادات.
                 </AlertDescription>
               </Alert>
 
               <div className="flex gap-2 pt-4">
-                <Button onClick={handleTopUp} disabled={!selectedPackage} className="flex-1">
+                <Button
+                  onClick={handleTopUp}
+                  disabled={!selectedPackage}
+                  className="flex-1"
+                >
                   <CreditCard className="h-4 w-4 ml-2" />
                   تأكيد الشراء
                 </Button>
-                <Button variant="outline" onClick={() => setIsTopUpDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsTopUpDialogOpen(false)}
+                >
                   إلغاء
                 </Button>
               </div>
@@ -202,12 +239,16 @@ export function CreditSystemComponent() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">الرصيد الحالي</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              الرصيد الحالي
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-green-600">{creditsSystem.currentCredits.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {creditsSystem.currentCredits.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">رسالة متاحة</p>
               </div>
               <div className="p-2 bg-green-100 rounded-lg">
@@ -219,31 +260,43 @@ export function CreditSystemComponent() {
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">الاستخدام الشهري</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              الاستخدام الشهري
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-2">
               <div>
-                <div className="text-2xl font-bold text-blue-600">{creditsSystem.monthlyUsage.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">من {creditsSystem.monthlyLimit.toLocaleString()}</p>
+                <div className="text-2xl font-bold text-blue-600">
+                  {creditsSystem.monthlyUsage.toLocaleString()}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  من {creditsSystem.monthlyLimit.toLocaleString()}
+                </p>
               </div>
               <div className="p-2 bg-blue-100 rounded-lg">
                 <MessageSquare className="h-5 w-5 text-blue-600" />
               </div>
             </div>
             <Progress value={usagePercentage} className="h-2" />
-            <p className="text-xs text-muted-foreground mt-1">{usagePercentage.toFixed(1)}% من الحد الشهري</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {usagePercentage.toFixed(1)}% من الحد الشهري
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">متوسط التكلفة</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              متوسط التكلفة
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-purple-600">0.05 ر.س</div>
+                <div className="text-2xl font-bold text-purple-600">
+                  0.05 ر.س
+                </div>
                 <p className="text-xs text-muted-foreground">لكل رسالة</p>
               </div>
               <div className="p-2 bg-purple-100 rounded-lg">
@@ -259,8 +312,8 @@ export function CreditSystemComponent() {
         <Alert className="border-yellow-200 bg-yellow-50">
           <AlertTriangle className="h-4 w-4 text-yellow-600" />
           <AlertDescription className="text-yellow-800">
-            <strong>تحذير:</strong> لقد استخدمت {usagePercentage.toFixed(1)}% من حدك الشهري. فكر في شحن رصيدك لتجنب
-            انقطاع الخدمة.
+            <strong>تحذير:</strong> لقد استخدمت {usagePercentage.toFixed(1)}% من
+            حدك الشهري. فكر في شحن رصيدك لتجنب انقطاع الخدمة.
           </AlertDescription>
         </Alert>
       )}
@@ -282,11 +335,16 @@ export function CreditSystemComponent() {
             <CardContent>
               <div className="space-y-4">
                 {creditsSystem.transactions.map((transaction) => (
-                  <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={transaction.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       {getTransactionIcon(transaction.type)}
                       <div>
-                        <div className="font-medium">{transaction.description}</div>
+                        <div className="font-medium">
+                          {transaction.description}
+                        </div>
                         <div className="text-sm text-muted-foreground flex items-center gap-2">
                           <Calendar className="h-3 w-3" />
                           {transaction.date}
@@ -300,11 +358,16 @@ export function CreditSystemComponent() {
                       </div>
                     </div>
                     <div className="text-left">
-                      <div className={`font-semibold ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}>
+                      <div
+                        className={`font-semibold ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}
+                      >
                         {transaction.amount > 0 ? "+" : ""}
                         {transaction.amount.toLocaleString()}
                       </div>
-                      <Badge className={getStatusColor(transaction.status)} variant="outline">
+                      <Badge
+                        className={getStatusColor(transaction.status)}
+                        variant="outline"
+                      >
                         {transaction.status === "completed"
                           ? "مكتمل"
                           : transaction.status === "pending"
@@ -323,7 +386,9 @@ export function CreditSystemComponent() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">الاستخدام حسب الرقم</CardTitle>
-              <CardDescription>توزيع استخدام الرصيد على أرقام الواتساب</CardDescription>
+              <CardDescription>
+                توزيع استخدام الرصيد على أرقام الواتساب
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -332,21 +397,33 @@ export function CreditSystemComponent() {
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <div className="font-medium">{usage.displayName}</div>
-                        <div className="text-sm text-muted-foreground">{usage.phoneNumber}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {usage.phoneNumber}
+                        </div>
                       </div>
                       <div className="text-left">
-                        <div className="font-semibold">{usage.creditsUsed.toLocaleString()}</div>
-                        <div className="text-xs text-muted-foreground">رصيد مُستخدم</div>
+                        <div className="font-semibold">
+                          {usage.creditsUsed.toLocaleString()}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          رصيد مُستخدم
+                        </div>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">الرسائل هذا الشهر:</span>
-                        <div className="font-medium">{usage.messagesThisMonth.toLocaleString()}</div>
+                        <span className="text-muted-foreground">
+                          الرسائل هذا الشهر:
+                        </span>
+                        <div className="font-medium">
+                          {usage.messagesThisMonth.toLocaleString()}
+                        </div>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">آخر استخدام:</span>
+                        <span className="text-muted-foreground">
+                          آخر استخدام:
+                        </span>
                         <div className="font-medium">{usage.lastUsed}</div>
                       </div>
                     </div>
@@ -389,15 +466,21 @@ export function CreditSystemComponent() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">الاستخدام المتوقع هذا الشهر</span>
-                    <span className="font-medium text-blue-600">2,100 رسالة</span>
+                    <span className="font-medium text-blue-600">
+                      2,100 رسالة
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">الرصيد المطلوب</span>
-                    <span className="font-medium text-green-600">850 رسالة إضافية</span>
+                    <span className="font-medium text-green-600">
+                      850 رسالة إضافية
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">التكلفة المتوقعة</span>
-                    <span className="font-medium text-purple-600">42.50 ر.س</span>
+                    <span className="font-medium text-purple-600">
+                      42.50 ر.س
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -406,5 +489,5 @@ export function CreditSystemComponent() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

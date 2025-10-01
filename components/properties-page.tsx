@@ -662,16 +662,17 @@ function PropertyCard({
           </div>
         </div>
         <div className="flex flex-wrap gap-1 pt-2">
-          {Array.isArray(property.features) && property.features
-            .slice(0, 3)
-            .map((feature: string, index: number) => (
-              <span
-                key={index}
-                className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
-              >
-                {feature}
-              </span>
-            ))}
+          {Array.isArray(property.features) &&
+            property.features
+              .slice(0, 3)
+              .map((feature: string, index: number) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
+                >
+                  {feature}
+                </span>
+              ))}
           {Array.isArray(property.features) && property.features.length > 3 && (
             <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
               +{property.features.length - 3} more
@@ -756,14 +757,15 @@ function PropertyListItem({
             </div>
           </div>
           <div className="mt-2 flex flex-wrap gap-1">
-            {Array.isArray(property.features) && property.features.map((feature: string, index: number) => (
-              <span
-                key={index}
-                className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
-              >
-                {feature}
-              </span>
-            ))}
+            {Array.isArray(property.features) &&
+              property.features.map((feature: string, index: number) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
+                >
+                  {feature}
+                </span>
+              ))}
           </div>
           <div className="mt-auto pt-4 flex gap-2 justify-end">
             <Button variant="outline" size="sm">

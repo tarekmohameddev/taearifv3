@@ -43,7 +43,7 @@ export function RegisterPage() {
   } = useAuthStore();
   const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
-  
+
   // Token validation
   const { tokenValidation } = useTokenValidation();
   const [formData, setFormData] = useState<FormData>({
@@ -68,7 +68,7 @@ export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [subdomainFocused, setSubdomainFocused] = useState(false);
   const [subdomainSuggestions, setSubdomainSuggestions] = useState<string[]>(
-    []
+    [],
   );
   const [referralCodeLocked, setReferralCodeLocked] = useState(false);
   const [googleAuthUrl, setGoogleAuthUrl] = useState<string>("");
@@ -347,7 +347,10 @@ export function RegisterPage() {
   // Show loading while validating token
   if (tokenValidation.loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+      <div
+        className="min-h-screen flex items-center justify-center bg-gray-50"
+        dir="rtl"
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">جاري التحقق من صحة الجلسة...</p>

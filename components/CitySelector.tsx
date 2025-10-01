@@ -64,10 +64,7 @@ const CitySelector: React.FC<CitySelectorProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className={cn(
-            "w-full justify-between text-black",
-            className,
-          )}
+          className={cn("w-full justify-between text-black", className)}
         >
           {selectedCity ? selectedCity.name_ar : "اختر مدينة"}
         </Button>

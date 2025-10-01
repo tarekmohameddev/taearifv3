@@ -6,7 +6,9 @@ import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
 export { PAGE_DEFINITIONS };
 
 // دالة مساعدة لتحويل البيانات من object إلى array
-const convertObjectToArray = (pageData: Record<string, any>): ComponentInstance[] => {
+const convertObjectToArray = (
+  pageData: Record<string, any>,
+): ComponentInstance[] => {
   return Object.entries(pageData).map(([id, component]: [string, any]) => ({
     id,
     type: component.type,
@@ -14,12 +16,14 @@ const convertObjectToArray = (pageData: Record<string, any>): ComponentInstance[
     componentName: component.componentName,
     data: component.data,
     position: component.position || 0,
-    layout: component.layout || { row: 0, col: 0, span: 2 }
+    layout: component.layout || { row: 0, col: 0, span: 2 },
   }));
 };
 
 // دالة مساعدة لتحويل البيانات من array إلى object
-const convertArrayToObject = (components: ComponentInstance[]): Record<string, any> => {
+const convertArrayToObject = (
+  components: ComponentInstance[],
+): Record<string, any> => {
   const pageData: Record<string, any> = {};
   components.forEach((component, index) => {
     const id = component.id || `${component.type}-${Date.now()}-${index}`;
@@ -29,7 +33,7 @@ const convertArrayToObject = (components: ComponentInstance[]): Record<string, a
       componentName: component.componentName,
       data: component.data,
       position: (component as any).position || index,
-      layout: (component as any).layout || { row: index, col: 0, span: 2 }
+      layout: (component as any).layout || { row: index, col: 0, span: 2 },
     };
   });
   return pageData;
@@ -41,7 +45,7 @@ export const getPageDefinition = (
 ): ComponentInstance[] | undefined => {
   const pageData = (PAGE_DEFINITIONS as any)[pageSlug];
   if (!pageData) return undefined;
-  
+
   return convertObjectToArray(pageData);
 };
 

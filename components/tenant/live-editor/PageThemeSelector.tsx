@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Palette, Sparkles, Globe } from "lucide-react";
 import SaveConfirmationDialog from "@/components/SaveConfirmationDialog";
+import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 
 interface PageThemeOption {
   id: string;
@@ -22,9 +23,9 @@ interface PageThemeOption {
   components: {
     header: string;
     hero: string;
-    "halfTextHalfImage": string;
-    "propertySlider": string;
-    "ctaValuation": string;
+    halfTextHalfImage: string;
+    propertySlider: string;
+    ctaValuation: string;
   };
 }
 
@@ -43,9 +44,9 @@ const PAGE_THEME_OPTIONS: PageThemeOption[] = [
     components: {
       header: "header1",
       hero: "hero1",
-      "halfTextHalfImage": "halfTextHalfImage1",
-      "propertySlider": "propertySlider1",
-      "ctaValuation": "ctaValuation1",
+      halfTextHalfImage: "halfTextHalfImage1",
+      propertySlider: "propertySlider1",
+      ctaValuation: "ctaValuation1",
     },
   },
   {
@@ -56,9 +57,9 @@ const PAGE_THEME_OPTIONS: PageThemeOption[] = [
     components: {
       header: "header2",
       hero: "hero2",
-      "halfTextHalfImage": "halfTextHalfImage1",
-      "propertySlider": "propertySlider1",
-      "ctaValuation": "ctaValuation1",
+      halfTextHalfImage: "halfTextHalfImage1",
+      propertySlider: "propertySlider1",
+      ctaValuation: "ctaValuation1",
     },
   },
   {
@@ -69,9 +70,9 @@ const PAGE_THEME_OPTIONS: PageThemeOption[] = [
     components: {
       header: "header3",
       hero: "hero3",
-      "halfTextHalfImage": "halfTextHalfImage1",
-      "propertySlider": "propertySlider1",
-      "ctaValuation": "ctaValuation1",
+      halfTextHalfImage: "halfTextHalfImage1",
+      propertySlider: "propertySlider1",
+      ctaValuation: "ctaValuation1",
     },
   },
   {
@@ -82,9 +83,9 @@ const PAGE_THEME_OPTIONS: PageThemeOption[] = [
     components: {
       header: "header1",
       hero: "hero2",
-      "halfTextHalfImage": "halfTextHalfImage1",
-      "propertySlider": "propertySlider1",
-      "ctaValuation": "ctaValuation1",
+      halfTextHalfImage: "halfTextHalfImage1",
+      propertySlider: "propertySlider1",
+      ctaValuation: "ctaValuation1",
     },
   },
 ];
@@ -93,6 +94,7 @@ export function PageThemeSelector({
   onThemeChange,
   className = "",
 }: PageThemeSelectorProps) {
+  const t = useEditorT();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -137,7 +139,7 @@ export function PageThemeSelector({
             className={`inline-flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200 hover:from-indigo-100 hover:to-purple-100 hover:border-indigo-300 transition-all duration-200 ${className}`}
           >
             <Globe className="w-4 h-4 text-indigo-600" />
-            <span className="text-indigo-700 font-medium">Page Theme</span>
+            <span className="text-indigo-700 font-medium">{t("page_theme.page_theme")}</span>
             <Sparkles className="w-3 h-3 text-indigo-500" />
           </Button>
         </DialogTrigger>
@@ -146,11 +148,10 @@ export function PageThemeSelector({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
               <Globe className="w-5 h-5 text-indigo-600" />
-              Choose Page Theme
+              {t("page_theme.choose_page_theme")}
             </DialogTitle>
             <DialogDescription>
-              Select a theme to apply to all components on this page. This will
-              change the design of all sections at once.
+              {t("page_theme.page_theme_description")}
             </DialogDescription>
           </DialogHeader>
 
@@ -158,7 +159,7 @@ export function PageThemeSelector({
             {/* Theme Grid */}
             <div>
               <h3 className="font-medium text-gray-900 mb-4">
-                Available Page Themes
+                {t("page_theme.available_page_themes")}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {PAGE_THEME_OPTIONS.map((theme) => (
@@ -188,9 +189,9 @@ export function PageThemeSelector({
                           {theme.name}
                         </h4>
                         {selectedTheme === theme.id && (
-                          <Badge className="bg-indigo-600 text-white text-xs">
-                            Selected
-                          </Badge>
+                        <Badge className="bg-indigo-600 text-white text-xs">
+                          {t("theme_selector.selected")}
+                        </Badge>
                         )}
                       </div>
                       <p className="text-sm text-gray-600 mb-3">
@@ -200,7 +201,7 @@ export function PageThemeSelector({
                       {/* Components Preview */}
                       <div className="space-y-2">
                         <h5 className="text-xs font-medium text-gray-700 uppercase tracking-wide">
-                          Components:
+                          {t("page_theme.components")}:
                         </h5>
                         <div className="grid grid-cols-2 gap-1 text-xs">
                           {Object.entries(theme.components).map(
@@ -250,7 +251,7 @@ export function PageThemeSelector({
             {selectedTheme && (
               <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
                 <h3 className="font-medium text-indigo-900 mb-3">
-                  Theme Preview
+                  {t("page_theme.theme_preview")}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {Object.entries(
@@ -284,14 +285,14 @@ export function PageThemeSelector({
             {/* Action Buttons */}
             <div className="flex justify-end gap-3 pt-4 border-t">
               <Button variant="outline" onClick={handleCancel}>
-                Cancel
+                {t("theme_selector.cancel")}
               </Button>
               <Button
                 onClick={handleConfirm}
                 disabled={!selectedTheme}
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
               >
-                Apply Page Theme
+                {t("page_theme.apply_page_theme")}
               </Button>
             </div>
           </div>

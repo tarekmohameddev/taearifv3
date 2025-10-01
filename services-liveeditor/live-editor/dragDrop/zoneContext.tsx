@@ -35,8 +35,5 @@ export const DropZoneProvider = ({
   children: ReactNode;
   value: DropZoneContext;
 }) => (
-  <dropZoneContext.Provider value={value}>
-    {children}
-  </dropZoneContext.Provider>
+  <dropZoneContext.Provider value={value}>{children}</dropZoneContext.Provider>
 );
-

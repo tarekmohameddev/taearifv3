@@ -36,14 +36,16 @@ export default async function handler(req, res) {
     // دالة إنشاء المكونات الأولية من defaultComponents
     const createInitialComponents = () => {
       const homepageComponents = defaultComponents.homepage;
-      return Object.entries(homepageComponents).map(([type, componentName], index) => ({
-        id: `${type}-${Math.random().toString(36).substr(2, 9)}`,
-        type: type,
-        name: getComponentDisplayName(type),
-        componentName: componentName,
-        data: {},
-        position: index,
-      }));
+      return Object.entries(homepageComponents).map(
+        ([type, componentName], index) => ({
+          id: `${type}-${Math.random().toString(36).substr(2, 9)}`,
+          type: type,
+          name: getComponentDisplayName(type),
+          componentName: componentName,
+          data: {},
+          position: index,
+        }),
+      );
     };
 
     // دالة للحصول على اسم العرض للمكون

@@ -338,9 +338,12 @@ export default function CrmPage() {
 
           // Add "unassigned" stage for customers without stage
           const unassignedCustomers = crmData.stages_with_customers.flatMap(
-            (stage: any) => (stage.customers || []).filter((customer: any) => !customer.stage_id)
+            (stage: any) =>
+              (stage.customers || []).filter(
+                (customer: any) => !customer.stage_id,
+              ),
           );
-          
+
           if (unassignedCustomers.length > 0) {
             transformedStages.unshift({
               id: "unassigned",
@@ -379,7 +382,9 @@ export default function CrmPage() {
                 district: customer.district || "",
                 assignedAgent: customer.assigned_agent || "",
                 lastContact: customer.last_contact || "",
-                urgency: customer.priority ? getPriorityLabel(customer.priority) : "",
+                urgency: customer.priority
+                  ? getPriorityLabel(customer.priority)
+                  : "",
                 pipelineStage: String(stage.stage_id),
                 dealValue: customer.deal_value || 0,
                 probability: customer.probability || 0,
@@ -393,7 +398,8 @@ export default function CrmPage() {
                 familySize: customer.family_size || 0,
                 leadSource: customer.lead_source || "",
                 satisfaction: customer.satisfaction || 0,
-                communicationPreference: customer.communication_preference || "",
+                communicationPreference:
+                  customer.communication_preference || "",
                 expectedCloseDate: customer.expected_close_date || "",
               })),
           );
@@ -567,8 +573,11 @@ export default function CrmPage() {
           .updateCustomerStage(dragPreview.id.toString(), stageId)
           .then((success) => {
             if (!success) {
-                          // Revert if API fails
-            updateCustomerStage(dragPreview.id.toString(), originalStage || "");
+              // Revert if API fails
+              updateCustomerStage(
+                dragPreview.id.toString(),
+                originalStage || "",
+              );
               utilities.announceToScreenReader(
                 `فشل في نقل العميل ${customerName}`,
               );
@@ -606,16 +615,15 @@ export default function CrmPage() {
     focusedCustomer,
     focusedStage,
     pipelineStages,
-    onKeyDown: (e, customer, stageId) => {
-    },
+    onKeyDown: (e, customer, stageId) => {},
     onMoveCustomerToStage: async (customer, targetStageId) => {
       const success = await dataHandler.updateCustomerStage(
         customer.id.toString(),
         targetStageId,
       );
-              if (success) {
-          updateCustomerStage(customer.id.toString(), targetStageId);
-        }
+      if (success) {
+        updateCustomerStage(customer.id.toString(), targetStageId);
+      }
     },
     onSetFocusedCustomer: setFocusedCustomer,
     onSetFocusedStage: setFocusedStage,
@@ -688,15 +696,23 @@ export default function CrmPage() {
   const filteredCustomers = customersData.filter((customer: Customer) => {
     const matchesSearch =
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (customer.nameEn?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (customer.email?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (customer.nameEn?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      ) ||
+      (customer.email?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      ) ||
       (customer.phone_number || customer.phone || "").includes(searchTerm) ||
       (customer.city?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (customer.district?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+      (customer.district?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      );
 
     const matchesStage =
-      filterStage === "all" || 
-      (filterStage === "unassigned" && (!customer.pipelineStage && !customer.stage_id)) ||
+      filterStage === "all" ||
+      (filterStage === "unassigned" &&
+        !customer.pipelineStage &&
+        !customer.stage_id) ||
       customer.pipelineStage === filterStage ||
       (customer.stage_id && String(customer.stage_id) === filterStage);
     const matchesType =
@@ -721,14 +737,20 @@ export default function CrmPage() {
       if (stage.id === "unassigned") {
         return !c.pipelineStage && !c.stage_id;
       }
-      return c.pipelineStage === stage.id || (c.stage_id && String(c.stage_id) === stage.id);
+      return (
+        c.pipelineStage === stage.id ||
+        (c.stage_id && String(c.stage_id) === stage.id)
+      );
     }).length,
     value: customersData
       .filter((c: Customer) => {
         if (stage.id === "unassigned") {
           return !c.pipelineStage && !c.stage_id;
         }
-        return c.pipelineStage === stage.id || (c.stage_id && String(c.stage_id) === stage.id);
+        return (
+          c.pipelineStage === stage.id ||
+          (c.stage_id && String(c.stage_id) === stage.id)
+        );
       })
       .reduce((sum: number, c: Customer) => sum + (c.dealValue || 0), 0),
   }));
@@ -859,11 +881,11 @@ export default function CrmPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-        <CrmPageSkeleton />
-      </div>
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <CrmPageSkeleton />
+        </div>
       </div>
     );
   }
@@ -897,7 +919,9 @@ export default function CrmPage() {
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+                <p className="text-lg text-gray-500">
+                  يرجى تسجيل الدخول لعرض المحتوى
+                </p>
               </div>
             </div>
           </main>
@@ -937,8 +961,7 @@ export default function CrmPage() {
               filterUrgency={filterUrgency}
               setFilterUrgency={setFilterUrgency}
               pipelineStages={pipelineStages}
-              onSearchResults={(results) => {
-              }}
+              onSearchResults={(results) => {}}
             />
 
             {/* Main Content */}
@@ -993,8 +1016,7 @@ export default function CrmPage() {
               />
             )}
 
-
-                          {/* طلبات العملاء */}
+            {/* طلبات العملاء */}
             {activeView === "inquiry" && (
               <InquiryList
                 onViewInquiry={handleViewInquiry}

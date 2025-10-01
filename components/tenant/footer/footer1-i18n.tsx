@@ -5,7 +5,15 @@ import { useClientT } from "@/context-liveeditor/clientI18nStore";
 import { useClientLocale } from "@/context-liveeditor/clientI18nStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from "lucide-react";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
 
 interface Footer1I18nProps {
   logo?: string;
@@ -33,11 +41,11 @@ export default function Footer1I18n({
   logo = "/placeholder-logo.png",
   logoText = {
     ar: "شركة العقارات",
-    en: "Real Estate Company"
+    en: "Real Estate Company",
   },
   companyInfo = {
     ar: "نحن نقدم أفضل الخدمات العقارية مع ضمان الجودة والموثوقية. نساعدك في العثور على العقار المثالي الذي يناسب احتياجاتك وميزانيتك.",
-    en: "We provide the best real estate services with quality and reliability guarantee. We help you find the perfect property that suits your needs and budget."
+    en: "We provide the best real estate services with quality and reliability guarantee. We help you find the perfect property that suits your needs and budget.",
   },
   quickLinks = [
     { label: { ar: "الرئيسية", en: "Home" }, href: "/" },
@@ -48,16 +56,16 @@ export default function Footer1I18n({
   contactInfo = {
     address: {
       ar: "الرياض، المملكة العربية السعودية",
-      en: "Riyadh, Saudi Arabia"
+      en: "Riyadh, Saudi Arabia",
     },
     phone: "+966 50 123 4567",
-    email: "info@company.com"
+    email: "info@company.com",
   },
   socialLinks = {
     facebook: "https://facebook.com",
     twitter: "https://twitter.com",
     instagram: "https://instagram.com",
-    linkedin: "https://linkedin.com"
+    linkedin: "https://linkedin.com",
   },
   className = "",
 }: Footer1I18nProps) {
@@ -76,8 +84,8 @@ export default function Footer1I18n({
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <img 
-                src={logo} 
+              <img
+                src={logo}
                 alt={getTranslatedText(logoText)}
                 className="h-10 w-10 object-contain"
               />
@@ -90,22 +98,34 @@ export default function Footer1I18n({
             </p>
             <div className="flex space-x-4">
               {socialLinks.facebook && (
-                <a href={socialLinks.facebook} className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href={socialLinks.facebook}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   <Facebook className="h-5 w-5" />
                 </a>
               )}
               {socialLinks.twitter && (
-                <a href={socialLinks.twitter} className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href={socialLinks.twitter}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   <Twitter className="h-5 w-5" />
                 </a>
               )}
               {socialLinks.instagram && (
-                <a href={socialLinks.instagram} className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href={socialLinks.instagram}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   <Instagram className="h-5 w-5" />
                 </a>
               )}
               {socialLinks.linkedin && (
-                <a href={socialLinks.linkedin} className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href={socialLinks.linkedin}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   <Linkedin className="h-5 w-5" />
                 </a>
               )}
@@ -118,7 +138,7 @@ export default function Footer1I18n({
             <ul className="space-y-2">
               {quickLinks.map((link, index) => (
                 <li key={index}>
-                  <a 
+                  <a
                     href={link.href}
                     className="text-gray-300 hover:text-white transition-colors text-sm"
                   >
@@ -131,7 +151,9 @@ export default function Footer1I18n({
 
           {/* Contact Info */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">{t("footer.contact_info")}</h3>
+            <h3 className="text-lg font-semibold">
+              {t("footer.contact_info")}
+            </h3>
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-blue-400 mt-0.5" />
@@ -141,11 +163,15 @@ export default function Footer1I18n({
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-blue-400" />
-                <span className="text-gray-300 text-sm">{contactInfo.phone}</span>
+                <span className="text-gray-300 text-sm">
+                  {contactInfo.phone}
+                </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-blue-400" />
-                <span className="text-gray-300 text-sm">{contactInfo.email}</span>
+                <span className="text-gray-300 text-sm">
+                  {contactInfo.email}
+                </span>
               </div>
             </div>
           </div>
@@ -153,12 +179,10 @@ export default function Footer1I18n({
           {/* Newsletter */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">{t("footer.newsletter")}</h3>
-            <p className="text-gray-300 text-sm">
-              {t("footer.subscribe")}
-            </p>
+            <p className="text-gray-300 text-sm">{t("footer.subscribe")}</p>
             <div className="flex space-x-2">
-              <Input 
-                type="email" 
+              <Input
+                type="email"
                 placeholder={t("forms.email")}
                 className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
               />
@@ -175,13 +199,20 @@ export default function Footer1I18n({
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-sm">
-              © 2024 {getTranslatedText(logoText)}. {t("footer.all_rights_reserved")}
+              © 2024 {getTranslatedText(logoText)}.{" "}
+              {t("footer.all_rights_reserved")}
             </p>
             <div className="flex space-x-6 text-sm">
-              <a href="/privacy" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="/privacy"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 {t("footer.privacy_policy")}
               </a>
-              <a href="/terms" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="/terms"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 {t("footer.terms_of_service")}
               </a>
             </div>
@@ -191,5 +222,3 @@ export default function Footer1I18n({
     </footer>
   );
 }
-
-

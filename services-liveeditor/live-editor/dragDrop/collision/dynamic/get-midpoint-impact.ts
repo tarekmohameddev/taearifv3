@@ -9,7 +9,7 @@ export const getMidpointImpact = (
   dragShape: Shape,
   dropShape: Shape,
   direction: Direction,
-  offset: number = 0.05
+  offset: number = 0.05,
 ): boolean => {
   const dragCenter = dragShape.center;
   const dropCenter = dropShape.center;

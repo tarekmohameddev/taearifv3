@@ -21,13 +21,13 @@ let flushNext: UniqueIdentifier = "";
 
 /**
  * نظام Collision Detection ديناميكي مستوحى من Puck
- * 
+ *
  * يجمع بين midpoint detection و directional collision للحصول على
  * تجربة سحب وإفلات سلسة وخالية من التشويش في التخطيطات المعقدة
  */
 export const createDynamicCollisionDetector = (
   dragAxis: DragAxis,
-  midpointOffset: number = 0.05
+  midpointOffset: number = 0.05,
 ) =>
   ((input) => {
     const { dragOperation, droppable } = input;
@@ -116,10 +116,15 @@ export const createDynamicCollisionDetector = (
           // مبسط مؤقتاً
           const deltaX = dragShape.center.x - (droppable.shape?.center.x || 0);
           const deltaY = dragShape.center.y - (droppable.shape?.center.y || 0);
-          
-          const calculatedDirection: Direction = Math.abs(deltaX) > Math.abs(deltaY) 
-            ? (deltaX > 0 ? "right" : "left")
-            : (deltaY > 0 ? "down" : "up");
+
+          const calculatedDirection: Direction =
+            Math.abs(deltaX) > Math.abs(deltaY)
+              ? deltaX > 0
+                ? "right"
+                : "left"
+              : deltaY > 0
+                ? "down"
+                : "up";
 
           data.direction = calculatedDirection;
 

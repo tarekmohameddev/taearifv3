@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Palette, Sparkles } from "lucide-react";
 import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 
 interface ThemeOption {
   id: string;
@@ -35,22 +36,29 @@ export function ThemeSelector({
   onThemeChange,
   className = "",
 }: ThemeSelectorProps) {
+  const t = useEditorT();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState(currentTheme);
-  const [themeOptions, setThemeOptions] = useState<Record<string, ThemeOption[]>>({});
+  const [themeOptions, setThemeOptions] = useState<
+    Record<string, ThemeOption[]>
+  >({});
 
   useEffect(() => {
     const newThemeOptions: Record<string, ThemeOption[]> = {};
     for (const componentType in COMPONENTS) {
       const component = COMPONENTS[componentType];
       if (component && component.variants) {
-        newThemeOptions[componentType] = component.variants.map((variant: any) => ({
-          id: variant.id || variant,
-          name: variant.name || `${component.displayName} ${(variant.id || variant).replace(componentType, "")}`,
-          image: "/placeholder.svg",
-          description: `${component.description} - ${variant.id || variant} variant`,
-          category: componentType,
-        }));
+        newThemeOptions[componentType] = component.variants.map(
+          (variant: any) => ({
+            id: variant.id || variant,
+            name:
+              variant.name ||
+              `${component.displayName} ${(variant.id || variant).replace(componentType, "")}`,
+            image: "/placeholder.svg",
+            description: `${component.description} - ${variant.id || variant} variant`,
+            category: componentType,
+          }),
+        );
       }
     }
     setThemeOptions(newThemeOptions);
@@ -82,7 +90,7 @@ export function ThemeSelector({
           className={`inline-flex items-center gap-2 bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 hover:from-purple-100 hover:to-blue-100 hover:border-purple-300 transition-all duration-200 ${className}`}
         >
           <Palette className="w-4 h-4 text-purple-600" />
-          <span className="text-purple-700 font-medium">Change Theme</span>
+          <span className="text-purple-700 font-medium">{t("theme_selector.change_theme")}</span>
           <Sparkles className="w-3 h-3 text-purple-500" />
         </Button>
       </DialogTrigger>
@@ -91,11 +99,10 @@ export function ThemeSelector({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Palette className="w-5 h-5 text-purple-600" />
-            Choose Your Theme
+            {t("theme_selector.choose_theme")}
           </DialogTitle>
           <DialogDescription>
-            Select a new theme for your {componentType} component. Each theme
-            offers a unique design and layout.
+            {t("theme_selector.theme_description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -103,7 +110,7 @@ export function ThemeSelector({
           {/* Current Theme Display */}
           {currentThemeData && (
             <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-              <h3 className="font-medium text-blue-900 mb-2">Current Theme</h3>
+              <h3 className="font-medium text-blue-900 mb-2">{t("theme_selector.current_theme")}</h3>
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <img
@@ -112,7 +119,7 @@ export function ThemeSelector({
                     className="w-16 h-10 object-cover rounded border-2 border-blue-300"
                   />
                   <Badge className="absolute -top-1 -right-1 bg-blue-600 text-xs">
-                    Active
+                    {t("theme_selector.active")}
                   </Badge>
                 </div>
                 <div>
@@ -129,7 +136,7 @@ export function ThemeSelector({
 
           {/* Theme Grid */}
           <div>
-            <h3 className="font-medium text-gray-900 mb-4">Available Themes</h3>
+            <h3 className="font-medium text-gray-900 mb-4">{t("theme_selector.available_themes")}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {currentThemes.map((theme) => (
                 <div
@@ -159,7 +166,7 @@ export function ThemeSelector({
                       </h4>
                       {selectedTheme === theme.id && (
                         <Badge className="bg-purple-600 text-white text-xs">
-                          Selected
+                          {t("theme_selector.selected")}
                         </Badge>
                       )}
                     </div>
@@ -173,7 +180,7 @@ export function ThemeSelector({
                       size="sm"
                       className="w-full text-purple-600 hover:text-purple-700 hover:bg-purple-50"
                     >
-                      Preview Theme
+                      {t("theme_selector.preview_theme")}
                     </Button>
                   </div>
 
@@ -201,14 +208,14 @@ export function ThemeSelector({
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={handleCancel}>
-              Cancel
+              {t("theme_selector.cancel")}
             </Button>
             <Button
               onClick={handleConfirm}
               disabled={selectedTheme === currentTheme}
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
             >
-              Apply Theme
+              {t("theme_selector.apply_theme")}
             </Button>
           </div>
         </div>

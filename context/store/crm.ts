@@ -297,7 +297,9 @@ const useCrmStore = create<CrmStore>()(
         const { customers, customersCache } = get();
 
         const updatedCustomers = customers.map((customer) =>
-          customer.id.toString() === customerId ? { ...customer, ...updates } : customer,
+          customer.id.toString() === customerId
+            ? { ...customer, ...updates }
+            : customer,
         );
 
         const updatedCache = new Map(customersCache);

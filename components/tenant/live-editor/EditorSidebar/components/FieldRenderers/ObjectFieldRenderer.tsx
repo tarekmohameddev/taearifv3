@@ -82,8 +82,7 @@ export function ObjectFieldRenderer({
             <div className="mb-6">
               <CardThemeSelector
                 currentTheme={
-                  getValueByPath(`${normalizedPath}.theme`) ||
-                  "card-default"
+                  getValueByPath(`${normalizedPath}.theme`) || "card-default"
                 }
                 onThemeChange={(theme) =>
                   updateValue(`${normalizedPath}.theme`, theme)
@@ -111,23 +110,18 @@ export function ObjectFieldRenderer({
                   <ColorFieldRenderer
                     label="Color"
                     path={`${normalizedPath}.colors.from`}
-                    value={getValueByPath(
-                      `${normalizedPath}.colors.from`,
-                    )}
+                    value={getValueByPath(`${normalizedPath}.colors.from`)}
                     updateValue={updateValue}
                   />
                 </div>
               )}
 
-              {getValueByPath(`${normalizedPath}.type`) ===
-                "gradient" && (
+              {getValueByPath(`${normalizedPath}.type`) === "gradient" && (
                 <div className="space-y-4">
                   <ColorFieldRenderer
                     label="From"
                     path={`${normalizedPath}.colors.from`}
-                    value={getValueByPath(
-                      `${normalizedPath}.colors.from`,
-                    )}
+                    value={getValueByPath(`${normalizedPath}.colors.from`)}
                     updateValue={updateValue}
                   />
                   <ColorFieldRenderer
@@ -158,17 +152,30 @@ export function ObjectFieldRenderer({
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                      />
                     </svg>
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-800">Menu Items</h3>
-                    <p className="text-sm text-slate-600">Manage your navigation menu items</p>
+                    <p className="text-sm text-slate-600">
+                      Manage your navigation menu items
+                    </p>
                   </div>
                 </div>
                 <div className="text-sm text-slate-500">
-                  Menu items are managed through the main array field below. Each item can have submenus with their own items.
+                  Menu items are managed through the main array field below.
+                  Each item can have submenus with their own items.
                 </div>
               </div>
             </div>
@@ -196,12 +203,18 @@ export function ObjectFieldRenderer({
                 {f.type === "array" ? (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-semibold text-slate-700 text-lg">{f.label}</h4>
+                      <h4 className="font-semibold text-slate-700 text-lg">
+                        {f.label}
+                      </h4>
                       <div className="flex items-center space-x-2">
                         <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
-                          {Array.isArray(getValueByPath(`${normalizedPath}.${f.key}`)) 
-                            ? getValueByPath(`${normalizedPath}.${f.key}`).length 
-                            : 0} items
+                          {Array.isArray(
+                            getValueByPath(`${normalizedPath}.${f.key}`),
+                          )
+                            ? getValueByPath(`${normalizedPath}.${f.key}`)
+                                .length
+                            : 0}{" "}
+                          items
                         </span>
                       </div>
                     </div>

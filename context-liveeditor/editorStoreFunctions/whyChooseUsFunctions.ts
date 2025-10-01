@@ -9,23 +9,24 @@ export const getDefaultWhyChooseUsData = (): ComponentData => ({
     maxWidth: "1600px",
     padding: {
       y: "py-14",
-      smY: "sm:py-16"
-    }
+      smY: "sm:py-16",
+    },
   },
   header: {
     title: "لماذا تختارنا؟",
-    description: "مكتبنا يجمع بين الخبرة والالتزام لتقديم خدمات مميزة في مجال العقارات",
+    description:
+      "مكتبنا يجمع بين الخبرة والالتزام لتقديم خدمات مميزة في مجال العقارات",
     marginBottom: "mb-10",
     textAlign: "text-right",
     paddingX: "px-5",
     typography: {
       title: {
-        className: "section-title text-right"
+        className: "section-title text-right",
       },
       description: {
-        className: "section-subtitle-xl"
-      }
-    }
+        className: "section-subtitle-xl",
+      },
+    },
   },
   features: {
     list: [
@@ -49,14 +50,14 @@ export const getDefaultWhyChooseUsData = (): ComponentData => ({
       gap: "gap-8",
       columns: {
         sm: "sm:grid-cols-2",
-        lg: "lg:grid-cols-3"
-      }
+        lg: "lg:grid-cols-3",
+      },
     },
     icon: {
       className: "h-[7rem] w-[7rem]",
       height: "h-[7rem]",
-      width: "w-[7rem]"
-    }
+      width: "w-[7rem]",
+    },
   },
   typography: {
     title: {
@@ -65,7 +66,7 @@ export const getDefaultWhyChooseUsData = (): ComponentData => ({
       textAlign: "text-center",
       fontSize: "text-lg",
       fontWeight: "font-bold",
-      color: "text-emerald-700"
+      color: "text-emerald-700",
     },
     description: {
       className: "mt-3 text-center text-lg leading-7 text-gray-600",
@@ -73,44 +74,44 @@ export const getDefaultWhyChooseUsData = (): ComponentData => ({
       textAlign: "text-center",
       fontSize: "text-lg",
       lineHeight: "leading-7",
-      color: "text-gray-600"
-    }
+      color: "text-gray-600",
+    },
   },
   responsive: {
     mobile: {
       padding: "py-14",
-      gridCols: "grid-cols-1"
+      gridCols: "grid-cols-1",
     },
     tablet: {
       padding: "sm:py-16",
-      gridCols: "sm:grid-cols-2"
+      gridCols: "sm:grid-cols-2",
     },
     desktop: {
-      gridCols: "xl:grid-cols-3"
-    }
+      gridCols: "xl:grid-cols-3",
+    },
   },
   animations: {
     header: {
       enabled: true,
       type: "fade-up",
       duration: 600,
-      delay: 200
+      delay: 200,
     },
     features: {
       enabled: true,
       type: "fade-up",
       duration: 500,
       delay: 300,
-      stagger: 100
-    }
+      stagger: 100,
+    },
   },
   styling: {
     background: "#ffffff",
     textColor: "#1f2937",
     accentColor: "#059669",
     borderColor: "#e5e7eb",
-    ringColor: "#059669"
-  }
+    ringColor: "#059669",
+  },
 });
 
 export const whyChooseUsFunctions = {
@@ -118,17 +119,17 @@ export const whyChooseUsFunctions = {
     if (state.whyChooseUsStates[variantId]) {
       return state;
     }
-    
+
     const defaultData = getDefaultWhyChooseUsData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     return {
       ...state,
       whyChooseUsStates: { ...state.whyChooseUsStates, [variantId]: data },
     };
   },
 
-  getData: (state: any, variantId: string) => 
+  getData: (state: any, variantId: string) =>
     state.whyChooseUsStates[variantId] || getDefaultWhyChooseUsData(),
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
@@ -139,7 +140,7 @@ export const whyChooseUsFunctions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.whyChooseUsStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
       ...state,
       whyChooseUsStates: { ...state.whyChooseUsStates, [variantId]: newData },

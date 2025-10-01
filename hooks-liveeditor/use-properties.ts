@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
 export interface Property {
   id: string;
@@ -8,9 +8,9 @@ export interface Property {
   views: number;
   bedrooms?: number;
   image: string;
-  status: 'available' | 'rented' | 'sold';
+  status: "available" | "rented" | "sold";
   type: string;
-  transactionType: 'rent' | 'sale';
+  transactionType: "rent" | "sale";
 }
 
 export interface PropertiesResponse {
@@ -27,8 +27,8 @@ export interface PropertiesResponse {
 }
 
 export interface UsePropertiesOptions {
-  transactionType?: 'rent' | 'sale';
-  status?: 'all' | 'available' | 'rented' | 'sold';
+  transactionType?: "rent" | "sale";
+  status?: "all" | "available" | "rented" | "sold";
   type?: string;
   search?: string;
   price?: string;
@@ -47,50 +47,57 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
     type,
     search,
     price,
-    autoFetch = true
+    autoFetch = true,
   } = options;
 
   const fetchProperties = useCallback(async () => {
-    console.log('fetchProperties called with:', { transactionType, status, type, search, price });
+    console.log("fetchProperties called with:", {
+      transactionType,
+      status,
+      type,
+      search,
+      price,
+    });
     setLoading(true);
     setError(null);
 
     try {
       // بناء query parameters
       const params = new URLSearchParams();
-      
-      if (transactionType) params.append('transactionType', transactionType);
-      if (status && status !== 'all') params.append('status', status);
-      if (type) params.append('type', type);
-      if (search) params.append('search', search);
-      if (price) params.append('price', price);
+
+      if (transactionType) params.append("transactionType", transactionType);
+      if (status && status !== "all") params.append("status", status);
+      if (type) params.append("type", type);
+      if (search) params.append("search", search);
+      if (price) params.append("price", price);
 
       const queryString = params.toString();
-      const url = `/api/properties/properties${queryString ? `?${queryString}` : ''}`;
-      
-      console.log('Fetching from URL:', url);
+      const url = `/api/properties/properties${queryString ? `?${queryString}` : ""}`;
+
+      console.log("Fetching from URL:", url);
 
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result: PropertiesResponse = await response.json();
-      
-      console.log('API Response:', result);
-      
+
+      console.log("API Response:", result);
+
       if (result.success) {
         setProperties(result.data);
         setTotal(result.total);
-        console.log('Properties updated:', result.data.length, 'items');
+        console.log("Properties updated:", result.data.length, "items");
       } else {
-        throw new Error('Failed to fetch properties');
+        throw new Error("Failed to fetch properties");
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
       setError(errorMessage);
-      console.error('Error fetching properties:', err);
+      console.error("Error fetching properties:", err);
     } finally {
       setLoading(false);
     }
@@ -98,7 +105,14 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
 
   // جلب البيانات تلقائياً عند تغيير المعاملات
   useEffect(() => {
-    console.log('useEffect triggered with:', { transactionType, status, type, search, price, autoFetch });
+    console.log("useEffect triggered with:", {
+      transactionType,
+      status,
+      type,
+      search,
+      price,
+      autoFetch,
+    });
     if (autoFetch) {
       fetchProperties();
     }
@@ -111,7 +125,7 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
 
   // دالة لفلترة العقارات محلياً (للحالات التي تحتاج فلترة سريعة)
   const filterProperties = (filterFn: (property: Property) => boolean) => {
-    setProperties(prev => prev.filter(filterFn));
+    setProperties((prev) => prev.filter(filterFn));
   };
 
   // دالة لإعادة تعيين الفلاتر
@@ -128,6 +142,6 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
     total,
     refetch,
     filterProperties,
-    resetFilters
+    resetFilters,
   };
 };

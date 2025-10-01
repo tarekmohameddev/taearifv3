@@ -55,13 +55,13 @@ export const filterButtonsFunctions = {
 
     const defaultData = getDefaultFilterButtonsData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
-    return { 
-      filterButtonsStates: { ...state.filterButtonsStates, [variantId]: data } 
+
+    return {
+      filterButtonsStates: { ...state.filterButtonsStates, [variantId]: data },
     } as any;
   },
 
-  getData: (state: any, variantId: string) => 
+  getData: (state: any, variantId: string) =>
     state.filterButtonsStates[variantId] || getDefaultFilterButtonsData(),
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
@@ -69,11 +69,15 @@ export const filterButtonsFunctions = {
   }),
 
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.filterButtonsStates[variantId] || getDefaultFilterButtonsData();
+    const source =
+      state.filterButtonsStates[variantId] || getDefaultFilterButtonsData();
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
-      filterButtonsStates: { ...state.filterButtonsStates, [variantId]: newData },
+      filterButtonsStates: {
+        ...state.filterButtonsStates,
+        [variantId]: newData,
+      },
     } as any;
   },
 };

@@ -40,7 +40,10 @@ export const resetComponentInState = (
         store.setHeaderData(resetComponent.componentName, defaultData);
         break;
       case "halfTextHalfImage":
-        store.sethalfTextHalfImageData(resetComponent.componentName, defaultData);
+        store.sethalfTextHalfImageData(
+          resetComponent.componentName,
+          defaultData,
+        );
         break;
       case "propertySlider":
         store.setPropertySliderData(resetComponent.componentName, defaultData);

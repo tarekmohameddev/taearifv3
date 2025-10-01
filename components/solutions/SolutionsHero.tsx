@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Layers, Play, Phone } from 'lucide-react';
+import { Layers, Play, Phone } from "lucide-react";
 
 export default function SolutionsHero() {
   return (
@@ -22,8 +22,8 @@ export default function SolutionsHero() {
 
           {/* Main Headline */}
           <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in ">
-          <span className="text-black">حلول&nbsp;</span>
-<span className="gradient-text">تعاريف</span>
+            <span className="text-black">حلول&nbsp;</span>
+            <span className="gradient-text">تعاريف</span>
 
             <br />
             <span className="gradient-success">المتكاملة</span>
@@ -31,16 +31,23 @@ export default function SolutionsHero() {
 
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed animate-slide-up">
-            اكتشف مجموعة شاملة من الحلول التقنية المصممة خصيصاً لتطوير أعمالك العقارية وتحقيق النجاح المستدام
+            اكتشف مجموعة شاملة من الحلول التقنية المصممة خصيصاً لتطوير أعمالك
+            العقارية وتحقيق النجاح المستدام
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-slide-up">
-            <a href={`register/`} className="btn btn-success text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl">
+            <a
+              href={`register/`}
+              className="btn btn-success text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl"
+            >
               <Play className="ml-2 h-5 w-5" />
               ابدأ رحلتك الآن
             </a>
-            <a href="https://wa.me/966592960339" className="btn btn-outline text-lg px-8 py-4 rounded-full flex items-center">
+            <a
+              href="https://wa.me/966592960339"
+              className="btn btn-outline text-lg px-8 py-4 rounded-full flex items-center"
+            >
               <Phone className="ml-2 h-5 w-5" />
               استشارة مجانية
             </a>

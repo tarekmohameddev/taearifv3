@@ -2,10 +2,10 @@ import { ComponentStructure } from "./types";
 
 // Validation schema for header data
 const validateHeaderData = (data: any): boolean => {
-  if (!data || typeof data !== 'object') return false;
-  
-  const requiredFields = ['visible', 'menu', 'logo', 'colors'];
-  return requiredFields.every(field => field in data);
+  if (!data || typeof data !== "object") return false;
+
+  const requiredFields = ["visible", "menu", "logo", "colors"];
+  return requiredFields.every((field) => field in data);
 };
 
 export const headerStructure: ComponentStructure = {
@@ -251,8 +251,16 @@ export const headerStructure: ComponentStructure = {
               fields: [
                 { key: "showProfile", label: "Show Profile", type: "boolean" },
                 { key: "showCart", label: "Show Cart", type: "boolean" },
-                { key: "showWishlist", label: "Show Wishlist", type: "boolean" },
-                { key: "showNotifications", label: "Show Notifications", type: "boolean" },
+                {
+                  key: "showWishlist",
+                  label: "Show Wishlist",
+                  type: "boolean",
+                },
+                {
+                  key: "showNotifications",
+                  label: "Show Notifications",
+                  type: "boolean",
+                },
               ],
             },
             {
@@ -260,9 +268,21 @@ export const headerStructure: ComponentStructure = {
               label: "Mobile Menu",
               type: "object",
               fields: [
-                { key: "showLogo", label: "Show Logo in Mobile Menu", type: "boolean" },
-                { key: "showLanguageToggle", label: "Show Language Toggle", type: "boolean" },
-                { key: "showSearch", label: "Show Search in Mobile Menu", type: "boolean" },
+                {
+                  key: "showLogo",
+                  label: "Show Logo in Mobile Menu",
+                  type: "boolean",
+                },
+                {
+                  key: "showLanguageToggle",
+                  label: "Show Language Toggle",
+                  type: "boolean",
+                },
+                {
+                  key: "showSearch",
+                  label: "Show Search in Mobile Menu",
+                  type: "boolean",
+                },
               ],
             },
           ],
@@ -287,10 +307,15 @@ export const headerStructure: ComponentStructure = {
               label: "Mobile Menu",
               type: "object",
               fields: [
-                { key: "side", label: "Side", type: "select", options: [
-                  { label: "Left", value: "left" },
-                  { label: "Right", value: "right" },
-                ]},
+                {
+                  key: "side",
+                  label: "Side",
+                  type: "select",
+                  options: [
+                    { label: "Left", value: "left" },
+                    { label: "Right", value: "right" },
+                  ],
+                },
                 { key: "width", label: "Width (px)", type: "number" },
                 { key: "overlay", label: "Show Overlay", type: "boolean" },
               ],

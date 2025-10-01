@@ -10,11 +10,14 @@ interface MovementInterval {
 }
 
 // تخزين آخر موضع وحركة لكل عملية سحب
-const movementHistory = new Map<string, {
-  lastPosition: Vector;
-  lastDirection?: Direction;
-  lastTimestamp: number;
-}>();
+const movementHistory = new Map<
+  string,
+  {
+    lastPosition: Vector;
+    lastDirection?: Direction;
+    lastTimestamp: number;
+  }
+>();
 
 /**
  * تتبع فترات الحركة لتحديد الاتجاه والسرعة
@@ -23,7 +26,7 @@ const movementHistory = new Map<string, {
 export const trackMovementInterval = (
   currentPosition: Vector,
   dragAxis: DragAxis,
-  dragId: string = "default"
+  dragId: string = "default",
 ): MovementInterval => {
   const now = Date.now();
   const history = movementHistory.get(dragId);

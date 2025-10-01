@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { PropertyCard } from "@/components/property-card"
-import { Property } from "@/lib/mock-data"
+import { PropertyCard } from "@/components/property-card";
+import { Property } from "@/lib/mock-data";
 
 interface PropertyGridProps {
-  properties: Property[]
-  emptyMessage?: string
+  properties: Property[];
+  emptyMessage?: string;
 }
 
-export default function PropertyGrid({ 
-  properties, 
-  emptyMessage = "لم يتم العثور على نتائج." 
+export default function PropertyGrid({
+  properties,
+  emptyMessage = "لم يتم العثور على نتائج.",
 }: PropertyGridProps) {
   return (
     <section className="w-full bg-background py-8">
@@ -28,5 +28,5 @@ export default function PropertyGrid({
         )}
       </div>
     </section>
-  )
+  );
 }

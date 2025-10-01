@@ -247,12 +247,13 @@ export function GeneralSettingsPage() {
                     }
                   />
                   <p className="mt-1 text-xs text-muted-foreground">
-                  هذا الشعار سيظهر في نتائج محركات البحث وملخصات المشاركة على وسائل التواصل الاجتماعي.
+                    هذا الشعار سيظهر في نتائج محركات البحث وملخصات المشاركة على
+                    وسائل التواصل الاجتماعي.
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                  سيظهر كعنوان تبويب المتصفح (Tab title).
+                    سيظهر كعنوان تبويب المتصفح (Tab title).
                   </p>
-                  </div>
+                </div>
                 <div>
                   <Label htmlFor="description">وصف الموقع</Label>
                   <Textarea

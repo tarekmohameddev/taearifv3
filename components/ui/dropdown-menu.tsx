@@ -56,7 +56,7 @@ const DropdownMenuSubContent = React.forwardRef<
 DropdownMenuSubContent.displayName =
   DropdownMenuPrimitive.SubContent.displayName;
 
-  const DropdownMenuContent = React.forwardRef<
+const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
 >(({ className, sideOffset = 4, ...props }, ref) => (
@@ -74,7 +74,7 @@ DropdownMenuSubContent.displayName =
         "max-h-60 overflow-y-auto",
         "scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-gray-300 scrollbar-track-gray-100",
         "dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900",
-        className
+        className,
       )}
       {...props}
     />

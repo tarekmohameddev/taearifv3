@@ -5,7 +5,8 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 export const getDefaultTestimonialsData = (): ComponentData => ({
   visible: true,
   title: "آراء عملائنا",
-  description: "نحن نفخر بشركائنا وعملائنا ونسعى دائمًا لتقديم أفضل الحلول التي تدعم نموهم ونجاحهم.",
+  description:
+    "نحن نفخر بشركائنا وعملائنا ونسعى دائمًا لتقديم أفضل الحلول التي تدعم نموهم ونجاحهم.",
   background: {
     color: "#ffffff",
     image: "",
@@ -47,7 +48,8 @@ export const getDefaultTestimonialsData = (): ComponentData => ({
   testimonials: [
     {
       id: "1",
-      quote: "خدمة ممتازة وسريعة، ساعدوني في العثور على العقار المثالي في وقت قياسي.",
+      quote:
+        "خدمة ممتازة وسريعة، ساعدوني في العثور على العقار المثالي في وقت قياسي.",
       name: "أحمد محمد",
       location: "الرياض",
       rating: 5,
@@ -90,17 +92,17 @@ export const testimonialsFunctions = {
     if (state.testimonialsStates[variantId]) {
       return state;
     }
-    
+
     const defaultData = getDefaultTestimonialsData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     return {
       ...state,
       testimonialsStates: { ...state.testimonialsStates, [variantId]: data },
     };
   },
 
-  getData: (state: any, variantId: string) => 
+  getData: (state: any, variantId: string) =>
     state.testimonialsStates[variantId] || getDefaultTestimonialsData(),
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
@@ -111,7 +113,7 @@ export const testimonialsFunctions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.testimonialsStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
       ...state,
       testimonialsStates: { ...state.testimonialsStates, [variantId]: newData },

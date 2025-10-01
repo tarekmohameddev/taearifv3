@@ -254,7 +254,7 @@ export const mapSectionFunctions = {
   // Update map section data
   update: (
     currentData: ComponentData,
-    updates: Partial<ComponentData>
+    updates: Partial<ComponentData>,
   ): ComponentData => ({
     ...currentData,
     ...updates,
@@ -272,13 +272,13 @@ export const mapSectionFunctions = {
   // Remove marker
   removeMarker: (
     currentData: ComponentData,
-    markerId: string
+    markerId: string,
   ): ComponentData => ({
     ...currentData,
     markers: {
       ...currentData.markers,
       list: (currentData.markers?.list || []).filter(
-        (marker: any) => marker.id !== markerId
+        (marker: any) => marker.id !== markerId,
       ),
     },
   }),
@@ -287,13 +287,13 @@ export const mapSectionFunctions = {
   updateMarker: (
     currentData: ComponentData,
     markerId: string,
-    updates: any
+    updates: any,
   ): ComponentData => ({
     ...currentData,
     markers: {
       ...currentData.markers,
       list: (currentData.markers?.list || []).map((marker: any) =>
-        marker.id === markerId ? { ...marker, ...updates } : marker
+        marker.id === markerId ? { ...marker, ...updates } : marker,
       ),
     },
   }),
@@ -302,7 +302,7 @@ export const mapSectionFunctions = {
   updateMapCenter: (
     currentData: ComponentData,
     lat: number,
-    lng: number
+    lng: number,
   ): ComponentData => ({
     ...currentData,
     map: {
@@ -324,7 +324,7 @@ export const mapSectionFunctions = {
   toggleMapControl: (
     currentData: ComponentData,
     control: string,
-    enabled: boolean
+    enabled: boolean,
   ): ComponentData => ({
     ...currentData,
     map: {
@@ -336,7 +336,7 @@ export const mapSectionFunctions = {
   // Update content overlay
   updateContentOverlay: (
     currentData: ComponentData,
-    content: any
+    content: any,
   ): ComponentData => ({
     ...currentData,
     content: {
@@ -348,7 +348,7 @@ export const mapSectionFunctions = {
   // Update animations
   updateAnimations: (
     currentData: ComponentData,
-    animations: any
+    animations: any,
   ): ComponentData => ({
     ...currentData,
     animations: {
@@ -360,7 +360,7 @@ export const mapSectionFunctions = {
   // Update responsive settings
   updateResponsive: (
     currentData: ComponentData,
-    responsive: any
+    responsive: any,
   ): ComponentData => ({
     ...currentData,
     responsive: {
@@ -404,7 +404,7 @@ export const mapSectionFunctions = {
 
   // Get map bounds from markers
   getMapBounds: (
-    data: ComponentData
+    data: ComponentData,
   ): { north: number; south: number; east: number; west: number } | null => {
     if (!data.markers?.list || data.markers.list.length === 0) {
       return null;

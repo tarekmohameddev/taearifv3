@@ -1,19 +1,20 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Star } from "lucide-react"
-import useTenantStore from "@/context-liveeditor/tenantStore"
-import { useEditorStore } from "@/context-liveeditor/editorStore"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Star } from "lucide-react";
+import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context-liveeditor/editorStore";
 
 // Default contact map section data
 const getDefaultcontactMapSectionData = () => ({
   visible: true,
   title: "شاركنا تقييمك معنا",
-  description: "نحن نهتم برأيك! قم بتقييم تجربتك معنا من خلال اختيار عدد النجوم المناسب وكتابة تعليقك. تساعدنا في تحسين الخدمة وتقديم أفضل تجربة لعملائنا",
+  description:
+    "نحن نهتم برأيك! قم بتقييم تجربتك معنا من خلال اختيار عدد النجوم المناسب وكتابة تعليقك. تساعدنا في تحسين الخدمة وتقديم أفضل تجربة لعملائنا",
   background: {
     color: "#ffffff",
     image: "",
@@ -158,7 +159,7 @@ const getDefaultcontactMapSectionData = () => ({
       delay: 200,
     },
   },
-})
+});
 
 interface contactMapSectionProps {
   visible?: boolean;
@@ -316,66 +317,77 @@ interface contactMapSectionProps {
 
 export default function contactMapSection(props: contactMapSectionProps = {}) {
   // Initialize variant id early so hooks can depend on it
-  const variantId = props.variant || "contactMapSection1"
-  
+  const variantId = props.variant || "contactMapSection1";
+
   // Subscribe to editor store updates for this component variant
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant)
-  const getComponentData = useEditorStore((s) => s.getComponentData)
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
 
   useEffect(() => {
     if (props.useStore) {
-      ensureComponentVariant('contactMapSection', variantId, props)
+      ensureComponentVariant("contactMapSection", variantId, props);
     }
-  }, [variantId, props.useStore, ensureComponentVariant])
+  }, [variantId, props.useStore, ensureComponentVariant]);
 
   // Get tenant data
-  const tenantData = useTenantStore((s) => s.tenantData)
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const tenantId = useTenantStore((s) => s.tenantId)
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
 
   useEffect(() => {
     if (tenantId) {
-      fetchTenantData(tenantId)
+      fetchTenantData(tenantId);
     }
-  }, [tenantId, fetchTenantData])
+  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore ? (getComponentData('contactMapSection', variantId) || {}) : {}
+  const storeData = props.useStore
+    ? getComponentData("contactMapSection", variantId) || {}
+    : {};
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
-      return {}
+      return {};
     }
     // Search through all pages for this component variant
-    for (const [pageSlug, pageComponents] of Object.entries(tenantData.componentSettings)) {
-      
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
       // Check if pageComponents is an object (not array)
-      if (typeof pageComponents === 'object' && !Array.isArray(pageComponents)) {
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
         // Search through all components in this page
-        for (const [componentId, component] of Object.entries(pageComponents as any)) {
-          
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
           // Check if this is the exact component we're looking for by ID
-          if ((component as any).type === 'contactMapSection' && 
-              (component as any).componentName === variantId &&
-              componentId === props.id) {
-            return (component as any).data
+          if (
+            (component as any).type === "contactMapSection" &&
+            (component as any).componentName === variantId &&
+            componentId === props.id
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-    return {}
-  }
-  
-  const tenantComponentData = getTenantComponentData()
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
 
   // Merge data with priority: storeData > tenantComponentData > props > default
-  const mergedData = { 
-    ...getDefaultcontactMapSectionData(), 
-    ...props, 
+  const mergedData = {
+    ...getDefaultcontactMapSectionData(),
+    ...props,
     ...tenantComponentData,
-    ...storeData 
-  }
+    ...storeData,
+  };
 
   // Debug: Log the merged data to see what's happening
   console.log("🔍 contactMapSection1 - mergedData:", {
@@ -383,60 +395,76 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
     mapEnabled: mergedData.map?.enabled,
     tenantComponentData,
     storeData,
-    props
+    props,
   });
 
   // Local state for form
-  const [rating, setRating] = useState(0)
-  const [hoveredRating, setHoveredRating] = useState(0)
+  const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
   const [formData, setFormData] = useState({
     name: "",
     country: "",
     feedback: "",
-  })
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-  }
+    e.preventDefault();
+  };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   // Don't render if not visible
   if (!mergedData.visible) {
-    return null
+    return null;
   }
 
   return (
-    <section 
+    <section
       className={`w-full bg-background ${mergedData.spacing?.paddingY || "py-14 sm:py-16"}`}
       style={{
-        backgroundColor: mergedData.background?.color || mergedData.styling?.bgColor || "transparent"
+        backgroundColor:
+          mergedData.background?.color ||
+          mergedData.styling?.bgColor ||
+          "transparent",
       }}
     >
-      <div 
-        className={`mx-auto ${mergedData.spacing?.maxWidth || "max-w-[1600px]"} ${mergedData.spacing?.paddingX || "px-4"}`} 
+      <div
+        className={`mx-auto ${mergedData.spacing?.maxWidth || "max-w-[1600px]"} ${mergedData.spacing?.paddingX || "px-4"}`}
         dir="rtl"
         style={{
-          gridTemplateColumns: mergedData.grid?.columns?.desktop ? `repeat(${mergedData.grid.columns.desktop}, 1fr)` : undefined,
-          gap: mergedData.grid?.gapX || mergedData.grid?.gapY ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}` : undefined
+          gridTemplateColumns: mergedData.grid?.columns?.desktop
+            ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
+            : undefined,
+          gap:
+            mergedData.grid?.gapX || mergedData.grid?.gapY
+              ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}`
+              : undefined,
         }}
       >
         {/* العنوان والوصف */}
-        <header className={`${mergedData.spacing?.headerMarginBottom || "mb-10"} ${mergedData.header?.alignment || "text-right"}`}>
-          <h2 
+        <header
+          className={`${mergedData.spacing?.headerMarginBottom || "mb-10"} ${mergedData.header?.alignment || "text-right"}`}
+        >
+          <h2
             className={mergedData.header?.title?.className || "section-title"}
             style={{
-              color: mergedData.styling?.textColor || mergedData.colors?.textColor || undefined
+              color:
+                mergedData.styling?.textColor ||
+                mergedData.colors?.textColor ||
+                undefined,
             }}
           >
             {mergedData.title}
           </h2>
-          <p 
+          <p
             className={`${mergedData.header?.description?.className || "section-subtitle"} ${mergedData.header?.description?.maxWidth || "max-w-4xl"} ${mergedData.header?.description?.lineHeight || "leading-7"} ${mergedData.header?.description?.marginTop || "mt-4"}`}
             style={{
-              color: mergedData.styling?.textColor || mergedData.colors?.textColor || undefined
+              color:
+                mergedData.styling?.textColor ||
+                mergedData.colors?.textColor ||
+                undefined,
             }}
           >
             {mergedData.description}
@@ -444,76 +472,126 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
         </header>
 
         {/* التقسيم 50/50 */}
-        <div 
+        <div
           className={`grid ${mergedData.spacing?.gridGap || "gap-8"} ${mergedData.layout?.gridCols || "grid-cols-1 lg:grid-cols-2"}`}
           style={{
-            gridTemplateColumns: mergedData.grid?.columns?.desktop ? `repeat(${mergedData.grid.columns.desktop}, 1fr)` : undefined,
-            gap: mergedData.grid?.gapX || mergedData.grid?.gapY ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}` : undefined
+            gridTemplateColumns: mergedData.grid?.columns?.desktop
+              ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
+              : undefined,
+            gap:
+              mergedData.grid?.gapX || mergedData.grid?.gapY
+                ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}`
+                : undefined,
           }}
         >
           {/* النموذج - الجانب الأيمن */}
-          {(mergedData.form?.enabled !== false) && (
-            <div className={mergedData.layout?.formOrder || "order-1 lg:order-1"}>
-              <form onSubmit={handleSubmit} className={mergedData.spacing?.formGap || "space-y-6"}>
-                <div className={`grid grid-cols-1 ${mergedData.spacing?.inputGap || "gap-4"} sm:grid-cols-2`}>
-                  {(mergedData.form?.fields?.name?.enabled !== false) && (
+          {mergedData.form?.enabled !== false && (
+            <div
+              className={mergedData.layout?.formOrder || "order-1 lg:order-1"}
+            >
+              <form
+                onSubmit={handleSubmit}
+                className={mergedData.spacing?.formGap || "space-y-6"}
+              >
+                <div
+                  className={`grid grid-cols-1 ${mergedData.spacing?.inputGap || "gap-4"} sm:grid-cols-2`}
+                >
+                  {mergedData.form?.fields?.name?.enabled !== false && (
                     <div>
-                      <label htmlFor="name" className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
+                      <label
+                        htmlFor="name"
+                        className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}
+                      >
                         {mergedData.form?.fields?.name?.label || "اسمك"}
                       </label>
                       <Input
                         id="name"
                         type={mergedData.form?.fields?.name?.type || "text"}
-                        placeholder={mergedData.form?.fields?.name?.placeholder || "أدخل اسمك"}
+                        placeholder={
+                          mergedData.form?.fields?.name?.placeholder ||
+                          "أدخل اسمك"
+                        }
                         value={formData.name}
-                        onChange={(e) => handleInputChange("name", e.target.value)}
-                        className={mergedData.form?.fields?.name?.height || "h-12"}
-                        required={mergedData.form?.fields?.name?.required || true}
+                        onChange={(e) =>
+                          handleInputChange("name", e.target.value)
+                        }
+                        className={
+                          mergedData.form?.fields?.name?.height || "h-12"
+                        }
+                        required={
+                          mergedData.form?.fields?.name?.required || true
+                        }
                       />
                     </div>
                   )}
-                  {(mergedData.form?.fields?.country?.enabled !== false) && (
+                  {mergedData.form?.fields?.country?.enabled !== false && (
                     <div>
-                      <label htmlFor="country" className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
+                      <label
+                        htmlFor="country"
+                        className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}
+                      >
                         {mergedData.form?.fields?.country?.label || "بلدك"}
                       </label>
                       <Input
                         id="country"
                         type={mergedData.form?.fields?.country?.type || "text"}
-                        placeholder={mergedData.form?.fields?.country?.placeholder || "أدخل بلدك"}
+                        placeholder={
+                          mergedData.form?.fields?.country?.placeholder ||
+                          "أدخل بلدك"
+                        }
                         value={formData.country}
-                        onChange={(e) => handleInputChange("country", e.target.value)}
-                        className={mergedData.form?.fields?.country?.height || "h-12"}
-                        required={mergedData.form?.fields?.country?.required || true}
+                        onChange={(e) =>
+                          handleInputChange("country", e.target.value)
+                        }
+                        className={
+                          mergedData.form?.fields?.country?.height || "h-12"
+                        }
+                        required={
+                          mergedData.form?.fields?.country?.required || true
+                        }
                       />
                     </div>
                   )}
                 </div>
 
-                {(mergedData.form?.fields?.feedback?.enabled !== false) && (
+                {mergedData.form?.fields?.feedback?.enabled !== false && (
                   <div>
-                    <label htmlFor="feedback" className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
+                    <label
+                      htmlFor="feedback"
+                      className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}
+                    >
                       {mergedData.form?.fields?.feedback?.label || "تعليقك"}
                     </label>
                     <Textarea
                       id="feedback"
-                      placeholder={mergedData.form?.fields?.feedback?.placeholder || "أدخل تعليقك"}
+                      placeholder={
+                        mergedData.form?.fields?.feedback?.placeholder ||
+                        "أدخل تعليقك"
+                      }
                       value={formData.feedback}
-                      onChange={(e) => handleInputChange("feedback", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("feedback", e.target.value)
+                      }
                       className={`${mergedData.form?.fields?.feedback?.minHeight || "min-h-[120px]"} ${mergedData.form?.fields?.feedback?.resize || "resize-none"}`}
-                      required={mergedData.form?.fields?.feedback?.required || true}
+                      required={
+                        mergedData.form?.fields?.feedback?.required || true
+                      }
                     />
                   </div>
                 )}
 
                 {/* تقييم بالنجوم */}
-                {(mergedData.form?.rating?.enabled !== false) && (
+                {mergedData.form?.rating?.enabled !== false && (
                   <div>
-                    <label className={`${mergedData.labels?.labelMarginBottom || "mb-3"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}>
+                    <label
+                      className={`${mergedData.labels?.labelMarginBottom || "mb-3"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}
+                    >
                       {mergedData.form?.rating?.label || "التقييم"}
                     </label>
                     <div className="flex items-center gap-2">
-                      {Array.from({ length: mergedData.form.rating?.maxStars || 5 }).map((_, i) => (
+                      {Array.from({
+                        length: mergedData.form.rating?.maxStars || 5,
+                      }).map((_, i) => (
                         <button
                           key={i}
                           type="button"
@@ -532,7 +610,12 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                         </button>
                       ))}
                       {mergedData.form.rating?.showRatingText && (
-                        <span className={`mr-2 ${mergedData.labels?.labelSize || "text-sm"} text-muted-foreground`} style={{ color: mergedData.form.rating?.ratingTextColor }}>
+                        <span
+                          className={`mr-2 ${mergedData.labels?.labelSize || "text-sm"} text-muted-foreground`}
+                          style={{
+                            color: mergedData.form.rating?.ratingTextColor,
+                          }}
+                        >
                           {rating}/{mergedData.form.rating?.maxStars || 5}
                         </span>
                       )}
@@ -540,13 +623,18 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                   </div>
                 )}
 
-                {(mergedData.form?.submitButton?.enabled !== false) && (
+                {mergedData.form?.submitButton?.enabled !== false && (
                   <Button
-                    type={mergedData.form?.submitButton?.type as any || "submit"}
+                    type={
+                      (mergedData.form?.submitButton?.type as any) || "submit"
+                    }
                     className={`${mergedData.form?.submitButton?.width || "w-full"} rounded-xl ${mergedData.form?.submitButton?.height || "py-6"} ${mergedData.form?.submitButton?.fontSize || "text-lg"} ${mergedData.form?.submitButton?.fontWeight || "font-semibold"} ${mergedData.form?.submitButton?.borderRadius || "rounded-xl"}`}
                     style={{
-                      backgroundColor: mergedData.form?.submitButton?.backgroundColor || "#059669",
-                      color: mergedData.form?.submitButton?.textColor || "#ffffff",
+                      backgroundColor:
+                        mergedData.form?.submitButton?.backgroundColor ||
+                        "#059669",
+                      color:
+                        mergedData.form?.submitButton?.textColor || "#ffffff",
                     }}
                   >
                     {mergedData.form?.submitButton?.text || "إرسال"}
@@ -558,16 +646,23 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
 
           {/* الخريطة - الجانب الأيسر */}
           {mergedData.map?.enabled && (
-            <div className={mergedData.layout?.mapOrder || "order-2 lg:order-2"}>
-              <div className={`${mergedData.map.height || "h-[400px] lg:h-[500px]"} w-full ${mergedData.map.overflow || "overflow-hidden"} ${mergedData.map.borderRadius || "rounded-xl"} ${mergedData.map.border || "border"}`}>
+            <div
+              className={mergedData.layout?.mapOrder || "order-2 lg:order-2"}
+            >
+              <div
+                className={`${mergedData.map.height || "h-[400px] lg:h-[500px]"} w-full ${mergedData.map.overflow || "overflow-hidden"} ${mergedData.map.borderRadius || "rounded-xl"} ${mergedData.map.border || "border"}`}
+              >
                 <iframe
                   src={mergedData.map.src}
                   width={mergedData.map.width || "100%"}
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen={mergedData.map.allowFullScreen}
-                  loading={mergedData.map.loading as any || "lazy"}
-                  referrerPolicy={mergedData.map.referrerPolicy as any || "no-referrer-when-downgrade"}
+                  loading={(mergedData.map.loading as any) || "lazy"}
+                  referrerPolicy={
+                    (mergedData.map.referrerPolicy as any) ||
+                    "no-referrer-when-downgrade"
+                  }
                   title={mergedData.map.title}
                 />
               </div>
@@ -576,5 +671,5 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
         </div>
       </div>
     </section>
-  )
+  );
 }

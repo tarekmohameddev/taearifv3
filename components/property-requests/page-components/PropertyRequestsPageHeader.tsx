@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -73,7 +72,7 @@ export const PropertyRequestsPageHeader = () => {
     full_name: "الاسم الكامل",
     phone: "رقم الهاتف",
     contact_on_whatsapp: "التواصل عبر واتساب",
-    notes: "ملاحظات"
+    notes: "ملاحظات",
   };
 
   // Fetch settings when dialog opens
@@ -92,7 +91,9 @@ export const PropertyRequestsPageHeader = () => {
 
     setLoading(true);
     try {
-      const response = await axiosInstance.get("/v1/property-request-settings?merged=true");
+      const response = await axiosInstance.get(
+        "/v1/property-request-settings?merged=true",
+      );
       if (response.data.status === "success") {
         setSettings(response.data.data.settings);
         setAllowedKeys(response.data.data.allowed_keys);
@@ -105,13 +106,17 @@ export const PropertyRequestsPageHeader = () => {
     }
   };
 
-  const handleSettingChange = (fieldKey: string, setting: 'is_visible' | 'is_required', value: boolean) => {
-    setSettings(prev => ({
+  const handleSettingChange = (
+    fieldKey: string,
+    setting: "is_visible" | "is_required",
+    value: boolean,
+  ) => {
+    setSettings((prev) => ({
       ...prev,
       [fieldKey]: {
         ...prev[fieldKey],
-        [setting]: value
-      }
+        [setting]: value,
+      },
     }));
   };
 
@@ -124,12 +129,12 @@ export const PropertyRequestsPageHeader = () => {
 
     setSaving(true);
     try {
-      const items = allowedKeys.map(key => ({
+      const items = allowedKeys.map((key) => ({
         field_key: key,
         is_visible: settings[key]?.is_visible ?? true,
         is_required: settings[key]?.is_required ?? false,
         label_ar: settings[key]?.label_ar || fieldLabels[key],
-        sort_order: settings[key]?.sort_order || 10
+        sort_order: settings[key]?.sort_order || 10,
       }));
 
       await axiosInstance.post("/v1/property-request-settings/bulk", { items });
@@ -146,16 +151,15 @@ export const PropertyRequestsPageHeader = () => {
   return (
     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">إعدادات طلبات العقارات</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          إعدادات طلبات العقارات
+        </h1>
         <p className="text-muted-foreground">
           إدارة الحقول المرئية والمطلوبة في نموذج طلب العقار
         </p>
       </div>
       <div className="flex items-center gap-2">
-        <Dialog
-          open={showSettingsDialog}
-          onOpenChange={setShowSettingsDialog}
-        >
+        <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
           <DialogTrigger asChild>
             <Button>
               <Settings className="ml-2 h-4 w-4" />
@@ -170,13 +174,18 @@ export const PropertyRequestsPageHeader = () => {
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                  <span className="mr-2 text-sm text-muted-foreground">جاري تحميل الإعدادات...</span>
+                  <span className="mr-2 text-sm text-muted-foreground">
+                    جاري تحميل الإعدادات...
+                  </span>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {allowedKeys.map((fieldKey) => (
-                      <div key={fieldKey} className="border rounded-lg p-4 space-y-3">
+                      <div
+                        key={fieldKey}
+                        className="border rounded-lg p-4 space-y-3"
+                      >
                         <div className="flex items-center justify-between">
                           <Label className="text-sm font-medium">
                             {fieldLabels[fieldKey] || fieldKey}
@@ -185,26 +194,40 @@ export const PropertyRequestsPageHeader = () => {
                         <Separator />
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <Label htmlFor={`visible-${fieldKey}`} className="text-xs">
+                            <Label
+                              htmlFor={`visible-${fieldKey}`}
+                              className="text-xs"
+                            >
                               مرئي
                             </Label>
                             <Switch
                               id={`visible-${fieldKey}`}
                               checked={settings[fieldKey]?.is_visible ?? true}
-                              onCheckedChange={(checked) => 
-                                handleSettingChange(fieldKey, 'is_visible', checked)
+                              onCheckedChange={(checked) =>
+                                handleSettingChange(
+                                  fieldKey,
+                                  "is_visible",
+                                  checked,
+                                )
                               }
                             />
                           </div>
                           <div className="flex items-center justify-between">
-                            <Label htmlFor={`required-${fieldKey}`} className="text-xs">
+                            <Label
+                              htmlFor={`required-${fieldKey}`}
+                              className="text-xs"
+                            >
                               مطلوب
                             </Label>
                             <Switch
                               id={`required-${fieldKey}`}
                               checked={settings[fieldKey]?.is_required ?? false}
-                              onCheckedChange={(checked) => 
-                                handleSettingChange(fieldKey, 'is_required', checked)
+                              onCheckedChange={(checked) =>
+                                handleSettingChange(
+                                  fieldKey,
+                                  "is_required",
+                                  checked,
+                                )
                               }
                             />
                           </div>
@@ -222,7 +245,10 @@ export const PropertyRequestsPageHeader = () => {
                 >
                   إلغاء
                 </Button>
-                <Button onClick={handleSaveSettings} disabled={saving || loading}>
+                <Button
+                  onClick={handleSaveSettings}
+                  disabled={saving || loading}
+                >
                   {saving ? (
                     <>
                       <Loader2 className="ml-2 h-4 w-4 animate-spin" />
@@ -242,4 +268,4 @@ export const PropertyRequestsPageHeader = () => {
       </div>
     </div>
   );
-}; 
+};

@@ -117,7 +117,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                             onClick={() =>
                               window.open(
                                 `${useAuthStore.getState().userData?.domain}`,
-                                "_blank"
+                                "_blank",
                               )
                             }
                           >
@@ -169,7 +169,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                                 {item.label}
                               </Link>
                             </Button>
-                          )
+                          ),
                         )}
                     </nav>
                   </div>
@@ -244,7 +244,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                   onClick={() =>
                     window.open(
                       "https://wa.me/966592960339?text=مرحباً، أحتاج مساعدة في استخدام منشئ المواقع",
-                      "_blank"
+                      "_blank",
                     )
                   }
                 >

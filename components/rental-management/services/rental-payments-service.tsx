@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,10 +20,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DollarSign,
   Search,
@@ -33,54 +39,57 @@ import {
   Clock,
   CreditCard,
   Receipt,
-} from "lucide-react"
-import useAuthStore from "@/context/AuthContext"
+} from "lucide-react";
+import useAuthStore from "@/context/AuthContext";
 
 interface RentalPayment {
-  id: string
-  paymentNumber: string
-  contractId: string
-  contractNumber: string
-  propertyTitle: string
-  propertyTitleAr: string
+  id: string;
+  paymentNumber: string;
+  contractId: string;
+  contractNumber: string;
+  propertyTitle: string;
+  propertyTitleAr: string;
   tenant: {
-    name: string
-    nameAr: string
-    phone: string
-    email: string
-  }
+    name: string;
+    nameAr: string;
+    phone: string;
+    email: string;
+  };
   paymentDetails: {
-    amount: number
-    dueDate: string
-    dueDateHijri: string
-    paidDate?: string
-    paidDateHijri?: string
-    paymentMethod: string
-    paymentMethodAr: string
-    transactionId?: string
-    receiptNumber?: string
-  }
-  status: "pending" | "paid" | "overdue" | "partial" | "cancelled"
-  statusAr: string
-  paymentType: "rent" | "deposit" | "commission" | "late_fee" | "maintenance"
-  paymentTypeAr: string
-  notes: string
-  notesAr: string
-  createdDate: string
-  createdDateHijri: string
-  lateFee?: number
-  daysOverdue?: number
+    amount: number;
+    dueDate: string;
+    dueDateHijri: string;
+    paidDate?: string;
+    paidDateHijri?: string;
+    paymentMethod: string;
+    paymentMethodAr: string;
+    transactionId?: string;
+    receiptNumber?: string;
+  };
+  status: "pending" | "paid" | "overdue" | "partial" | "cancelled";
+  statusAr: string;
+  paymentType: "rent" | "deposit" | "commission" | "late_fee" | "maintenance";
+  paymentTypeAr: string;
+  notes: string;
+  notesAr: string;
+  createdDate: string;
+  createdDateHijri: string;
+  lateFee?: number;
+  daysOverdue?: number;
 }
 
 export function RentalPaymentsService() {
-  const [payments, setPayments] = useState<RentalPayment[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [filterType, setFilterType] = useState("all")
-  const [selectedPayment, setSelectedPayment] = useState<RentalPayment | null>(null)
-  const [isRecordPaymentDialogOpen, setIsRecordPaymentDialogOpen] = useState(false)
-  const { userData } = useAuthStore()
+  const [payments, setPayments] = useState<RentalPayment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterType, setFilterType] = useState("all");
+  const [selectedPayment, setSelectedPayment] = useState<RentalPayment | null>(
+    null,
+  );
+  const [isRecordPaymentDialogOpen, setIsRecordPaymentDialogOpen] =
+    useState(false);
+  const { userData } = useAuthStore();
 
   // Active contracts for creating payment records
   const activeContracts = [
@@ -105,18 +114,18 @@ export function RentalPaymentsService() {
       propertyTitle: "استوديو حديث في الدمام",
       monthlyRent: 2200,
     },
-  ]
+  ];
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchPayments")
-      return
+      console.log("No token available, skipping fetchPayments");
+      return;
     }
 
     const fetchPayments = async () => {
-      setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setPayments([
         {
@@ -278,74 +287,78 @@ export function RentalPaymentsService() {
           createdDate: "2024-01-15",
           createdDateHijri: "1446/07/15",
         },
-      ])
-      setLoading(false)
-    }
+      ]);
+      setLoading(false);
+    };
 
-    fetchPayments()
-  }, [userData?.token])
+    fetchPayments();
+  }, [userData?.token]);
 
   const filteredPayments = payments.filter((payment) => {
     const matchesSearch =
       payment.tenant.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.propertyTitleAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.propertyTitleAr
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       payment.paymentNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.contractNumber.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === "all" || payment.status === filterStatus
-    const matchesType = filterType === "all" || payment.paymentType === filterType
-    return matchesSearch && matchesStatus && matchesType
-  })
+      payment.contractNumber.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || payment.status === filterStatus;
+    const matchesType =
+      filterType === "all" || payment.paymentType === filterType;
+    return matchesSearch && matchesStatus && matchesType;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "paid":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "overdue":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       case "partial":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 text-orange-800";
       case "cancelled":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       case "paid":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "overdue":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
       case "partial":
-        return <DollarSign className="h-4 w-4" />
+        return <DollarSign className="h-4 w-4" />;
       case "cancelled":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
       default:
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
     }
-  }
+  };
 
   const getTypeColor = (type: string) => {
     switch (type) {
       case "rent":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "deposit":
-        return "bg-purple-100 text-purple-800"
+        return "bg-purple-100 text-purple-800";
       case "commission":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "late_fee":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       case "maintenance":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 text-orange-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const handleMarkAsPaid = (paymentId: string) => {
     setPayments((prev) =>
@@ -365,8 +378,8 @@ export function RentalPaymentsService() {
             }
           : payment,
       ),
-    )
-  }
+    );
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
@@ -374,11 +387,13 @@ export function RentalPaymentsService() {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+            <p className="text-lg text-gray-500">
+              يرجى تسجيل الدخول لعرض المحتوى
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -402,7 +417,7 @@ export function RentalPaymentsService() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -411,9 +426,14 @@ export function RentalPaymentsService() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">إدارة المدفوعات</h2>
-          <p className="text-muted-foreground">تتبع ومراقبة مدفوعات الإيجار والرسوم</p>
+          <p className="text-muted-foreground">
+            تتبع ومراقبة مدفوعات الإيجار والرسوم
+          </p>
         </div>
-        <Dialog open={isRecordPaymentDialogOpen} onOpenChange={setIsRecordPaymentDialogOpen}>
+        <Dialog
+          open={isRecordPaymentDialogOpen}
+          onOpenChange={setIsRecordPaymentDialogOpen}
+        >
           <DialogTrigger asChild>
             <Button>
               <Plus className="ml-2 h-4 w-4" />
@@ -423,7 +443,9 @@ export function RentalPaymentsService() {
           <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>تسجيل دفعة جديدة</DialogTitle>
-              <DialogDescription>تسجيل دفعة إيجار أو رسوم أخرى</DialogDescription>
+              <DialogDescription>
+                تسجيل دفعة إيجار أو رسوم أخرى
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
@@ -435,8 +457,8 @@ export function RentalPaymentsService() {
                   <SelectContent>
                     {activeContracts.map((contract) => (
                       <SelectItem key={contract.id} value={contract.id}>
-                        {contract.contractNumber} - {contract.tenantName} ({contract.monthlyRent.toLocaleString()}{" "}
-                        ر.س/شهر)
+                        {contract.contractNumber} - {contract.tenantName} (
+                        {contract.monthlyRent.toLocaleString()} ر.س/شهر)
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -500,14 +522,23 @@ export function RentalPaymentsService() {
 
               <div className="space-y-2">
                 <Label htmlFor="notes">ملاحظات</Label>
-                <Textarea id="notes" placeholder="ملاحظات حول الدفعة..." rows={3} />
+                <Textarea
+                  id="notes"
+                  placeholder="ملاحظات حول الدفعة..."
+                  rows={3}
+                />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsRecordPaymentDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsRecordPaymentDialogOpen(false)}
+              >
                 إلغاء
               </Button>
-              <Button onClick={() => setIsRecordPaymentDialogOpen(false)}>تسجيل الدفعة</Button>
+              <Button onClick={() => setIsRecordPaymentDialogOpen(false)}>
+                تسجيل الدفعة
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -561,14 +592,21 @@ export function RentalPaymentsService() {
               <div className="flex items-start justify-between">
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center space-x-3 space-x-reverse">
-                    <h3 className="font-semibold text-lg">{payment.paymentNumber}</h3>
+                    <h3 className="font-semibold text-lg">
+                      {payment.paymentNumber}
+                    </h3>
                     <Badge className={getStatusColor(payment.status)}>
                       {getStatusIcon(payment.status)}
                       <span className="mr-1">{payment.statusAr}</span>
                     </Badge>
-                    <Badge className={getTypeColor(payment.paymentType)}>{payment.paymentTypeAr}</Badge>
+                    <Badge className={getTypeColor(payment.paymentType)}>
+                      {payment.paymentTypeAr}
+                    </Badge>
                     {payment.status === "overdue" && payment.daysOverdue && (
-                      <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                      <Badge
+                        variant="outline"
+                        className="bg-red-50 text-red-700 border-red-200"
+                      >
                         <AlertTriangle className="h-3 w-3 ml-1" />
                         متأخر {payment.daysOverdue} أيام
                       </Badge>
@@ -617,7 +655,9 @@ export function RentalPaymentsService() {
 
                   {payment.notesAr && (
                     <div className="p-3 bg-muted rounded-md">
-                      <p className="text-sm text-muted-foreground">{payment.notesAr}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {payment.notesAr}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -627,7 +667,11 @@ export function RentalPaymentsService() {
                     <div className="text-2xl font-bold text-green-600">
                       {payment.paymentDetails.amount.toLocaleString()} ر.س
                     </div>
-                    {payment.lateFee && <div className="text-sm text-red-600">+ {payment.lateFee} ر.س رسوم تأخير</div>}
+                    {payment.lateFee && (
+                      <div className="text-sm text-red-600">
+                        + {payment.lateFee} ر.س رسوم تأخير
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     {payment.status === "pending" && (
@@ -650,16 +694,21 @@ export function RentalPaymentsService() {
                         تأكيد الدفع
                       </Button>
                     )}
-                    <Button size="sm" variant="outline" onClick={() => setSelectedPayment(payment)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedPayment(payment)}
+                    >
                       <Eye className="h-3 w-3 ml-1" />
                       التفاصيل
                     </Button>
-                    {payment.status === "paid" && payment.paymentDetails.receiptNumber && (
-                      <Button size="sm" variant="outline">
-                        <Download className="h-3 w-3 ml-1" />
-                        الإيصال
-                      </Button>
-                    )}
+                    {payment.status === "paid" &&
+                      payment.paymentDetails.receiptNumber && (
+                        <Button size="sm" variant="outline">
+                          <Download className="h-3 w-3 ml-1" />
+                          الإيصال
+                        </Button>
+                      )}
                   </div>
                 </div>
               </div>
@@ -669,12 +718,16 @@ export function RentalPaymentsService() {
       </div>
 
       {/* Payment Details Dialog */}
-      <Dialog open={!!selectedPayment} onOpenChange={() => setSelectedPayment(null)}>
+      <Dialog
+        open={!!selectedPayment}
+        onOpenChange={() => setSelectedPayment(null)}
+      >
         <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>تفاصيل الدفعة</DialogTitle>
             <DialogDescription>
-              دفعة رقم {selectedPayment?.paymentNumber} - {selectedPayment?.tenant.nameAr}
+              دفعة رقم {selectedPayment?.paymentNumber} -{" "}
+              {selectedPayment?.tenant.nameAr}
             </DialogDescription>
           </DialogHeader>
           {selectedPayment && (
@@ -691,29 +744,46 @@ export function RentalPaymentsService() {
                     <h4 className="font-semibold">معلومات الدفعة</h4>
                     <div className="space-y-2">
                       <div>
-                        <Label className="text-sm font-medium">رقم الدفعة</Label>
-                        <p className="text-sm text-muted-foreground">{selectedPayment.paymentNumber}</p>
+                        <Label className="text-sm font-medium">
+                          رقم الدفعة
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedPayment.paymentNumber}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">نوع الدفعة</Label>
-                        <Badge className={getTypeColor(selectedPayment.paymentType)}>
+                        <Label className="text-sm font-medium">
+                          نوع الدفعة
+                        </Label>
+                        <Badge
+                          className={getTypeColor(selectedPayment.paymentType)}
+                        >
                           {selectedPayment.paymentTypeAr}
                         </Badge>
                       </div>
                       <div>
                         <Label className="text-sm font-medium">المبلغ</Label>
                         <p className="text-sm text-muted-foreground font-bold text-green-600">
-                          {selectedPayment.paymentDetails.amount.toLocaleString()} ر.س
+                          {selectedPayment.paymentDetails.amount.toLocaleString()}{" "}
+                          ر.س
                         </p>
                       </div>
                       <div>
                         <Label className="text-sm font-medium">الحالة</Label>
-                        <Badge className={getStatusColor(selectedPayment.status)}>{selectedPayment.statusAr}</Badge>
+                        <Badge
+                          className={getStatusColor(selectedPayment.status)}
+                        >
+                          {selectedPayment.statusAr}
+                        </Badge>
                       </div>
                       {selectedPayment.lateFee && (
                         <div>
-                          <Label className="text-sm font-medium">رسوم التأخير</Label>
-                          <p className="text-sm text-red-600">{selectedPayment.lateFee} ر.س</p>
+                          <Label className="text-sm font-medium">
+                            رسوم التأخير
+                          </Label>
+                          <p className="text-sm text-red-600">
+                            {selectedPayment.lateFee} ر.س
+                          </p>
                         </div>
                       )}
                     </div>
@@ -722,26 +792,36 @@ export function RentalPaymentsService() {
                     <h4 className="font-semibold">تفاصيل الدفع</h4>
                     <div className="space-y-2">
                       <div>
-                        <Label className="text-sm font-medium">تاريخ الاستحقاق</Label>
-                        <p className="text-sm text-muted-foreground">{selectedPayment.paymentDetails.dueDateHijri}</p>
+                        <Label className="text-sm font-medium">
+                          تاريخ الاستحقاق
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedPayment.paymentDetails.dueDateHijri}
+                        </p>
                       </div>
                       {selectedPayment.paymentDetails.paidDateHijri && (
                         <div>
-                          <Label className="text-sm font-medium">تاريخ الدفع</Label>
+                          <Label className="text-sm font-medium">
+                            تاريخ الدفع
+                          </Label>
                           <p className="text-sm text-muted-foreground">
                             {selectedPayment.paymentDetails.paidDateHijri}
                           </p>
                         </div>
                       )}
                       <div>
-                        <Label className="text-sm font-medium">طريقة الدفع</Label>
+                        <Label className="text-sm font-medium">
+                          طريقة الدفع
+                        </Label>
                         <p className="text-sm text-muted-foreground">
                           {selectedPayment.paymentDetails.paymentMethodAr}
                         </p>
                       </div>
                       {selectedPayment.paymentDetails.transactionId && (
                         <div>
-                          <Label className="text-sm font-medium">رقم المعاملة</Label>
+                          <Label className="text-sm font-medium">
+                            رقم المعاملة
+                          </Label>
                           <p className="text-sm text-muted-foreground">
                             {selectedPayment.paymentDetails.transactionId}
                           </p>
@@ -749,7 +829,9 @@ export function RentalPaymentsService() {
                       )}
                       {selectedPayment.paymentDetails.receiptNumber && (
                         <div>
-                          <Label className="text-sm font-medium">رقم الإيصال</Label>
+                          <Label className="text-sm font-medium">
+                            رقم الإيصال
+                          </Label>
                           <p className="text-sm text-muted-foreground">
                             {selectedPayment.paymentDetails.receiptNumber}
                           </p>
@@ -762,7 +844,9 @@ export function RentalPaymentsService() {
                   <div>
                     <h4 className="font-semibold mb-2">ملاحظات</h4>
                     <div className="p-3 bg-blue-50 rounded-md">
-                      <p className="text-sm text-blue-800">{selectedPayment.notesAr}</p>
+                      <p className="text-sm text-blue-800">
+                        {selectedPayment.notesAr}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -772,23 +856,35 @@ export function RentalPaymentsService() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">رقم العقد</Label>
-                    <p className="text-sm text-muted-foreground">{selectedPayment.contractNumber}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedPayment.contractNumber}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">العقار</Label>
-                    <p className="text-sm text-muted-foreground">{selectedPayment.propertyTitleAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedPayment.propertyTitleAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">المستأجر</Label>
-                    <p className="text-sm text-muted-foreground">{selectedPayment.tenant.nameAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedPayment.tenant.nameAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">رقم الهاتف</Label>
-                    <p className="text-sm text-muted-foreground">{selectedPayment.tenant.phone}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedPayment.tenant.phone}
+                    </p>
                   </div>
                   <div className="col-span-2">
-                    <Label className="text-sm font-medium">البريد الإلكتروني</Label>
-                    <p className="text-sm text-muted-foreground">{selectedPayment.tenant.email}</p>
+                    <Label className="text-sm font-medium">
+                      البريد الإلكتروني
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedPayment.tenant.email}
+                    </p>
                   </div>
                 </div>
               </TabsContent>
@@ -798,17 +894,32 @@ export function RentalPaymentsService() {
                   {filteredPayments
                     .filter((p) => p.contractId === selectedPayment.contractId)
                     .map((payment, index) => (
-                      <div key={payment.id} className="flex items-center justify-between p-3 border rounded-md">
+                      <div
+                        key={payment.id}
+                        className="flex items-center justify-between p-3 border rounded-md"
+                      >
                         <div className="flex items-center space-x-3 space-x-reverse">
-                          <div className="flex-shrink-0">{getStatusIcon(payment.status)}</div>
+                          <div className="flex-shrink-0">
+                            {getStatusIcon(payment.status)}
+                          </div>
                           <div>
-                            <p className="text-sm font-medium">{payment.paymentTypeAr}</p>
-                            <p className="text-xs text-muted-foreground">{payment.paymentDetails.dueDateHijri}</p>
+                            <p className="text-sm font-medium">
+                              {payment.paymentTypeAr}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {payment.paymentDetails.dueDateHijri}
+                            </p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-medium">{payment.paymentDetails.amount.toLocaleString()} ر.س</p>
-                          <Badge className={`text-xs ${getStatusColor(payment.status)}`}>{payment.statusAr}</Badge>
+                          <p className="text-sm font-medium">
+                            {payment.paymentDetails.amount.toLocaleString()} ر.س
+                          </p>
+                          <Badge
+                            className={`text-xs ${getStatusColor(payment.status)}`}
+                          >
+                            {payment.statusAr}
+                          </Badge>
                         </div>
                       </div>
                     ))}
@@ -820,18 +931,20 @@ export function RentalPaymentsService() {
             <Button variant="outline" onClick={() => setSelectedPayment(null)}>
               إغلاق
             </Button>
-            {selectedPayment?.status === "paid" && selectedPayment.paymentDetails.receiptNumber && (
-              <Button variant="outline">
-                <Download className="ml-2 h-4 w-4" />
-                تحميل الإيصال
-              </Button>
-            )}
-            {(selectedPayment?.status === "pending" || selectedPayment?.status === "overdue") && (
+            {selectedPayment?.status === "paid" &&
+              selectedPayment.paymentDetails.receiptNumber && (
+                <Button variant="outline">
+                  <Download className="ml-2 h-4 w-4" />
+                  تحميل الإيصال
+                </Button>
+              )}
+            {(selectedPayment?.status === "pending" ||
+              selectedPayment?.status === "overdue") && (
               <Button
                 className="bg-green-600 hover:bg-green-700"
                 onClick={() => {
-                  handleMarkAsPaid(selectedPayment.id)
-                  setSelectedPayment(null)
+                  handleMarkAsPaid(selectedPayment.id);
+                  setSelectedPayment(null);
                 }}
               >
                 <CheckCircle className="ml-2 h-4 w-4" />
@@ -845,7 +958,9 @@ export function RentalPaymentsService() {
       {filteredPayments.length === 0 && (
         <div className="text-center py-12">
           <DollarSign className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">لم يتم العثور على مدفوعات</h3>
+          <h3 className="text-lg font-medium mb-2">
+            لم يتم العثور على مدفوعات
+          </h3>
           <p className="text-muted-foreground mb-4">
             {searchTerm || filterStatus !== "all" || filterType !== "all"
               ? "جرب تعديل معايير البحث"
@@ -858,5 +973,5 @@ export function RentalPaymentsService() {
         </div>
       )}
     </div>
-  )
+  );
 }

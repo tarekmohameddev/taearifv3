@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -130,10 +129,7 @@ export const CustomerTable = ({
                   تصدير البيانات المحددة
                 </Button>
                 <Separator />
-                <Button
-                  className="w-full justify-start"
-                  variant="destructive"
-                >
+                <Button className="w-full justify-start" variant="destructive">
                   <Trash2 className="ml-2 h-4 w-4" />
                   حذف العملاء المحددين
                 </Button>
@@ -222,12 +218,14 @@ export const CustomerTable = ({
                           <span className="italic">لا يوجد بريد إلكتروني</span>
                         </div>
                       )}
-                      
+
                       {/* Phone Number */}
                       {customer.phone_number ? (
                         <div className="flex items-center text-sm">
                           <Phone className="ml-2 h-3 w-3 text-green-600" />
-                          <span className="font-medium">{customer.phone_number}</span>
+                          <span className="font-medium">
+                            {customer.phone_number}
+                          </span>
                         </div>
                       ) : (
                         <div className="flex items-center text-sm text-muted-foreground">
@@ -241,17 +239,22 @@ export const CustomerTable = ({
                     <Badge
                       variant="outline"
                       className={
-                        customer.type?.name === "Buyer" || customer.type?.name === "مشتري"
+                        customer.type?.name === "Buyer" ||
+                        customer.type?.name === "مشتري"
                           ? "border-blue-500 text-blue-700"
-                          : customer.type?.name === "Seller" || customer.type?.name === "بائع"
-                          ? "border-green-500 text-green-700"
-                          : customer.type?.name === "Rented" || customer.type?.name === "مستأجر"
-                          ? "border-purple-500 text-purple-700"
-                          : customer.type?.name === "Landlord" || customer.type?.name === "مؤجر"
-                          ? "border-orange-500 text-orange-700"
-                          : customer.type?.name === "Investor" || customer.type?.name === "مستثمر"
-                          ? "border-red-500 text-red-700"
-                          : "border-gray-500 text-gray-700"
+                          : customer.type?.name === "Seller" ||
+                              customer.type?.name === "بائع"
+                            ? "border-green-500 text-green-700"
+                            : customer.type?.name === "Rented" ||
+                                customer.type?.name === "مستأجر"
+                              ? "border-purple-500 text-purple-700"
+                              : customer.type?.name === "Landlord" ||
+                                  customer.type?.name === "مؤجر"
+                                ? "border-orange-500 text-orange-700"
+                                : customer.type?.name === "Investor" ||
+                                    customer.type?.name === "مستثمر"
+                                  ? "border-red-500 text-red-700"
+                                  : "border-gray-500 text-gray-700"
                       }
                     >
                       {customer.type?.name || "غير محدد"}
@@ -269,13 +272,16 @@ export const CustomerTable = ({
                     <Badge
                       variant="outline"
                       className={
-                        customer.priority?.name === "High" || customer.priority?.name === "عالية"
+                        customer.priority?.name === "High" ||
+                        customer.priority?.name === "عالية"
                           ? "border-red-500 text-red-700"
-                          : customer.priority?.name === "Medium" || customer.priority?.name === "متوسطة"
-                          ? "border-yellow-500 text-yellow-700"
-                          : customer.priority?.name === "Low" || customer.priority?.name === "منخفضة"
-                          ? "border-green-500 text-green-700"
-                          : "border-gray-500 text-gray-700"
+                          : customer.priority?.name === "Medium" ||
+                              customer.priority?.name === "متوسطة"
+                            ? "border-yellow-500 text-yellow-700"
+                            : customer.priority?.name === "Low" ||
+                                customer.priority?.name === "منخفضة"
+                              ? "border-green-500 text-green-700"
+                              : "border-gray-500 text-gray-700"
                       }
                     >
                       {customer.priority?.name || "غير محدد"}
@@ -431,4 +437,4 @@ export const CustomerTable = ({
       />
     </div>
   );
-}; 
+};

@@ -4,7 +4,14 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, Eye, EyeOff, ArrowLeft, Shield, Lock } from "lucide-react";
+import {
+  AlertCircle,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  Shield,
+  Lock,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,15 +23,10 @@ import useStore from "@/context/Store";
 export function ResetPasswordPage() {
   const router = useRouter();
   const { executeRecaptcha } = useGoogleReCaptcha();
-  
+
   // Zustand store
-  const {
-    userIdentifier,
-    userMethod,
-    resetCode,
-    setResetCode,
-    resetUserAuth,
-  } = useStore();
+  const { userIdentifier, userMethod, resetCode, setResetCode, resetUserAuth } =
+    useStore();
 
   // Local state
   const [newPassword, setNewPassword] = useState("");
@@ -40,7 +42,7 @@ export function ResetPasswordPage() {
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get("code");
-      
+
       if (code) {
         setResetCode(code);
       } else {
@@ -112,7 +114,7 @@ export function ResetPasswordPage() {
             new_password_confirmation: confirmPassword,
             recaptcha_token: recaptchaToken,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -122,7 +124,9 @@ export function ResetPasswordPage() {
           setCodeError("الكود غير صالح أو منتهي الصلاحية");
           toast.error("الكود غير صالح أو منتهي الصلاحية");
         } else {
-          throw new Error(data.message || "حدث خطأ أثناء إعادة تعيين كلمة المرور");
+          throw new Error(
+            data.message || "حدث خطأ أثناء إعادة تعيين كلمة المرور",
+          );
         }
         return;
       }
@@ -133,7 +137,10 @@ export function ResetPasswordPage() {
         router.push("/login");
       }, 2000);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الاتصال بالخادم";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "حدث خطأ أثناء الاتصال بالخادم";
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -143,17 +150,25 @@ export function ResetPasswordPage() {
   // إذا لم يتم تحميل الكود بعد، عرض loading
   if (!resetCode) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4" dir="rtl">
+      <div
+        className="min-h-screen flex flex-col items-center justify-center bg-white p-4"
+        dir="rtl"
+      >
         <div className="w-full max-w-md text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري تحميل صفحة إعادة تعيين كلمة المرور...</p>
+          <p className="text-gray-600">
+            جاري تحميل صفحة إعادة تعيين كلمة المرور...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4" dir="rtl">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center bg-white p-4"
+      dir="rtl"
+    >
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
@@ -171,7 +186,11 @@ export function ResetPasswordPage() {
         <Card className="border-0 shadow-2xl bg-white">
           <CardHeader className="text-center pb-4">
             <Link href="/forgot-password" className="absolute right-4 top-4">
-              <Button variant="ghost" size="sm" className="text-black hover:bg-gray-100">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-black hover:bg-gray-100"
+              >
                 <ArrowLeft className="h-4 w-4 ml-1" />
                 رجوع
               </Button>
@@ -179,9 +198,7 @@ export function ResetPasswordPage() {
             <CardTitle className="text-2xl font-bold text-black">
               إعادة تعيين كلمة المرور
             </CardTitle>
-            <p className="text-sm text-gray-600">
-              أدخل كلمة المرور الجديدة
-            </p>
+            <p className="text-sm text-gray-600">أدخل كلمة المرور الجديدة</p>
             <div className="flex items-center justify-center gap-2 mt-2">
               <Shield className="h-4 w-4 text-green-600" />
               <span className="text-xs text-green-600">آمن ومشفر</span>
@@ -198,8 +215,8 @@ export function ResetPasswordPage() {
                 <p className="text-sm mt-1">
                   يرجى طلب كود جديد من صفحة نسيان كلمة المرور
                 </p>
-                <Link 
-                  href="/forgot-password" 
+                <Link
+                  href="/forgot-password"
                   className="inline-block mt-2 text-sm text-red-600 hover:text-red-800 underline"
                 >
                   طلب كود جديد
@@ -210,7 +227,10 @@ export function ResetPasswordPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* New Password */}
               <div className="space-y-2">
-                <Label htmlFor="newPassword" className="text-sm font-medium text-black">
+                <Label
+                  htmlFor="newPassword"
+                  className="text-sm font-medium text-black"
+                >
                   كلمة المرور الجديدة
                 </Label>
                 <div className="relative">
@@ -249,8 +269,8 @@ export function ResetPasswordPage() {
                               ? passwordStrength <= 2
                                 ? "bg-red-500"
                                 : passwordStrength <= 3
-                                ? "bg-yellow-500"
-                                : "bg-green-500"
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
                               : "bg-gray-200"
                           }`}
                         />
@@ -267,7 +287,10 @@ export function ResetPasswordPage() {
 
               {/* Confirm Password */}
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium text-black">
+                <Label
+                  htmlFor="confirmPassword"
+                  className="text-sm font-medium text-black"
+                >
                   تأكيد كلمة المرور
                 </Label>
                 <div className="relative">
@@ -300,7 +323,12 @@ export function ResetPasswordPage() {
               <Button
                 type="submit"
                 className="w-full py-6 mt-2 bg-black hover:bg-gray-800 text-white"
-                disabled={isLoading || !newPassword.trim() || !confirmPassword.trim() || !!codeError}
+                disabled={
+                  isLoading ||
+                  !newPassword.trim() ||
+                  !confirmPassword.trim() ||
+                  !!codeError
+                }
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
@@ -348,4 +376,4 @@ export function ResetPasswordPage() {
       </div>
     </div>
   );
-} 
+}

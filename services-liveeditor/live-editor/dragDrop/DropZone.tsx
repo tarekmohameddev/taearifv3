@@ -38,7 +38,7 @@ export const LiveEditorDropZone = forwardRef<HTMLDivElement, DropZoneProps>(
       minEmptyHeight = 128,
       children,
     },
-    userRef
+    userRef,
   ) {
     const ctx = useContext(dropZoneContext);
     const zoneStore = useContext(ZoneStoreContext);
@@ -56,7 +56,8 @@ export const LiveEditorDropZone = forwardRef<HTMLDivElement, DropZoneProps>(
       zoneCompound = `${areaId}:${zone}`;
     }
 
-    const isRootZone = zoneCompound === "root" || zone === "root" || areaId === "root";
+    const isRootZone =
+      zoneCompound === "root" || zone === "root" || areaId === "root";
 
     const ref = useRef<HTMLDivElement | null>(null);
 
@@ -71,7 +72,7 @@ export const LiveEditorDropZone = forwardRef<HTMLDivElement, DropZoneProps>(
 
           // Remove any explicitly allowed items from disallow
           const filteredDisallow = (disallow || []).filter(
-            (item) => defaultedAllow.indexOf(item) === -1
+            (item) => defaultedAllow.indexOf(item) === -1,
           );
 
           if (filteredDisallow.indexOf(componentType) !== -1) {
@@ -85,12 +86,12 @@ export const LiveEditorDropZone = forwardRef<HTMLDivElement, DropZoneProps>(
 
         return true;
       },
-      [allow, disallow]
+      [allow, disallow],
     );
 
     const targetAccepted = useMemo(() => {
       if (!zoneStore) return true;
-      
+
       const state = zoneStore.getState();
       const draggedComponentType = state.draggedItem?.data?.componentType;
       return acceptsTarget(draggedComponentType);
@@ -98,7 +99,7 @@ export const LiveEditorDropZone = forwardRef<HTMLDivElement, DropZoneProps>(
 
     const isEnabled = useMemo(() => {
       if (!zoneStore) return true;
-      
+
       const state = zoneStore.getState();
       let _isEnabled = true;
       const isDeepestZone = state.zoneDepthIndex[zoneCompound] ?? false;
@@ -122,13 +123,19 @@ export const LiveEditorDropZone = forwardRef<HTMLDivElement, DropZoneProps>(
           unregisterLocalZone(zoneCompound);
         }
       };
-    }, [targetAccepted, isEnabled, zoneCompound, registerLocalZone, unregisterLocalZone]);
+    }, [
+      targetAccepted,
+      isEnabled,
+      zoneCompound,
+      registerLocalZone,
+      unregisterLocalZone,
+    ]);
 
     const isDropEnabled = isEnabled;
 
     useEffect(() => {
       if (!zoneStore) return;
-      
+
       const { enabledIndex } = zoneStore.getState();
       zoneStore.setState({
         enabledIndex: { ...enabledIndex, [zoneCompound]: isEnabled },
@@ -150,33 +157,30 @@ export const LiveEditorDropZone = forwardRef<HTMLDivElement, DropZoneProps>(
 
     const isDraggedOver = useMemo(() => {
       if (!zoneStore) return false;
-      
+
       const state = zoneStore.getState();
       return !!state.previewIndex[zoneCompound];
     }, [zoneStore, zoneCompound]);
-
 
     const setRefs = useCallback(
       (node: HTMLDivElement | null) => {
         ref.current = node;
         dropRef(node);
-        
-        if (typeof userRef === 'function') {
+
+        if (typeof userRef === "function") {
           userRef(node);
         } else if (userRef) {
           userRef.current = node;
         }
       },
-      [dropRef, userRef]
+      [dropRef, userRef],
     );
 
     return (
       <div
         className={`live-editor-dropzone ${
           isRootZone ? "live-editor-dropzone--root" : ""
-        } ${
-          isEnabled ? "live-editor-dropzone--enabled" : ""
-        } ${
+        } ${isEnabled ? "live-editor-dropzone--enabled" : ""} ${
           isDraggedOver ? "live-editor-dropzone--dragged-over" : ""
         }${className ? ` ${className}` : ""}`}
         ref={setRefs}
@@ -188,13 +192,13 @@ export const LiveEditorDropZone = forwardRef<HTMLDivElement, DropZoneProps>(
             minHeight: children ? "auto" : `${minEmptyHeight}px`,
             position: "relative",
             borderRadius: "4px",
-            border: isDraggedOver 
-              ? "2px dashed #3b82f6" 
-              : isEnabled 
-                ? "2px dashed transparent" 
+            border: isDraggedOver
+              ? "2px dashed #3b82f6"
+              : isEnabled
+                ? "2px dashed transparent"
                 : "none",
-            backgroundColor: isDraggedOver 
-              ? "rgba(59, 130, 246, 0.1)" 
+            backgroundColor: isDraggedOver
+              ? "rgba(59, 130, 246, 0.1)"
               : "transparent",
             background: undefined, // Remove any conflicting background property
             transition: "all 200ms ease",
@@ -202,7 +206,7 @@ export const LiveEditorDropZone = forwardRef<HTMLDivElement, DropZoneProps>(
         }
       >
         {children}
-        
+
         {/* Empty state when no children */}
         {!children && (
           <div
@@ -221,6 +225,5 @@ export const LiveEditorDropZone = forwardRef<HTMLDivElement, DropZoneProps>(
         )}
       </div>
     );
-  }
+  },
 );
-

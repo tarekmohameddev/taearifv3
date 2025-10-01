@@ -4,7 +4,11 @@ import ClientLayout from "./ClientLayout";
 import { Toaster } from "react-hot-toast";
 import { ReCaptchaWrapper } from "@/components/ReCaptchaWrapper";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="ar" dir="ltr" className="light" suppressHydrationWarning>
       <head>
@@ -19,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         {/* End Google Tag Manager */}
-        
+
         <script
           type="text/javascript"
           dangerouslySetInnerHTML={{
@@ -42,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         {/* End Google Tag Manager (noscript) */}
-        
+
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

@@ -5,8 +5,10 @@ export const parseComponentName = (
   componentName: string,
 ): { baseName: string; number: string } => {
   // تحويل المسافات إلى camelCase أولاً وتحويل PascalCase إلى camelCase
-  const normalizedName = componentName?.replace(/\s+/g, '').replace(/^\w/, (c) => c.toLowerCase());
-  
+  const normalizedName = componentName
+    ?.replace(/\s+/g, "")
+    .replace(/^\w/, (c) => c.toLowerCase());
+
   const match = normalizedName?.match(/^(.*?)(\d+)$/);
 
   if (!match) {
@@ -63,8 +65,10 @@ export const sanitizeComponentName = (componentName: string): string => {
   if (!componentName) return "";
 
   // تحويل المسافات إلى camelCase أولاً وتحويل PascalCase إلى camelCase
-  const camelCase = componentName.replace(/\s+/g, '').replace(/^\w/, (c) => c.toLowerCase());
-  
+  const camelCase = componentName
+    .replace(/\s+/g, "")
+    .replace(/^\w/, (c) => c.toLowerCase());
+
   // إزالة الأحرف غير المسموحة
   return camelCase.replace(/[^a-zA-Z0-9-_]/g, "");
 };

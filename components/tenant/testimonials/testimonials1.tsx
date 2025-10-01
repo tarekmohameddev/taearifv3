@@ -1,24 +1,25 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import SwiperCarousel from "@/components/ui/swiper-carousel"
-import { TestimonialCard } from "@/components/testimonial-card"
-import useTenantStore from "@/context-liveeditor/tenantStore"
-import { useEditorStore } from "@/context-liveeditor/editorStore"
+import { useEffect } from "react";
+import SwiperCarousel from "@/components/ui/swiper-carousel";
+import { TestimonialCard } from "@/components/testimonial-card";
+import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context-liveeditor/editorStore";
 
 type Testimonial = {
-  id: string
-  quote: string
-  name: string
-  location: string
-  rating: number
-}
+  id: string;
+  quote: string;
+  name: string;
+  location: string;
+  rating: number;
+};
 
 // Default testimonials data
 const getDefaultTestimonialsData = () => ({
   visible: true,
   title: "آراء عملائنا",
-  description: "نحن نفخر بشركائنا وعملائنا ونسعى دائمًا لتقديم أفضل الحلول التي تدعم نموهم ونجاحهم.",
+  description:
+    "نحن نفخر بشركائنا وعملائنا ونسعى دائمًا لتقديم أفضل الحلول التي تدعم نموهم ونجاحهم.",
   background: {
     color: "#ffffff",
     image: "",
@@ -73,21 +74,24 @@ const getDefaultTestimonialsData = () => ({
     },
     {
       id: "t2",
-      quote: "أخلاق عالية وسعر ممتاز، ورجل نصوح. الله يجزاك الله خير أبو سليمان. تجربة رائعة وأنصح بها.",
+      quote:
+        "أخلاق عالية وسعر ممتاز، ورجل نصوح. الله يجزاك الله خير أبو سليمان. تجربة رائعة وأنصح بها.",
       name: "عبدالعزيز الحمد السايح",
       location: "عيون الجواء",
       rating: 5,
     },
     {
       id: "t3",
-      quote: "أخلاق جدا عالية رب يرحم الله أبو طارق. تعامل راقٍ وسرعة في الإنجاز.",
+      quote:
+        "أخلاق جدا عالية رب يرحم الله أبو طارق. تعامل راقٍ وسرعة في الإنجاز.",
       name: "بندر الحربي",
       location: "المرقب",
       rating: 5,
     },
     {
       id: "t4",
-      quote: "خدمة ممتازة وفريق متعاون. سهّلوا علينا إجراءات التأجير بشكل كبير.",
+      quote:
+        "خدمة ممتازة وفريق متعاون. سهّلوا علينا إجراءات التأجير بشكل كبير.",
       name: "محمد العتيبي",
       location: "الرياض",
       rating: 4,
@@ -157,7 +161,7 @@ const getDefaultTestimonialsData = () => ({
       delay: 200,
     },
   },
-})
+});
 
 interface TestimonialsProps {
   visible?: boolean;
@@ -279,97 +283,122 @@ interface TestimonialsProps {
 
 export default function TestimonialsSection(props: TestimonialsProps = {}) {
   // Initialize variant id early so hooks can depend on it
-  const variantId = props.variant || "testimonials1"
-  
+  const variantId = props.variant || "testimonials1";
+
   // Subscribe to editor store updates for this testimonials variant
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant)
-  const getComponentData = useEditorStore((s) => s.getComponentData)
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
 
   useEffect(() => {
     if (props.useStore) {
-      ensureComponentVariant('testimonials', variantId, props)
+      ensureComponentVariant("testimonials", variantId, props);
     }
-  }, [variantId, props.useStore, ensureComponentVariant])
+  }, [variantId, props.useStore, ensureComponentVariant]);
 
   // Get tenant data
-  const tenantData = useTenantStore((s) => s.tenantData)
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const tenantId = useTenantStore((s) => s.tenantId)
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
 
   useEffect(() => {
     if (tenantId) {
-      fetchTenantData(tenantId)
+      fetchTenantData(tenantId);
     }
-  }, [tenantId, fetchTenantData])
+  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore ? (getComponentData('testimonials', variantId) || {}) : {}
-  
+  const storeData = props.useStore
+    ? getComponentData("testimonials", variantId) || {}
+    : {};
+
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
-    if (!tenantData?.componentSettings) return {}
-    
+    if (!tenantData?.componentSettings) return {};
+
     // Search through all pages for this component variant
-    for (const [pageSlug, pageComponents] of Object.entries(tenantData.componentSettings)) {
-      
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
       // Check if pageComponents is an object (not array)
-      if (typeof pageComponents === 'object' && !Array.isArray(pageComponents)) {
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
         // Search through all components in this page
-        for (const [componentId, component] of Object.entries(pageComponents as any)) {
-          
-          if ((component as any).type === 'testimonials' && 
-              (component as any).componentName === variantId &&
-              componentId === props.id) {
-            return (component as any).data
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          if (
+            (component as any).type === "testimonials" &&
+            (component as any).componentName === variantId &&
+            componentId === props.id
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-    return {}
-  }
-  
-  const tenantComponentData = getTenantComponentData()
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
   // Merge data with priority: storeData > tenantComponentData > props > default
-  const mergedData = { 
-    ...getDefaultTestimonialsData(), 
-    ...props, 
+  const mergedData = {
+    ...getDefaultTestimonialsData(),
+    ...props,
     ...tenantComponentData,
-    ...storeData 
-  }
+    ...storeData,
+  };
 
   // Don't render if not visible
   if (!mergedData.visible) {
-    return null
+    return null;
   }
 
   return (
-    <section 
+    <section
       className="w-full bg-background py-14 sm:py-16"
       style={{
-        backgroundColor: mergedData.background?.color || mergedData.styling?.bgColor || "transparent"
+        backgroundColor:
+          mergedData.background?.color ||
+          mergedData.styling?.bgColor ||
+          "transparent",
       }}
     >
-      <div 
-        className="w-full" 
+      <div
+        className="w-full"
         dir="rtl"
         style={{
-          gridTemplateColumns: mergedData.grid?.columns?.desktop ? `repeat(${mergedData.grid.columns.desktop}, 1fr)` : undefined,
-          gap: mergedData.grid?.gapX || mergedData.grid?.gapY ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}` : undefined
+          gridTemplateColumns: mergedData.grid?.columns?.desktop
+            ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
+            : undefined,
+          gap:
+            mergedData.grid?.gapX || mergedData.grid?.gapY
+              ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}`
+              : undefined,
         }}
       >
         <header className="mb-8 text-center md:text-right mx-auto px-5 sm:px-26">
-          <h2 
+          <h2
             className="section-title"
             style={{
-              color: mergedData.styling?.textColor || mergedData.colors?.textColor || undefined
+              color:
+                mergedData.styling?.textColor ||
+                mergedData.colors?.textColor ||
+                undefined,
             }}
           >
             {mergedData.title}
           </h2>
-          <p 
+          <p
             className="section-subtitle-large"
             style={{
-              color: mergedData.styling?.textColor || mergedData.colors?.textColor || undefined
+              color:
+                mergedData.styling?.textColor ||
+                mergedData.colors?.textColor ||
+                undefined,
             }}
           >
             {mergedData.description}
@@ -379,14 +408,15 @@ export default function TestimonialsSection(props: TestimonialsProps = {}) {
         <div className="testimonials-swiper">
           <SwiperCarousel
             desktopCount={mergedData.carousel?.desktopCount || 3}
-            
             // توحيد ارتفاع السلايد للشهادات
             slideClassName="!h-[260px] sm:!h-[220px] md:!h-[240px] lg:!h-[260px]"
-            items={mergedData.testimonials?.map((t: any) => (
-              <div key={t.id} className="h-full w-full">
-                <TestimonialCard t={t} />
-              </div>
-            )) || []}
+            items={
+              mergedData.testimonials?.map((t: any) => (
+                <div key={t.id} className="h-full w-full">
+                  <TestimonialCard t={t} />
+                </div>
+              )) || []
+            }
             space={mergedData.carousel?.space || 20}
             autoplay={mergedData.carousel?.autoplay || true}
             showPagination={mergedData.carousel?.showPagination || true}
@@ -402,18 +432,18 @@ export default function TestimonialsSection(props: TestimonialsProps = {}) {
           opacity: 1;
           margin: 0 4px;
         }
-        
+
         .testimonials-swiper :global(.swiper-pagination-bullet-active) {
           width: 32px;
           height: 12px;
           border-radius: 6px;
           background: #059669;
         }
-        
+
         .testimonials-swiper :global(.swiper-pagination) {
           bottom: -40px;
         }
       `}</style>
     </section>
-  )
+  );
 }

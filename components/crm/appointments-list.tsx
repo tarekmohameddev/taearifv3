@@ -67,19 +67,28 @@ export default function AppointmentsList({
 
   // Filter appointments based on search and filters
   const filteredAppointments = appointmentsData.filter((appointment) => {
-    const matchesSearch = searchTerm === "" || 
+    const matchesSearch =
+      searchTerm === "" ||
       appointment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.customer?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.customer?.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       appointment.customer?.phone_number?.includes(searchTerm) ||
-      appointment.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+      appointment.customer?.email
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
 
-    const matchesStage = filterStage === "all" || 
-      (filterStage === "unassigned" && (!appointment.customer?.pipelineStage && !appointment.customer?.stage_id)) ||
+    const matchesStage =
+      filterStage === "all" ||
+      (filterStage === "unassigned" &&
+        !appointment.customer?.pipelineStage &&
+        !appointment.customer?.stage_id) ||
       appointment.customer?.pipelineStage === filterStage ||
-      (appointment.customer?.stage_id && String(appointment.customer.stage_id) === filterStage);
+      (appointment.customer?.stage_id &&
+        String(appointment.customer.stage_id) === filterStage);
 
-    const matchesUrgency = filterUrgency === "all" || 
-      appointment.priority_label === filterUrgency;
+    const matchesUrgency =
+      filterUrgency === "all" || appointment.priority_label === filterUrgency;
 
     return matchesSearch && matchesStage && matchesUrgency;
   });
@@ -103,107 +112,115 @@ export default function AppointmentsList({
       <div className="space-y-4">
         {filteredAppointments.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">لا توجد مواعيد تطابق معايير البحث</p>
+            <p className="text-muted-foreground">
+              لا توجد مواعيد تطابق معايير البحث
+            </p>
           </div>
         ) : (
           filteredAppointments.map((appointment) => (
-          <Card
-            key={appointment.id}
-            className="hover:shadow-md transition-shadow"
-          >
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`w-1 h-16 rounded-full ${getStatusColor(appointment.status)}`}
-                  />
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage
-                        src={appointment.customer?.avatar || "/placeholder.svg"}
-                      />
-                      <AvatarFallback>
-                        {appointment.customer?.name
-                          ?.split(" ")
-                          ?.slice(0, 2)
-                          ?.map((n) => n[0])
-                          ?.join("") || "عميل"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-semibold">{appointment.title}</h3>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {appointment.customer?.name || "عميل غير محدد"}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {appointment.datetime
-                            ? new Date(appointment.datetime).toLocaleDateString(
-                                "en-GB",
-                                {
+            <Card
+              key={appointment.id}
+              className="hover:shadow-md transition-shadow"
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-1 h-16 rounded-full ${getStatusColor(appointment.status)}`}
+                    />
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage
+                          src={
+                            appointment.customer?.avatar || "/placeholder.svg"
+                          }
+                        />
+                        <AvatarFallback>
+                          {appointment.customer?.name
+                            ?.split(" ")
+                            ?.slice(0, 2)
+                            ?.map((n) => n[0])
+                            ?.join("") || "عميل"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-semibold">{appointment.title}</h3>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            {appointment.customer?.name || "عميل غير محدد"}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {appointment.datetime
+                              ? new Date(
+                                  appointment.datetime,
+                                ).toLocaleDateString("en-GB", {
                                   year: "numeric",
                                   month: "2-digit",
                                   day: "2-digit",
                                   timeZone: "Asia/Riyadh",
-                                },
-                              )
-                            : appointment.date}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {appointment.datetime
-                            ? new Date(appointment.datetime).toLocaleTimeString(
-                                "ar-US",
-                                { hour: "2-digit", minute: "2-digit" },
-                              )
-                            : appointment.time}
-                        </span>
+                                })
+                              : appointment.date}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {appointment.datetime
+                              ? new Date(
+                                  appointment.datetime,
+                                ).toLocaleTimeString("ar-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : appointment.time}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className={getPriorityColor(
-                      appointment.priority_label || "متوسطة",
-                    )}
-                  >
-                    {appointment.priority_label || "متوسطة"}
-                  </Badge>
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <Bell className="h-3 w-3" />
-                    تذكير
-                  </Badge>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onViewAppointment(appointment)}
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className={getPriorityColor(
+                        appointment.priority_label || "متوسطة",
+                      )}
                     >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onEditAppointment(appointment)}
+                      {appointment.priority_label || "متوسطة"}
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="flex items-center gap-1"
                     >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Phone className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <MessageSquare className="h-4 w-4" />
-                    </Button>
+                      <Bell className="h-3 w-3" />
+                      تذكير
+                    </Badge>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onViewAppointment(appointment)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onEditAppointment(appointment)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <Phone className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <MessageSquare className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))
+              </CardContent>
+            </Card>
+          ))
         )}
       </div>
     </div>

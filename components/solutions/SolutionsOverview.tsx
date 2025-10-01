@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Globe, Users, Home, Bot, Check } from 'lucide-react';
+import { Globe, Users, Home, Bot, Check } from "lucide-react";
 
 export default function SolutionsOverview() {
   return (
@@ -12,7 +12,8 @@ export default function SolutionsOverview() {
             <span className="gradient-text">في منصة واحدة</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            نقدم لك حلول متكاملة تغطي جميع احتياجاتك العقارية من بناء الموقع إلى إدارة العملاء والأملاك
+            نقدم لك حلول متكاملة تغطي جميع احتياجاتك العقارية من بناء الموقع إلى
+            إدارة العملاء والأملاك
           </p>
         </div>
 
@@ -24,9 +25,12 @@ export default function SolutionsOverview() {
                 <Globe className="h-8 w-8 text-purple-600" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold mb-4">منشئ المواقع العقارية</h3>
+                <h3 className="text-2xl font-bold mb-4">
+                  منشئ المواقع العقارية
+                </h3>
                 <p className="text-gray-600 mb-4 leading-relaxed">
-                  أنشئ موقعك العقاري الاحترافي خلال دقائق مع قوالب مصممة خصيصاً للسوق العقاري السعودي
+                  أنشئ موقعك العقاري الاحترافي خلال دقائق مع قوالب مصممة خصيصاً
+                  للسوق العقاري السعودي
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
@@ -53,9 +57,12 @@ export default function SolutionsOverview() {
                 <Users className="h-8 w-8 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold mb-4">نظام إدارة العملاء CRM</h3>
+                <h3 className="text-2xl font-bold mb-4">
+                  نظام إدارة العملاء CRM
+                </h3>
                 <p className="text-gray-600 mb-4 leading-relaxed">
-                  نظام متطور لإدارة علاقاتك مع العملاء وتتبع جميع التفاعلات والصفقات بكفاءة عالية
+                  نظام متطور لإدارة علاقاتك مع العملاء وتتبع جميع التفاعلات
+                  والصفقات بكفاءة عالية
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
@@ -82,9 +89,12 @@ export default function SolutionsOverview() {
                 <Home className="h-8 w-8 text-orange-600" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold mb-4">نظام إدارة الأملاك PMS</h3>
+                <h3 className="text-2xl font-bold mb-4">
+                  نظام إدارة الأملاك PMS
+                </h3>
                 <p className="text-gray-600 mb-4 leading-relaxed">
-                  أدر محفظتك العقارية بسهولة مع تتبع الإيجارات والصيانة والمدفوعات في مكان واحد
+                  أدر محفظتك العقارية بسهولة مع تتبع الإيجارات والصيانة
+                  والمدفوعات في مكان واحد
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
@@ -114,9 +124,12 @@ export default function SolutionsOverview() {
                 <Bot className="h-8 w-8 text-purple-600" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold mb-4">المساعد الذكي للواتساب</h3>
+                <h3 className="text-2xl font-bold mb-4">
+                  المساعد الذكي للواتساب
+                </h3>
                 <p className="text-gray-600 mb-4 leading-relaxed">
-                  مساعد ذكي يعمل على مدار الساعة للرد على استفسارات العملاء وحفظ بياناتهم تلقائياً
+                  مساعد ذكي يعمل على مدار الساعة للرد على استفسارات العملاء وحفظ
+                  بياناتهم تلقائياً
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">

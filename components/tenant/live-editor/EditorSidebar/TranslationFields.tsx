@@ -2,7 +2,11 @@
 
 import React from "react";
 import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-import { locales, localeNames, localeFlags } from "@/lib-liveeditor/i18n/config";
+import {
+  locales,
+  localeNames,
+  localeFlags,
+} from "@/lib-liveeditor/i18n/config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,7 +46,10 @@ export function TranslationFields({
 
   const getPlaceholder = (locale: string) => {
     if (placeholder) return placeholder;
-    return t(`${fieldKey}.placeholder`) || `Enter ${label || fieldKey} in ${localeNames[locale as keyof typeof localeNames]}`;
+    return (
+      t(`${fieldKey}.placeholder`) ||
+      `Enter ${label || fieldKey} in ${localeNames[locale as keyof typeof localeNames]}`
+    );
   };
 
   return (
@@ -63,13 +70,11 @@ export function TranslationFields({
                 className="flex items-center gap-1 text-xs"
               >
                 <span>{localeFlags[locale]}</span>
-                <span className="hidden sm:inline">
-                  {localeNames[locale]}
-                </span>
+                <span className="hidden sm:inline">{localeNames[locale]}</span>
               </TabsTrigger>
             ))}
           </TabsList>
-          
+
           {locales.map((locale) => (
             <TabsContent key={locale} value={locale} className="mt-4">
               <div className="space-y-2">
@@ -106,25 +111,25 @@ export function TranslationFields({
 export function useTranslationFields(
   fieldKey: string,
   value: Record<string, string>,
-  onChange: (value: Record<string, string>) => void
+  onChange: (value: Record<string, string>) => void,
 ) {
   const t = useEditorT();
-  
+
   const getTranslation = (locale: string) => {
     return value[locale] || "";
   };
-  
+
   const setTranslation = (locale: string, translation: string) => {
     onChange({
       ...value,
       [locale]: translation,
     });
   };
-  
+
   const getPlaceholder = (locale: string) => {
     return t(`${fieldKey}.placeholder`) || `Enter ${fieldKey} in ${locale}`;
   };
-  
+
   return {
     getTranslation,
     setTranslation,

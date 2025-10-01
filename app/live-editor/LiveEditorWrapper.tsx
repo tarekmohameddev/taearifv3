@@ -8,7 +8,9 @@ interface LiveEditorWrapperProps {
   tenantId: string | null;
 }
 
-export default function LiveEditorWrapper({ tenantId }: LiveEditorWrapperProps) {
+export default function LiveEditorWrapper({
+  tenantId,
+}: LiveEditorWrapperProps) {
   const setTenantId = useTenantStore((s) => s.setTenantId);
 
   // Set tenantId in store when component mounts

@@ -117,13 +117,13 @@ export function AdvancedFilterDialog({
     setSelectedPurposes((prev) =>
       prev.includes(purpose)
         ? prev.filter((p) => p !== purpose)
-        : [...prev, purpose]
+        : [...prev, purpose],
     );
   };
 
   const handleTypeToggle = (type: string) => {
     setSelectedTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
   };
 
@@ -131,19 +131,19 @@ export function AdvancedFilterDialog({
     setSelectedFeatures((prev) =>
       prev.includes(feature)
         ? prev.filter((f) => f !== feature)
-        : [...prev, feature]
+        : [...prev, feature],
     );
   };
 
   const handleBedToggle = (bed: number) => {
     setSelectedBeds((prev) =>
-      prev.includes(bed) ? prev.filter((b) => b !== bed) : [...prev, bed]
+      prev.includes(bed) ? prev.filter((b) => b !== bed) : [...prev, bed],
     );
   };
 
   const handleBathToggle = (bath: number) => {
     setSelectedBaths((prev) =>
-      prev.includes(bath) ? prev.filter((b) => b !== bath) : [...prev, bath]
+      prev.includes(bath) ? prev.filter((b) => b !== bath) : [...prev, bath],
     );
   };
 

@@ -203,7 +203,6 @@ export function GoogleRegisterPage() {
           payload.referral_code = formData.referral_code;
         }
 
-
         const response = await axios.post(link, payload, {
           headers: { "Content-Type": "application/json" },
         });
@@ -211,7 +210,6 @@ export function GoogleRegisterPage() {
         if (response.status < 200 || response.status >= 300) {
           throw new Error(response.data.message || "فشل إكمال التسجيل");
         }
-
 
         const { user, token: UserToken } = response.data;
 

@@ -139,14 +139,7 @@ export default function InquiryList({
     "عقار",
   ];
 
-  const propertyTypes = [
-    "شقة",
-    "فيلا",
-    "مكتب",
-    "محل",
-    "أرض",
-    "مزرعة",
-  ];
+  const propertyTypes = ["شقة", "فيلا", "مكتب", "محل", "أرض", "مزرعة"];
 
   const perPageOptions = [5, 10, 20, 50];
 
@@ -174,21 +167,30 @@ export default function InquiryList({
       // Add a small delay to show loading state for better UX
       setTimeout(() => setListLoading(true), 100);
     }
-    
+
     try {
       // Build query parameters
       const params = new URLSearchParams();
-      
-      if (filters.inquiry_type && filters.inquiry_type !== "all") params.append("inquiry_type", filters.inquiry_type);
-      if (filters.property_type && filters.property_type !== "all") params.append("property_type", filters.property_type);
-      if (filters.min_budget > 0) params.append("min_budget", filters.min_budget.toString());
-      if (filters.max_budget < 10000000) params.append("max_budget", filters.max_budget.toString());
-      if (filters.location) params.append("location", filters.location);
-      if (filters.customer_id) params.append("customer_id", filters.customer_id);
-      if (filters.per_page) params.append("per_page", filters.per_page.toString());
-      if (filters.current_page) params.append("page", filters.current_page.toString());
 
-      const response = await axiosInstance.get(`/v1/inquiry?${params.toString()}`);
+      if (filters.inquiry_type && filters.inquiry_type !== "all")
+        params.append("inquiry_type", filters.inquiry_type);
+      if (filters.property_type && filters.property_type !== "all")
+        params.append("property_type", filters.property_type);
+      if (filters.min_budget > 0)
+        params.append("min_budget", filters.min_budget.toString());
+      if (filters.max_budget < 10000000)
+        params.append("max_budget", filters.max_budget.toString());
+      if (filters.location) params.append("location", filters.location);
+      if (filters.customer_id)
+        params.append("customer_id", filters.customer_id);
+      if (filters.per_page)
+        params.append("per_page", filters.per_page.toString());
+      if (filters.current_page)
+        params.append("page", filters.current_page.toString());
+
+      const response = await axiosInstance.get(
+        `/v1/inquiry?${params.toString()}`,
+      );
       const data = response.data;
 
       if (data.status === "success") {
@@ -275,7 +277,7 @@ export default function InquiryList({
   // Filter inquiries locally for search
   const filteredInquiries = inquiries.filter((inquiry) => {
     if (!searchQuery) return true;
-    
+
     return (
       inquiry.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
       inquiry.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -288,7 +290,8 @@ export default function InquiryList({
   useEffect(() => {
     let count = 0;
     if (tempFilters.inquiry_type && tempFilters.inquiry_type !== "all") count++;
-    if (tempFilters.property_type && tempFilters.property_type !== "all") count++;
+    if (tempFilters.property_type && tempFilters.property_type !== "all")
+      count++;
     if (tempFilters.min_budget > 0) count++;
     if (tempFilters.max_budget < 10000000) count++;
     if (tempFilters.location) count++;
@@ -320,7 +323,7 @@ export default function InquiryList({
   };
 
   const handlePageChange = (page: number) => {
-    setFilters(prev => ({ ...prev, current_page: page }));
+    setFilters((prev) => ({ ...prev, current_page: page }));
   };
 
   if (loading) {
@@ -347,7 +350,10 @@ export default function InquiryList({
             <SlidersHorizontal className="h-4 w-4 ml-2" />
             الفلاتر
             {activeFilters > 0 && (
-              <Badge variant="secondary" className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs">
+              <Badge
+                variant="secondary"
+                className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs"
+              >
                 {activeFilters}
               </Badge>
             )}
@@ -364,140 +370,169 @@ export default function InquiryList({
         <Card className="border-2 border-blue-100 bg-blue-50/30">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                             {/* Inquiry Type */}
-               <div className="space-y-2">
-                 <Label className="text-sm font-medium">نوع الطلب</Label>
-                 <Select
-                   value={tempFilters.inquiry_type}
-                   onValueChange={(value) => setTempFilters(prev => ({ ...prev, inquiry_type: value }))}
-                 >
-                   <SelectTrigger>
-                     <SelectValue placeholder="اختر نوع الطلب" />
-                   </SelectTrigger>
-                                      <SelectContent>
-                     <SelectItem value="all">جميع الأنواع</SelectItem>
-                     {inquiryTypes.map((type) => (
-                       <SelectItem key={type} value={type}>
-                         {type}
-                       </SelectItem>
-                     ))}
-                   </SelectContent>
-                 </Select>
-               </div>
+              {/* Inquiry Type */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">نوع الطلب</Label>
+                <Select
+                  value={tempFilters.inquiry_type}
+                  onValueChange={(value) =>
+                    setTempFilters((prev) => ({ ...prev, inquiry_type: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر نوع الطلب" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">جميع الأنواع</SelectItem>
+                    {inquiryTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-               {/* Property Type */}
-               <div className="space-y-2">
-                 <Label className="text-sm font-medium">نوع العقار</Label>
-                 <Select
-                   value={tempFilters.property_type}
-                   onValueChange={(value) => setTempFilters(prev => ({ ...prev, property_type: value }))}
-                 >
-                   <SelectTrigger>
-                     <SelectValue placeholder="اختر نوع العقار" />
-                   </SelectTrigger>
-                                      <SelectContent>
-                     <SelectItem value="all">جميع الأنواع</SelectItem>
-                     {propertyTypes.map((type) => (
-                       <SelectItem key={type} value={type}>
-                         {type}
-                       </SelectItem>
-                     ))}
-                   </SelectContent>
-                 </Select>
-               </div>
+              {/* Property Type */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">نوع العقار</Label>
+                <Select
+                  value={tempFilters.property_type}
+                  onValueChange={(value) =>
+                    setTempFilters((prev) => ({
+                      ...prev,
+                      property_type: value,
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر نوع العقار" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">جميع الأنواع</SelectItem>
+                    {propertyTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-               {/* Location */}
-               <div className="space-y-2">
-                 <Label className="text-sm font-medium">الموقع</Label>
-                 <Input
-                   placeholder="أدخل الموقع..."
-                   value={tempFilters.location}
-                   onChange={(e) => setTempFilters(prev => ({ ...prev, location: e.target.value }))}
-                 />
-               </div>
+              {/* Location */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">الموقع</Label>
+                <Input
+                  placeholder="أدخل الموقع..."
+                  value={tempFilters.location}
+                  onChange={(e) =>
+                    setTempFilters((prev) => ({
+                      ...prev,
+                      location: e.target.value,
+                    }))
+                  }
+                />
+              </div>
 
-               {/* Customer ID */}
-               <div className="space-y-2">
-                 <Label className="text-sm font-medium">رقم العميل</Label>
-                 <Input
-                   placeholder="أدخل رقم العميل..."
-                   value={tempFilters.customer_id}
-                   onChange={(e) => setTempFilters(prev => ({ ...prev, customer_id: e.target.value }))}
-                 />
-               </div>
+              {/* Customer ID */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">رقم العميل</Label>
+                <Input
+                  placeholder="أدخل رقم العميل..."
+                  value={tempFilters.customer_id}
+                  onChange={(e) =>
+                    setTempFilters((prev) => ({
+                      ...prev,
+                      customer_id: e.target.value,
+                    }))
+                  }
+                />
+              </div>
 
-                                                             {/* Budget Range */}
-                 <div className="space-y-2 md:col-span-2">
-                   <Label className="text-sm font-medium">
-                     نطاق الميزانية: {formatCurrency(tempFilters.min_budget)} - {formatCurrency(tempFilters.max_budget)}
-                   </Label>
-                   <div className="space-y-4">
-                                           <div className="relative">
-                        <Slider
-                          value={[tempFilters.min_budget, tempFilters.max_budget]}
-                          onValueChange={([min, max]) => 
-                            setTempFilters(prev => ({ ...prev, min_budget: min, max_budget: max }))
-                          }
-                          max={10000000}
-                          min={0}
-                          step={100000}
-                          className="w-full slider-range"
-                        />
-                      </div>
-                     <div className="flex justify-between text-xs text-muted-foreground">
-                       <span>0 ريال</span>
-                       <span>10 مليون ريال</span>
-                     </div>
-                   </div>
-                 </div>
+              {/* Budget Range */}
+              <div className="space-y-2 md:col-span-2">
+                <Label className="text-sm font-medium">
+                  نطاق الميزانية: {formatCurrency(tempFilters.min_budget)} -{" "}
+                  {formatCurrency(tempFilters.max_budget)}
+                </Label>
+                <div className="space-y-4">
+                  <div className="relative">
+                    <Slider
+                      value={[tempFilters.min_budget, tempFilters.max_budget]}
+                      onValueChange={([min, max]) =>
+                        setTempFilters((prev) => ({
+                          ...prev,
+                          min_budget: min,
+                          max_budget: max,
+                        }))
+                      }
+                      max={10000000}
+                      min={0}
+                      step={100000}
+                      className="w-full slider-range"
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>0 ريال</span>
+                    <span>10 مليون ريال</span>
+                  </div>
+                </div>
+              </div>
 
-               {/* Per Page */}
-               <div className="space-y-2">
-                 <Label className="text-sm font-medium">عدد النتائج في الصفحة</Label>
-                 <Select
-                   value={tempFilters.per_page.toString()}
-                   onValueChange={(value) => setTempFilters(prev => ({ ...prev, per_page: parseInt(value) }))}
-                 >
-                   <SelectTrigger>
-                     <SelectValue />
-                   </SelectTrigger>
-                   <SelectContent>
-                     {perPageOptions.map((option) => (
-                       <SelectItem key={option} value={option.toString()}>
-                         {option} نتيجة
-                       </SelectItem>
-                     ))}
-                   </SelectContent>
-                 </Select>
-               </div>
+              {/* Per Page */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">
+                  عدد النتائج في الصفحة
+                </Label>
+                <Select
+                  value={tempFilters.per_page.toString()}
+                  onValueChange={(value) =>
+                    setTempFilters((prev) => ({
+                      ...prev,
+                      per_page: parseInt(value),
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {perPageOptions.map((option) => (
+                      <SelectItem key={option} value={option.toString()}>
+                        {option} نتيجة
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-                         {/* Filter Actions */}
-             <div className="flex justify-between items-center mt-6 pt-4 border-t">
-               <div className="text-sm text-muted-foreground">
-                 {activeFilters} فلتر نشط
-               </div>
-               <div className="flex gap-2">
-                 <Button
-                   variant="outline"
-                   size="sm"
-                   onClick={clearFilters}
-                   disabled={activeFilters === 0}
-                 >
-                   <X className="h-4 w-4 ml-2" />
-                   مسح الفلاتر
-                 </Button>
-                 <Button
-                   variant="default"
-                   size="sm"
-                   onClick={applyFilters}
-                   className="bg-blue-600 hover:bg-blue-700"
-                 >
-                   <Filter className="h-4 w-4 ml-2" />
-                   تطبيق الفلاتر
-                 </Button>
-               </div>
-             </div>
+            {/* Filter Actions */}
+            <div className="flex justify-between items-center mt-6 pt-4 border-t">
+              <div className="text-sm text-muted-foreground">
+                {activeFilters} فلتر نشط
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearFilters}
+                  disabled={activeFilters === 0}
+                >
+                  <X className="h-4 w-4 ml-2" />
+                  مسح الفلاتر
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={applyFilters}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Filter className="h-4 w-4 ml-2" />
+                  تطبيق الفلاتر
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -518,7 +553,8 @@ export default function InquiryList({
       {pagination && (
         <div className="flex justify-between items-center text-sm text-muted-foreground">
           <span>
-            عرض {pagination.from} إلى {pagination.to} من {pagination.total} نتيجة
+            عرض {pagination.from} إلى {pagination.to} من {pagination.total}{" "}
+            نتيجة
           </span>
           <span>
             الصفحة {pagination.current_page} من {pagination.last_page}
@@ -526,130 +562,136 @@ export default function InquiryList({
         </div>
       )}
 
-                    {/* Inquiries List */}
-       <div className="space-y-4">
-         {listLoading ? (
-           <InquiryListSkeleton />
-         ) : (
-           <>
-             {filteredInquiries.map((inquiry) => (
-               <Card
-                 key={inquiry.id}
-                 className="hover:shadow-md transition-shadow"
-               >
-                 <CardContent className="p-4">
-                   <div className="flex items-start justify-between">
-                     <div className="flex items-start gap-4 flex-1">
-                       <Avatar className="h-10 w-10">
-                         <AvatarImage src="/placeholder.svg" />
-                         <AvatarFallback>
-                           {inquiry.customer.name
-                             ?.split(" ")
-                             ?.slice(0, 2)
-                             ?.map((n) => n[0])
-                             ?.join("") || "عميل"}
-                         </AvatarFallback>
-                       </Avatar>
-                       
-                       <div className="flex-1 space-y-2">
-                         <div className="flex items-start justify-between">
-                           <div>
-                             <h3 className="font-semibold text-sm line-clamp-2">
-                               {inquiry.message}
-                             </h3>
-                             <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
-                               <span className="flex items-center gap-1">
-                                 <User className="h-3 w-3" />
-                                 {inquiry.customer.name}
-                               </span>
-                               <span className="flex items-center gap-1">
-                                 <MapPin className="h-3 w-3" />
-                                 {inquiry.location}
-                               </span>
-                               {inquiry.created_at && (
-                                 <span className="flex items-center gap-1">
-                                   <Calendar className="h-3 w-3" />
-                                   {formatDate(inquiry.created_at)}
-                                 </span>
-                               )}
-                             </div>
-                           </div>
-                         </div>
+      {/* Inquiries List */}
+      <div className="space-y-4">
+        {listLoading ? (
+          <InquiryListSkeleton />
+        ) : (
+          <>
+            {filteredInquiries.map((inquiry) => (
+              <Card
+                key={inquiry.id}
+                className="hover:shadow-md transition-shadow"
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4 flex-1">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src="/placeholder.svg" />
+                        <AvatarFallback>
+                          {inquiry.customer.name
+                            ?.split(" ")
+                            ?.slice(0, 2)
+                            ?.map((n) => n[0])
+                            ?.join("") || "عميل"}
+                        </AvatarFallback>
+                      </Avatar>
 
-                         <div className="flex items-center gap-2 flex-wrap">
-                           <Badge
-                             variant="outline"
-                             className={`text-xs ${getInquiryTypeColor(inquiry.inquiry_type)}`}
-                           >
-                             {inquiry.inquiry_type}
-                           </Badge>
-                           
-                           {inquiry.property_type && (
-                             <Badge variant="outline" className="text-xs flex items-center gap-1">
-                               {getPropertyTypeIcon(inquiry.property_type)}
-                               {inquiry.property_type}
-                             </Badge>
-                           )}
-                           
-                           {inquiry.budget && (
-                             <Badge variant="outline" className="text-xs flex items-center gap-1">
-                               <DollarSign className="h-3 w-3" />
-                               {formatBudget(inquiry.budget)}
-                             </Badge>
-                           )}
-                         </div>
-                       </div>
-                     </div>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="font-semibold text-sm line-clamp-2">
+                              {inquiry.message}
+                            </h3>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
+                              <span className="flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                {inquiry.customer.name}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3" />
+                                {inquiry.location}
+                              </span>
+                              {inquiry.created_at && (
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  {formatDate(inquiry.created_at)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
 
-                     <div className="flex items-center gap-1">
-                       <Button
-                         variant="ghost"
-                         size="icon"
-                         onClick={() => onViewInquiry(inquiry)}
-                       >
-                         <Eye className="h-4 w-4" />
-                       </Button>
-                       <Button
-                         variant="ghost"
-                         size="icon"
-                         onClick={() => onEditInquiry(inquiry)}
-                       >
-                         <Edit className="h-4 w-4" />
-                       </Button>
-                       <Button
-                         variant="ghost"
-                         size="icon"
-                         onClick={() => onContactCustomer(inquiry)}
-                       >
-                         <Phone className="h-4 w-4" />
-                       </Button>
-                       <Button variant="ghost" size="icon">
-                         <MessageSquare className="h-4 w-4" />
-                       </Button>
-                     </div>
-                   </div>
-                 </CardContent>
-               </Card>
-             ))}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge
+                            variant="outline"
+                            className={`text-xs ${getInquiryTypeColor(inquiry.inquiry_type)}`}
+                          >
+                            {inquiry.inquiry_type}
+                          </Badge>
 
-             {filteredInquiries.length === 0 && !loading && (
-               <div className="text-center py-12 text-muted-foreground">
-                 <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                 <h3 className="text-lg font-semibold mb-2">لا توجد طلبات</h3>
-                 <p className="text-sm">
-                   {searchQuery || activeFilters > 0
-                     ? "لم يتم العثور على طلبات تطابق معايير البحث"
-                     : "لم يتم العثور على أي طلبات حالياً"}
-                 </p>
-                 <Button onClick={onAddInquiry} className="mt-4">
-                   <Plus className="ml-2 h-4 w-4" />
-                   إضافة طلب جديد
-                 </Button>
-               </div>
-             )}
-           </>
-         )}
-       </div>
+                          {inquiry.property_type && (
+                            <Badge
+                              variant="outline"
+                              className="text-xs flex items-center gap-1"
+                            >
+                              {getPropertyTypeIcon(inquiry.property_type)}
+                              {inquiry.property_type}
+                            </Badge>
+                          )}
+
+                          {inquiry.budget && (
+                            <Badge
+                              variant="outline"
+                              className="text-xs flex items-center gap-1"
+                            >
+                              <DollarSign className="h-3 w-3" />
+                              {formatBudget(inquiry.budget)}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onViewInquiry(inquiry)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onEditInquiry(inquiry)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onContactCustomer(inquiry)}
+                      >
+                        <Phone className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <MessageSquare className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {filteredInquiries.length === 0 && !loading && (
+              <div className="text-center py-12 text-muted-foreground">
+                <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-semibold mb-2">لا توجد طلبات</h3>
+                <p className="text-sm">
+                  {searchQuery || activeFilters > 0
+                    ? "لم يتم العثور على طلبات تطابق معايير البحث"
+                    : "لم يتم العثور على أي طلبات حالياً"}
+                </p>
+                <Button onClick={onAddInquiry} className="mt-4">
+                  <Plus className="ml-2 h-4 w-4" />
+                  إضافة طلب جديد
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
       {/* Pagination */}
       {pagination && pagination.last_page > 1 && (
@@ -663,24 +705,29 @@ export default function InquiryList({
             <ChevronRight className="h-4 w-4" />
             السابق
           </Button>
-          
+
           <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(5, pagination.last_page) }, (_, i) => {
-              const page = i + 1;
-              return (
-                <Button
-                  key={page}
-                  variant={page === pagination.current_page ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handlePageChange(page)}
-                  className="w-8 h-8 p-0"
-                >
-                  {page}
-                </Button>
-              );
-            })}
+            {Array.from(
+              { length: Math.min(5, pagination.last_page) },
+              (_, i) => {
+                const page = i + 1;
+                return (
+                  <Button
+                    key={page}
+                    variant={
+                      page === pagination.current_page ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handlePageChange(page)}
+                    className="w-8 h-8 p-0"
+                  >
+                    {page}
+                  </Button>
+                );
+              },
+            )}
           </div>
-          
+
           <Button
             variant="outline"
             size="sm"
@@ -732,4 +779,4 @@ function InquiryListSkeleton() {
       ))}
     </div>
   );
-} 
+}

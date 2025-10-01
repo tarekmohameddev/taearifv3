@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import useAuthStore from "@/context/AuthContext"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import useAuthStore from "@/context/AuthContext";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -15,11 +21,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Building2,
   Plus,
@@ -34,68 +40,68 @@ import {
   DollarSign,
   Users,
   TrendingUp,
-} from "lucide-react"
+} from "lucide-react";
 
 interface Vendor {
-  id: string
-  name: string
-  nameAr: string
-  type: "developer" | "individual" | "company" | "broker"
-  typeAr: string
+  id: string;
+  name: string;
+  nameAr: string;
+  type: "developer" | "individual" | "company" | "broker";
+  typeAr: string;
   contact: {
-    email: string
-    phone: string
-    address: string
-    addressAr: string
-    website?: string
-  }
+    email: string;
+    phone: string;
+    address: string;
+    addressAr: string;
+    website?: string;
+  };
   businessInfo: {
-    licenseNumber: string
-    establishedYear: number
-    specialization: string[]
-    specializationAr: string[]
-    rating: number
-    totalDeals: number
-    totalValue: number
-  }
+    licenseNumber: string;
+    establishedYear: number;
+    specialization: string[];
+    specializationAr: string[];
+    rating: number;
+    totalDeals: number;
+    totalValue: number;
+  };
   properties: {
-    active: number
-    sold: number
-    avgPrice: number
-    locations: string[]
-    locationsAr: string[]
-  }
-  status: "active" | "inactive" | "pending" | "blacklisted"
-  statusAr: string
-  notes: string
-  notesAr: string
-  lastContact: string
-  lastContactHijri: string
-  createdDate: string
-  createdDateHijri: string
-  avatar?: string
+    active: number;
+    sold: number;
+    avgPrice: number;
+    locations: string[];
+    locationsAr: string[];
+  };
+  status: "active" | "inactive" | "pending" | "blacklisted";
+  statusAr: string;
+  notes: string;
+  notesAr: string;
+  lastContact: string;
+  lastContactHijri: string;
+  createdDate: string;
+  createdDateHijri: string;
+  avatar?: string;
 }
 
 export function VendorManagementService() {
-  const [vendors, setVendors] = useState<Vendor[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterType, setFilterType] = useState("all")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const { userData } = useAuthStore()
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { userData } = useAuthStore();
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchVendors")
-      return
+      console.log("No token available, skipping fetchVendors");
+      return;
     }
 
     const fetchVendors = async () => {
-      setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setVendors([
         {
@@ -291,53 +297,56 @@ export function VendorManagementService() {
           createdDateHijri: "1446/07/01",
           avatar: "/placeholder.svg?height=40&width=40",
         },
-      ])
-      setLoading(false)
-    }
+      ]);
+      setLoading(false);
+    };
 
-    fetchVendors()
-  }, [userData?.token])
+    fetchVendors();
+  }, [userData?.token]);
 
   const filteredVendors = vendors.filter((vendor) => {
     const matchesSearch =
       vendor.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vendor.contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vendor.contact.phone.includes(searchTerm) ||
-      vendor.businessInfo.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesType = filterType === "all" || vendor.type === filterType
-    const matchesStatus = filterStatus === "all" || vendor.status === filterStatus
-    return matchesSearch && matchesType && matchesStatus
-  })
+      vendor.businessInfo.licenseNumber
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+    const matchesType = filterType === "all" || vendor.type === filterType;
+    const matchesStatus =
+      filterStatus === "all" || vendor.status === filterStatus;
+    return matchesSearch && matchesType && matchesStatus;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "inactive":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
       case "pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "blacklisted":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getTypeColor = (type: string) => {
     switch (type) {
       case "developer":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "individual":
-        return "bg-purple-100 text-purple-800"
+        return "bg-purple-100 text-purple-800";
       case "company":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "broker":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 text-orange-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getRatingStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -345,8 +354,8 @@ export function VendorManagementService() {
         key={i}
         className={`h-3 w-3 ${i < Math.floor(rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
       />
-    ))
-  }
+    ));
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
@@ -354,11 +363,13 @@ export function VendorManagementService() {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+            <p className="text-lg text-gray-500">
+              يرجى تسجيل الدخول لعرض المحتوى
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -384,7 +395,7 @@ export function VendorManagementService() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -393,7 +404,9 @@ export function VendorManagementService() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">إدارة البائعين والمطورين</h2>
-          <p className="text-muted-foreground">إدارة معلومات البائعين والمطورين والوسطاء</p>
+          <p className="text-muted-foreground">
+            إدارة معلومات البائعين والمطورين والوسطاء
+          </p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
@@ -405,7 +418,9 @@ export function VendorManagementService() {
           <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>إضافة بائع جديد</DialogTitle>
-              <DialogDescription>تسجيل بائع أو مطور جديد في النظام</DialogDescription>
+              <DialogDescription>
+                تسجيل بائع أو مطور جديد في النظام
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -431,7 +446,11 @@ export function VendorManagementService() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="vendor-email">البريد الإلكتروني</Label>
-                  <Input id="vendor-email" type="email" placeholder="info@company.com" />
+                  <Input
+                    id="vendor-email"
+                    type="email"
+                    placeholder="info@company.com"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="vendor-phone">رقم الهاتف</Label>
@@ -440,7 +459,10 @@ export function VendorManagementService() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="vendor-address">العنوان</Label>
-                <Input id="vendor-address" placeholder="طريق الملك فهد، الرياض" />
+                <Input
+                  id="vendor-address"
+                  placeholder="طريق الملك فهد، الرياض"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -449,7 +471,11 @@ export function VendorManagementService() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="established-year">سنة التأسيس</Label>
-                  <Input id="established-year" type="number" placeholder="2015" />
+                  <Input
+                    id="established-year"
+                    type="number"
+                    placeholder="2015"
+                  />
                 </div>
               </div>
               <div className="space-y-2">
@@ -458,18 +484,31 @@ export function VendorManagementService() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="specialization">التخصص</Label>
-                <Textarea id="specialization" placeholder="سكني، تجاري، مختلط..." rows={2} />
+                <Textarea
+                  id="specialization"
+                  placeholder="سكني، تجاري، مختلط..."
+                  rows={2}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="vendor-notes">ملاحظات</Label>
-                <Textarea id="vendor-notes" placeholder="أي ملاحظات حول البائع..." rows={3} />
+                <Textarea
+                  id="vendor-notes"
+                  placeholder="أي ملاحظات حول البائع..."
+                  rows={3}
+                />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsAddDialogOpen(false)}
+              >
                 إلغاء
               </Button>
-              <Button onClick={() => setIsAddDialogOpen(false)}>إضافة البائع</Button>
+              <Button onClick={() => setIsAddDialogOpen(false)}>
+                إضافة البائع
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -521,7 +560,10 @@ export function VendorManagementService() {
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4 space-x-reverse flex-1">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={vendor.avatar || "/placeholder.svg"} alt={vendor.nameAr} />
+                    <AvatarImage
+                      src={vendor.avatar || "/placeholder.svg"}
+                      alt={vendor.nameAr}
+                    />
                     <AvatarFallback>
                       {vendor.nameAr
                         .split(" ")
@@ -532,11 +574,17 @@ export function VendorManagementService() {
                   <div className="space-y-3 flex-1">
                     <div className="flex items-center space-x-3 space-x-reverse">
                       <h3 className="font-semibold text-lg">{vendor.nameAr}</h3>
-                      <Badge className={getStatusColor(vendor.status)}>{vendor.statusAr}</Badge>
-                      <Badge className={getTypeColor(vendor.type)}>{vendor.typeAr}</Badge>
+                      <Badge className={getStatusColor(vendor.status)}>
+                        {vendor.statusAr}
+                      </Badge>
+                      <Badge className={getTypeColor(vendor.type)}>
+                        {vendor.typeAr}
+                      </Badge>
                       <div className="flex items-center space-x-1 space-x-reverse">
                         {getRatingStars(vendor.businessInfo.rating)}
-                        <span className="text-sm text-muted-foreground ml-1">({vendor.businessInfo.rating})</span>
+                        <span className="text-sm text-muted-foreground ml-1">
+                          ({vendor.businessInfo.rating})
+                        </span>
                       </div>
                     </div>
 
@@ -570,29 +618,43 @@ export function VendorManagementService() {
                         <div className="flex items-center space-x-2 space-x-reverse text-sm">
                           <TrendingUp className="h-3 w-3 text-muted-foreground" />
                           <span className="font-medium">متوسط السعر:</span>
-                          <span>{vendor.properties.avgPrice.toLocaleString()} ر.س</span>
+                          <span>
+                            {vendor.properties.avgPrice.toLocaleString()} ر.س
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      {vendor.businessInfo.specializationAr.map((spec, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {spec}
-                        </Badge>
-                      ))}
+                      {vendor.businessInfo.specializationAr.map(
+                        (spec, index) => (
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="text-xs"
+                          >
+                            {spec}
+                          </Badge>
+                        ),
+                      )}
                     </div>
 
                     {vendor.notesAr && (
                       <div className="p-3 bg-muted rounded-md">
-                        <p className="text-sm text-muted-foreground">{vendor.notesAr}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {vendor.notesAr}
+                        </p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2 ml-4">
-                  <Button size="sm" variant="outline" onClick={() => setSelectedVendor(vendor)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedVendor(vendor)}
+                  >
                     <Eye className="h-3 w-3 ml-1" />
                     التفاصيل
                   </Button>
@@ -612,11 +674,16 @@ export function VendorManagementService() {
       </div>
 
       {/* Vendor Details Dialog */}
-      <Dialog open={!!selectedVendor} onOpenChange={() => setSelectedVendor(null)}>
+      <Dialog
+        open={!!selectedVendor}
+        onOpenChange={() => setSelectedVendor(null)}
+      >
         <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>تفاصيل البائع</DialogTitle>
-            <DialogDescription>معلومات كاملة عن {selectedVendor?.nameAr}</DialogDescription>
+            <DialogDescription>
+              معلومات كاملة عن {selectedVendor?.nameAr}
+            </DialogDescription>
           </DialogHeader>
           {selectedVendor && (
             <Tabs defaultValue="info" className="w-full">
@@ -630,7 +697,10 @@ export function VendorManagementService() {
               <TabsContent value="info" className="space-y-4">
                 <div className="flex items-center space-x-4 space-x-reverse mb-6">
                   <Avatar className="h-16 w-16">
-                    <AvatarImage src={selectedVendor.avatar || "/placeholder.svg"} alt={selectedVendor.nameAr} />
+                    <AvatarImage
+                      src={selectedVendor.avatar || "/placeholder.svg"}
+                      alt={selectedVendor.nameAr}
+                    />
                     <AvatarFallback className="text-lg">
                       {selectedVendor.nameAr
                         .split(" ")
@@ -639,30 +709,48 @@ export function VendorManagementService() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="text-xl font-semibold">{selectedVendor.nameAr}</h3>
+                    <h3 className="text-xl font-semibold">
+                      {selectedVendor.nameAr}
+                    </h3>
                     <div className="flex items-center space-x-2 space-x-reverse mt-1">
-                      <Badge className={getTypeColor(selectedVendor.type)}>{selectedVendor.typeAr}</Badge>
-                      <Badge className={getStatusColor(selectedVendor.status)}>{selectedVendor.statusAr}</Badge>
+                      <Badge className={getTypeColor(selectedVendor.type)}>
+                        {selectedVendor.typeAr}
+                      </Badge>
+                      <Badge className={getStatusColor(selectedVendor.status)}>
+                        {selectedVendor.statusAr}
+                      </Badge>
                     </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm font-medium">البريد الإلكتروني</Label>
-                    <p className="text-sm text-muted-foreground">{selectedVendor.contact.email}</p>
+                    <Label className="text-sm font-medium">
+                      البريد الإلكتروني
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedVendor.contact.email}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">رقم الهاتف</Label>
-                    <p className="text-sm text-muted-foreground">{selectedVendor.contact.phone}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedVendor.contact.phone}
+                    </p>
                   </div>
                   <div className="col-span-2">
                     <Label className="text-sm font-medium">العنوان</Label>
-                    <p className="text-sm text-muted-foreground">{selectedVendor.contact.addressAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedVendor.contact.addressAr}
+                    </p>
                   </div>
                   {selectedVendor.contact.website && (
                     <div className="col-span-2">
-                      <Label className="text-sm font-medium">الموقع الإلكتروني</Label>
-                      <p className="text-sm text-muted-foreground">{selectedVendor.contact.website}</p>
+                      <Label className="text-sm font-medium">
+                        الموقع الإلكتروني
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedVendor.contact.website}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -672,38 +760,55 @@ export function VendorManagementService() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">رقم الترخيص</Label>
-                    <p className="text-sm text-muted-foreground">{selectedVendor.businessInfo.licenseNumber}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedVendor.businessInfo.licenseNumber}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">سنة التأسيس</Label>
-                    <p className="text-sm text-muted-foreground">{selectedVendor.businessInfo.establishedYear}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedVendor.businessInfo.establishedYear}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">التقييم</Label>
                     <div className="flex items-center space-x-2 space-x-reverse">
-                      <div className="flex">{getRatingStars(selectedVendor.businessInfo.rating)}</div>
-                      <span className="text-sm text-muted-foreground">({selectedVendor.businessInfo.rating})</span>
+                      <div className="flex">
+                        {getRatingStars(selectedVendor.businessInfo.rating)}
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        ({selectedVendor.businessInfo.rating})
+                      </span>
                     </div>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">إجمالي الصفقات</Label>
-                    <p className="text-sm text-muted-foreground">{selectedVendor.businessInfo.totalDeals}</p>
+                    <Label className="text-sm font-medium">
+                      إجمالي الصفقات
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedVendor.businessInfo.totalDeals}
+                    </p>
                   </div>
                   <div className="col-span-2">
-                    <Label className="text-sm font-medium">إجمالي قيمة الصفقات</Label>
+                    <Label className="text-sm font-medium">
+                      إجمالي قيمة الصفقات
+                    </Label>
                     <p className="text-sm text-muted-foreground font-bold text-green-600">
-                      {selectedVendor.businessInfo.totalValue.toLocaleString()} ر.س
+                      {selectedVendor.businessInfo.totalValue.toLocaleString()}{" "}
+                      ر.س
                     </p>
                   </div>
                 </div>
                 <div>
                   <Label className="text-sm font-medium">التخصصات</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedVendor.businessInfo.specializationAr.map((spec, index) => (
-                      <Badge key={index} variant="outline">
-                        {spec}
-                      </Badge>
-                    ))}
+                    {selectedVendor.businessInfo.specializationAr.map(
+                      (spec, index) => (
+                        <Badge key={index} variant="outline">
+                          {spec}
+                        </Badge>
+                      ),
+                    )}
                   </div>
                 </div>
               </TabsContent>
@@ -711,29 +816,37 @@ export function VendorManagementService() {
               <TabsContent value="properties" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">{selectedVendor.properties.active}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {selectedVendor.properties.active}
+                    </div>
                     <div className="text-sm text-blue-700">عقارات نشطة</div>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">{selectedVendor.properties.sold}</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {selectedVendor.properties.sold}
+                    </div>
                     <div className="text-sm text-green-700">عقارات مباعة</div>
                   </div>
                   <div className="col-span-2 text-center p-4 bg-purple-50 rounded-lg">
                     <div className="text-2xl font-bold text-purple-600">
                       {selectedVendor.properties.avgPrice.toLocaleString()}
                     </div>
-                    <div className="text-sm text-purple-700">متوسط السعر (ر.س)</div>
+                    <div className="text-sm text-purple-700">
+                      متوسط السعر (ر.س)
+                    </div>
                   </div>
                 </div>
                 <div>
                   <Label className="text-sm font-medium">المناطق النشطة</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedVendor.properties.locationsAr.map((location, index) => (
-                      <Badge key={index} variant="outline">
-                        <MapPin className="h-3 w-3 ml-1" />
-                        {location}
-                      </Badge>
-                    ))}
+                    {selectedVendor.properties.locationsAr.map(
+                      (location, index) => (
+                        <Badge key={index} variant="outline">
+                          <MapPin className="h-3 w-3 ml-1" />
+                          {location}
+                        </Badge>
+                      ),
+                    )}
                   </div>
                 </div>
               </TabsContent>
@@ -742,18 +855,24 @@ export function VendorManagementService() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">تاريخ التسجيل</Label>
-                    <p className="text-sm text-muted-foreground">{selectedVendor.createdDateHijri}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedVendor.createdDateHijri}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">آخر تواصل</Label>
-                    <p className="text-sm text-muted-foreground">{selectedVendor.lastContactHijri}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedVendor.lastContactHijri}
+                    </p>
                   </div>
                 </div>
                 {selectedVendor.notesAr && (
                   <div>
                     <Label className="text-sm font-medium">ملاحظات</Label>
                     <div className="p-3 bg-blue-50 rounded-md mt-2">
-                      <p className="text-sm text-blue-800">{selectedVendor.notesAr}</p>
+                      <p className="text-sm text-blue-800">
+                        {selectedVendor.notesAr}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -779,5 +898,5 @@ export function VendorManagementService() {
         </div>
       )}
     </div>
-  )
+  );
 }

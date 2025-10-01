@@ -194,16 +194,16 @@ export const heroFunctions = {
     }
 
     // تحديد البيانات الافتراضية حسب نوع المكون
-    const defaultData = variantId === "hero2" ? getDefaultHero2Data() : getDefaultHeroData();
+    const defaultData =
+      variantId === "hero2" ? getDefaultHero2Data() : getDefaultHeroData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
-    return { 
-      heroStates: { ...state.heroStates, [variantId]: data } 
+
+    return {
+      heroStates: { ...state.heroStates, [variantId]: data },
     } as any;
   },
 
-  getData: (state: any, variantId: string) => 
-    state.heroStates[variantId] || {},
+  getData: (state: any, variantId: string) => state.heroStates[variantId] || {},
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
     heroStates: { ...state.heroStates, [variantId]: data },
@@ -212,7 +212,7 @@ export const heroFunctions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.heroStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
       heroStates: { ...state.heroStates, [variantId]: newData },
     } as any;

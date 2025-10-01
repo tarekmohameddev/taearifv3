@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Target } from "lucide-react";
@@ -16,7 +15,8 @@ export const CrmLinkCard = () => {
                 هل تحتاج إلى مزيد من الميزات؟
               </h3>
               <p className="text-sm text-muted-foreground">
-                استخدم نظام CRM المتقدم لإدارة مراحل العملاء والمواعيد والتفاعلات
+                استخدم نظام CRM المتقدم لإدارة مراحل العملاء والمواعيد
+                والتفاعلات
               </p>
             </div>
             <Link href="/crm">
@@ -30,4 +30,4 @@ export const CrmLinkCard = () => {
       </Card>
     </div>
   );
-}; 
+};

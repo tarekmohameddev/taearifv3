@@ -93,31 +93,27 @@ export default function PipelineStage({
   onAddInteraction,
   viewType,
 }: PipelineStageProps) {
-  const stageCustomers = customers.filter(
-    (customer: any) => {
-      // Check both pipelineStage (for backward compatibility) and stage_id (new format)
-      const customerStage = customer.pipelineStage || customer.stage_id;
-      
-      // If stage.id is "unassigned", show customers with null stage_id
-      if (stage.id === "unassigned") {
-        return customerStage === null || customerStage === undefined;
-      }
-      
-      return String(customerStage) === String(stage.id);
-    },
-  );
-  const filteredStageCustomers = filteredCustomers.filter(
-    (c) => {
-      const customerStage = c.pipelineStage || c.stage_id;
-      
-      // If stage.id is "unassigned", show customers with null stage_id
-      if (stage.id === "unassigned") {
-        return customerStage === null || customerStage === undefined;
-      }
-      
-      return String(customerStage) === String(stage.id);
-    },
-  );
+  const stageCustomers = customers.filter((customer: any) => {
+    // Check both pipelineStage (for backward compatibility) and stage_id (new format)
+    const customerStage = customer.pipelineStage || customer.stage_id;
+
+    // If stage.id is "unassigned", show customers with null stage_id
+    if (stage.id === "unassigned") {
+      return customerStage === null || customerStage === undefined;
+    }
+
+    return String(customerStage) === String(stage.id);
+  });
+  const filteredStageCustomers = filteredCustomers.filter((c) => {
+    const customerStage = c.pipelineStage || c.stage_id;
+
+    // If stage.id is "unassigned", show customers with null stage_id
+    if (stage.id === "unassigned") {
+      return customerStage === null || customerStage === undefined;
+    }
+
+    return String(customerStage) === String(stage.id);
+  });
 
   const renderMobileView = () => (
     <Card

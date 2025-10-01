@@ -1,5 +1,10 @@
 import axiosInstance from "@/lib/axiosInstance";
-import { getErrorInfo, retryWithBackoff, logError, formatErrorMessage } from "@/utils/errorHandler";
+import {
+  getErrorInfo,
+  retryWithBackoff,
+  logError,
+  formatErrorMessage,
+} from "@/utils/errorHandler";
 
 module.exports = (set) => ({
   propertiesManagement: {
@@ -24,5 +29,4 @@ module.exports = (set) => ({
         },
       };
     }),
-
 });

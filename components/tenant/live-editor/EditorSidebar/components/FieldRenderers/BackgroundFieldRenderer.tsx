@@ -97,11 +97,9 @@ export function SimpleBackgroundFieldRenderer({
   renderField,
 }: SimpleBackgroundFieldRendererProps) {
   const hasBgType = fields.some((f) => f.key === "background.type");
-  const hasBgFrom = fields.some(
-    (f) => f.key === "background.colors.from",
-  );
+  const hasBgFrom = fields.some((f) => f.key === "background.colors.from");
   const hasBgTo = fields.some((f) => f.key === "background.colors.to");
-  
+
   if (!hasBgType && !hasBgFrom && !hasBgTo) return null;
 
   return (
@@ -143,8 +141,7 @@ export function SimpleBackgroundFieldRenderer({
               label="Color"
               path="background.colors.from"
               value={
-                (getValueByPath("background.colors.from") as any) ||
-                "#ffffff"
+                (getValueByPath("background.colors.from") as any) || "#ffffff"
               }
               updateValue={updateValue}
             />
@@ -156,8 +153,7 @@ export function SimpleBackgroundFieldRenderer({
               label="From"
               path="background.colors.from"
               value={
-                (getValueByPath("background.colors.from") as any) ||
-                "#ffffff"
+                (getValueByPath("background.colors.from") as any) || "#ffffff"
               }
               updateValue={updateValue}
             />
@@ -165,8 +161,7 @@ export function SimpleBackgroundFieldRenderer({
               label="To"
               path="background.colors.to"
               value={
-                (getValueByPath("background.colors.to") as any) ||
-                "#000000"
+                (getValueByPath("background.colors.to") as any) || "#000000"
               }
               updateValue={updateValue}
             />

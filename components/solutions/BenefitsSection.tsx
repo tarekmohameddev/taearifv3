@@ -1,6 +1,13 @@
-'use client';
+"use client";
 
-import { Zap, ShieldCheck, Headphones, TrendingUp, Smartphone, DollarSign } from 'lucide-react';
+import {
+  Zap,
+  ShieldCheck,
+  Headphones,
+  TrendingUp,
+  Smartphone,
+  DollarSign,
+} from "lucide-react";
 
 export default function BenefitsSection() {
   return (

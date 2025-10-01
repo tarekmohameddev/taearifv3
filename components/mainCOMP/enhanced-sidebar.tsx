@@ -28,7 +28,7 @@ export function EnhancedSidebar({
   const [isNewUser, setIsNewUser] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [internalActiveTab, setInternalActiveTab] = useState<string>(
-    activeTab || "dashboard"
+    activeTab || "dashboard",
   );
 
   const { sidebarData, fetchSideMenus } = useStore();
@@ -53,7 +53,7 @@ export function EnhancedSidebar({
           localStorage.setItem("hasVisitedBefore", "true");
           setIsNewUser(false);
         },
-        3 * 24 * 60 * 60 * 1000
+        3 * 24 * 60 * 60 * 1000,
       );
     }
   }, []);
@@ -65,12 +65,12 @@ export function EnhancedSidebar({
   const currentTab = isContentSection
     ? "content"
     : isLiveEditorSection
-    ? "live-editor"
-    : mainNavItems.find(
-        (item: any) =>
-          item.path === currentPath ||
-          (item.path !== "/" && currentPath.startsWith(item.path))
-      )?.id || "dashboard";
+      ? "live-editor"
+      : mainNavItems.find(
+          (item: any) =>
+            item.path === currentPath ||
+            (item.path !== "/" && currentPath.startsWith(item.path)),
+        )?.id || "dashboard";
 
   // تحديث العنصر النشط عند تغيير المسار
   useEffect(() => {
@@ -116,7 +116,8 @@ export function EnhancedSidebar({
             className={cn(
               "justify-start gap-3 h-auto py-2 px-3 w-full",
               isCollapsed && "justify-center px-2",
-              isActive && "bg-primary/10 text-primary border-r-2 border-primary"
+              isActive &&
+                "bg-primary/10 text-primary border-r-2 border-primary",
             )}
             asChild={!item.isAPP} // استخدام asChild فقط إذا لم يكن APP
           >
@@ -129,7 +130,7 @@ export function EnhancedSidebar({
                 <item.icon
                   className={cn(
                     "h-5 w-5",
-                    isActive ? "text-primary" : "text-muted-foreground"
+                    isActive ? "text-primary" : "text-muted-foreground",
                   )}
                 />
                 {!isCollapsed && (
@@ -143,23 +144,25 @@ export function EnhancedSidebar({
               </div>
             ) : (
               // إذا لم يكن APP، استخدام Link العادي
-              <Link href={(() => {
-                // التحقق من وجود dashboard في بداية المسار
-                if (item.path.startsWith('/dashboard')) {
-                  // إذا كان موجود، إزالته
-                  return item.path;
-                } else if (item.path.startsWith('/')) {
-                  // إذا كان يبدأ بـ /، إضافة dashboard قبل /
-                  return `/dashboard${item.path}`;
-                } else {
-                  // إذا لم يكن يبدأ بـ /، إضافة dashboard/
-                  return `/dashboard/${item.path}`;
-                }
-              })()}>
+              <Link
+                href={(() => {
+                  // التحقق من وجود dashboard في بداية المسار
+                  if (item.path.startsWith("/dashboard")) {
+                    // إذا كان موجود، إزالته
+                    return item.path;
+                  } else if (item.path.startsWith("/")) {
+                    // إذا كان يبدأ بـ /، إضافة dashboard قبل /
+                    return `/dashboard${item.path}`;
+                  } else {
+                    // إذا لم يكن يبدأ بـ /، إضافة dashboard/
+                    return `/dashboard/${item.path}`;
+                  }
+                })()}
+              >
                 <item.icon
                   className={cn(
                     "h-5 w-5",
-                    isActive ? "text-primary" : "text-muted-foreground"
+                    isActive ? "text-primary" : "text-muted-foreground",
                   )}
                 />
                 {!isCollapsed && (
@@ -195,7 +198,7 @@ export function EnhancedSidebar({
     const userData = useAuthStore.getState().userData;
     console.log("🔗 SidebarContent - userData:", userData);
     console.log("🔗 SidebarContent - domain:", userData?.domain);
-    
+
     return (
       <div className="flex h-full flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4 md:h-[60px]">
@@ -211,134 +214,154 @@ export function EnhancedSidebar({
           </div>
         </div>
 
-      <div className="px-3">
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
-                onClick={() => {
-                  const userData = useAuthStore.getState().userData;
-                  console.log("🔗 Full userData:", userData);
-                  console.log("🔗 Domain from userData:", userData?.domain);
-                  
-                  // التحقق من وجود userData
-                  if (!userData) {
-                    console.warn("userData is null or undefined");
-                    alert("يرجى تسجيل الدخول أولاً");
-                    return;
-                  }
-                  
-                  const domain = userData?.domain || "";
-                  console.log("🔗 Domain after fallback:", domain);
-                  console.log("🔗 Domain type:", typeof domain);
-                  console.log("🔗 Domain length:", domain.length);
-                  
-                  // التحقق من صحة الـ domain
-                  if (!domain || domain.trim() === "") {
-                    console.warn("Domain is empty or invalid");
-                    console.warn("Domain value:", domain);
-                    console.warn("Domain trimmed:", domain.trim());
-                    alert("يرجى إعداد domain صحيح في إعدادات الحساب");
-                    return;
-                  }
-                  
-                  // تنظيف الـ domain من المسافات
-                  const cleanDomain = domain.trim();
-                  
-                  // التحقق من أن الـ domain يحتوي على نقطة أو يكون URL صحيح
-                  if (!cleanDomain.includes(".") && !cleanDomain.startsWith("http")) {
-                    console.warn("Invalid domain format:", cleanDomain);
-                    alert("تنسيق الـ domain غير صحيح. يجب أن يحتوي على نقطة (مثل: example.com) أو يكون URL صحيح");
-                    return;
-                  }
-                  
-                  const url = cleanDomain.startsWith("http")
-                    ? cleanDomain
-                    : `https://${cleanDomain}`;
-                  
-                  // التحقق من صحة الـ URL قبل فتحه
-                  try {
-                    new URL(url);
-                    console.log("Opening URL:", url);
-                    window.open(url, "_blank");
-                  } catch (error) {
-                    console.error("Invalid URL:", url, error);
-                    alert("URL غير صحيح. يرجى التحقق من إعدادات الـ domain");
-                  }
-                }}
-              >
-                <ExternalLink className="h-4 w-4 text-primary" />
-                {!isCollapsed && <span>معاينة الموقع</span>}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <p>فتح الموقع في نافذة جديدة</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+        <div className="px-3">
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
+                  onClick={() => {
+                    const userData = useAuthStore.getState().userData;
+                    console.log("🔗 Full userData:", userData);
+                    console.log("🔗 Domain from userData:", userData?.domain);
 
-      <div className="flex-1 py-2 px-1">
-        {error && (
-          <div className="px-3 py-2">
-            <span className="text-sm text-red-500">{error}</span>
-          </div>
-        )}
+                    // التحقق من وجود userData
+                    if (!userData) {
+                      console.warn("userData is null or undefined");
+                      alert("يرجى تسجيل الدخول أولاً");
+                      return;
+                    }
 
-        {!loading && !error && (
-          <div className="space-y-1">
-            {/* Live Editor Link */}
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={currentTab === "live-editor" ? "secondary" : "ghost"}
-                    className={cn(
-                      "justify-start gap-3 h-auto py-2 px-3 w-full",
-                      isCollapsed && "justify-center px-2",
-                      currentTab === "live-editor" && "bg-primary/10 text-primary border-r-2 border-primary"
-                    )}
-                    asChild
-                  >
-                    <Link href="/live-editor">
-                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                      {!isCollapsed && (
-                        <div className="flex flex-col items-start ml-3">
-                          <span className="text-sm font-medium">Live Editor</span>
-                          <span className="text-xs text-muted-foreground hidden md:inline-block">
-                            محرر الموقع المباشر
-                          </span>
-                        </div>
+                    const domain = userData?.domain || "";
+                    console.log("🔗 Domain after fallback:", domain);
+                    console.log("🔗 Domain type:", typeof domain);
+                    console.log("🔗 Domain length:", domain.length);
+
+                    // التحقق من صحة الـ domain
+                    if (!domain || domain.trim() === "") {
+                      console.warn("Domain is empty or invalid");
+                      console.warn("Domain value:", domain);
+                      console.warn("Domain trimmed:", domain.trim());
+                      alert("يرجى إعداد domain صحيح في إعدادات الحساب");
+                      return;
+                    }
+
+                    // تنظيف الـ domain من المسافات
+                    const cleanDomain = domain.trim();
+
+                    // التحقق من أن الـ domain يحتوي على نقطة أو يكون URL صحيح
+                    if (
+                      !cleanDomain.includes(".") &&
+                      !cleanDomain.startsWith("http")
+                    ) {
+                      console.warn("Invalid domain format:", cleanDomain);
+                      alert(
+                        "تنسيق الـ domain غير صحيح. يجب أن يحتوي على نقطة (مثل: example.com) أو يكون URL صحيح",
+                      );
+                      return;
+                    }
+
+                    const url = cleanDomain.startsWith("http")
+                      ? cleanDomain
+                      : `https://${cleanDomain}`;
+
+                    // التحقق من صحة الـ URL قبل فتحه
+                    try {
+                      new URL(url);
+                      console.log("Opening URL:", url);
+                      window.open(url, "_blank");
+                    } catch (error) {
+                      console.error("Invalid URL:", url, error);
+                      alert("URL غير صحيح. يرجى التحقق من إعدادات الـ domain");
+                    }
+                  }}
+                >
+                  <ExternalLink className="h-4 w-4 text-primary" />
+                  {!isCollapsed && <span>معاينة الموقع</span>}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>فتح الموقع في نافذة جديدة</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+
+        <div className="flex-1 py-2 px-1">
+          {error && (
+            <div className="px-3 py-2">
+              <span className="text-sm text-red-500">{error}</span>
+            </div>
+          )}
+
+          {!loading && !error && (
+            <div className="space-y-1">
+              {/* Live Editor Link */}
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={
+                        currentTab === "live-editor" ? "secondary" : "ghost"
+                      }
+                      className={cn(
+                        "justify-start gap-3 h-auto py-2 px-3 w-full",
+                        isCollapsed && "justify-center px-2",
+                        currentTab === "live-editor" &&
+                          "bg-primary/10 text-primary border-r-2 border-primary",
                       )}
-                    </Link>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>Live Editor - محرر الموقع المباشر</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                      asChild
+                    >
+                      <Link href="/live-editor">
+                        <svg
+                          className="h-5 w-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                        {!isCollapsed && (
+                          <div className="flex flex-col items-start ml-3">
+                            <span className="text-sm font-medium">
+                              Live Editor
+                            </span>
+                            <span className="text-xs text-muted-foreground hidden md:inline-block">
+                              محرر الموقع المباشر
+                            </span>
+                          </div>
+                        )}
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>Live Editor - محرر الموقع المباشر</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-            {mainNavItems.map((item: any) => (
-              <NavItem
-                key={item.id}
-                item={item}
-                isActive={
-                  activeTab
-                    ? currentTab === item.id && activeTab === item.id
-                    : internalActiveTab === item.id
-                }
-              />
-            ))}
-          </div>
-        )}
+              {mainNavItems.map((item: any) => (
+                <NavItem
+                  key={item.id}
+                  item={item}
+                  isActive={
+                    activeTab
+                      ? currentTab === item.id && activeTab === item.id
+                      : internalActiveTab === item.id
+                  }
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
     );
   };
 
@@ -347,7 +370,7 @@ export function EnhancedSidebar({
       <div
         className={cn(
           "hidden md:flex flex-col border-l bg-background transition-all duration-300 z-40 sticky top-16 h-[calc(100vh-4rem)]",
-          isCollapsed ? "w-[70px]" : "w-[240px]"
+          isCollapsed ? "w-[70px]" : "w-[240px]",
         )}
       >
         <SidebarContent />

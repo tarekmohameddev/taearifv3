@@ -19,21 +19,25 @@ import { TranslationTestComponent } from "./TranslationTestComponent";
 
 // Deep merge function to properly merge nested objects
 const deepMerge = (target: any, source: any): any => {
-  if (!source || typeof source !== 'object') return target || source;
-  if (!target || typeof target !== 'object') return source;
-  
+  if (!source || typeof source !== "object") return target || source;
+  if (!target || typeof target !== "object") return source;
+
   const result = { ...target };
-  
+
   for (const key in source) {
     if (source.hasOwnProperty(key)) {
-      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      if (
+        source[key] &&
+        typeof source[key] === "object" &&
+        !Array.isArray(source[key])
+      ) {
         result[key] = deepMerge(target[key], source[key]);
       } else {
         result[key] = source[key];
       }
     }
   }
-  
+
   return result;
 };
 
@@ -80,9 +84,9 @@ export function EditorSidebar({
     document.removeEventListener("mouseup", handleMouseUp);
   }, [handleMouseMove]);
 
-  const { 
-    tempData, 
-    setTempData, 
+  const {
+    tempData,
+    setTempData,
     updateTempField,
     updateByPath,
     updateComponentByPath,
@@ -95,7 +99,7 @@ export function EditorSidebar({
     globalComponentsData,
     setGlobalComponentsData,
     updateGlobalComponentByPath,
-    setCurrentPage
+    setCurrentPage,
   } = useEditorStore();
 
   // Helpers to update array fields (slides, gallery) and top-level fields when needed
@@ -139,28 +143,30 @@ export function EditorSidebar({
       // Check if this is a global component
       if (selectedComponent.id === "global-header") {
         const defaultData = getDefaultHeaderData();
-        const dataToUse = globalComponentsData?.header && Object.keys(globalComponentsData.header).length > 0 
-          ? globalComponentsData.header 
-          : globalHeaderData && Object.keys(globalHeaderData).length > 0 
-          ? globalHeaderData 
-          : defaultData;
-        
-        
+        const dataToUse =
+          globalComponentsData?.header &&
+          Object.keys(globalComponentsData.header).length > 0
+            ? globalComponentsData.header
+            : globalHeaderData && Object.keys(globalHeaderData).length > 0
+              ? globalHeaderData
+              : defaultData;
+
         // Set current page to indicate we're editing global header
         setCurrentPage("global-header");
         setTempData(dataToUse);
         return;
       }
-      
+
       if (selectedComponent.id === "global-footer") {
         const defaultData = getDefaultFooterData();
-        const dataToUse = globalComponentsData?.footer && Object.keys(globalComponentsData.footer).length > 0 
-          ? globalComponentsData.footer 
-          : globalFooterData && Object.keys(globalFooterData).length > 0 
-          ? globalFooterData 
-          : defaultData;
-        
-        
+        const dataToUse =
+          globalComponentsData?.footer &&
+          Object.keys(globalComponentsData.footer).length > 0
+            ? globalComponentsData.footer
+            : globalFooterData && Object.keys(globalFooterData).length > 0
+              ? globalFooterData
+              : defaultData;
+
         // Set current page to indicate we're editing global footer
         setCurrentPage("global-footer");
         setTempData(dataToUse);
@@ -169,52 +175,63 @@ export function EditorSidebar({
 
       // Initialize store data for component types that use stores
       const store = useEditorStore.getState();
-      const defaultData = createDefaultData(selectedComponent.type, selectedComponent.componentName);
+      const defaultData = createDefaultData(
+        selectedComponent.type,
+        selectedComponent.componentName,
+      );
 
       // Use component.id as unique identifier, but also pass componentName for default data selection
       const uniqueVariantId = selectedComponent.id;
       const componentName = selectedComponent.componentName;
-      
+
       // Log sidebar initialization
-      logSidebar('INITIALIZE_COMPONENT', uniqueVariantId, componentName, {
+      logSidebar("INITIALIZE_COMPONENT", uniqueVariantId, componentName, {
         type: selectedComponent.type,
         uniqueVariantId,
         componentName,
-        hasSelectedData: !!(selectedComponent.data && Object.keys(selectedComponent.data).length > 0),
-        selectedDataKeys: selectedComponent.data ? Object.keys(selectedComponent.data) : [],
+        hasSelectedData: !!(
+          selectedComponent.data &&
+          Object.keys(selectedComponent.data).length > 0
+        ),
+        selectedDataKeys: selectedComponent.data
+          ? Object.keys(selectedComponent.data)
+          : [],
         defaultDataKeys: defaultData ? Object.keys(defaultData) : [],
         selectedData: selectedComponent.data,
         defaultData: defaultData,
         storeState: {
           allVariants: Object.keys(store.halfTextHalfImageStates || {}),
-          currentVariantData: store.halfTextHalfImageStates?.[uniqueVariantId]
-        }
+          currentVariantData: store.halfTextHalfImageStates?.[uniqueVariantId],
+        },
       });
-      
 
       // Use dynamic component initialization for all components
       // Use existing component data if available, otherwise use default data
-      const dataToUse = (selectedComponent.data && Object.keys(selectedComponent.data).length > 0) 
-        ? selectedComponent.data 
-        : defaultData;
-      
+      const dataToUse =
+        selectedComponent.data && Object.keys(selectedComponent.data).length > 0
+          ? selectedComponent.data
+          : defaultData;
+
       // Log data selection
-      logSidebar('DATA_SELECTION', uniqueVariantId, componentName, {
+      logSidebar("DATA_SELECTION", uniqueVariantId, componentName, {
         componentName,
         dataToUseKeys: dataToUse ? Object.keys(dataToUse) : [],
         dataToUse: dataToUse,
-        selectedDataKeys: selectedComponent.data ? Object.keys(selectedComponent.data) : [],
-        reason: selectedComponent.data && Object.keys(selectedComponent.data).length > 0 
-          ? 'Using existing component data' 
-          : 'Using default data for new component'
+        selectedDataKeys: selectedComponent.data
+          ? Object.keys(selectedComponent.data)
+          : [],
+        reason:
+          selectedComponent.data &&
+          Object.keys(selectedComponent.data).length > 0
+            ? "Using existing component data"
+            : "Using default data for new component",
       });
-      
 
       // Log before calling ensureComponentVariant
-      logSidebar('CALLING_ENSURE_VARIANT', uniqueVariantId, componentName, {
+      logSidebar("CALLING_ENSURE_VARIANT", uniqueVariantId, componentName, {
         type: selectedComponent.type,
         uniqueVariantId,
-        dataToUse: dataToUse
+        dataToUse: dataToUse,
       });
 
       store.ensureComponentVariant(
@@ -222,27 +239,29 @@ export function EditorSidebar({
         uniqueVariantId,
         dataToUse,
       );
-      
+
       // Initialize tempData with current component data from store (not selectedComponent.data)
       const currentComponentData = store.getComponentData(
         selectedComponent.type,
-        uniqueVariantId
+        uniqueVariantId,
       );
-      
-      
+
       setTempData(currentComponentData || {});
-      
     } else if (selectedComponent) {
       const store = useEditorStore.getState();
-      const defaultData = createDefaultData(selectedComponent.type, selectedComponent.componentName);
+      const defaultData = createDefaultData(
+        selectedComponent.type,
+        selectedComponent.componentName,
+      );
 
       // Use component.id as unique identifier instead of componentName
       const uniqueVariantId = selectedComponent.id;
 
       // Use existing component data if available, otherwise use default data
-      const dataToUse = (selectedComponent.data && Object.keys(selectedComponent.data).length > 0) 
-        ? selectedComponent.data 
-        : defaultData;
+      const dataToUse =
+        selectedComponent.data && Object.keys(selectedComponent.data).length > 0
+          ? selectedComponent.data
+          : defaultData;
 
       // Use dynamic component initialization for all components
       store.ensureComponentVariant(
@@ -250,11 +269,11 @@ export function EditorSidebar({
         uniqueVariantId,
         dataToUse,
       );
-      
+
       // Initialize tempData with current component data from store
       const currentComponentData = store.getComponentData(
         selectedComponent.type,
-        uniqueVariantId
+        uniqueVariantId,
       );
       setTempData(currentComponentData || {});
     }
@@ -266,40 +285,40 @@ export function EditorSidebar({
       // Use component.id as unique identifier instead of componentName
       const store = useEditorStore.getState();
       const uniqueVariantId = selectedComponent.id;
-      
+
       // Handle global components
       if (selectedComponent.id === "global-header") {
         const defaultData = getDefaultHeaderData();
-        const dataToUse = store.globalHeaderData && Object.keys(store.globalHeaderData).length > 0 
-          ? store.globalHeaderData 
-          : defaultData;
-        
-        
+        const dataToUse =
+          store.globalHeaderData &&
+          Object.keys(store.globalHeaderData).length > 0
+            ? store.globalHeaderData
+            : defaultData;
+
         setTempData(dataToUse);
       } else if (selectedComponent.id === "global-footer") {
         const defaultData = getDefaultFooterData();
-        const dataToUse = store.globalFooterData && Object.keys(store.globalFooterData).length > 0 
-          ? store.globalFooterData 
-          : defaultData;
-        
-        
+        const dataToUse =
+          store.globalFooterData &&
+          Object.keys(store.globalFooterData).length > 0
+            ? store.globalFooterData
+            : defaultData;
+
         setTempData(dataToUse);
       } else {
-      // Use existing component data if available, otherwise get from store
-      const existingData = selectedComponent.data && Object.keys(selectedComponent.data).length > 0 
-        ? selectedComponent.data 
-        : store.getComponentData(selectedComponent.type, uniqueVariantId);
-      
-      
-      setTempData(existingData || {});
+        // Use existing component data if available, otherwise get from store
+        const existingData =
+          selectedComponent.data &&
+          Object.keys(selectedComponent.data).length > 0
+            ? selectedComponent.data
+            : store.getComponentData(selectedComponent.type, uniqueVariantId);
+
+        setTempData(existingData || {});
       }
     } else {
       setTempData({});
     }
   }, [selectedComponent, globalHeaderData, globalFooterData]);
-
-
-
 
   // Clear tempData when view changes
   useEffect(() => {
@@ -317,79 +336,103 @@ export function EditorSidebar({
   };
 
   const handleSave = () => {
-    
     if (selectedComponent) {
       // Get store state before saving
       const store = useEditorStore.getState();
-      const currentPage = store.currentPage || 'homepage';
-      const pageComponentsBefore = store.pageComponentsByPage[currentPage] || [];
-      
+      const currentPage = store.currentPage || "homepage";
+      const pageComponentsBefore =
+        store.pageComponentsByPage[currentPage] || [];
+
       // Get the latest tempData from store for global components
-      const latestTempData = (selectedComponent.id === "global-header" || selectedComponent.id === "global-footer") 
-        ? (store.tempData && Object.keys(store.tempData).length > 0 ? store.tempData : tempData)
-        : tempData;
-      
-      
-      
+      const latestTempData =
+        selectedComponent.id === "global-header" ||
+        selectedComponent.id === "global-footer"
+          ? store.tempData && Object.keys(store.tempData).length > 0
+            ? store.tempData
+            : tempData
+          : tempData;
+
       // Handle global components
       if (selectedComponent.id === "global-header") {
         // Use latestTempData (which contains the edited data) instead of tempData
-        logChange(selectedComponent.id, 'header1', 'header', latestTempData, 'GLOBAL_HEADER');
-        
+        logChange(
+          selectedComponent.id,
+          "header1",
+          "header",
+          latestTempData,
+          "GLOBAL_HEADER",
+        );
+
         // Update both individual and unified global components data
         setGlobalHeaderData(latestTempData);
         setGlobalComponentsData({
           ...globalComponentsData,
-          header: latestTempData
+          header: latestTempData,
         });
         onComponentUpdate(selectedComponent.id, latestTempData);
-        
+
         // Log after save for global header
         const storeAfter = useEditorStore.getState();
-        const pageComponentsAfter = storeAfter.pageComponentsByPage[currentPage] || [];
-        
+        const pageComponentsAfter =
+          storeAfter.pageComponentsByPage[currentPage] || [];
+
         onClose();
         return;
       }
-      
+
       if (selectedComponent.id === "global-footer") {
         // Use latestTempData (which contains the edited data) instead of tempData
-        logChange(selectedComponent.id, 'footer1', 'footer', latestTempData, 'GLOBAL_FOOTER');
-        
+        logChange(
+          selectedComponent.id,
+          "footer1",
+          "footer",
+          latestTempData,
+          "GLOBAL_FOOTER",
+        );
+
         // Update both individual and unified global components data
         setGlobalFooterData(latestTempData);
         setGlobalComponentsData({
           ...globalComponentsData,
-          footer: latestTempData
+          footer: latestTempData,
         });
         onComponentUpdate(selectedComponent.id, latestTempData);
-        
+
         // Log after save for global footer
         const storeAfter = useEditorStore.getState();
-        const pageComponentsAfter = storeAfter.pageComponentsByPage[currentPage] || [];
-        
+        const pageComponentsAfter =
+          storeAfter.pageComponentsByPage[currentPage] || [];
+
         onClose();
         return;
       }
 
       // Use component.id as unique identifier instead of componentName
       const uniqueVariantId = selectedComponent.id;
-      
+
       // Get the latest data from the store (which includes all changes made via updateComponentByPath)
-      const storeData = store.getComponentData(selectedComponent.type, uniqueVariantId);
+      const storeData = store.getComponentData(
+        selectedComponent.type,
+        uniqueVariantId,
+      );
       const currentPageComponents = pageComponentsBefore;
-      const existingComponent = currentPageComponents.find((comp: any) => comp.id === selectedComponent.id);
-      
+      const existingComponent = currentPageComponents.find(
+        (comp: any) => comp.id === selectedComponent.id,
+      );
+
       // Merge store data with existing component data to preserve all changes
       // Priority: storeData (latest changes) > existingComponent.data (previous changes)
-      const mergedData = existingComponent?.data 
+      const mergedData = existingComponent?.data
         ? deepMerge(existingComponent.data, storeData)
         : storeData;
-      
-      
+
       // Update the component data in the store using the merged data
-      store.setComponentData(selectedComponent.type, uniqueVariantId, mergedData);
-      
+      store.setComponentData(
+        selectedComponent.type,
+        uniqueVariantId,
+        mergedData,
+      );
+
       // Update pageComponentsByPage with the merged data
       const updatedPageComponents = currentPageComponents.map((comp: any) => {
         if (comp.id === selectedComponent.id) {
@@ -400,19 +443,20 @@ export function EditorSidebar({
         }
         return comp;
       });
-      
+
       // Update pageComponentsByPage
       store.forceUpdatePageComponents(currentPage, updatedPageComponents);
-      
+
       onComponentUpdate(selectedComponent.id, mergedData);
-      
+
       // Update tempData with the merged data to keep sidebar in sync
       setTempData(mergedData);
-      
+
       // Log after save for regular components
       const storeAfter = useEditorStore.getState();
-      const pageComponentsAfter = storeAfter.pageComponentsByPage[currentPage] || [];
-      
+      const pageComponentsAfter =
+        storeAfter.pageComponentsByPage[currentPage] || [];
+
       onClose();
     }
   };
@@ -440,7 +484,7 @@ export function EditorSidebar({
                     <span className="text-white text-sm">🎨</span>
                   </div>
                   <h3 className="text-lg font-bold text-slate-800">
-                    Theme Settings
+                    {t("editor_sidebar.theme_settings")}
                   </h3>
                 </div>
 
@@ -467,16 +511,15 @@ export function EditorSidebar({
                             </svg>
                           </div>
                           <h4 className="text-lg font-bold text-slate-800">
-                            Page Theme
+                            {t("editor_sidebar.page_theme")}
                           </h4>
                         </div>
                         <span className="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-100 rounded-full shadow-sm">
-                          Global
+                          {t("editor_sidebar.global")}
                         </span>
                       </div>
                       <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                        Transform all components on this page with a single
-                        click ✨
+                        {t("editor_sidebar.transform_all_components")}
                       </p>
                       <PageThemeSelector
                         onThemeChange={(themeId, components) => {
@@ -496,7 +539,7 @@ export function EditorSidebar({
                           <div className="w-3 h-3 bg-white rounded-full"></div>
                         </div>
                         <span className="text-sm font-semibold text-slate-700">
-                          Primary Color
+                          {t("editor_sidebar.primary_color")}
                         </span>
                       </label>
                       <input
@@ -513,7 +556,7 @@ export function EditorSidebar({
                           </span>
                         </div>
                         <span className="text-sm font-semibold text-slate-700">
-                          Default Font
+                          {t("editor_sidebar.default_font")}
                         </span>
                       </label>
                       <select className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-700 font-medium">
@@ -546,7 +589,7 @@ export function EditorSidebar({
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                       />
                     </svg>
-                    <span>Add New Section</span>
+                    <span>{t("editor_sidebar.add_new_section")}</span>
                   </div>
                 </button>
               </div>
@@ -561,10 +604,10 @@ export function EditorSidebar({
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-800">
-                    Add New Section
+                    {t("editor_sidebar.add_section")}
                   </h3>
                   <p className="text-sm text-slate-500">
-                    Choose a section to enhance your page
+                    {t("editor_sidebar.choose_section")}
                   </p>
                 </div>
               </div>
@@ -637,7 +680,7 @@ export function EditorSidebar({
                         </svg>
                       </div>
                       <h4 className="text-lg font-bold text-slate-800">
-                        Component Theme
+                        {t("editor_sidebar.component_theme")}
                       </h4>
                     </div>
                     <span className="px-3 py-1 text-xs font-semibold text-purple-700 bg-purple-100 rounded-full shadow-sm">
@@ -645,7 +688,7 @@ export function EditorSidebar({
                     </span>
                   </div>
                   <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                    Switch between different visual styles for this component 🎭
+                    {t("editor_sidebar.switch_visual_styles")}
                   </p>
                   <div className="space-y-4">
                     <ThemeSelector
@@ -685,7 +728,7 @@ export function EditorSidebar({
                     <span className="text-white text-sm">✏️</span>
                   </div>
                   <h4 className="text-lg font-bold text-slate-800">
-                    Content Settings
+                    {t("editor_sidebar.content_settings")}
                   </h4>
                 </div>
 
@@ -701,80 +744,137 @@ export function EditorSidebar({
                       if (selectedComponent.id === "global-footer") {
                         return "footer1";
                       }
-                      
+
                       // أولاً: تحقق من componentName مباشرة
-                      if (selectedComponent.componentName && 
-                          selectedComponent.componentName !== 'undefined' && 
-                          selectedComponent.componentName !== 'null') {
+                      if (
+                        selectedComponent.componentName &&
+                        selectedComponent.componentName !== "undefined" &&
+                        selectedComponent.componentName !== "null"
+                      ) {
                         return selectedComponent.componentName;
                       }
-                      
+
                       // ثانياً: إذا كان componentName غير صحيح، استخدم fallback بناءً على نوع المكون
-                      if (selectedComponent.type === 'halfTextHalfImage') {
+                      if (selectedComponent.type === "halfTextHalfImage") {
                         // استخدام الـ id إذا كان يحتوي على رقم المكون
-                        if (selectedComponent.id && selectedComponent.id.includes('halfTextHalfImage3')) {
-                          return 'halfTextHalfImage3';
-                        } else if (selectedComponent.id && selectedComponent.id.includes('halfTextHalfImage2')) {
-                          return 'halfTextHalfImage2';
-                        } else if (selectedComponent.id && selectedComponent.id.includes('halfTextHalfImage1')) {
-                          return 'halfTextHalfImage1';
+                        if (
+                          selectedComponent.id &&
+                          selectedComponent.id.includes("halfTextHalfImage3")
+                        ) {
+                          return "halfTextHalfImage3";
+                        } else if (
+                          selectedComponent.id &&
+                          selectedComponent.id.includes("halfTextHalfImage2")
+                        ) {
+                          return "halfTextHalfImage2";
+                        } else if (
+                          selectedComponent.id &&
+                          selectedComponent.id.includes("halfTextHalfImage1")
+                        ) {
+                          return "halfTextHalfImage1";
                         }
-                        return 'halfTextHalfImage1'; // افتراضي لـ halfTextHalfImage1
+                        return "halfTextHalfImage1"; // افتراضي لـ halfTextHalfImage1
                       }
-                      
+
                       // ثالثاً: fallback عام
-                      return selectedComponent.id || selectedComponent.componentName;
+                      return (
+                        selectedComponent.id || selectedComponent.componentName
+                      );
                     })()}
                     componentId={selectedComponent.id}
                     onUpdateByPath={(path, value) => {
-                      
                       // Validate input
-                      if (!path || path.trim() === '') {
-                        console.error("❌ [EditorSidebar] Invalid path provided:", path);
+                      if (!path || path.trim() === "") {
+                        console.error(
+                          "❌ [EditorSidebar] Invalid path provided:",
+                          path,
+                        );
                         return;
                       }
-                      
+
                       // Handle global components with enhanced validation
                       if (selectedComponent.id === "global-header") {
                         // Validate header-specific paths
                         const validHeaderPaths = [
-                          'visible', 'position', 'height', 'background', 'colors', 
-                          'logo', 'menu', 'actions', 'responsive', 'animations'
+                          "visible",
+                          "position",
+                          "height",
+                          "background",
+                          "colors",
+                          "logo",
+                          "menu",
+                          "actions",
+                          "responsive",
+                          "animations",
                         ];
-                        
-                        const pathRoot = path.split('.')[0];
+
+                        const pathRoot = path.split(".")[0];
                         if (!validHeaderPaths.includes(pathRoot)) {
-                          console.warn("⚠️ [EditorSidebar] Potentially invalid header path:", path);
+                          console.warn(
+                            "⚠️ [EditorSidebar] Potentially invalid header path:",
+                            path,
+                          );
                         }
-                        
+
                         // Update tempData with validation
                         updateByPath(path, value);
-                        
                       } else if (selectedComponent.id === "global-footer") {
                         // Validate footer-specific paths
                         const validFooterPaths = [
-                          'visible', 'background', 'layout', 'content', 
-                          'footerBottom', 'styling'
+                          "visible",
+                          "background",
+                          "layout",
+                          "content",
+                          "footerBottom",
+                          "styling",
                         ];
-                        
-                        const pathRoot = path.split('.')[0];
+
+                        const pathRoot = path.split(".")[0];
                         if (!validFooterPaths.includes(pathRoot)) {
-                          console.warn("⚠️ [EditorSidebar] Potentially invalid footer path:", path);
+                          console.warn(
+                            "⚠️ [EditorSidebar] Potentially invalid footer path:",
+                            path,
+                          );
                         }
-                        
+
                         updateByPath(path, value);
-                        
                       } else {
                         // Handle regular components with enhanced logic
-                        if (path === "content.imagePosition" && selectedComponent.type === "halfTextHalfImage") {
+                        if (
+                          path === "content.imagePosition" &&
+                          selectedComponent.type === "halfTextHalfImage"
+                        ) {
                           // Update both content.imagePosition and top-level imagePosition for consistency
-                          updateComponentByPath(selectedComponent.type, selectedComponent.id, "content.imagePosition", value);
-                          updateComponentByPath(selectedComponent.type, selectedComponent.id, "imagePosition", value);
-                        } else if (path === "layout.direction" && selectedComponent.type === "halfTextHalfImage") {
+                          updateComponentByPath(
+                            selectedComponent.type,
+                            selectedComponent.id,
+                            "content.imagePosition",
+                            value,
+                          );
+                          updateComponentByPath(
+                            selectedComponent.type,
+                            selectedComponent.id,
+                            "imagePosition",
+                            value,
+                          );
+                        } else if (
+                          path === "layout.direction" &&
+                          selectedComponent.type === "halfTextHalfImage"
+                        ) {
                           // Update layout.direction
-                          updateComponentByPath(selectedComponent.type, selectedComponent.id, "layout.direction", value);
+                          updateComponentByPath(
+                            selectedComponent.type,
+                            selectedComponent.id,
+                            "layout.direction",
+                            value,
+                          );
                         } else {
-                          updateComponentByPath(selectedComponent.type, selectedComponent.id, path, value);
+                          updateComponentByPath(
+                            selectedComponent.type,
+                            selectedComponent.id,
+                            path,
+                            value,
+                          );
                         }
                       }
                     }}
@@ -808,7 +908,7 @@ export function EditorSidebar({
                               }
                               className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-700 resize-none"
                               rows={3}
-                              placeholder="Enter your text here..."
+                              placeholder={t("editor_sidebar.enter_your_text")}
                             />
                           ) : (
                             <input
@@ -818,7 +918,7 @@ export function EditorSidebar({
                                 handleInputChange("texts", key, e.target.value)
                               }
                               className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-700"
-                              placeholder="Enter your text here..."
+                              placeholder={t("editor_sidebar.enter_your_text")}
                             />
                           )}
                         </div>
@@ -861,16 +961,20 @@ export function EditorSidebar({
                   if (selectedComponent?.id === "global-header") {
                     const store = useEditorStore.getState();
                     const defaultData = getDefaultHeaderData();
-                    const originalData = store.globalHeaderData && Object.keys(store.globalHeaderData).length > 0 
-                      ? store.globalHeaderData 
-                      : defaultData;
+                    const originalData =
+                      store.globalHeaderData &&
+                      Object.keys(store.globalHeaderData).length > 0
+                        ? store.globalHeaderData
+                        : defaultData;
                     setTempData(originalData);
                   } else if (selectedComponent?.id === "global-footer") {
                     const store = useEditorStore.getState();
                     const defaultData = getDefaultFooterData();
-                    const originalData = store.globalFooterData && Object.keys(store.globalFooterData).length > 0 
-                      ? store.globalFooterData 
-                      : defaultData;
+                    const originalData =
+                      store.globalFooterData &&
+                      Object.keys(store.globalFooterData).length > 0
+                        ? store.globalFooterData
+                        : defaultData;
                     setTempData(originalData);
                   } else {
                     // Clear tempData when canceling regular components
@@ -904,7 +1008,7 @@ export function EditorSidebar({
                     d="M10 19l-7-7m0 0l7-7m-7 7h18"
                   />
                 </svg>
-                <span>Back to Settings</span>
+                <span>{t("editor_sidebar.back_to_settings")}</span>
               </div>
             </button>
           )}

@@ -2,7 +2,12 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Locale, defaultLocale, locales, isValidLocale } from "@/lib-liveeditor/i18n/config";
+import {
+  Locale,
+  defaultLocale,
+  locales,
+  isValidLocale,
+} from "@/lib-liveeditor/i18n/config";
 
 // Import translation files
 import arTranslations from "@/lib/i18n/locales/ar.json";
@@ -26,27 +31,27 @@ export const useClientI18nStore = create<ClientI18nState>()(
     (set, get) => ({
       locale: defaultLocale,
       translations,
-      
+
       setLocale: (locale: Locale) => {
         set({ locale });
       },
-      
+
       t: (key: string, params?: Record<string, string | number>) => {
         const { locale, translations } = get();
         const currentTranslations = translations[locale];
-        
+
         // Navigate through nested object using dot notation
-        const keys = key.split('.');
+        const keys = key.split(".");
         let value: any = currentTranslations;
-        
+
         for (const k of keys) {
-          if (value && typeof value === 'object' && k in value) {
+          if (value && typeof value === "object" && k in value) {
             value = value[k];
           } else {
             // Fallback to default locale if key not found
             value = translations[defaultLocale];
             for (const fallbackKey of keys) {
-              if (value && typeof value === 'object' && fallbackKey in value) {
+              if (value && typeof value === "object" && fallbackKey in value) {
                 value = value[fallbackKey];
               } else {
                 return key; // Return key if not found anywhere
@@ -55,31 +60,31 @@ export const useClientI18nStore = create<ClientI18nState>()(
             break;
           }
         }
-        
-        if (typeof value !== 'string') {
+
+        if (typeof value !== "string") {
           return key;
         }
-        
+
         // Replace parameters in the string
         if (params) {
           return value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
             return params[paramKey]?.toString() || match;
           });
         }
-        
+
         return value;
       },
-      
+
       getCurrentTranslations: () => {
         const { locale, translations } = get();
         return translations[locale];
       },
     }),
     {
-      name: 'client-i18n-storage',
+      name: "client-i18n-storage",
       partialize: (state) => ({ locale: state.locale }),
-    }
-  )
+    },
+  ),
 );
 
 // Hook for easy access to translations
@@ -97,6 +102,8 @@ export const useClientLocale = () => {
 
 // Hook for getting current translations object
 export const useClientTranslations = () => {
-  const getCurrentTranslations = useClientI18nStore((state) => state.getCurrentTranslations);
+  const getCurrentTranslations = useClientI18nStore(
+    (state) => state.getCurrentTranslations,
+  );
   return getCurrentTranslations();
 };

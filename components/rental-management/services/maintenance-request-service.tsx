@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,10 +20,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Wrench,
   Plus,
@@ -32,65 +38,66 @@ import {
   Phone,
   MessageSquare,
   Upload,
-} from "lucide-react"
-import useAuthStore from "@/context/AuthContext"
+} from "lucide-react";
+import useAuthStore from "@/context/AuthContext";
 
 interface MaintenanceRequest {
-  id: string
-  tenantId: string
-  tenantName: string
-  tenantNameAr: string
-  tenantAvatar: string
-  tenantPhone: string
-  unit: string
-  property: string
-  propertyAr: string
-  title: string
-  titleAr: string
-  description: string
-  descriptionAr: string
-  category: string
-  categoryAr: string
-  priority: "low" | "medium" | "high" | "urgent"
-  priorityAr: string
-  status: "open" | "in-progress" | "completed" | "cancelled"
-  statusAr: string
-  submittedDate: string
-  submittedDateHijri: string
-  scheduledDate?: string
-  scheduledDateHijri?: string
-  completedDate?: string
-  completedDateHijri?: string
-  assignedTo?: string
-  assignedToAr?: string
-  estimatedCost?: number
-  actualCost?: number
-  images?: string[]
-  notes?: string
-  notesAr?: string
+  id: string;
+  tenantId: string;
+  tenantName: string;
+  tenantNameAr: string;
+  tenantAvatar: string;
+  tenantPhone: string;
+  unit: string;
+  property: string;
+  propertyAr: string;
+  title: string;
+  titleAr: string;
+  description: string;
+  descriptionAr: string;
+  category: string;
+  categoryAr: string;
+  priority: "low" | "medium" | "high" | "urgent";
+  priorityAr: string;
+  status: "open" | "in-progress" | "completed" | "cancelled";
+  statusAr: string;
+  submittedDate: string;
+  submittedDateHijri: string;
+  scheduledDate?: string;
+  scheduledDateHijri?: string;
+  completedDate?: string;
+  completedDateHijri?: string;
+  assignedTo?: string;
+  assignedToAr?: string;
+  estimatedCost?: number;
+  actualCost?: number;
+  images?: string[];
+  notes?: string;
+  notesAr?: string;
 }
 
 export function MaintenanceRequestService() {
-  const [requests, setRequests] = useState<MaintenanceRequest[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [filterPriority, setFilterPriority] = useState("all")
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [selectedRequest, setSelectedRequest] = useState<MaintenanceRequest | null>(null)
-  const { userData } = useAuthStore()
+  const [requests, setRequests] = useState<MaintenanceRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterPriority, setFilterPriority] = useState("all");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] =
+    useState<MaintenanceRequest | null>(null);
+  const { userData } = useAuthStore();
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchMaintenanceRequests")
-      return
+      console.log("No token available, skipping fetchMaintenanceRequests");
+      return;
     }
 
     // Simulate API call to maintenance request microservice
     const fetchMaintenanceRequests = async () => {
-      setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setRequests([
         {
@@ -107,7 +114,8 @@ export function MaintenanceRequestService() {
           titleAr: "تسريب في صنبور المطبخ",
           description:
             "The kitchen faucet has been dripping constantly for the past week. It's getting worse and wasting water.",
-          descriptionAr: "صنبور المطبخ يقطر باستمرار منذ الأسبوع الماضي. المشكلة تزداد سوءاً وتهدر الماء.",
+          descriptionAr:
+            "صنبور المطبخ يقطر باستمرار منذ الأسبوع الماضي. المشكلة تزداد سوءاً وتهدر الماء.",
           category: "Plumbing",
           categoryAr: "سباكة",
           priority: "medium",
@@ -119,7 +127,8 @@ export function MaintenanceRequestService() {
           estimatedCost: 300,
           images: ["/placeholder.svg?height=200&width=300"],
           notes: "Tenant reports it started after the cold snap last week",
-          notesAr: "المستأجر يفيد أن المشكلة بدأت بعد موجة البرد الأسبوع الماضي",
+          notesAr:
+            "المستأجر يفيد أن المشكلة بدأت بعد موجة البرد الأسبوع الماضي",
         },
         {
           id: "2",
@@ -133,8 +142,10 @@ export function MaintenanceRequestService() {
           propertyAr: "أبراج جدة",
           title: "Air Conditioning Not Working",
           titleAr: "تكييف الهواء لا يعمل",
-          description: "The air conditioning system stopped working yesterday. The unit is getting very hot.",
-          descriptionAr: "نظام تكييف الهواء توقف عن العمل أمس. الوحدة أصبحت حارة جداً.",
+          description:
+            "The air conditioning system stopped working yesterday. The unit is getting very hot.",
+          descriptionAr:
+            "نظام تكييف الهواء توقف عن العمل أمس. الوحدة أصبحت حارة جداً.",
           category: "HVAC",
           categoryAr: "تكييف وتهوية",
           priority: "urgent",
@@ -163,7 +174,8 @@ export function MaintenanceRequestService() {
           propertyAr: "حدائق الدمام",
           title: "Broken Window Lock",
           titleAr: "قفل النافذة مكسور",
-          description: "The lock on the bedroom window is broken and won't secure properly.",
+          description:
+            "The lock on the bedroom window is broken and won't secure properly.",
           descriptionAr: "قفل نافذة غرفة النوم مكسور ولا يُؤمن بشكل صحيح.",
           category: "Security",
           categoryAr: "أمان",
@@ -189,8 +201,10 @@ export function MaintenanceRequestService() {
           propertyAr: "مرتفعات مكة",
           title: "Light Fixture Replacement",
           titleAr: "استبدال وحدة الإضاءة",
-          description: "The ceiling light fixture in the living room burned out and needs replacement.",
-          descriptionAr: "وحدة الإضاءة في السقف بغرفة المعيشة احترقت وتحتاج استبدال.",
+          description:
+            "The ceiling light fixture in the living room burned out and needs replacement.",
+          descriptionAr:
+            "وحدة الإضاءة في السقف بغرفة المعيشة احترقت وتحتاج استبدال.",
           category: "Electrical",
           categoryAr: "كهرباء",
           priority: "low",
@@ -208,68 +222,70 @@ export function MaintenanceRequestService() {
           notes: "Completed - new LED fixture installed",
           notesAr: "مكتمل - تم تركيب وحدة إضاءة LED جديدة",
         },
-      ])
-      setLoading(false)
-    }
+      ]);
+      setLoading(false);
+    };
 
-    fetchMaintenanceRequests()
-  }, [userData?.token])
+    fetchMaintenanceRequests();
+  }, [userData?.token]);
 
   const filteredRequests = requests.filter((request) => {
     const matchesSearch =
       request.titleAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.tenantNameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.unit.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.categoryAr.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === "all" || request.status === filterStatus
-    const matchesPriority = filterPriority === "all" || request.priority === filterPriority
-    return matchesSearch && matchesStatus && matchesPriority
-  })
+      request.categoryAr.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || request.status === filterStatus;
+    const matchesPriority =
+      filterPriority === "all" || request.priority === filterPriority;
+    return matchesSearch && matchesStatus && matchesPriority;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "open":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "in-progress":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "completed":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "cancelled":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "low":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "medium":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "high":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 text-orange-800";
       case "urgent":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "open":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       case "in-progress":
-        return <Wrench className="h-4 w-4" />
+        return <Wrench className="h-4 w-4" />;
       case "completed":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "cancelled":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
       default:
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
     }
-  }
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
@@ -277,11 +293,13 @@ export function MaintenanceRequestService() {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+            <p className="text-lg text-gray-500">
+              يرجى تسجيل الدخول لعرض المحتوى
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -307,7 +325,7 @@ export function MaintenanceRequestService() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -328,7 +346,9 @@ export function MaintenanceRequestService() {
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>إنشاء طلب صيانة</DialogTitle>
-              <DialogDescription>إنشاء طلب صيانة جديد للمشروع</DialogDescription>
+              <DialogDescription>
+                إنشاء طلب صيانة جديد للمشروع
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -339,10 +359,18 @@ export function MaintenanceRequestService() {
                       <SelectValue placeholder="اختر المستأجر" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">أحمد الراشد - الوحدة أ-204</SelectItem>
-                      <SelectItem value="2">محمد العتيبي - الوحدة ب-105</SelectItem>
-                      <SelectItem value="3">سارة المنصوري - الوحدة ج-301</SelectItem>
-                      <SelectItem value="4">خالد الحربي - الوحدة د-102</SelectItem>
+                      <SelectItem value="1">
+                        أحمد الراشد - الوحدة أ-204
+                      </SelectItem>
+                      <SelectItem value="2">
+                        محمد العتيبي - الوحدة ب-105
+                      </SelectItem>
+                      <SelectItem value="3">
+                        سارة المنصوري - الوحدة ج-301
+                      </SelectItem>
+                      <SelectItem value="4">
+                        خالد الحربي - الوحدة د-102
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -369,7 +397,11 @@ export function MaintenanceRequestService() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description-ar">الوصف</Label>
-                <Textarea id="description-ar" placeholder="وصف تفصيلي لمشكلة الصيانة..." rows={4} />
+                <Textarea
+                  id="description-ar"
+                  placeholder="وصف تفصيلي لمشكلة الصيانة..."
+                  rows={4}
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -395,15 +427,22 @@ export function MaintenanceRequestService() {
                 <Label>الصور</Label>
                 <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
                   <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">انقر لرفع الصور أو اسحب وأفلت</p>
+                  <p className="text-sm text-muted-foreground">
+                    انقر لرفع الصور أو اسحب وأفلت
+                  </p>
                 </div>
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateDialogOpen(false)}
+              >
                 إلغاء
               </Button>
-              <Button onClick={() => setIsCreateDialogOpen(false)}>إنشاء الطلب</Button>
+              <Button onClick={() => setIsCreateDialogOpen(false)}>
+                إنشاء الطلب
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -460,7 +499,10 @@ export function MaintenanceRequestService() {
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4 space-x-reverse">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={request.tenantAvatar || "/placeholder.svg"} alt={request.tenantNameAr} />
+                    <AvatarImage
+                      src={request.tenantAvatar || "/placeholder.svg"}
+                      alt={request.tenantNameAr}
+                    />
                     <AvatarFallback>
                       {request.tenantNameAr
                         .split(" ")
@@ -475,7 +517,9 @@ export function MaintenanceRequestService() {
                         {getStatusIcon(request.status)}
                         <span className="mr-1">{request.statusAr}</span>
                       </Badge>
-                      <Badge className={getPriorityColor(request.priority)}>{request.priorityAr}</Badge>
+                      <Badge className={getPriorityColor(request.priority)}>
+                        {request.priorityAr}
+                      </Badge>
                     </div>
                     <div className="flex items-center space-x-4 space-x-reverse text-sm text-muted-foreground">
                       <div className="flex items-center">
@@ -491,17 +535,29 @@ export function MaintenanceRequestService() {
                         {request.submittedDateHijri}
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{request.descriptionAr}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {request.descriptionAr}
+                    </p>
                     {request.notesAr && (
-                      <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded">{request.notesAr}</p>
+                      <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded">
+                        {request.notesAr}
+                      </p>
                     )}
                   </div>
                 </div>
                 <div className="text-left space-y-2">
-                  <div className="text-sm text-muted-foreground">الفئة: {request.categoryAr}</div>
-                  {request.estimatedCost && <div className="text-sm">التكلفة المقدرة: {request.estimatedCost} ر.س</div>}
+                  <div className="text-sm text-muted-foreground">
+                    الفئة: {request.categoryAr}
+                  </div>
+                  {request.estimatedCost && (
+                    <div className="text-sm">
+                      التكلفة المقدرة: {request.estimatedCost} ر.س
+                    </div>
+                  )}
                   {request.assignedToAr && (
-                    <div className="text-sm text-green-600">مُكلف إلى: {request.assignedToAr}</div>
+                    <div className="text-sm text-green-600">
+                      مُكلف إلى: {request.assignedToAr}
+                    </div>
                   )}
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline">
@@ -521,7 +577,10 @@ export function MaintenanceRequestService() {
       </div>
 
       {/* Request Details Dialog */}
-      <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
+      <Dialog
+        open={!!selectedRequest}
+        onOpenChange={() => setSelectedRequest(null)}
+      >
         <DialogContent className="sm:max-w-[700px]">
           <DialogHeader>
             <DialogTitle>تفاصيل طلب الصيانة</DialogTitle>
@@ -534,7 +593,9 @@ export function MaintenanceRequestService() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-sm font-medium">المستأجر</Label>
-                  <p className="text-sm text-muted-foreground">{selectedRequest.tenantNameAr}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedRequest.tenantNameAr}
+                  </p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium">المشروع والوحدة</Label>
@@ -544,11 +605,15 @@ export function MaintenanceRequestService() {
                 </div>
                 <div>
                   <Label className="text-sm font-medium">الفئة</Label>
-                  <p className="text-sm text-muted-foreground">{selectedRequest.categoryAr}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedRequest.categoryAr}
+                  </p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium">الأولوية</Label>
-                  <Badge className={getPriorityColor(selectedRequest.priority)}>{selectedRequest.priorityAr}</Badge>
+                  <Badge className={getPriorityColor(selectedRequest.priority)}>
+                    {selectedRequest.priorityAr}
+                  </Badge>
                 </div>
                 <div>
                   <Label className="text-sm font-medium">الحالة</Label>
@@ -559,13 +624,17 @@ export function MaintenanceRequestService() {
                 </div>
                 <div>
                   <Label className="text-sm font-medium">تاريخ التقديم</Label>
-                  <p className="text-sm text-muted-foreground">{selectedRequest.submittedDateHijri}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedRequest.submittedDateHijri}
+                  </p>
                 </div>
               </div>
 
               <div>
                 <Label className="text-sm font-medium">الوصف</Label>
-                <p className="text-sm text-muted-foreground mt-1">{selectedRequest.descriptionAr}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {selectedRequest.descriptionAr}
+                </p>
               </div>
 
               {selectedRequest.images && selectedRequest.images.length > 0 && (
@@ -587,7 +656,9 @@ export function MaintenanceRequestService() {
               {selectedRequest.assignedToAr && (
                 <div>
                   <Label className="text-sm font-medium">مُكلف إلى</Label>
-                  <p className="text-sm text-muted-foreground">{selectedRequest.assignedToAr}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedRequest.assignedToAr}
+                  </p>
                 </div>
               )}
 
@@ -607,7 +678,9 @@ export function MaintenanceRequestService() {
       {filteredRequests.length === 0 && (
         <div className="text-center py-12">
           <Wrench className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">لم يتم العثور على طلبات صيانة</h3>
+          <h3 className="text-lg font-medium mb-2">
+            لم يتم العثور على طلبات صيانة
+          </h3>
           <p className="text-muted-foreground mb-4">
             {searchTerm || filterStatus !== "all" || filterPriority !== "all"
               ? "جرب تعديل معايير البحث أو التصفية"
@@ -620,5 +693,5 @@ export function MaintenanceRequestService() {
         </div>
       )}
     </div>
-  )
+  );
 }

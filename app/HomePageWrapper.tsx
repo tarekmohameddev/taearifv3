@@ -1,12 +1,23 @@
 "use client";
 
-import { Suspense, lazy, useEffect, useMemo, Fragment, useCallback, useRef } from "react";
+import {
+  Suspense,
+  lazy,
+  useEffect,
+  useMemo,
+  Fragment,
+  useCallback,
+  useRef,
+} from "react";
 import { useRouter } from "next/navigation";
 import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
 import { useAuth } from "@/context/AuthContext";
 import Loading from "./loading";
 import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getSectionPath, getComponentSubPath } from "@/lib-liveeditor/ComponentsList";
+import {
+  getSectionPath,
+  getComponentSubPath,
+} from "@/lib-liveeditor/ComponentsList";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageSwitcher } from "@/components/tenant/LanguageSwitcher";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
@@ -14,17 +25,16 @@ import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 
 // دالة لتحميل المكونات ديناميكيًا بناءً على الاسم والرقم الأخير
 const loadComponent = (section: string, componentName: string) => {
-  
   // التحقق من صحة componentName
-  if (!componentName || typeof componentName !== 'string') {
+  if (!componentName || typeof componentName !== "string") {
     return null;
   }
-  
+
   const match = componentName.match(/^(.*?)(\d+)$/);
   if (!match) {
     return null;
   }
-  
+
   const baseName = match[1];
   const number = match[2];
 
@@ -59,7 +69,7 @@ const loadComponent = (section: string, componentName: string) => {
             </div>
           </div>
         ),
-      }))
+      })),
     );
   }
 
@@ -70,7 +80,7 @@ const loadComponent = (section: string, componentName: string) => {
   return lazy(() =>
     import(`@/components/tenant/${fullPath}`).catch(() => ({
       default: () => <div>Component {componentName} not found</div>,
-    }))
+    })),
   );
 };
 
@@ -79,13 +89,12 @@ interface HomePageWrapperProps {
 }
 
 export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
-
   const { user, loading } = useAuth();
   const router = useRouter();
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const error = useTenantStore((s) => s.error);
-  
+
   // Debug: Log error state
   useEffect(() => {
     if (error) {
@@ -94,12 +103,11 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
   }, [error]);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const setTenantId = useTenantStore((s) => s.setTenantId);
-  
+
   // Use ref to track if data has been fetched
   const hasFetchedRef = useRef(false);
   const isInitializedRef = useRef(false);
   const lastTenantIdRef = useRef<string | null>(null);
-
 
   // Set tenantId in store when component mounts
   useEffect(() => {
@@ -112,9 +120,14 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
 
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
-    if (tenantId && !tenantData && !loadingTenantData && !hasFetchedRef.current) {
-    console.warn("heyyyyyy333");
-    hasFetchedRef.current = true;
+    if (
+      tenantId &&
+      !tenantData &&
+      !loadingTenantData &&
+      !hasFetchedRef.current
+    ) {
+      console.warn("heyyyyyy333");
+      hasFetchedRef.current = true;
       fetchTenantData(tenantId);
     }
   }, [tenantId, tenantData, loadingTenantData]);
@@ -138,22 +151,26 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
     if (!tenantData) {
       return null;
     }
-    
+
     // التحقق من أن componentSettings موجود وأنه object وليس array فارغ
-    if (tenantData?.componentSettings && 
-        typeof tenantData.componentSettings === 'object' && 
-        !Array.isArray(tenantData.componentSettings) &&
-        tenantData.componentSettings.homepage &&
-        Object.keys(tenantData.componentSettings.homepage).length > 0) {
+    if (
+      tenantData?.componentSettings &&
+      typeof tenantData.componentSettings === "object" &&
+      !Array.isArray(tenantData.componentSettings) &&
+      tenantData.componentSettings.homepage &&
+      Object.keys(tenantData.componentSettings.homepage).length > 0
+    ) {
       const pageSettings = tenantData.componentSettings.homepage;
-      
+
       const components = Object.entries(pageSettings)
         .map(([id, component]: [string, any]) => {
-          
           // التحقق من وجود componentName
-          if (!component.componentName || typeof component.componentName !== 'string') {
+          if (
+            !component.componentName ||
+            typeof component.componentName !== "string"
+          ) {
             // استخدام fallback
-            const fallbackName = `${component.type || 'hero'}1`;
+            const fallbackName = `${component.type || "hero"}1`;
             return {
               id,
               componentName: fallbackName,
@@ -161,7 +178,7 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
               position: component.position,
             };
           }
-          
+
           return {
             id,
             componentName: component.componentName,
@@ -170,39 +187,44 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
           };
         })
         .sort((a, b) => (a.position || 0) - (b.position || 0));
-      
+
       return components;
     }
 
     // إذا كان tenantData موجود ولكن componentSettings فارغ، استخدم البيانات الافتراضية
-    const defaultComponentsList = Object.entries(PAGE_DEFINITIONS.homepage).map(([key, component], index) => {
-      return {
-        id: `default-${index}`,
-        componentName: component.componentName, // استخراج componentName من object
-        data: component.data || {},
-        position: component.position || index,
-      };
-    });
-    
+    const defaultComponentsList = Object.entries(PAGE_DEFINITIONS.homepage).map(
+      ([key, component], index) => {
+        return {
+          id: `default-${index}`,
+          componentName: component.componentName, // استخراج componentName من object
+          data: component.data || {},
+          position: component.position || index,
+        };
+      },
+    );
+
     return defaultComponentsList;
   }, [tenantData]);
 
   // منع إعادة render عند تغيير loadingTenantData
-  const memoizedComponentsList = useMemo(() => componentsList, [componentsList]);
+  const memoizedComponentsList = useMemo(
+    () => componentsList,
+    [componentsList],
+  );
 
   // التحقق من الخطأ أولاً قبل التحقق من التحميل
   // إذا كان هناك خطأ أو لم توجد بيانات للـ tenant، اعرض not-found
-  if (error || (!tenantId)) {
+  if (error || !tenantId) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4">
         <h1 className="text-6xl font-bold text-red-600 mb-4">404</h1>
         <h2 className="text-2xl font-semibold mb-6">Tenant Not Found</h2>
         <p className="text-gray-600 mb-8 text-center max-w-md">
-          The tenant "{tenantId}" you are looking for might have been removed, 
+          The tenant "{tenantId}" you are looking for might have been removed,
           had its name changed, or is temporarily unavailable.
         </p>
-        <button 
-          onClick={() => window.location.href = '/'} 
+        <button
+          onClick={() => (window.location.href = "/")}
           className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Return to Homepage
@@ -217,23 +239,26 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
   }
 
   // Filter out header and footer components since they are now global
-  const filteredComponentsList = (memoizedComponentsList || []).filter((comp: any) => {
-    
-    // التحقق من أن componentName موجود وأنه string
-    if (!comp.componentName || typeof comp.componentName !== 'string') {
-      console.warn("🏠 HomePageWrapper - Invalid componentName:", comp.componentName);
-      return true; // احتفظ بالمكون إذا كان componentName غير صحيح
-    }
-    
-    if (comp.componentName.startsWith("header")) {
-      return false;
-    }
-    if (comp.componentName.startsWith("footer")) {
-      return false;
-    }
-    return true;
-  });
-  
+  const filteredComponentsList = (memoizedComponentsList || []).filter(
+    (comp: any) => {
+      // التحقق من أن componentName موجود وأنه string
+      if (!comp.componentName || typeof comp.componentName !== "string") {
+        console.warn(
+          "🏠 HomePageWrapper - Invalid componentName:",
+          comp.componentName,
+        );
+        return true; // احتفظ بالمكون إذا كان componentName غير صحيح
+      }
+
+      if (comp.componentName.startsWith("header")) {
+        return false;
+      }
+      if (comp.componentName.startsWith("footer")) {
+        return false;
+      }
+      return true;
+    },
+  );
 
   return (
     <I18nProvider>
@@ -250,7 +275,10 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
             filteredComponentsList.map((comp: any) => {
               const Cmp = loadComponent("homepage", comp.componentName);
               if (!Cmp) {
-                console.log("❌ HomePage - Component not found:", comp.componentName);
+                console.log(
+                  "❌ HomePage - Component not found:",
+                  comp.componentName,
+                );
                 return <Fragment key={comp.id} />;
               }
 

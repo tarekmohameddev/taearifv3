@@ -56,7 +56,10 @@ const CrmPageSkeleton = () => {
             </div>
             <div className="space-y-4 p-2 bg-gray-50 dark:bg-gray-900/50 rounded-b-lg h-[60vh] overflow-y-auto">
               {[...Array(3)].map((_, j) => (
-                <div key={j} className="p-4 rounded-lg border bg-card shadow-sm space-y-3">
+                <div
+                  key={j}
+                  className="p-4 rounded-lg border bg-card shadow-sm space-y-3"
+                >
                   <div className="flex items-center justify-between">
                     <Skeleton className="h-5 w-32" />
                     <Skeleton className="h-8 w-8 rounded-full" />
@@ -81,4 +84,4 @@ const CrmPageSkeleton = () => {
   );
 };
 
-export default CrmPageSkeleton; 
+export default CrmPageSkeleton;

@@ -16,37 +16,37 @@ interface NestedDroppableOptions {
  */
 export const createNestedDroppablePlugin = (
   options: NestedDroppableOptions,
-  contextId: string
+  contextId: string,
 ): Plugin => {
   let lastParams: NestedDroppableParams | null = null;
 
   const getZoneFromId = (id: string): string | null => {
     if (id === "root") return "root";
-    
+
     // إذا كان ID يحتوي على ":" فهو zone مركب
     if (id.includes(":")) {
       const [areaId, zoneId] = id.split(":");
       return zoneId;
     }
-    
+
     return id;
   };
 
   const getAreaFromId = (id: string): string | null => {
     if (id === "root") return "root";
-    
+
     // إذا كان ID يحتوي على ":" فهو zone مركب
     if (id.includes(":")) {
       const [areaId] = id.split(":");
       return areaId;
     }
-    
+
     return null;
   };
 
   const findDeepestDroppable = (
     droppables: Map<string, Droppable>,
-    targetPosition: { x: number; y: number }
+    targetPosition: { x: number; y: number },
   ): Droppable | null => {
     let deepestDroppable: Droppable | null = null;
     let maxDepth = -1;
@@ -55,7 +55,7 @@ export const createNestedDroppablePlugin = (
       if (droppable.disabled || !droppable.shape) continue;
 
       const rect = droppable.shape.boundingRectangle;
-      
+
       // التحقق من التداخل مع النقطة
       if (
         targetPosition.x >= rect.left &&
@@ -65,7 +65,7 @@ export const createNestedDroppablePlugin = (
       ) {
         // حساب العمق بناءً على data
         const depth = (droppable.data as any)?.depth || 0;
-        
+
         if (depth > maxDepth) {
           maxDepth = depth;
           deepestDroppable = droppable;
@@ -78,7 +78,7 @@ export const createNestedDroppablePlugin = (
 
   return {
     name: "NestedDroppable",
-    
+
     onDragMove: (manager: DragDropManager) => {
       const dragOperation = manager.dragOperation;
       if (!dragOperation.source) return;
@@ -86,7 +86,7 @@ export const createNestedDroppablePlugin = (
       const pointerPosition = dragOperation.position.current;
       const deepestDroppable = findDeepestDroppable(
         manager.registry.droppables,
-        pointerPosition
+        pointerPosition,
       );
 
       let zone: string | null = null;
@@ -100,7 +100,7 @@ export const createNestedDroppablePlugin = (
       const currentParams: NestedDroppableParams = { zone, area };
 
       // التحقق من التغيير
-      const hasChanged = 
+      const hasChanged =
         !lastParams ||
         lastParams.zone !== currentParams.zone ||
         lastParams.area !== currentParams.area;

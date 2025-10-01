@@ -1,11 +1,23 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,9 +26,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Building2,
   MapPin,
@@ -30,56 +42,61 @@ import {
   Edit,
   Eye,
   MoreHorizontal,
-} from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import useAuthStore from "@/context/AuthContext"
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import useAuthStore from "@/context/AuthContext";
 
 interface Property {
-  id: string
-  name: string
-  nameAr: string
-  address: string
-  addressAr: string
-  city: string
-  cityAr: string
-  district: string
-  districtAr: string
-  type: string
-  typeAr: string
-  units: number
-  occupiedUnits: number
-  monthlyRent: number
-  bedrooms: number
-  bathrooms: number
-  squareMeters: number
-  status: "available" | "occupied" | "maintenance" | "under-construction"
-  statusAr: string
-  lastUpdated: string
-  image: string
-  amenities: string[]
-  amenitiesAr: string[]
+  id: string;
+  name: string;
+  nameAr: string;
+  address: string;
+  addressAr: string;
+  city: string;
+  cityAr: string;
+  district: string;
+  districtAr: string;
+  type: string;
+  typeAr: string;
+  units: number;
+  occupiedUnits: number;
+  monthlyRent: number;
+  bedrooms: number;
+  bathrooms: number;
+  squareMeters: number;
+  status: "available" | "occupied" | "maintenance" | "under-construction";
+  statusAr: string;
+  lastUpdated: string;
+  image: string;
+  amenities: string[];
+  amenitiesAr: string[];
 }
 
 export function PropertyListingService() {
-  const [properties, setProperties] = useState<Property[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [filterCity, setFilterCity] = useState("all")
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const { userData } = useAuthStore()
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterCity, setFilterCity] = useState("all");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { userData } = useAuthStore();
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchProperties")
-      return
+      console.log("No token available, skipping fetchProperties");
+      return;
     }
 
     // Simulate API call to property listing microservice
     const fetchProperties = async () => {
-      setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setProperties([
         {
@@ -130,7 +147,12 @@ export function PropertyListingService() {
           lastUpdated: "1446/07/14",
           image: "/placeholder.svg?height=200&width=300",
           amenities: ["Sea View", "Gym", "Parking", "Concierge"],
-          amenitiesAr: ["إطلالة بحرية", "صالة رياضية", "موقف سيارات", "خدمة الاستقبال"],
+          amenitiesAr: [
+            "إطلالة بحرية",
+            "صالة رياضية",
+            "موقف سيارات",
+            "خدمة الاستقبال",
+          ],
         },
         {
           id: "3",
@@ -182,37 +204,39 @@ export function PropertyListingService() {
           amenities: ["Haram View", "Parking", "Elevator"],
           amenitiesAr: ["إطلالة على الحرم", "موقف سيارات", "مصعد"],
         },
-      ])
-      setLoading(false)
-    }
+      ]);
+      setLoading(false);
+    };
 
-    fetchProperties()
-  }, [userData?.token])
+    fetchProperties();
+  }, [userData?.token]);
 
   const filteredProperties = properties.filter((property) => {
     const matchesSearch =
       property.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
       property.addressAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.cityAr.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === "all" || property.status === filterStatus
-    const matchesCity = filterCity === "all" || property.city.toLowerCase() === filterCity
-    return matchesSearch && matchesStatus && matchesCity
-  })
+      property.cityAr.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || property.status === filterStatus;
+    const matchesCity =
+      filterCity === "all" || property.city.toLowerCase() === filterCity;
+    return matchesSearch && matchesStatus && matchesCity;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "available":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "occupied":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "maintenance":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 text-orange-800";
       case "under-construction":
-        return "bg-purple-100 text-purple-800"
+        return "bg-purple-100 text-purple-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
@@ -220,11 +244,13 @@ export function PropertyListingService() {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+            <p className="text-lg text-gray-500">
+              يرجى تسجيل الدخول لعرض المحتوى
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -247,7 +273,7 @@ export function PropertyListingService() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -256,7 +282,9 @@ export function PropertyListingService() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">المشاريع العقارية</h2>
-          <p className="text-muted-foreground">إدارة المشاريع العقارية والوحدات السكنية</p>
+          <p className="text-muted-foreground">
+            إدارة المشاريع العقارية والوحدات السكنية
+          </p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
@@ -268,7 +296,9 @@ export function PropertyListingService() {
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>إضافة مشروع عقاري جديد</DialogTitle>
-              <DialogDescription>إنشاء مشروع عقاري جديد في النظام</DialogDescription>
+              <DialogDescription>
+                إنشاء مشروع عقاري جديد في النظام
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -283,10 +313,14 @@ export function PropertyListingService() {
                       <SelectValue placeholder="اختر النوع" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="residential-complex">مجمع سكني</SelectItem>
+                      <SelectItem value="residential-complex">
+                        مجمع سكني
+                      </SelectItem>
                       <SelectItem value="tower">برج سكني</SelectItem>
                       <SelectItem value="villa-complex">مجمع فلل</SelectItem>
-                      <SelectItem value="apartment-building">مبنى شقق</SelectItem>
+                      <SelectItem value="apartment-building">
+                        مبنى شقق
+                      </SelectItem>
                       <SelectItem value="commercial">تجاري</SelectItem>
                     </SelectContent>
                   </Select>
@@ -315,7 +349,10 @@ export function PropertyListingService() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="address-ar">العنوان</Label>
-                <Input id="address-ar" placeholder="طريق الملك فهد، حي العليا" />
+                <Input
+                  id="address-ar"
+                  placeholder="طريق الملك فهد، حي العليا"
+                />
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
@@ -347,10 +384,15 @@ export function PropertyListingService() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsAddDialogOpen(false)}
+              >
                 إلغاء
               </Button>
-              <Button onClick={() => setIsAddDialogOpen(false)}>إضافة المشروع</Button>
+              <Button onClick={() => setIsAddDialogOpen(false)}>
+                إضافة المشروع
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -404,7 +446,11 @@ export function PropertyListingService() {
                 alt={property.nameAr}
                 className="w-full h-48 object-cover"
               />
-              <Badge className={`absolute top-2 left-2 ${getStatusColor(property.status)}`}>{property.statusAr}</Badge>
+              <Badge
+                className={`absolute top-2 left-2 ${getStatusColor(property.status)}`}
+              >
+                {property.statusAr}
+              </Badge>
             </div>
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start">
@@ -483,7 +529,9 @@ export function PropertyListingService() {
                       {property.monthlyRent.toLocaleString()} ر.س/شهر
                     </span>
                   </div>
-                  <span className="text-xs text-muted-foreground">محدث {property.lastUpdated}</span>
+                  <span className="text-xs text-muted-foreground">
+                    محدث {property.lastUpdated}
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -507,5 +555,5 @@ export function PropertyListingService() {
         </div>
       )}
     </div>
-  )
+  );
 }

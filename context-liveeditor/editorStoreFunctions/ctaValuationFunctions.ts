@@ -6,7 +6,8 @@ export const getDefaultCtaValuationData = (): ComponentData => ({
   visible: true,
   content: {
     title: "تقييم عقارك",
-    description1: "لو لديك عقار ترغب في عرضه، اطلب معاينته الآن ليتم تقييمه بشكل دقيق وتحضيره لعرضه",
+    description1:
+      "لو لديك عقار ترغب في عرضه، اطلب معاينته الآن ليتم تقييمه بشكل دقيق وتحضيره لعرضه",
     description2: "بأفضل طريقة",
     buttonText: "طلب معاينة",
     buttonUrl: "#",
@@ -89,11 +90,10 @@ export const ctaValuationFunctions = {
     if (state.ctaValuationStates[variantId]) {
       return state;
     }
-    
+
     const defaultData = getDefaultCtaValuationData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
-    
+
     return {
       ...state,
       ctaValuationStates: { ...state.ctaValuationStates, [variantId]: data },
@@ -101,7 +101,8 @@ export const ctaValuationFunctions = {
   },
 
   getData: (state: any, variantId: string) => {
-    const data = state.ctaValuationStates[variantId] || getDefaultCtaValuationData();
+    const data =
+      state.ctaValuationStates[variantId] || getDefaultCtaValuationData();
     return data;
   },
 
@@ -113,7 +114,7 @@ export const ctaValuationFunctions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.ctaValuationStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
       ...state,
       ctaValuationStates: { ...state.ctaValuationStates, [variantId]: newData },

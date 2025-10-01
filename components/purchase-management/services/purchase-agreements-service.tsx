@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,10 +20,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   FileText,
   Plus,
@@ -33,90 +39,91 @@ import {
   Clock,
   AlertTriangle,
   MapPin,
-} from "lucide-react"
-import useAuthStore from "@/context/AuthContext"
+} from "lucide-react";
+import useAuthStore from "@/context/AuthContext";
 
 interface PurchaseAgreement {
-  id: string
-  contractNumber: string
+  id: string;
+  contractNumber: string;
   propertyDetails: {
-    title: string
-    titleAr: string
-    type: string
-    typeAr: string
-    location: string
-    locationAr: string
-    area: number
-    bedrooms?: number
-    bathrooms?: number
-    features: string[]
-    featuresAr: string[]
-  }
+    title: string;
+    titleAr: string;
+    type: string;
+    typeAr: string;
+    location: string;
+    locationAr: string;
+    area: number;
+    bedrooms?: number;
+    bathrooms?: number;
+    features: string[];
+    featuresAr: string[];
+  };
   buyer: {
-    name: string
-    nameAr: string
-    email: string
-    phone: string
-    nationalId: string
-  }
+    name: string;
+    nameAr: string;
+    email: string;
+    phone: string;
+    nationalId: string;
+  };
   seller: {
-    name: string
-    nameAr: string
-    email: string
-    phone: string
-    nationalId: string
-  }
+    name: string;
+    nameAr: string;
+    email: string;
+    phone: string;
+    nationalId: string;
+  };
   financialDetails: {
-    totalPrice: number
-    downPayment: number
-    remainingAmount: number
-    paymentSchedule: string
-    paymentScheduleAr: string
-    financingType: string
-    financingTypeAr: string
-  }
+    totalPrice: number;
+    downPayment: number;
+    remainingAmount: number;
+    paymentSchedule: string;
+    paymentScheduleAr: string;
+    financingType: string;
+    financingTypeAr: string;
+  };
   contractDates: {
-    signedDate: string
-    signedDateHijri: string
-    completionDate: string
-    completionDateHijri: string
-    handoverDate: string
-    handoverDateHijri: string
-  }
-  status: "draft" | "signed" | "in_progress" | "completed" | "cancelled"
-  statusAr: string
+    signedDate: string;
+    signedDateHijri: string;
+    completionDate: string;
+    completionDateHijri: string;
+    handoverDate: string;
+    handoverDateHijri: string;
+  };
+  status: "draft" | "signed" | "in_progress" | "completed" | "cancelled";
+  statusAr: string;
   documents: {
-    contract: boolean
-    titleDeed: boolean
-    inspection: boolean
-    financing: boolean
-    insurance: boolean
-  }
-  notes: string
-  notesAr: string
-  createdDate: string
-  createdDateHijri: string
+    contract: boolean;
+    titleDeed: boolean;
+    inspection: boolean;
+    financing: boolean;
+    insurance: boolean;
+  };
+  notes: string;
+  notesAr: string;
+  createdDate: string;
+  createdDateHijri: string;
 }
 
 export function PurchaseAgreementsService() {
-  const [agreements, setAgreements] = useState<PurchaseAgreement[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [selectedAgreement, setSelectedAgreement] = useState<PurchaseAgreement | null>(null)
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const { userData } = useAuthStore()
+  const [agreements, setAgreements] = useState<PurchaseAgreement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [selectedAgreement, setSelectedAgreement] =
+    useState<PurchaseAgreement | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const { userData } = useAuthStore();
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchAgreements")
-      return
+      console.log("No token available, skipping fetchAgreements");
+      return;
     }
 
     const fetchAgreements = async () => {
-      setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setAgreements([
         {
@@ -302,62 +309,69 @@ export function PurchaseAgreementsService() {
           createdDate: "2024-01-22",
           createdDateHijri: "1446/07/22",
         },
-      ])
-      setLoading(false)
-    }
+      ]);
+      setLoading(false);
+    };
 
-    fetchAgreements()
-  }, [userData?.token])
+    fetchAgreements();
+  }, [userData?.token]);
 
   const filteredAgreements = agreements.filter((agreement) => {
     const matchesSearch =
-      agreement.contractNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      agreement.contractNumber
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       agreement.buyer.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agreement.propertyDetails.titleAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agreement.propertyDetails.locationAr.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === "all" || agreement.status === filterStatus
-    return matchesSearch && matchesStatus
-  })
+      agreement.propertyDetails.titleAr
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      agreement.propertyDetails.locationAr
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || agreement.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "draft":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
       case "signed":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "in_progress":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "completed":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "cancelled":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "draft":
-        return <FileText className="h-4 w-4" />
+        return <FileText className="h-4 w-4" />;
       case "signed":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "in_progress":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       case "completed":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "cancelled":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
       default:
-        return <FileText className="h-4 w-4" />
+        return <FileText className="h-4 w-4" />;
     }
-  }
+  };
 
   const getDocumentCompletionPercentage = (documents: any) => {
-    const total = Object.keys(documents).length
-    const completed = Object.values(documents).filter(Boolean).length
-    return Math.round((completed / total) * 100)
-  }
+    const total = Object.keys(documents).length;
+    const completed = Object.values(documents).filter(Boolean).length;
+    return Math.round((completed / total) * 100);
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
@@ -365,11 +379,13 @@ export function PurchaseAgreementsService() {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+            <p className="text-lg text-gray-500">
+              يرجى تسجيل الدخول لعرض المحتوى
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -393,7 +409,7 @@ export function PurchaseAgreementsService() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -402,7 +418,9 @@ export function PurchaseAgreementsService() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">إدارة عقود الشراء</h2>
-          <p className="text-muted-foreground">إدارة ومتابعة عقود شراء العقارات</p>
+          <p className="text-muted-foreground">
+            إدارة ومتابعة عقود شراء العقارات
+          </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
@@ -429,7 +447,10 @@ export function PurchaseAgreementsService() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="property-title">عنوان العقار</Label>
-                <Input id="property-title" placeholder="فيلا فاخرة في حي العليا" />
+                <Input
+                  id="property-title"
+                  placeholder="فيلا فاخرة في حي العليا"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -454,7 +475,10 @@ export function PurchaseAgreementsService() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="property-location">موقع العقار</Label>
-                <Input id="property-location" placeholder="الرياض - حي العليا" />
+                <Input
+                  id="property-location"
+                  placeholder="الرياض - حي العليا"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -478,14 +502,23 @@ export function PurchaseAgreementsService() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="contract-notes">ملاحظات العقد</Label>
-                <Textarea id="contract-notes" placeholder="أي ملاحظات أو شروط خاصة..." rows={3} />
+                <Textarea
+                  id="contract-notes"
+                  placeholder="أي ملاحظات أو شروط خاصة..."
+                  rows={3}
+                />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateDialogOpen(false)}
+              >
                 إلغاء
               </Button>
-              <Button onClick={() => setIsCreateDialogOpen(false)}>إنشاء العقد</Button>
+              <Button onClick={() => setIsCreateDialogOpen(false)}>
+                إنشاء العقد
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -521,17 +554,25 @@ export function PurchaseAgreementsService() {
       {/* Agreements List */}
       <div className="space-y-4">
         {filteredAgreements.map((agreement) => (
-          <Card key={agreement.id} className="hover:shadow-md transition-shadow">
+          <Card
+            key={agreement.id}
+            className="hover:shadow-md transition-shadow"
+          >
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center space-x-3 space-x-reverse">
-                    <h3 className="font-semibold text-lg">{agreement.contractNumber}</h3>
+                    <h3 className="font-semibold text-lg">
+                      {agreement.contractNumber}
+                    </h3>
                     <Badge className={getStatusColor(agreement.status)}>
                       {getStatusIcon(agreement.status)}
                       <span className="mr-1">{agreement.statusAr}</span>
                     </Badge>
-                    <Badge variant="outline">الوثائق: {getDocumentCompletionPercentage(agreement.documents)}%</Badge>
+                    <Badge variant="outline">
+                      الوثائق:{" "}
+                      {getDocumentCompletionPercentage(agreement.documents)}%
+                    </Badge>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -556,7 +597,10 @@ export function PurchaseAgreementsService() {
                       <div className="flex items-center space-x-2 space-x-reverse text-sm">
                         <DollarSign className="h-3 w-3 text-muted-foreground" />
                         <span className="font-medium">السعر:</span>
-                        <span>{agreement.financialDetails.totalPrice.toLocaleString()} ر.س</span>
+                        <span>
+                          {agreement.financialDetails.totalPrice.toLocaleString()}{" "}
+                          ر.س
+                        </span>
                       </div>
                       <div className="flex items-center space-x-2 space-x-reverse text-sm">
                         <Calendar className="h-3 w-3 text-muted-foreground" />
@@ -573,13 +617,19 @@ export function PurchaseAgreementsService() {
 
                   {agreement.notesAr && (
                     <div className="p-3 bg-muted rounded-md">
-                      <p className="text-sm text-muted-foreground">{agreement.notesAr}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {agreement.notesAr}
+                      </p>
                     </div>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2 ml-4">
-                  <Button size="sm" variant="outline" onClick={() => setSelectedAgreement(agreement)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedAgreement(agreement)}
+                  >
                     <Eye className="h-3 w-3 ml-1" />
                     التفاصيل
                   </Button>
@@ -595,12 +645,16 @@ export function PurchaseAgreementsService() {
       </div>
 
       {/* Agreement Details Dialog */}
-      <Dialog open={!!selectedAgreement} onOpenChange={() => setSelectedAgreement(null)}>
+      <Dialog
+        open={!!selectedAgreement}
+        onOpenChange={() => setSelectedAgreement(null)}
+      >
         <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>تفاصيل عقد الشراء</DialogTitle>
             <DialogDescription>
-              عقد رقم {selectedAgreement?.contractNumber} - {selectedAgreement?.propertyDetails.titleAr}
+              عقد رقم {selectedAgreement?.contractNumber} -{" "}
+              {selectedAgreement?.propertyDetails.titleAr}
             </DialogDescription>
           </DialogHeader>
           {selectedAgreement && (
@@ -616,30 +670,44 @@ export function PurchaseAgreementsService() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">عنوان العقار</Label>
-                    <p className="text-sm text-muted-foreground">{selectedAgreement.propertyDetails.titleAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAgreement.propertyDetails.titleAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">نوع العقار</Label>
-                    <p className="text-sm text-muted-foreground">{selectedAgreement.propertyDetails.typeAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAgreement.propertyDetails.typeAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">الموقع</Label>
-                    <p className="text-sm text-muted-foreground">{selectedAgreement.propertyDetails.locationAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAgreement.propertyDetails.locationAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">المساحة</Label>
-                    <p className="text-sm text-muted-foreground">{selectedAgreement.propertyDetails.area} م²</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAgreement.propertyDetails.area} م²
+                    </p>
                   </div>
                   {selectedAgreement.propertyDetails.bedrooms && (
                     <div>
                       <Label className="text-sm font-medium">غرف النوم</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.propertyDetails.bedrooms}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.propertyDetails.bedrooms}
+                      </p>
                     </div>
                   )}
                   {selectedAgreement.propertyDetails.bathrooms && (
                     <div>
-                      <Label className="text-sm font-medium">دورات المياه</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.propertyDetails.bathrooms}</p>
+                      <Label className="text-sm font-medium">
+                        دورات المياه
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.propertyDetails.bathrooms}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -647,11 +715,13 @@ export function PurchaseAgreementsService() {
                   <div>
                     <Label className="text-sm font-medium">المميزات</Label>
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {selectedAgreement.propertyDetails.featuresAr.map((feature, index) => (
-                        <Badge key={index} variant="outline">
-                          {feature}
-                        </Badge>
-                      ))}
+                      {selectedAgreement.propertyDetails.featuresAr.map(
+                        (feature, index) => (
+                          <Badge key={index} variant="outline">
+                            {feature}
+                          </Badge>
+                        ),
+                      )}
                     </div>
                   </div>
                 )}
@@ -663,19 +733,29 @@ export function PurchaseAgreementsService() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium">الاسم</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.buyer.nameAr}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.buyer.nameAr}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">رقم الهوية</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.buyer.nationalId}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.buyer.nationalId}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">الهاتف</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.buyer.phone}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.buyer.phone}
+                      </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">البريد الإلكتروني</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.buyer.email}</p>
+                      <Label className="text-sm font-medium">
+                        البريد الإلكتروني
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.buyer.email}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -684,19 +764,29 @@ export function PurchaseAgreementsService() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium">الاسم</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.seller.nameAr}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.seller.nameAr}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">رقم الهوية</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.seller.nationalId}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.seller.nationalId}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">الهاتف</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.seller.phone}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.seller.phone}
+                      </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">البريد الإلكتروني</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.seller.email}</p>
+                      <Label className="text-sm font-medium">
+                        البريد الإلكتروني
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.seller.email}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -705,21 +795,28 @@ export function PurchaseAgreementsService() {
               <TabsContent value="financial" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm font-medium">السعر الإجمالي</Label>
+                    <Label className="text-sm font-medium">
+                      السعر الإجمالي
+                    </Label>
                     <p className="text-sm text-muted-foreground font-bold text-green-600">
-                      {selectedAgreement.financialDetails.totalPrice.toLocaleString()} ر.س
+                      {selectedAgreement.financialDetails.totalPrice.toLocaleString()}{" "}
+                      ر.س
                     </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">المقدم</Label>
                     <p className="text-sm text-muted-foreground">
-                      {selectedAgreement.financialDetails.downPayment.toLocaleString()} ر.س
+                      {selectedAgreement.financialDetails.downPayment.toLocaleString()}{" "}
+                      ر.س
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">المبلغ المتبقي</Label>
+                    <Label className="text-sm font-medium">
+                      المبلغ المتبقي
+                    </Label>
                     <p className="text-sm text-muted-foreground">
-                      {selectedAgreement.financialDetails.remainingAmount.toLocaleString()} ر.س
+                      {selectedAgreement.financialDetails.remainingAmount.toLocaleString()}{" "}
+                      ر.س
                     </p>
                   </div>
                   <div>
@@ -738,7 +835,9 @@ export function PurchaseAgreementsService() {
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <Label className="text-sm font-medium">تاريخ التوقيع</Label>
-                    <p className="text-sm text-muted-foreground">{selectedAgreement.contractDates.signedDateHijri}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAgreement.contractDates.signedDateHijri}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">تاريخ الإنجاز</Label>
@@ -748,7 +847,9 @@ export function PurchaseAgreementsService() {
                   </div>
                   <div>
                     <Label className="text-sm font-medium">تاريخ التسليم</Label>
-                    <p className="text-sm text-muted-foreground">{selectedAgreement.contractDates.handoverDateHijri}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAgreement.contractDates.handoverDateHijri}
+                    </p>
                   </div>
                 </div>
               </TabsContent>
@@ -759,7 +860,9 @@ export function PurchaseAgreementsService() {
                     <span className="text-sm font-medium">عقد الشراء</span>
                     <Badge
                       className={
-                        selectedAgreement.documents.contract ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        selectedAgreement.documents.contract
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
                       }
                     >
                       {selectedAgreement.documents.contract ? "مكتمل" : "مفقود"}
@@ -774,7 +877,9 @@ export function PurchaseAgreementsService() {
                           : "bg-red-100 text-red-800"
                       }
                     >
-                      {selectedAgreement.documents.titleDeed ? "مكتمل" : "مفقود"}
+                      {selectedAgreement.documents.titleDeed
+                        ? "مكتمل"
+                        : "مفقود"}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between p-3 border rounded-md">
@@ -786,7 +891,9 @@ export function PurchaseAgreementsService() {
                           : "bg-red-100 text-red-800"
                       }
                     >
-                      {selectedAgreement.documents.inspection ? "مكتمل" : "مفقود"}
+                      {selectedAgreement.documents.inspection
+                        ? "مكتمل"
+                        : "مفقود"}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between p-3 border rounded-md">
@@ -798,7 +905,9 @@ export function PurchaseAgreementsService() {
                           : "bg-red-100 text-red-800"
                       }
                     >
-                      {selectedAgreement.documents.financing ? "مكتمل" : "مفقود"}
+                      {selectedAgreement.documents.financing
+                        ? "مكتمل"
+                        : "مفقود"}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between p-3 border rounded-md">
@@ -810,13 +919,19 @@ export function PurchaseAgreementsService() {
                           : "bg-red-100 text-red-800"
                       }
                     >
-                      {selectedAgreement.documents.insurance ? "مكتمل" : "مفقود"}
+                      {selectedAgreement.documents.insurance
+                        ? "مكتمل"
+                        : "مفقود"}
                     </Badge>
                   </div>
                 </div>
                 <div className="p-4 bg-blue-50 rounded-md">
                   <p className="text-sm text-blue-800">
-                    نسبة اكتمال الوثائق: {getDocumentCompletionPercentage(selectedAgreement.documents)}%
+                    نسبة اكتمال الوثائق:{" "}
+                    {getDocumentCompletionPercentage(
+                      selectedAgreement.documents,
+                    )}
+                    %
                   </p>
                 </div>
               </TabsContent>
@@ -830,7 +945,9 @@ export function PurchaseAgreementsService() {
           <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium mb-2">لم يتم العثور على عقود</h3>
           <p className="text-muted-foreground mb-4">
-            {searchTerm || filterStatus !== "all" ? "جرب تعديل معايير البحث" : "لا توجد عقود شراء مسجلة حالياً"}
+            {searchTerm || filterStatus !== "all"
+              ? "جرب تعديل معايير البحث"
+              : "لا توجد عقود شراء مسجلة حالياً"}
           </p>
           <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="ml-2 h-4 w-4" />
@@ -839,5 +956,5 @@ export function PurchaseAgreementsService() {
         </div>
       )}
     </div>
-  )
+  );
 }

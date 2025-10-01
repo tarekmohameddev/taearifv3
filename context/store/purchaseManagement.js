@@ -1,6 +1,11 @@
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
-import { getErrorInfo, retryWithBackoff, logError, formatErrorMessage } from "@/utils/errorHandler";
+import {
+  getErrorInfo,
+  retryWithBackoff,
+  logError,
+  formatErrorMessage,
+} from "@/utils/errorHandler";
 
 module.exports = (set, get) => ({
   purchaseManagement: {
@@ -8,13 +13,12 @@ module.exports = (set, get) => ({
     purchaseRequests: [],
     purchaseRequestStats: null,
     recentRequests: [],
-    
+
     // Properties Data
     properties: [],
-    
-        // Properties Data
-        projects: [],
 
+    // Properties Data
+    projects: [],
 
     // UI State
     loading: false,
@@ -23,21 +27,21 @@ module.exports = (set, get) => ({
     loadingStats: false,
     error: null,
     isInitialized: false,
-    
+
     // Pagination
     pagination: null,
-    
+
     // Filters and Search
     searchTerm: "",
     statusFilter: "all",
     priorityFilter: "all",
-    
+
     // Forms State
     isCreatingRequest: false,
     isUpdatingRequest: false,
     isTransitioningStage: false,
     isDeletingRequest: false,
-    
+
     // Delete Confirmation Dialog
     deleteConfirmDialog: {
       isOpen: false,
@@ -74,22 +78,28 @@ module.exports = (set, get) => ({
 
     try {
       const params = new URLSearchParams();
-      params.set('page', page.toString());
-      
+      params.set("page", page.toString());
+
       // Add filters if provided
       Object.entries(filters).forEach(([key, value]) => {
         if (value && value !== "all" && value.length > 0) {
           if (Array.isArray(value)) {
-            params.set(key, value.join(','));
+            params.set(key, value.join(","));
           } else {
             params.set(key, value.toString());
           }
         }
       });
 
-      const response = await retryWithBackoff(async () => {
-        return await axiosInstance.get(`/v1/pms/purchase-requests?${params.toString()}`);
-      }, 3, 1000);
+      const response = await retryWithBackoff(
+        async () => {
+          return await axiosInstance.get(
+            `/v1/pms/purchase-requests?${params.toString()}`,
+          );
+        },
+        3,
+        1000,
+      );
 
       const requestsList = response.data.data || [];
       const pagination = response.data.pagination || null;
@@ -121,42 +131,60 @@ module.exports = (set, get) => ({
         priority: mapApiPriorityToPriority(request.priority),
         progress: request.progress_percentage || 0,
         createdAt: request.created_at,
-        assignedAgent: request.assigned_user ? {
-          name: request.assigned_user.name || "غير محدد",
-          email: request.assigned_user.email || "agent@company.com",
-          phone: "+966 50 000 0000",
-          avatar: "/placeholder.svg",
-        } : {
-          name: "غير محدد",
-          email: "agent@company.com",
-          phone: "+966 50 000 0000",
-          avatar: "/placeholder.svg",
-        },
+        assignedAgent: request.assigned_user
+          ? {
+              name: request.assigned_user.name || "غير محدد",
+              email: request.assigned_user.email || "agent@company.com",
+              phone: "+966 50 000 0000",
+              avatar: "/placeholder.svg",
+            }
+          : {
+              name: "غير محدد",
+              email: "agent@company.com",
+              phone: "+966 50 000 0000",
+              avatar: "/placeholder.svg",
+            },
         stages: {
           reservation: {
-            status: request.stages[0]?.status === "قيد التنفيذ" ? "in-progress" :
-                    request.stages[0]?.status === "الانتظار" ? "pending" : "completed",
+            status:
+              request.stages[0]?.status === "قيد التنفيذ"
+                ? "in-progress"
+                : request.stages[0]?.status === "الانتظار"
+                  ? "pending"
+                  : "completed",
             completedAt: request.stages[0]?.completed_at || undefined,
             documents: request.stages[0]?.documents || [],
             notes: request.stages[0]?.notes || "",
           },
           contract: {
-            status: request.stages[1]?.status === "قيد التنفيذ" ? "in-progress" :
-                    request.stages[1]?.status === "الانتظار" ? "pending" : "completed",
+            status:
+              request.stages[1]?.status === "قيد التنفيذ"
+                ? "in-progress"
+                : request.stages[1]?.status === "الانتظار"
+                  ? "pending"
+                  : "completed",
             completedAt: request.stages[1]?.completed_at || undefined,
             documents: request.stages[1]?.documents || [],
             notes: request.stages[1]?.notes || "",
           },
           completion: {
-            status: request.stages[2]?.status === "قيد التنفيذ" ? "in-progress" :
-                    request.stages[2]?.status === "الانتظار" ? "pending" : "completed",
+            status:
+              request.stages[2]?.status === "قيد التنفيذ"
+                ? "in-progress"
+                : request.stages[2]?.status === "الانتظار"
+                  ? "pending"
+                  : "completed",
             completedAt: request.stages[2]?.completed_at || undefined,
             documents: request.stages[2]?.documents || [],
             notes: request.stages[2]?.notes || "",
           },
           receiving: {
-            status: request.stages[3]?.status === "قيد التنفيذ" ? "in-progress" :
-                    request.stages[3]?.status === "الانتظار" ? "pending" : "completed",
+            status:
+              request.stages[3]?.status === "قيد التنفيذ"
+                ? "in-progress"
+                : request.stages[3]?.status === "الانتظار"
+                  ? "pending"
+                  : "completed",
             completedAt: request.stages[3]?.completed_at || undefined,
             documents: request.stages[3]?.documents || [],
             notes: request.stages[3]?.notes || "",
@@ -177,17 +205,20 @@ module.exports = (set, get) => ({
 
       return transformedRequests;
     } catch (error) {
-      const errorInfo = logError(error, 'fetchPurchaseRequests');
-      
+      const errorInfo = logError(error, "fetchPurchaseRequests");
+
       set((state) => ({
         purchaseManagement: {
           ...state.purchaseManagement,
-          error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات طلبات الشراء"),
+          error: formatErrorMessage(
+            error,
+            "حدث خطأ أثناء جلب بيانات طلبات الشراء",
+          ),
           loading: false,
           isInitialized: true,
         },
       }));
-      
+
       throw error;
     }
   },
@@ -212,18 +243,24 @@ module.exports = (set, get) => ({
     try {
       // Since we don't have a dedicated stats endpoint, we'll derive stats from the requests
       const requests = await get().fetchPurchaseRequests();
-      
+
       const stats = {
         totalRequests: requests.length,
-        activeRequests: requests.filter(r => r.currentStage !== "completed").length,
-        completedRequests: requests.filter(r => r.currentStage === "completed").length,
-        highPriorityRequests: requests.filter(r => r.priority === "high").length,
-        averageProgress: requests.reduce((sum, r) => sum + r.progress, 0) / requests.length || 0,
+        activeRequests: requests.filter((r) => r.currentStage !== "completed")
+          .length,
+        completedRequests: requests.filter(
+          (r) => r.currentStage === "completed",
+        ).length,
+        highPriorityRequests: requests.filter((r) => r.priority === "high")
+          .length,
+        averageProgress:
+          requests.reduce((sum, r) => sum + r.progress, 0) / requests.length ||
+          0,
         priorityBreakdown: {
-          high: requests.filter(r => r.priority === "high").length,
-          medium: requests.filter(r => r.priority === "medium").length,
-          low: requests.filter(r => r.priority === "low").length,
-          urgent: requests.filter(r => r.priority === "urgent").length,
+          high: requests.filter((r) => r.priority === "high").length,
+          medium: requests.filter((r) => r.priority === "medium").length,
+          low: requests.filter((r) => r.priority === "low").length,
+          urgent: requests.filter((r) => r.priority === "urgent").length,
         },
         recentRequests: requests.slice(0, 5), // Last 5 requests
       };
@@ -239,16 +276,19 @@ module.exports = (set, get) => ({
 
       return stats;
     } catch (error) {
-      const errorInfo = logError(error, 'fetchPurchaseRequestStats');
-      
+      const errorInfo = logError(error, "fetchPurchaseRequestStats");
+
       set((state) => ({
         purchaseManagement: {
           ...state.purchaseManagement,
-          error: formatErrorMessage(error, "حدث خطأ أثناء جلب إحصائيات طلبات الشراء"),
+          error: formatErrorMessage(
+            error,
+            "حدث خطأ أثناء جلب إحصائيات طلبات الشراء",
+          ),
           loadingStats: false,
         },
       }));
-      
+
       throw error;
     }
   },
@@ -271,9 +311,13 @@ module.exports = (set, get) => ({
     }));
 
     try {
-      const response = await retryWithBackoff(async () => {
-        return await axiosInstance.get("/properties");
-      }, 3, 1000);
+      const response = await retryWithBackoff(
+        async () => {
+          return await axiosInstance.get("/properties");
+        },
+        3,
+        1000,
+      );
 
       const propertiesList = response.data.data.properties || [];
 
@@ -287,8 +331,8 @@ module.exports = (set, get) => ({
 
       return propertiesList;
     } catch (error) {
-      const errorInfo = logError(error, 'fetchProperties');
-      
+      const errorInfo = logError(error, "fetchProperties");
+
       set((state) => ({
         purchaseManagement: {
           ...state.purchaseManagement,
@@ -296,12 +340,11 @@ module.exports = (set, get) => ({
           loadingProperties: false,
         },
       }));
-      
+
       throw error;
     }
   },
 
-  
   // Fetch projects
   fetchProjects: async () => {
     // التحقق من وجود التوكن قبل إجراء الطلب
@@ -320,9 +363,13 @@ module.exports = (set, get) => ({
     }));
 
     try {
-      const response = await retryWithBackoff(async () => {
-        return await axiosInstance.get("/projects");
-      }, 3, 1000);
+      const response = await retryWithBackoff(
+        async () => {
+          return await axiosInstance.get("/projects");
+        },
+        3,
+        1000,
+      );
 
       const projectsList = response.data.data.projects || [];
 
@@ -336,8 +383,8 @@ module.exports = (set, get) => ({
 
       return projectsList;
     } catch (error) {
-      const errorInfo = logError(error, 'fetchProjects');
-      
+      const errorInfo = logError(error, "fetchProjects");
+
       set((state) => ({
         purchaseManagement: {
           ...state.purchaseManagement,
@@ -345,12 +392,10 @@ module.exports = (set, get) => ({
           loadingProjects: false,
         },
       }));
-      
+
       throw error;
     }
   },
-
-
 
   // Create Purchase Request
   createPurchaseRequest: async (requestData) => {
@@ -363,9 +408,16 @@ module.exports = (set, get) => ({
     }));
 
     try {
-      const response = await retryWithBackoff(async () => {
-        return await axiosInstance.post("/v1/pms/purchase-requests", requestData);
-      }, 3, 1000);
+      const response = await retryWithBackoff(
+        async () => {
+          return await axiosInstance.post(
+            "/v1/pms/purchase-requests",
+            requestData,
+          );
+        },
+        3,
+        1000,
+      );
 
       // Refresh the requests list
       await get().fetchPurchaseRequests();
@@ -380,8 +432,8 @@ module.exports = (set, get) => ({
       // Return full axios response so caller can check status (200/201)
       return response;
     } catch (error) {
-      const errorInfo = logError(error, 'createPurchaseRequest');
-      
+      const errorInfo = logError(error, "createPurchaseRequest");
+
       set((state) => ({
         purchaseManagement: {
           ...state.purchaseManagement,
@@ -389,7 +441,7 @@ module.exports = (set, get) => ({
           isCreatingRequest: false,
         },
       }));
-      
+
       throw error;
     }
   },
@@ -405,9 +457,16 @@ module.exports = (set, get) => ({
     }));
 
     try {
-      const response = await retryWithBackoff(async () => {
-        return await axiosInstance.patch(`/v1/pms/purchase-requests/${id}`, requestData);
-      }, 3, 1000);
+      const response = await retryWithBackoff(
+        async () => {
+          return await axiosInstance.patch(
+            `/v1/pms/purchase-requests/${id}`,
+            requestData,
+          );
+        },
+        3,
+        1000,
+      );
 
       // Refresh the requests list
       await get().fetchPurchaseRequests();
@@ -421,8 +480,8 @@ module.exports = (set, get) => ({
 
       return response.data;
     } catch (error) {
-      const errorInfo = logError(error, 'updatePurchaseRequest');
-      
+      const errorInfo = logError(error, "updatePurchaseRequest");
+
       set((state) => ({
         purchaseManagement: {
           ...state.purchaseManagement,
@@ -430,7 +489,7 @@ module.exports = (set, get) => ({
           isUpdatingRequest: false,
         },
       }));
-      
+
       throw error;
     }
   },
@@ -446,9 +505,16 @@ module.exports = (set, get) => ({
     }));
 
     try {
-      const response = await retryWithBackoff(async () => {
-        return await axiosInstance.post(`/v1/pms/purchase-requests/${id}/simple-transition-stage`, transitionData);
-      }, 3, 1000);
+      const response = await retryWithBackoff(
+        async () => {
+          return await axiosInstance.post(
+            `/v1/pms/purchase-requests/${id}/simple-transition-stage`,
+            transitionData,
+          );
+        },
+        3,
+        1000,
+      );
 
       // Refresh the requests list
       await get().fetchPurchaseRequests();
@@ -462,8 +528,8 @@ module.exports = (set, get) => ({
 
       return response.data;
     } catch (error) {
-      const errorInfo = logError(error, 'transitionToNextStage');
-      
+      const errorInfo = logError(error, "transitionToNextStage");
+
       set((state) => ({
         purchaseManagement: {
           ...state.purchaseManagement,
@@ -471,7 +537,7 @@ module.exports = (set, get) => ({
           isTransitioningStage: false,
         },
       }));
-      
+
       throw error;
     }
   },
@@ -487,23 +553,29 @@ module.exports = (set, get) => ({
     }));
 
     try {
-      const response = await retryWithBackoff(async () => {
-        return await axiosInstance.delete(`/v1/pms/purchase-requests/${id}`);
-      }, 3, 1000);
+      const response = await retryWithBackoff(
+        async () => {
+          return await axiosInstance.delete(`/v1/pms/purchase-requests/${id}`);
+        },
+        3,
+        1000,
+      );
 
       // Remove from local state
       set((state) => ({
         purchaseManagement: {
           ...state.purchaseManagement,
-          purchaseRequests: state.purchaseManagement.purchaseRequests.filter(req => req.id !== id),
+          purchaseRequests: state.purchaseManagement.purchaseRequests.filter(
+            (req) => req.id !== id,
+          ),
           isDeletingRequest: false,
         },
       }));
 
       return response.data;
     } catch (error) {
-      const errorInfo = logError(error, 'deletePurchaseRequest');
-      
+      const errorInfo = logError(error, "deletePurchaseRequest");
+
       set((state) => ({
         purchaseManagement: {
           ...state.purchaseManagement,
@@ -511,7 +583,7 @@ module.exports = (set, get) => ({
           isDeletingRequest: false,
         },
       }));
-      
+
       throw error;
     }
   },

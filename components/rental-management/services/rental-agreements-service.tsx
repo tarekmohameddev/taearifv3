@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,10 +20,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   FileText,
   Search,
@@ -33,100 +39,116 @@ import {
   CheckCircle,
   Clock,
   Edit,
-} from "lucide-react"
-import useAuthStore from "@/context/AuthContext"
+} from "lucide-react";
+import useAuthStore from "@/context/AuthContext";
 
 interface RentalAgreement {
-  id: string
-  contractNumber: string
-  propertyId: string
-  propertyTitle: string
-  propertyTitleAr: string
-  propertyAddress: string
-  propertyAddressAr: string
+  id: string;
+  contractNumber: string;
+  propertyId: string;
+  propertyTitle: string;
+  propertyTitleAr: string;
+  propertyAddress: string;
+  propertyAddressAr: string;
   tenant: {
-    name: string
-    nameAr: string
-    email: string
-    phone: string
-    nationalId: string
-    nationality: string
-    nationalityAr: string
-  }
+    name: string;
+    nameAr: string;
+    email: string;
+    phone: string;
+    nationalId: string;
+    nationality: string;
+    nationalityAr: string;
+  };
   landlord: {
-    name: string
-    nameAr: string
-    email: string
-    phone: string
-    nationalId: string
-  }
+    name: string;
+    nameAr: string;
+    email: string;
+    phone: string;
+    nationalId: string;
+  };
   contractDetails: {
-    startDate: string
-    startDateHijri: string
-    endDate: string
-    endDateHijri: string
-    duration: number
-    durationUnit: string
-    durationUnitAr: string
-    monthlyRent: number
-    securityDeposit: number
-    brokerageCommission: number
-    renewalOption: boolean
-    renewalOptionAr: string
-  }
+    startDate: string;
+    startDateHijri: string;
+    endDate: string;
+    endDateHijri: string;
+    duration: number;
+    durationUnit: string;
+    durationUnitAr: string;
+    monthlyRent: number;
+    securityDeposit: number;
+    brokerageCommission: number;
+    renewalOption: boolean;
+    renewalOptionAr: string;
+  };
   paymentTerms: {
-    paymentMethod: string
-    paymentMethodAr: string
-    paymentFrequency: string
-    paymentFrequencyAr: string
-    dueDate: number
-    lateFee: number
-    gracePeriod: number
-  }
-  status: "draft" | "active" | "expired" | "terminated" | "renewed"
-  statusAr: string
-  signedDate: string
-  signedDateHijri: string
+    paymentMethod: string;
+    paymentMethodAr: string;
+    paymentFrequency: string;
+    paymentFrequencyAr: string;
+    dueDate: number;
+    lateFee: number;
+    gracePeriod: number;
+  };
+  status: "draft" | "active" | "expired" | "terminated" | "renewed";
+  statusAr: string;
+  signedDate: string;
+  signedDateHijri: string;
   documents: Array<{
-    type: string
-    typeAr: string
-    url: string
-    uploadedDate: string
-  }>
-  terms: string[]
-  termsAr: string[]
-  notes: string
-  notesAr: string
-  createdBy: string
-  createdByAr: string
+    type: string;
+    typeAr: string;
+    url: string;
+    uploadedDate: string;
+  }>;
+  terms: string[];
+  termsAr: string[];
+  notes: string;
+  notesAr: string;
+  createdBy: string;
+  createdByAr: string;
 }
 
 export function RentalAgreementsService() {
-  const [agreements, setAgreements] = useState<RentalAgreement[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [selectedAgreement, setSelectedAgreement] = useState<RentalAgreement | null>(null)
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const { userData } = useAuthStore()
+  const [agreements, setAgreements] = useState<RentalAgreement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [selectedAgreement, setSelectedAgreement] =
+    useState<RentalAgreement | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const { userData } = useAuthStore();
 
   // Available approved rental requests for creating contracts
   const approvedRequests = [
-    { id: "1", applicantName: "أحمد الراشد", propertyTitle: "شقة فاخرة في حي العليا", rent: 4500 },
-    { id: "2", applicantName: "سارة المنصوري", propertyTitle: "فيلا واسعة في جدة", rent: 8500 },
-    { id: "3", applicantName: "خالد الحربي", propertyTitle: "استوديو حديث في الدمام", rent: 2200 },
-  ]
+    {
+      id: "1",
+      applicantName: "أحمد الراشد",
+      propertyTitle: "شقة فاخرة في حي العليا",
+      rent: 4500,
+    },
+    {
+      id: "2",
+      applicantName: "سارة المنصوري",
+      propertyTitle: "فيلا واسعة في جدة",
+      rent: 8500,
+    },
+    {
+      id: "3",
+      applicantName: "خالد الحربي",
+      propertyTitle: "استوديو حديث في الدمام",
+      rent: 2200,
+    },
+  ];
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchAgreements")
-      return
+      console.log("No token available, skipping fetchAgreements");
+      return;
     }
 
     const fetchAgreements = async () => {
-      setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setAgreements([
         {
@@ -341,70 +363,83 @@ export function RentalAgreementsService() {
           signedDate: "",
           signedDateHijri: "",
           documents: [],
-          terms: ["Short-term rental agreement", "Furnished studio apartment", "Internet and utilities included"],
-          termsAr: ["عقد إيجار قصير الأمد", "شقة استوديو مفروشة", "الإنترنت والخدمات مشمولة"],
+          terms: [
+            "Short-term rental agreement",
+            "Furnished studio apartment",
+            "Internet and utilities included",
+          ],
+          termsAr: [
+            "عقد إيجار قصير الأمد",
+            "شقة استوديو مفروشة",
+            "الإنترنت والخدمات مشمولة",
+          ],
           notes: "Temporary accommodation for work assignment",
           notesAr: "إقامة مؤقتة لمهمة عمل",
           createdBy: "Property Manager",
           createdByAr: "مدير العقارات",
         },
-      ])
-      setLoading(false)
-    }
+      ]);
+      setLoading(false);
+    };
 
-    fetchAgreements()
-  }, [userData?.token])
+    fetchAgreements();
+  }, [userData?.token]);
 
   const filteredAgreements = agreements.filter((agreement) => {
     const matchesSearch =
-      agreement.tenant.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agreement.propertyTitleAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agreement.contractNumber.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === "all" || agreement.status === filterStatus
-    return matchesSearch && matchesStatus
-  })
+      agreement.tenant.nameAr
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      agreement.propertyTitleAr
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      agreement.contractNumber.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || agreement.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "draft":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
       case "active":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "expired":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       case "terminated":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 text-orange-800";
       case "renewed":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "draft":
-        return <Edit className="h-4 w-4" />
+        return <Edit className="h-4 w-4" />;
       case "active":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "expired":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
       case "terminated":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
       case "renewed":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       default:
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
     }
-  }
+  };
 
   const getDaysUntilExpiry = (endDate: string) => {
-    const today = new Date()
-    const expiry = new Date(endDate)
-    const diffTime = expiry.getTime() - today.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
-  }
+    const today = new Date();
+    const expiry = new Date(endDate);
+    const diffTime = expiry.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
@@ -412,11 +447,13 @@ export function RentalAgreementsService() {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+            <p className="text-lg text-gray-500">
+              يرجى تسجيل الدخول لعرض المحتوى
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -440,7 +477,7 @@ export function RentalAgreementsService() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -449,7 +486,9 @@ export function RentalAgreementsService() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">طلبات الإيجار</h2>
-          <p className="text-muted-foreground">إدارة طلبات الإيجار النشطة والمنتهية</p>
+          <p className="text-muted-foreground">
+            إدارة طلبات الإيجار النشطة والمنتهية
+          </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
@@ -461,7 +500,9 @@ export function RentalAgreementsService() {
           <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>إنشاء عقد إيجار جديد</DialogTitle>
-              <DialogDescription>إنشاء عقد إيجار من طلب موافق عليه</DialogDescription>
+              <DialogDescription>
+                إنشاء عقد إيجار من طلب موافق عليه
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
@@ -473,7 +514,8 @@ export function RentalAgreementsService() {
                   <SelectContent>
                     {approvedRequests.map((request) => (
                       <SelectItem key={request.id} value={request.id}>
-                        {request.applicantName} - {request.propertyTitle} ({request.rent.toLocaleString()} ر.س/شهر)
+                        {request.applicantName} - {request.propertyTitle} (
+                        {request.rent.toLocaleString()} ر.س/شهر)
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -495,7 +537,12 @@ export function RentalAgreementsService() {
                 <div className="space-y-2">
                   <Label htmlFor="duration">مدة العقد</Label>
                   <div className="flex gap-2">
-                    <Input id="duration" type="number" placeholder="12" className="flex-1" />
+                    <Input
+                      id="duration"
+                      type="number"
+                      placeholder="12"
+                      className="flex-1"
+                    />
                     <Select>
                       <SelectTrigger className="w-24">
                         <SelectValue placeholder="شهر" />
@@ -509,7 +556,11 @@ export function RentalAgreementsService() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="security-deposit">مبلغ التأمين (ر.س)</Label>
-                  <Input id="security-deposit" type="number" placeholder="9000" />
+                  <Input
+                    id="security-deposit"
+                    type="number"
+                    placeholder="9000"
+                  />
                 </div>
               </div>
 
@@ -572,7 +623,11 @@ export function RentalAgreementsService() {
 
               <div className="space-y-2">
                 <Label htmlFor="special-terms">شروط خاصة</Label>
-                <Textarea id="special-terms" placeholder="أي شروط خاصة للعقد..." rows={3} />
+                <Textarea
+                  id="special-terms"
+                  placeholder="أي شروط خاصة للعقد..."
+                  rows={3}
+                />
               </div>
 
               <div className="space-y-2">
@@ -581,10 +636,15 @@ export function RentalAgreementsService() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateDialogOpen(false)}
+              >
                 إلغاء
               </Button>
-              <Button onClick={() => setIsCreateDialogOpen(false)}>إنشاء العقد</Button>
+              <Button onClick={() => setIsCreateDialogOpen(false)}>
+                إنشاء العقد
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -620,22 +680,32 @@ export function RentalAgreementsService() {
       {/* Agreements List */}
       <div className="space-y-4">
         {filteredAgreements.map((agreement) => {
-          const daysUntilExpiry = getDaysUntilExpiry(agreement.contractDetails.endDate)
-          const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0
+          const daysUntilExpiry = getDaysUntilExpiry(
+            agreement.contractDetails.endDate,
+          );
+          const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
 
           return (
-            <Card key={agreement.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={agreement.id}
+              className="hover:shadow-md transition-shadow"
+            >
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="space-y-3 flex-1">
                     <div className="flex items-center space-x-3 space-x-reverse">
-                      <h3 className="font-semibold text-lg">{agreement.contractNumber}</h3>
+                      <h3 className="font-semibold text-lg">
+                        {agreement.contractNumber}
+                      </h3>
                       <Badge className={getStatusColor(agreement.status)}>
                         {getStatusIcon(agreement.status)}
                         <span className="mr-1">{agreement.statusAr}</span>
                       </Badge>
                       {isExpiringSoon && (
-                        <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                        <Badge
+                          variant="outline"
+                          className="bg-yellow-50 text-yellow-700 border-yellow-200"
+                        >
                           <AlertTriangle className="h-3 w-3 ml-1" />
                           ينتهي خلال {daysUntilExpiry} يوم
                         </Badge>
@@ -658,7 +728,8 @@ export function RentalAgreementsService() {
                           <DollarSign className="h-3 w-3 text-muted-foreground" />
                           <span className="font-medium">الإيجار الشهري:</span>
                           <span className="font-bold text-green-600">
-                            {agreement.contractDetails.monthlyRent.toLocaleString()} ر.س
+                            {agreement.contractDetails.monthlyRent.toLocaleString()}{" "}
+                            ر.س
                           </span>
                         </div>
                       </div>
@@ -667,7 +738,9 @@ export function RentalAgreementsService() {
                         <div className="flex items-center space-x-2 space-x-reverse text-sm">
                           <Calendar className="h-3 w-3 text-muted-foreground" />
                           <span className="font-medium">تاريخ البداية:</span>
-                          <span>{agreement.contractDetails.startDateHijri}</span>
+                          <span>
+                            {agreement.contractDetails.startDateHijri}
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2 space-x-reverse text-sm">
                           <Calendar className="h-3 w-3 text-muted-foreground" />
@@ -678,7 +751,8 @@ export function RentalAgreementsService() {
                           <FileText className="h-3 w-3 text-muted-foreground" />
                           <span className="font-medium">المدة:</span>
                           <span>
-                            {agreement.contractDetails.duration} {agreement.contractDetails.durationUnitAr}
+                            {agreement.contractDetails.duration}{" "}
+                            {agreement.contractDetails.durationUnitAr}
                           </span>
                         </div>
                       </div>
@@ -686,22 +760,35 @@ export function RentalAgreementsService() {
 
                     {agreement.notesAr && (
                       <div className="p-3 bg-muted rounded-md">
-                        <p className="text-sm text-muted-foreground">{agreement.notesAr}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {agreement.notesAr}
+                        </p>
                       </div>
                     )}
                   </div>
 
                   <div className="flex flex-col items-end space-y-2 ml-4">
                     <div className="text-sm text-muted-foreground text-right">
-                      <div>مبلغ التأمين: {agreement.contractDetails.securityDeposit.toLocaleString()} ر.س</div>
+                      <div>
+                        مبلغ التأمين:{" "}
+                        {agreement.contractDetails.securityDeposit.toLocaleString()}{" "}
+                        ر.س
+                      </div>
                       <div>
                         إجمالي القيمة:{" "}
-                        {(agreement.contractDetails.monthlyRent * agreement.contractDetails.duration).toLocaleString()}{" "}
+                        {(
+                          agreement.contractDetails.monthlyRent *
+                          agreement.contractDetails.duration
+                        ).toLocaleString()}{" "}
                         ر.س
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => setSelectedAgreement(agreement)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSelectedAgreement(agreement)}
+                      >
                         <Eye className="h-3 w-3 ml-1" />
                         التفاصيل
                       </Button>
@@ -720,17 +807,26 @@ export function RentalAgreementsService() {
                 </div>
               </CardContent>
             </Card>
-          )
+          );
         })}
       </div>
 
       {/* Agreement Details Dialog */}
-      <Dialog open={!!selectedAgreement} onOpenChange={() => setSelectedAgreement(null)}>
-        <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto text-right" dir="rtl">
+      <Dialog
+        open={!!selectedAgreement}
+        onOpenChange={() => setSelectedAgreement(null)}
+      >
+        <DialogContent
+          className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto text-right"
+          dir="rtl"
+        >
           <DialogHeader>
-            <DialogTitle className="text-right" dir="rtl">تفاصيل طلب الإيجار</DialogTitle>
+            <DialogTitle className="text-right" dir="rtl">
+              تفاصيل طلب الإيجار
+            </DialogTitle>
             <DialogDescription>
-              عقد رقم {selectedAgreement?.contractNumber} - {selectedAgreement?.tenant.nameAr}
+              عقد رقم {selectedAgreement?.contractNumber} -{" "}
+              {selectedAgreement?.tenant.nameAr}
             </DialogDescription>
           </DialogHeader>
           {selectedAgreement && (
@@ -749,20 +845,30 @@ export function RentalAgreementsService() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label className="text-sm font-medium">رقم العقد</Label>
-                        <p className="text-sm text-muted-foreground">{selectedAgreement.contractNumber}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedAgreement.contractNumber}
+                        </p>
                       </div>
                       <div>
                         <Label className="text-sm font-medium">الحالة</Label>
-                        <Badge className={getStatusColor(selectedAgreement.status)}>{selectedAgreement.statusAr}</Badge>
+                        <Badge
+                          className={getStatusColor(selectedAgreement.status)}
+                        >
+                          {selectedAgreement.statusAr}
+                        </Badge>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">تاريخ البداية</Label>
+                        <Label className="text-sm font-medium">
+                          تاريخ البداية
+                        </Label>
                         <p className="text-sm text-muted-foreground">
                           {selectedAgreement.contractDetails.startDateHijri}
                         </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">تاريخ الانتهاء</Label>
+                        <Label className="text-sm font-medium">
+                          تاريخ الانتهاء
+                        </Label>
                         <p className="text-sm text-muted-foreground">
                           {selectedAgreement.contractDetails.endDateHijri}
                         </p>
@@ -775,7 +881,9 @@ export function RentalAgreementsService() {
                         </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">خيار التجديد</Label>
+                        <Label className="text-sm font-medium">
+                          خيار التجديد
+                        </Label>
                         <p className="text-sm text-muted-foreground">
                           {selectedAgreement.contractDetails.renewalOptionAr}
                         </p>
@@ -786,28 +894,40 @@ export function RentalAgreementsService() {
                     <h4 className="font-semibold">التفاصيل المالية</h4>
                     <div className="space-y-2">
                       <div>
-                        <Label className="text-sm font-medium">الإيجار الشهري</Label>
+                        <Label className="text-sm font-medium">
+                          الإيجار الشهري
+                        </Label>
                         <p className="text-sm text-muted-foreground font-bold text-green-600">
-                          {selectedAgreement.contractDetails.monthlyRent.toLocaleString()} ر.س
+                          {selectedAgreement.contractDetails.monthlyRent.toLocaleString()}{" "}
+                          ر.س
                         </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">مبلغ التأمين</Label>
+                        <Label className="text-sm font-medium">
+                          مبلغ التأمين
+                        </Label>
                         <p className="text-sm text-muted-foreground">
-                          {selectedAgreement.contractDetails.securityDeposit.toLocaleString()} ر.س
+                          {selectedAgreement.contractDetails.securityDeposit.toLocaleString()}{" "}
+                          ر.س
                         </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">عمولة الوساطة</Label>
+                        <Label className="text-sm font-medium">
+                          عمولة الوساطة
+                        </Label>
                         <p className="text-sm text-muted-foreground">
-                          {selectedAgreement.contractDetails.brokerageCommission.toLocaleString()} ر.س
+                          {selectedAgreement.contractDetails.brokerageCommission.toLocaleString()}{" "}
+                          ر.س
                         </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">إجمالي القيمة</Label>
+                        <Label className="text-sm font-medium">
+                          إجمالي القيمة
+                        </Label>
                         <p className="text-sm text-muted-foreground">
                           {(
-                            selectedAgreement.contractDetails.monthlyRent * selectedAgreement.contractDetails.duration
+                            selectedAgreement.contractDetails.monthlyRent *
+                            selectedAgreement.contractDetails.duration
                           ).toLocaleString()}{" "}
                           ر.س
                         </p>
@@ -821,7 +941,9 @@ export function RentalAgreementsService() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium">طريقة الدفع</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.paymentTerms.paymentMethodAr}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.paymentTerms.paymentMethodAr}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">تكرار الدفع</Label>
@@ -830,14 +952,20 @@ export function RentalAgreementsService() {
                       </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">تاريخ الاستحقاق</Label>
+                      <Label className="text-sm font-medium">
+                        تاريخ الاستحقاق
+                      </Label>
                       <p className="text-sm text-muted-foreground">
                         اليوم {selectedAgreement.paymentTerms.dueDate} من كل شهر
                       </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">رسوم التأخير</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.paymentTerms.lateFee} ر.س</p>
+                      <Label className="text-sm font-medium">
+                        رسوم التأخير
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.paymentTerms.lateFee} ر.س
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -849,24 +977,42 @@ export function RentalAgreementsService() {
                     <h4 className="font-semibold">معلومات المستأجر</h4>
                     <div className="space-y-2">
                       <div>
-                        <Label className="text-sm font-medium">الاسم الكامل</Label>
-                        <p className="text-sm text-muted-foreground">{selectedAgreement.tenant.nameAr}</p>
+                        <Label className="text-sm font-medium">
+                          الاسم الكامل
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedAgreement.tenant.nameAr}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">رقم الهوية</Label>
-                        <p className="text-sm text-muted-foreground">{selectedAgreement.tenant.nationalId}</p>
+                        <Label className="text-sm font-medium">
+                          رقم الهوية
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedAgreement.tenant.nationalId}
+                        </p>
                       </div>
                       <div>
                         <Label className="text-sm font-medium">الجنسية</Label>
-                        <p className="text-sm text-muted-foreground">{selectedAgreement.tenant.nationalityAr}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedAgreement.tenant.nationalityAr}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">رقم الهاتف</Label>
-                        <p className="text-sm text-muted-foreground">{selectedAgreement.tenant.phone}</p>
+                        <Label className="text-sm font-medium">
+                          رقم الهاتف
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedAgreement.tenant.phone}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">البريد الإلكتروني</Label>
-                        <p className="text-sm text-muted-foreground">{selectedAgreement.tenant.email}</p>
+                        <Label className="text-sm font-medium">
+                          البريد الإلكتروني
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedAgreement.tenant.email}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -874,20 +1020,36 @@ export function RentalAgreementsService() {
                     <h4 className="font-semibold">معلومات المؤجر</h4>
                     <div className="space-y-2">
                       <div>
-                        <Label className="text-sm font-medium">الاسم الكامل</Label>
-                        <p className="text-sm text-muted-foreground">{selectedAgreement.landlord.nameAr}</p>
+                        <Label className="text-sm font-medium">
+                          الاسم الكامل
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedAgreement.landlord.nameAr}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">رقم الهوية</Label>
-                        <p className="text-sm text-muted-foreground">{selectedAgreement.landlord.nationalId}</p>
+                        <Label className="text-sm font-medium">
+                          رقم الهوية
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedAgreement.landlord.nationalId}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">رقم الهاتف</Label>
-                        <p className="text-sm text-muted-foreground">{selectedAgreement.landlord.phone}</p>
+                        <Label className="text-sm font-medium">
+                          رقم الهاتف
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedAgreement.landlord.phone}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">البريد الإلكتروني</Label>
-                        <p className="text-sm text-muted-foreground">{selectedAgreement.landlord.email}</p>
+                        <Label className="text-sm font-medium">
+                          البريد الإلكتروني
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedAgreement.landlord.email}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -898,11 +1060,15 @@ export function RentalAgreementsService() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium">اسم العقار</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.propertyTitleAr}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.propertyTitleAr}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">العنوان</Label>
-                      <p className="text-sm text-muted-foreground">{selectedAgreement.propertyAddressAr}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAgreement.propertyAddressAr}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -913,7 +1079,10 @@ export function RentalAgreementsService() {
                   <h4 className="font-semibold mb-3">شروط وأحكام العقد</h4>
                   <div className="space-y-2">
                     {selectedAgreement.termsAr.map((term, index) => (
-                      <div key={index} className="flex items-start space-x-3 space-x-reverse p-3 bg-muted rounded-md">
+                      <div
+                        key={index}
+                        className="flex items-start space-x-3 space-x-reverse p-3 bg-muted rounded-md"
+                      >
                         <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5">
                           {index + 1}
                         </div>
@@ -926,7 +1095,9 @@ export function RentalAgreementsService() {
                   <div>
                     <h4 className="font-semibold mb-2">ملاحظات إضافية</h4>
                     <div className="p-3 bg-blue-50 rounded-md">
-                      <p className="text-sm text-blue-800">{selectedAgreement.notesAr}</p>
+                      <p className="text-sm text-blue-800">
+                        {selectedAgreement.notesAr}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -936,12 +1107,19 @@ export function RentalAgreementsService() {
                 {selectedAgreement.documents.length > 0 ? (
                   <div className="space-y-3">
                     {selectedAgreement.documents.map((doc, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-md">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 border rounded-md"
+                      >
                         <div className="flex items-center space-x-3 space-x-reverse">
                           <FileText className="h-4 w-4 text-muted-foreground" />
                           <div>
-                            <span className="text-sm font-medium">{doc.typeAr}</span>
-                            <p className="text-xs text-muted-foreground">تم الرفع في: {doc.uploadedDate}</p>
+                            <span className="text-sm font-medium">
+                              {doc.typeAr}
+                            </span>
+                            <p className="text-xs text-muted-foreground">
+                              تم الرفع في: {doc.uploadedDate}
+                            </p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -955,13 +1133,18 @@ export function RentalAgreementsService() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground text-center py-8">لم يتم رفع مستندات بعد</p>
+                  <p className="text-sm text-muted-foreground text-center py-8">
+                    لم يتم رفع مستندات بعد
+                  </p>
                 )}
               </TabsContent>
             </Tabs>
           )}
           <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={() => setSelectedAgreement(null)}>
+            <Button
+              variant="outline"
+              onClick={() => setSelectedAgreement(null)}
+            >
               إغلاق
             </Button>
             <Button variant="outline">
@@ -983,7 +1166,9 @@ export function RentalAgreementsService() {
           <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium mb-2">لم يتم العثور على عقود</h3>
           <p className="text-muted-foreground mb-4">
-            {searchTerm || filterStatus !== "all" ? "جرب تعديل معايير البحث" : "لا توجد عقود إيجار حالياً"}
+            {searchTerm || filterStatus !== "all"
+              ? "جرب تعديل معايير البحث"
+              : "لا توجد عقود إيجار حالياً"}
           </p>
           <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="ml-2 h-4 w-4" />
@@ -992,5 +1177,5 @@ export function RentalAgreementsService() {
         </div>
       )}
     </div>
-  )
+  );
 }

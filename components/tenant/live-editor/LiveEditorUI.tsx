@@ -49,13 +49,14 @@ import { CachedComponent, EmptyPage } from "@/services-liveeditor/live-editor";
 
 import {
   AVAILABLE_SECTIONS,
+  getAvailableSectionsTranslated,
   getSectionIcon,
+  getSectionIconTranslated,
 } from "@/components/tenant/live-editor/EditorSidebar/constants";
 
 // Import static components
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
-
 
 // ============================================================================
 // واجهة المستخدم الرئيسية للـ LiveEditor
@@ -106,7 +107,7 @@ const AutoFrame = ({
     }
 
     const styleElements = document.querySelectorAll(
-      'style, link[rel="stylesheet"]'
+      'style, link[rel="stylesheet"]',
     );
     const iframeHead = iframeDoc.head;
 
@@ -175,7 +176,7 @@ const AutoFrame = ({
 
     // نسخ الـ meta tags المهمة
     const metaTags = document.querySelectorAll(
-      'meta[name="viewport"], meta[charset]'
+      'meta[name="viewport"], meta[charset]',
     );
     metaTags.forEach((metaTag) => {
       const clonedMeta = metaTag.cloneNode(true) as HTMLMetaElement;
@@ -246,10 +247,10 @@ const AutoFrame = ({
         // انتظار تحميل الـ styles ثم إعلام أن الـ iframe جاهز
         const checkStylesLoaded = () => {
           const iframeStyles = doc.querySelectorAll(
-            'style, link[rel="stylesheet"]'
+            'style, link[rel="stylesheet"]',
           );
           const parentStyles = document.querySelectorAll(
-            'style, link[rel="stylesheet"]'
+            'style, link[rel="stylesheet"]',
           );
 
           if (iframeStyles.length >= parentStyles.length) {
@@ -327,21 +328,23 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const globalFooterData = useEditorStore((s) => s.globalFooterData);
   const setGlobalHeaderData = useEditorStore((s) => s.setGlobalHeaderData);
   const setGlobalFooterData = useEditorStore((s) => s.setGlobalFooterData);
-  
+
   // Initialize data immediately if not exists
   if (!globalHeaderData || Object.keys(globalHeaderData).length === 0) {
-    const { getDefaultHeaderData } = require("@/context-liveeditor/editorStoreFunctions/headerFunctions");
+    const {
+      getDefaultHeaderData,
+    } = require("@/context-liveeditor/editorStoreFunctions/headerFunctions");
     const defaultHeaderData = getDefaultHeaderData();
     setGlobalHeaderData(defaultHeaderData);
   }
-  
+
   if (!globalFooterData || Object.keys(globalFooterData).length === 0) {
-    const { getDefaultFooterData } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
+    const {
+      getDefaultFooterData,
+    } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
     const defaultFooterData = getDefaultFooterData();
     setGlobalFooterData(defaultFooterData);
   }
-  
-  
 
   const [sidebarWidth, setSidebarWidth] = useState(state.sidebarWidth);
   const [selectedDevice, setSelectedDevice] = useState<DeviceType>("laptop");
@@ -421,7 +424,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     (componentType: string): string => {
       return `${componentType}1`;
     },
-    []
+    [],
   );
 
   // دالة إضافة مكون جديد - محسنة لتعمل مع النظام الجديد
@@ -455,12 +458,11 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         },
       };
 
-
       // إضافة المكون في الموضع المحدد مع تحديث محسن
       const updatedComponents = [...pageComponents];
       const targetIndex = Math.min(
         componentData.index,
-        updatedComponents.length
+        updatedComponents.length,
       );
       updatedComponents.splice(targetIndex, 0, newComponent);
 
@@ -475,7 +477,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       // إعادة تعيين علامة الإغلاق اليدوي عند إضافة مكون جديد
       setWasComponentsSidebarManuallyClosed(false);
     },
-    [pageComponents, state, getComponentNameWithOne]
+    [pageComponents, state, getComponentNameWithOne],
   );
 
   // دالة نقل مكون محسنة - تستقبل النتيجة المعالجة مسبقاً
@@ -486,11 +488,10 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       finalIndex: number,
       destinationZone: string,
       updatedComponents?: any[],
-      debugInfo?: PositionDebugInfo
+      debugInfo?: PositionDebugInfo,
     ) => {
       // إذا كانت البيانات المحدثة متوفرة، استخدمها مباشرة
       if (updatedComponents && debugInfo) {
-
         // تحديث الحالة بالمكونات المحدثة
         state.setPageComponents(updatedComponents);
 
@@ -519,7 +520,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         if (!validation.isValid) {
           console.warn(
             "⚠️ Position validation failed after move:",
-            validation.issues
+            validation.issues,
           );
         }
 
@@ -540,7 +541,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             ...comp.layout,
             row: index,
           },
-        })
+        }),
       );
 
       // استخدام position tracker المحسن
@@ -549,11 +550,10 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         sourceIndex,
         sourceZone,
         finalIndex,
-        destinationZone
+        destinationZone,
       );
 
       if (result.success) {
-
         state.setPageComponents(result.updatedComponents);
         setDebugInfo(result.debugInfo);
 
@@ -561,7 +561,10 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         setTimeout(() => {
           const store = useEditorStore.getState();
           const currentPage = store.currentPage;
-          store.forceUpdatePageComponents(currentPage, result.updatedComponents);
+          store.forceUpdatePageComponents(
+            currentPage,
+            result.updatedComponents,
+          );
         }, 0);
 
         const validation = validateComponentPositions(result.updatedComponents);
@@ -570,7 +573,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         if (!validation.isValid) {
           console.warn(
             "⚠️ Position validation failed after move:",
-            validation.issues
+            validation.issues,
           );
         }
 
@@ -581,7 +584,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         setDebugInfo(result.debugInfo);
       }
     },
-    [pageComponents, state, selectedComponentId]
+    [pageComponents, state, selectedComponentId],
   );
 
   // دالة معالجة معلومات التصحيح
@@ -631,12 +634,12 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             };
           }
           return comp;
-        }
+        },
       );
 
       // تحديث الحالة إذا كانت هناك تغييرات في المواضع
       const hasPositionChanges = componentsWithCorrectPositions.some(
-        (comp: any, index: number) => pageComponents[index].position !== index
+        (comp: any, index: number) => pageComponents[index].position !== index,
       );
 
       if (hasPositionChanges) {
@@ -647,7 +650,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
           const currentPage = store.currentPage;
           store.forceUpdatePageComponents(
             currentPage,
-            componentsWithCorrectPositions
+            componentsWithCorrectPositions,
           );
         }, 0);
         return; // العودة مبكراً لتجنب التحقق المزدوج
@@ -659,7 +662,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       if (!validation.isValid && showDebugPanel) {
         console.warn(
           "⚠️ Position validation issues detected:",
-          validation.issues
+          validation.issues,
         );
       }
     }
@@ -691,8 +694,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         }
         data-live-editor-entry
       >
-                {/* Static Header - Clickable for editing */}
-                <div
+        {/* Static Header - Clickable for editing */}
+        <div
           onClick={() => {
             handleEditClick("global-header");
           }}
@@ -735,7 +738,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             .filter(
               (component: any) =>
                 !component.componentName?.startsWith("header") &&
-                !component.componentName?.startsWith("footer")
+                !component.componentName?.startsWith("footer"),
             )
             .map((component: any, index: number) => (
               <motion.div
@@ -797,8 +800,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             ))}
         </LiveEditorDropZone>
 
-              {/* Static Footer - Clickable for editing */}
-              <div
+        {/* Static Footer - Clickable for editing */}
+        <div
           onClick={() => {
             handleEditClick("global-footer");
           }}
@@ -828,7 +831,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       selectedComponentId,
       handleEditClick,
       handleDeleteClick,
-    ]
+    ],
   );
 
   if (!user) {
@@ -880,15 +883,23 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const ComponentsSidebar = () => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const t = useEditorT();
+
+    // الحصول على الأقسام المترجمة
+    const availableSections = useMemo(() => {
+      return getAvailableSectionsTranslated(t);
+    }, [t]);
 
     const filteredSections = useMemo(
       () =>
-        AVAILABLE_SECTIONS.filter(
+        availableSections.filter(
           (section) =>
             section.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            section.description.toLowerCase().includes(searchTerm.toLowerCase())
+            section.description
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()),
         ),
-      [searchTerm]
+      [availableSections, searchTerm],
     );
 
     return (
@@ -903,7 +914,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-900">Components</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t("live_editor.components")}</h2>
             <motion.button
               onClick={() => setIsExpanded((v) => !v)}
               className="p-1 rounded-md hover:bg-gray-100"
@@ -943,7 +954,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
               >
                 <input
                   type="text"
-                  placeholder="Search components..."
+                  placeholder={t("live_editor.search_components")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -1003,7 +1014,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                         <div className="p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
                           <div className="flex items-center space-x-3">
                             <div className="text-2xl">
-                              {getSectionIcon(section.type)}
+                              {getSectionIconTranslated(section.type, t)}
                             </div>
                             <div className="flex-1">
                               <h3 className="font-medium text-gray-900">
@@ -1051,7 +1062,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                       />
                     </svg>
-                    <p>No components found</p>
+                    <p>{t("live_editor.no_components_found")}</p>
                   </motion.div>
                 )}
               </motion.div>
@@ -1104,8 +1115,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   className="p-2 rounded-md hover:bg-gray-100 transition-colors"
                   title={
                     isComponentsSidebarOpen
-                      ? "Hide Components"
-                      : "Show Components"
+                      ? t("live_editor.hide_components")
+                      : t("live_editor.show_components")
                   }
                 >
                   <svg
@@ -1127,7 +1138,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   </svg>
                 </button>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {pageTitle} Editor
+                  {pageTitle} {t("live_editor.editor")}
                 </h1>
               </div>
               <div className="flex items-center space-x-3">
@@ -1140,7 +1151,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                         ? "bg-white shadow-sm text-blue-600"
                         : "text-gray-600 hover:text-gray-800 hover:bg-gray-200"
                     }`}
-                    title="Mobile View (375x667)"
+                    title={t("live_editor.mobile_view")}
                   >
                     <svg
                       className="w-5 h-5"
@@ -1158,7 +1169,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                         ? "bg-white shadow-sm text-blue-600"
                         : "text-gray-600 hover:text-gray-800 hover:bg-gray-200"
                     }`}
-                    title="Tablet View (768x1024)"
+                    title={t("live_editor.tablet_view")}
                   >
                     <svg
                       className="w-5 h-5"
@@ -1176,7 +1187,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                         ? "bg-white shadow-sm text-blue-600"
                         : "text-gray-600 hover:text-gray-800 hover:bg-gray-200"
                     }`}
-                    title="Desktop View (Full Screen)"
+                    title={t("live_editor.desktop_view")}
                   >
                     <svg
                       className="w-5 h-5"
@@ -1212,7 +1223,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                     />
                   </svg>
-                  Add New Section
+                  {t("live_editor.add_new_section")}
                 </button>
 
                 <button
@@ -1232,7 +1243,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                   </svg>
-                  Delete Page
+                  {t("live_editor.delete_page")}
                 </button>
                 {/* Debug Toggle Button - Development Only */}
                 {process.env.NODE_ENV === "development" && (
@@ -1258,7 +1269,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                         d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
                       />
                     </svg>
-                    Debug
+                    {t("live_editor.debug")}
                   </button>
                 )}
 
@@ -1266,7 +1277,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   onClick={openMainSidebar}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  Open Editor
+                  {t("live_editor.open_editor")}
                 </button>
               </div>
             </div>
@@ -1360,10 +1371,11 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{t("editor.delete_component")}</AlertDialogTitle>
+              <AlertDialogTitle>
+                {t("editor.delete_component")}
+              </AlertDialogTitle>
               <AlertDialogDescription>
-                This section will be completely removed from your website along
-                with all associated data.
+                {t("live_editor.delete_component_description")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -1405,11 +1417,10 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                 </div>
                 <div>
                   <AlertDialogTitle className="text-2xl font-bold text-gray-900">
-                    Delete Page Permanently
+                    {t("live_editor.delete_page_permanently")}
                   </AlertDialogTitle>
                   <p className="text-sm text-gray-500 mt-1">
-                    This action will remove the entire page and all its
-                    components
+                    {t("live_editor.delete_page_description")}
                   </p>
                 </div>
               </div>
@@ -1430,38 +1441,37 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   </div>
                   <div className="flex-1">
                     <h4 className="text-lg font-semibold text-red-800 mb-2">
-                      ⚠️ CRITICAL WARNING: This action cannot be undone!
+                      ⚠️ {t("live_editor.critical_warning")}
                     </h4>
                     <ul className="text-red-700 space-y-1 text-sm">
                       <li>
-                        • The entire page "{pageTitle}" will be permanently
-                        deleted
+                        • {t("live_editor.page_will_be_deleted")}
                       </li>
                       <li>
-                        • All components and their data will be lost forever
+                        • {t("live_editor.all_components_lost")}
                       </li>
                       <li>
-                        • This action will affect your live website immediately
+                        • {t("live_editor.affect_live_website")}
                       </li>
-                      <li>• No backup will be created automatically</li>
+                      <li>• {t("live_editor.no_backup")}</li>
                     </ul>
                   </div>
                 </div>
               </div>
               <div className="space-y-4">
                 <p className="text-gray-700 font-medium">
-                  To confirm deletion, please type the following text exactly:
+                  {t("live_editor.confirm_deletion")}
                 </p>
                 <div className="bg-gray-100 p-3 rounded-lg border">
                   <p className="text-sm font-mono text-gray-800">
-                    "I am sure I want to delete this page"
+                    "{t("live_editor.confirmation_text")}"
                   </p>
                 </div>
                 <input
                   type="text"
                   value={deletePageConfirmation}
                   onChange={(e) => setDeletePageConfirmation(e.target.value)}
-                  placeholder="Type the confirmation text here..."
+                  placeholder={t("live_editor.type_confirmation")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
                 />
               </div>
@@ -1471,7 +1481,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                 onClick={cancelDeletePage}
                 className="flex-1 sm:flex-none bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 px-6 py-3"
               >
-                Cancel
+                {t("theme_selector.cancel")}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmDeletePage}
@@ -1481,7 +1491,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                 }
                 className="flex-1 sm:flex-none bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 border-0 px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
-                Yes, I'm Sure
+                {t("live_editor.yes_im_sure")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -1498,7 +1508,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             <div className="p-4 border-b border-gray-200 bg-gray-50">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-gray-900">
-                  🔍 Position Debug Panel
+                  🔍 {t("live_editor.position_debug_panel")}
                 </h3>
                 <div className="flex items-center space-x-2">
                   <button
@@ -1506,7 +1516,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                     className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
                     title="Reset all positions"
                   >
-                    Reset
+                    {t("live_editor.reset")}
                   </button>
                   <button
                     onClick={() => setShowDebugPanel(false)}
@@ -1537,8 +1547,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   <div
                     className={`text-xs font-medium mb-2 ${positionValidation.isValid ? "text-green-600" : "text-red-600"}`}
                   >
-                    Position Validation:{" "}
-                    {positionValidation.isValid ? "✅ Valid" : "❌ Invalid"}
+                    {t("live_editor.position_validation")}:{" "}
+                    {positionValidation.isValid ? `✅ ${t("live_editor.valid")}` : `❌ ${t("live_editor.invalid")}`}
                   </div>
                   {!positionValidation.isValid && (
                     <div className="space-y-1">
@@ -1558,7 +1568,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                           >
                             💡 {suggestion}
                           </div>
-                        )
+                        ),
                       )}
                     </div>
                   )}
@@ -1568,7 +1578,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
               {/* Current Components */}
               <div className="mb-4">
                 <div className="text-xs font-medium text-gray-700 mb-2">
-                  Current Components ({pageComponents.length})
+                  {t("live_editor.current_components")} ({pageComponents.length})
                 </div>
                 <div className="space-y-1">
                   {pageComponents.map((comp: any, index: number) => (
@@ -1596,29 +1606,29 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
               {debugInfo && (
                 <div className="mb-4">
                   <div className="text-xs font-medium text-gray-700 mb-2">
-                    Last Move Operation
+                    {t("live_editor.last_move_operation")}
                   </div>
                   <div className="text-xs bg-gray-50 p-2 rounded border">
                     <div>
-                      <strong>Component:</strong>{" "}
+                      <strong>{t("live_editor.component")}:</strong>{" "}
                       {debugInfo.operation.componentName}
                     </div>
                     <div>
-                      <strong>From:</strong> {debugInfo.operation.sourceIndex} →{" "}
-                      <strong>To:</strong> {debugInfo.calculatedIndex}
+                      <strong>{t("live_editor.from")}:</strong> {debugInfo.operation.sourceIndex} →{" "}
+                      <strong>{t("live_editor.to")}:</strong> {debugInfo.calculatedIndex}
                     </div>
                     <div>
-                      <strong>Final:</strong> {debugInfo.finalIndex}
+                      <strong>{t("live_editor.final")}:</strong> {debugInfo.finalIndex}
                     </div>
                     {debugInfo.adjustmentReason && (
                       <div>
-                        <strong>Reason:</strong> {debugInfo.adjustmentReason}
+                        <strong>{t("live_editor.reason")}:</strong> {debugInfo.adjustmentReason}
                       </div>
                     )}
                     <div>
-                      <strong>Timestamp:</strong>{" "}
+                      <strong>{t("live_editor.timestamp")}:</strong>{" "}
                       {new Date(
-                        debugInfo.operation.timestamp
+                        debugInfo.operation.timestamp,
                       ).toLocaleTimeString()}
                     </div>
                   </div>
@@ -1633,7 +1643,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   }}
                   className="w-full text-xs px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                 >
-                  Generate Full Report (Check Console)
+                  {t("live_editor.generate_full_report")}
                 </button>
                 <button
                   onClick={() => {
@@ -1641,7 +1651,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   }}
                   className="w-full text-xs px-3 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
                 >
-                  Toggle Verbose Logging
+                  {t("live_editor.toggle_verbose_logging")}
                 </button>
                 <button
                   onClick={() => {
@@ -1649,7 +1659,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   }}
                   className="w-full text-xs px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
                 >
-                  Debug Changes
+                  {t("live_editor.debug_changes")}
                 </button>
               </div>
             </div>

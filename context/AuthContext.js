@@ -41,17 +41,23 @@ const useAuthStore = create((set, get) => ({
     set({ IsLoading: true, error: null });
     if (get().IsDone === true) return;
     set({ IsDone: true, error: null });
-    
+
     // فتح axios قبل جلب البيانات لضمان عدم حظر الطلبات
     unlockAxios();
-    
+
     try {
       console.log("[AuthContext] Fetching user info...");
       const userInfoResponse = await fetch("/api/user/getUserInfo");
-      console.log("[AuthContext] getUserInfo response status:", userInfoResponse.status);
+      console.log(
+        "[AuthContext] getUserInfo response status:",
+        userInfoResponse.status,
+      );
 
       if (!userInfoResponse.ok) {
-        console.log("[AuthContext] getUserInfo failed with status:", userInfoResponse.status);
+        console.log(
+          "[AuthContext] getUserInfo failed with status:",
+          userInfoResponse.status,
+        );
         set({ authenticated: false });
         throw new Error("فشل في جلب بيانات المستخدم");
       }
@@ -69,7 +75,7 @@ const useAuthStore = create((set, get) => ({
         IsLoading: true,
         error: null,
       });
-      
+
       // تحديث localStorage للتوافق مع AuthProvider
       try {
         localStorage.setItem("user", JSON.stringify(userData));
@@ -116,32 +122,31 @@ const useAuthStore = create((set, get) => ({
       set({ IsDone: false, error: null });
     }
   },
-  
+
   clearMessage: () => {
     set((state) => ({
       userData: {
         ...state.userData,
-        message: null
-      }
-    }))
+        message: null,
+      },
+    }));
   },
 
   setMessage: (message) => {
     set((state) => ({
       userData: {
         ...state.userData,
-        message: message
-      }
-    }))
+        message: message,
+      },
+    }));
   },
 
-    
   login: async (email, password, recaptchaToken) => {
     set({ IsLoading: true, errorLogin: null, errorLoginATserver: null });
-    
+
     // فتح axios قبل تسجيل الدخول لضمان عدم حظر الطلبات
     unlockAxios();
-    
+
     try {
       const externalResponse = await fetch(
         `${process.env.NEXT_PUBLIC_Backend_URL}/login`,
@@ -199,13 +204,18 @@ const useAuthStore = create((set, get) => ({
         onboarding_completed: user.onboarding_completed || false,
       };
       set({ UserIslogged: true, userData: safeUserData });
-      
+
       // تحديث localStorage للتوافق مع AuthProvider
       try {
         localStorage.setItem("user", JSON.stringify(safeUserData));
-        console.log("[AuthContext] Updated localStorage with user data from login");
+        console.log(
+          "[AuthContext] Updated localStorage with user data from login",
+        );
       } catch (error) {
-        console.log("[AuthContext] Error updating localStorage from login:", error);
+        console.log(
+          "[AuthContext] Error updating localStorage from login:",
+          error,
+        );
       }
 
       unlockAxios(); // ✅ إعادة تفعيل axios
@@ -263,7 +273,7 @@ const useAuthStore = create((set, get) => ({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`
+        `${process.env.NEXT_PUBLIC_Backend_URL}/auth/google/redirect`,
       );
       const data = await response.json();
 
@@ -303,19 +313,24 @@ const useAuthStore = create((set, get) => ({
         token,
         onboarding_completed: user.onboarding_completed || false,
       };
-      
+
       set({
         UserIslogged: true,
         authenticated: true,
         userData,
       });
-      
+
       // تحديث localStorage للتوافق مع AuthProvider
       try {
         localStorage.setItem("user", JSON.stringify(userData));
-        console.log("[AuthContext] Updated localStorage with user data from loginWithToken");
+        console.log(
+          "[AuthContext] Updated localStorage with user data from loginWithToken",
+        );
       } catch (error) {
-        console.log("[AuthContext] Error updating localStorage from loginWithToken:", error);
+        console.log(
+          "[AuthContext] Error updating localStorage from loginWithToken:",
+          error,
+        );
       }
 
       unlockAxios(); // ✅ إعادة تفعيل axios
@@ -357,7 +372,7 @@ const useAuthStore = create((set, get) => ({
       const userData = response.data;
       set({ liveEditorUser: userData });
       localStorage.setItem("liveEditorUser", JSON.stringify(userData));
-      
+
       // Set cookie for backend APIs
       try {
         document.cookie = `user=${encodeURIComponent(
@@ -378,7 +393,15 @@ const useAuthStore = create((set, get) => ({
   },
 
   // Live Editor Register
-  liveEditorRegister: async (username, websiteName, email, password, firstName, lastName, phoneNumber) => {
+  liveEditorRegister: async (
+    username,
+    websiteName,
+    email,
+    password,
+    firstName,
+    lastName,
+    phoneNumber,
+  ) => {
     try {
       set({ liveEditorLoading: true, liveEditorError: null });
       const response = await axios.post(`/api/users/register`, {
@@ -390,11 +413,11 @@ const useAuthStore = create((set, get) => ({
         lastName,
         phoneNumber,
       });
-      
+
       const userData = response.data;
       set({ liveEditorUser: userData });
       localStorage.setItem("liveEditorUser", JSON.stringify(userData));
-      
+
       // Set cookie for backend APIs
       try {
         document.cookie = `user=${encodeURIComponent(
@@ -421,16 +444,17 @@ const useAuthStore = create((set, get) => ({
       const response = await axios.post(
         `/api/users/fetchUsername`,
         { username },
-        { signal: options.signal }
+        { signal: options.signal },
       );
-      
+
       const userData = response.data;
       set({ liveEditorUser: userData });
       localStorage.setItem("liveEditorUser", JSON.stringify(userData));
       return userData;
     } catch (err) {
       if (!axios.isCancel(err)) {
-        const errorMessage = err.response?.data?.message || "فشل تحميل البيانات";
+        const errorMessage =
+          err.response?.data?.message || "فشل تحميل البيانات";
         set({ liveEditorError: errorMessage });
         throw err;
       }
@@ -466,13 +490,17 @@ const useAuthStore = create((set, get) => ({
       const response = await axios.put(`/api/images/toggle-image`, {
         username: liveEditorUser.username,
       });
-      
-      const updatedUser = { ...liveEditorUser, imageToggle: response.data.imageToggle };
+
+      const updatedUser = {
+        ...liveEditorUser,
+        imageToggle: response.data.imageToggle,
+      };
       set({ liveEditorUser: updatedUser });
       localStorage.setItem("liveEditorUser", JSON.stringify(updatedUser));
       return { success: true, user: updatedUser };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Failed to toggle image";
+      const errorMessage =
+        err.response?.data?.message || "Failed to toggle image";
       set({ liveEditorError: errorMessage });
       return { success: false, error: errorMessage };
     } finally {
@@ -497,7 +525,14 @@ const useAuthStore = create((set, get) => ({
 export default useAuthStore;
 
 // Live Editor React Context (for backward compatibility)
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from "react";
 
 export const AuthContext = createContext();
 
@@ -583,32 +618,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const fetchUser = useCallback(
-    async (username, options = {}) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await axios.post(
-          `/api/users/fetchUsername`,
-          { username },
-          { signal: options.signal }, // إضافة الـ signal هنا
-        );
-        const userData = response.data;
-        setUser(userData);
-        localStorage.setItem("user", JSON.stringify(userData));
-        return userData; // إرجاع البيانات للاستخدام في المكونات الأخرى
-      } catch (err) {
-        if (!axios.isCancel(err)) {
-          // التحقق من أن الخطأ ليس بسبب إلغاء الطلب
-          setError(err.response?.data?.message || "فشل تحميل البيانات");
-          throw err;
-        }
-      } finally {
-        setLoading(false);
+  const fetchUser = useCallback(async (username, options = {}) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.post(
+        `/api/users/fetchUsername`,
+        { username },
+        { signal: options.signal }, // إضافة الـ signal هنا
+      );
+      const userData = response.data;
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      return userData; // إرجاع البيانات للاستخدام في المكونات الأخرى
+    } catch (err) {
+      if (!axios.isCancel(err)) {
+        // التحقق من أن الخطأ ليس بسبب إلغاء الطلب
+        setError(err.response?.data?.message || "فشل تحميل البيانات");
+        throw err;
       }
-    },
-    [],
-  );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const logout = async () => {
     try {

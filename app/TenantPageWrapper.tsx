@@ -4,7 +4,10 @@ import { Suspense, lazy, Fragment, useMemo, useEffect } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import Loading from "@/app/loading";
 import { notFound } from "next/navigation";
-import { getSectionPath, getComponentSubPath } from "@/lib-liveeditor/ComponentsList";
+import {
+  getSectionPath,
+  getComponentSubPath,
+} from "@/lib-liveeditor/ComponentsList";
 import Header1 from "@/components/tenant/header/header1";
 import Footer1 from "@/components/tenant/footer/footer1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
@@ -12,7 +15,10 @@ import { LanguageDropdown } from "@/components/tenant/LanguageDropdown";
 import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
 
 const loadComponent = (section: string, componentName: string) => {
-  console.log("📄 TenantPageWrapper - loadComponent called with:", { section, componentName });
+  console.log("📄 TenantPageWrapper - loadComponent called with:", {
+    section,
+    componentName,
+  });
   if (!componentName) return null;
   const match = componentName?.match(/^(.*?)(\d+)$/);
   if (!match) return null;
@@ -51,7 +57,7 @@ const loadComponent = (section: string, componentName: string) => {
             </div>
           </div>
         ),
-      }))
+      })),
     );
   }
 
@@ -62,7 +68,7 @@ const loadComponent = (section: string, componentName: string) => {
   return lazy(() =>
     import(`@/components/tenant/${fullPath}`).catch(() => ({
       default: () => <div>Component {componentName} not found</div>,
-    }))
+    })),
   );
 };
 
@@ -71,7 +77,10 @@ interface TenantPageWrapperProps {
   slug: string;
 }
 
-export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperProps) {
+export default function TenantPageWrapper({
+  tenantId,
+  slug,
+}: TenantPageWrapperProps) {
   console.log("📄 TenantPageWrapper - Component rendered");
 
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -103,17 +112,17 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
   // التحقق من وجود الـ slug في componentSettings أو البيانات الافتراضية
   const slugExists = useMemo(() => {
     if (!slug) return false;
-    
+
     // التحقق من وجود الـ slug في componentSettings
     if (tenantData?.componentSettings && slug in tenantData.componentSettings) {
       return true;
     }
-    
+
     // التحقق من وجود الـ slug في البيانات الافتراضية
     if ((PAGE_DEFINITIONS as any)[slug]) {
       return true;
     }
-    
+
     return false;
   }, [tenantData?.componentSettings, slug]);
 
@@ -137,7 +146,10 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
         }))
         .sort((a, b) => (a.position || 0) - (b.position || 0));
 
-      console.log("📄 TenantPageWrapper - Components from componentSettings:", components);
+      console.log(
+        "📄 TenantPageWrapper - Components from componentSettings:",
+        components,
+      );
       return components;
     }
 
@@ -154,7 +166,10 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
         }))
         .sort((a, b) => (a.position || 0) - (b.position || 0));
 
-      console.log("📄 TenantPageWrapper - Components from default:", components);
+      console.log(
+        "📄 TenantPageWrapper - Components from default:",
+        components,
+      );
       return components;
     }
 
@@ -172,7 +187,6 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
     notFound();
   }
 
-
   // Filter out header and footer components since they are now global
   const filteredComponentsList = componentsList.filter((comp: any) => {
     if (comp.componentName?.startsWith("header")) {
@@ -183,7 +197,6 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
     }
     return true;
   });
-
 
   return (
     <I18nProvider>
@@ -202,10 +215,12 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
           {Array.isArray(filteredComponentsList) &&
           filteredComponentsList.length > 0 ? (
             filteredComponentsList.map((comp: any) => {
-
               const Cmp = loadComponent(slug as string, comp.componentName);
               if (!Cmp) {
-                console.log("❌ Page - Component not found:", comp.componentName);
+                console.log(
+                  "❌ Page - Component not found:",
+                  comp.componentName,
+                );
                 return <Fragment key={comp.id} />;
               }
 

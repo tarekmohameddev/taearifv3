@@ -16,7 +16,7 @@ export function I18nProvider({ children }: I18nProviderProps) {
   useEffect(() => {
     // Get locale from the original URL (before rewrite)
     // We need to check the browser's current URL
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const currentUrl = window.location.pathname;
       const locale = getLocaleFromPathname(currentUrl);
       if (isValidLocale(locale)) {

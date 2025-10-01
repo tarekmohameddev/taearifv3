@@ -10,7 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Globe, Check } from "lucide-react";
-import { locales, localeNames, localeFlags, getDirectionForLocale, getDefaultDirection } from "@/lib-liveeditor/i18n/config";
+import {
+  locales,
+  localeNames,
+  localeFlags,
+  getDirectionForLocale,
+  getDefaultDirection,
+} from "@/lib-liveeditor/i18n/config";
 import { useEditorLocale } from "@/context-liveeditor/editorI18nStore";
 
 export function LanguageDropdown() {
@@ -36,7 +42,7 @@ export function LanguageDropdown() {
 
       setTimeout(() => setIsChanging(false), 100);
     },
-    [pathname, router, setLocale]
+    [pathname, router, setLocale],
   );
 
   const currentLang = pathname.split("/")[1] || "en";
@@ -56,14 +62,14 @@ export function LanguageDropdown() {
             isChanging ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
-  <span className="hidden sm:inline-flex items-center gap-2">
-  <img
-    src={localeFlags[currentLang]}
-    alt={localeNames[currentLang]}
-    className="w-5 h-auto rounded-sm"
-  />
-  <span className="flex-1">{localeNames[currentLang]}</span>
-</span>
+          <span className="hidden sm:inline-flex items-center gap-2">
+            <img
+              src={localeFlags[currentLang]}
+              alt={localeNames[currentLang]}
+              className="w-5 h-auto rounded-sm"
+            />
+            <span className="flex-1">{localeNames[currentLang]}</span>
+          </span>
 
           <span className="sm:hidden">
             <img
@@ -74,7 +80,7 @@ export function LanguageDropdown() {
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start"  style={{ zIndex: 999999 }} >
+      <DropdownMenuContent align="start" style={{ zIndex: 999999 }}>
         {locales.map((locale) => (
           <DropdownMenuItem
             key={locale}

@@ -5,7 +5,8 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 export const getDefaultContactMapSectionData = (): ComponentData => ({
   visible: true,
   title: "شاركنا تقييمك معنا",
-  description: "نحن نهتم برأيك! قم بتقييم تجربتك معنا من خلال اختيار عدد النجوم المناسب وكتابة تعليقك. تساعدنا في تحسين الخدمة وتقديم أفضل تجربة لعملائنا",
+  description:
+    "نحن نهتم برأيك! قم بتقييم تجربتك معنا من خلال اختيار عدد النجوم المناسب وكتابة تعليقك. تساعدنا في تحسين الخدمة وتقديم أفضل تجربة لعملائنا",
   background: {
     color: "#ffffff",
     image: "",
@@ -78,8 +79,8 @@ export const getDefaultContactMapSectionData = (): ComponentData => ({
     title: "موقعنا",
     address: "المملكة العربية السعودية - القصيم",
     coordinates: {
-      lat: 26.3260,
-      lng: 43.9750,
+      lat: 26.326,
+      lng: 43.975,
     },
     zoom: 15,
     height: "h-96",
@@ -98,31 +99,41 @@ export const contactMapSectionFunctions = {
     if (state.contactMapSectionStates[variantId]) {
       return state;
     }
-    
+
     const defaultData = getDefaultContactMapSectionData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     return {
       ...state,
-      contactMapSectionStates: { ...state.contactMapSectionStates, [variantId]: data },
+      contactMapSectionStates: {
+        ...state.contactMapSectionStates,
+        [variantId]: data,
+      },
     };
   },
 
-  getData: (state: any, variantId: string) => 
-    state.contactMapSectionStates[variantId] || getDefaultContactMapSectionData(),
+  getData: (state: any, variantId: string) =>
+    state.contactMapSectionStates[variantId] ||
+    getDefaultContactMapSectionData(),
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
     ...state,
-    contactMapSectionStates: { ...state.contactMapSectionStates, [variantId]: data },
+    contactMapSectionStates: {
+      ...state.contactMapSectionStates,
+      [variantId]: data,
+    },
   }),
 
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.contactMapSectionStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
       ...state,
-      contactMapSectionStates: { ...state.contactMapSectionStates, [variantId]: newData },
+      contactMapSectionStates: {
+        ...state.contactMapSectionStates,
+        [variantId]: newData,
+      },
     };
   },
 };

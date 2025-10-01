@@ -103,8 +103,7 @@ export default function MenuManagementPage() {
     url?: string;
   }>({});
 
-  useEffect(() => {
-  }, [menuItems, editingItem]);
+  useEffect(() => {}, [menuItems, editingItem]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

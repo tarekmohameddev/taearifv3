@@ -76,7 +76,7 @@ export function ArrayFieldRenderer({
 
   // Enhanced Object array support with universal compatibility
   const items: any[] = Array.isArray(value) ? value : [];
-  
+
   // Smart default value generator based on field definitions
   const generateDefaultItem = (): any => {
     const newItem: any = {};
@@ -99,7 +99,7 @@ export function ArrayFieldRenderer({
           newItem[f.key] = f.defaultValue || "";
           break;
         case "select":
-          newItem[f.key] = f.defaultValue || (f.options?.[0]?.value || "");
+          newItem[f.key] = f.defaultValue || f.options?.[0]?.value || "";
           break;
         case "object":
           newItem[f.key] = f.defaultValue || {};
@@ -153,17 +153,18 @@ export function ArrayFieldRenderer({
       item?.heading,
       item?.id,
       item?.key,
-      item?.value
+      item?.value,
     ];
 
-    const candidate = titlePatterns.find(pattern => 
-      pattern && typeof pattern === 'string' && pattern.trim().length > 0
+    const candidate = titlePatterns.find(
+      (pattern) =>
+        pattern && typeof pattern === "string" && pattern.trim().length > 0,
     );
 
     const base = candidate
       ? String(candidate).trim()
       : `${arrDef.itemLabel || "Item"} ${idx + 1}`;
-    
+
     // Truncate long titles
     return base.length > 50 ? base.substring(0, 47) + "..." : base;
   };
@@ -171,9 +172,9 @@ export function ArrayFieldRenderer({
   // Enhanced nested array support for complex structures like menu items
   const renderNestedArray = (field: any, itemPath: string, item: any) => {
     if (field.type !== "array") return null;
-    
+
     const nestedItems = Array.isArray(item[field.key]) ? item[field.key] : [];
-    
+
     return (
       <div className="mt-4 space-y-3">
         <div className="flex items-center justify-between">
@@ -185,10 +186,20 @@ export function ArrayFieldRenderer({
             <button
               type="button"
               onClick={() => {
-                const newItem = field.of ? field.of.reduce((acc: any, f: any) => {
-                  acc[f.key] = f.defaultValue || (f.type === "text" ? "" : f.type === "number" ? 0 : f.type === "boolean" ? false : "");
-                  return acc;
-                }, {}) : {};
+                const newItem = field.of
+                  ? field.of.reduce((acc: any, f: any) => {
+                      acc[f.key] =
+                        f.defaultValue ||
+                        (f.type === "text"
+                          ? ""
+                          : f.type === "number"
+                            ? 0
+                            : f.type === "boolean"
+                              ? false
+                              : "");
+                      return acc;
+                    }, {})
+                  : {};
                 const updatedItem = { ...item };
                 updatedItem[field.key] = [...nestedItems, newItem];
                 updateValue(itemPath, updatedItem);
@@ -199,9 +210,12 @@ export function ArrayFieldRenderer({
             </button>
           </div>
         </div>
-        
+
         {nestedItems.map((nestedItem: any, nestedIdx: number) => (
-          <div key={nestedIdx} className="bg-slate-50 rounded-lg p-3 border border-slate-200">
+          <div
+            key={nestedIdx}
+            className="bg-slate-50 rounded-lg p-3 border border-slate-200"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-slate-600">
                 {field.itemLabel || "Item"} {nestedIdx + 1}
@@ -210,7 +224,9 @@ export function ArrayFieldRenderer({
                 type="button"
                 onClick={() => {
                   const updatedItem = { ...item };
-                  updatedItem[field.key] = nestedItems.filter((_: any, i: number) => i !== nestedIdx);
+                  updatedItem[field.key] = nestedItems.filter(
+                    (_: any, i: number) => i !== nestedIdx,
+                  );
                   updateValue(itemPath, updatedItem);
                 }}
                 className="text-red-500 hover:text-red-700 text-xs"
@@ -218,12 +234,16 @@ export function ArrayFieldRenderer({
                 Remove
               </button>
             </div>
-            
-            {field.of && field.of.map((nestedField: any) => (
-              <div key={nestedField.key} className="mb-2">
-                {renderField(nestedField, `${itemPath}.${field.key}.${nestedIdx}`)}
-              </div>
-            ))}
+
+            {field.of &&
+              field.of.map((nestedField: any) => (
+                <div key={nestedField.key} className="mb-2">
+                  {renderField(
+                    nestedField,
+                    `${itemPath}.${field.key}.${nestedIdx}`,
+                  )}
+                </div>
+              ))}
           </div>
         ))}
       </div>
@@ -233,39 +253,48 @@ export function ArrayFieldRenderer({
   // Enhanced item subtitle for menu items (shows type and submenu count)
   const getItemSubtitle = (item: any): string => {
     const parts: string[] = [];
-    
+
     if (item?.type) {
       parts.push(`Type: ${item.type}`);
     }
-    
+
     if (item?.submenu && Array.isArray(item.submenu)) {
       const totalSubItems = item.submenu.reduce((total: number, sub: any) => {
         return total + (Array.isArray(sub.items) ? sub.items.length : 0);
       }, 0);
-      parts.push(`${item.submenu.length} submenu${item.submenu.length !== 1 ? 's' : ''} (${totalSubItems} items)`);
+      parts.push(
+        `${item.submenu.length} submenu${item.submenu.length !== 1 ? "s" : ""} (${totalSubItems} items)`,
+      );
     }
-    
+
     if (item?.url) {
       parts.push(`URL: ${item.url}`);
     }
-    
-    return parts.join(' • ');
+
+    return parts.join(" • ");
   };
 
   // Enhanced validation for array items with better error messages
-  const validateItem = (item: any, index: number): { isValid: boolean; errors: string[] } => {
+  const validateItem = (
+    item: any,
+    index: number,
+  ): { isValid: boolean; errors: string[] } => {
     const errors: string[] = [];
-    
+
     // Check required fields based on field definitions
     for (const f of arrDef.of) {
       if (f.type === "text" && (!item[f.key] || item[f.key].trim() === "")) {
         // Only mark as error if it's a critical field
-        if (f.key.includes("title") || f.key.includes("name") || f.key.includes("text")) {
+        if (
+          f.key.includes("title") ||
+          f.key.includes("name") ||
+          f.key.includes("text")
+        ) {
           errors.push(`${f.label || f.key} is required`);
         }
       }
     }
-    
+
     return { isValid: errors.length === 0, errors };
   };
 
@@ -290,9 +319,7 @@ export function ArrayFieldRenderer({
           </div>
           <div>
             <span className="font-bold text-slate-800">{def.label}</span>
-            <p className="text-xs text-slate-500 mt-1">
-              {items.length} items
-            </p>
+            <p className="text-xs text-slate-500 mt-1">{items.length} items</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -339,21 +366,20 @@ export function ArrayFieldRenderer({
           const key = `${normalizedPath}.${idx}`;
           const isOpen = expanded[key] ?? false;
           const validation = validateItem(item, idx);
-          
-          const toggle = () =>
-            setExpanded((s) => ({ ...s, [key]: !isOpen }));
-          
+
+          const toggle = () => setExpanded((s) => ({ ...s, [key]: !isOpen }));
+
           const move = (dir: -1 | 1) => {
             const next = items.slice();
             const newIdx = idx + dir;
             if (newIdx < 0 || newIdx >= items.length) {
               return;
             }
-            
+
             const tmp = next[idx];
             next[idx] = next[newIdx];
             next[newIdx] = tmp;
-            
+
             updateValue(normalizedPath, next);
           };
 
@@ -374,8 +400,8 @@ export function ArrayFieldRenderer({
             <div
               key={idx}
               className={`bg-white rounded-xl border-2 shadow-sm overflow-hidden transition-all duration-200 ${
-                validation.isValid 
-                  ? "border-slate-200 hover:border-slate-300" 
+                validation.isValid
+                  ? "border-slate-200 hover:border-slate-300"
                   : "border-red-200 hover:border-red-300"
               }`}
             >
@@ -401,11 +427,13 @@ export function ArrayFieldRenderer({
                       />
                     </svg>
                   </button>
-                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
-                    validation.isValid 
-                      ? "bg-gradient-to-br from-blue-500 to-indigo-600" 
-                      : "bg-gradient-to-br from-red-500 to-red-600"
-                  }`}>
+                  <div
+                    className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+                      validation.isValid
+                        ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                        : "bg-gradient-to-br from-red-500 to-red-600"
+                    }`}
+                  >
                     <span className="text-white text-xs font-bold">
                       {idx + 1}
                     </span>
@@ -423,20 +451,29 @@ export function ArrayFieldRenderer({
                     {/* Show menu item type badge */}
                     {arrDef.itemLabel === "Item" && item?.type && (
                       <div className="flex items-center space-x-1 mt-1">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          item.type === "link" ? "bg-blue-100 text-blue-800" :
-                          item.type === "mega_menu" ? "bg-purple-100 text-purple-800" :
-                          item.type === "dropdown" ? "bg-green-100 text-green-800" :
-                          item.type === "button" ? "bg-orange-100 text-orange-800" :
-                          "bg-gray-100 text-gray-800"
-                        }`}>
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            item.type === "link"
+                              ? "bg-blue-100 text-blue-800"
+                              : item.type === "mega_menu"
+                                ? "bg-purple-100 text-purple-800"
+                                : item.type === "dropdown"
+                                  ? "bg-green-100 text-green-800"
+                                  : item.type === "button"
+                                    ? "bg-orange-100 text-orange-800"
+                                    : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
                           {item.type}
                         </span>
-                        {item?.submenu && Array.isArray(item.submenu) && item.submenu.length > 0 && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                            {item.submenu.length} submenu{item.submenu.length !== 1 ? 's' : ''}
-                          </span>
-                        )}
+                        {item?.submenu &&
+                          Array.isArray(item.submenu) &&
+                          item.submenu.length > 0 && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                              {item.submenu.length} submenu
+                              {item.submenu.length !== 1 ? "s" : ""}
+                            </span>
+                          )}
                       </div>
                     )}
                     {!validation.isValid && (
@@ -469,7 +506,7 @@ export function ArrayFieldRenderer({
                       />
                     </svg>
                   </button>
-                  
+
                   {/* Move Down Button */}
                   <button
                     type="button"
@@ -568,11 +605,9 @@ export function ArrayFieldRenderer({
                   {arrDef.of.map((f: any) => (
                     <div key={f.key}>
                       {/* Render nested arrays specially */}
-                      {f.type === "array" ? (
-                        renderNestedArray(f, `${normalizedPath}.${idx}`, item)
-                      ) : (
-                        renderField(f, `${normalizedPath}.${idx}`)
-                      )}
+                      {f.type === "array"
+                        ? renderNestedArray(f, `${normalizedPath}.${idx}`, item)
+                        : renderField(f, `${normalizedPath}.${idx}`)}
                     </div>
                   ))}
                 </div>
@@ -601,7 +636,9 @@ export function ArrayFieldRenderer({
               No {arrDef.itemLabel || "items"} yet
             </h3>
             <p className="text-slate-500 text-sm mb-4 max-w-sm mx-auto">
-              {arrDef.itemLabel ? `Add your first ${arrDef.itemLabel.toLowerCase()} to get started` : "Click the Add button to create your first item"}
+              {arrDef.itemLabel
+                ? `Add your first ${arrDef.itemLabel.toLowerCase()} to get started`
+                : "Click the Add button to create your first item"}
             </p>
             <div className="flex flex-col sm:flex-row gap-2 justify-center">
               <button
@@ -614,7 +651,9 @@ export function ArrayFieldRenderer({
                 <button
                   onClick={() => {
                     // Add multiple items at once
-                    const multipleItems = Array.from({ length: 3 }, () => generateDefaultItem());
+                    const multipleItems = Array.from({ length: 3 }, () =>
+                      generateDefaultItem(),
+                    );
                     updateValue(normalizedPath, multipleItems);
                   }}
                   className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"

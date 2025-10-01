@@ -261,7 +261,7 @@ export default function PropertyForm({ mode }) {
       (error) => {
         console.error("Error getting location:", error);
         toast.error("غير قادر على الحصول على موقعك الحالي");
-      }
+      },
     );
   };
 
@@ -310,7 +310,7 @@ export default function PropertyForm({ mode }) {
         // Initialize search box if search input exists
         if (searchInputRef.current) {
           const searchBoxInstance = new google.maps.places.SearchBox(
-            searchInputRef.current
+            searchInputRef.current,
           );
           setSearchBox(searchBoxInstance);
 
@@ -440,7 +440,7 @@ export default function PropertyForm({ mode }) {
           setProjects(projects);
 
           const matchedProject = projects.find(
-            (p) => p.id === property.project_id
+            (p) => p.id === property.project_id,
           );
 
           // معالجة الميزات
@@ -462,7 +462,7 @@ export default function PropertyForm({ mode }) {
                 question: faq.question,
                 answer: faq.answer,
                 displayOnPage: faq.displayOnPage,
-              }))
+              })),
             );
           }
           // تحديد قيم transaction_type و PropertyType بناءً على البيانات المُستلمة
@@ -549,7 +549,7 @@ export default function PropertyForm({ mode }) {
             ? Array.isArray(property.floor_planning_image)
               ? property.floor_planning_image.filter((img) => img && img !== "")
               : [property.floor_planning_image].filter(
-                  (img) => img && img !== ""
+                  (img) => img && img !== "",
                 )
             : [];
 
@@ -564,7 +564,7 @@ export default function PropertyForm({ mode }) {
           });
         } catch (error) {
           toast.error(
-            "حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى."
+            "حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى.",
           );
         }
       };
@@ -603,8 +603,8 @@ export default function PropertyForm({ mode }) {
   const handleToggleFaqDisplay = (id) => {
     setFaqs(
       faqs.map((faq) =>
-        faq.id === id ? { ...faq, displayOnPage: !faq.displayOnPage } : faq
-      )
+        faq.id === id ? { ...faq, displayOnPage: !faq.displayOnPage } : faq,
+      ),
     );
   };
   // جلب البيانات الأساسية
@@ -678,7 +678,7 @@ export default function PropertyForm({ mode }) {
         useAuthStore.getState().userData?.real_estate_limit_number
     ) {
       toast.error(
-        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.real_estate_limit_number} عقارات`
+        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.real_estate_limit_number} عقارات`,
       );
       hasReachedLimit =
         properties.length >=
@@ -743,11 +743,13 @@ export default function PropertyForm({ mode }) {
         toast.error("يجب أن يكون الفيديو بصيغة MP4 أو MOV أو AVI فقط");
         return;
       }
-      
+
       // Get video size limit from user's package
-      const videoSizeLimit = useAuthStore.getState().userData?.membership?.package?.video_size_limit || 50;
+      const videoSizeLimit =
+        useAuthStore.getState().userData?.membership?.package
+          ?.video_size_limit || 50;
       const maxSizeInBytes = videoSizeLimit * 1024 * 1024; // Convert MB to bytes
-      
+
       if (file.size > maxSizeInBytes) {
         toast.error(`يجب أن يكون حجم الملف أقل من ${videoSizeLimit} ميجابايت`);
         return;
@@ -873,7 +875,7 @@ export default function PropertyForm({ mode }) {
         if (images.thumbnail) {
           const uploadedFile = await uploadSingleFile(
             images.thumbnail,
-            "property"
+            "property",
           );
           thumbnailPath =
             mode === "add"
@@ -884,12 +886,12 @@ export default function PropertyForm({ mode }) {
         if (images.gallery.length > 0) {
           const uploadedFiles = await uploadMultipleFiles(
             images.gallery,
-            "property"
+            "property",
           );
           galleryPaths =
             mode === "add"
               ? uploadedFiles.map((f) =>
-                  f.path.replace("https://taearif.com", "")
+                  f.path.replace("https://taearif.com", ""),
                 )
               : uploadedFiles.map((f) => f.url);
         }
@@ -897,12 +899,12 @@ export default function PropertyForm({ mode }) {
         if (images.floorPlans.length > 0) {
           const uploadedFiles = await uploadMultipleFiles(
             images.floorPlans,
-            "property"
+            "property",
           );
           floorPlansPaths =
             mode === "add"
               ? uploadedFiles.map((f) =>
-                  f.path.replace("https://taearif.com", "")
+                  f.path.replace("https://taearif.com", ""),
                 )
               : uploadedFiles.map((f) => f.url);
         }
@@ -998,10 +1000,10 @@ export default function PropertyForm({ mode }) {
         } else {
           response = await axiosInstance.post(
             `/properties/${id}`,
-            propertyData
+            propertyData,
           );
           toast.success(
-            publish ? "تم تحديث ونشر العقار بنجاح" : "تم حفظ التغييرات كمسودة"
+            publish ? "تم تحديث ونشر العقار بنجاح" : "تم حفظ التغييرات كمسودة",
           );
           const currentState = useStore.getState();
           const updatedProperty = response.data.property;
@@ -1009,7 +1011,7 @@ export default function PropertyForm({ mode }) {
             updatedProperty.status === 1 ? "منشور" : "مسودة";
           const updatedProperties =
             currentState.propertiesManagement.properties.map((prop) =>
-              prop.id === updatedProperty.id ? updatedProperty : prop
+              prop.id === updatedProperty.id ? updatedProperty : prop,
             );
           setPropertiesManagement({ properties: updatedProperties });
         }
@@ -1047,7 +1049,9 @@ export default function PropertyForm({ mode }) {
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+                <p className="text-lg text-gray-500">
+                  يرجى تسجيل الدخول لعرض المحتوى
+                </p>
               </div>
             </div>
           </main>
@@ -1489,7 +1493,7 @@ export default function PropertyForm({ mode }) {
                               setFormData((prev) => ({
                                 ...prev,
                                 features: prev.features.filter(
-                                  (_, i) => i !== index
+                                  (_, i) => i !== index,
                                 ),
                               }));
                             }}
@@ -2161,7 +2165,10 @@ export default function PropertyForm({ mode }) {
                     )}
                     <p className="text-sm text-muted-foreground">
                       يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى لحجم
-                      الملف هو {useAuthStore.getState().userData?.membership?.package?.video_size_limit || 50} ميجابايت والحد الأقصى للطول هو 5 دقائق.
+                      الملف هو{" "}
+                      {useAuthStore.getState().userData?.membership?.package
+                        ?.video_size_limit || 50}{" "}
+                      ميجابايت والحد الأقصى للطول هو 5 دقائق.
                     </p>
                   </div>
                 </CardContent>

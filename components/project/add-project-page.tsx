@@ -148,7 +148,7 @@ export default function AddProjectPage(): JSX.Element {
   });
 
   const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(
-    null
+    null,
   );
   const [planImages, setPlanImages] = useState<ProjectImage[]>([]);
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
@@ -196,7 +196,7 @@ export default function AddProjectPage(): JSX.Element {
       projects.length >= useAuthStore.getState().userData?.project_limit_number
     ) {
       toast.error(
-        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.project_limit_number} مشروع`
+        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.project_limit_number} مشروع`,
       );
       hasReachedLimit =
         projects.length >=
@@ -210,7 +210,7 @@ export default function AddProjectPage(): JSX.Element {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
     if (id === "amenities") {
@@ -364,11 +364,13 @@ export default function AddProjectPage(): JSX.Element {
       toast.error("يجب أن يكون الفيديو بصيغة MP4 أو MOV أو AVI فقط");
       return;
     }
-    
+
     // Get video size limit from user's package
-    const videoSizeLimit = useAuthStore.getState().userData?.membership?.package?.video_size_limit || 50;
+    const videoSizeLimit =
+      useAuthStore.getState().userData?.membership?.package?.video_size_limit ||
+      50;
     const maxSizeInBytes = videoSizeLimit * 1024 * 1024; // Convert MB to bytes
-    
+
     if (file.size > maxSizeInBytes) {
       toast.error(`يجب أن يكون حجم الملف أقل من ${videoSizeLimit} ميجابايت`);
       return;
@@ -455,7 +457,7 @@ export default function AddProjectPage(): JSX.Element {
   };
 
   const handleSaveProject = async (
-    status_publish: "منشور" | "مسودة" | "Pre-construction"
+    status_publish: "منشور" | "مسودة" | "Pre-construction",
   ) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
@@ -501,7 +503,7 @@ export default function AddProjectPage(): JSX.Element {
       if (thumbnailImage) {
         const uploadResult = await uploadSingleFile(
           thumbnailImage.file,
-          "project"
+          "project",
         );
         featuredImagePath = uploadResult.path;
       }
@@ -564,7 +566,7 @@ export default function AddProjectPage(): JSX.Element {
       let formattedDate = "";
       if (newProject.completionDate) {
         const convertedDateStr = convertArabicToEnglishNumbers(
-          newProject.completionDate
+          newProject.completionDate,
         );
 
         if (isValidDate(convertedDateStr)) {
@@ -644,7 +646,7 @@ export default function AddProjectPage(): JSX.Element {
 
       const response = await axiosInstance.post(
         `${process.env.NEXT_PUBLIC_Backend_URL}/projects`,
-        projectData
+        projectData,
       );
 
       const currentState = useStore.getState();
@@ -685,7 +687,9 @@ export default function AddProjectPage(): JSX.Element {
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+                <p className="text-lg text-gray-500">
+                  يرجى تسجيل الدخول لعرض المحتوى
+                </p>
               </div>
             </div>
           </main>
@@ -1321,7 +1325,10 @@ export default function AddProjectPage(): JSX.Element {
                       </Button>
                       <p className="text-sm text-muted-foreground">
                         يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى
-                        لحجم الملف هو {useAuthStore.getState().userData?.membership?.package?.video_size_limit || 50} ميجابايت والحد الأقصى للطول هو 5 دقائق.
+                        لحجم الملف هو{" "}
+                        {useAuthStore.getState().userData?.membership?.package
+                          ?.video_size_limit || 50}{" "}
+                        ميجابايت والحد الأقصى للطول هو 5 دقائق.
                       </p>
                     </div>
                   </div>

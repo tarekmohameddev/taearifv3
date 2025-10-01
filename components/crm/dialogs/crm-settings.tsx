@@ -53,16 +53,16 @@ export default function CrmSettingsDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Form dialog states
   const [showFormDialog, setShowFormDialog] = useState(false);
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
-  const [formType, setFormType] = useState<"stages" | "procedures" | "priorities" | "types">("stages");
+  const [formType, setFormType] = useState<
+    "stages" | "procedures" | "priorities" | "types"
+  >("stages");
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
-
-
 
   // Load all data once when dialog opens
   useEffect(() => {
@@ -70,29 +70,34 @@ export default function CrmSettingsDialog({
       const loadAllData = async () => {
         setIsLoading(true);
         setError(null);
-        
+
         try {
           // Load all data in parallel
-          const [stagesResponse, proceduresResponse, prioritiesResponse, typesResponse] = await Promise.all([
+          const [
+            stagesResponse,
+            proceduresResponse,
+            prioritiesResponse,
+            typesResponse,
+          ] = await Promise.all([
             axiosInstance.get("/crm/stages"),
             axiosInstance.get("/crm/procedures"),
             axiosInstance.get("/crm/priorities"),
-            axiosInstance.get("/crm/types")
+            axiosInstance.get("/crm/types"),
           ]);
 
           // Update store with all data
           if (stagesResponse.data.status === "success") {
             setPipelineStages(stagesResponse.data.data);
           }
-          
+
           if (proceduresResponse.data.status === "success") {
             setProcedures(proceduresResponse.data.data);
           }
-          
+
           if (prioritiesResponse.data.status === "success") {
             setPriorities(prioritiesResponse.data.data);
           }
-          
+
           if (typesResponse.data.status === "success") {
             setTypes(typesResponse.data.data);
           }
@@ -114,14 +119,19 @@ export default function CrmSettingsDialog({
   };
 
   // Form dialog handlers
-  const handleOpenAddForm = (type: "stages" | "procedures" | "priorities" | "types") => {
+  const handleOpenAddForm = (
+    type: "stages" | "procedures" | "priorities" | "types",
+  ) => {
     setFormType(type);
     setFormMode("add");
     setSelectedItem(null);
     setShowFormDialog(true);
   };
 
-  const handleOpenEditForm = (type: "stages" | "procedures" | "priorities" | "types", item: any) => {
+  const handleOpenEditForm = (
+    type: "stages" | "procedures" | "priorities" | "types",
+    item: any,
+  ) => {
     setFormType(type);
     setFormMode("edit");
     setSelectedItem(item);
@@ -141,7 +151,7 @@ export default function CrmSettingsDialog({
       setIsLoading(true);
       setFormError(null);
       setFieldErrors({});
-      
+
       const response = await axiosInstance.post("/crm/stages", data);
       if (response.data.status === "success") {
         const newStages = [...pipelineStages, response.data.data];
@@ -150,7 +160,7 @@ export default function CrmSettingsDialog({
       }
     } catch (err: any) {
       console.error("Error adding stage:", err);
-      
+
       if (err.response?.data?.status === "error") {
         if (err.response.data.errors) {
           setFieldErrors(err.response.data.errors);
@@ -174,7 +184,7 @@ export default function CrmSettingsDialog({
       setIsLoading(true);
       setFormError(null);
       setFieldErrors({});
-      
+
       const response = await axiosInstance.post("/crm/procedures", data);
       if (response.data.status === "success") {
         const newProcedures = [...procedures, response.data.data];
@@ -183,7 +193,7 @@ export default function CrmSettingsDialog({
       }
     } catch (err: any) {
       console.error("Error adding procedure:", err);
-      
+
       if (err.response?.data?.status === "error") {
         if (err.response.data.errors) {
           setFieldErrors(err.response.data.errors);
@@ -203,7 +213,7 @@ export default function CrmSettingsDialog({
       setIsLoading(true);
       setFormError(null);
       setFieldErrors({});
-      
+
       const response = await axiosInstance.post("/crm/priorities", data);
       if (response.data.status === "success") {
         const newPriorities = [...priorities, response.data.data];
@@ -212,7 +222,7 @@ export default function CrmSettingsDialog({
       }
     } catch (err: any) {
       console.error("Error adding priority:", err);
-      
+
       if (err.response?.data?.status === "error") {
         if (err.response.data.errors) {
           setFieldErrors(err.response.data.errors);
@@ -232,7 +242,7 @@ export default function CrmSettingsDialog({
       setIsLoading(true);
       setFormError(null);
       setFieldErrors({});
-      
+
       const response = await axiosInstance.post("/crm/types", data);
       if (response.data.status === "success") {
         const newTypes = [...types, response.data.data];
@@ -241,7 +251,7 @@ export default function CrmSettingsDialog({
       }
     } catch (err: any) {
       console.error("Error adding type:", err);
-      
+
       if (err.response?.data?.status === "error") {
         if (err.response.data.errors) {
           setFieldErrors(err.response.data.errors);
@@ -262,18 +272,20 @@ export default function CrmSettingsDialog({
       setIsLoading(true);
       setFormError(null);
       setFieldErrors({});
-      
+
       const response = await axiosInstance.put(`/crm/stages/${id}`, data);
       if (response.data.status === "success") {
-        const updatedStages = pipelineStages.map(stage => 
-          stage.id.toString() === id.toString() ? { ...stage, ...response.data.data } : stage
+        const updatedStages = pipelineStages.map((stage) =>
+          stage.id.toString() === id.toString()
+            ? { ...stage, ...response.data.data }
+            : stage,
         );
         setPipelineStages(updatedStages);
         handleCloseForm();
       }
     } catch (err: any) {
       console.error("Error updating stage:", err);
-      
+
       if (err.response?.data?.status === "error") {
         if (err.response.data.errors) {
           setFieldErrors(err.response.data.errors);
@@ -297,18 +309,18 @@ export default function CrmSettingsDialog({
       setIsLoading(true);
       setFormError(null);
       setFieldErrors({});
-      
+
       const response = await axiosInstance.put(`/crm/procedures/${id}`, data);
       if (response.data.status === "success") {
-        const updatedProcedures = procedures.map(proc => 
-          proc.id === id ? { ...proc, ...response.data.data } : proc
+        const updatedProcedures = procedures.map((proc) =>
+          proc.id === id ? { ...proc, ...response.data.data } : proc,
         );
         setProcedures(updatedProcedures);
         handleCloseForm();
       }
     } catch (err: any) {
       console.error("Error updating procedure:", err);
-      
+
       if (err.response?.data?.status === "error") {
         if (err.response.data.errors) {
           setFieldErrors(err.response.data.errors);
@@ -328,18 +340,20 @@ export default function CrmSettingsDialog({
       setIsLoading(true);
       setFormError(null);
       setFieldErrors({});
-      
+
       const response = await axiosInstance.put(`/crm/priorities/${id}`, data);
       if (response.data.status === "success") {
-        const updatedPriorities = priorities.map(priority => 
-          priority.id === id ? { ...priority, ...response.data.data } : priority
+        const updatedPriorities = priorities.map((priority) =>
+          priority.id === id
+            ? { ...priority, ...response.data.data }
+            : priority,
         );
         setPriorities(updatedPriorities);
         handleCloseForm();
       }
     } catch (err: any) {
       console.error("Error updating priority:", err);
-      
+
       if (err.response?.data?.status === "error") {
         if (err.response.data.errors) {
           setFieldErrors(err.response.data.errors);
@@ -359,18 +373,18 @@ export default function CrmSettingsDialog({
       setIsLoading(true);
       setFormError(null);
       setFieldErrors({});
-      
+
       const response = await axiosInstance.put(`/crm/types/${id}`, data);
       if (response.data.status === "success") {
-        const updatedTypes = types.map(type => 
-          type.id === id ? { ...type, ...response.data.data } : type
+        const updatedTypes = types.map((type) =>
+          type.id === id ? { ...type, ...response.data.data } : type,
         );
         setTypes(updatedTypes);
         handleCloseForm();
       }
     } catch (err: any) {
       console.error("Error updating type:", err);
-      
+
       if (err.response?.data?.status === "error") {
         if (err.response.data.errors) {
           setFieldErrors(err.response.data.errors);
@@ -421,7 +435,11 @@ export default function CrmSettingsDialog({
     }
   };
 
-  const handleDeleteItem = async (endpoint: string, itemId: string, itemType: string) => {
+  const handleDeleteItem = async (
+    endpoint: string,
+    itemId: string,
+    itemType: string,
+  ) => {
     if (!confirm(`هل أنت متأكد من حذف هذا ${itemType}؟`)) {
       return;
     }
@@ -436,20 +454,28 @@ export default function CrmSettingsDialog({
         // Update local data based on the endpoint
         switch (endpoint) {
           case "/crm/stages":
-            const updatedStages = pipelineStages.filter(stage => stage.id.toString() !== itemId);
+            const updatedStages = pipelineStages.filter(
+              (stage) => stage.id.toString() !== itemId,
+            );
             setPipelineStages(updatedStages);
             if (onStageDeleted) onStageDeleted(itemId);
             break;
           case "/crm/procedures":
-            const updatedProcedures = procedures.filter(proc => proc.id.toString() !== itemId);
+            const updatedProcedures = procedures.filter(
+              (proc) => proc.id.toString() !== itemId,
+            );
             setProcedures(updatedProcedures);
             break;
           case "/crm/priorities":
-            const updatedPriorities = priorities.filter(priority => priority.id.toString() !== itemId);
+            const updatedPriorities = priorities.filter(
+              (priority) => priority.id.toString() !== itemId,
+            );
             setPriorities(updatedPriorities);
             break;
           case "/crm/types":
-            const updatedTypes = types.filter(type => type.id.toString() !== itemId);
+            const updatedTypes = types.filter(
+              (type) => type.id.toString() !== itemId,
+            );
             setTypes(updatedTypes);
             break;
         }
@@ -509,7 +535,10 @@ export default function CrmSettingsDialog({
                 ترتيب {item.order}
               </Badge>
               {item.is_active === 1 && (
-                <Badge variant="default" className="bg-green-100 text-green-800 mr-2">
+                <Badge
+                  variant="default"
+                  className="bg-green-100 text-green-800 mr-2"
+                >
                   نشط
                 </Badge>
               )}
@@ -579,7 +608,10 @@ export default function CrmSettingsDialog({
 
   return (
     <Dialog open={showCrmSettingsDialog} onOpenChange={handleClose}>
-      <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden" dir="rtl">
+      <DialogContent
+        className="max-w-5xl max-h-[85vh] overflow-hidden"
+        dir="rtl"
+      >
         <DialogHeader className="pb-4">
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Settings className="h-6 w-6" />
@@ -594,127 +626,149 @@ export default function CrmSettingsDialog({
           </div>
         )}
 
-                {isLoading ? (
+        {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <div className="text-center">
               <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-              <p className="text-muted-foreground text-right">جاري تحميل إعدادات CRM...</p>
+              <p className="text-muted-foreground text-right">
+                جاري تحميل إعدادات CRM...
+              </p>
             </div>
           </div>
         ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="h-full"
+          >
             <TabsList className="grid w-full grid-cols-4 mb-6 bg-muted/30">
-              <TabsTrigger value="stages" className="flex items-center gap-2 text-sm font-medium">
+              <TabsTrigger
+                value="stages"
+                className="flex items-center gap-2 text-sm font-medium"
+              >
                 <Target className="h-4 w-4 ml-2" />
                 مراحل البيع
               </TabsTrigger>
-              <TabsTrigger value="procedures" className="flex items-center gap-2 text-sm font-medium">
+              <TabsTrigger
+                value="procedures"
+                className="flex items-center gap-2 text-sm font-medium"
+              >
                 <ListCheck className="h-4 w-4 ml-2" />
                 الإجراءات
               </TabsTrigger>
-              <TabsTrigger value="priorities" className="flex items-center gap-2 text-sm font-medium">
+              <TabsTrigger
+                value="priorities"
+                className="flex items-center gap-2 text-sm font-medium"
+              >
                 <Flag className="h-4 w-4 ml-2" />
                 الأولويات
               </TabsTrigger>
-              <TabsTrigger value="types" className="flex items-center gap-2 text-sm font-medium">
+              <TabsTrigger
+                value="types"
+                className="flex items-center gap-2 text-sm font-medium"
+              >
                 <Tag className="h-4 w-4 ml-2" />
                 الأنواع
               </TabsTrigger>
             </TabsList>
 
-          <div className="flex-1 overflow-y-auto">
-            <TabsContent value="stages" className="mt-0" dir="rtl">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5 ml-2" />
-                      إدارة مراحل البيع
-                    </CardTitle>
-                    <Button onClick={handleOpenAddStageForm} size="sm" className="gap-2">
-                      <Plus className="h-4 w-4 ml-2" />
-                      إضافة مرحلة
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {renderItemList(pipelineStages, "stages", "/crm/stages")}
-                </CardContent>
-              </Card>
-            </TabsContent>
+            <div className="flex-1 overflow-y-auto">
+              <TabsContent value="stages" className="mt-0" dir="rtl">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Target className="h-5 w-5 ml-2" />
+                        إدارة مراحل البيع
+                      </CardTitle>
+                      <Button
+                        onClick={handleOpenAddStageForm}
+                        size="sm"
+                        className="gap-2"
+                      >
+                        <Plus className="h-4 w-4 ml-2" />
+                        إضافة مرحلة
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {renderItemList(pipelineStages, "stages", "/crm/stages")}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            <TabsContent value="procedures" className="mt-0" dir="rtl">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <ListCheck className="h-5 w-5 ml-2" />
-                      إدارة الإجراءات
-                    </CardTitle>
-                    <Button 
-                      size="sm" 
-                      className="gap-2"
-                      onClick={() => handleOpenAddForm("procedures")}
-                    >
-                      <Plus className="h-4 w-4 ml-2" />
-                      إضافة إجراء
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {renderItemList(procedures, "إجراء", "/crm/procedures")}
-                </CardContent>
-              </Card>
-            </TabsContent>
+              <TabsContent value="procedures" className="mt-0" dir="rtl">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <ListCheck className="h-5 w-5 ml-2" />
+                        إدارة الإجراءات
+                      </CardTitle>
+                      <Button
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => handleOpenAddForm("procedures")}
+                      >
+                        <Plus className="h-4 w-4 ml-2" />
+                        إضافة إجراء
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {renderItemList(procedures, "إجراء", "/crm/procedures")}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            <TabsContent value="priorities" className="mt-0" dir="rtl">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Flag className="h-5 w-5 ml-2" />
-                      إدارة الأولويات
-                    </CardTitle>
-                    <Button 
-                      size="sm" 
-                      className="gap-2"
-                      onClick={() => handleOpenAddForm("priorities")}
-                    >
-                      <Plus className="h-4 w-4 ml-2" />
-                      إضافة أولوية
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {renderItemList(priorities, "أولوية", "/crm/priorities")}
-                </CardContent>
-              </Card>
-            </TabsContent>
+              <TabsContent value="priorities" className="mt-0" dir="rtl">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Flag className="h-5 w-5 ml-2" />
+                        إدارة الأولويات
+                      </CardTitle>
+                      <Button
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => handleOpenAddForm("priorities")}
+                      >
+                        <Plus className="h-4 w-4 ml-2" />
+                        إضافة أولوية
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {renderItemList(priorities, "أولوية", "/crm/priorities")}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            <TabsContent value="types" className="mt-0" dir="rtl">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Tag className="h-5 w-5 ml-2" />
-                      إدارة الأنواع
-                    </CardTitle>
-                    <Button 
-                      size="sm" 
-                      className="gap-2"
-                      onClick={() => handleOpenAddForm("types")}
-                    >
-                      <Plus className="h-4 w-4 ml-2" />
-                      إضافة نوع
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {renderItemList(types, "نوع", "/crm/types")}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </div>
+              <TabsContent value="types" className="mt-0" dir="rtl">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Tag className="h-5 w-5 ml-2" />
+                        إدارة الأنواع
+                      </CardTitle>
+                      <Button
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => handleOpenAddForm("types")}
+                      >
+                        <Plus className="h-4 w-4 ml-2" />
+                        إضافة نوع
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {renderItemList(types, "نوع", "/crm/types")}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </div>
           </Tabs>
         )}
 

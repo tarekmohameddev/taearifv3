@@ -11,7 +11,10 @@ import useAuthStore from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
 import { LanguageSwitcher } from "@/components/tenant/live-editor/LanguageSwitcher";
-import { useEditorT, useEditorLocale } from "@/context-liveeditor/editorI18nStore";
+import {
+  useEditorT,
+  useEditorLocale,
+} from "@/context-liveeditor/editorI18nStore";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/live-editor/LanguageDropdown";
 import { AuthProvider } from "@/context/AuthContext";
@@ -68,14 +71,13 @@ function AddPageDialog({
     const newErrors: Record<string, string> = {};
 
     if (!formData.pageName.trim()) {
-      newErrors.pageName = "Page name is required";
+      newErrors.pageName = t("validation.page_name_required");
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = "Slug is required";
+      newErrors.slug = t("validation.slug_required");
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug =
-        "Slug must contain only lowercase letters, numbers, and hyphens";
+      newErrors.slug = t("validation.slug_format");
     }
 
     // التحقق من عدم تكرار الـ slug
@@ -83,11 +85,11 @@ function AddPageDialog({
       ? Object.keys(tenantData.componentSettings)
       : [];
     if (existingSlugs.includes(formData.slug)) {
-      newErrors.slug = "This slug already exists";
+      newErrors.slug = t("validation.slug_exists");
     }
 
     if (!formData.metaTitle.trim()) {
-      newErrors.metaTitle = "Meta title is required";
+      newErrors.metaTitle = t("validation.meta_title_required");
     }
 
     setErrors(newErrors);
@@ -135,8 +137,8 @@ function AddPageDialog({
       const isPredefinedPage = predefinedPages.includes(formData.slug);
 
       const successMessage = isPredefinedPage
-        ? "Page created successfully with default components!"
-        : "Custom page created successfully!";
+        ? t("messages.page_created_with_defaults")
+        : t("messages.custom_page_created");
 
       toast.success(successMessage);
       setOpen(false);
@@ -156,7 +158,7 @@ function AddPageDialog({
         metaKeywords: "",
       });
     } catch (error) {
-      toast.error("Error creating page");
+      toast.error(t("messages.error_creating_page"));
       console.error("Error creating page:", error);
     } finally {
       setIsLoading(false);
@@ -183,7 +185,7 @@ function AddPageDialog({
         <Button
           variant="outline"
           size="sm"
-          className={`inline-flex ${locale == "ar"? "mx-4": "" } items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:text-white hover:scale-[calc(1.05)] border-0 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 shadow-lg hover:shadow-xl`}
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:text-white hover:scale-[calc(1.05)] border-0 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 shadow-lg hover:shadow-xl"
         >
           <svg
             className="w-4 h-4"
@@ -198,10 +200,10 @@ function AddPageDialog({
               d="M12 6v6m0 0v6m0-6h6m-6 0H6"
             />
           </svg>
-          Add Page
+          {t("editor.add_page")}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto" dir="ltr">
         <DialogHeader className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center">
@@ -248,7 +250,7 @@ function AddPageDialog({
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                Page Information
+                {t("editor.page_information")}
               </Badge>
             </div>
 
@@ -262,7 +264,7 @@ function AddPageDialog({
                 </Label>
                 <Input
                   id="pageName"
-                  placeholder="e.g., Products Page"
+                  placeholder={t("forms.page_name_placeholder")}
                   value={formData.pageName}
                   onChange={(e) => handlePageNameChange(e.target.value)}
                   className={`transition-all duration-200 ${errors.pageName ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
@@ -292,7 +294,7 @@ function AddPageDialog({
                   htmlFor="slug"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Slug (Page URL) *
+                  {t("forms.slug")} *
                 </Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
@@ -327,7 +329,7 @@ function AddPageDialog({
                   </p>
                 )}
                 <p className="text-xs text-gray-500">
-                  URL will be: /tenant/{tenantId}/{formData.slug}
+                  {t("forms.url_preview", { tenantId, slug: formData.slug })}
                 </p>
                 {formData.slug && (
                   <div className="mt-2">
@@ -352,7 +354,7 @@ function AddPageDialog({
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        This page will be created with default components
+                        {t("messages.default_components_note")}
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-3 py-2 rounded-md">
@@ -369,7 +371,7 @@ function AddPageDialog({
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        This will be a custom page (empty by default)
+                        {t("messages.custom_page_note")}
                       </div>
                     )}
                   </div>
@@ -400,7 +402,7 @@ function AddPageDialog({
                     d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                   />
                 </svg>
-                SEO Settings
+                {t("editor.seo_settings")}
               </Badge>
             </div>
 
@@ -410,11 +412,11 @@ function AddPageDialog({
                   htmlFor="metaTitle"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Meta Title *
+                  {t("forms.meta_title")} *
                 </Label>
                 <Input
                   id="metaTitle"
-                  placeholder="Page title for search engines"
+                  placeholder={t("forms.meta_title_placeholder")}
                   value={formData.metaTitle}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -443,7 +445,7 @@ function AddPageDialog({
                   </p>
                 )}
                 <p className="text-xs text-gray-500">
-                  This title will appear in search results
+                  {t("forms.meta_title_help")}
                 </p>
               </div>
 
@@ -452,11 +454,11 @@ function AddPageDialog({
                   htmlFor="metaDescription"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Meta Description
+                  {t("forms.meta_description")}
                 </Label>
                 <Textarea
                   id="metaDescription"
-                  placeholder="Brief description of the page for search results"
+                  placeholder={t("forms.meta_description_placeholder")}
                   value={formData.metaDescription}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -468,7 +470,7 @@ function AddPageDialog({
                   rows={3}
                 />
                 <p className="text-xs text-gray-500">
-                  Recommended length: 150-160 characters
+                  {t("forms.meta_description_help")}
                 </p>
               </div>
 
@@ -477,11 +479,11 @@ function AddPageDialog({
                   htmlFor="metaKeywords"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Meta Keywords
+                  {t("forms.meta_keywords")}
                 </Label>
                 <Input
                   id="metaKeywords"
-                  placeholder="keyword1, keyword2, keyword3"
+                  placeholder={t("forms.meta_keywords_placeholder")}
                   value={formData.metaKeywords}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -492,7 +494,7 @@ function AddPageDialog({
                   className="focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
                 />
                 <p className="text-xs text-gray-500">
-                  Separate keywords with commas
+                  {t("forms.meta_keywords_help")}
                 </p>
               </div>
             </div>
@@ -525,7 +527,7 @@ function AddPageDialog({
                       d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                     />
                   </svg>
-                  Quick Preview
+                  {t("editor.quick_preview")}
                 </Badge>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -537,7 +539,7 @@ function AddPageDialog({
                 </div>
                 <div className="text-sm text-gray-600 mt-1 line-clamp-2">
                   {formData.metaDescription ||
-                    "Page description will appear here..."}
+                    t("forms.page_description_placeholder")}
                 </div>
               </div>
             </div>
@@ -550,7 +552,7 @@ function AddPageDialog({
             onClick={() => setOpen(false)}
             className="w-full sm:w-auto"
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -578,7 +580,7 @@ function AddPageDialog({
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Creating...
+                {t("common.creating")}
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -609,7 +611,11 @@ function AddPageDialog({
 function EditorNavBar() {
   const pathname = usePathname();
   const requestSave = useEditorStore((state) => state.requestSave);
-  const { liveEditorUser: user, liveEditorLoading: loading, userData } = useAuthStore();
+  const {
+    liveEditorUser: user,
+    liveEditorLoading: loading,
+    userData,
+  } = useAuthStore();
   const router = useRouter();
   const [recentlyAddedPages, setRecentlyAddedPages] = useState<string[]>([]);
   const t = useEditorT();
@@ -617,17 +623,17 @@ function EditorNavBar() {
   const tenantId = userData?.username || "";
   const basePath = `/live-editor`;
   const currentPath = (pathname || "").replace(basePath, "") || "";
-  
+
   // إنشاء URL كامل مع tenantId.domain.com
   const getTenantUrl = (path: string = "") => {
     if (!tenantId) return path;
-    
+
     // في التطوير: tenantId.localhost:3000
     // في الإنتاج: tenantId.domain.com
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    const domain = isDevelopment ? 'localhost:3000' : 'taearif.com';
-    
-    return `http${isDevelopment ? '' : 's'}://${tenantId}.${domain}${path}`;
+    const isDevelopment = process.env.NODE_ENV === "development";
+    const domain = isDevelopment ? "localhost:3000" : "taearif.com";
+
+    return `http${isDevelopment ? "" : "s"}://${tenantId}.${domain}${path}`;
   };
   const { fetchTenantData, tenantData, loadingTenantData, error } =
     useTenantStore();
@@ -720,47 +726,58 @@ function EditorNavBar() {
     if (!tenantData) return;
 
     const { setPageComponentsForPage } = useEditorStore.getState();
-    
+
     // التحقق من وجود componentSettings وأنها ليست فارغة
-    const hasComponentSettings = tenantData.componentSettings && 
-                                  typeof tenantData.componentSettings === 'object' && 
-                                  !Array.isArray(tenantData.componentSettings) &&
-                                  Object.keys(tenantData.componentSettings).length > 0;
+    const hasComponentSettings =
+      tenantData.componentSettings &&
+      typeof tenantData.componentSettings === "object" &&
+      !Array.isArray(tenantData.componentSettings) &&
+      Object.keys(tenantData.componentSettings).length > 0;
 
     if (hasComponentSettings) {
       // تحميل جميع الصفحات من componentSettings
-      Object.entries(tenantData.componentSettings).forEach(([pageSlug, pageData]: [string, any]) => {
-        const components = Object.entries(pageData).map(([id, component]: [string, any]) => ({
-          id,
-          type: component.type,
-          name: component.name,
-          componentName: component.componentName,
-          data: component.data || {},
-          position: component.position || 0,
-          layout: component.layout || { row: 0, col: 0, span: 2 }
-        }));
-        
-        // تحديث كل صفحة في الـ store
-        setPageComponentsForPage(pageSlug, components);
-      });
+      Object.entries(tenantData.componentSettings).forEach(
+        ([pageSlug, pageData]: [string, any]) => {
+          const components = Object.entries(pageData).map(
+            ([id, component]: [string, any]) => ({
+              id,
+              type: component.type,
+              name: component.name,
+              componentName: component.componentName,
+              data: component.data || {},
+              position: component.position || 0,
+              layout: component.layout || { row: 0, col: 0, span: 2 },
+            }),
+          );
+
+          // تحديث كل صفحة في الـ store
+          setPageComponentsForPage(pageSlug, components);
+        },
+      );
     } else {
       // تحميل البيانات الافتراضية من PAGE_DEFINITIONS
-      const { PAGE_DEFINITIONS } = require("@/lib-liveeditor/defaultComponents");
-      
-      Object.entries(PAGE_DEFINITIONS).forEach(([pageSlug, pageData]: [string, any]) => {
-        const components = Object.entries(pageData).map(([id, component]: [string, any]) => ({
-          id,
-          type: component.type,
-          name: component.name,
-          componentName: component.componentName,
-          data: component.data || {},
-          position: component.position || 0,
-          layout: component.layout || { row: 0, col: 0, span: 2 }
-        }));
-        
-        // تحديث كل صفحة في الـ store
-        setPageComponentsForPage(pageSlug, components);
-      });
+      const {
+        PAGE_DEFINITIONS,
+      } = require("@/lib-liveeditor/defaultComponents");
+
+      Object.entries(PAGE_DEFINITIONS).forEach(
+        ([pageSlug, pageData]: [string, any]) => {
+          const components = Object.entries(pageData).map(
+            ([id, component]: [string, any]) => ({
+              id,
+              type: component.type,
+              name: component.name,
+              componentName: component.componentName,
+              data: component.data || {},
+              position: component.position || 0,
+              layout: component.layout || { row: 0, col: 0, span: 2 },
+            }),
+          );
+
+          // تحديث كل صفحة في الـ store
+          setPageComponentsForPage(pageSlug, components);
+        },
+      );
     }
   }, [tenantData]);
 
@@ -775,12 +792,12 @@ function EditorNavBar() {
   // }
 
   return (
-    <nav className="bg-white border-b-[1.5px] border-red-300 sticky top-0 z-[9999]">
+    <nav className="bg-white border-b-[1.5px] border-red-300 sticky top-0 z-[9999]" dir="ltr">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-1">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Live Editor</h1>
+              <h1 className="text-xl font-bold text-gray-900">{t("editor.title")}</h1>
               <span className="ml-2 text-sm text-gray-500">({tenantId})</span>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -801,7 +818,7 @@ function EditorNavBar() {
           </div>
           <div className="flex items-center space-x-4">
             <AddPageDialog onPageCreated={addPageToLocalList} />
-            
+
             <button
               onClick={requestSave} // عند الضغط، يتم استدعاء الدالة من السياق
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 focus:ring-blue-500 "
@@ -843,7 +860,7 @@ function EditorNavBar() {
               {t("editor.preview")}
             </Link>
             <Link
-              href={getTenantUrl('/')}
+              href={getTenantUrl("/")}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-[calc(1.02)]"
@@ -863,9 +880,9 @@ function EditorNavBar() {
               </svg>
               {t("editor.live_preview")}
             </Link>
-             
-             {/* Language Dropdown */}
-             <LanguageDropdown />
+
+            {/* Language Dropdown */}
+            <LanguageDropdown />
           </div>
         </div>
       </div>
@@ -879,15 +896,16 @@ export default function LiveEditorLayout({
   children: ReactNode;
 }) {
   const { setLocale } = useEditorLocale();
+  const t = useEditorT();
   const pathname = usePathname();
-  
+
   // Token validation
   const { tokenValidation } = useTokenValidation();
 
   // تحديث الـ store عند تحميل الصفحة
   useEffect(() => {
     if (pathname) {
-      const currentLang = pathname.split('/')[1] || 'en';
+      const currentLang = pathname.split("/")[1] || "en";
       setLocale(currentLang as any);
     }
   }, [pathname, setLocale]);
@@ -895,10 +913,13 @@ export default function LiveEditorLayout({
   // Show loading while validating token
   if (tokenValidation.loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+      <div
+        className="min-h-screen flex items-center justify-center bg-gray-50"
+        dir="ltr"
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري التحقق من صحة الجلسة...</p>
+          <p className="text-gray-600">{t("common.validating_session")}</p>
         </div>
       </div>
     );
@@ -909,7 +930,7 @@ export default function LiveEditorLayout({
     <I18nProvider>
       <AuthProvider>
         <EditorProvider>
-          <div className="min-h-screen bg-gray-50 flex flex-col">
+          <div className="min-h-screen bg-gray-50 flex flex-col" dir="ltr">
             {/* إضافة Toaster هنا ليعمل في كل مكان */}
             <Toaster position="top-center" reverseOrder={false} />
 
@@ -917,7 +938,7 @@ export default function LiveEditorLayout({
 
             <EditorNavBar />
 
-            <main className="flex-1">{children}</main>
+            <main className="flex-1" dir="ltr">{children}</main>
           </div>
         </EditorProvider>
       </AuthProvider>

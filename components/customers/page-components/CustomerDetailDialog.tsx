@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -59,12 +58,12 @@ export const CustomerDetailDialog = ({
                       selectedCustomer.customer_type === "مشتري"
                         ? "border-blue-500 text-blue-700"
                         : selectedCustomer.customer_type === "بائع"
-                        ? "border-green-500 text-green-700"
-                        : selectedCustomer.customer_type === "مستأجر"
-                        ? "border-purple-500 text-purple-700"
-                        : selectedCustomer.customer_type === "مؤجر"
-                        ? "border-orange-500 text-orange-700"
-                        : "border-red-500 text-red-700"
+                          ? "border-green-500 text-green-700"
+                          : selectedCustomer.customer_type === "مستأجر"
+                            ? "border-purple-500 text-purple-700"
+                            : selectedCustomer.customer_type === "مؤجر"
+                              ? "border-orange-500 text-orange-700"
+                              : "border-red-500 text-red-700"
                     }
                   >
                     {selectedCustomer.customer_type}
@@ -90,35 +89,44 @@ export const CustomerDetailDialog = ({
                 <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span>الهاتف:</span>
-                    {selectedCustomer.phone_number && selectedCustomer.phone_number !== "N/A" ? (
+                    {selectedCustomer.phone_number &&
+                    selectedCustomer.phone_number !== "N/A" ? (
                       <span className="font-medium flex items-center">
                         <Phone className="ml-1 h-3 w-3 text-green-600" />
                         {selectedCustomer.phone_number}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير متوفر</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير متوفر
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
                     <span>واتساب:</span>
-                    {selectedCustomer.whatsapp && selectedCustomer.whatsapp !== "N/A" ? (
+                    {selectedCustomer.whatsapp &&
+                    selectedCustomer.whatsapp !== "N/A" ? (
                       <span className="font-medium flex items-center">
                         <MessageSquare className="ml-1 h-3 w-3 text-green-500" />
                         {selectedCustomer.whatsapp}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير متوفر</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير متوفر
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
                     <span>البريد:</span>
-                    {selectedCustomer.email && selectedCustomer.email !== "N/A" ? (
+                    {selectedCustomer.email &&
+                    selectedCustomer.email !== "N/A" ? (
                       <span className="font-medium text-sm flex items-center">
                         <Mail className="ml-1 h-3 w-3 text-blue-500" />
                         {selectedCustomer.email}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير متوفر</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير متوفر
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
@@ -128,7 +136,9 @@ export const CustomerDetailDialog = ({
                         {selectedCustomer.communicationPreference}
                       </Badge>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير محدد</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير محدد
+                      </span>
                     )}
                   </div>
                 </CardContent>
@@ -144,7 +154,10 @@ export const CustomerDetailDialog = ({
                 <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span>المدينة:</span>
-                    {(typeof selectedCustomer.city === "string" && selectedCustomer.city && selectedCustomer.city !== "N/A") || selectedCustomer.city?.name_ar ? (
+                    {(typeof selectedCustomer.city === "string" &&
+                      selectedCustomer.city &&
+                      selectedCustomer.city !== "N/A") ||
+                    selectedCustomer.city?.name_ar ? (
                       <span className="font-medium flex items-center">
                         <MapPin className="ml-1 h-3 w-3 text-blue-500" />
                         {typeof selectedCustomer.city === "string"
@@ -152,30 +165,41 @@ export const CustomerDetailDialog = ({
                           : selectedCustomer.city?.name_ar}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير محددة</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير محددة
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
                     <span>الحي:</span>
-                    {(typeof selectedCustomer.district === "string" && selectedCustomer.district && selectedCustomer.district !== "N/A") || 
-                     (selectedCustomer.district as { name_ar: string })?.name_ar ? (
+                    {(typeof selectedCustomer.district === "string" &&
+                      selectedCustomer.district &&
+                      selectedCustomer.district !== "N/A") ||
+                    (selectedCustomer.district as { name_ar: string })
+                      ?.name_ar ? (
                       <span className="font-medium">
                         {typeof selectedCustomer.district === "string"
                           ? selectedCustomer.district
-                          : (selectedCustomer.district as { name_ar: string })?.name_ar}
+                          : (selectedCustomer.district as { name_ar: string })
+                              ?.name_ar}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير محدد</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير محدد
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
                     <span>الجنسية:</span>
-                    {selectedCustomer.nationality && selectedCustomer.nationality !== "N/A" ? (
+                    {selectedCustomer.nationality &&
+                    selectedCustomer.nationality !== "N/A" ? (
                       <span className="font-medium">
                         {selectedCustomer.nationality}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير محددة</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير محددة
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
@@ -186,7 +210,9 @@ export const CustomerDetailDialog = ({
                         {selectedCustomer.familySize} أفراد
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير محدد</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير محدد
+                      </span>
                     )}
                   </div>
                 </CardContent>
@@ -207,7 +233,9 @@ export const CustomerDetailDialog = ({
                         {selectedCustomer.assignedAgent}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير مخصص</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير مخصص
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
@@ -217,7 +245,9 @@ export const CustomerDetailDialog = ({
                         {selectedCustomer.leadSource}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير محدد</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير محدد
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
@@ -228,14 +258,16 @@ export const CustomerDetailDialog = ({
                           selectedCustomer.urgency === "عالية"
                             ? "destructive"
                             : selectedCustomer.urgency === "متوسطة"
-                            ? "default"
-                            : "secondary"
+                              ? "default"
+                              : "secondary"
                         }
                       >
                         {selectedCustomer.urgency}
                       </Badge>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">غير محددة</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        غير محددة
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center justify-between">
@@ -243,10 +275,14 @@ export const CustomerDetailDialog = ({
                     {selectedCustomer.satisfaction ? (
                       <div className="flex items-center">
                         <Star className="ml-1 h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-medium">{selectedCustomer.satisfaction}/5</span>
+                        <span className="font-medium">
+                          {selectedCustomer.satisfaction}/5
+                        </span>
                       </div>
                     ) : (
-                      <span className="text-muted-foreground italic text-sm">لم يتم التقييم</span>
+                      <span className="text-muted-foreground italic text-sm">
+                        لم يتم التقييم
+                      </span>
                     )}
                   </div>
                 </CardContent>
@@ -297,4 +333,4 @@ export const CustomerDetailDialog = ({
       </DialogContent>
     </Dialog>
   );
-}; 
+};

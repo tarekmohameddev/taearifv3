@@ -7,6 +7,7 @@
 ## المكونات الرئيسية
 
 ### 1. `lib/axiosInstance.js`
+
 معالج الأخطاء الرئيسي لجميع طلبات HTTP:
 
 - **أخطاء المصادقة (401)**: إعادة توجيه تلقائي لصفحة تسجيل الدخول
@@ -15,27 +16,38 @@
 - **أخطاء الشبكة**: معالجة مشاكل الاتصال
 
 ### 2. `utils/errorHandler.js`
+
 أدوات مساعدة لمعالجة الأخطاء:
 
 ```javascript
-import { getErrorInfo, retryWithBackoff, logError, formatErrorMessage } from "@/utils/errorHandler";
+import {
+  getErrorInfo,
+  retryWithBackoff,
+  logError,
+  formatErrorMessage,
+} from "@/utils/errorHandler";
 
 // تحديد نوع الخطأ
 const errorInfo = getErrorInfo(error);
 
 // إعادة المحاولة مع تأخير متزايد
-const result = await retryWithBackoff(async () => {
-  return await apiCall();
-}, 3, 1000);
+const result = await retryWithBackoff(
+  async () => {
+    return await apiCall();
+  },
+  3,
+  1000,
+);
 
 // تسجيل الخطأ
-logError(error, 'functionName');
+logError(error, "functionName");
 
 // تنسيق رسالة الخطأ للمستخدم
 const userMessage = formatErrorMessage(error);
 ```
 
 ### 3. `components/ui/error-display.tsx`
+
 مكونات عرض الأخطاء في واجهة المستخدم:
 
 - `ErrorDisplay`: عرض مفصل للخطأ مع إمكانية إعادة المحاولة
@@ -44,21 +56,25 @@ const userMessage = formatErrorMessage(error);
 ## أنواع الأخطاء المدعومة
 
 ### أخطاء الخادم (500+)
+
 - **السبب**: مشاكل في الخادم أو قاعدة البيانات
 - **المعالجة**: إعادة محاولة تلقائية مع تأخير متزايد
 - **الرسالة**: "خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقاً"
 
 ### أخطاء الشبكة
+
 - **السبب**: مشاكل في الاتصال بالإنترنت
 - **المعالجة**: إعادة محاولة تلقائية
 - **الرسالة**: "خطأ في الاتصال بالخادم. تحقق من اتصال الإنترنت"
 
 ### أخطاء المصادقة (401)
+
 - **السبب**: انتهاء صلاحية الجلسة
 - **المعالجة**: إعادة توجيه تلقائي لصفحة تسجيل الدخول
 - **الرسالة**: "تم فقدان التوثيق. الرجاء إعادة تسجيل الدخول"
 
 ### أخطاء العميل (400-499)
+
 - **السبب**: بيانات غير صحيحة أو طلب غير صالح
 - **المعالجة**: عرض رسالة خطأ واضحة
 - **الرسالة**: تختلف حسب نوع الخطأ
@@ -66,37 +82,43 @@ const userMessage = formatErrorMessage(error);
 ## الاستخدام في المكونات
 
 ### في Store (Zustand)
+
 ```javascript
-import { getErrorInfo, logError, formatErrorMessage } from "@/utils/errorHandler";
+import {
+  getErrorInfo,
+  logError,
+  formatErrorMessage,
+} from "@/utils/errorHandler";
 
 fetchData: async () => {
   try {
-    const response = await axiosInstance.get('/api/data');
+    const response = await axiosInstance.get("/api/data");
     // معالجة النجاح
   } catch (error) {
-    const errorInfo = logError(error, 'fetchData');
+    const errorInfo = logError(error, "fetchData");
     set({ error: formatErrorMessage(error) });
   }
-}
+};
 ```
 
 ### في المكونات
+
 ```jsx
 import { ErrorDisplay } from "@/components/ui/error-display";
 
 function MyComponent() {
   const { data, error, loading, fetchData } = useStore();
-  
+
   if (error) {
     return (
-      <ErrorDisplay 
+      <ErrorDisplay
         error={error}
         onRetry={fetchData}
         title="خطأ في تحميل البيانات"
       />
     );
   }
-  
+
   // باقي المكون
 }
 ```
@@ -111,6 +133,7 @@ function MyComponent() {
 ## تسجيل الأخطاء
 
 يتم تسجيل جميع الأخطاء في وحدة التحكم مع:
+
 - نوع الخطأ
 - رسالة الخطأ
 - رسالة المستخدم

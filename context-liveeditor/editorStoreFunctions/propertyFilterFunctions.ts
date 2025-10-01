@@ -21,7 +21,7 @@ export const getDefaultPropertyFilterData = (): ComponentData => ({
       "أرض استراحة",
       "استراحة",
       "فلة غير مكتملة",
-      "أرض تجارية"
+      "أرض تجارية",
     ],
   },
   styling: {
@@ -48,7 +48,8 @@ export const getDefaultPropertyFilterData = (): ComponentData => ({
       hoverBgColor: "#f3f4f6",
       borderRadius: "0.625rem",
       maxHeight: "15rem",
-      shadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+      shadow:
+        "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
     },
     searchButton: {
       bgColor: "#059669",
@@ -91,13 +92,16 @@ export const propertyFilterFunctions = {
 
     const defaultData = getDefaultPropertyFilterData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
-    return { 
-      propertyFilterStates: { ...state.propertyFilterStates, [variantId]: data } 
+
+    return {
+      propertyFilterStates: {
+        ...state.propertyFilterStates,
+        [variantId]: data,
+      },
     } as any;
   },
 
-  getData: (state: any, variantId: string) => 
+  getData: (state: any, variantId: string) =>
     state.propertyFilterStates[variantId] || getDefaultPropertyFilterData(),
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
@@ -105,11 +109,15 @@ export const propertyFilterFunctions = {
   }),
 
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.propertyFilterStates[variantId] || getDefaultPropertyFilterData();
+    const source =
+      state.propertyFilterStates[variantId] || getDefaultPropertyFilterData();
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
-      propertyFilterStates: { ...state.propertyFilterStates, [variantId]: newData },
+      propertyFilterStates: {
+        ...state.propertyFilterStates,
+        [variantId]: newData,
+      },
     } as any;
   },
 };

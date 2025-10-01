@@ -1,32 +1,29 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import PropertyFilter from "@/components/tenant/propertyFilter/propertyFilter1"
-import FilterButtons from "@/components/tenant/filterButtons/filterButtons1"
-import PropertyGrid from "@/components/tenant/grid/grid1"
-import { usePropertiesStore } from "@/store/propertiesStore"
+import { useEffect } from "react";
+import PropertyFilter from "@/components/tenant/propertyFilter/propertyFilter1";
+import FilterButtons from "@/components/tenant/filterButtons/filterButtons1";
+import PropertyGrid from "@/components/tenant/grid/grid1";
+import { usePropertiesStore } from "@/store/propertiesStore";
 
 interface PropertiesPageProps {
-  className?: string
+  className?: string;
 }
 
 export default function PropertiesPage({ className }: PropertiesPageProps) {
   // Store state
-  const { 
-    transactionType,
-    setTransactionType 
-  } = usePropertiesStore()
-  
+  const { transactionType, setTransactionType } = usePropertiesStore();
+
   // تعيين نوع المعاملة الافتراضي عند تحميل المكون
   useEffect(() => {
     // يمكن تعيين نوع المعاملة الافتراضي هنا إذا لزم الأمر
-  }, [])
+  }, []);
 
   return (
-    <div className={`w-full ${className || ''}`}>
+    <div className={`w-full ${className || ""}`}>
       {/* نموذج البحث والفلترة */}
       <PropertyFilter />
-      
+
       {/* أزرار الفلتر */}
       <div className="mx-auto max-w-[1600px] px-4">
         <FilterButtons />
@@ -35,5 +32,5 @@ export default function PropertiesPage({ className }: PropertiesPageProps) {
       {/* شبكة العقارات */}
       <PropertyGrid />
     </div>
-  )
+  );
 }

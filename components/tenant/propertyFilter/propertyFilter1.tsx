@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import { ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { usePropertiesStore } from "@/store/propertiesStore"
+import { useState, useEffect, useRef } from "react";
+import { ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { usePropertiesStore } from "@/store/propertiesStore";
 
 const propertyTypes = [
   "مزرعة",
@@ -17,67 +17,66 @@ const propertyTypes = [
   "أرض استراحة",
   "استراحة",
   "فلة غير مكتملة",
-  "أرض تجارية"
-]
+  "أرض تجارية",
+];
 
 interface PropertyFilterProps {
-  className?: string
+  className?: string;
 }
 
 export default function PropertyFilter({ className }: PropertyFilterProps) {
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   // Store state
-  const { 
-    search, 
-    propertyType, 
-    price, 
-    setSearch, 
-    setPropertyType, 
-    setPrice 
-  } = usePropertiesStore()
-  
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [filteredTypes, setFilteredTypes] = useState(propertyTypes)
+  const { search, propertyType, price, setSearch, setPropertyType, setPrice } =
+    usePropertiesStore();
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [filteredTypes, setFilteredTypes] = useState(propertyTypes);
 
   // تحديث الفلتر عند تغيير البحث
   useEffect(() => {
     if (propertyType) {
-      setFilteredTypes(propertyTypes.filter(type => 
-        type.toLowerCase().includes(propertyType.toLowerCase())
-      ))
+      setFilteredTypes(
+        propertyTypes.filter((type) =>
+          type.toLowerCase().includes(propertyType.toLowerCase()),
+        ),
+      );
     } else {
-      setFilteredTypes(propertyTypes)
+      setFilteredTypes(propertyTypes);
     }
-  }, [propertyType])
+  }, [propertyType]);
 
   // إغلاق الـ dropdown عند النقر خارجه
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // لا حاجة لـ router.push لأن store سيتولى تحديث البيانات
-  }
+  };
 
   const handleTypeSelect = (type: string) => {
-    setPropertyType(type)
-    setIsDropdownOpen(false)
-  }
+    setPropertyType(type);
+    setIsDropdownOpen(false);
+  };
 
   return (
-    <div className={`mb-6 md:mb-18 ${className || ''} max-w-[1600px] mx-auto`}>
-      <form 
+    <div className={`mb-6 md:mb-18 ${className || ""} max-w-[1600px] mx-auto`}>
+      <form
         onSubmit={handleSubmit}
         className="grid grid-cols-1 xs:grid-cols-2 md:flex flex-col md:flex-row mt-4 bg-white rounded-[10px] gap-x-5 md:gap-x-5 gap-y-4 p-4 "
       >
@@ -100,8 +99,8 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
                 placeholder="نوع العقار"
                 value={propertyType}
                 onChange={(e) => {
-                  setPropertyType(e.target.value)
-                  setIsDropdownOpen(true)
+                  setPropertyType(e.target.value);
+                  setIsDropdownOpen(true);
                 }}
                 onFocus={() => setIsDropdownOpen(true)}
                 className="w-full h-12 md:h-14 outline-none pr-10 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border border-gray-200 rounded-[10px] focus-visible:ring-0"
@@ -111,7 +110,7 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
                 <ChevronDown className="w-5 h-5 text-gray-400" />
               </div>
             </div>
-            
+
             {/* Dropdown */}
             {isDropdownOpen && (
               <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-[10px] mt-1 max-h-60 overflow-y-auto shadow-lg">
@@ -141,14 +140,14 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
             placeholder="السعر"
             value={price}
             onChange={(e) => {
-              const v = e.target.value
+              const v = e.target.value;
               if (v === "") {
-                setPrice(v)
-                return
+                setPrice(v);
+                return;
               }
-              const n = Number(v)
-              if (Number.isNaN(n)) return
-              setPrice(String(n >= 0 ? n : 0))
+              const n = Number(v);
+              if (Number.isNaN(n)) return;
+              setPrice(String(n >= 0 ? n : 0));
             }}
             className="w-full h-full outline-none pr-2 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border-0 focus-visible:ring-0"
             type="number"
@@ -169,5 +168,5 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
         </div>
       </form>
     </div>
-  )
+  );
 }

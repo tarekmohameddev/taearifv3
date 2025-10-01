@@ -5,11 +5,13 @@
 هذا الدليل يوضح جميع API endpoints المتاحة للـ Live Editor المدمج في الداشبورد.
 
 ## Base URL
+
 ```
 /api/tenant
 ```
 
 ## Authentication
+
 جميع الطلبات تتطلب مصادقة صحيحة عبر NextAuth.js.
 
 ## Endpoints
@@ -17,9 +19,11 @@
 ### 1. إدارة المكونات
 
 #### `PUT /api/tenant/components`
+
 تحديث مكون معين للمستخدم.
 
 **Request Body:**
+
 ```json
 {
   "componentType": "string",
@@ -29,6 +33,7 @@
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -42,6 +47,7 @@
 ```
 
 **Error Responses:**
+
 - `404`: User not found
 - `405`: Method not allowed
 
@@ -50,9 +56,11 @@
 ### 2. الحصول على بيانات المستأجر
 
 #### `POST /api/tenant/getTenant`
+
 الحصول على بيانات مستأجر معين.
 
 **Request Body:**
+
 ```json
 {
   "websiteName": "string"
@@ -60,6 +68,7 @@
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -74,6 +83,7 @@
 ```
 
 **Error Responses:**
+
 - `400`: websiteName is required
 - `404`: Tenant not found
 - `405`: Method not allowed
@@ -83,9 +93,11 @@
 ### 3. حفظ الصفحات
 
 #### `POST /api/tenant/save-pages`
+
 حفظ جميع صفحات المستأجر مع المكونات.
 
 **Request Body:**
+
 ```json
 {
   "tenantId": "string",
@@ -106,6 +118,7 @@
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -118,6 +131,7 @@
 ```
 
 **Error Responses:**
+
 - `400`: tenantId is required
 - `500`: Internal server error
 - `405`: Method not allowed
@@ -127,9 +141,11 @@
 ### 4. متغيرات المكونات
 
 #### `POST /api/tenant/component-variants`
+
 إنشاء أو تحديث متغير مكون معين.
 
 **Request Body:**
+
 ```json
 {
   "componentType": "string",
@@ -138,6 +154,7 @@
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -151,6 +168,7 @@
 ```
 
 **Error Responses:**
+
 - `405`: Method not allowed
 - `500`: Internal server error
 
@@ -159,6 +177,7 @@
 ## Data Models
 
 ### Component Structure
+
 ```typescript
 interface Component {
   id: string;
@@ -181,6 +200,7 @@ interface Component {
 ```
 
 ### Page Structure
+
 ```typescript
 interface Page {
   [pageName: string]: Component[];
@@ -188,6 +208,7 @@ interface Page {
 ```
 
 ### Tenant Structure
+
 ```typescript
 interface Tenant {
   username: string;
@@ -213,6 +234,7 @@ interface Tenant {
 ## Error Handling
 
 ### Standard Error Response
+
 ```json
 {
   "success": false,
@@ -223,6 +245,7 @@ interface Tenant {
 ```
 
 ### Error Codes
+
 - `400`: Bad Request
 - `401`: Unauthorized
 - `404`: Not Found
@@ -232,9 +255,10 @@ interface Tenant {
 ## Rate Limiting
 
 جميع endpoints محمية بمعدل طلبات:
+
 - **Limit:** 100 requests per minute
 - **Window:** 60 seconds
-- **Headers:** 
+- **Headers:**
   - `X-RateLimit-Limit`
   - `X-RateLimit-Remaining`
   - `X-RateLimit-Reset`
@@ -242,72 +266,76 @@ interface Tenant {
 ## Examples
 
 ### إنشاء صفحة جديدة
+
 ```javascript
-const response = await fetch('/api/tenant/save-pages', {
-  method: 'POST',
+const response = await fetch("/api/tenant/save-pages", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer your-token'
+    "Content-Type": "application/json",
+    Authorization: "Bearer your-token",
   },
   body: JSON.stringify({
-    tenantId: 'user123',
+    tenantId: "user123",
     pages: {
-      'homepage': [
+      homepage: [
         {
-          id: 'hero-1',
-          type: 'hero',
-          name: 'Hero Section',
-          componentName: 'hero1',
+          id: "hero-1",
+          type: "hero",
+          name: "Hero Section",
+          componentName: "hero1",
           data: {
-            title: 'Welcome to Our Website',
-            subtitle: 'Your trusted partner',
-            buttonText: 'Get Started',
-            buttonLink: '/contact'
+            title: "Welcome to Our Website",
+            subtitle: "Your trusted partner",
+            buttonText: "Get Started",
+            buttonLink: "/contact",
           },
-          position: 0
-        }
-      ]
-    }
-  })
+          position: 0,
+        },
+      ],
+    },
+  }),
 });
 ```
 
 ### تحديث مكون
+
 ```javascript
-const response = await fetch('/api/tenant/components', {
-  method: 'PUT',
+const response = await fetch("/api/tenant/components", {
+  method: "PUT",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer your-token'
+    "Content-Type": "application/json",
+    Authorization: "Bearer your-token",
   },
   body: JSON.stringify({
-    componentType: 'hero',
+    componentType: "hero",
     data: {
-      title: 'New Title',
-      subtitle: 'New Subtitle'
+      title: "New Title",
+      subtitle: "New Subtitle",
     },
-    id: 'user123'
-  })
+    id: "user123",
+  }),
 });
 ```
 
 ### الحصول على بيانات المستأجر
+
 ```javascript
-const response = await fetch('/api/tenant/getTenant', {
-  method: 'POST',
+const response = await fetch("/api/tenant/getTenant", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer your-token'
+    "Content-Type": "application/json",
+    Authorization: "Bearer your-token",
   },
   body: JSON.stringify({
-    websiteName: 'my-website'
-  })
+    websiteName: "my-website",
+  }),
 });
 ```
 
 ## Testing
 
 ### Test Endpoints
+
 ```bash
 # Test components endpoint
 curl -X PUT http://localhost:3000/api/tenant/components \
@@ -325,16 +353,19 @@ curl -X POST http://localhost:3000/api/tenant/getTenant \
 ## Security
 
 ### Authentication
+
 - جميع endpoints محمية بـ NextAuth.js
 - JWT tokens للجلسات
 - حماية CSRF
 
 ### Data Validation
+
 - تحقق من صحة البيانات المدخلة
 - تنظيف البيانات قبل المعالجة
 - حماية من SQL injection
 
 ### CORS
+
 - إعدادات CORS محددة
 - السماح للمصادر الموثوقة فقط
 - حماية من XSS attacks

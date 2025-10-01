@@ -17,8 +17,6 @@ import { CustomerDetailDialog } from "./page-components/CustomerDetailDialog";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
 import useAuthStore from "@/context/AuthContext";
 
-
-
 interface Customer {
   id: number;
   name: string;
@@ -69,19 +67,19 @@ const customers: Customer[] = [
     phone_number: "+966 50 123 4567",
     type: {
       id: 1,
-      name: "مشتري"
+      name: "مشتري",
     },
     stage: {
       id: 1,
-      name: "مرحلة أولية"
+      name: "مرحلة أولية",
     },
     priority: {
       id: 2,
-      name: "متوسطة"
+      name: "متوسطة",
     },
     procedure: {
       id: 1,
-      name: "لقاء"
+      name: "لقاء",
     },
     district: {
       id: 10100003001,
@@ -93,7 +91,7 @@ const customers: Customer[] = [
       country_name_ar: "السعودية",
       country_name_en: "Saudi Arabia",
       created_at: "2023-08-15T00:00:00.000000Z",
-      updated_at: "2023-08-15T00:00:00.000000Z"
+      updated_at: "2023-08-15T00:00:00.000000Z",
     },
     note: "عميل مهم، يبحث عن فيلا في حي راقي",
     city_id: 1,
@@ -101,13 +99,15 @@ const customers: Customer[] = [
     created_at: "2023-08-15T00:00:00.000000Z",
     updated_at: "2023-08-15T00:00:00.000000Z",
     interested_categories: [],
-    interested_properties: []
+    interested_properties: [],
   },
 ];
 
 export default function CustomersPage() {
   const [activeTab, setActiveTab] = useState("customers");
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null,
+  );
   const [selectedCustomers, setSelectedCustomers] = useState<number[]>([]);
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
@@ -115,7 +115,8 @@ export default function CustomersPage() {
   const [showAddCustomerDialog, setShowAddCustomerDialog] = useState(false);
   const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false);
   const [showStageDialog, setShowStageDialog] = useState(false);
-  const [selectedCustomerForStage, setSelectedCustomerForStage] = useState<Customer | null>(null);
+  const [selectedCustomerForStage, setSelectedCustomerForStage] =
+    useState<Customer | null>(null);
   const [totalCustomers, setTotalCustomers] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -143,7 +144,9 @@ export default function CustomersPage() {
     null,
   ); // ← ID العميل الجاري تعديله
   const [open, setOpen] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string[]>
+  >({});
   const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newCustomer, setNewCustomer] = useState({
@@ -165,116 +168,141 @@ export default function CustomersPage() {
   const { userData } = useAuthStore();
 
   // Function to fetch customers with current filters and pagination
-  const fetchCustomersWithFilters = useCallback(async (page = 1) => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
-      console.log("No token available, skipping fetchCustomersWithFilters");
-      return;
-    }
+  const fetchCustomersWithFilters = useCallback(
+    async (page = 1) => {
+      // التحقق من وجود التوكن قبل إجراء الطلب
+      if (!userData?.token) {
+        console.log("No token available, skipping fetchCustomersWithFilters");
+        return;
+      }
 
-    try {
-      setLoading(true);
-      const response = await axiosInstance.get(`/customers?page=${page}`);
-      const { customers, summary, pagination } = response.data.data;
-      setCustomersData(customers);
-      setTotalCustomers(summary.total_customers);
-      setPagination(pagination);
-    } catch (err) {
-      console.error("Error fetching customers:", err);
-      setError("حدث خطأ أثناء تحميل البيانات.");
-    } finally {
-      setLoading(false);
-    }
-  }, [setLoading, setError, userData?.token]);
-
-  useEffect(() => {
-    fetchCustomersWithFilters(1);
-  }, [fetchCustomersWithFilters]);
-
-  // Function to handle filter changes from FiltersAndSearch component
-  const handleFilterChange = useCallback((newCustomersData: Customer[], newPagination?: any) => {
-    setCustomersData(newCustomersData);
-    if (newPagination) {
-      setPagination(newPagination);
-    }
-    // Reset selected customers when filters change
-    setSelectedCustomers([]);
-  }, [setSelectedCustomers]);
-
-  // Handle page change
-  const handlePageChange = useCallback((page: number) => {
-    // Get current filters from store
-    const { searchTerm, filterType, filterCity, filterDistrict, filterPriority } = useCustomersFiltersStore.getState();
-    
-    // Build query parameters
-    const params = new URLSearchParams();
-    params.append('page', page.toString());
-    
-    if (searchTerm.trim()) {
-      params.append('q', searchTerm.trim());
-    }
-    if (filterCity !== "all") {
-      params.append('city_id', filterCity);
-    }
-    if (filterDistrict !== "all") {
-      params.append('district_id', filterDistrict);
-    }
-    if (filterType !== "all") {
-      params.append('type_id', filterType);
-    }
-    if (filterPriority !== "all") {
-      params.append('priority_id', filterPriority);
-    }
-    
-    // Use search endpoint if there are filters, otherwise use regular endpoint
-    const endpoint = params.toString().includes('q=') || 
-                    params.toString().includes('city_id=') || 
-                    params.toString().includes('district_id=') || 
-                    params.toString().includes('type_id=') || 
-                    params.toString().includes('priority_id=') 
-                    ? '/customers/search' 
-                    : '/customers';
-    
-    // Fetch data with current filters and new page
-    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get(endpoint, { params });
+        const response = await axiosInstance.get(`/customers?page=${page}`);
         const { customers, summary, pagination } = response.data.data;
         setCustomersData(customers);
         setTotalCustomers(summary.total_customers);
         setPagination(pagination);
-        // Reset selected customers when page changes
-        setSelectedCustomers([]);
       } catch (err) {
         console.error("Error fetching customers:", err);
         setError("حدث خطأ أثناء تحميل البيانات.");
       } finally {
         setLoading(false);
       }
-    };
-    
-    fetchData();
-  }, [setLoading, setError, setSelectedCustomers, setCustomersData, setTotalCustomers, setPagination]);
+    },
+    [setLoading, setError, userData?.token],
+  );
+
+  useEffect(() => {
+    fetchCustomersWithFilters(1);
+  }, [fetchCustomersWithFilters]);
+
+  // Function to handle filter changes from FiltersAndSearch component
+  const handleFilterChange = useCallback(
+    (newCustomersData: Customer[], newPagination?: any) => {
+      setCustomersData(newCustomersData);
+      if (newPagination) {
+        setPagination(newPagination);
+      }
+      // Reset selected customers when filters change
+      setSelectedCustomers([]);
+    },
+    [setSelectedCustomers],
+  );
+
+  // Handle page change
+  const handlePageChange = useCallback(
+    (page: number) => {
+      // Get current filters from store
+      const {
+        searchTerm,
+        filterType,
+        filterCity,
+        filterDistrict,
+        filterPriority,
+      } = useCustomersFiltersStore.getState();
+
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+
+      if (searchTerm.trim()) {
+        params.append("q", searchTerm.trim());
+      }
+      if (filterCity !== "all") {
+        params.append("city_id", filterCity);
+      }
+      if (filterDistrict !== "all") {
+        params.append("district_id", filterDistrict);
+      }
+      if (filterType !== "all") {
+        params.append("type_id", filterType);
+      }
+      if (filterPriority !== "all") {
+        params.append("priority_id", filterPriority);
+      }
+
+      // Use search endpoint if there are filters, otherwise use regular endpoint
+      const endpoint =
+        params.toString().includes("q=") ||
+        params.toString().includes("city_id=") ||
+        params.toString().includes("district_id=") ||
+        params.toString().includes("type_id=") ||
+        params.toString().includes("priority_id=")
+          ? "/customers/search"
+          : "/customers";
+
+      // Fetch data with current filters and new page
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+          const response = await axiosInstance.get(endpoint, { params });
+          const { customers, summary, pagination } = response.data.data;
+          setCustomersData(customers);
+          setTotalCustomers(summary.total_customers);
+          setPagination(pagination);
+          // Reset selected customers when page changes
+          setSelectedCustomers([]);
+        } catch (err) {
+          console.error("Error fetching customers:", err);
+          setError("حدث خطأ أثناء تحميل البيانات.");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    },
+    [
+      setLoading,
+      setError,
+      setSelectedCustomers,
+      setCustomersData,
+      setTotalCustomers,
+      setPagination,
+    ],
+  );
 
   // Function to handle new customer added
-  const handleCustomerAdded = useCallback((newCustomer: Customer) => {
-    // Refresh the current page to update pagination
-    handlePageChange(pagination?.current_page || 1);
-  }, [handlePageChange, pagination?.current_page]);
+  const handleCustomerAdded = useCallback(
+    (newCustomer: Customer) => {
+      // Refresh the current page to update pagination
+      handlePageChange(pagination?.current_page || 1);
+    },
+    [handlePageChange, pagination?.current_page],
+  );
 
   // Search is now handled by FiltersAndSearch component
 
-  const handleNewCustomerChange = (field: keyof typeof newCustomer) => (
-    value: any,
-  ) => {
-    setNewCustomer((prev) => ({ ...prev, [field]: value }));
-  };
-  const handleNewCustomerInputChange = (field: keyof typeof newCustomer) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setNewCustomer((prev) => ({ ...prev, [field]: e.target.value }));
-  };
+  const handleNewCustomerChange =
+    (field: keyof typeof newCustomer) => (value: any) => {
+      setNewCustomer((prev) => ({ ...prev, [field]: value }));
+    };
+  const handleNewCustomerInputChange =
+    (field: keyof typeof newCustomer) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setNewCustomer((prev) => ({ ...prev, [field]: e.target.value }));
+    };
 
   const handleAddCustomer = async () => {
     // This function is now handled by CustomerPageHeader component
@@ -307,7 +335,9 @@ export default function CustomersPage() {
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+                <p className="text-lg text-gray-500">
+                  يرجى تسجيل الدخول لعرض المحتوى
+                </p>
               </div>
             </div>
           </main>
@@ -394,20 +424,20 @@ export default function CustomersPage() {
                       <Skeleton className="h-4 w-20 ml-8" />
                       <Skeleton className="h-4 w-16 ml-8" />
                     </div>
-                    
+
                     {/* Table Rows */}
                     {[...Array(8)].map((_, i) => (
                       <div key={i} className="flex items-center border-b p-4">
                         {/* Checkbox */}
                         <Skeleton className="h-4 w-4 ml-4" />
-                        
+
                         {/* Customer Info */}
                         <div className="flex items-center space-x-3 ml-8">
                           <div>
                             <Skeleton className="h-5 w-32 mb-1" />
                           </div>
                         </div>
-                        
+
                         {/* Contact Info */}
                         <div className="space-y-1 ml-auto">
                           <div className="flex items-center">
@@ -419,24 +449,24 @@ export default function CustomersPage() {
                             <Skeleton className="h-3 w-20" />
                           </div>
                         </div>
-                        
+
                         {/* Type Badge */}
                         <div className="ml-8">
                           <Skeleton className="h-6 w-16 rounded-full" />
                         </div>
-                        
+
                         {/* Location */}
                         <div className="ml-8">
                           <Skeleton className="h-4 w-16 mb-1" />
                           <Skeleton className="h-3 w-12" />
                         </div>
-                        
+
                         {/* Last Contact */}
                         <div className="flex items-center ml-8">
                           <Skeleton className="h-3 w-3 ml-2" />
                           <Skeleton className="h-3 w-16" />
                         </div>
-                        
+
                         {/* Actions */}
                         <div className="flex items-center gap-1 ml-8">
                           <Skeleton className="h-8 w-8" />
@@ -491,11 +521,13 @@ export default function CustomersPage() {
     }
   };
 
-  const handleChange = (field: string) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setFormData((prev) => prev ? ({ ...prev, [field]: e.target.value }) : null);
-  };
+  const handleChange =
+    (field: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setFormData((prev) =>
+        prev ? { ...prev, [field]: e.target.value } : null,
+      );
+    };
 
   const handleStageUpdated = (customerId: number, newStageId: number) => {
     // Refresh the current page to update data
@@ -503,21 +535,20 @@ export default function CustomersPage() {
   };
 
   // Sort customers (filtering is now handled by API)
-  const filteredAndSortedCustomers = customersData
-    .sort((a, b) => {
-      let aValue = a[sortField as keyof Customer];
-      let bValue = b[sortField as keyof Customer];
+  const filteredAndSortedCustomers = customersData.sort((a, b) => {
+    let aValue = a[sortField as keyof Customer];
+    let bValue = b[sortField as keyof Customer];
 
-      // Handle cases where values might not be strings
-      const aStr = String(aValue ?? "").toLowerCase();
-      const bStr = String(bValue ?? "").toLowerCase();
+    // Handle cases where values might not be strings
+    const aStr = String(aValue ?? "").toLowerCase();
+    const bStr = String(bValue ?? "").toLowerCase();
 
-      if (sortDirection === "asc") {
-        return aStr.localeCompare(bStr);
-      } else {
-        return bStr.localeCompare(aStr);
-      }
-    });
+    if (sortDirection === "asc") {
+      return aStr.localeCompare(bStr);
+    } else {
+      return bStr.localeCompare(aStr);
+    }
+  });
 
   const handleSort = (field: keyof Customer) => {
     if (sortField === field) {

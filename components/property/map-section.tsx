@@ -99,7 +99,6 @@ export function MapSection({ onLocationUpdate }) {
   }, []); // إزالة onLocationUpdate من dependencies
 
   const updateLocation = (lat, lng, mapInstance) => {
-
     // إزالة العلامة القديمة إذا كانت موجودة
     if (markerRef.current) {
       markerRef.current.setMap(null);
@@ -114,7 +113,6 @@ export function MapSection({ onLocationUpdate }) {
       title: "موقع العقار",
       animation: window.google.maps.Animation.DROP,
     });
-
 
     // إضافة مستمع للسحب
     newMarker.addListener("dragend", (event) => {
@@ -134,10 +132,8 @@ export function MapSection({ onLocationUpdate }) {
   };
 
   const reverseGeocode = (lat, lng) => {
-
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-
       if (status === "OK" && results && results[0]) {
         const address = results[0].formatted_address;
         onLocationUpdate(lat, lng, address);
@@ -148,7 +144,6 @@ export function MapSection({ onLocationUpdate }) {
   };
 
   const getCurrentLocation = () => {
-
     if (navigator.geolocation && map) {
       navigator.geolocation.getCurrentPosition(
         (position) => {

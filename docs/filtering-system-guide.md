@@ -7,9 +7,11 @@
 ## المكونات الرئيسية
 
 ### 1. `AdvancedFilterDialog`
+
 مكون الفلترة الرئيسي مع تصميم حديث:
 
 **المميزات:**
+
 - تصميم أنيق بالأبيض والأسود
 - فلاتر متعددة: الهدف، النوع، السعر، المساحة، الغرف، الحمامات، المميزات
 - Price Range Slider مع قيم ديناميكية من الـ backend
@@ -19,6 +21,7 @@
 - أزرار إعادة التعيين والتطبيق
 
 **الاستخدام:**
+
 ```tsx
 <AdvancedFilterDialog
   isOpen={filterDialogOpen}
@@ -29,18 +32,22 @@
 ```
 
 ### 2. `ActiveFiltersDisplay`
+
 مكون عرض الفلاتر النشطة:
 
 **المميزات:**
+
 - عرض الفلاتر المطبقة كـ badges
 - إمكانية إزالة الفلاتر الفردية
 - زر "مسح الكل"
 - تصميم أنيق مع الألوان الأبيض والأسود
 
 ### 3. زر الفلترة
+
 زر أنيق بجانب زر "إضافة عقار":
 
 **المميزات:**
+
 - أيقونة Filter
 - عداد الفلاتر النشطة
 - تصميم متسق مع باقي الواجهة
@@ -48,34 +55,41 @@
 ## أنواع الفلاتر المدعومة
 
 ### 1. الهدف من العقار (Purposes)
+
 - `rent` - للإيجار
 - `sale` - للبيع
 
 ### 2. نوع العقار (Type)
+
 - `residential` - سكني
 - `commercial` - تجاري
 - `rent` - للإيجار
 - `sale` - للبيع
 
 ### 3. نطاق السعر (Price Range)
+
 - Slider مع قيم ديناميكية من الـ backend
 - `price_from` - الحد الأدنى للسعر
 - `price_to` - الحد الأقصى للسعر
 
 ### 4. نطاق المساحة (Area Range)
+
 - Slider للمساحة بالمتر المربع
 - `area_from` - الحد الأدنى للمساحة
 - `area_to` - الحد الأقصى للمساحة
 
 ### 5. عدد الغرف (Beds)
+
 - Checkboxes للاختيار من 1+ إلى 8+
 - `beds` - مصفوفة بأرقام الغرف المختارة
 
 ### 6. عدد الحمامات (Baths)
+
 - Checkboxes للاختيار من 1+ إلى 6+
 - `baths` - مصفوفة بأرقام الحمامات المختارة
 
 ### 7. المميزات (Features)
+
 - Checkboxes للمميزات المتاحة
 - `features` - مصفوفة بالمميزات المختارة
 
@@ -88,6 +102,7 @@
 ```
 
 ### معاملات URL المدعومة:
+
 - `purposes_filter` - الهدف من العقار
 - `type` - نوع العقار
 - `price_from` - الحد الأدنى للسعر
@@ -101,6 +116,7 @@
 ## التكامل مع Backend
 
 ### استجابة API المطلوبة:
+
 ```json
 {
   "status": "success",
@@ -127,15 +143,16 @@
 ```
 
 ### إرسال الفلاتر للـ Backend:
+
 ```javascript
 // في propertiesManagement.js
 const params = new URLSearchParams();
-params.set('page', page.toString());
+params.set("page", page.toString());
 
 Object.entries(filters).forEach(([key, value]) => {
   if (value && value.length > 0) {
     if (Array.isArray(value)) {
-      params.set(key, value.join(','));
+      params.set(key, value.join(","));
     } else {
       params.set(key, value.toString());
     }
@@ -143,13 +160,14 @@ Object.entries(filters).forEach(([key, value]) => {
 });
 
 const response = await axiosInstance.get(
-  `${process.env.NEXT_PUBLIC_Backend_URL}/properties?${params.toString()}`
+  `${process.env.NEXT_PUBLIC_Backend_URL}/properties?${params.toString()}`,
 );
 ```
 
 ## الاستخدام في المكونات
 
 ### في صفحة إدارة العقارات:
+
 ```tsx
 // State للفلاتر
 const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
@@ -181,6 +199,7 @@ const handleClearAllFilters = () => {
 ## التصميم والألوان
 
 ### نظام الألوان:
+
 - **الخلفية**: أبيض (`bg-white`)
 - **الحدود**: أسود (`border-black`)
 - **النصوص**: أسود (`text-black`)
@@ -189,6 +208,7 @@ const handleClearAllFilters = () => {
 - **الـ Badges**: أسود (`bg-black text-white`)
 
 ### العناصر المميزة:
+
 - **Price/Area Sliders**: تصميم أنيق مع قيم ديناميكية
 - **Checkboxes**: مخصصة بالأبيض والأسود
 - **Active Filters Display**: badges أنيقة مع أزرار إزالة

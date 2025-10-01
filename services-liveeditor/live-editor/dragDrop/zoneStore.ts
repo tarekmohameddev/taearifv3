@@ -36,4 +36,3 @@ export const createZoneStore = () =>
   }));
 
 export type ZoneStoreType = ReturnType<typeof createZoneStore>;
-

@@ -1,7 +1,15 @@
 "use client";
 
-import React, { useState } from 'react';
-import { clearDebugLog, downloadDebugLog, getDebugLogs, debugLogger, getChangeLogsAsString, getAllChangeLogs, clearChangeLogs } from '@/lib-liveeditor/debugLogger';
+import React, { useState } from "react";
+import {
+  clearDebugLog,
+  downloadDebugLog,
+  getDebugLogs,
+  debugLogger,
+  getChangeLogsAsString,
+  getAllChangeLogs,
+  clearChangeLogs,
+} from "@/lib-liveeditor/debugLogger";
 
 interface DebugControlsProps {
   onClose?: () => void;
@@ -15,7 +23,7 @@ export const DebugControls: React.FC<DebugControlsProps> = ({ onClose }) => {
 
   const handleClearLog = () => {
     clearDebugLog();
-    alert('Debug log cleared!');
+    alert("Debug log cleared!");
   };
 
   const handleDownloadLog = () => {
@@ -36,25 +44,25 @@ export const DebugControls: React.FC<DebugControlsProps> = ({ onClose }) => {
 
   const handleClearChangeLogs = () => {
     clearChangeLogs();
-    alert('Change logs cleared!');
+    alert("Change logs cleared!");
   };
 
   const handleDownloadChangeLogs = () => {
     const changeLogsString = getChangeLogsAsString();
-    const blob = new Blob([changeLogsString], { type: 'text/plain' });
+    const blob = new Blob([changeLogsString], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `changes-debug-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `changes-debug-${new Date().toISOString().split("T")[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
-    alert('Changes debug info saved to file!');
+
+    alert("Changes debug info saved to file!");
   };
 
-  if (process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== "development") {
     return null;
   }
 
@@ -99,7 +107,9 @@ export const DebugControls: React.FC<DebugControlsProps> = ({ onClose }) => {
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[80vh] overflow-hidden">
             <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="text-lg font-bold">Changes Detected ({changeLogs.length})</h3>
+              <h3 className="text-lg font-bold">
+                Changes Detected ({changeLogs.length})
+              </h3>
               <button
                 onClick={() => setShowChangeLogs(false)}
                 className="text-gray-500 hover:text-gray-700"
@@ -109,7 +119,9 @@ export const DebugControls: React.FC<DebugControlsProps> = ({ onClose }) => {
             </div>
             <div className="p-4 overflow-y-auto max-h-[60vh]">
               {changeLogs.length === 0 ? (
-                <p className="text-gray-500">No changes detected yet. Try modifying a component.</p>
+                <p className="text-gray-500">
+                  No changes detected yet. Try modifying a component.
+                </p>
               ) : (
                 <div className="space-y-6">
                   {changeLogs.map((changeLog, index) => (
@@ -128,16 +140,20 @@ export const DebugControls: React.FC<DebugControlsProps> = ({ onClose }) => {
                           ID: {changeLog.componentId}
                         </span>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <h4 className="text-sm font-bold text-red-600 mb-2">BEFORE:</h4>
+                          <h4 className="text-sm font-bold text-red-600 mb-2">
+                            BEFORE:
+                          </h4>
                           <pre className="text-xs bg-white p-3 rounded border overflow-x-auto max-h-60">
                             {JSON.stringify(changeLog.before, null, 2)}
                           </pre>
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-green-600 mb-2">AFTER:</h4>
+                          <h4 className="text-sm font-bold text-green-600 mb-2">
+                            AFTER:
+                          </h4>
                           <pre className="text-xs bg-white p-3 rounded border overflow-x-auto max-h-60">
                             {JSON.stringify(changeLog.after, null, 2)}
                           </pre>

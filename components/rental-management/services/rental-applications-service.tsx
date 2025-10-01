@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,13 +20,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Command,
   CommandEmpty,
@@ -28,16 +34,16 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Pagination,
   PaginationContent,
@@ -46,7 +52,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
 import {
   Users,
   Search,
@@ -72,78 +78,80 @@ import {
   Check,
   ChevronsUpDown,
   CreditCard,
-} from "lucide-react"
-import axiosInstance from "@/lib/axiosInstance"
-import useStore from "@/context/Store"
-import { RentalDetailsDialog } from "../rental-details-dialog"
-import { UpdatedAddRentalForm } from "./updated-rental-form"
-import { PaymentCollectionDialog } from "../payment-collection-dialog"
-import useAuthStore from "@/context/AuthContext"
+} from "lucide-react";
+import axiosInstance from "@/lib/axiosInstance";
+import useStore from "@/context/Store";
+import { RentalDetailsDialog } from "../rental-details-dialog";
+import { UpdatedAddRentalForm } from "./updated-rental-form";
+import { PaymentCollectionDialog } from "../payment-collection-dialog";
+import useAuthStore from "@/context/AuthContext";
 
 interface Property {
-  id: number
-  featured_image: string
-  price: string
-  beds: number
-  bath: number
-  area: string
-  latitude: string
-  longitude: string
+  id: number;
+  featured_image: string;
+  price: string;
+  beds: number;
+  bath: number;
+  area: string;
+  latitude: string;
+  longitude: string;
 }
 
 interface RentalData {
-  id: number
-  user_id: number
-  property_number: string
-  unit_label: string
-  tenant_full_name: string
-  tenant_phone: string
-  tenant_email: string
-  tenant_job_title: string
-  tenant_social_status: string
-  tenant_national_id: string
-  base_rent_amount: string
-  currency: string
-  deposit_amount: string
-  move_in_date: string
-  paying_plan: string
-  rental_period_months: number
-  status: string
-  notes: string
-  created_at: string
-  updated_at: string
-  property: Property
-  next_payment_due_date?: string
-  next_payment_amount?: string
+  id: number;
+  user_id: number;
+  property_number: string;
+  unit_label: string;
+  tenant_full_name: string;
+  tenant_phone: string;
+  tenant_email: string;
+  tenant_job_title: string;
+  tenant_social_status: string;
+  tenant_national_id: string;
+  base_rent_amount: string;
+  currency: string;
+  deposit_amount: string;
+  move_in_date: string;
+  paying_plan: string;
+  rental_period_months: number;
+  status: string;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+  property: Property;
+  next_payment_due_date?: string;
+  next_payment_amount?: string;
 }
 
 interface ApiResponse {
-  status: boolean
-  data: RentalData[]
+  status: boolean;
+  data: RentalData[];
   pagination: {
-    current_page: number
-    per_page: number
-    total: number
-    last_page: number
-    from: number
-    to: number
-    has_more_pages: boolean
-    next_page_url: string | null
-    prev_page_url: string | null
-  }
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+    from: number;
+    to: number;
+    has_more_pages: boolean;
+    next_page_url: string | null;
+    prev_page_url: string | null;
+  };
 }
 
 interface RentalApplicationsServiceProps {
-  openAddDialogCounter?: number
+  openAddDialogCounter?: number;
 }
 
-export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalApplicationsServiceProps) {
-  const { 
-    rentalApplications, 
+export function RentalApplicationsService({
+  openAddDialogCounter = 0,
+}: RentalApplicationsServiceProps) {
+  const {
+    rentalApplications,
     setRentalApplications,
     openRentalDetailsDialog,
-    openPaymentCollectionDialog
-  } = useStore()
+    openPaymentCollectionDialog,
+  } = useStore();
   const {
     rentals,
     pagination,
@@ -161,277 +169,328 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
     isDeleting,
     isInitialized,
     lastProcessedOpenAddDialogCounter,
-  } = rentalApplications
-  const { userData } = useAuthStore()
+  } = rentalApplications;
+  const { userData } = useAuthStore();
 
   // Dialog states are now managed by Zustand store
 
   // Dialog functions are now managed by Zustand store
-  
+
   // Open Add Rental dialog when the counter changes from parent
   useEffect(() => {
     // Simplified logic: if counter > last processed, open dialog
-    if (openAddDialogCounter > 0 && openAddDialogCounter > lastProcessedOpenAddDialogCounter) {
-      setRentalApplications({ 
-        isAddRentalDialogOpen: true, 
-        lastProcessedOpenAddDialogCounter: openAddDialogCounter 
-      })
-    } else if (lastProcessedOpenAddDialogCounter === -1 && openAddDialogCounter >= 0) {
-      setRentalApplications({ lastProcessedOpenAddDialogCounter: openAddDialogCounter })
+    if (
+      openAddDialogCounter > 0 &&
+      openAddDialogCounter > lastProcessedOpenAddDialogCounter
+    ) {
+      setRentalApplications({
+        isAddRentalDialogOpen: true,
+        lastProcessedOpenAddDialogCounter: openAddDialogCounter,
+      });
+    } else if (
+      lastProcessedOpenAddDialogCounter === -1 &&
+      openAddDialogCounter >= 0
+    ) {
+      setRentalApplications({
+        lastProcessedOpenAddDialogCounter: openAddDialogCounter,
+      });
     }
-  }, [openAddDialogCounter, lastProcessedOpenAddDialogCounter, setRentalApplications])
+  }, [
+    openAddDialogCounter,
+    lastProcessedOpenAddDialogCounter,
+    setRentalApplications,
+  ]);
 
   useEffect(() => {
     if (!isInitialized && userData?.token) {
-      fetchRentals()
+      fetchRentals();
     }
-  }, [isInitialized, userData?.token])
+  }, [isInitialized, userData?.token]);
 
   // دالة مساعدة للتعامل مع البيانات المفقودة
-  const getSafeValue = (value: any, fallback: string = 'غير محدد') => {
-    if (value === null || value === undefined || value === '') {
-      return fallback
+  const getSafeValue = (value: any, fallback: string = "غير محدد") => {
+    if (value === null || value === undefined || value === "") {
+      return fallback;
     }
-    return value
-  }
+    return value;
+  };
 
   // دالة للحصول على اسم المستأجر مع معالجة البيانات المفقودة
   const getTenantName = (rental: RentalData) => {
-    return getSafeValue(rental.tenant_full_name, 'مستأجر غير محدد')
-  }
+    return getSafeValue(rental.tenant_full_name, "مستأجر غير محدد");
+  };
 
   // دالة للحصول على رمز الوحدة مع معالجة البيانات المفقودة
   const getUnitLabel = (rental: RentalData) => {
-    return getSafeValue(rental.unit_label, 'غير محدد')
-  }
+    return getSafeValue(rental.unit_label, "غير محدد");
+  };
 
   // دالة للحصول على رقم العقار مع معالجة البيانات المفقودة
   const getPropertyNumber = (rental: RentalData) => {
-    return getSafeValue(rental.property_number, 'غير محدد')
-  }
+    return getSafeValue(rental.property_number, "غير محدد");
+  };
 
   // دالة للحصول على المهنة مع معالجة البيانات المفقودة
   const getJobTitle = (rental: RentalData) => {
-    return getSafeValue(rental.tenant_job_title, 'غير محدد')
-  }
+    return getSafeValue(rental.tenant_job_title, "غير محدد");
+  };
 
   // دالة للحصول على رقم الهاتف مع معالجة البيانات المفقودة
   const getPhoneNumber = (rental: RentalData) => {
-    return getSafeValue(rental.tenant_phone, 'غير محدد')
-  }
+    return getSafeValue(rental.tenant_phone, "غير محدد");
+  };
 
   // دالة للحصول على البريد الإلكتروني مع معالجة البيانات المفقودة
   const getEmail = (rental: RentalData) => {
-    return getSafeValue(rental.tenant_email, 'غير محدد')
-  }
+    return getSafeValue(rental.tenant_email, "غير محدد");
+  };
 
   // دالة للحصول على تفاصيل العقار مع معالجة البيانات المفقودة
   const getPropertyDetails = (rental: RentalData) => {
     if (!rental.property) {
-      return { beds: 'غير محدد', bath: 'غير محدد', area: 'غير محدد' }
+      return { beds: "غير محدد", bath: "غير محدد", area: "غير محدد" };
     }
     return {
-      beds: getSafeValue(rental.property.beds, 'غير محدد'),
-      bath: getSafeValue(rental.property.bath, 'غير محدد'),
-      area: getSafeValue(rental.property.area, 'غير محدد')
-    }
-  }
+      beds: getSafeValue(rental.property.beds, "غير محدد"),
+      bath: getSafeValue(rental.property.bath, "غير محدد"),
+      area: getSafeValue(rental.property.area, "غير محدد"),
+    };
+  };
 
   const fetchRentals = async (page: number = 1) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchRentals")
-      setRentalApplications({ loading: false, error: "Authentication required. Please login." })
-      return
+      console.log("No token available, skipping fetchRentals");
+      setRentalApplications({
+        loading: false,
+        error: "Authentication required. Please login.",
+      });
+      return;
     }
 
     try {
-      setRentalApplications({ loading: true, error: null })
-      const response = await axiosInstance.get<ApiResponse>(`/v1/rms/rentals?page=${page}`)
-      
+      setRentalApplications({ loading: true, error: null });
+      const response = await axiosInstance.get<ApiResponse>(
+        `/v1/rms/rentals?page=${page}`,
+      );
+
       if (response.data.status) {
-        setRentalApplications({ 
-          rentals: response.data.data, 
+        setRentalApplications({
+          rentals: response.data.data,
           pagination: (response.data as any).pagination,
-          isInitialized: true 
-        })
+          isInitialized: true,
+        });
       } else {
-        setRentalApplications({ error: "فشل في جلب البيانات" })
+        setRentalApplications({ error: "فشل في جلب البيانات" });
       }
     } catch (err) {
-      setRentalApplications({ error: "حدث خطأ أثناء جلب البيانات" })
+      setRentalApplications({ error: "حدث خطأ أثناء جلب البيانات" });
     } finally {
-      setRentalApplications({ loading: false })
+      setRentalApplications({ loading: false });
     }
-  }
+  };
 
   const handlePageChange = (page: number) => {
-    fetchRentals(page)
-  }
+    fetchRentals(page);
+  };
 
   const filteredRentals = (rentals || []).filter((rental: RentalData) => {
     const matchesSearch =
       getTenantName(rental).toLowerCase().includes(searchTerm.toLowerCase()) ||
       getUnitLabel(rental).toLowerCase().includes(searchTerm.toLowerCase()) ||
       getPhoneNumber(rental).includes(searchTerm) ||
-      getEmail(rental).toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === "all" || getSafeValue(rental.status) === filterStatus
-    return matchesSearch && matchesStatus
-  })
+      getEmail(rental).toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || getSafeValue(rental.status) === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusColor = (status: string | null | undefined) => {
-    const safeStatus = getSafeValue(status, 'unknown')
+    const safeStatus = getSafeValue(status, "unknown");
     switch (safeStatus) {
       case "active":
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-gray-100 text-gray-800 border-gray-200";
       case "pending":
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-gray-100 text-gray-800 border-gray-200";
       case "expired":
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-gray-100 text-gray-800 border-gray-200";
       case "cancelled":
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-gray-100 text-gray-800 border-gray-200";
       case "draft":
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  }
+  };
 
   const getStatusIcon = (status: string | null | undefined) => {
-    const safeStatus = getSafeValue(status, 'unknown')
+    const safeStatus = getSafeValue(status, "unknown");
     switch (safeStatus) {
       case "active":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "pending":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       case "expired":
-        return <XCircle className="h-4 w-4" />
+        return <XCircle className="h-4 w-4" />;
       case "cancelled":
-        return <XCircle className="h-4 w-4" />
+        return <XCircle className="h-4 w-4" />;
       case "draft":
-        return <FileText className="h-4 w-4" />
+        return <FileText className="h-4 w-4" />;
       default:
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
     }
-  }
+  };
 
   const getStatusText = (status: string | null | undefined) => {
-    const safeStatus = getSafeValue(status, 'unknown')
+    const safeStatus = getSafeValue(status, "unknown");
     switch (safeStatus) {
       case "active":
-        return "نشط"
+        return "نشط";
       case "pending":
-        return "قيد الانتظار"
+        return "قيد الانتظار";
       case "expired":
-        return "منتهي الصلاحية"
+        return "منتهي الصلاحية";
       case "cancelled":
-        return "ملغي"
+        return "ملغي";
       case "draft":
-        return "مسودة"
+        return "مسودة";
       default:
-        return "غير محدد"
+        return "غير محدد";
     }
-  }
+  };
 
   const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return 'غير محدد'
+    if (!dateString) return "غير محدد";
     try {
-      const date = new Date(dateString)
-      if (isNaN(date.getTime())) return 'تاريخ غير صحيح'
-      return date.toLocaleDateString('ar-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "تاريخ غير صحيح";
+      return date.toLocaleDateString("ar-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
     } catch (error) {
-      return 'تاريخ غير صحيح'
+      return "تاريخ غير صحيح";
     }
-  }
+  };
 
-  const formatCurrency = (amount: string | null | undefined, currency: string | null | undefined) => {
-    if (!amount || isNaN(parseFloat(amount))) return 'غير محدد'
+  const formatCurrency = (
+    amount: string | null | undefined,
+    currency: string | null | undefined,
+  ) => {
+    if (!amount || isNaN(parseFloat(amount))) return "غير محدد";
     try {
-      return new Intl.NumberFormat('ar-US', {
-        style: 'currency',
-        currency: currency || 'SAR'
-      }).format(parseFloat(amount))
+      return new Intl.NumberFormat("ar-US", {
+        style: "currency",
+        currency: currency || "SAR",
+      }).format(parseFloat(amount));
     } catch (error) {
-      return 'مبلغ غير صحيح'
+      return "مبلغ غير صحيح";
     }
-  }
+  };
 
   const handleCreateRental = async (formData: any) => {
     try {
-      setRentalApplications({ isSubmitting: true })
-      
-      const response = await axiosInstance.post("/v1/rms/rentals", formData)
-      
+      setRentalApplications({ isSubmitting: true });
+
+      const response = await axiosInstance.post("/v1/rms/rentals", formData);
+
       if (response.data.status) {
         // إغلاق النافذة المنبثقة أولاً
-        setRentalApplications({ isAddRentalDialogOpen: false })
-        
+        setRentalApplications({ isAddRentalDialogOpen: false });
+
         // إعادة جلب البيانات من API لضمان الحصول على أحدث البيانات
-        await fetchRentals(1)
-        
+        await fetchRentals(1);
+
         // يمكن إضافة toast notification هنا
-        console.log("تم إضافة الإيجار بنجاح وإعادة تحميل البيانات")
+        console.log("تم إضافة الإيجار بنجاح وإعادة تحميل البيانات");
       } else {
-        alert("فشل في إضافة الإيجار: " + (response.data.message || "خطأ غير معروف"))
+        alert(
+          "فشل في إضافة الإيجار: " + (response.data.message || "خطأ غير معروف"),
+        );
       }
     } catch (err: any) {
-      alert("خطأ في إضافة الإيجار: " + (err.response?.data?.message || err.message || "خطأ غير معروف"))
+      alert(
+        "خطأ في إضافة الإيجار: " +
+          (err.response?.data?.message || err.message || "خطأ غير معروف"),
+      );
       // إغلاق النافذة المنبثقة في حالة الخطأ
-      setRentalApplications({ isAddRentalDialogOpen: false })
+      setRentalApplications({ isAddRentalDialogOpen: false });
     } finally {
-      setRentalApplications({ isSubmitting: false })
+      setRentalApplications({ isSubmitting: false });
     }
-  }
+  };
 
   const handleUpdateRental = async (rentalId: number, formData: any) => {
     try {
-      setRentalApplications({ isSubmitting: true })
-      const response = await axiosInstance.patch(`/v1/rms/rentals/${rentalId}`, formData)
-      
+      setRentalApplications({ isSubmitting: true });
+      const response = await axiosInstance.patch(
+        `/v1/rms/rentals/${rentalId}`,
+        formData,
+      );
+
       if (response.data.status) {
         // تحديث الإيجار في القائمة بالبيانات الجديدة
-        const updated = rentals.map((rental: RentalData) => rental.id === rentalId ? response.data.data : rental)
-        setRentalApplications({ rentals: updated, isEditRentalDialogOpen: false, editingRental: null })
+        const updated = rentals.map((rental: RentalData) =>
+          rental.id === rentalId ? response.data.data : rental,
+        );
+        setRentalApplications({
+          rentals: updated,
+          isEditRentalDialogOpen: false,
+          editingRental: null,
+        });
         // يمكن إضافة toast notification هنا
       }
     } catch (err) {
       // يمكن إضافة toast error هنا
       // إغلاق النافذة المنبثقة في حالة الخطأ
-      setRentalApplications({ isEditRentalDialogOpen: false, editingRental: null })
+      setRentalApplications({
+        isEditRentalDialogOpen: false,
+        editingRental: null,
+      });
     } finally {
-      setRentalApplications({ isSubmitting: false })
+      setRentalApplications({ isSubmitting: false });
     }
-  }
+  };
 
   const handleDeleteRental = async (rentalId: number) => {
     try {
-      setRentalApplications({ isDeleteDialogOpen: false, isDeleting: true })
-      const response = await axiosInstance.delete(`/v1/rms/rentals/${rentalId}`)
-      
+      setRentalApplications({ isDeleteDialogOpen: false, isDeleting: true });
+      const response = await axiosInstance.delete(
+        `/v1/rms/rentals/${rentalId}`,
+      );
+
       if (response.status) {
-        const updated = rentals.filter((rental: RentalData) => rental.id !== rentalId)
-        setRentalApplications({ rentals: updated, isDeleteDialogOpen: false, deletingRental: null })
+        const updated = rentals.filter(
+          (rental: RentalData) => rental.id !== rentalId,
+        );
+        setRentalApplications({
+          rentals: updated,
+          isDeleteDialogOpen: false,
+          deletingRental: null,
+        });
       }
     } catch (err) {
-      setRentalApplications({ isDeleteDialogOpen: false, deletingRental: null })
+      setRentalApplications({
+        isDeleteDialogOpen: false,
+        deletingRental: null,
+      });
     } finally {
-      setRentalApplications({ isDeleting: false })
+      setRentalApplications({ isDeleting: false });
     }
-  }
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+          <p className="text-lg text-gray-500">
+            يرجى تسجيل الدخول لعرض المحتوى
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -457,7 +516,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -471,28 +530,42 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
           إعادة المحاولة
         </Button>
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-6">
       {/* Header and Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <Dialog open={isAddRentalDialogOpen} onOpenChange={(open) => setRentalApplications({ isAddRentalDialogOpen: open })}>
+        <Dialog
+          open={isAddRentalDialogOpen}
+          onOpenChange={(open) =>
+            setRentalApplications({ isAddRentalDialogOpen: open })
+          }
+        >
           <DialogTrigger asChild>
             <Button className="bg-gray-700 hover:bg-gray-800">
               <Plus className="ml-2 h-4 w-4" />
               إضافة إيجار جديد
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto text-right" dir="rtl">
+          <DialogContent
+            className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto text-right"
+            dir="rtl"
+          >
             <DialogHeader>
-              <DialogTitle className="text-right" dir="rtl">إضافة عقد إيجار جديد</DialogTitle>
-              <DialogDescription className="text-right" dir="rtl">أدخل تفاصيل طلب الإيجار الجديد</DialogDescription>
+              <DialogTitle className="text-right" dir="rtl">
+                إضافة عقد إيجار جديد
+              </DialogTitle>
+              <DialogDescription className="text-right" dir="rtl">
+                أدخل تفاصيل طلب الإيجار الجديد
+              </DialogDescription>
             </DialogHeader>
-            <UpdatedAddRentalForm 
+            <UpdatedAddRentalForm
               onSubmit={handleCreateRental}
-              onCancel={() => setRentalApplications({ isAddRentalDialogOpen: false })}
+              onCancel={() =>
+                setRentalApplications({ isAddRentalDialogOpen: false })
+              }
               isSubmitting={isSubmitting}
             />
           </DialogContent>
@@ -506,11 +579,16 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
           <Input
             placeholder="البحث في الإيجارات..."
             value={searchTerm}
-            onChange={(e) => setRentalApplications({ searchTerm: e.target.value })}
+            onChange={(e) =>
+              setRentalApplications({ searchTerm: e.target.value })
+            }
             className="pr-10"
           />
         </div>
-        <Select value={filterStatus} onValueChange={(v) => setRentalApplications({ filterStatus: v })}>
+        <Select
+          value={filterStatus}
+          onValueChange={(v) => setRentalApplications({ filterStatus: v })}
+        >
           <SelectTrigger className="w-full sm:w-48">
             <Filter className="ml-2 h-4 w-4" />
             <SelectValue placeholder="جميع الحالات" />
@@ -590,7 +668,10 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
       </div> */}
 
       {/* Modern Rentals Table */}
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden" dir="rtl">
+      <div
+        className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+        dir="rtl"
+      >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gradient-to-r from-gray-900 to-gray-800 border-b border-gray-300">
@@ -608,10 +689,10 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                   مدة الإيجار
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                تاريخ الانتقال
+                  تاريخ الانتقال
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                تاريخ الاستحقاق
+                  تاريخ الاستحقاق
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
                   الحالة
@@ -623,11 +704,11 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredRentals.map((rental: RentalData, index: number) => (
-                <tr 
-                  key={rental.id} 
+                <tr
+                  key={rental.id}
                   onClick={() => openRentalDetailsDialog(rental.id)}
                   className={`hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-300 hover:shadow-sm cursor-pointer ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                    index % 2 === 0 ? "bg-white" : "bg-gray-25"
                   }`}
                 >
                   {/* المستأجر */}
@@ -636,7 +717,11 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       <div className="flex-shrink-0">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-br from-gray-800 to-gray-600 flex items-center justify-center">
                           <span className="text-white font-bold text-lg">
-                            {getTenantName(rental).split(' ').map((n: string) => n[0]).join('').slice(0, 2) || '??'}
+                            {getTenantName(rental)
+                              .split(" ")
+                              .map((n: string) => n[0])
+                              .join("")
+                              .slice(0, 2) || "??"}
                           </span>
                         </div>
                       </div>
@@ -665,7 +750,8 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                     </div>
                     {rental.property && (
                       <div className="text-xs text-gray-400 mt-1">
-                        {getPropertyDetails(rental).beds} غرف • {getPropertyDetails(rental).bath} حمام
+                        {getPropertyDetails(rental).beds} غرف •{" "}
+                        {getPropertyDetails(rental).bath} حمام
                       </div>
                     )}
                   </td>
@@ -676,21 +762,27 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       {formatCurrency(rental.base_rent_amount, rental.currency)}
                     </div>
                     <div className="text-sm text-gray-500">
-                      الضمان: {formatCurrency(rental.deposit_amount, rental.currency)}
+                      الضمان:{" "}
+                      {formatCurrency(rental.deposit_amount, rental.currency)}
                     </div>
                     <div className="text-xs text-gray-400 mt-1">
-                      {getSafeValue(rental.paying_plan) === 'monthly' ? 'شهري' : 
-                       getSafeValue(rental.paying_plan) === 'quarterly' ? 'ربع سنوي' :
-                       getSafeValue(rental.paying_plan) === 'semi_annual' ? 'نصف سنوي' :
-                       getSafeValue(rental.paying_plan) === 'annual' ? 'سنوي' : 
-                       getSafeValue(rental.paying_plan)}
+                      {getSafeValue(rental.paying_plan) === "monthly"
+                        ? "شهري"
+                        : getSafeValue(rental.paying_plan) === "quarterly"
+                          ? "ربع سنوي"
+                          : getSafeValue(rental.paying_plan) === "semi_annual"
+                            ? "نصف سنوي"
+                            : getSafeValue(rental.paying_plan) === "annual"
+                              ? "سنوي"
+                              : getSafeValue(rental.paying_plan)}
                     </div>
                   </td>
 
                   {/* مدة الإيجار */}
                   <td className="px-6 py-5">
                     <div className="text-sm font-semibold text-gray-900">
-                      {getSafeValue(rental.rental_period_months, 'غير محدد')} شهر
+                      {getSafeValue(rental.rental_period_months, "غير محدد")}{" "}
+                      شهر
                     </div>
                     <div className="text-xs text-gray-500">
                       من {formatDate(rental.move_in_date)}
@@ -703,7 +795,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       {formatDate(rental.move_in_date)}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {new Date(rental.created_at).toLocaleDateString('ar-US')}
+                      {new Date(rental.created_at).toLocaleDateString("ar-US")}
                     </div>
                   </td>
 
@@ -713,17 +805,22 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       {formatDate(rental.next_payment_due_date)}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {rental.next_payment_amount ? `${rental.next_payment_amount} ريال سعودي` : 'غير محدد'}
+                      {rental.next_payment_amount
+                        ? `${rental.next_payment_amount} ريال سعودي`
+                        : "غير محدد"}
                     </div>
                   </td>
 
-                  
                   {/* الحالة */}
                   <td className="px-6 py-5">
                     <div className="flex items-center">
-                      <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm ${getStatusColor(rental.status)}`}>
+                      <div
+                        className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm ${getStatusColor(rental.status)}`}
+                      >
                         {getStatusIcon(rental.status)}
-                        <span className="mr-1">{getStatusText(rental.status)}</span>
+                        <span className="mr-1">
+                          {getStatusText(rental.status)}
+                        </span>
                       </div>
                     </div>
                   </td>
@@ -733,9 +830,9 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                     <div className="flex items-center justify-center z-[9999]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
+                          <Button
+                            size="sm"
+                            variant="outline"
                             onClick={(e) => e.stopPropagation()}
                             className="h-8 w-8 p-0 border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 shadow-sm"
                           >
@@ -743,40 +840,46 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={(e) => {
-                              e.stopPropagation()
-                              openRentalDetailsDialog(rental.id)
+                              e.stopPropagation();
+                              openRentalDetailsDialog(rental.id);
                             }}
                             className="cursor-pointer hover:bg-gray-100"
                           >
                             <Eye className="h-4 w-4 ml-2 text-gray-600" />
                             عرض التفاصيل
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={(e) => {
-                              e.stopPropagation()
-                              openPaymentCollectionDialog(rental.id)
+                              e.stopPropagation();
+                              openPaymentCollectionDialog(rental.id);
                             }}
                             className="cursor-pointer hover:bg-gray-100"
                           >
                             <CreditCard className="h-4 w-4 ml-2 text-gray-600" />
                             تحصيل المدفوعات
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={(e) => {
-                              e.stopPropagation()
-                              setRentalApplications({ editingRental: rental, isEditRentalDialogOpen: true })
+                              e.stopPropagation();
+                              setRentalApplications({
+                                editingRental: rental,
+                                isEditRentalDialogOpen: true,
+                              });
                             }}
                             className="cursor-pointer hover:bg-gray-100"
                           >
                             <Edit className="h-4 w-4 ml-2 text-gray-600" />
                             تعديل الإيجار
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={(e) => {
-                              e.stopPropagation()
-                              setRentalApplications({ deletingRental: rental, isDeleteDialogOpen: true })
+                              e.stopPropagation();
+                              setRentalApplications({
+                                deletingRental: rental,
+                                isDeleteDialogOpen: true,
+                              });
                             }}
                             className="cursor-pointer hover:bg-gray-100 text-gray-600"
                           >
@@ -792,18 +895,24 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
             </tbody>
           </table>
         </div>
-        
+
         {filteredRentals.length === 0 && (
           <div className="text-center py-16">
             <div className="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <Users className="h-8 w-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">لا توجد إيجارات</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              لا توجد إيجارات
+            </h3>
             <p className="text-gray-500 mb-6">
-              {searchTerm || filterStatus !== "all" ? "جرب تعديل معايير البحث" : "ابدأ بإضافة إيجار جديد"}
+              {searchTerm || filterStatus !== "all"
+                ? "جرب تعديل معايير البحث"
+                : "ابدأ بإضافة إيجار جديد"}
             </p>
-            <Button 
-              onClick={() => setRentalApplications({ isAddRentalDialogOpen: true })}
+            <Button
+              onClick={() =>
+                setRentalApplications({ isAddRentalDialogOpen: true })
+              }
               className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
             >
               <Plus className="ml-2 h-4 w-4" />
@@ -814,66 +923,112 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
       </div>
 
       {/* Rental Details Dialog */}
-      <Dialog open={!!selectedRental} onOpenChange={() => setRentalApplications({ selectedRental: null })}>
-        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto text-right" dir="rtl">
+      <Dialog
+        open={!!selectedRental}
+        onOpenChange={() => setRentalApplications({ selectedRental: null })}
+      >
+        <DialogContent
+          className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto text-right"
+          dir="rtl"
+        >
           <DialogHeader>
-            <DialogTitle className="text-right" dir="rtl">تفاصيل طلب الإيجار</DialogTitle>
+            <DialogTitle className="text-right" dir="rtl">
+              تفاصيل طلب الإيجار
+            </DialogTitle>
             <DialogDescription className="text-right" dir="rtl">
               {selectedRental?.tenant_full_name} - {selectedRental?.unit_label}
             </DialogDescription>
           </DialogHeader>
           {selectedRental && (
             <Tabs defaultValue="tenant" className="w-full">
-              <TabsList className="grid w-full grid-cols-3"  dir="rtl">
+              <TabsList className="grid w-full grid-cols-3" dir="rtl">
                 <TabsTrigger value="tenant">المستأجر</TabsTrigger>
                 <TabsTrigger value="property">العقار</TabsTrigger>
                 <TabsTrigger value="contract">العقد</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="tenant" className="space-y-6"  dir="rtl">
+              <TabsContent value="tenant" className="space-y-6" dir="rtl">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h4 className="font-semibold text-lg text-gray-900">المعلومات الشخصية</h4>
+                    <h4 className="font-semibold text-lg text-gray-900">
+                      المعلومات الشخصية
+                    </h4>
                     <div className="space-y-3">
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">الاسم الكامل</Label>
-                        <p className="text-sm text-gray-900 font-medium">{selectedRental.tenant_full_name}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700">رقم الهوية</Label>
-                        <p className="text-sm text-gray-900">{selectedRental.tenant_national_id}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700">الحالة الاجتماعية</Label>
-                        <p className="text-sm text-gray-900 capitalize">{selectedRental.tenant_social_status}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700">رقم الهاتف</Label>
-                        <p className="text-sm text-gray-900">{selectedRental.tenant_phone}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700">البريد الإلكتروني</Label>
-                        <p className="text-sm text-gray-900">{selectedRental.tenant_email}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-lg text-gray-900">المعلومات المهنية</h4>
-                    <div className="space-y-3">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700">المهنة</Label>
-                        <p className="text-sm text-gray-900">{selectedRental.tenant_job_title}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700">مبلغ الإيجار</Label>
-                        <p className="text-lg font-bold text-gray-900">
-                          {formatCurrency(selectedRental.base_rent_amount, selectedRental.currency)}
-                        </p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700">مبلغ الضمان</Label>
+                        <Label className="text-sm font-medium text-gray-700">
+                          الاسم الكامل
+                        </Label>
                         <p className="text-sm text-gray-900 font-medium">
-                          {formatCurrency(selectedRental.deposit_amount, selectedRental.currency)}
+                          {selectedRental.tenant_full_name}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          رقم الهوية
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.tenant_national_id}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          الحالة الاجتماعية
+                        </Label>
+                        <p className="text-sm text-gray-900 capitalize">
+                          {selectedRental.tenant_social_status}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          رقم الهاتف
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.tenant_phone}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          البريد الإلكتروني
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.tenant_email}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-lg text-gray-900">
+                      المعلومات المهنية
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          المهنة
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.tenant_job_title}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          مبلغ الإيجار
+                        </Label>
+                        <p className="text-lg font-bold text-gray-900">
+                          {formatCurrency(
+                            selectedRental.base_rent_amount,
+                            selectedRental.currency,
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          مبلغ الضمان
+                        </Label>
+                        <p className="text-sm text-gray-900 font-medium">
+                          {formatCurrency(
+                            selectedRental.deposit_amount,
+                            selectedRental.currency,
+                          )}
                         </p>
                       </div>
                     </div>
@@ -881,121 +1036,199 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                 </div>
               </TabsContent>
 
-              <TabsContent value="property" className="space-y-6"  dir="rtl">
+              <TabsContent value="property" className="space-y-6" dir="rtl">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h4 className="font-semibold text-lg text-gray-900">تفاصيل العقار</h4>
+                    <h4 className="font-semibold text-lg text-gray-900">
+                      تفاصيل العقار
+                    </h4>
                     <div className="space-y-3">
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">رقم العقار</Label>
-                        <p className="text-sm text-gray-900">{selectedRental.property?.id}</p>
+                        <Label className="text-sm font-medium text-gray-700">
+                          رقم العقار
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.property?.id}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">عدد الغرف</Label>
-                        <p className="text-sm text-gray-900">{selectedRental.property?.beds} غرف</p>
+                        <Label className="text-sm font-medium text-gray-700">
+                          عدد الغرف
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.property?.beds} غرف
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">عدد الحمامات</Label>
-                                                <p className="text-sm text-gray-900">{selectedRental.property?.bath} حمام</p>
-                        </div>
-                        <div>
-                          <Label className="text-sm font-medium text-gray-700">المساحة</Label>
-                          <p className="text-sm text-gray-900">{selectedRental.property?.area} متر مربع</p>
+                        <Label className="text-sm font-medium text-gray-700">
+                          عدد الحمامات
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.property?.bath} حمام
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          المساحة
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.property?.area} متر مربع
+                        </p>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-4"  dir="rtl">
-                    <h4 className="font-semibold text-lg text-gray-900">الموقع</h4>
+                  <div className="space-y-4" dir="rtl">
+                    <h4 className="font-semibold text-lg text-gray-900">
+                      الموقع
+                    </h4>
                     <div className="space-y-3">
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">خط الطول</Label>
-                                                <p className="text-sm text-gray-900">{selectedRental.property?.latitude}</p>
-                        </div>
-                        <div>
-                          <Label className="text-sm font-medium text-gray-700">خط العرض</Label>
-                          <p className="text-sm text-gray-900">{selectedRental.property?.longitude}</p>
+                        <Label className="text-sm font-medium text-gray-700">
+                          خط الطول
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.property?.latitude}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          خط العرض
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.property?.longitude}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
               </TabsContent>
 
-              <TabsContent value="contract" className="space-y-6"  dir="rtl">
+              <TabsContent value="contract" className="space-y-6" dir="rtl">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h4 className="font-semibold text-lg text-gray-900">تفاصيل العقد</h4>
+                    <h4 className="font-semibold text-lg text-gray-900">
+                      تفاصيل العقد
+                    </h4>
                     <div className="space-y-3">
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">رقم العقد</Label>
-                        <p className="text-sm text-gray-900">{selectedRental.id}</p>
+                        <Label className="text-sm font-medium text-gray-700">
+                          رقم العقد
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.id}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">الحالة</Label>
-                        <Badge className={getStatusColor(selectedRental.status)}>
+                        <Label className="text-sm font-medium text-gray-700">
+                          الحالة
+                        </Label>
+                        <Badge
+                          className={getStatusColor(selectedRental.status)}
+                        >
                           {getStatusIcon(selectedRental.status)}
-                          <span className="mr-1">{getStatusText(selectedRental.status)}</span>
+                          <span className="mr-1">
+                            {getStatusText(selectedRental.status)}
+                          </span>
                         </Badge>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">مدة الإيجار</Label>
-                        <p className="text-sm text-gray-900">{selectedRental.rental_period_months} شهر</p>
+                        <Label className="text-sm font-medium text-gray-700">
+                          مدة الإيجار
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {selectedRental.rental_period_months} شهر
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">خطة الدفع</Label>
-                        <p className="text-sm text-gray-900 capitalize">{selectedRental.paying_plan}</p>
+                        <Label className="text-sm font-medium text-gray-700">
+                          خطة الدفع
+                        </Label>
+                        <p className="text-sm text-gray-900 capitalize">
+                          {selectedRental.paying_plan}
+                        </p>
                       </div>
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <h4 className="font-semibold text-lg text-gray-900">التواريخ</h4>
+                    <h4 className="font-semibold text-lg text-gray-900">
+                      التواريخ
+                    </h4>
                     <div className="space-y-3">
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">تاريخ الانتقال</Label>
-                        <p className="text-sm text-gray-900">{formatDate(selectedRental.move_in_date)}</p>
+                        <Label className="text-sm font-medium text-gray-700">
+                          تاريخ الانتقال
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {formatDate(selectedRental.move_in_date)}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">تاريخ الإنشاء</Label>
-                        <p className="text-sm text-gray-900">{formatDate(selectedRental.created_at)}</p>
+                        <Label className="text-sm font-medium text-gray-700">
+                          تاريخ الإنشاء
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {formatDate(selectedRental.created_at)}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">آخر تحديث</Label>
-                        <p className="text-sm text-gray-900">{formatDate(selectedRental.updated_at)}</p>
+                        <Label className="text-sm font-medium text-gray-700">
+                          آخر تحديث
+                        </Label>
+                        <p className="text-sm text-gray-900">
+                          {formatDate(selectedRental.updated_at)}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
-                
+
                 {selectedRental.notes && (
                   <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-gray-900 mb-2">ملاحظات</h4>
-                    <p className="text-sm text-gray-800">{selectedRental.notes}</p>
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      ملاحظات
+                    </h4>
+                    <p className="text-sm text-gray-800">
+                      {selectedRental.notes}
+                    </p>
                   </div>
                 )}
               </TabsContent>
             </Tabs>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRentalApplications({ selectedRental: null })}>
+            <Button
+              variant="outline"
+              onClick={() => setRentalApplications({ selectedRental: null })}
+            >
               إغلاق
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-
       {/* Edit Rental Dialog */}
-      <Dialog open={isEditRentalDialogOpen} onOpenChange={() => setRentalApplications({ isEditRentalDialogOpen: false })}>
+      <Dialog
+        open={isEditRentalDialogOpen}
+        onOpenChange={() =>
+          setRentalApplications({ isEditRentalDialogOpen: false })
+        }
+      >
         <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>تعديل طلب الإيجار</DialogTitle>
             <DialogDescription>تعديل تفاصيل طلب الإيجار</DialogDescription>
           </DialogHeader>
           {editingRental && (
-            <EditRentalForm 
+            <EditRentalForm
               rental={editingRental}
-              onSubmit={(formData) => handleUpdateRental(editingRental.id, formData)}
+              onSubmit={(formData) =>
+                handleUpdateRental(editingRental.id, formData)
+              }
               onCancel={() => {
-                setRentalApplications({ isEditRentalDialogOpen: false, editingRental: null })
+                setRentalApplications({
+                  isEditRentalDialogOpen: false,
+                  editingRental: null,
+                });
               }}
               isSubmitting={isSubmitting}
             />
@@ -1004,7 +1237,12 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={() => setRentalApplications({ isDeleteDialogOpen: false })}>
+      <Dialog
+        open={isDeleteDialogOpen}
+        onOpenChange={() =>
+          setRentalApplications({ isDeleteDialogOpen: false })
+        }
+      >
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="text-red-600 flex items-center gap-2">
@@ -1015,7 +1253,7 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
               ⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!
             </DialogDescription>
           </DialogHeader>
-          
+
           {deletingRental && (
             <div className="space-y-4">
               <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -1023,35 +1261,51 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                   هل أنت متأكد من حذف الإيجار التالي؟
                 </p>
                 <div className="space-y-2 text-sm text-red-700">
-                  <p><strong>المستأجر:</strong> {deletingRental.tenant_full_name}</p>
-                  <p><strong>الوحدة:</strong> {deletingRental.unit_label}</p>
-                  <p><strong>مبلغ الإيجار:</strong> {formatCurrency(deletingRental.base_rent_amount, deletingRental.currency)}</p>
+                  <p>
+                    <strong>المستأجر:</strong> {deletingRental.tenant_full_name}
+                  </p>
+                  <p>
+                    <strong>الوحدة:</strong> {deletingRental.unit_label}
+                  </p>
+                  <p>
+                    <strong>مبلغ الإيجار:</strong>{" "}
+                    {formatCurrency(
+                      deletingRental.base_rent_amount,
+                      deletingRental.currency,
+                    )}
+                  </p>
                 </div>
               </div>
-              
+
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-sm text-yellow-800">
-                  <strong>تحذير:</strong> سيتم حذف جميع البيانات المرتبطة بهذا الإيجار نهائياً ولا يمكن استردادها.
+                  <strong>تحذير:</strong> سيتم حذف جميع البيانات المرتبطة بهذا
+                  الإيجار نهائياً ولا يمكن استردادها.
                 </p>
               </div>
             </div>
           )}
-          
+
           <DialogFooter className="flex gap-2">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => {
-                setRentalApplications({ isDeleteDialogOpen: false, deletingRental: null })
+                setRentalApplications({
+                  isDeleteDialogOpen: false,
+                  deletingRental: null,
+                });
               }}
               disabled={isDeleting}
             >
               إلغاء
             </Button>
-            <Button 
-              type="button" 
-              variant="destructive" 
-              onClick={() => deletingRental && handleDeleteRental(deletingRental.id)}
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() =>
+                deletingRental && handleDeleteRental(deletingRental.id)
+              }
               disabled={isDeleting}
               className="bg-gray-900 hover:bg-gray-800"
             >
@@ -1083,26 +1337,34 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious 
+                <PaginationPrevious
                   href="#"
                   onClick={(e) => {
-                    e.preventDefault()
+                    e.preventDefault();
                     if (pagination.current_page > 1) {
-                      handlePageChange(pagination.current_page - 1)
+                      handlePageChange(pagination.current_page - 1);
                     }
                   }}
-                  className={pagination.current_page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  className={
+                    pagination.current_page <= 1
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
                 />
               </PaginationItem>
-              
+
               {/* Page Numbers */}
-              {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map((page) => {
+              {Array.from(
+                { length: pagination.last_page },
+                (_, i) => i + 1,
+              ).map((page) => {
                 // Show first page, last page, current page, and pages around current page
-                const shouldShow = 
-                  page === 1 || 
-                  page === pagination.last_page || 
-                  (page >= pagination.current_page - 1 && page <= pagination.current_page + 1)
-                
+                const shouldShow =
+                  page === 1 ||
+                  page === pagination.last_page ||
+                  (page >= pagination.current_page - 1 &&
+                    page <= pagination.current_page + 1);
+
                 if (!shouldShow) {
                   // Show ellipsis for gaps
                   if (page === 2 && pagination.current_page > 3) {
@@ -1110,25 +1372,28 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       <PaginationItem key={`ellipsis-${page}`}>
                         <PaginationEllipsis />
                       </PaginationItem>
-                    )
+                    );
                   }
-                  if (page === pagination.last_page - 1 && pagination.current_page < pagination.last_page - 2) {
+                  if (
+                    page === pagination.last_page - 1 &&
+                    pagination.current_page < pagination.last_page - 2
+                  ) {
                     return (
                       <PaginationItem key={`ellipsis-${page}`}>
                         <PaginationEllipsis />
                       </PaginationItem>
-                    )
+                    );
                   }
-                  return null
+                  return null;
                 }
-                
+
                 return (
                   <PaginationItem key={page}>
                     <PaginationLink
                       href="#"
                       onClick={(e) => {
-                        e.preventDefault()
-                        handlePageChange(page)
+                        e.preventDefault();
+                        handlePageChange(page);
                       }}
                       isActive={page === pagination.current_page}
                       className="cursor-pointer"
@@ -1136,42 +1401,51 @@ export function RentalApplicationsService({ openAddDialogCounter = 0 }: RentalAp
                       {page}
                     </PaginationLink>
                   </PaginationItem>
-                )
+                );
               })}
-              
+
               <PaginationItem>
-                <PaginationNext 
+                <PaginationNext
                   href="#"
                   onClick={(e) => {
-                    e.preventDefault()
+                    e.preventDefault();
                     if (pagination.current_page < pagination.last_page) {
-                      handlePageChange(pagination.current_page + 1)
+                      handlePageChange(pagination.current_page + 1);
                     }
                   }}
-                  className={pagination.current_page >= pagination.last_page ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  className={
+                    pagination.current_page >= pagination.last_page
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
                 />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
-          
+
           {/* Pagination Info */}
           <div className="mt-4 text-center text-sm text-gray-500">
-            عرض {pagination.from} إلى {pagination.to} من {pagination.total} نتيجة
+            عرض {pagination.from} إلى {pagination.to} من {pagination.total}{" "}
+            نتيجة
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // مكون إضافة إيجار جديد
 interface AddRentalFormProps {
-  onSubmit: (data: any) => void
-  onCancel: () => void
-  isSubmitting: boolean
+  onSubmit: (data: any) => void;
+  onCancel: () => void;
+  isSubmitting: boolean;
 }
 
-function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps) {
+function AddRentalForm({
+  onSubmit,
+  onCancel,
+  isSubmitting,
+}: AddRentalFormProps) {
   const [formData, setFormData] = useState({
     tenant_full_name: "",
     contract_number: "",
@@ -1194,130 +1468,163 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
     deposit_amount: "",
     platform_fee: "",
     water_fee: "",
-    notes: ""
-  })
+    notes: "",
+  });
 
-  const [projects, setProjects] = useState<any[]>([])
-  const [properties, setProperties] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<{[key: string]: string}>({})
-  const [openProject, setOpenProject] = useState(false)
-  const [openProperty, setOpenProperty] = useState(false)
+  const [projects, setProjects] = useState<any[]>([]);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [openProject, setOpenProject] = useState(false);
+  const [openProperty, setOpenProperty] = useState(false);
 
   // جلب البيانات عند فتح النموذج
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const [projectsRes, propertiesRes] = await Promise.all([
           axiosInstance.get("/projects"),
           axiosInstance.get("/properties"),
-        ])
-        
+        ]);
+
         // معالجة بيانات المشاريع - البيانات في data.projects
-        if (projectsRes.data?.data?.projects && Array.isArray(projectsRes.data.data.projects)) {
-          setProjects(projectsRes.data.data.projects)
-        } else if (projectsRes.data?.projects && Array.isArray(projectsRes.data.projects)) {
-          setProjects(projectsRes.data.projects)
+        if (
+          projectsRes.data?.data?.projects &&
+          Array.isArray(projectsRes.data.data.projects)
+        ) {
+          setProjects(projectsRes.data.data.projects);
+        } else if (
+          projectsRes.data?.projects &&
+          Array.isArray(projectsRes.data.projects)
+        ) {
+          setProjects(projectsRes.data.projects);
         } else {
-          setProjects([])
+          setProjects([]);
         }
-        
+
         // معالجة بيانات العقارات - البيانات في data.properties
-        if (propertiesRes.data?.data?.properties && Array.isArray(propertiesRes.data.data.properties)) {
-          setProperties(propertiesRes.data.data.properties)
-        } else if (propertiesRes.data?.properties && Array.isArray(propertiesRes.data.properties)) {
-          setProperties(propertiesRes.data.properties)
+        if (
+          propertiesRes.data?.data?.properties &&
+          Array.isArray(propertiesRes.data.data.properties)
+        ) {
+          setProperties(propertiesRes.data.data.properties);
+        } else if (
+          propertiesRes.data?.properties &&
+          Array.isArray(propertiesRes.data.properties)
+        ) {
+          setProperties(propertiesRes.data.properties);
         } else {
-          setProperties([])
+          setProperties([]);
         }
       } catch (error) {
-        setErrors({ general: "حدث خطأ في جلب البيانات" })
-        setProjects([])
-        setProperties([])
+        setErrors({ general: "حدث خطأ في جلب البيانات" });
+        setProjects([]);
+        setProperties([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   // دالة التحقق من البيانات
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {}
+    const newErrors: { [key: string]: string } = {};
 
     // التحقق من الحقول الإجبارية
     if (!formData.tenant_full_name.trim()) {
-      newErrors.tenant_full_name = "الاسم الكامل مطلوب"
+      newErrors.tenant_full_name = "الاسم الكامل مطلوب";
     }
     if (!formData.tenant_phone.trim()) {
-      newErrors.tenant_phone = "رقم الهاتف مطلوب"
+      newErrors.tenant_phone = "رقم الهاتف مطلوب";
     }
     if (!formData.move_in_date.trim()) {
-      newErrors.move_in_date = "تاريخ الانتقال مطلوب"
+      newErrors.move_in_date = "تاريخ الانتقال مطلوب";
     }
     if (!formData.rental_period || formData.rental_period <= 0) {
-      newErrors.rental_period = "مدة الإيجار مطلوبة ولا تقل عن شهر واحد"
+      newErrors.rental_period = "مدة الإيجار مطلوبة ولا تقل عن شهر واحد";
     }
-    if (!formData.base_rent_amount || parseFloat(formData.base_rent_amount) < 100) {
-      newErrors.base_rent_amount = "مبلغ الإيجار مطلوب ولا يقل عن 100 ريال"
+    if (
+      !formData.base_rent_amount ||
+      parseFloat(formData.base_rent_amount) < 100
+    ) {
+      newErrors.base_rent_amount = "مبلغ الإيجار مطلوب ولا يقل عن 100 ريال";
     }
 
     // التحقق من صحة رقم الهاتف
-    if (formData.tenant_phone && !/^[0-9+\-\s()]+$/.test(formData.tenant_phone)) {
-      newErrors.tenant_phone = "رقم الهاتف غير صحيح"
+    if (
+      formData.tenant_phone &&
+      !/^[0-9+\-\s()]+$/.test(formData.tenant_phone)
+    ) {
+      newErrors.tenant_phone = "رقم الهاتف غير صحيح";
     }
 
     // التحقق من صحة البريد الإلكتروني (إذا تم إدخاله)
-    if (formData.tenant_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.tenant_email)) {
-      newErrors.tenant_email = "البريد الإلكتروني غير صحيح"
+    if (
+      formData.tenant_email &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.tenant_email)
+    ) {
+      newErrors.tenant_email = "البريد الإلكتروني غير صحيح";
     }
 
     // التحقق من صحة تاريخ الانتقال
     if (formData.move_in_date) {
-      const selectedDate = new Date(formData.move_in_date)
-      const today = new Date()
-      today.setHours(0, 0, 0, 0) // إزالة الوقت للمقارنة الصحيحة
-      
+      const selectedDate = new Date(formData.move_in_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // إزالة الوقت للمقارنة الصحيحة
+
       if (selectedDate < today) {
-        newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي"
+        newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي";
       }
     }
 
     // التحقق من صحة مدة الإيجار
-    if (formData.rental_period && (isNaN(formData.rental_period) || formData.rental_period <= 0)) {
-      newErrors.rental_period = "مدة الإيجار يجب أن تكون رقم صحيح أكبر من 0"
+    if (
+      formData.rental_period &&
+      (isNaN(formData.rental_period) || formData.rental_period <= 0)
+    ) {
+      newErrors.rental_period = "مدة الإيجار يجب أن تكون رقم صحيح أكبر من 0";
     }
 
     // التحقق من صحة مبلغ الإيجار
-    if (formData.base_rent_amount && (isNaN(parseFloat(formData.base_rent_amount)) || parseFloat(formData.base_rent_amount) < 100)) {
-      newErrors.base_rent_amount = "مبلغ الإيجار يجب أن يكون رقم صحيح لا يقل عن 100 ريال"
+    if (
+      formData.base_rent_amount &&
+      (isNaN(parseFloat(formData.base_rent_amount)) ||
+        parseFloat(formData.base_rent_amount) < 100)
+    ) {
+      newErrors.base_rent_amount =
+        "مبلغ الإيجار يجب أن يكون رقم صحيح لا يقل عن 100 ريال";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!validateForm()) {
-      return
+      return;
     }
-    
+
     // تحويل البيانات إلى الأنواع الصحيحة
     const processedFormData: any = {
       ...formData,
       property_id: formData.property_id ? parseInt(formData.property_id) : null,
       project_id: formData.project_id ? parseInt(formData.project_id) : null,
       rental_period: Number(formData.rental_period) || 12,
-      base_rent_amount: formData.base_rent_amount ? parseFloat(formData.base_rent_amount) : 0,
-      deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
-    }
-    
-    onSubmit(processedFormData)
-  }
+      base_rent_amount: formData.base_rent_amount
+        ? parseFloat(formData.base_rent_amount)
+        : 0,
+      deposit_amount: formData.deposit_amount
+        ? parseFloat(formData.deposit_amount)
+        : 0,
+    };
+
+    onSubmit(processedFormData);
+  };
 
   return (
     <div className="bg-white rounded-lg">
@@ -1329,27 +1636,35 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
           </div>
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">معلومات المستأجر</h4>
-            
+            <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">
+              معلومات المستأجر
+            </h4>
+
             <div className="space-y-2">
-              <Label htmlFor="tenant_full_name" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="tenant_full_name"
+                className="text-sm font-medium text-gray-700"
+              >
                 الاسم الكامل <span className="text-red-500">*</span>
               </Label>
-              <Input 
+              <Input
                 id="tenant_full_name"
                 value={formData.tenant_full_name}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, tenant_full_name: e.target.value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_full_name: e.target.value,
+                  }));
                   if (errors.tenant_full_name) {
-                    setErrors(prev => ({ ...prev, tenant_full_name: "" }))
+                    setErrors((prev) => ({ ...prev, tenant_full_name: "" }));
                   }
                 }}
                 placeholder="أدخل الاسم الكامل"
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_full_name ? 'border-red-500' : ''}`}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_full_name ? "border-red-500" : ""}`}
               />
               {errors.tenant_full_name && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -1360,20 +1675,26 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tenant_phone" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="tenant_phone"
+                className="text-sm font-medium text-gray-700"
+              >
                 رقم الهاتف <span className="text-red-500">*</span>
               </Label>
-              <Input 
+              <Input
                 id="tenant_phone"
                 value={formData.tenant_phone}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, tenant_phone: e.target.value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_phone: e.target.value,
+                  }));
                   if (errors.tenant_phone) {
-                    setErrors(prev => ({ ...prev, tenant_phone: "" }))
+                    setErrors((prev) => ({ ...prev, tenant_phone: "" }));
                   }
                 }}
                 placeholder="0551234567"
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_phone ? 'border-red-500' : ''}`}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_phone ? "border-red-500" : ""}`}
               />
               {errors.tenant_phone && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -1384,19 +1705,27 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tenant_email" className="text-sm font-medium text-gray-700">البريد الإلكتروني</Label>
-              <Input 
+              <Label
+                htmlFor="tenant_email"
+                className="text-sm font-medium text-gray-700"
+              >
+                البريد الإلكتروني
+              </Label>
+              <Input
                 id="tenant_email"
                 type="email"
                 value={formData.tenant_email}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, tenant_email: e.target.value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_email: e.target.value,
+                  }));
                   if (errors.tenant_email) {
-                    setErrors(prev => ({ ...prev, tenant_email: "" }))
+                    setErrors((prev) => ({ ...prev, tenant_email: "" }));
                   }
                 }}
                 placeholder="example@email.com"
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_email ? 'border-red-500' : ''}`}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_email ? "border-red-500" : ""}`}
               />
               {errors.tenant_email && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -1407,19 +1736,42 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tenant_job_title" className="text-sm font-medium text-gray-700">المهنة</Label>
-              <Input 
+              <Label
+                htmlFor="tenant_job_title"
+                className="text-sm font-medium text-gray-700"
+              >
+                المهنة
+              </Label>
+              <Input
                 id="tenant_job_title"
                 value={formData.tenant_job_title}
-                onChange={(e) => setFormData(prev => ({ ...prev, tenant_job_title: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_job_title: e.target.value,
+                  }))
+                }
                 placeholder="مهندس، طبيب، معلم..."
                 className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tenant_social_status" className="text-sm font-medium text-gray-700">الحالة الاجتماعية</Label>
-              <Select value={formData.tenant_social_status} onValueChange={(value) => setFormData(prev => ({ ...prev, tenant_social_status: value }))}>
+              <Label
+                htmlFor="tenant_social_status"
+                className="text-sm font-medium text-gray-700"
+              >
+                الحالة الاجتماعية
+              </Label>
+              <Select
+                value={formData.tenant_social_status}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_social_status: value,
+                  }))
+                }
+              >
                 <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
                   <SelectValue />
                 </SelectTrigger>
@@ -1434,11 +1786,21 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tenant_national_id" className="text-sm font-medium text-gray-700">رقم الهوية</Label>
-              <Input 
+              <Label
+                htmlFor="tenant_national_id"
+                className="text-sm font-medium text-gray-700"
+              >
+                رقم الهوية
+              </Label>
+              <Input
                 id="tenant_national_id"
                 value={formData.tenant_national_id}
-                onChange={(e) => setFormData(prev => ({ ...prev, tenant_national_id: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_national_id: e.target.value,
+                  }))
+                }
                 placeholder="1234567890"
                 className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
               />
@@ -1446,10 +1808,14 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
           </div>
 
           <div className="space-y-4">
-            <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">تفاصيل العقد</h4>
-            
+            <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">
+              تفاصيل العقد
+            </h4>
+
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">المشروع</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                المشروع
+              </Label>
               <Popover open={openProject} onOpenChange={setOpenProject}>
                 <PopoverTrigger asChild>
                   <Button
@@ -1459,7 +1825,11 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
                     className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
                   >
                     {formData.project_id
-                      ? projects.find((project) => project.id.toString() === formData.project_id)?.contents?.[0]?.title || `مشروع ${formData.project_id}`
+                      ? projects.find(
+                          (project) =>
+                            project.id.toString() === formData.project_id,
+                        )?.contents?.[0]?.title ||
+                        `مشروع ${formData.project_id}`
                       : "اختر مشروع..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -1470,23 +1840,33 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
                     <CommandList>
                       <CommandEmpty>لم يتم العثور على مشروع.</CommandEmpty>
                       <CommandGroup>
-                        {Array.isArray(projects) && projects.map((project) => (
-                          <CommandItem
-                            key={project.id}
-                            value={project.contents?.[0]?.title || `مشروع ${project.id}`}
-                            onSelect={() => {
-                              setFormData(prev => ({ ...prev, project_id: project.id.toString() }))
-                              setOpenProject(false)
-                            }}
-                          >
-                            <Check
-                              className={`mr-2 h-4 w-4 ${
-                                formData.project_id === project.id.toString() ? "opacity-100" : "opacity-0"
-                              }`}
-                            />
-                            {project.contents?.[0]?.title || `مشروع ${project.id}`}
-                          </CommandItem>
-                        ))}
+                        {Array.isArray(projects) &&
+                          projects.map((project) => (
+                            <CommandItem
+                              key={project.id}
+                              value={
+                                project.contents?.[0]?.title ||
+                                `مشروع ${project.id}`
+                              }
+                              onSelect={() => {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  project_id: project.id.toString(),
+                                }));
+                                setOpenProject(false);
+                              }}
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  formData.project_id === project.id.toString()
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                }`}
+                              />
+                              {project.contents?.[0]?.title ||
+                                `مشروع ${project.id}`}
+                            </CommandItem>
+                          ))}
                       </CommandGroup>
                     </CommandList>
                   </Command>
@@ -1495,7 +1875,9 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">العقار</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                العقار
+              </Label>
               <Popover open={openProperty} onOpenChange={setOpenProperty}>
                 <PopoverTrigger asChild>
                   <Button
@@ -1505,7 +1887,10 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
                     className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
                   >
                     {formData.property_id
-                      ? properties.find((property) => property.id.toString() === formData.property_id)?.title || `عقار ${formData.property_id}`
+                      ? properties.find(
+                          (property) =>
+                            property.id.toString() === formData.property_id,
+                        )?.title || `عقار ${formData.property_id}`
                       : "اختر عقار..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -1516,23 +1901,30 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
                     <CommandList>
                       <CommandEmpty>لم يتم العثور على عقار.</CommandEmpty>
                       <CommandGroup>
-                        {Array.isArray(properties) && properties.map((property) => (
-                          <CommandItem
-                            key={property.id}
-                            value={property.title || `عقار ${property.id}`}
-                            onSelect={() => {
-                              setFormData(prev => ({ ...prev, property_id: property.id.toString() }))
-                              setOpenProperty(false)
-                            }}
-                          >
-                            <Check
-                              className={`mr-2 h-4 w-4 ${
-                                formData.property_id === property.id.toString() ? "opacity-100" : "opacity-0"
-                              }`}
-                            />
-                            {property.title || `عقار ${property.id}`}
-                          </CommandItem>
-                        ))}
+                        {Array.isArray(properties) &&
+                          properties.map((property) => (
+                            <CommandItem
+                              key={property.id}
+                              value={property.title || `عقار ${property.id}`}
+                              onSelect={() => {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  property_id: property.id.toString(),
+                                }));
+                                setOpenProperty(false);
+                              }}
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  formData.property_id ===
+                                  property.id.toString()
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                }`}
+                              />
+                              {property.title || `عقار ${property.id}`}
+                            </CommandItem>
+                          ))}
                       </CommandGroup>
                     </CommandList>
                   </Command>
@@ -1541,31 +1933,47 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="unit_label" className="text-sm font-medium text-gray-700">رمز الوحدة</Label>
-              <Input 
+              <Label
+                htmlFor="unit_label"
+                className="text-sm font-medium text-gray-700"
+              >
+                رمز الوحدة
+              </Label>
+              <Input
                 id="unit_label"
                 value={formData.unit_label}
-                onChange={(e) => setFormData(prev => ({ ...prev, unit_label: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    unit_label: e.target.value,
+                  }))
+                }
                 placeholder="A-12"
                 className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="move_in_date" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="move_in_date"
+                className="text-sm font-medium text-gray-700"
+              >
                 تاريخ الانتقال <span className="text-red-500">*</span>
               </Label>
-              <Input 
+              <Input
                 id="move_in_date"
                 type="date"
                 value={formData.move_in_date}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, move_in_date: e.target.value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    move_in_date: e.target.value,
+                  }));
                   if (errors.move_in_date) {
-                    setErrors(prev => ({ ...prev, move_in_date: "" }))
+                    setErrors((prev) => ({ ...prev, move_in_date: "" }));
                   }
                 }}
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.move_in_date ? 'border-red-500' : ''}`}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.move_in_date ? "border-red-500" : ""}`}
               />
               {errors.move_in_date && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -1576,26 +1984,32 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="rental_period_months" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="rental_period_months"
+                className="text-sm font-medium text-gray-700"
+              >
                 مدة الإيجار (بالشهور) <span className="text-red-500">*</span>
               </Label>
-              <Input 
+              <Input
                 id="rental_period_months"
                 type="number"
                 value={formData.rental_period}
                 onChange={(e) => {
-                  const value = parseInt(e.target.value) || 0
-                  setFormData(prev => ({ ...prev, rental_period: value }))
-                  
+                  const value = parseInt(e.target.value) || 0;
+                  setFormData((prev) => ({ ...prev, rental_period: value }));
+
                   // التحقق الفوري من القيمة
                   if (value <= 0) {
-                    setErrors(prev => ({ ...prev, rental_period: "مدة الإيجار مطلوبة ولا تقل عن شهر واحد" }))
+                    setErrors((prev) => ({
+                      ...prev,
+                      rental_period: "مدة الإيجار مطلوبة ولا تقل عن شهر واحد",
+                    }));
                   } else {
-                    setErrors(prev => ({ ...prev, rental_period: "" }))
+                    setErrors((prev) => ({ ...prev, rental_period: "" }));
                   }
                 }}
                 min="1"
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.rental_period ? 'border-red-500' : ''}`}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.rental_period ? "border-red-500" : ""}`}
               />
               {errors.rental_period && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -1606,8 +2020,18 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="paying_plan" className="text-sm font-medium text-gray-700">خطة الدفع</Label>
-              <Select value={formData.paying_plan} onValueChange={(value) => setFormData(prev => ({ ...prev, paying_plan: value }))}>
+              <Label
+                htmlFor="paying_plan"
+                className="text-sm font-medium text-gray-700"
+              >
+                خطة الدفع
+              </Label>
+              <Select
+                value={formData.paying_plan}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, paying_plan: value }))
+                }
+              >
                 <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
                   <SelectValue />
                 </SelectTrigger>
@@ -1621,22 +2045,28 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="base_rent_amount" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="base_rent_amount"
+                className="text-sm font-medium text-gray-700"
+              >
                 مبلغ الإيجار <span className="text-red-500">*</span>
               </Label>
-              <Input 
+              <Input
                 id="base_rent_amount"
                 type="number"
                 value={formData.base_rent_amount}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, base_rent_amount: e.target.value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    base_rent_amount: e.target.value,
+                  }));
                   if (errors.base_rent_amount) {
-                    setErrors(prev => ({ ...prev, base_rent_amount: "" }))
+                    setErrors((prev) => ({ ...prev, base_rent_amount: "" }));
                   }
                 }}
                 placeholder="6500"
                 min="100"
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.base_rent_amount ? 'border-red-500' : ''}`}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.base_rent_amount ? "border-red-500" : ""}`}
               />
               {errors.base_rent_amount && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -1647,12 +2077,22 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="deposit_amount" className="text-sm font-medium text-gray-700">مبلغ الضمان</Label>
-              <Input 
+              <Label
+                htmlFor="deposit_amount"
+                className="text-sm font-medium text-gray-700"
+              >
+                مبلغ الضمان
+              </Label>
+              <Input
                 id="deposit_amount"
                 type="number"
                 value={formData.deposit_amount}
-                onChange={(e) => setFormData(prev => ({ ...prev, deposit_amount: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    deposit_amount: e.target.value,
+                  }))
+                }
                 placeholder="10000"
                 className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
               />
@@ -1661,11 +2101,15 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="notes" className="text-sm font-medium text-gray-700">ملاحظات</Label>
-          <Textarea 
+          <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
+            ملاحظات
+          </Label>
+          <Textarea
             id="notes"
             value={formData.notes}
-            onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, notes: e.target.value }))
+            }
             placeholder="ملاحظات إضافية حول العقد..."
             rows={3}
             className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
@@ -1674,17 +2118,17 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
 
         <DialogFooter className="bg-gray-50 px-6 py-4 -mx-6 -mb-6 rounded-b-lg">
           <div className="flex gap-3 w-full">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onCancel} 
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
               disabled={isSubmitting}
               className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
             >
               إلغاء
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={isSubmitting || loading}
               className="flex-1 bg-gray-900 hover:bg-gray-800 text-white"
             >
@@ -1704,18 +2148,23 @@ function AddRentalForm({ onSubmit, onCancel, isSubmitting }: AddRentalFormProps)
         </DialogFooter>
       </form>
     </div>
-  )
+  );
 }
 
 // مكون تعديل الإيجار
 interface EditRentalFormProps {
-  rental: RentalData
-  onSubmit: (data: any) => void
-  onCancel: () => void
-  isSubmitting: boolean
+  rental: RentalData;
+  onSubmit: (data: any) => void;
+  onCancel: () => void;
+  isSubmitting: boolean;
 }
 
-function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRentalFormProps) {
+function EditRentalForm({
+  rental,
+  onSubmit,
+  onCancel,
+  isSubmitting,
+}: EditRentalFormProps) {
   const [formData, setFormData] = useState({
     tenant_full_name: rental.tenant_full_name || "",
     tenant_phone: rental.tenant_phone || "",
@@ -1726,136 +2175,169 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
     property_id: rental.property?.id?.toString() || "",
     project_id: "",
     unit_label: rental.unit_label || "",
-    move_in_date: rental.move_in_date ? rental.move_in_date.split('T')[0] : "",
+    move_in_date: rental.move_in_date ? rental.move_in_date.split("T")[0] : "",
     rental_period: rental.rental_period_months || 12,
     paying_plan: rental.paying_plan || "monthly",
     base_rent_amount: rental.base_rent_amount || "",
     currency: rental.currency || "SAR",
     deposit_amount: rental.deposit_amount || "",
-    notes: rental.notes || ""
-  })
+    notes: rental.notes || "",
+  });
 
-  const [projects, setProjects] = useState<any[]>([])
-  const [properties, setProperties] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<{[key: string]: string}>({})
-  const [openProject, setOpenProject] = useState(false)
-  const [openProperty, setOpenProperty] = useState(false)
+  const [projects, setProjects] = useState<any[]>([]);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [openProject, setOpenProject] = useState(false);
+  const [openProperty, setOpenProperty] = useState(false);
 
   // جلب البيانات عند فتح النموذج
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const [projectsRes, propertiesRes] = await Promise.all([
           axiosInstance.get("/projects"),
           axiosInstance.get("/properties"),
-        ])
-        
+        ]);
+
         // معالجة بيانات المشاريع - البيانات في data.projects
-        if (projectsRes.data?.data?.projects && Array.isArray(projectsRes.data.data.projects)) {
-          setProjects(projectsRes.data.data.projects)
-        } else if (projectsRes.data?.projects && Array.isArray(projectsRes.data.projects)) {
-          setProjects(projectsRes.data.projects)
+        if (
+          projectsRes.data?.data?.projects &&
+          Array.isArray(projectsRes.data.data.projects)
+        ) {
+          setProjects(projectsRes.data.data.projects);
+        } else if (
+          projectsRes.data?.projects &&
+          Array.isArray(projectsRes.data.projects)
+        ) {
+          setProjects(projectsRes.data.projects);
         } else {
-          setProjects([])
+          setProjects([]);
         }
-        
+
         // معالجة بيانات العقارات - البيانات في data.properties
-        if (propertiesRes.data?.data?.properties && Array.isArray(propertiesRes.data.data.properties)) {
-          setProperties(propertiesRes.data.data.properties)
-        } else if (propertiesRes.data?.properties && Array.isArray(propertiesRes.data.properties)) {
-          setProperties(propertiesRes.data.properties)
+        if (
+          propertiesRes.data?.data?.properties &&
+          Array.isArray(propertiesRes.data.data.properties)
+        ) {
+          setProperties(propertiesRes.data.data.properties);
+        } else if (
+          propertiesRes.data?.properties &&
+          Array.isArray(propertiesRes.data.properties)
+        ) {
+          setProperties(propertiesRes.data.properties);
         } else {
-          setProperties([])
+          setProperties([]);
         }
       } catch (error) {
-        setErrors({ general: "حدث خطأ في جلب البيانات" })
-        setProjects([])
-        setProperties([])
+        setErrors({ general: "حدث خطأ في جلب البيانات" });
+        setProjects([]);
+        setProperties([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   // دالة التحقق من البيانات
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {}
+    const newErrors: { [key: string]: string } = {};
 
     // التحقق من الحقول الإجبارية
     if (!formData.tenant_full_name.trim()) {
-      newErrors.tenant_full_name = "الاسم الكامل مطلوب"
+      newErrors.tenant_full_name = "الاسم الكامل مطلوب";
     }
     if (!formData.tenant_phone.trim()) {
-      newErrors.tenant_phone = "رقم الهاتف مطلوب"
+      newErrors.tenant_phone = "رقم الهاتف مطلوب";
     }
     if (!formData.move_in_date.trim()) {
-      newErrors.move_in_date = "تاريخ الانتقال مطلوب"
+      newErrors.move_in_date = "تاريخ الانتقال مطلوب";
     }
     if (!formData.rental_period || formData.rental_period <= 0) {
-      newErrors.rental_period = "مدة الإيجار مطلوبة ولا تقل عن شهر واحد"
+      newErrors.rental_period = "مدة الإيجار مطلوبة ولا تقل عن شهر واحد";
     }
-    if (!formData.base_rent_amount || parseFloat(formData.base_rent_amount) < 100) {
-      newErrors.base_rent_amount = "مبلغ الإيجار مطلوب ولا يقل عن 100 ريال"
+    if (
+      !formData.base_rent_amount ||
+      parseFloat(formData.base_rent_amount) < 100
+    ) {
+      newErrors.base_rent_amount = "مبلغ الإيجار مطلوب ولا يقل عن 100 ريال";
     }
 
     // التحقق من صحة رقم الهاتف
-    if (formData.tenant_phone && !/^[0-9+\-\s()]+$/.test(formData.tenant_phone)) {
-      newErrors.tenant_phone = "رقم الهاتف غير صحيح"
+    if (
+      formData.tenant_phone &&
+      !/^[0-9+\-\s()]+$/.test(formData.tenant_phone)
+    ) {
+      newErrors.tenant_phone = "رقم الهاتف غير صحيح";
     }
 
     // التحقق من صحة البريد الإلكتروني (إذا تم إدخاله)
-    if (formData.tenant_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.tenant_email)) {
-      newErrors.tenant_email = "البريد الإلكتروني غير صحيح"
+    if (
+      formData.tenant_email &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.tenant_email)
+    ) {
+      newErrors.tenant_email = "البريد الإلكتروني غير صحيح";
     }
 
     // التحقق من صحة تاريخ الانتقال
     if (formData.move_in_date) {
-      const selectedDate = new Date(formData.move_in_date)
-      const today = new Date()
-      today.setHours(0, 0, 0, 0) // إزالة الوقت للمقارنة الصحيحة
-      
+      const selectedDate = new Date(formData.move_in_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // إزالة الوقت للمقارنة الصحيحة
+
       if (selectedDate < today) {
-        newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي"
+        newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي";
       }
     }
 
     // التحقق من صحة مدة الإيجار
-    if (formData.rental_period && (isNaN(formData.rental_period) || formData.rental_period <= 0)) {
-      newErrors.rental_period = "مدة الإيجار يجب أن تكون رقم صحيح أكبر من 0"
+    if (
+      formData.rental_period &&
+      (isNaN(formData.rental_period) || formData.rental_period <= 0)
+    ) {
+      newErrors.rental_period = "مدة الإيجار يجب أن تكون رقم صحيح أكبر من 0";
     }
 
     // التحقق من صحة مبلغ الإيجار
-    if (formData.base_rent_amount && (isNaN(parseFloat(formData.base_rent_amount)) || parseFloat(formData.base_rent_amount) < 100)) {
-      newErrors.base_rent_amount = "مبلغ الإيجار يجب أن يكون رقم صحيح لا يقل عن 100 ريال"
+    if (
+      formData.base_rent_amount &&
+      (isNaN(parseFloat(formData.base_rent_amount)) ||
+        parseFloat(formData.base_rent_amount) < 100)
+    ) {
+      newErrors.base_rent_amount =
+        "مبلغ الإيجار يجب أن يكون رقم صحيح لا يقل عن 100 ريال";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!validateForm()) {
-      return
+      return;
     }
-    
+
     // تحويل البيانات إلى الأنواع الصحيحة
     const processedFormData: any = {
       ...formData,
       property_id: formData.property_id ? parseInt(formData.property_id) : null,
       project_id: formData.project_id ? parseInt(formData.project_id) : null,
       rental_period: Number(formData.rental_period) || 12,
-      base_rent_amount: formData.base_rent_amount ? parseFloat(formData.base_rent_amount) : 0,
-      deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
-    }
-    
-    onSubmit(processedFormData)
-  }
+      base_rent_amount: formData.base_rent_amount
+        ? parseFloat(formData.base_rent_amount)
+        : 0,
+      deposit_amount: formData.deposit_amount
+        ? parseFloat(formData.deposit_amount)
+        : 0,
+    };
+
+    onSubmit(processedFormData);
+  };
 
   return (
     <div className="bg-white rounded-lg">
@@ -1867,27 +2349,35 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
           </div>
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">معلومات المستأجر</h4>
-          
+            <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">
+              معلومات المستأجر
+            </h4>
+
             <div className="space-y-2">
-              <Label htmlFor="edit_tenant_full_name" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="edit_tenant_full_name"
+                className="text-sm font-medium text-gray-700"
+              >
                 الاسم الكامل <span className="text-red-500">*</span>
               </Label>
-              <Input 
+              <Input
                 id="edit_tenant_full_name"
                 value={formData.tenant_full_name}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, tenant_full_name: e.target.value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_full_name: e.target.value,
+                  }));
                   if (errors.tenant_full_name) {
-                    setErrors(prev => ({ ...prev, tenant_full_name: "" }))
+                    setErrors((prev) => ({ ...prev, tenant_full_name: "" }));
                   }
                 }}
                 placeholder="أدخل الاسم الكامل"
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_full_name ? 'border-red-500' : ''}`}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_full_name ? "border-red-500" : ""}`}
               />
               {errors.tenant_full_name && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -1898,20 +2388,26 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit_tenant_phone" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="edit_tenant_phone"
+                className="text-sm font-medium text-gray-700"
+              >
                 رقم الهاتف <span className="text-red-500">*</span>
               </Label>
-              <Input 
+              <Input
                 id="edit_tenant_phone"
                 value={formData.tenant_phone}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, tenant_phone: e.target.value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_phone: e.target.value,
+                  }));
                   if (errors.tenant_phone) {
-                    setErrors(prev => ({ ...prev, tenant_phone: "" }))
+                    setErrors((prev) => ({ ...prev, tenant_phone: "" }));
                   }
                 }}
                 placeholder="0551234567"
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_phone ? 'border-red-500' : ''}`}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_phone ? "border-red-500" : ""}`}
               />
               {errors.tenant_phone && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -1922,19 +2418,27 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit_tenant_email" className="text-sm font-medium text-gray-700">البريد الإلكتروني</Label>
-              <Input 
+              <Label
+                htmlFor="edit_tenant_email"
+                className="text-sm font-medium text-gray-700"
+              >
+                البريد الإلكتروني
+              </Label>
+              <Input
                 id="edit_tenant_email"
                 type="email"
                 value={formData.tenant_email}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, tenant_email: e.target.value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_email: e.target.value,
+                  }));
                   if (errors.tenant_email) {
-                    setErrors(prev => ({ ...prev, tenant_email: "" }))
+                    setErrors((prev) => ({ ...prev, tenant_email: "" }));
                   }
                 }}
                 placeholder="example@email.com"
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_email ? 'border-red-500' : ''}`}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.tenant_email ? "border-red-500" : ""}`}
               />
               {errors.tenant_email && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -1944,239 +2448,314 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
               )}
             </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="edit_tenant_job_title">المهنة</Label>
-            <Input 
-              id="edit_tenant_job_title"
-              value={formData.tenant_job_title}
-              onChange={(e) => setFormData(prev => ({ ...prev, tenant_job_title: e.target.value }))}
-              placeholder="مهندس، طبيب، معلم..."
-            />
+            <div className="space-y-2">
+              <Label htmlFor="edit_tenant_job_title">المهنة</Label>
+              <Input
+                id="edit_tenant_job_title"
+                value={formData.tenant_job_title}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_job_title: e.target.value,
+                  }))
+                }
+                placeholder="مهندس، طبيب، معلم..."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit_tenant_social_status">
+                الحالة الاجتماعية
+              </Label>
+              <Select
+                value={formData.tenant_social_status}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_social_status: value,
+                  }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="single">أعزب</SelectItem>
+                  <SelectItem value="married">متزوج</SelectItem>
+                  <SelectItem value="divorced">مطلق</SelectItem>
+                  <SelectItem value="widowed">أرمل</SelectItem>
+                  <SelectItem value="other">أخرى</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit_tenant_national_id">رقم الهوية</Label>
+              <Input
+                id="edit_tenant_national_id"
+                value={formData.tenant_national_id}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    tenant_national_id: e.target.value,
+                  }))
+                }
+                placeholder="1234567890"
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="edit_tenant_social_status">الحالة الاجتماعية</Label>
-            <Select value={formData.tenant_social_status} onValueChange={(value) => setFormData(prev => ({ ...prev, tenant_social_status: value }))}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="single">أعزب</SelectItem>
-                <SelectItem value="married">متزوج</SelectItem>
-                <SelectItem value="divorced">مطلق</SelectItem>
-                <SelectItem value="widowed">أرمل</SelectItem>
-                <SelectItem value="other">أخرى</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <div className="space-y-4">
+            <h4 className="font-semibold text-lg text-gray-900 border-b pb-2">
+              تفاصيل العقد
+            </h4>
 
-          <div className="space-y-2">
-            <Label htmlFor="edit_tenant_national_id">رقم الهوية</Label>
-            <Input 
-              id="edit_tenant_national_id"
-              value={formData.tenant_national_id}
-              onChange={(e) => setFormData(prev => ({ ...prev, tenant_national_id: e.target.value }))}
-              placeholder="1234567890"
-            />
+            {/* اختيار المشروع */}
+            <div className="space-y-2">
+              <Label htmlFor="edit_project">المشروع</Label>
+              <Popover open={openProject} onOpenChange={setOpenProject}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openProject}
+                    className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                  >
+                    {formData.project_id
+                      ? projects.find(
+                          (project) =>
+                            project.id.toString() === formData.project_id,
+                        )?.contents?.[0]?.title ||
+                        `مشروع ${formData.project_id}`
+                      : "اختر مشروع..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="ابحث عن مشروع..." />
+                    <CommandList>
+                      <CommandEmpty>لم يتم العثور على مشروع.</CommandEmpty>
+                      <CommandGroup>
+                        {Array.isArray(projects) &&
+                          projects.map((project) => (
+                            <CommandItem
+                              key={project.id}
+                              value={
+                                project.contents?.[0]?.title ||
+                                `مشروع ${project.id}`
+                              }
+                              onSelect={() => {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  project_id: project.id.toString(),
+                                }));
+                                setOpenProject(false);
+                              }}
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  formData.project_id === project.id.toString()
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                }`}
+                              />
+                              {project.contents?.[0]?.title ||
+                                `مشروع ${project.id}`}
+                            </CommandItem>
+                          ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* اختيار العقار */}
+            <div className="space-y-2">
+              <Label htmlFor="edit_property">العقار</Label>
+              <Popover open={openProperty} onOpenChange={setOpenProperty}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openProperty}
+                    className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                  >
+                    {formData.property_id
+                      ? properties.find(
+                          (property) =>
+                            property.id.toString() === formData.property_id,
+                        )?.title || `عقار ${formData.property_id}`
+                      : "اختر عقار..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="ابحث عن عقار..." />
+                    <CommandList>
+                      <CommandEmpty>لم يتم العثور على عقار.</CommandEmpty>
+                      <CommandGroup>
+                        {Array.isArray(properties) &&
+                          properties.map((property) => (
+                            <CommandItem
+                              key={property.id}
+                              value={property.title || `عقار ${property.id}`}
+                              onSelect={() => {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  property_id: property.id.toString(),
+                                }));
+                                setOpenProperty(false);
+                              }}
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  formData.property_id ===
+                                  property.id.toString()
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                }`}
+                              />
+                              {property.title || `عقار ${property.id}`}
+                            </CommandItem>
+                          ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit_unit_label">رمز الوحدة *</Label>
+              <Input
+                id="edit_unit_label"
+                value={formData.unit_label}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    unit_label: e.target.value,
+                  }))
+                }
+                placeholder="A-12"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit_move_in_date">تاريخ الانتقال *</Label>
+              <Input
+                id="edit_move_in_date"
+                type="date"
+                value={formData.move_in_date}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    move_in_date: e.target.value,
+                  }))
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit_rental_period_months">
+                مدة الإيجار (بالشهور) *
+              </Label>
+              <Input
+                id="edit_rental_period_months"
+                type="number"
+                value={formData.rental_period}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    rental_period: parseInt(e.target.value),
+                  }))
+                }
+                min="1"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit_paying_plan">خطة الدفع</Label>
+              <Select
+                value={formData.paying_plan}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, paying_plan: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="monthly">شهري</SelectItem>
+                  <SelectItem value="quarterly">ربع سنوي</SelectItem>
+                  <SelectItem value="semi_annual">نصف سنوي</SelectItem>
+                  <SelectItem value="annual">سنوي</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit_base_rent_amount">مبلغ الإيجار *</Label>
+              <Input
+                id="edit_base_rent_amount"
+                type="number"
+                value={formData.base_rent_amount}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    base_rent_amount: e.target.value,
+                  }))
+                }
+                placeholder="6500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit_deposit_amount">مبلغ الضمان *</Label>
+              <Input
+                id="edit_deposit_amount"
+                type="number"
+                value={formData.deposit_amount}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    deposit_amount: e.target.value,
+                  }))
+                }
+                placeholder="10000"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h4 className="font-semibold text-lg text-gray-900 border-b pb-2">تفاصيل العقد</h4>
-          
-          {/* اختيار المشروع */}
-          <div className="space-y-2">
-            <Label htmlFor="edit_project">المشروع</Label>
-            <Popover open={openProject} onOpenChange={setOpenProject}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={openProject}
-                  className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
-                >
-                  {formData.project_id
-                    ? projects.find((project) => project.id.toString() === formData.project_id)?.contents?.[0]?.title || `مشروع ${formData.project_id}`
-                    : "اختر مشروع..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput placeholder="ابحث عن مشروع..." />
-                  <CommandList>
-                    <CommandEmpty>لم يتم العثور على مشروع.</CommandEmpty>
-                    <CommandGroup>
-                      {Array.isArray(projects) && projects.map((project) => (
-                        <CommandItem
-                          key={project.id}
-                          value={project.contents?.[0]?.title || `مشروع ${project.id}`}
-                          onSelect={() => {
-                            setFormData(prev => ({ ...prev, project_id: project.id.toString() }))
-                            setOpenProject(false)
-                          }}
-                        >
-                          <Check
-                            className={`mr-2 h-4 w-4 ${
-                              formData.project_id === project.id.toString() ? "opacity-100" : "opacity-0"
-                            }`}
-                          />
-                          {project.contents?.[0]?.title || `مشروع ${project.id}`}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* اختيار العقار */}
-          <div className="space-y-2">
-            <Label htmlFor="edit_property">العقار</Label>
-            <Popover open={openProperty} onOpenChange={setOpenProperty}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={openProperty}
-                  className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
-                >
-                  {formData.property_id
-                    ? properties.find((property) => property.id.toString() === formData.property_id)?.title || `عقار ${formData.property_id}`
-                    : "اختر عقار..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput placeholder="ابحث عن عقار..." />
-                  <CommandList>
-                    <CommandEmpty>لم يتم العثور على عقار.</CommandEmpty>
-                    <CommandGroup>
-                      {Array.isArray(properties) && properties.map((property) => (
-                        <CommandItem
-                          key={property.id}
-                          value={property.title || `عقار ${property.id}`}
-                          onSelect={() => {
-                            setFormData(prev => ({ ...prev, property_id: property.id.toString() }))
-                            setOpenProperty(false)
-                          }}
-                        >
-                          <Check
-                            className={`mr-2 h-4 w-4 ${
-                              formData.property_id === property.id.toString() ? "opacity-100" : "opacity-0"
-                            }`}
-                          />
-                          {property.title || `عقار ${property.id}`}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="edit_unit_label">رمز الوحدة *</Label>
-            <Input 
-              id="edit_unit_label"
-              value={formData.unit_label}
-              onChange={(e) => setFormData(prev => ({ ...prev, unit_label: e.target.value }))}
-              placeholder="A-12"
-              
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit_move_in_date">تاريخ الانتقال *</Label>
-            <Input 
-              id="edit_move_in_date"
-              type="date"
-              value={formData.move_in_date}
-              onChange={(e) => setFormData(prev => ({ ...prev, move_in_date: e.target.value }))}
-              
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit_rental_period_months">مدة الإيجار (بالشهور) *</Label>
-            <Input 
-              id="edit_rental_period_months"
-              type="number"
-              value={formData.rental_period}
-              onChange={(e) => setFormData(prev => ({ ...prev, rental_period: parseInt(e.target.value) }))}
-              min="1"
-              
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit_paying_plan">خطة الدفع</Label>
-            <Select value={formData.paying_plan} onValueChange={(value) => setFormData(prev => ({ ...prev, paying_plan: value }))}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="monthly">شهري</SelectItem>
-                <SelectItem value="quarterly">ربع سنوي</SelectItem>
-                <SelectItem value="semi_annual">نصف سنوي</SelectItem>
-                <SelectItem value="annual">سنوي</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit_base_rent_amount">مبلغ الإيجار *</Label>
-            <Input 
-              id="edit_base_rent_amount"
-              type="number"
-              value={formData.base_rent_amount}
-              onChange={(e) => setFormData(prev => ({ ...prev, base_rent_amount: e.target.value }))}
-              placeholder="6500"
-              
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit_deposit_amount">مبلغ الضمان *</Label>
-            <Input 
-              id="edit_deposit_amount"
-              type="number"
-              value={formData.deposit_amount}
-              onChange={(e) => setFormData(prev => ({ ...prev, deposit_amount: e.target.value }))}
-              placeholder="10000"
-              
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="edit_notes">ملاحظات</Label>
+          <Textarea
+            id="edit_notes"
+            value={formData.notes}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, notes: e.target.value }))
+            }
+            placeholder="ملاحظات إضافية حول العقد..."
+            rows={3}
+          />
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="edit_notes">ملاحظات</Label>
-        <Textarea 
-          id="edit_notes"
-          value={formData.notes}
-          onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-          placeholder="ملاحظات إضافية حول العقد..."
-          rows={3}
-        />
-      </div>
 
         <DialogFooter className="bg-gray-50 px-6 py-4 -mx-6 -mb-6 rounded-b-lg">
           <div className="flex gap-3 w-full">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onCancel} 
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
               disabled={isSubmitting}
               className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
             >
               إلغاء
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={isSubmitting || loading}
               className="flex-1 bg-gray-900 hover:bg-gray-800 text-white"
             >
@@ -2196,5 +2775,5 @@ function EditRentalForm({ rental, onSubmit, onCancel, isSubmitting }: EditRental
         </DialogFooter>
       </form>
     </div>
-  )
+  );
 }

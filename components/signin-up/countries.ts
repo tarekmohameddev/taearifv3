@@ -15,7 +15,11 @@ export const countries = [
   { code: "ye", dialCode: "+967", name: "الجمهورية اليمنية" },
   { code: "ps", dialCode: "+970", name: "دولة فلسطين" },
   { code: "ma", dialCode: "+212", name: "المملكة المغربية" },
-  { code: "dz", dialCode: "+213", name: "الجمهورية الجزائرية الديمقراطية الشعبية" },
+  {
+    code: "dz",
+    dialCode: "+213",
+    name: "الجمهورية الجزائرية الديمقراطية الشعبية",
+  },
   { code: "tn", dialCode: "+216", name: "الجمهورية التونسية" },
   { code: "ly", dialCode: "+218", name: "دولة ليبيا" },
   { code: "sd", dialCode: "+249", name: "جمهورية السودان" },

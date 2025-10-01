@@ -29,7 +29,8 @@ export const getDefaultHalfTextHalfImageData = (): ComponentData => ({
   content: {
     eyebrow: "شريك موثوق",
     title: "نحن شريكك الموثوق في عالم العقارات",
-    description: "نقدم لك أفضل الخدمات العقارية مع ضمان الجودة والموثوقية. فريقنا من الخبراء يساعدك في العثور على العقار المثالي الذي يناسب احتياجاتك وميزانيتك.",
+    description:
+      "نقدم لك أفضل الخدمات العقارية مع ضمان الجودة والموثوقية. فريقنا من الخبراء يساعدك في العثور على العقار المثالي الذي يناسب احتياجاتك وميزانيتك.",
     button: {
       text: "تعرف علينا",
       enabled: true,
@@ -129,7 +130,7 @@ export const getDefaultHalfTextHalfImage2Data = (): ComponentData => ({
     gap: {
       x: "gap-x-10",
       y: "gap-y-16",
-      yMd: "md:gap-y-10"
+      yMd: "md:gap-y-10",
     },
   },
   spacing: {
@@ -138,13 +139,14 @@ export const getDefaultHalfTextHalfImage2Data = (): ComponentData => ({
       y: "py-5",
       smX: "sm:px-6",
       smY: "sm:py-20",
-      lgX: "lg:px-8"
+      lgX: "lg:px-8",
     },
   },
   content: {
     eyebrow: "تجربتك العقارية تبدأ هنا",
     title: "إيجاد عقار مناسب هو هدفنا",
-    description: "يقدم لك دليل الجواء العقاري أفضل الحلول العقارية لتلبية كافة احتياجاتك في البيع والإيجار، مع ضمان تجربة مريحة ومضمونة.",
+    description:
+      "يقدم لك دليل الجواء العقاري أفضل الحلول العقارية لتلبية كافة احتياجاتك في البيع والإيجار، مع ضمان تجربة مريحة ومضمونة.",
     stats: {
       stat1: { value: "+100", label: "عميل سعيد" },
       stat2: { value: "+50", label: "عقار تم بيعه" },
@@ -235,127 +237,136 @@ export const getDefaultHalfTextHalfImage3Data = (): ComponentData => ({
     maxWidth: "1600px",
     gap: {
       x: "md:gap-x-[30px] lg:gap-x-[74px]",
-      y: "gap-[12px]"
+      y: "gap-[12px]",
     },
-    minHeight: "369px"
+    minHeight: "369px",
   },
   spacing: {
     padding: {
       x: "px-4",
       y: "py-[24px]",
-      lgY: "lg:py-[52px]"
-    }
+      lgY: "lg:py-[52px]",
+    },
   },
   // Legacy props for backward compatibility
   title: "رسالتنا",
-  description: "نحن في مكتب دليل الجواء العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
+  description:
+    "نحن في مكتب دليل الجواء العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
   imageSrc: "https://dalel-lovat.vercel.app//images/aboutUs-page/message.webp",
   imageAlt: "Choose Us",
   imagePosition: "left",
   // New structure for editor compatibility - MUST match the legacy props
   content: {
     title: "رسالتنا",
-    description: "نحن في مكتب دليل الجواء العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
-    imagePosition: "left"
+    description:
+      "نحن في مكتب دليل الجواء العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
+    imagePosition: "left",
   },
   image: {
     src: "https://dalel-lovat.vercel.app//images/aboutUs-page/message.webp",
-    alt: "Choose Us"
-  }
+    alt: "Choose Us",
+  },
 });
 
 export const halfTextHalfImageFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     // Log the function call
-    logEditorStore('ENSURE_VARIANT_CALLED', variantId, 'unknown', {
+    logEditorStore("ENSURE_VARIANT_CALLED", variantId, "unknown", {
       variantId,
       hasInitial: !!(initial && Object.keys(initial).length > 0),
       initialKeys: initial ? Object.keys(initial) : [],
-      existingData: state.halfTextHalfImageStates[variantId] ? Object.keys(state.halfTextHalfImageStates[variantId]) : [],
-      allVariants: Object.keys(state.halfTextHalfImageStates)
+      existingData: state.halfTextHalfImageStates[variantId]
+        ? Object.keys(state.halfTextHalfImageStates[variantId])
+        : [],
+      allVariants: Object.keys(state.halfTextHalfImageStates),
     });
 
     // إذا كان لدينا initial data جديدة، دائماً استخدمها (حتى لو كانت البيانات موجودة)
     if (initial && Object.keys(initial).length > 0) {
-      
       // Log the data override
-      logEditorStore('OVERRIDE_EXISTING_DATA', variantId, 'unknown', {
+      logEditorStore("OVERRIDE_EXISTING_DATA", variantId, "unknown", {
         oldData: state.halfTextHalfImageStates[variantId],
         newData: initial,
-        reason: 'Initial data provided'
+        reason: "Initial data provided",
       });
-      
+
       // دائماً استخدم البيانات الجديدة
       const data: ComponentData = initial;
       const newState = {
-        halfTextHalfImageStates: { ...state.halfTextHalfImageStates, [variantId]: data },
+        halfTextHalfImageStates: {
+          ...state.halfTextHalfImageStates,
+          [variantId]: data,
+        },
       };
-      
-      logEditorStore('ENSURE_VARIANT_RESULT', variantId, 'unknown', {
+
+      logEditorStore("ENSURE_VARIANT_RESULT", variantId, "unknown", {
         newState: newState,
-        allVariantsAfter: Object.keys(newState.halfTextHalfImageStates)
+        allVariantsAfter: Object.keys(newState.halfTextHalfImageStates),
       });
-      
+
       return newState as any;
     }
-    
+
     if (
       state.halfTextHalfImageStates[variantId] &&
       Object.keys(state.halfTextHalfImageStates[variantId]).length > 0
     ) {
-      logEditorStore('VARIANT_ALREADY_EXISTS', variantId, 'unknown', {
+      logEditorStore("VARIANT_ALREADY_EXISTS", variantId, "unknown", {
         existingData: state.halfTextHalfImageStates[variantId],
-        reason: 'Variant already exists with data'
+        reason: "Variant already exists with data",
       });
       return {} as any;
     }
-    
+
     // تحديد البيانات الافتراضية حسب نوع المكون
     let defaultData;
-    
+
     // إذا كان لدينا initial data، استخدمها أولاً
     if (initial && Object.keys(initial).length > 0) {
       defaultData = initial;
-      logEditorStore('USING_INITIAL_DATA', variantId, 'unknown', {
-        initialData: initial
+      logEditorStore("USING_INITIAL_DATA", variantId, "unknown", {
+        initialData: initial,
       });
     } else {
       // تحديد البيانات الافتراضية حسب نوع المكون
       if (variantId === "halfTextHalfImage2") {
         defaultData = getDefaultHalfTextHalfImage2Data();
-        logEditorStore('USING_DEFAULT_DATA', variantId, 'halfTextHalfImage2', {
-          defaultData: defaultData
+        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage2", {
+          defaultData: defaultData,
         });
       } else if (variantId === "halfTextHalfImage3") {
         defaultData = getDefaultHalfTextHalfImage3Data();
-        logEditorStore('USING_DEFAULT_DATA', variantId, 'halfTextHalfImage3', {
-          defaultData: defaultData
+        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage3", {
+          defaultData: defaultData,
         });
       } else {
         defaultData = getDefaultHalfTextHalfImageData();
-        logEditorStore('USING_DEFAULT_DATA', variantId, 'halfTextHalfImage1', {
+        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage1", {
           defaultData: defaultData,
-          reason: 'Fallback for unknown variant'
+          reason: "Fallback for unknown variant",
         });
       }
     }
-    
+
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     const result = {
-      halfTextHalfImageStates: { ...state.halfTextHalfImageStates, [variantId]: data },
+      halfTextHalfImageStates: {
+        ...state.halfTextHalfImageStates,
+        [variantId]: data,
+      },
     };
-    
-    logEditorStore('ENSURE_VARIANT_FINAL_RESULT', variantId, 'unknown', {
+
+    logEditorStore("ENSURE_VARIANT_FINAL_RESULT", variantId, "unknown", {
       finalData: data,
       result: result,
-      allVariantsAfter: Object.keys(result.halfTextHalfImageStates)
+      allVariantsAfter: Object.keys(result.halfTextHalfImageStates),
     });
-    
+
     return result as any;
   },
 
-  getData: (state: any, variantId: string) => 
+  getData: (state: any, variantId: string) =>
     state.halfTextHalfImageStates[variantId] || {},
 
   setData: (state: any, variantId: string, data: ComponentData) => {
@@ -368,9 +379,12 @@ export const halfTextHalfImageFunctions = {
       }
       return comp;
     });
-    
+
     return {
-      halfTextHalfImageStates: { ...state.halfTextHalfImageStates, [variantId]: data },
+      halfTextHalfImageStates: {
+        ...state.halfTextHalfImageStates,
+        [variantId]: data,
+      },
       pageComponentsByPage: {
         ...state.pageComponentsByPage,
         [currentPage]: updatedComponents,
@@ -381,7 +395,7 @@ export const halfTextHalfImageFunctions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.halfTextHalfImageStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     // Update pageComponentsByPage as well
     const currentPage = state.currentPage;
     const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
@@ -391,9 +405,12 @@ export const halfTextHalfImageFunctions = {
       }
       return comp;
     });
-    
+
     return {
-      halfTextHalfImageStates: { ...state.halfTextHalfImageStates, [variantId]: newData },
+      halfTextHalfImageStates: {
+        ...state.halfTextHalfImageStates,
+        [variantId]: newData,
+      },
       pageComponentsByPage: {
         ...state.pageComponentsByPage,
         [currentPage]: updatedComponents,

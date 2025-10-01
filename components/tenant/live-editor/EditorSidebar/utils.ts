@@ -1,14 +1,21 @@
 import { ComponentData } from "@/lib/types";
 import { AVAILABLE_SECTIONS } from "./constants";
 import { getComponentById, COMPONENTS } from "@/lib-liveeditor/ComponentsList";
-import { getDefaultHalfTextHalfImageData, getDefaultHalfTextHalfImage2Data, getDefaultHalfTextHalfImage3Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
+import {
+  getDefaultHalfTextHalfImageData,
+  getDefaultHalfTextHalfImage2Data,
+  getDefaultHalfTextHalfImage3Data,
+} from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
 import { logSidebar } from "@/lib-liveeditor/debugLogger";
 
 // دالة لإنشاء البيانات الافتراضية لكل نوع مكون
-export const createDefaultData = (type: string, componentName?: string): ComponentData => {
+export const createDefaultData = (
+  type: string,
+  componentName?: string,
+): ComponentData => {
   // الحصول على معلومات المكون من ComponentsList
   const component = getComponentById(type);
-  
+
   if (!component) {
     // إذا لم يتم العثور على المكون، إرجاع بيانات افتراضية عامة
     return {
@@ -260,40 +267,60 @@ export const createDefaultData = (type: string, componentName?: string): Compone
 
     case "halfTextHalfImage":
       // تحديد البيانات الافتراضية حسب componentName
-      
+
       // Log the function call
-      logSidebar('CREATE_DEFAULT_DATA_CALLED', 'unknown', componentName || 'unknown', {
-        type,
-        componentName,
-        reason: 'Creating default data for component'
-      });
-      
+      logSidebar(
+        "CREATE_DEFAULT_DATA_CALLED",
+        "unknown",
+        componentName || "unknown",
+        {
+          type,
+          componentName,
+          reason: "Creating default data for component",
+        },
+      );
+
       if (componentName === "halfTextHalfImage2") {
         const data = getDefaultHalfTextHalfImage2Data();
-        
-        logSidebar('CREATE_DEFAULT_DATA_RESULT', 'unknown', 'halfTextHalfImage2', {
-          data: data,
-          reason: 'halfTextHalfImage2 default data'
-        });
-        
+
+        logSidebar(
+          "CREATE_DEFAULT_DATA_RESULT",
+          "unknown",
+          "halfTextHalfImage2",
+          {
+            data: data,
+            reason: "halfTextHalfImage2 default data",
+          },
+        );
+
         return data;
       } else if (componentName === "halfTextHalfImage3") {
         const data = getDefaultHalfTextHalfImage3Data();
-        
-        logSidebar('CREATE_DEFAULT_DATA_RESULT', 'unknown', 'halfTextHalfImage3', {
-          data: data,
-          reason: 'halfTextHalfImage3 default data'
-        });
-        
+
+        logSidebar(
+          "CREATE_DEFAULT_DATA_RESULT",
+          "unknown",
+          "halfTextHalfImage3",
+          {
+            data: data,
+            reason: "halfTextHalfImage3 default data",
+          },
+        );
+
         return data;
       } else {
         const data = getDefaultHalfTextHalfImageData();
-        
-        logSidebar('CREATE_DEFAULT_DATA_RESULT', 'unknown', 'halfTextHalfImage1', {
-          data: data,
-          reason: `Fallback for componentName: "${componentName}"`
-        });
-        
+
+        logSidebar(
+          "CREATE_DEFAULT_DATA_RESULT",
+          "unknown",
+          "halfTextHalfImage1",
+          {
+            data: data,
+            reason: `Fallback for componentName: "${componentName}"`,
+          },
+        );
+
         return data;
       }
 
@@ -363,7 +390,8 @@ export const createDefaultData = (type: string, componentName?: string): Compone
         content: {
           title: "احصل على تقييم عقارك",
           subtitle: "تقييم عقاري احترافي خلال 24 ساعة",
-          description: "فريقنا الخبير يوفر تقييمات عقارية دقيقة لمساعدتك في اتخاذ قرارات مستنيرة.",
+          description:
+            "فريقنا الخبير يوفر تقييمات عقارية دقيقة لمساعدتك في اتخاذ قرارات مستنيرة.",
           button: {
             text: "احصل على تقييم مجاني",
             url: "/valuation",
@@ -388,7 +416,8 @@ export const createDefaultData = (type: string, componentName?: string): Compone
         visible: true,
         background: {
           type: "image",
-          image: "https://dalel-lovat.vercel.app/images/footer/FooterImage.webp",
+          image:
+            "https://dalel-lovat.vercel.app/images/footer/FooterImage.webp",
           alt: "خلفية الفوتر",
           color: "#1f2937",
           gradient: {
@@ -415,7 +444,8 @@ export const createDefaultData = (type: string, componentName?: string): Compone
           companyInfo: {
             enabled: true,
             name: "مكتب دليل الجواء",
-            description: "دليل الجواء العقاري يقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
+            description:
+              "دليل الجواء العقاري يقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
             tagline: "للخدمات العقارية",
             logo: "",
           },
@@ -442,9 +472,24 @@ export const createDefaultData = (type: string, componentName?: string): Compone
             enabled: true,
             title: "وسائل التواصل الاجتماعي",
             platforms: [
-              { name: "واتساب", icon: "FaWhatsapp", url: "#", color: "#25D366" },
-              { name: "لينكد إن", icon: "Linkedin", url: "#", color: "#0077B5" },
-              { name: "إنستغرام", icon: "Instagram", url: "#", color: "#E4405F" },
+              {
+                name: "واتساب",
+                icon: "FaWhatsapp",
+                url: "#",
+                color: "#25D366",
+              },
+              {
+                name: "لينكد إن",
+                icon: "Linkedin",
+                url: "#",
+                color: "#0077B5",
+              },
+              {
+                name: "إنستغرام",
+                icon: "Instagram",
+                url: "#",
+                color: "#E4405F",
+              },
               { name: "تويتر", icon: "Twitter", url: "#", color: "#1DA1F2" },
               { name: "فيسبوك", icon: "Facebook", url: "#", color: "#1877F2" },
             ],
@@ -452,7 +497,8 @@ export const createDefaultData = (type: string, componentName?: string): Compone
         },
         footerBottom: {
           enabled: true,
-          copyright: "© 2024 مكتب دليل الجواء للخدمات العقارية. جميع الحقوق محفوظة.",
+          copyright:
+            "© 2024 مكتب دليل الجواء للخدمات العقارية. جميع الحقوق محفوظة.",
           legalLinks: [
             { text: "سياسة الخصوصية", url: "/privacy" },
             { text: "الشروط والأحكام", url: "/terms" },

@@ -17,26 +17,35 @@ export function ActiveFiltersDisplay({
 }: ActiveFiltersDisplayProps) {
   const getFilterDisplayName = (key: string, value: any) => {
     switch (key) {
-      case 'purposes_filter':
-        return value === 'rent' ? 'للإيجار' : value === 'sale' ? 'للبيع' : value;
-      case 'type':
-        return value === 'residential' ? 'سكني' : 
-               value === 'commercial' ? 'تجاري' : 
-               value === 'rent' ? 'للإيجار' : 
-               value === 'sale' ? 'للبيع' : value;
-      case 'price_from':
+      case "purposes_filter":
+        return value === "rent"
+          ? "للإيجار"
+          : value === "sale"
+            ? "للبيع"
+            : value;
+      case "type":
+        return value === "residential"
+          ? "سكني"
+          : value === "commercial"
+            ? "تجاري"
+            : value === "rent"
+              ? "للإيجار"
+              : value === "sale"
+                ? "للبيع"
+                : value;
+      case "price_from":
         return `من ${value.toLocaleString()} ريال`;
-      case 'price_to':
+      case "price_to":
         return `إلى ${value.toLocaleString()} ريال`;
-      case 'area_from':
+      case "area_from":
         return `من ${value} م²`;
-      case 'area_to':
+      case "area_to":
         return `إلى ${value} م²`;
-      case 'beds':
+      case "beds":
         return `${value}+ غرف`;
-      case 'baths':
+      case "baths":
         return `${value}+ حمامات`;
-      case 'features':
+      case "features":
         return value;
       default:
         return value;
@@ -44,28 +53,32 @@ export function ActiveFiltersDisplay({
   };
 
   const getActiveFilters = () => {
-    const activeFilters: Array<{ key: string; value: any; displayName: string }> = [];
-    
+    const activeFilters: Array<{
+      key: string;
+      value: any;
+      displayName: string;
+    }> = [];
+
     Object.entries(filters).forEach(([key, value]) => {
-      if (value && value !== '' && value !== 0) {
+      if (value && value !== "" && value !== 0) {
         if (Array.isArray(value) && value.length > 0) {
           value.forEach((item: any) => {
             activeFilters.push({
               key,
               value: item,
-              displayName: getFilterDisplayName(key, item)
+              displayName: getFilterDisplayName(key, item),
             });
           });
         } else if (!Array.isArray(value)) {
           activeFilters.push({
             key,
             value,
-            displayName: getFilterDisplayName(key, value)
+            displayName: getFilterDisplayName(key, value),
           });
         }
       }
     });
-    
+
     return activeFilters;
   };
 
@@ -78,7 +91,7 @@ export function ActiveFiltersDisplay({
   return (
     <div className="flex flex-wrap items-center gap-2 p-4 bg-gray-50 border border-gray-200 rounded-lg">
       <span className="text-sm font-medium text-gray-700">الفلاتر النشطة:</span>
-      
+
       {activeFilters.map((filter, index) => (
         <Badge
           key={`${filter.key}-${filter.value}-${index}`}
@@ -96,7 +109,7 @@ export function ActiveFiltersDisplay({
           </Button>
         </Badge>
       ))}
-      
+
       <Button
         variant="outline"
         size="sm"

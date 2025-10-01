@@ -1,13 +1,21 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
-import { FaWhatsapp } from "react-icons/fa"
-import { useEffect } from "react"
-import useTenantStore from "@/context-liveeditor/tenantStore"
-import { useEditorStore } from "@/context-liveeditor/editorStore"
-import { logChange } from "@/lib-liveeditor/debugLogger"
+import Image from "next/image";
+import Link from "next/link";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+} from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
+import { useEffect } from "react";
+import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { logChange } from "@/lib-liveeditor/debugLogger";
 
 // Define footer data type
 type FooterData = {
@@ -61,7 +69,12 @@ type FooterData = {
     socialMedia: {
       enabled: boolean;
       title: string;
-      platforms: Array<{ name: string; icon: string; url: string; color: string }>;
+      platforms: Array<{
+        name: string;
+        icon: string;
+        url: string;
+        color: string;
+      }>;
     };
   };
   footerBottom: {
@@ -94,7 +107,7 @@ type FooterData = {
       borderRadius: string;
     };
   };
-}
+};
 
 // Default footer data
 const getDefaultFooterData = (): FooterData => ({
@@ -128,7 +141,8 @@ const getDefaultFooterData = (): FooterData => ({
     companyInfo: {
       enabled: true,
       name: "مكتب دليل الجواء",
-      description: "دليل الجواء العقاري يقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
+      description:
+        "دليل الجواء العقاري يقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
       tagline: "للخدمات العقارية",
       logo: "",
     },
@@ -196,7 +210,7 @@ const getDefaultFooterData = (): FooterData => ({
       borderRadius: "none",
     },
   },
-})
+});
 
 interface FooterProps {
   // Editor props
@@ -207,125 +221,143 @@ interface FooterProps {
 
 export default function Footer(props: FooterProps = {}) {
   // Initialize variant id early so hooks can depend on it
-  const variantId = props.variant || "footer1"
-  
+  const variantId = props.variant || "footer1";
+
   // Subscribe to editor store updates for this component variant
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant)
-  const getComponentData = useEditorStore((s) => s.getComponentData)
-  
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+
   // Subscribe to global components data
-  const globalFooterData = useEditorStore((s) => s.globalFooterData)
+  const globalFooterData = useEditorStore((s) => s.globalFooterData);
 
   useEffect(() => {
     if (props.useStore) {
-      ensureComponentVariant('footer', variantId, props)
+      ensureComponentVariant("footer", variantId, props);
     }
-  }, [variantId, props.useStore, ensureComponentVariant])
+  }, [variantId, props.useStore, ensureComponentVariant]);
 
   // Get tenant data
-  const tenantData = useTenantStore((s) => s.tenantData)
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const tenantId = useTenantStore((s) => s.tenantId)
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
 
   useEffect(() => {
     if (tenantId) {
-      fetchTenantData(tenantId)
+      fetchTenantData(tenantId);
     }
-  }, [tenantId, fetchTenantData])
+  }, [tenantId, fetchTenantData]);
 
   // Check if this is a global footer
-  const isGlobalFooter = variantId === "global-footer"
-  
+  const isGlobalFooter = variantId === "global-footer";
+
   // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore ? (getComponentData('footer', variantId) || {}) : {}
+  const storeData = props.useStore
+    ? getComponentData("footer", variantId) || {}
+    : {};
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
-      return {}
+      return {};
     }
     // Search through all pages for this component variant
-    for (const [pageSlug, pageComponents] of Object.entries(tenantData.componentSettings)) {
-      
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
       // Check if pageComponents is an object (not array)
-      if (typeof pageComponents === 'object' && !Array.isArray(pageComponents)) {
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
         // Search through all components in this page
-        for (const [componentId, component] of Object.entries(pageComponents as any)) {
-          
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
           // Check if this is the exact component we're looking for by ID
-          if ((component as any).type === 'footer' && 
-              (component as any).componentName === variantId &&
-              componentId === props.id) {
-            return (component as any).data
+          if (
+            (component as any).type === "footer" &&
+            (component as any).componentName === variantId &&
+            componentId === props.id
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-    return {}
-  }
-  
-  const tenantComponentData = getTenantComponentData()
+    return {};
+  };
 
-  // Merge data with priority: 
+  const tenantComponentData = getTenantComponentData();
+
+  // Merge data with priority:
   // For global footer: globalFooterData > props > default
   // For regular footer: storeData > tenantComponentData > props > default
-  const mergedData = isGlobalFooter ? {
-    ...getDefaultFooterData(), 
-    ...props, 
-    ...globalFooterData
-  } : {
-    ...getDefaultFooterData(), 
-    ...props, 
-    ...tenantComponentData,
-    ...storeData 
-  }
+  const mergedData = isGlobalFooter
+    ? {
+        ...getDefaultFooterData(),
+        ...props,
+        ...globalFooterData,
+      }
+    : {
+        ...getDefaultFooterData(),
+        ...props,
+        ...tenantComponentData,
+        ...storeData,
+      };
 
   // Debug logging for global footer changes
   useEffect(() => {
     if (isGlobalFooter) {
-      logChange(variantId, 'footer1', 'footer', mergedData, 'GLOBAL_FOOTER');
+      logChange(variantId, "footer1", "footer", mergedData, "GLOBAL_FOOTER");
     }
-  }, [isGlobalFooter, variantId, mergedData])
+  }, [isGlobalFooter, variantId, mergedData]);
 
   // Force re-render when globalFooterData changes
   useEffect(() => {
     if (isGlobalFooter && globalFooterData) {
       // This will trigger a re-render when globalFooterData changes
     }
-  }, [isGlobalFooter, globalFooterData])
+  }, [isGlobalFooter, globalFooterData]);
 
   // Don't render if not visible
   if (!mergedData.visible) {
-    return null
+    return null;
   }
 
   const getBackgroundStyle = () => {
-    const { background } = mergedData
-    
+    const { background } = mergedData;
+
     if (background.type === "image" && background.image) {
-      return {}
+      return {};
     } else if (background.type === "color" && background.color) {
-      return { backgroundColor: background.color }
+      return { backgroundColor: background.color };
     } else if (background.type === "gradient" && background.gradient.enabled) {
-      const { direction, startColor, endColor, middleColor } = background.gradient
+      const { direction, startColor, endColor, middleColor } =
+        background.gradient;
       if (middleColor) {
-        return { background: `linear-gradient(${direction}, ${startColor}, ${middleColor}, ${endColor})` }
+        return {
+          background: `linear-gradient(${direction}, ${startColor}, ${middleColor}, ${endColor})`,
+        };
       }
-      return { background: `linear-gradient(${direction}, ${startColor}, ${endColor})` }
+      return {
+        background: `linear-gradient(${direction}, ${startColor}, ${endColor})`,
+      };
     }
-    return {}
-  }
+    return {};
+  };
 
   const getOverlayStyle = () => {
-    const { overlay } = mergedData.background
-    if (!overlay.enabled) return {}
-    
+    const { overlay } = mergedData.background;
+    if (!overlay.enabled) return {};
+
     return {
       backgroundColor: overlay.color,
       opacity: overlay.opacity,
       mixBlendMode: overlay.blendMode as any,
-    }
-  }
+    };
+  };
 
   const getIconComponent = (iconName: string) => {
     const iconMap: { [key: string]: any } = {
@@ -334,48 +366,62 @@ export default function Footer(props: FooterProps = {}) {
       Instagram: Instagram,
       Twitter: Twitter,
       Facebook: Facebook,
-    }
-    return iconMap[iconName] || MapPin
-  }
+    };
+    return iconMap[iconName] || MapPin;
+  };
 
   return (
-    <footer 
-      className="relative w-full" 
+    <footer
+      className="relative w-full"
       style={{
         ...getBackgroundStyle(),
-        backgroundColor: mergedData.background?.color || mergedData.styling?.bgColor || undefined
+        backgroundColor:
+          mergedData.background?.color ||
+          mergedData.styling?.bgColor ||
+          undefined,
       }}
     >
       {/* صورة الخلفية */}
-      {mergedData.background.type === "image" && mergedData.background.image && (
-        <div className="absolute inset-0">
-          <Image
-            src={mergedData.background.image}
-            alt={mergedData.background.alt}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority={false}
-          />
-          <div className="absolute inset-0" style={getOverlayStyle()} />
-        </div>
-      )}
+      {mergedData.background.type === "image" &&
+        mergedData.background.image && (
+          <div className="absolute inset-0">
+            <Image
+              src={mergedData.background.image}
+              alt={mergedData.background.alt}
+              fill
+              sizes="100vw"
+              className="object-cover"
+              priority={false}
+            />
+            <div className="absolute inset-0" style={getOverlayStyle()} />
+          </div>
+        )}
 
       {/* المحتوى */}
-      <div 
-        className={`relative z-10 px-4 py-16 text-white`} 
+      <div
+        className={`relative z-10 px-4 py-16 text-white`}
         dir="rtl"
         style={{
           padding: `${mergedData.layout.padding}px`,
-          gridTemplateColumns: mergedData.grid?.columns?.desktop ? `repeat(${mergedData.grid.columns.desktop}, 1fr)` : undefined,
-          gap: mergedData.grid?.gapX || mergedData.grid?.gapY ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}` : undefined
+          gridTemplateColumns: mergedData.grid?.columns?.desktop
+            ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
+            : undefined,
+          gap:
+            mergedData.grid?.gapX || mergedData.grid?.gapY
+              ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}`
+              : undefined,
         }}
       >
-        <div 
+        <div
           className={`mx-auto grid max-w-${mergedData.layout.maxWidth} grid-cols-1 gap-${mergedData.layout.spacing} md:grid-cols-${mergedData.layout.columns}`}
           style={{
-            gridTemplateColumns: mergedData.grid?.columns?.desktop ? `repeat(${mergedData.grid.columns.desktop}, 1fr)` : undefined,
-            gap: mergedData.grid?.gapX || mergedData.grid?.gapY ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}` : undefined
+            gridTemplateColumns: mergedData.grid?.columns?.desktop
+              ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
+              : undefined,
+            gap:
+              mergedData.grid?.gapX || mergedData.grid?.gapY
+                ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}`
+                : undefined,
           }}
         >
           {/* العمود الأيمن: عن المكتب */}
@@ -386,22 +432,28 @@ export default function Footer(props: FooterProps = {}) {
                   <MapPin className="size-5" />
                 </div>
                 <div>
-                  <h3 
+                  <h3
                     className={`text-lg font-${mergedData.styling.typography.titleWeight} text-white`}
-                    style={{ fontSize: `var(--${mergedData.styling.typography.titleSize})` }}
+                    style={{
+                      fontSize: `var(--${mergedData.styling.typography.titleSize})`,
+                    }}
                   >
                     {mergedData.content.companyInfo.name}
                   </h3>
-                  <p className="text-sm text-white/80">{mergedData.content.companyInfo.tagline}</p>
+                  <p className="text-sm text-white/80">
+                    {mergedData.content.companyInfo.tagline}
+                  </p>
                 </div>
               </div>
-              <h4 
+              <h4
                 className={`text-xl font-${mergedData.styling.typography.titleWeight}`}
-                style={{ fontSize: `var(--${mergedData.styling.typography.titleSize})` }}
+                style={{
+                  fontSize: `var(--${mergedData.styling.typography.titleSize})`,
+                }}
               >
                 عن المكتب
               </h4>
-              <p 
+              <p
                 className={`text-${mergedData.styling.typography.bodySize} font-${mergedData.styling.typography.bodyWeight} leading-7 text-white/90`}
               >
                 {mergedData.content.companyInfo.description}
@@ -412,23 +464,29 @@ export default function Footer(props: FooterProps = {}) {
           {/* العمود الأوسط: روابط مهمة */}
           {mergedData.content.quickLinks.enabled && (
             <div className="space-y-4">
-              <h4 
+              <h4
                 className={`text-xl font-${mergedData.styling.typography.titleWeight}`}
-                style={{ fontSize: `var(--${mergedData.styling.typography.titleSize})` }}
+                style={{
+                  fontSize: `var(--${mergedData.styling.typography.titleSize})`,
+                }}
               >
                 {mergedData.content.quickLinks.title}
               </h4>
               <nav className="space-y-3">
-                                  {mergedData.content.quickLinks.links.map((link: any, index: number) => (
-                  <Link 
-                    key={index}
-                    href={link.url} 
-                    className="block text-white/90 transition-colors hover:text-emerald-400"
-                    style={{ transition: mergedData.styling.effects.hoverTransition }}
-                  >
-                    {link.text}
-                  </Link>
-                ))}
+                {mergedData.content.quickLinks.links.map(
+                  (link: any, index: number) => (
+                    <Link
+                      key={index}
+                      href={link.url}
+                      className="block text-white/90 transition-colors hover:text-emerald-400"
+                      style={{
+                        transition: mergedData.styling.effects.hoverTransition,
+                      }}
+                    >
+                      {link.text}
+                    </Link>
+                  ),
+                )}
               </nav>
             </div>
           )}
@@ -436,33 +494,41 @@ export default function Footer(props: FooterProps = {}) {
           {/* العمود الأيسر: معلومات التواصل */}
           {mergedData.content.contactInfo.enabled && (
             <div className="space-y-4">
-              <h4 
+              <h4
                 className={`text-xl font-${mergedData.styling.typography.titleWeight}`}
-                style={{ fontSize: `var(--${mergedData.styling.typography.titleSize})` }}
+                style={{
+                  fontSize: `var(--${mergedData.styling.typography.titleSize})`,
+                }}
               >
                 {mergedData.content.contactInfo.title}
               </h4>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <MapPin className="mt-1 size-5" />
-                  <span className={`text-${mergedData.styling.typography.bodySize} text-white/90`}>
+                  <span
+                    className={`text-${mergedData.styling.typography.bodySize} text-white/90`}
+                  >
                     {mergedData.content.contactInfo.address}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Phone className="size-5" />
                   <div className="space-y-1">
-                    <a 
-                      href={`tel:${mergedData.content.contactInfo.phone1}`} 
+                    <a
+                      href={`tel:${mergedData.content.contactInfo.phone1}`}
                       className={`block text-${mergedData.styling.typography.bodySize} text-white/90 hover:text-emerald-400`}
-                      style={{ transition: mergedData.styling.effects.hoverTransition }}
+                      style={{
+                        transition: mergedData.styling.effects.hoverTransition,
+                      }}
                     >
                       {mergedData.content.contactInfo.phone1}
                     </a>
-                    <a 
-                      href={`tel:${mergedData.content.contactInfo.phone2}`} 
+                    <a
+                      href={`tel:${mergedData.content.contactInfo.phone2}`}
                       className={`block text-${mergedData.styling.typography.bodySize} text-white/90 hover:text-emerald-400`}
-                      style={{ transition: mergedData.styling.effects.hoverTransition }}
+                      style={{
+                        transition: mergedData.styling.effects.hoverTransition,
+                      }}
                     >
                       {mergedData.content.contactInfo.phone2}
                     </a>
@@ -470,10 +536,12 @@ export default function Footer(props: FooterProps = {}) {
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail className="size-5" />
-                  <a 
-                    href={`mailto:${mergedData.content.contactInfo.email}`} 
+                  <a
+                    href={`mailto:${mergedData.content.contactInfo.email}`}
                     className={`text-${mergedData.styling.typography.bodySize} text-white/90 hover:text-emerald-400`}
-                    style={{ transition: mergedData.styling.effects.hoverTransition }}
+                    style={{
+                      transition: mergedData.styling.effects.hoverTransition,
+                    }}
                   >
                     {mergedData.content.contactInfo.email}
                   </a>
@@ -483,23 +551,28 @@ export default function Footer(props: FooterProps = {}) {
               {/* أيقونات وسائل التواصل الاجتماعي */}
               {mergedData.content.socialMedia.enabled && (
                 <div className="flex items-center gap-3 pt-4">
-                  {mergedData.content.socialMedia.platforms.map((platform: any, index: number) => {
-                    const IconComponent = getIconComponent(platform.icon)
-                    return (
-                      <a
-                        key={index}
-                        href={platform.url}
-                        className="grid size-10 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-emerald-600"
-                        aria-label={platform.name}
-                        style={{ 
-                          transition: mergedData.styling.effects.hoverTransition,
-                          '--hover-color': platform.color,
-                        } as React.CSSProperties}
-                      >
-                        <IconComponent className="size-5" />
-                      </a>
-                    )
-                  })}
+                  {mergedData.content.socialMedia.platforms.map(
+                    (platform: any, index: number) => {
+                      const IconComponent = getIconComponent(platform.icon);
+                      return (
+                        <a
+                          key={index}
+                          href={platform.url}
+                          className="grid size-10 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-emerald-600"
+                          aria-label={platform.name}
+                          style={
+                            {
+                              transition:
+                                mergedData.styling.effects.hoverTransition,
+                              "--hover-color": platform.color,
+                            } as React.CSSProperties
+                          }
+                        >
+                          <IconComponent className="size-5" />
+                        </a>
+                      );
+                    },
+                  )}
                 </div>
               )}
             </div>
@@ -508,7 +581,7 @@ export default function Footer(props: FooterProps = {}) {
 
         {/* خط الفصل وحقوق الطبع */}
         {mergedData.footerBottom.enabled && (
-          <div 
+          <div
             className={`mx-auto mt-12 max-w-${mergedData.layout.maxWidth} border-t border-white/20 pt-8`}
             style={{ borderColor: mergedData.styling.colors.border }}
           >
@@ -517,21 +590,25 @@ export default function Footer(props: FooterProps = {}) {
                 {mergedData.footerBottom.copyright}
               </p>
               <div className="flex gap-6">
-                {mergedData.footerBottom.legalLinks.map((link: any, index: number) => (
-                  <Link 
-                    key={index}
-                    href={link.url} 
-                    className="hover:text-emerald-400"
-                    style={{ transition: mergedData.styling.effects.hoverTransition }}
-                  >
-                    {link.text}
-                  </Link>
-                ))}
+                {mergedData.footerBottom.legalLinks.map(
+                  (link: any, index: number) => (
+                    <Link
+                      key={index}
+                      href={link.url}
+                      className="hover:text-emerald-400"
+                      style={{
+                        transition: mergedData.styling.effects.hoverTransition,
+                      }}
+                    >
+                      {link.text}
+                    </Link>
+                  ),
+                )}
               </div>
             </div>
           </div>
         )}
       </div>
     </footer>
-  )
+  );
 }

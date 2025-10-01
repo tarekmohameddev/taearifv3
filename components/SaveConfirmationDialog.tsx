@@ -10,6 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 
 export default function SaveConfirmationDialog({
   open,
@@ -23,6 +24,7 @@ export default function SaveConfirmationDialog({
   onConfirm: () => void | Promise<void>;
 }) {
   const [loading, setLoading] = useState(false);
+  const t = useEditorT();
 
   // Reset loading state when dialog closes
   const handleClose = () => {
@@ -41,14 +43,13 @@ export default function SaveConfirmationDialog({
     try {
       setLoading(true);
       await Promise.resolve(onConfirm());
-      
+
       // Add a timeout as fallback in case dialog doesn't close
       setTimeout(() => {
         setLoading(false);
       }, 5000); // 5 seconds timeout
-      
     } catch (error) {
-      console.error('Save operation failed:', error);
+      console.error("Save operation failed:", error);
       // Reset loading state on error
       setLoading(false);
     }
@@ -62,28 +63,28 @@ export default function SaveConfirmationDialog({
         <DialogHeader>
           <DialogTitle>
             {isThemeConfirmation
-              ? "Apply Theme and Discard Custom Edits?"
-              : "Confirm Save"}
+              ? t("dialog.apply_theme_title")
+              : t("dialog.confirm_save_title")}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             {isThemeConfirmation ? (
               <>
-                This action will{" "}
+                {t("dialog.theme_warning_part1")}{" "}
                 <strong className="text-red-600">
-                  permanently remove all your custom edits
+                  {t("dialog.theme_warning_part2")}
                 </strong>{" "}
-                and replace them with the selected theme defaults.
+                {t("dialog.theme_warning_part3")}
                 <br />
-                This cannot be undone.
+                {t("dialog.cannot_undo")}
               </>
             ) : (
-              "All your changes will be saved and applied immediately."
+              t("dialog.save_changes_description")
             )}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={handleConfirm}
@@ -92,10 +93,10 @@ export default function SaveConfirmationDialog({
             className={isThemeConfirmation ? "bg-red-600 hover:bg-red-700" : ""}
           >
             {loading
-              ? "Loading..."
+              ? t("common.loading")
               : isThemeConfirmation
-                ? "Apply Theme"
-                : "Confirm Save"}
+                ? t("dialog.apply_theme_button")
+                : t("dialog.confirm_save_button")}
           </Button>
         </DialogFooter>
       </DialogContent>

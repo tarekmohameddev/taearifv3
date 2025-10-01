@@ -13,9 +13,24 @@ export const heroStructure: ComponentStructure = {
           label: "Height",
           type: "object",
           fields: [
-            { key: "desktop", label: "Desktop", type: "text", placeholder: "90vh" },
-            { key: "tablet", label: "Tablet", type: "text", placeholder: "80vh" },
-            { key: "mobile", label: "Mobile", type: "text", placeholder: "70vh" },
+            {
+              key: "desktop",
+              label: "Desktop",
+              type: "text",
+              placeholder: "90vh",
+            },
+            {
+              key: "tablet",
+              label: "Tablet",
+              type: "text",
+              placeholder: "80vh",
+            },
+            {
+              key: "mobile",
+              label: "Mobile",
+              type: "text",
+              placeholder: "70vh",
+            },
           ],
         },
         {
@@ -23,9 +38,24 @@ export const heroStructure: ComponentStructure = {
           label: "Minimum Height",
           type: "object",
           fields: [
-            { key: "desktop", label: "Desktop", type: "text", placeholder: "520px" },
-            { key: "tablet", label: "Tablet", type: "text", placeholder: "480px" },
-            { key: "mobile", label: "Mobile", type: "text", placeholder: "400px" },
+            {
+              key: "desktop",
+              label: "Desktop",
+              type: "text",
+              placeholder: "520px",
+            },
+            {
+              key: "tablet",
+              label: "Tablet",
+              type: "text",
+              placeholder: "480px",
+            },
+            {
+              key: "mobile",
+              label: "Mobile",
+              type: "text",
+              placeholder: "400px",
+            },
           ],
         },
         {
@@ -41,7 +71,12 @@ export const heroStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { key: "opacity", label: "Opacity", type: "text", placeholder: "0.45" },
+                {
+                  key: "opacity",
+                  label: "Opacity",
+                  type: "text",
+                  placeholder: "0.45",
+                },
                 { key: "color", label: "Color", type: "color" },
               ],
             },
@@ -177,14 +212,14 @@ export const heroStructure: ComponentStructure = {
                       addLabel: "Add Option",
                       itemLabel: "Option",
                       of: [{ key: "value", label: "Value", type: "text" }],
-        },
-      ],
-    },
-    {
+                    },
+                  ],
+                },
+                {
                   key: "price",
                   label: "Price Field",
                   type: "object",
-      fields: [
+                  fields: [
                     { key: "enabled", label: "Enabled", type: "boolean" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "icon", label: "Icon", type: "text" },
@@ -198,25 +233,25 @@ export const heroStructure: ComponentStructure = {
                         { key: "id", label: "ID", type: "text" },
                         { key: "label", label: "Label", type: "text" },
                       ],
-        },
-      ],
-    },
-    {
+                    },
+                  ],
+                },
+                {
                   key: "keywords",
                   label: "Keywords Field",
                   type: "object",
-      fields: [
+                  fields: [
                     { key: "enabled", label: "Enabled", type: "boolean" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                   ],
                 },
-      ],
-    },
-    {
+              ],
+            },
+            {
               key: "responsive",
               label: "Responsive Layout",
               type: "object",
-      fields: [
+              fields: [
                 { key: "desktop", label: "Desktop", type: "text" },
                 { key: "tablet", label: "Tablet", type: "text" },
                 { key: "mobile", label: "Mobile", type: "text" },
@@ -270,13 +305,41 @@ export const heroStructure: ComponentStructure = {
         { key: "background.image", label: "Background Image", type: "image" },
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.subtitle", label: "Subtitle", type: "text" },
-        { key: "content.paddingTop", label: "Content Padding Top", type: "text" },
-        { key: "searchForm.enabled", label: "Show Search Form", type: "boolean" },
-        { key: "searchForm.fields.purpose.enabled", label: "Show Purpose Field", type: "boolean" },
-        { key: "searchForm.fields.city.enabled", label: "Show City Field", type: "boolean" },
-        { key: "searchForm.fields.type.enabled", label: "Show Type Field", type: "boolean" },
-        { key: "searchForm.fields.price.enabled", label: "Show Price Field", type: "boolean" },
-        { key: "searchForm.fields.keywords.enabled", label: "Show Keywords Field", type: "boolean" },
+        {
+          key: "content.paddingTop",
+          label: "Content Padding Top",
+          type: "text",
+        },
+        {
+          key: "searchForm.enabled",
+          label: "Show Search Form",
+          type: "boolean",
+        },
+        {
+          key: "searchForm.fields.purpose.enabled",
+          label: "Show Purpose Field",
+          type: "boolean",
+        },
+        {
+          key: "searchForm.fields.city.enabled",
+          label: "Show City Field",
+          type: "boolean",
+        },
+        {
+          key: "searchForm.fields.type.enabled",
+          label: "Show Type Field",
+          type: "boolean",
+        },
+        {
+          key: "searchForm.fields.price.enabled",
+          label: "Show Price Field",
+          type: "boolean",
+        },
+        {
+          key: "searchForm.fields.keywords.enabled",
+          label: "Show Keywords Field",
+          type: "boolean",
+        },
       ],
     },
     {
@@ -289,9 +352,24 @@ export const heroStructure: ComponentStructure = {
           label: "Height",
           type: "object",
           fields: [
-            { key: "desktop", label: "Desktop", type: "text", placeholder: "229px" },
-            { key: "tablet", label: "Tablet", type: "text", placeholder: "229px" },
-            { key: "mobile", label: "Mobile", type: "text", placeholder: "229px" },
+            {
+              key: "desktop",
+              label: "Desktop",
+              type: "text",
+              placeholder: "229px",
+            },
+            {
+              key: "tablet",
+              label: "Tablet",
+              type: "text",
+              placeholder: "229px",
+            },
+            {
+              key: "mobile",
+              label: "Mobile",
+              type: "text",
+              placeholder: "229px",
+            },
           ],
         },
         {
@@ -299,9 +377,24 @@ export const heroStructure: ComponentStructure = {
           label: "Minimum Height",
           type: "object",
           fields: [
-            { key: "desktop", label: "Desktop", type: "text", placeholder: "229px" },
-            { key: "tablet", label: "Tablet", type: "text", placeholder: "229px" },
-            { key: "mobile", label: "Mobile", type: "text", placeholder: "229px" },
+            {
+              key: "desktop",
+              label: "Desktop",
+              type: "text",
+              placeholder: "229px",
+            },
+            {
+              key: "tablet",
+              label: "Tablet",
+              type: "text",
+              placeholder: "229px",
+            },
+            {
+              key: "mobile",
+              label: "Mobile",
+              type: "text",
+              placeholder: "229px",
+            },
           ],
         },
         {
@@ -317,7 +410,12 @@ export const heroStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { key: "opacity", label: "Opacity", type: "text", placeholder: "0.6" },
+                {
+                  key: "opacity",
+                  label: "Opacity",
+                  type: "text",
+                  placeholder: "0.6",
+                },
                 { key: "color", label: "Color", type: "color" },
               ],
             },
@@ -348,9 +446,24 @@ export const heroStructure: ComponentStructure = {
                       label: "Size",
                       type: "object",
                       fields: [
-                        { key: "desktop", label: "Desktop", type: "text", placeholder: "36px" },
-                        { key: "tablet", label: "Tablet", type: "text", placeholder: "36px" },
-                        { key: "mobile", label: "Mobile", type: "text", placeholder: "36px" },
+                        {
+                          key: "desktop",
+                          label: "Desktop",
+                          type: "text",
+                          placeholder: "36px",
+                        },
+                        {
+                          key: "tablet",
+                          label: "Tablet",
+                          type: "text",
+                          placeholder: "36px",
+                        },
+                        {
+                          key: "mobile",
+                          label: "Mobile",
+                          type: "text",
+                          placeholder: "36px",
+                        },
                       ],
                     },
                     { key: "weight", label: "Weight", type: "text" },
@@ -369,9 +482,24 @@ export const heroStructure: ComponentStructure = {
                       label: "Size",
                       type: "object",
                       fields: [
-                        { key: "desktop", label: "Desktop", type: "text", placeholder: "15px" },
-                        { key: "tablet", label: "Tablet", type: "text", placeholder: "15px" },
-                        { key: "mobile", label: "Mobile", type: "text", placeholder: "15px" },
+                        {
+                          key: "desktop",
+                          label: "Desktop",
+                          type: "text",
+                          placeholder: "15px",
+                        },
+                        {
+                          key: "tablet",
+                          label: "Tablet",
+                          type: "text",
+                          placeholder: "15px",
+                        },
+                        {
+                          key: "mobile",
+                          label: "Mobile",
+                          type: "text",
+                          placeholder: "15px",
+                        },
                       ],
                     },
                     { key: "weight", label: "Weight", type: "text" },
@@ -417,9 +545,21 @@ export const heroStructure: ComponentStructure = {
         { key: "background.image", label: "Background Image", type: "image" },
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.description", label: "Description", type: "text" },
-        { key: "background.overlay.enabled", label: "Show Overlay", type: "boolean" },
-        { key: "background.overlay.opacity", label: "Overlay Opacity", type: "text" },
-        { key: "background.overlay.color", label: "Overlay Color", type: "color" },
+        {
+          key: "background.overlay.enabled",
+          label: "Show Overlay",
+          type: "boolean",
+        },
+        {
+          key: "background.overlay.opacity",
+          label: "Overlay Opacity",
+          type: "text",
+        },
+        {
+          key: "background.overlay.color",
+          label: "Overlay Color",
+          type: "color",
+        },
       ],
     },
   ],

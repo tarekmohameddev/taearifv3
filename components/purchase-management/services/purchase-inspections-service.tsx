@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,10 +20,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Search,
   Plus,
@@ -31,79 +37,85 @@ import {
   AlertTriangle,
   Eye,
   Phone,
-} from "lucide-react"
-import useAuthStore from "@/context/AuthContext"
+} from "lucide-react";
+import useAuthStore from "@/context/AuthContext";
 
 interface PropertyInspection {
-  id: string
-  inspectionNumber: string
+  id: string;
+  inspectionNumber: string;
   propertyDetails: {
-    title: string
-    titleAr: string
-    type: string
-    typeAr: string
-    location: string
-    locationAr: string
-    area: number
-    price: number
-  }
+    title: string;
+    titleAr: string;
+    type: string;
+    typeAr: string;
+    location: string;
+    locationAr: string;
+    area: number;
+    price: number;
+  };
   client: {
-    name: string
-    nameAr: string
-    email: string
-    phone: string
-    type: "buyer" | "investor"
-    typeAr: string
-  }
+    name: string;
+    nameAr: string;
+    email: string;
+    phone: string;
+    type: "buyer" | "investor";
+    typeAr: string;
+  };
   inspector: {
-    name: string
-    nameAr: string
-    phone: string
-    specialization: string
-    specializationAr: string
-  }
-  scheduledDate: string
-  scheduledDateHijri: string
-  scheduledTime: string
-  status: "scheduled" | "in_progress" | "completed" | "cancelled" | "rescheduled"
-  statusAr: string
-  inspectionType: "initial" | "detailed" | "final" | "follow_up"
-  inspectionTypeAr: string
+    name: string;
+    nameAr: string;
+    phone: string;
+    specialization: string;
+    specializationAr: string;
+  };
+  scheduledDate: string;
+  scheduledDateHijri: string;
+  scheduledTime: string;
+  status:
+    | "scheduled"
+    | "in_progress"
+    | "completed"
+    | "cancelled"
+    | "rescheduled";
+  statusAr: string;
+  inspectionType: "initial" | "detailed" | "final" | "follow_up";
+  inspectionTypeAr: string;
   findings?: {
-    overallCondition: string
-    overallConditionAr: string
-    structuralIssues: string[]
-    structuralIssuesAr: string[]
-    recommendations: string
-    recommendationsAr: string
-    estimatedRepairCost?: number
-  }
-  notes: string
-  notesAr: string
-  createdDate: string
-  createdDateHijri: string
+    overallCondition: string;
+    overallConditionAr: string;
+    structuralIssues: string[];
+    structuralIssuesAr: string[];
+    recommendations: string;
+    recommendationsAr: string;
+    estimatedRepairCost?: number;
+  };
+  notes: string;
+  notesAr: string;
+  createdDate: string;
+  createdDateHijri: string;
 }
 
 export function PurchaseInspectionsService() {
-  const [inspections, setInspections] = useState<PropertyInspection[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const { userData } = useAuthStore()
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [filterType, setFilterType] = useState("all")
-  const [selectedInspection, setSelectedInspection] = useState<PropertyInspection | null>(null)
-  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false)
+  const [inspections, setInspections] = useState<PropertyInspection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const { userData } = useAuthStore();
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterType, setFilterType] = useState("all");
+  const [selectedInspection, setSelectedInspection] =
+    useState<PropertyInspection | null>(null);
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchInspections")
-      return
+      console.log("No token available, skipping fetchInspections");
+      return;
     }
 
     const fetchInspections = async () => {
-      setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setInspections([
         {
@@ -184,9 +196,16 @@ export function PurchaseInspectionsService() {
           findings: {
             overallCondition: "Good",
             overallConditionAr: "جيدة",
-            structuralIssues: ["Minor wall cracks", "Outdated electrical outlets"],
-            structuralIssuesAr: ["شقوق طفيفة في الجدران", "مقابس كهربائية قديمة"],
-            recommendations: "Property is in good condition with minor repairs needed",
+            structuralIssues: [
+              "Minor wall cracks",
+              "Outdated electrical outlets",
+            ],
+            structuralIssuesAr: [
+              "شقوق طفيفة في الجدران",
+              "مقابس كهربائية قديمة",
+            ],
+            recommendations:
+              "Property is in good condition with minor repairs needed",
             recommendationsAr: "العقار في حالة جيدة مع الحاجة لإصلاحات طفيفة",
             estimatedRepairCost: 15000,
           },
@@ -275,72 +294,82 @@ export function PurchaseInspectionsService() {
           createdDate: "2024-01-20",
           createdDateHijri: "1446/07/20",
         },
-      ])
-      setLoading(false)
-    }
+      ]);
+      setLoading(false);
+    };
 
-    fetchInspections()
-  }, [userData?.token])
+    fetchInspections();
+  }, [userData?.token]);
 
   const filteredInspections = inspections.filter((inspection) => {
     const matchesSearch =
-      inspection.client.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inspection.propertyDetails.titleAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inspection.inspectionNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inspection.propertyDetails.locationAr.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === "all" || inspection.status === filterStatus
-    const matchesType = filterType === "all" || inspection.inspectionType === filterType
-    return matchesSearch && matchesStatus && matchesType
-  })
+      inspection.client.nameAr
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      inspection.propertyDetails.titleAr
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      inspection.inspectionNumber
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      inspection.propertyDetails.locationAr
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || inspection.status === filterStatus;
+    const matchesType =
+      filterType === "all" || inspection.inspectionType === filterType;
+    return matchesSearch && matchesStatus && matchesType;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "scheduled":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "in_progress":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "completed":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "cancelled":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       case "rescheduled":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 text-orange-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "scheduled":
-        return <Calendar className="h-4 w-4" />
+        return <Calendar className="h-4 w-4" />;
       case "in_progress":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       case "completed":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "cancelled":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
       case "rescheduled":
-        return <Calendar className="h-4 w-4" />
+        return <Calendar className="h-4 w-4" />;
       default:
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
     }
-  }
+  };
 
   const getTypeColor = (type: string) => {
     switch (type) {
       case "initial":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "detailed":
-        return "bg-purple-100 text-purple-800"
+        return "bg-purple-100 text-purple-800";
       case "final":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "follow_up":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 text-orange-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
@@ -348,11 +377,13 @@ export function PurchaseInspectionsService() {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+            <p className="text-lg text-gray-500">
+              يرجى تسجيل الدخول لعرض المحتوى
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -376,7 +407,7 @@ export function PurchaseInspectionsService() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -385,9 +416,14 @@ export function PurchaseInspectionsService() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">إدارة معاينات العقارات</h2>
-          <p className="text-muted-foreground">جدولة ومتابعة معاينات العقارات للعملاء</p>
+          <p className="text-muted-foreground">
+            جدولة ومتابعة معاينات العقارات للعملاء
+          </p>
         </div>
-        <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+        <Dialog
+          open={isScheduleDialogOpen}
+          onOpenChange={setIsScheduleDialogOpen}
+        >
           <DialogTrigger asChild>
             <Button>
               <Plus className="ml-2 h-4 w-4" />
@@ -397,7 +433,9 @@ export function PurchaseInspectionsService() {
           <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>جدولة معاينة عقار</DialogTitle>
-              <DialogDescription>جدولة معاينة عقار جديدة للعميل</DialogDescription>
+              <DialogDescription>
+                جدولة معاينة عقار جديدة للعميل
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -412,7 +450,10 @@ export function PurchaseInspectionsService() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="property-title">عنوان العقار</Label>
-                <Input id="property-title" placeholder="فيلا فاخرة في حي العليا" />
+                <Input
+                  id="property-title"
+                  placeholder="فيلا فاخرة في حي العليا"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -437,7 +478,10 @@ export function PurchaseInspectionsService() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="property-location">موقع العقار</Label>
-                <Input id="property-location" placeholder="الرياض - حي العليا" />
+                <Input
+                  id="property-location"
+                  placeholder="الرياض - حي العليا"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -483,24 +527,41 @@ export function PurchaseInspectionsService() {
                       <SelectValue placeholder="اختر المهندس" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="mohammed-saud">م. محمد السعود - هندسة إنشائية</SelectItem>
-                      <SelectItem value="khalid-otaibi">م. خالد العتيبي - أنظمة المباني</SelectItem>
-                      <SelectItem value="nora-zahra">م. نورا الزهراء - عمارة</SelectItem>
-                      <SelectItem value="fahad-saud">م. فهد السعود - عقارات تجارية</SelectItem>
+                      <SelectItem value="mohammed-saud">
+                        م. محمد السعود - هندسة إنشائية
+                      </SelectItem>
+                      <SelectItem value="khalid-otaibi">
+                        م. خالد العتيبي - أنظمة المباني
+                      </SelectItem>
+                      <SelectItem value="nora-zahra">
+                        م. نورا الزهراء - عمارة
+                      </SelectItem>
+                      <SelectItem value="fahad-saud">
+                        م. فهد السعود - عقارات تجارية
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="inspection-notes">ملاحظات المعاينة</Label>
-                <Textarea id="inspection-notes" placeholder="أي ملاحظات أو متطلبات خاصة..." rows={3} />
+                <Textarea
+                  id="inspection-notes"
+                  placeholder="أي ملاحظات أو متطلبات خاصة..."
+                  rows={3}
+                />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsScheduleDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsScheduleDialogOpen(false)}
+              >
                 إلغاء
               </Button>
-              <Button onClick={() => setIsScheduleDialogOpen(false)}>جدولة المعاينة</Button>
+              <Button onClick={() => setIsScheduleDialogOpen(false)}>
+                جدولة المعاينة
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -548,17 +609,24 @@ export function PurchaseInspectionsService() {
       {/* Inspections List */}
       <div className="space-y-4">
         {filteredInspections.map((inspection) => (
-          <Card key={inspection.id} className="hover:shadow-md transition-shadow">
+          <Card
+            key={inspection.id}
+            className="hover:shadow-md transition-shadow"
+          >
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center space-x-3 space-x-reverse">
-                    <h3 className="font-semibold text-lg">{inspection.inspectionNumber}</h3>
+                    <h3 className="font-semibold text-lg">
+                      {inspection.inspectionNumber}
+                    </h3>
                     <Badge className={getStatusColor(inspection.status)}>
                       {getStatusIcon(inspection.status)}
                       <span className="mr-1">{inspection.statusAr}</span>
                     </Badge>
-                    <Badge className={getTypeColor(inspection.inspectionType)}>{inspection.inspectionTypeAr}</Badge>
+                    <Badge className={getTypeColor(inspection.inspectionType)}>
+                      {inspection.inspectionTypeAr}
+                    </Badge>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -600,11 +668,17 @@ export function PurchaseInspectionsService() {
 
                   {inspection.findings && (
                     <div className="p-3 bg-green-50 rounded-md">
-                      <p className="text-sm font-medium text-green-800 mb-1">نتائج المعاينة:</p>
-                      <p className="text-sm text-green-700">{inspection.findings.recommendationsAr}</p>
+                      <p className="text-sm font-medium text-green-800 mb-1">
+                        نتائج المعاينة:
+                      </p>
+                      <p className="text-sm text-green-700">
+                        {inspection.findings.recommendationsAr}
+                      </p>
                       {inspection.findings.estimatedRepairCost && (
                         <p className="text-sm text-green-600 mt-1">
-                          تكلفة الإصلاحات المقدرة: {inspection.findings.estimatedRepairCost.toLocaleString()} ر.س
+                          تكلفة الإصلاحات المقدرة:{" "}
+                          {inspection.findings.estimatedRepairCost.toLocaleString()}{" "}
+                          ر.س
                         </p>
                       )}
                     </div>
@@ -612,13 +686,19 @@ export function PurchaseInspectionsService() {
 
                   {inspection.notesAr && (
                     <div className="p-3 bg-muted rounded-md">
-                      <p className="text-sm text-muted-foreground">{inspection.notesAr}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {inspection.notesAr}
+                      </p>
                     </div>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2 ml-4">
-                  <Button size="sm" variant="outline" onClick={() => setSelectedInspection(inspection)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedInspection(inspection)}
+                  >
                     <Eye className="h-3 w-3 ml-1" />
                     التفاصيل
                   </Button>
@@ -634,12 +714,16 @@ export function PurchaseInspectionsService() {
       </div>
 
       {/* Inspection Details Dialog */}
-      <Dialog open={!!selectedInspection} onOpenChange={() => setSelectedInspection(null)}>
+      <Dialog
+        open={!!selectedInspection}
+        onOpenChange={() => setSelectedInspection(null)}
+      >
         <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>تفاصيل المعاينة</DialogTitle>
             <DialogDescription>
-              معاينة رقم {selectedInspection?.inspectionNumber} - {selectedInspection?.propertyDetails.titleAr}
+              معاينة رقم {selectedInspection?.inspectionNumber} -{" "}
+              {selectedInspection?.propertyDetails.titleAr}
             </DialogDescription>
           </DialogHeader>
           {selectedInspection && (
@@ -655,33 +739,55 @@ export function PurchaseInspectionsService() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">رقم المعاينة</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.inspectionNumber}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.inspectionNumber}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">نوع المعاينة</Label>
-                    <Badge className={getTypeColor(selectedInspection.inspectionType)}>
+                    <Badge
+                      className={getTypeColor(
+                        selectedInspection.inspectionType,
+                      )}
+                    >
                       {selectedInspection.inspectionTypeAr}
                     </Badge>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">التاريخ المجدول</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.scheduledDateHijri}</p>
+                    <Label className="text-sm font-medium">
+                      التاريخ المجدول
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.scheduledDateHijri}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">الوقت المجدول</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.scheduledTime}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.scheduledTime}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">الحالة</Label>
-                    <Badge className={getStatusColor(selectedInspection.status)}>{selectedInspection.statusAr}</Badge>
+                    <Badge
+                      className={getStatusColor(selectedInspection.status)}
+                    >
+                      {selectedInspection.statusAr}
+                    </Badge>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">المهندس المعاين</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.inspector.nameAr}</p>
+                    <Label className="text-sm font-medium">
+                      المهندس المعاين
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.inspector.nameAr}
+                    </p>
                   </div>
                   <div className="col-span-2">
                     <Label className="text-sm font-medium">التخصص</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.inspector.specializationAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.inspector.specializationAr}
+                    </p>
                   </div>
                 </div>
               </TabsContent>
@@ -690,24 +796,33 @@ export function PurchaseInspectionsService() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">عنوان العقار</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.propertyDetails.titleAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.propertyDetails.titleAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">نوع العقار</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.propertyDetails.typeAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.propertyDetails.typeAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">الموقع</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.propertyDetails.locationAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.propertyDetails.locationAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">المساحة</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.propertyDetails.area} م²</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.propertyDetails.area} م²
+                    </p>
                   </div>
                   <div className="col-span-2">
                     <Label className="text-sm font-medium">السعر</Label>
                     <p className="text-sm text-muted-foreground font-bold text-green-600">
-                      {selectedInspection.propertyDetails.price.toLocaleString()} ر.س
+                      {selectedInspection.propertyDetails.price.toLocaleString()}{" "}
+                      ر.س
                     </p>
                   </div>
                 </div>
@@ -717,19 +832,29 @@ export function PurchaseInspectionsService() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">اسم العميل</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.client.nameAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.client.nameAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">نوع العميل</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.client.typeAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.client.typeAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">رقم الهاتف</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.client.phone}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.client.phone}
+                    </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">البريد الإلكتروني</Label>
-                    <p className="text-sm text-muted-foreground">{selectedInspection.client.email}</p>
+                    <Label className="text-sm font-medium">
+                      البريد الإلكتروني
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInspection.client.email}
+                    </p>
                   </div>
                 </div>
               </TabsContent>
@@ -738,31 +863,48 @@ export function PurchaseInspectionsService() {
                 {selectedInspection.findings ? (
                   <div className="space-y-4">
                     <div>
-                      <Label className="text-sm font-medium">الحالة العامة</Label>
-                      <p className="text-sm text-muted-foreground">{selectedInspection.findings.overallConditionAr}</p>
+                      <Label className="text-sm font-medium">
+                        الحالة العامة
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedInspection.findings.overallConditionAr}
+                      </p>
                     </div>
-                    {selectedInspection.findings.structuralIssuesAr.length > 0 && (
+                    {selectedInspection.findings.structuralIssuesAr.length >
+                      0 && (
                       <div>
-                        <Label className="text-sm font-medium">المشاكل المكتشفة</Label>
+                        <Label className="text-sm font-medium">
+                          المشاكل المكتشفة
+                        </Label>
                         <ul className="text-sm text-muted-foreground mt-2 space-y-1">
-                          {selectedInspection.findings.structuralIssuesAr.map((issue, index) => (
-                            <li key={index} className="flex items-center space-x-2 space-x-reverse">
-                              <AlertTriangle className="h-3 w-3 text-orange-500" />
-                              <span>{issue}</span>
-                            </li>
-                          ))}
+                          {selectedInspection.findings.structuralIssuesAr.map(
+                            (issue, index) => (
+                              <li
+                                key={index}
+                                className="flex items-center space-x-2 space-x-reverse"
+                              >
+                                <AlertTriangle className="h-3 w-3 text-orange-500" />
+                                <span>{issue}</span>
+                              </li>
+                            ),
+                          )}
                         </ul>
                       </div>
                     )}
                     <div>
                       <Label className="text-sm font-medium">التوصيات</Label>
-                      <p className="text-sm text-muted-foreground">{selectedInspection.findings.recommendationsAr}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedInspection.findings.recommendationsAr}
+                      </p>
                     </div>
                     {selectedInspection.findings.estimatedRepairCost && (
                       <div>
-                        <Label className="text-sm font-medium">تكلفة الإصلاحات المقدرة</Label>
+                        <Label className="text-sm font-medium">
+                          تكلفة الإصلاحات المقدرة
+                        </Label>
                         <p className="text-sm text-muted-foreground font-bold text-orange-600">
-                          {selectedInspection.findings.estimatedRepairCost.toLocaleString()} ر.س
+                          {selectedInspection.findings.estimatedRepairCost.toLocaleString()}{" "}
+                          ر.س
                         </p>
                       </div>
                     )}
@@ -770,7 +912,9 @@ export function PurchaseInspectionsService() {
                 ) : (
                   <div className="text-center py-8">
                     <AlertTriangle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">لم يتم إكمال المعاينة بعد</p>
+                    <p className="text-muted-foreground">
+                      لم يتم إكمال المعاينة بعد
+                    </p>
                   </div>
                 )}
               </TabsContent>
@@ -782,7 +926,9 @@ export function PurchaseInspectionsService() {
       {filteredInspections.length === 0 && (
         <div className="text-center py-12">
           <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">لم يتم العثور على معاينات</h3>
+          <h3 className="text-lg font-medium mb-2">
+            لم يتم العثور على معاينات
+          </h3>
           <p className="text-muted-foreground mb-4">
             {searchTerm || filterStatus !== "all" || filterType !== "all"
               ? "جرب تعديل معايير البحث"
@@ -795,5 +941,5 @@ export function PurchaseInspectionsService() {
         </div>
       )}
     </div>
-  )
+  );
 }

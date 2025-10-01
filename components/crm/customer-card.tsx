@@ -197,7 +197,9 @@ export default function CustomerCard({
             {getPriorityLabel(customer.priority)}
           </Badge>
           <div className="text-xs text-muted-foreground truncate flex-1 text-left">
-            {customer.note && customer.note.length > 0 ? "لديه ملاحظات" : "لا توجد ملاحظات"}
+            {customer.note && customer.note.length > 0
+              ? "لديه ملاحظات"
+              : "لا توجد ملاحظات"}
           </div>
         </div>
       </div>
@@ -284,7 +286,9 @@ export default function CustomerCard({
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1">
             <MapPin className="h-3 w-3" />
-            <span className="truncate">{customer.email || "لا يوجد بريد إلكتروني"}</span>
+            <span className="truncate">
+              {customer.email || "لا يوجد بريد إلكتروني"}
+            </span>
           </div>
         </div>
 

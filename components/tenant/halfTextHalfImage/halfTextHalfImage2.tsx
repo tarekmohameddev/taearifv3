@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import useStore from "@/context/Store"
-import { useAuth } from "@/context/AuthContext"
-import { useRouter } from "next/navigation"
-import useTenantStore from "@/context-liveeditor/tenantStore"
-import { useEditorStore } from "@/context-liveeditor/editorStore"
+import { useEffect } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import useStore from "@/context/Store";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context-liveeditor/editorStore";
 
 // Default half text half image data for variant 2 (with stats)
 const getDefaulthalfTextHalfImageData = () => ({
@@ -20,7 +20,7 @@ const getDefaulthalfTextHalfImageData = () => ({
     gap: {
       x: "gap-x-10",
       y: "gap-y-16",
-      yMd: "md:gap-y-10"
+      yMd: "md:gap-y-10",
     },
   },
   spacing: {
@@ -29,13 +29,14 @@ const getDefaulthalfTextHalfImageData = () => ({
       y: "py-5",
       smX: "sm:px-6",
       smY: "sm:py-20",
-      lgX: "lg:px-8"
+      lgX: "lg:px-8",
     },
   },
   content: {
     eyebrow: "تجربتك العقارية تبدأ هنا",
     title: "إيجاد عقار مناسب هو هدفنا",
-    description: "يقدم لك دليل الجواء العقاري أفضل الحلول العقارية لتلبية كافة احتياجاتك في البيع والإيجار، مع ضمان تجربة مريحة ومضمونة.",
+    description:
+      "يقدم لك دليل الجواء العقاري أفضل الحلول العقارية لتلبية كافة احتياجاتك في البيع والإيجار، مع ضمان تجربة مريحة ومضمونة.",
     stats: {
       stat1: { value: "+100", label: "عميل سعيد" },
       stat2: { value: "+50", label: "عقار تم بيعه" },
@@ -116,7 +117,7 @@ const getDefaulthalfTextHalfImageData = () => ({
       stagger: 100,
     },
   },
-})
+});
 
 interface halfTextHalfImageProps {
   visible?: boolean;
@@ -143,15 +144,17 @@ interface halfTextHalfImageProps {
     eyebrow?: string;
     title?: string;
     description?: string;
-    stats?: {
-      stat1?: { value: string; label: string; };
-      stat2?: { value: string; label: string; };
-      stat3?: { value: string; label: string; };
-      stat4?: { value: string; label: string; };
-    } | Array<{
-      value: string;
-      label: string;
-    }>;
+    stats?:
+      | {
+          stat1?: { value: string; label: string };
+          stat2?: { value: string; label: string };
+          stat3?: { value: string; label: string };
+          stat4?: { value: string; label: string };
+        }
+      | Array<{
+          value: string;
+          label: string;
+        }>;
   };
   typography?: {
     eyebrow?: {
@@ -234,138 +237,173 @@ interface halfTextHalfImageProps {
 
 const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   // Initialize variant id early so hooks can depend on it
-  const variantId = props.variant || "halfTextHalfImage2"
+  const variantId = props.variant || "halfTextHalfImage2";
   // Subscribe to editor store updates for this half text half image variant
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant)
-  const getComponentData = useEditorStore((s) => s.getComponentData)
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
 
   useEffect(() => {
     if (props.useStore) {
       // Use component.id as unique identifier instead of variantId
-      const uniqueId = props.id || variantId
-      ensureComponentVariant('halfTextHalfImage', uniqueId, props)
+      const uniqueId = props.id || variantId;
+      ensureComponentVariant("halfTextHalfImage", uniqueId, props);
     }
-  }, [variantId, props.useStore, props.id, ensureComponentVariant])
+  }, [variantId, props.useStore, props.id, ensureComponentVariant]);
 
-  const { user, loading } = useAuth()
-  const tenantId = useTenantStore((s) => s.tenantId)
-  const router = useRouter()
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const tenantData = useTenantStore((s) => s.tenantData)
-  const loadingTenantData = useTenantStore((s) => s.loadingTenantData)
-  const error = useTenantStore((s) => s.error)
+  const { user, loading } = useAuth();
+  const tenantId = useTenantStore((s) => s.tenantId);
+  const router = useRouter();
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
+  const error = useTenantStore((s) => s.error);
 
   // Get data from store or tenantData with fallback logic
-  const uniqueId = props.id || variantId
-  const storeData = props.useStore ? (getComponentData('halfTextHalfImage', uniqueId) || {}) : {}
-  
+  const uniqueId = props.id || variantId;
+  const storeData = props.useStore
+    ? getComponentData("halfTextHalfImage", uniqueId) || {}
+    : {};
+
   // Subscribe to store updates to re-render when data changes
-  const halfTextHalfImageStates = useEditorStore((s) => s.halfTextHalfImageStates)
-  const currentStoreData = props.useStore ? (halfTextHalfImageStates[uniqueId] || {}) : {}
-  
+  const halfTextHalfImageStates = useEditorStore(
+    (s) => s.halfTextHalfImageStates,
+  );
+  const currentStoreData = props.useStore
+    ? halfTextHalfImageStates[uniqueId] || {}
+    : {};
+
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
-    if (!tenantData?.componentSettings) return {}
-    
-    
+    if (!tenantData?.componentSettings) return {};
+
     // Search through all pages for this component variant
-    for (const [pageSlug, pageComponents] of Object.entries(tenantData.componentSettings)) {
-      
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
       // Check if pageComponents is an object (not array)
-      if (typeof pageComponents === 'object' && !Array.isArray(pageComponents)) {
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
         // Search through all components in this page
-        for (const [componentId, component] of Object.entries(pageComponents as any)) {
-          
-          if ((component as any).type === 'halfTextHalfImage' && 
-              (component as any).componentName === variantId &&
-              componentId === props.id) {
-            return (component as any).data
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          if (
+            (component as any).type === "halfTextHalfImage" &&
+            (component as any).componentName === variantId &&
+            componentId === props.id
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-    return {}
-  }
-  
-  const tenantComponentData = getTenantComponentData()
-  
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
+
   // Merge data with priority: storeData > tenantComponentData > props > default
-  const mergedData = { 
-    ...getDefaulthalfTextHalfImageData(), 
-    ...props, 
+  const mergedData = {
+    ...getDefaulthalfTextHalfImageData(),
+    ...props,
     ...tenantComponentData,
-    ...currentStoreData 
-  }
+    ...currentStoreData,
+  };
 
   useEffect(() => {
     if (tenantId) {
-      fetchTenantData(tenantId)
+      fetchTenantData(tenantId);
     }
-  }, [tenantId, fetchTenantData])
+  }, [tenantId, fetchTenantData]);
 
   // Generate dynamic styles
   const sectionStyles = {
     maxWidth: mergedData.layout?.maxWidth || "1600px",
-  }
+  };
 
   // Don't render if not visible
   if (!mergedData.visible) {
-    return null
+    return null;
   }
 
   return (
-    <section 
+    <section
       className={cn(
         "w-full bg-background",
         mergedData.spacing?.padding?.x || "px-4",
         mergedData.spacing?.padding?.y || "py-5",
         mergedData.spacing?.padding?.smX || "sm:px-6",
         mergedData.spacing?.padding?.smY || "sm:py-20",
-        mergedData.spacing?.padding?.lgX || "lg:px-8"
+        mergedData.spacing?.padding?.lgX || "lg:px-8",
       )}
       style={{
-        backgroundColor: mergedData.background?.color || mergedData.styling?.bgColor || "transparent"
+        backgroundColor:
+          mergedData.background?.color ||
+          mergedData.styling?.bgColor ||
+          "transparent",
       }}
       data-debug="halfTextHalfImage2-component"
     >
-      <div 
+      <div
         className={cn(
           "mx-auto grid grid-cols-1 items-center",
           mergedData.layout?.gridCols || "md:grid-cols-10",
           mergedData.layout?.gap?.x || "gap-x-10",
           mergedData.layout?.gap?.y || "gap-y-16",
-          mergedData.layout?.gap?.yMd || "md:gap-y-10"
+          mergedData.layout?.gap?.yMd || "md:gap-y-10",
         )}
-        style={{ 
+        style={{
           maxWidth: sectionStyles.maxWidth,
-          gridTemplateColumns: mergedData.grid?.columns?.desktop ? `repeat(${mergedData.grid.columns.desktop}, 1fr)` : undefined,
-          gap: mergedData.grid?.gapX || mergedData.grid?.gapY ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}` : undefined
+          gridTemplateColumns: mergedData.grid?.columns?.desktop
+            ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
+            : undefined,
+          gap:
+            mergedData.grid?.gapX || mergedData.grid?.gapY
+              ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}`
+              : undefined,
         }}
         dir={mergedData.layout?.direction || "rtl"}
       >
         {/* النص */}
-        <div className={cn(
-          mergedData.responsive?.grid?.textCols || "md:col-span-5",
-          mergedData.responsive?.grid?.textOrder || "order-2 md:order-2"
-        )}>
+        <div
+          className={cn(
+            mergedData.responsive?.grid?.textCols || "md:col-span-5",
+            mergedData.responsive?.grid?.textOrder || "order-2 md:order-2",
+          )}
+        >
           {mergedData.content?.eyebrow && (
-            <p className={cn(
-              mergedData.typography?.eyebrow?.className || "section-title text-emerald-700",
-              mergedData.typography?.eyebrow?.marginBottom || "mb-3"
-            )}>
+            <p
+              className={cn(
+                mergedData.typography?.eyebrow?.className ||
+                  "section-title text-emerald-700",
+                mergedData.typography?.eyebrow?.marginBottom || "mb-3",
+              )}
+            >
               {mergedData.content.eyebrow}
             </p>
           )}
-          
-          <h2 className={cn(
-            mergedData.typography?.title?.className || "section-title leading-[1.25] text-black",
-            mergedData.typography?.title?.textBalance || "text-balance"
-          )}>
+
+          <h2
+            className={cn(
+              mergedData.typography?.title?.className ||
+                "section-title leading-[1.25] text-black",
+              mergedData.typography?.title?.textBalance || "text-balance",
+            )}
+          >
             {mergedData.content?.title || "إيجاد عقار مناسب هو هدفنا"}
           </h2>
-          
+
           {mergedData.content?.description && (
-            <p className={mergedData.typography?.description?.className || "section-subtitle-large max-w-3xl"}>
+            <p
+              className={
+                mergedData.typography?.description?.className ||
+                "section-subtitle-large max-w-3xl"
+              }
+            >
               {mergedData.content.description}
             </p>
           )}
@@ -378,60 +416,99 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
             // إذا كانت البيانات بالبنية الجديدة (object)
             if (stats.stat1 || stats.stat2 || stats.stat3 || stats.stat4) {
               return (
-                <ul className={cn(
-                  "grid text-center",
-                  mergedData.responsive?.stats?.gridCols || "grid-cols-2 sm:grid-cols-4",
-                  mergedData.responsive?.stats?.gap || "gap-4",
-                  mergedData.responsive?.stats?.marginTop || "mt-10"
-                )}>
+                <ul
+                  className={cn(
+                    "grid text-center",
+                    mergedData.responsive?.stats?.gridCols ||
+                      "grid-cols-2 sm:grid-cols-4",
+                    mergedData.responsive?.stats?.gap || "gap-4",
+                    mergedData.responsive?.stats?.marginTop || "mt-10",
+                  )}
+                >
                   {stats.stat1 && (
                     <li>
-                      <div className={mergedData.typography?.stats?.valueClassName || "text-2xl text-emerald-700"}>
+                      <div
+                        className={
+                          mergedData.typography?.stats?.valueClassName ||
+                          "text-2xl text-emerald-700"
+                        }
+                      >
                         {stats.stat1.value}
                       </div>
-                      <div className={cn(
-                        mergedData.typography?.stats?.labelClassName || "text-xl text-black",
-                        mergedData.typography?.stats?.labelMarginTop || "mt-1"
-                      )}>
+                      <div
+                        className={cn(
+                          mergedData.typography?.stats?.labelClassName ||
+                            "text-xl text-black",
+                          mergedData.typography?.stats?.labelMarginTop ||
+                            "mt-1",
+                        )}
+                      >
                         {stats.stat1.label}
                       </div>
                     </li>
                   )}
                   {stats.stat2 && (
                     <li>
-                      <div className={mergedData.typography?.stats?.valueClassName || "text-2xl text-emerald-700"}>
+                      <div
+                        className={
+                          mergedData.typography?.stats?.valueClassName ||
+                          "text-2xl text-emerald-700"
+                        }
+                      >
                         {stats.stat2.value}
                       </div>
-                      <div className={cn(
-                        mergedData.typography?.stats?.labelClassName || "text-xl text-black",
-                        mergedData.typography?.stats?.labelMarginTop || "mt-1"
-                      )}>
+                      <div
+                        className={cn(
+                          mergedData.typography?.stats?.labelClassName ||
+                            "text-xl text-black",
+                          mergedData.typography?.stats?.labelMarginTop ||
+                            "mt-1",
+                        )}
+                      >
                         {stats.stat2.label}
                       </div>
                     </li>
                   )}
                   {stats.stat3 && (
                     <li>
-                      <div className={mergedData.typography?.stats?.valueClassName || "text-2xl text-emerald-700"}>
+                      <div
+                        className={
+                          mergedData.typography?.stats?.valueClassName ||
+                          "text-2xl text-emerald-700"
+                        }
+                      >
                         {stats.stat3.value}
                       </div>
-                      <div className={cn(
-                        mergedData.typography?.stats?.labelClassName || "text-xl text-black",
-                        mergedData.typography?.stats?.labelMarginTop || "mt-1"
-                      )}>
+                      <div
+                        className={cn(
+                          mergedData.typography?.stats?.labelClassName ||
+                            "text-xl text-black",
+                          mergedData.typography?.stats?.labelMarginTop ||
+                            "mt-1",
+                        )}
+                      >
                         {stats.stat3.label}
                       </div>
                     </li>
                   )}
                   {stats.stat4 && (
                     <li>
-                      <div className={mergedData.typography?.stats?.valueClassName || "text-2xl text-emerald-700"}>
+                      <div
+                        className={
+                          mergedData.typography?.stats?.valueClassName ||
+                          "text-2xl text-emerald-700"
+                        }
+                      >
                         {stats.stat4.value}
                       </div>
-                      <div className={cn(
-                        mergedData.typography?.stats?.labelClassName || "text-xl text-black",
-                        mergedData.typography?.stats?.labelMarginTop || "mt-1"
-                      )}>
+                      <div
+                        className={cn(
+                          mergedData.typography?.stats?.labelClassName ||
+                            "text-xl text-black",
+                          mergedData.typography?.stats?.labelMarginTop ||
+                            "mt-1",
+                        )}
+                      >
                         {stats.stat4.label}
                       </div>
                     </li>
@@ -443,21 +520,33 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
             // إذا كانت البيانات بالبنية القديمة (array)
             if (Array.isArray(stats) && stats.length > 0) {
               return (
-                <ul className={cn(
-                  "grid text-center",
-                  mergedData.responsive?.stats?.gridCols || "grid-cols-2 sm:grid-cols-4",
-                  mergedData.responsive?.stats?.gap || "gap-4",
-                  mergedData.responsive?.stats?.marginTop || "mt-10"
-                )}>
+                <ul
+                  className={cn(
+                    "grid text-center",
+                    mergedData.responsive?.stats?.gridCols ||
+                      "grid-cols-2 sm:grid-cols-4",
+                    mergedData.responsive?.stats?.gap || "gap-4",
+                    mergedData.responsive?.stats?.marginTop || "mt-10",
+                  )}
+                >
                   {stats.map((stat: any, index: number) => (
                     <li key={index}>
-                      <div className={mergedData.typography?.stats?.valueClassName || "text-2xl text-emerald-700"}>
+                      <div
+                        className={
+                          mergedData.typography?.stats?.valueClassName ||
+                          "text-2xl text-emerald-700"
+                        }
+                      >
                         {stat.value}
                       </div>
-                      <div className={cn(
-                        mergedData.typography?.stats?.labelClassName || "text-xl text-black",
-                        mergedData.typography?.stats?.labelMarginTop || "mt-1"
-                      )}>
+                      <div
+                        className={cn(
+                          mergedData.typography?.stats?.labelClassName ||
+                            "text-xl text-black",
+                          mergedData.typography?.stats?.labelMarginTop ||
+                            "mt-1",
+                        )}
+                      >
                         {stat.label}
                       </div>
                     </li>
@@ -471,38 +560,44 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
         </div>
 
         {/* الصورة */}
-        <div className={cn(
-          mergedData.responsive?.grid?.imageCols || "md:col-span-5",
-          mergedData.responsive?.grid?.imageOrder || "order-2 md:order-2"
-        )}>
-          <figure className={cn(
-            "relative flex-1",
-            mergedData.image?.background?.positioning?.pr || "pr-[15px]",
-            mergedData.image?.background?.positioning?.xlPr || "xl:pr-[21px]",
-            mergedData.image?.background?.positioning?.pb || "pb-[15px]",
-            mergedData.image?.background?.positioning?.xlPb || "xl:pb-[21px]",
-            mergedData.image?.background?.enabled && (
-              mergedData.image?.background?.className || "bg-emerald-600 rounded-[10px]"
-            )
+        <div
+          className={cn(
+            mergedData.responsive?.grid?.imageCols || "md:col-span-5",
+            mergedData.responsive?.grid?.imageOrder || "order-2 md:order-2",
           )}
-          style={{
-            background: mergedData.image?.background?.enabled 
-              ? `linear-gradient(135deg, ${mergedData.image?.background?.color || "#059669"}, ${mergedData.image?.background?.color || "#059669"})`
-              : undefined
-          }}
+        >
+          <figure
+            className={cn(
+              "relative flex-1",
+              mergedData.image?.background?.positioning?.pr || "pr-[15px]",
+              mergedData.image?.background?.positioning?.xlPr || "xl:pr-[21px]",
+              mergedData.image?.background?.positioning?.pb || "pb-[15px]",
+              mergedData.image?.background?.positioning?.xlPb || "xl:pb-[21px]",
+              mergedData.image?.background?.enabled &&
+                (mergedData.image?.background?.className ||
+                  "bg-emerald-600 rounded-[10px]"),
+            )}
+            style={{
+              background: mergedData.image?.background?.enabled
+                ? `linear-gradient(135deg, ${mergedData.image?.background?.color || "#059669"}, ${mergedData.image?.background?.color || "#059669"})`
+                : undefined,
+            }}
           >
             <Image
               src={mergedData.image?.src || "/placeholder.svg"}
               alt={mergedData.image?.alt || "صورة داخلية لغرفة معيشة حديثة"}
               width={mergedData.image?.width || 800}
               height={mergedData.image?.height || 600}
-              className={mergedData.image?.style?.className || "w-full h-full object-cover rounded-[15px]"}
+              className={
+                mergedData.image?.style?.className ||
+                "w-full h-full object-cover rounded-[15px]"
+              }
             />
           </figure>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default halfTextHalfImage
+export default halfTextHalfImage;

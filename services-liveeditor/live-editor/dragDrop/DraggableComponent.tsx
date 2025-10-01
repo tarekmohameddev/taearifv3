@@ -68,7 +68,7 @@ export const LiveEditorDraggableComponent = ({
         [zoneCompound]: active,
       }));
     },
-    [setLocalZones, ctx]
+    [setLocalZones, ctx],
   );
 
   const unregisterLocalZone = useCallback(
@@ -80,10 +80,11 @@ export const LiveEditorDraggableComponent = ({
         return newLocalZones;
       });
     },
-    [setLocalZones, ctx]
+    [setLocalZones, ctx],
   );
 
-  const containsActiveZone = Object.values(localZones).filter(Boolean).length > 0;
+  const containsActiveZone =
+    Object.values(localZones).filter(Boolean).length > 0;
 
   // مؤقتاً - سنستخدم default collision detector
   // const dynamicCollisionDetector = useMemo(
@@ -119,7 +120,6 @@ export const LiveEditorDraggableComponent = ({
     feedback: "clone",
   });
 
-
   const ref = useRef<HTMLElement>(null);
 
   const refSetter = useCallback(
@@ -129,7 +129,7 @@ export const LiveEditorDraggableComponent = ({
         ref.current = el;
       }
     },
-    [sortableRef]
+    [sortableRef],
   );
 
   // لا نحتاج portal أو style calculations بعد الآن
@@ -139,13 +139,13 @@ export const LiveEditorDraggableComponent = ({
   const onClick = useCallback(
     (e: Event | SyntheticEvent) => {
       e.stopPropagation();
-      
+
       // فتح edit عند النقر على المكون
       if (onEditClick) {
         onEditClick();
       }
     },
-    [onEditClick, componentType, id]
+    [onEditClick, componentType, id],
   );
 
   const [hover, setHover] = useState(false);
@@ -199,7 +199,7 @@ export const LiveEditorDraggableComponent = ({
     el.setAttribute("data-component-id", id);
     el.setAttribute("data-index", index.toString());
     el.style.position = "relative";
-    
+
     el.addEventListener("click", onClick);
     el.addEventListener("mouseenter", _onMouseOver);
     el.addEventListener("mouseleave", _onMouseLeave);
@@ -223,7 +223,7 @@ export const LiveEditorDraggableComponent = ({
 
     if (ref.current) {
       const computedStyle = window.getComputedStyle(ref.current);
-      
+
       if (
         computedStyle.display === "inline" ||
         computedStyle.display === "inline-block"
@@ -238,20 +238,21 @@ export const LiveEditorDraggableComponent = ({
 
   // Debug logging
 
-    return (
+  return (
     <>
       {children((el: HTMLElement | null) => {
         refSetter(el);
-        
+
         // إضافة الأزرار داخل المكون نفسه
         if (el && dragFinished && isVisible) {
-          
           // التحقق من وجود الأزرار مسبقاً لتجنب التكرار
-          let existingActionBar = el.querySelector('.live-editor-component-actions');
-          
+          let existingActionBar = el.querySelector(
+            ".live-editor-component-actions",
+          );
+
           if (!existingActionBar) {
-            const actionDiv = document.createElement('div');
-            actionDiv.className = 'live-editor-component-actions';
+            const actionDiv = document.createElement("div");
+            actionDiv.className = "live-editor-component-actions";
             actionDiv.style.cssText = `
               position: absolute;
               top: 8px;
@@ -259,7 +260,7 @@ export const LiveEditorDraggableComponent = ({
               z-index: 1000;
               pointer-events: auto;
             `;
-            
+
             // إنشاء الأزرار
             const actionBarHTML = `
               <div class="live-editor-action-bar" style="
@@ -273,7 +274,7 @@ export const LiveEditorDraggableComponent = ({
                 align-items: center;
                 gap: 4px;
               ">
-                ${label ? `<span style="color: white; font-size: 12px;">${label}</span>` : ''}
+                ${label ? `<span style="color: white; font-size: 12px;">${label}</span>` : ""}
                 <button 
                   class="live-editor-edit-btn"
                   title="تحرير المكون (Edit Component)"
@@ -320,37 +321,41 @@ export const LiveEditorDraggableComponent = ({
                 </button>
               </div>
             `;
-            
+
             actionDiv.innerHTML = actionBarHTML;
-            
+
             // إضافة event listeners
-            const editBtn = actionDiv.querySelector('.live-editor-edit-btn');
-            const deleteBtn = actionDiv.querySelector('.live-editor-delete-btn');
-            
+            const editBtn = actionDiv.querySelector(".live-editor-edit-btn");
+            const deleteBtn = actionDiv.querySelector(
+              ".live-editor-delete-btn",
+            );
+
             if (editBtn && onEditClick) {
-              editBtn.addEventListener('click', (e) => {
+              editBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 onEditClick();
               });
             }
-            
+
             if (deleteBtn && onDeleteClick) {
-              deleteBtn.addEventListener('click', (e) => {
+              deleteBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 onDeleteClick();
               });
             }
-            
+
             // التأكد من أن المكون له position relative
-            if (getComputedStyle(el).position === 'static') {
-              el.style.position = 'relative';
+            if (getComputedStyle(el).position === "static") {
+              el.style.position = "relative";
             }
-            
+
             el.appendChild(actionDiv);
           }
         } else if (el && !isVisible) {
           // إزالة الأزرار عند إخفاءها
-          const existingActionBar = el.querySelector('.live-editor-component-actions');
+          const existingActionBar = el.querySelector(
+            ".live-editor-component-actions",
+          );
           if (existingActionBar) {
             existingActionBar.remove();
           }

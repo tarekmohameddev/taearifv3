@@ -12,4 +12,17 @@ export { gridStructure } from "./grid";
 export { filterButtonsStructure } from "./filterButtons";
 export { propertyFilterStructure } from "./propertyFilter";
 export { propertiesPageStructure } from "./propertiesPage";
-export type { ComponentStructure, VariantDefinition, FieldDefinition } from "./types";
+export type {
+  ComponentStructure,
+  VariantDefinition,
+  FieldDefinition,
+} from "./types";
+
+// Export translation helpers
+export {
+  translateLabel,
+  translateOptions,
+  translateFieldDefinition,
+  translateVariantDefinition,
+  translateComponentStructure,
+} from "./translationHelper";

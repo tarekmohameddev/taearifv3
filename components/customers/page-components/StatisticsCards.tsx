@@ -1,8 +1,5 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Users,
-} from "lucide-react";
+import { Users } from "lucide-react";
 
 export const StatisticsCards = ({ totalCustomers }: any) => {
   return (
@@ -92,4 +89,4 @@ export const StatisticsCards = ({ totalCustomers }: any) => {
       </Card> */}
     </div>
   );
-}; 
+};

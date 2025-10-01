@@ -60,17 +60,20 @@ export const getDefaultPropertySliderData = (): ComponentData => ({
 export const propertySliderFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     if (state.propertySliderStates[variantId]) return state;
-    
+
     const defaultData = getDefaultPropertySliderData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     return {
       ...state,
-      propertySliderStates: { ...state.propertySliderStates, [variantId]: data },
+      propertySliderStates: {
+        ...state.propertySliderStates,
+        [variantId]: data,
+      },
     };
   },
 
-  getData: (state: any, variantId: string) => 
+  getData: (state: any, variantId: string) =>
     state.propertySliderStates[variantId] || getDefaultPropertySliderData(),
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
@@ -81,10 +84,13 @@ export const propertySliderFunctions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.propertySliderStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
       ...state,
-      propertySliderStates: { ...state.propertySliderStates, [variantId]: newData },
+      propertySliderStates: {
+        ...state.propertySliderStates,
+        [variantId]: newData,
+      },
     };
   },
 };

@@ -37,7 +37,8 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "المعاينة الأولية للعقار",
       desc: "زيارة العقار وتقييم حالته ومعرفة ميزاته ومراجعة التفاصيل التي تحتاج إلى توضيح.",
-      image: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/1.svg",
+      image:
+        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/1.svg",
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -52,7 +53,8 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "كتابة تفصيل العقار",
       desc: "وصف دقيق للممتلكات بما في ذلك الموقع، المساحة، المرافق، والحالة العامة.",
-      image: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/2.svg",
+      image:
+        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/2.svg",
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -67,7 +69,8 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "التصوير الاحترافي للعقار",
       desc: "الاستعانة بمصور محترف لالتقاط صور عالية الجودة مع الاهتمام بالإضاءة والزوايا.",
-      image: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/3.svg",
+      image:
+        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/3.svg",
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -82,7 +85,8 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "توقيع اتفاقية الوساطة والتسويق",
       desc: "توقيع عقد رسمي بينك وبين المالك لتنظيم عملية تسويق العقار وحقوق الطرفين.",
-      image: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/4.svg",
+      image:
+        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/4.svg",
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -97,7 +101,8 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "تصميم بوستر للعقار وإضافته لموقعنا",
       desc: "إعداد بوستر يحتوي على الصور والتفاصيل الرئيسية ونشره على موقعنا الإلكتروني.",
-      image: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/5.svg",
+      image:
+        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/5.svg",
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -112,7 +117,8 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
     {
       title: "جذب العملاء المحتملين",
       desc: "استخدام وسائل الاتصال المختلفة لجذب المشترين المهتمين مثل الإعلانات.",
-      image: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/6.svg",
+      image:
+        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/6.svg",
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -164,14 +170,14 @@ export const stepsSectionFunctions = {
 
     const defaultData = getDefaultStepsSectionData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
+
     return {
       ...state,
       stepsSectionStates: { ...state.stepsSectionStates, [variantId]: data },
     };
   },
 
-  getData: (state: any, variantId: string) => 
+  getData: (state: any, variantId: string) =>
     state.stepsSectionStates[variantId] || getDefaultStepsSectionData(),
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
@@ -182,7 +188,7 @@ export const stepsSectionFunctions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.stepsSectionStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
       ...state,
       stepsSectionStates: { ...state.stepsSectionStates, [variantId]: newData },

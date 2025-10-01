@@ -211,7 +211,9 @@ const getDefaultFooterData = (): FooterData => ({
   },
 });
 
-export default function StaticFooter({ overrideData }: { overrideData?: any } = {}) {
+export default function StaticFooter({
+  overrideData,
+}: { overrideData?: any } = {}) {
   // Subscribe to global components data
   const globalComponentsData = useEditorStore((s) => s.globalComponentsData);
   const globalFooterData = globalComponentsData?.footer;
@@ -219,7 +221,7 @@ export default function StaticFooter({ overrideData }: { overrideData?: any } = 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
-  
+
   // Get global components data from tenantData
   const tenantGlobalComponentsData = tenantData?.globalComponentsData;
   const tenantGlobalFooterData = tenantGlobalComponentsData?.footer;
@@ -242,21 +244,23 @@ export default function StaticFooter({ overrideData }: { overrideData?: any } = 
       ...tenantGlobalFooterData, // tenantGlobalFooterData overrides editorStore
       ...(overrideData || {}), // overrideData overrides everything (for iframe)
     };
-    
+
     console.log("🔍 [StaticFooter1] Merged footer data:", {
       defaultData: Object.keys(defaultData),
       globalFooterData: Object.keys(globalFooterData || {}),
       tenantGlobalFooterData: Object.keys(tenantGlobalFooterData || {}),
       overrideData: Object.keys(overrideData || {}),
       mergedData: Object.keys(result),
-      hasGlobalData: !!globalFooterData && Object.keys(globalFooterData).length > 0,
-      hasTenantGlobalData: !!tenantGlobalFooterData && Object.keys(tenantGlobalFooterData).length > 0,
-      hasOverrideData: !!overrideData && Object.keys(overrideData).length > 0
+      hasGlobalData:
+        !!globalFooterData && Object.keys(globalFooterData).length > 0,
+      hasTenantGlobalData:
+        !!tenantGlobalFooterData &&
+        Object.keys(tenantGlobalFooterData).length > 0,
+      hasOverrideData: !!overrideData && Object.keys(overrideData).length > 0,
     });
-    
+
     return result;
   }, [defaultData, globalComponentsData, tenantGlobalFooterData, overrideData]);
-
 
   // Don't render if not visible
   if (!mergedData.visible) {
@@ -423,7 +427,7 @@ export default function StaticFooter({ overrideData }: { overrideData?: any } = 
                     >
                       {link.text}
                     </Link>
-                  )
+                  ),
                 )}
               </nav>
             </div>
@@ -509,7 +513,7 @@ export default function StaticFooter({ overrideData }: { overrideData?: any } = 
                           <IconComponent className="size-5" />
                         </a>
                       );
-                    }
+                    },
                   )}
                 </div>
               )}
@@ -540,7 +544,7 @@ export default function StaticFooter({ overrideData }: { overrideData?: any } = 
                     >
                       {link.text}
                     </Link>
-                  )
+                  ),
                 )}
               </div>
             </div>

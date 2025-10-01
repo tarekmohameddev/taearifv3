@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { headers } from 'next/headers';
+import { headers } from "next/headers";
 import OnboardingPage from "@/components/signin-up/onboarding-page";
 import TenantPageWrapper from "../[slug]/TenantPageWrapper";
 
@@ -10,13 +10,13 @@ export const metadata: Metadata = {
 
 export default async function OnboardingRoute() {
   const headersList = await headers();
-  const tenantId = headersList.get('x-tenant-id');
-  
+  const tenantId = headersList.get("x-tenant-id");
+
   // إذا كان هناك subdomain (tenantId موجود)، افتح TenantPageWrapper
   if (tenantId) {
     return <TenantPageWrapper tenantId={tenantId} slug="onboarding" />;
   }
-  
+
   // إذا لم يكن هناك subdomain، افتح صفحة الـ onboarding العادية
   return <OnboardingPage />;
 }

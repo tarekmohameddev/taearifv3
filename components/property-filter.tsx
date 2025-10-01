@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const propertyTypes = [
   "مزرعة",
@@ -17,78 +17,89 @@ const propertyTypes = [
   "أرض استراحة",
   "استراحة",
   "فلة غير مكتملة",
-  "أرض تجارية"
-]
+  "أرض تجارية",
+];
 
 interface PropertyFilterProps {
-  transactionType: "rent" | "sale"
+  transactionType: "rent" | "sale";
 }
 
-export default function PropertyFilter({ transactionType }: PropertyFilterProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  
-  const [search, setSearch] = useState(searchParams.get("search") || "")
-  const [propertyType, setPropertyType] = useState(searchParams.get("type_id") || "")
-  const [price, setPrice] = useState(searchParams.get("price") || "")
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [filteredTypes, setFilteredTypes] = useState(propertyTypes)
+export default function PropertyFilter({
+  transactionType,
+}: PropertyFilterProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [propertyType, setPropertyType] = useState(
+    searchParams.get("type_id") || "",
+  );
+  const [price, setPrice] = useState(searchParams.get("price") || "");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [filteredTypes, setFilteredTypes] = useState(propertyTypes);
 
   // تحديث الفلتر عند تغيير البحث
   useEffect(() => {
     if (propertyType) {
-      setFilteredTypes(propertyTypes.filter(type => 
-        type.toLowerCase().includes(propertyType.toLowerCase())
-      ))
+      setFilteredTypes(
+        propertyTypes.filter((type) =>
+          type.toLowerCase().includes(propertyType.toLowerCase()),
+        ),
+      );
     } else {
-      setFilteredTypes(propertyTypes)
+      setFilteredTypes(propertyTypes);
     }
-  }, [propertyType])
+  }, [propertyType]);
 
   // إغلاق الـ dropdown عند النقر خارجه
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // إغلاق الـ dropdown عند تغيير الصفحة
   useEffect(() => {
-    setIsDropdownOpen(false)
-  }, [searchParams])
+    setIsDropdownOpen(false);
+  }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const params = new URLSearchParams()
-    
-    if (search) params.set("search", search)
-    if (propertyType) params.set("type_id", propertyType)
-    if (price) params.set("price", price)
-    params.set("transactionType", transactionType)
-    
-    const queryString = params.toString()
-    const url = queryString ? `?${queryString}` : ""
-    
-    router.push(`/${transactionType === "rent" ? "for-rent" : "for-sale"}${url}`)
-  }
+    e.preventDefault();
+
+    const params = new URLSearchParams();
+
+    if (search) params.set("search", search);
+    if (propertyType) params.set("type_id", propertyType);
+    if (price) params.set("price", price);
+    params.set("transactionType", transactionType);
+
+    const queryString = params.toString();
+    const url = queryString ? `?${queryString}` : "";
+
+    router.push(
+      `/${transactionType === "rent" ? "for-rent" : "for-sale"}${url}`,
+    );
+  };
 
   const handleTypeSelect = (type: string) => {
-    setPropertyType(type)
-    setIsDropdownOpen(false)
-  }
+    setPropertyType(type);
+    setIsDropdownOpen(false);
+  };
 
   return (
     <div className="mb-6 md:mb-18">
-      <form 
+      <form
         onSubmit={handleSubmit}
         className="grid grid-cols-1 xs:grid-cols-2 md:flex flex-col md:flex-row mt-4 bg-white rounded-[10px] gap-x-5 md:gap-x-5 gap-y-4 p-4 "
       >
@@ -111,8 +122,8 @@ export default function PropertyFilter({ transactionType }: PropertyFilterProps)
                 placeholder="نوع العقار"
                 value={propertyType}
                 onChange={(e) => {
-                  setPropertyType(e.target.value)
-                  setIsDropdownOpen(true)
+                  setPropertyType(e.target.value);
+                  setIsDropdownOpen(true);
                 }}
                 onFocus={() => setIsDropdownOpen(true)}
                 className="w-full h-12 md:h-14 outline-none pr-10 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border border-gray-200 rounded-[10px] focus-visible:ring-0"
@@ -122,7 +133,7 @@ export default function PropertyFilter({ transactionType }: PropertyFilterProps)
                 <ChevronDown className="w-5 h-5 text-gray-400" />
               </div>
             </div>
-            
+
             {/* Dropdown */}
             {isDropdownOpen && (
               <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-[10px] mt-1 max-h-60 overflow-y-auto shadow-lg">
@@ -152,14 +163,14 @@ export default function PropertyFilter({ transactionType }: PropertyFilterProps)
             placeholder={"10000"}
             value={price}
             onChange={(e) => {
-              const v = e.target.value
+              const v = e.target.value;
               if (v === "") {
-                setPrice(v)
-                return
+                setPrice(v);
+                return;
               }
-              const n = Number(v)
-              if (Number.isNaN(n)) return
-              setPrice(String(n >= 0 ? n : 0))
+              const n = Number(v);
+              if (Number.isNaN(n)) return;
+              setPrice(String(n >= 0 ? n : 0));
             }}
             className="w-full h-full outline-none pr-2 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border-0 focus-visible:ring-0"
             type="number"
@@ -180,5 +191,5 @@ export default function PropertyFilter({ transactionType }: PropertyFilterProps)
         </div>
       </form>
     </div>
-  )
+  );
 }

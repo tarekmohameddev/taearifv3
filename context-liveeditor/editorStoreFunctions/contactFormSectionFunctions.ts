@@ -297,7 +297,7 @@ export const contactFormSectionFunctions = {
   // Update contact form section data
   update: (
     currentData: ComponentData,
-    updates: Partial<ComponentData>
+    updates: Partial<ComponentData>,
   ): ComponentData => ({
     ...currentData,
     ...updates,
@@ -306,7 +306,7 @@ export const contactFormSectionFunctions = {
   // Add new social link
   addSocialLink: (
     currentData: ComponentData,
-    socialLink: any
+    socialLink: any,
   ): ComponentData => ({
     ...currentData,
     content: {
@@ -318,13 +318,13 @@ export const contactFormSectionFunctions = {
   // Remove social link
   removeSocialLink: (
     currentData: ComponentData,
-    index: number
+    index: number,
   ): ComponentData => ({
     ...currentData,
     content: {
       ...currentData.content,
       socialLinks: (currentData.content?.socialLinks || []).filter(
-        (_, i) => i !== index
+        (_, i) => i !== index,
       ),
     },
   }),
@@ -333,13 +333,13 @@ export const contactFormSectionFunctions = {
   updateSocialLink: (
     currentData: ComponentData,
     index: number,
-    updates: any
+    updates: any,
   ): ComponentData => ({
     ...currentData,
     content: {
       ...currentData.content,
       socialLinks: (currentData.content?.socialLinks || []).map((link, i) =>
-        i === index ? { ...link, ...updates } : link
+        i === index ? { ...link, ...updates } : link,
       ),
     },
   }),
@@ -348,7 +348,7 @@ export const contactFormSectionFunctions = {
   updateFormField: (
     currentData: ComponentData,
     fieldName: string,
-    updates: any
+    updates: any,
   ): ComponentData => ({
     ...currentData,
     form: {
@@ -366,7 +366,7 @@ export const contactFormSectionFunctions = {
   // Update submit button
   updateSubmitButton: (
     currentData: ComponentData,
-    updates: any
+    updates: any,
   ): ComponentData => ({
     ...currentData,
     form: {
@@ -393,7 +393,7 @@ export const contactFormSectionFunctions = {
   // Update animations
   updateAnimations: (
     currentData: ComponentData,
-    animations: any
+    animations: any,
   ): ComponentData => ({
     ...currentData,
     animations: {
@@ -405,7 +405,7 @@ export const contactFormSectionFunctions = {
   // Update responsive settings
   updateResponsive: (
     currentData: ComponentData,
-    responsive: any
+    responsive: any,
   ): ComponentData => ({
     ...currentData,
     responsive: {
@@ -469,7 +469,7 @@ export const contactFormSectionFunctions = {
   // Get social link by platform
   getSocialLinkByPlatform: (data: ComponentData, platform: string) => {
     return data.content?.socialLinks?.find(
-      (link: any) => link.alt === platform
+      (link: any) => link.alt === platform,
     );
   },
 

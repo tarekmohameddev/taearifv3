@@ -4,7 +4,10 @@ import { Suspense, lazy, Fragment, useMemo, useEffect } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import Loading from "@/app/loading";
 import { notFound } from "next/navigation";
-import { getSectionPath, getComponentSubPath } from "@/lib-liveeditor/ComponentsList";
+import {
+  getSectionPath,
+  getComponentSubPath,
+} from "@/lib-liveeditor/ComponentsList";
 import Header1 from "@/components/tenant/header/header1";
 import Footer1 from "@/components/tenant/footer/footer1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
@@ -47,7 +50,7 @@ const loadComponent = (section: string, componentName: string) => {
             </div>
           </div>
         ),
-      }))
+      })),
     );
   }
 
@@ -57,7 +60,7 @@ const loadComponent = (section: string, componentName: string) => {
   return lazy(() =>
     import(`@/components/tenant/${fullPath}`).catch(() => ({
       default: () => <div>Component {componentName} not found</div>,
-    }))
+    })),
   );
 };
 
@@ -66,14 +69,15 @@ interface TenantPageWrapperProps {
   slug: string;
 }
 
-export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperProps) {
-
+export default function TenantPageWrapper({
+  tenantId,
+  slug,
+}: TenantPageWrapperProps) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const setTenantId = useTenantStore((s) => s.setTenantId);
   const error = useTenantStore((s) => s.error);
-
 
   // Set tenantId in store when component mounts
   useEffect(() => {
@@ -91,31 +95,29 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
 
   // التحقق من وجود الـ slug في componentSettings أو البيانات الافتراضية
   const slugExists = useMemo(() => {
-    
     if (!slug) {
       return false;
     }
-    
+
     // التحقق من وجود الـ slug في componentSettings
     if (tenantData?.componentSettings && slug in tenantData.componentSettings) {
       return true;
     }
-    
+
     // التحقق من وجود الـ slug في البيانات الافتراضية
     if ((PAGE_DEFINITIONS as any)[slug]) {
       return true;
     }
-    
+
     return false;
   }, [tenantData?.componentSettings, slug]);
 
   // Get components from componentSettings or default components
   const componentsList = useMemo(() => {
-    
     // التحقق من أن componentSettings موجود وأنه object وليس array فارغ
     if (
       tenantData?.componentSettings &&
-      typeof tenantData.componentSettings === 'object' &&
+      typeof tenantData.componentSettings === "object" &&
       !Array.isArray(tenantData.componentSettings) &&
       slug &&
       tenantData.componentSettings[slug] &&
@@ -139,10 +141,10 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
     }
 
     // استخدام البيانات الافتراضية من PAGE_DEFINITIONS
-    
+
     if (slug && (PAGE_DEFINITIONS as any)[slug]) {
       const defaultPageData = (PAGE_DEFINITIONS as any)[slug];
-      
+
       const components = Object.entries(defaultPageData)
         .map(([id, component]: [string, any]) => {
           return {
@@ -170,15 +172,13 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
     notFound();
   }
 
-
   // Filter out header and footer components since they are now global
   const filteredComponentsList = componentsList.filter((comp: any) => {
-    
     // التحقق من أن componentName موجود وأنه string
-    if (!comp.componentName || typeof comp.componentName !== 'string') {
+    if (!comp.componentName || typeof comp.componentName !== "string") {
       return true; // احتفظ بالمكون إذا كان componentName غير صحيح
     }
-    
+
     if (comp.componentName.startsWith("header")) {
       return false;
     }
@@ -187,20 +187,19 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
     }
     return true;
   });
-  
 
-  if (error || (!tenantId)) {
+  if (error || !tenantId) {
     // console.log("🏠 HomePageWrapper - Showing not-found due to:", { error, hasTenantData: !!tenantData, tenantId });
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4">
         <h1 className="text-6xl font-bold text-red-600 mb-4">404</h1>
         <h2 className="text-2xl font-semibold mb-6">Tenant Not Found</h2>
         <p className="text-gray-600 mb-8 text-center max-w-md">
-          The tenant "{tenantId}" you are looking for might have been removed, 
+          The tenant "{tenantId}" you are looking for might have been removed,
           had its name changed, or is temporarily unavailable.
         </p>
-        <button 
-          onClick={() => window.location.href = '/'} 
+        <button
+          onClick={() => (window.location.href = "/")}
           className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Return to Homepage
@@ -226,7 +225,6 @@ export default function TenantPageWrapper({ tenantId, slug }: TenantPageWrapperP
           {Array.isArray(filteredComponentsList) &&
           filteredComponentsList.length > 0 ? (
             filteredComponentsList.map((comp: any) => {
-              
               const Cmp = loadComponent(slug as string, comp.componentName);
               if (!Cmp) {
                 return <Fragment key={comp.id} />;

@@ -41,7 +41,8 @@ export default function MapComponent({
 
           // Fix Leaflet icon issues by using CDN URLs
           const DefaultIcon = L.icon({
-            iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+            iconUrl:
+              "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
             shadowUrl:
               "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
             iconSize: [25, 41],
@@ -63,9 +64,9 @@ export default function MapComponent({
           }).addTo(map);
 
           // Add marker
-          const marker = L.marker([latitude, longitude], { draggable: true }).addTo(
-            map,
-          );
+          const marker = L.marker([latitude, longitude], {
+            draggable: true,
+          }).addTo(map);
 
           // Handle marker drag
           marker.on("dragend", (e: L.DragEndEvent) => {

@@ -1,8 +1,7 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-;
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import SwiperCarousel from "@/components/ui/swiper-carousel";
@@ -145,105 +144,120 @@ interface PropertySliderProps {
 
 export default function PropertySlider(props: PropertySliderProps = {}) {
   // Initialize variant id early so hooks can depend on it
-  const variantId = props.variant || "propertySlider1"
-  
+  const variantId = props.variant || "propertySlider1";
+
   // State for API data
-  const [apiProperties, setApiProperties] = useState<Property[]>(defaultProperties)
-  const [loading, setLoading] = useState(false)
-  
+  const [apiProperties, setApiProperties] =
+    useState<Property[]>(defaultProperties);
+  const [loading, setLoading] = useState(false);
+
   // Subscribe to editor store updates for this component variant
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant)
-  const getComponentData = useEditorStore((s) => s.getComponentData)
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
 
   // Fetch properties from API
   const fetchProperties = async (apiUrl?: string) => {
     try {
-      setLoading(true)
-      const url = apiUrl || '/api/properties/latestRentals'
-      const response = await fetch(url)
+      setLoading(true);
+      const url = apiUrl || "/api/properties/latestRentals";
+      const response = await fetch(url);
       if (response.ok) {
-        const result = await response.json()
+        const result = await response.json();
         if (result.success && result.data) {
-          setApiProperties(result.data)
+          setApiProperties(result.data);
         }
       }
     } catch (error) {
-      console.error('Error fetching properties:', error)
+      console.error("Error fetching properties:", error);
       // Keep default properties on error
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-  
+  };
+
   useEffect(() => {
     if (props.useStore) {
-      ensureComponentVariant('propertySlider', variantId, props)
+      ensureComponentVariant("propertySlider", variantId, props);
     }
-  }, [variantId, props.useStore, ensureComponentVariant])
+  }, [variantId, props.useStore, ensureComponentVariant]);
 
   // Get tenant data
-  const tenantData = useTenantStore((s) => s.tenantData)
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData)
-  const tenantId = useTenantStore((s) => s.tenantId)
-  const router = useRouter()
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+  const router = useRouter();
 
   useEffect(() => {
     if (tenantId) {
-      fetchTenantData(tenantId)
+      fetchTenantData(tenantId);
     }
-  }, [tenantId, fetchTenantData])
+  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore ? (getComponentData('propertySlider', variantId) || {}) : {}
+  const storeData = props.useStore
+    ? getComponentData("propertySlider", variantId) || {}
+    : {};
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
-      return {}
+      return {};
     }
     // Search through all pages for this component variant
-    for (const [pageSlug, pageComponents] of Object.entries(tenantData.componentSettings)) {
-      
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
       // Check if pageComponents is an object (not array)
-      if (typeof pageComponents === 'object' && !Array.isArray(pageComponents)) {
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
         // Search through all components in this page
-        for (const [componentId, component] of Object.entries(pageComponents as any)) {
-          
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
           // Check if this is the exact component we're looking for by ID
-          if ((component as any).type === 'propertySlider' && 
-              (component as any).componentName === variantId &&
-              componentId === props.id) {
-            return (component as any).data
+          if (
+            (component as any).type === "propertySlider" &&
+            (component as any).componentName === variantId &&
+            componentId === props.id
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-    return {}
-  }
-  
-  const tenantComponentData = getTenantComponentData()
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
 
   // Merge data with priority: storeData > tenantComponentData > props > default
-  const mergedData = { 
-    ...getDefaultPropertySliderData(), 
-    ...props, 
+  const mergedData = {
+    ...getDefaultPropertySliderData(),
+    ...props,
     ...tenantComponentData,
-    ...storeData 
-  }
+    ...storeData,
+  };
 
   // Fetch properties on component mount and when API URL changes
   useEffect(() => {
-    const apiUrl = mergedData.dataSource?.apiUrl || '/api/properties/latestRentals'
-    const useApiData = mergedData.dataSource?.enabled !== false
-    
+    const apiUrl =
+      mergedData.dataSource?.apiUrl || "/api/properties/latestRentals";
+    const useApiData = mergedData.dataSource?.enabled !== false;
+
     if (useApiData) {
-      fetchProperties(apiUrl)
+      fetchProperties(apiUrl);
     }
-  }, [mergedData.dataSource?.apiUrl, mergedData.dataSource?.enabled])
+  }, [mergedData.dataSource?.apiUrl, mergedData.dataSource?.enabled]);
 
   // Use API data if enabled, otherwise use static data
-  const useApiData = mergedData.dataSource?.enabled !== false
-  const properties = useApiData ? apiProperties : (mergedData.items || mergedData.properties || defaultProperties);
+  const useApiData = mergedData.dataSource?.enabled !== false;
+  const properties = useApiData
+    ? apiProperties
+    : mergedData.items || mergedData.properties || defaultProperties;
 
   // Generate dynamic styles
   const titleStyles = {
@@ -284,89 +298,125 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   }
 
   return (
-    <section 
-      className="w-full bg-background py-14 sm:py-16" 
+    <section
+      className="w-full bg-background py-14 sm:py-16"
       style={{
-        backgroundColor: mergedData.background?.color || mergedData.styling?.bgColor || "transparent",
+        backgroundColor:
+          mergedData.background?.color ||
+          mergedData.styling?.bgColor ||
+          "transparent",
         paddingTop: mergedData.layout?.padding?.top || "56px",
-        paddingBottom: mergedData.layout?.padding?.bottom || "56px"
+        paddingBottom: mergedData.layout?.padding?.bottom || "56px",
       }}
     >
-      <div 
-        className="mx-auto" 
+      <div
+        className="mx-auto"
         style={{
           maxWidth: mergedData.layout?.maxWidth || "1600px",
-          gridTemplateColumns: mergedData.grid?.columns?.desktop ? `repeat(${mergedData.grid.columns.desktop}, 1fr)` : undefined,
-          gap: mergedData.grid?.gapX || mergedData.grid?.gapY ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}` : undefined
+          gridTemplateColumns: mergedData.grid?.columns?.desktop
+            ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
+            : undefined,
+          gap:
+            mergedData.grid?.gapX || mergedData.grid?.gapY
+              ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}`
+              : undefined,
         }}
       >
-        <div className="mb-6 px-5" dir="rtl" style={{ marginBottom: titleBottomMargin }}>
+        <div
+          className="mb-6 px-5"
+          dir="rtl"
+          style={{ marginBottom: titleBottomMargin }}
+        >
           {/* Mobile Layout - Button on left side */}
           <div className="flex items-center justify-between md:hidden">
-            <h2 
+            <h2
               className="section-title font-extrabold"
               style={{
                 fontFamily: mergedData.typography?.title?.fontFamily || "Inter",
-                fontSize: mergedData.typography?.title?.fontSize?.desktop || "2xl",
-                fontWeight: mergedData.typography?.title?.fontWeight || "extrabold",
-                color: mergedData.styling?.textColor || mergedData.colors?.textColor || mergedData.typography?.title?.color || "#1f2937"
+                fontSize:
+                  mergedData.typography?.title?.fontSize?.desktop || "2xl",
+                fontWeight:
+                  mergedData.typography?.title?.fontWeight || "extrabold",
+                color:
+                  mergedData.styling?.textColor ||
+                  mergedData.colors?.textColor ||
+                  mergedData.typography?.title?.color ||
+                  "#1f2937",
               }}
             >
               {mergedData.content?.title || "أحدث العقارات للإيجار"}
             </h2>
-            <Link 
-              href={mergedData.content?.viewAllUrl || "#"} 
+            <Link
+              href={mergedData.content?.viewAllUrl || "#"}
               className="text-emerald-700 hover:underline text-sm"
               style={{
                 fontSize: mergedData.typography?.link?.fontSize || "sm",
-                color: mergedData.styling?.textColor || mergedData.colors?.textColor || mergedData.typography?.link?.color || "#059669"
+                color:
+                  mergedData.styling?.textColor ||
+                  mergedData.colors?.textColor ||
+                  mergedData.typography?.link?.color ||
+                  "#059669",
               }}
             >
               {mergedData.content?.viewAllText || "عرض الكل"}
             </Link>
           </div>
-          
+
           {/* Desktop Layout - Button on right side */}
           <div className="hidden md:flex items-end justify-between">
             <div>
-              <h2 
+              <h2
                 className="section-title font-extrabold"
                 style={{
-                  fontFamily: mergedData.typography?.title?.fontFamily || "Inter",
-                  fontSize: mergedData.typography?.title?.fontSize?.desktop || "2xl",
-                  fontWeight: mergedData.typography?.title?.fontWeight || "extrabold",
-                  color: mergedData.styling?.textColor || mergedData.colors?.textColor || mergedData.typography?.title?.color || "#1f2937"
+                  fontFamily:
+                    mergedData.typography?.title?.fontFamily || "Inter",
+                  fontSize:
+                    mergedData.typography?.title?.fontSize?.desktop || "2xl",
+                  fontWeight:
+                    mergedData.typography?.title?.fontWeight || "extrabold",
+                  color:
+                    mergedData.styling?.textColor ||
+                    mergedData.colors?.textColor ||
+                    mergedData.typography?.title?.color ||
+                    "#1f2937",
                 }}
               >
                 {mergedData.content?.title || "أحدث العقارات للإيجار"}
               </h2>
-              <p 
+              <p
                 className="section-subtitle"
                 style={{
-                  fontFamily: mergedData.typography?.subtitle?.fontFamily || "Inter",
-                  fontSize: mergedData.typography?.subtitle?.fontSize?.desktop || "lg",
-                  fontWeight: mergedData.typography?.subtitle?.fontWeight || "normal",
-                  color: mergedData.styling?.textColor || mergedData.colors?.textColor || mergedData.typography?.subtitle?.color || "#6b7280"
+                  fontFamily:
+                    mergedData.typography?.subtitle?.fontFamily || "Inter",
+                  fontSize:
+                    mergedData.typography?.subtitle?.fontSize?.desktop || "lg",
+                  fontWeight:
+                    mergedData.typography?.subtitle?.fontWeight || "normal",
+                  color:
+                    mergedData.styling?.textColor ||
+                    mergedData.colors?.textColor ||
+                    mergedData.typography?.subtitle?.color ||
+                    "#6b7280",
                 }}
               >
-                {mergedData.content?.description || "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع"}
+                {mergedData.content?.description ||
+                  "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع"}
               </p>
             </div>
-            <Link 
-              href={mergedData.content?.viewAllUrl || "#"} 
+            <Link
+              href={mergedData.content?.viewAllUrl || "#"}
               className="text-emerald-700 hover:underline"
               style={linkStyles}
             >
               {mergedData.content?.viewAllText || "عرض الكل"}
             </Link>
           </div>
-          
+
           {/* Description for mobile */}
-          <p 
-            className="section-subtitle md:hidden"
-            style={subtitleStyles}
-          >
-            {mergedData.description || mergedData.content?.description || "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع"}
+          <p className="section-subtitle md:hidden" style={subtitleStyles}>
+            {mergedData.description ||
+              mergedData.content?.description ||
+              "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع"}
           </p>
         </div>
 

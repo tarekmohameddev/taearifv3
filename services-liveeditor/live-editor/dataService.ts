@@ -23,9 +23,12 @@ export const loadComponentsFromDatabase = (
             const componentName = comp.componentName.replace(/^\d+$/, ""); // إزالة الأرقام من البداية
             if (componentName.startsWith("header")) correctType = "header";
             else if (componentName.startsWith("hero")) correctType = "hero";
-            else if (componentName.startsWith("halfTextHalfImage")) correctType = "halfTextHalfImage";
-            else if (componentName.startsWith("propertySlider")) correctType = "propertySlider";
-            else if (componentName.startsWith("ctaValuation")) correctType = "ctaValuation";
+            else if (componentName.startsWith("halfTextHalfImage"))
+              correctType = "halfTextHalfImage";
+            else if (componentName.startsWith("propertySlider"))
+              correctType = "propertySlider";
+            else if (componentName.startsWith("ctaValuation"))
+              correctType = "ctaValuation";
           }
 
           // إذا لم نتمكن من استخراج النوع من componentName، جرب من id
@@ -61,10 +64,14 @@ export const loadComponentsFromDatabase = (
             comp.name || getComponentDisplayName(correctType) || "Component",
           componentName: (() => {
             // إذا كان componentName موجود وصحيح، استخدمه
-            if (comp.componentName && comp.componentName !== "undefined" && comp.componentName !== "null") {
+            if (
+              comp.componentName &&
+              comp.componentName !== "undefined" &&
+              comp.componentName !== "null"
+            ) {
               return comp.componentName;
             }
-            
+
             // إذا كان componentName undefined أو "undefined"، أنشئ واحد جديد
             if (correctType && correctType !== "unknown") {
               // استخدم النوع الصحيح مع رقم 1، مع مراعاة الصفحة

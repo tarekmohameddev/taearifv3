@@ -5,6 +5,7 @@ import { ComponentInstanceWithPosition } from "@/lib-liveeditor/types";
 import { useSidebarStateManager } from "@/context-liveeditor/SidebarStateManager";
 import { AdvancedSimpleSwitcher } from "./components/AdvancedSimpleSwitcher";
 import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 
 interface UnifiedSidebarProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export function UnifiedSidebar({
   width,
   setWidth,
 }: UnifiedSidebarProps) {
+  const t = useEditorT();
   const {
     selectedComponent: sidebarSelectedComponent,
     setSelectedComponent,
@@ -44,28 +46,39 @@ export function UnifiedSidebar({
   }, [selectedComponent, setSelectedComponent]);
 
   // Handle component updates directly on pageComponentsByPage
-  const handleUpdateByPath = useCallback((path: string, value: any) => {
-    if (!selectedComponent) return;
+  const handleUpdateByPath = useCallback(
+    (path: string, value: any) => {
+      if (!selectedComponent) return;
 
+      // Handle global components
+      if (selectedComponent.id === "global-header") {
+        updateGlobalHeader(path, value);
+        onComponentUpdate(selectedComponent.id, getGlobalHeaderData());
+      } else if (selectedComponent.id === "global-footer") {
+        updateGlobalFooter(path, value);
+        onComponentUpdate(selectedComponent.id, getGlobalFooterData());
+      } else {
+        // Update component data directly in pageComponentsByPage
+        updateComponentData(selectedComponent.id, path, value);
 
-    // Handle global components
-    if (selectedComponent.id === "global-header") {
-      updateGlobalHeader(path, value);
-      onComponentUpdate(selectedComponent.id, getGlobalHeaderData());
-    } else if (selectedComponent.id === "global-footer") {
-      updateGlobalFooter(path, value);
-      onComponentUpdate(selectedComponent.id, getGlobalFooterData());
-    } else {
-      // Update component data directly in pageComponentsByPage
-      updateComponentData(selectedComponent.id, path, value);
-      
-      // Get updated data and notify parent
-      const updatedData = getComponentData(selectedComponent.id);
-      if (updatedData) {
-        onComponentUpdate(selectedComponent.id, updatedData);
+        // Get updated data and notify parent
+        const updatedData = getComponentData(selectedComponent.id);
+        if (updatedData) {
+          onComponentUpdate(selectedComponent.id, updatedData);
+        }
       }
-    }
-  }, [selectedComponent, updateComponentData, getComponentData, updateGlobalHeader, updateGlobalFooter, getGlobalHeaderData, getGlobalFooterData, onComponentUpdate]);
+    },
+    [
+      selectedComponent,
+      updateComponentData,
+      getComponentData,
+      updateGlobalHeader,
+      updateGlobalFooter,
+      getGlobalHeaderData,
+      getGlobalFooterData,
+      onComponentUpdate,
+    ],
+  );
 
   // Get current component data for display
   const getCurrentComponentData = useCallback(() => {
@@ -78,7 +91,12 @@ export function UnifiedSidebar({
     } else {
       return getComponentData(selectedComponent.id) || {};
     }
-  }, [selectedComponent, getComponentData, getGlobalHeaderData, getGlobalFooterData]);
+  }, [
+    selectedComponent,
+    getComponentData,
+    getGlobalHeaderData,
+    getGlobalFooterData,
+  ]);
 
   // Handle save (no-op since we're editing directly)
   const handleSave = useCallback(() => {
@@ -98,14 +116,24 @@ export function UnifiedSidebar({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-200/60">
           <h3 className="text-lg font-semibold text-slate-800">
-            Edit Component
+            {t("editor_sidebar.edit_component")}
           </h3>
           <button
             onClick={onClose}
             className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -113,9 +141,9 @@ export function UnifiedSidebar({
         {/* Component Info */}
         <div className="p-4 border-b border-slate-200/60">
           <div className="text-sm text-slate-600">
-            <div className="font-medium">Type: {selectedComponent.type}</div>
-            <div className="font-medium">ID: {selectedComponent.id}</div>
-            <div className="font-medium">Page: {currentPage}</div>
+            <div className="font-medium">{t("editor_sidebar.type")}: {selectedComponent.type}</div>
+            <div className="font-medium">{t("editor_sidebar.id")}: {selectedComponent.id}</div>
+            <div className="font-medium">{t("editor_sidebar.page")}: {currentPage}</div>
           </div>
         </div>
 
@@ -124,14 +152,16 @@ export function UnifiedSidebar({
           {COMPONENTS[selectedComponent.type] ? (
             <AdvancedSimpleSwitcher
               type={selectedComponent.type}
-              componentName={selectedComponent.componentName || selectedComponent.name}
+              componentName={
+                selectedComponent.componentName || selectedComponent.name
+              }
               componentId={selectedComponent.id}
               onUpdateByPath={handleUpdateByPath}
               currentData={currentData}
             />
           ) : (
             <div className="text-center text-slate-500 py-8">
-              Component type not supported: {selectedComponent.type}
+              {t("editor_sidebar.component_type_not_supported")}: {selectedComponent.type}
             </div>
           )}
         </div>
@@ -142,7 +172,7 @@ export function UnifiedSidebar({
             onClick={handleSave}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
-            Save Changes
+            {t("editor_sidebar.save_changes")}
           </button>
         </div>
       </div>
@@ -163,12 +193,12 @@ export function UnifiedSidebar({
           };
 
           const handleMouseUp = () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
           };
 
-          document.addEventListener('mousemove', handleMouseMove);
-          document.addEventListener('mouseup', handleMouseUp);
+          document.addEventListener("mousemove", handleMouseMove);
+          document.addEventListener("mouseup", handleMouseUp);
         }}
       />
     </div>

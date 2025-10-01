@@ -61,23 +61,35 @@ interface PropertyRequestsResponse {
 export default function PropertyRequestsPage() {
   const [activeTab, setActiveTab] = useState("property-requests");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPropertyRequest, setSelectedPropertyRequest] = useState<PropertyRequest | null>(null);
-  const [selectedPropertyRequests, setSelectedPropertyRequests] = useState<number[]>([]);
+  const [selectedPropertyRequest, setSelectedPropertyRequest] =
+    useState<PropertyRequest | null>(null);
+  const [selectedPropertyRequests, setSelectedPropertyRequests] = useState<
+    number[]
+  >([]);
   const [sortField, setSortField] = useState("created_at");
   const [sortDirection, setSortDirection] = useState("desc");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterType, setFilterType] = useState("all");
   const [filterCity, setFilterCity] = useState("all");
-  const [showPropertyRequestDialog, setShowPropertyRequestDialog] = useState(false);
+  const [showPropertyRequestDialog, setShowPropertyRequestDialog] =
+    useState(false);
   const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false);
   const [totalPropertyRequests, setTotalPropertyRequests] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [propertyRequestsData, setPropertyRequestsData] = useState<PropertyRequest[]>([]);
-  const [formData, setFormData] = useState<Partial<PropertyRequest> | null>(null);
-  const [editingPropertyRequestId, setEditingPropertyRequestId] = useState<number | null>(null);
+  const [propertyRequestsData, setPropertyRequestsData] = useState<
+    PropertyRequest[]
+  >([]);
+  const [formData, setFormData] = useState<Partial<PropertyRequest> | null>(
+    null,
+  );
+  const [editingPropertyRequestId, setEditingPropertyRequestId] = useState<
+    number | null
+  >(null);
   const [open, setOpen] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string[]>
+  >({});
   const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newPropertyRequest, setNewPropertyRequest] = useState({
@@ -95,7 +107,7 @@ export default function PropertyRequestsPage() {
     full_name: "",
     phone: "",
     contact_on_whatsapp: false,
-    notes: ""
+    notes: "",
   });
   const { userData } = useAuthStore();
 
@@ -124,17 +136,16 @@ export default function PropertyRequestsPage() {
     fetchPropertyRequests();
   }, [userData?.token]);
 
-  const handleNewPropertyRequestChange = (field: keyof typeof newPropertyRequest) => (
-    value: any,
-  ) => {
-    setNewPropertyRequest((prev) => ({ ...prev, [field]: value }));
-  };
-  
-  const handleNewPropertyRequestInputChange = (field: keyof typeof newPropertyRequest) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setNewPropertyRequest((prev) => ({ ...prev, [field]: e.target.value }));
-  };
+  const handleNewPropertyRequestChange =
+    (field: keyof typeof newPropertyRequest) => (value: any) => {
+      setNewPropertyRequest((prev) => ({ ...prev, [field]: value }));
+    };
+
+  const handleNewPropertyRequestInputChange =
+    (field: keyof typeof newPropertyRequest) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setNewPropertyRequest((prev) => ({ ...prev, [field]: e.target.value }));
+    };
 
   const handleAddPropertyRequest = async () => {
     // التحقق من وجود التوكن قبل إجراء الطلب
@@ -145,17 +156,20 @@ export default function PropertyRequestsPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await axiosInstance.post("/v1/property-requests", newPropertyRequest);
-      
+      const response = await axiosInstance.post(
+        "/v1/property-requests",
+        newPropertyRequest,
+      );
+
       // Add the new property request to the list
       setPropertyRequestsData((prev) => [response.data.data, ...prev]);
-      
+
       // Show success toast
       toast.success("تم إضافة طلب العقار بنجاح! 🎉", {
         duration: 4000,
         position: "top-center",
       });
-      
+
       // Reset form - clear all inputs
       setNewPropertyRequest({
         property_type: "",
@@ -172,7 +186,7 @@ export default function PropertyRequestsPage() {
         full_name: "",
         phone: "",
         contact_on_whatsapp: false,
-        notes: ""
+        notes: "",
       });
       // Clear any existing errors
       setClientErrors({});
@@ -205,7 +219,7 @@ export default function PropertyRequestsPage() {
       full_name: propertyRequest.full_name || "",
       phone: propertyRequest.phone || "",
       contact_on_whatsapp: propertyRequest.contact_on_whatsapp,
-      notes: propertyRequest.notes || ""
+      notes: propertyRequest.notes || "",
     });
     setOpen(true);
   };
@@ -288,20 +302,20 @@ export default function PropertyRequestsPage() {
                       <Skeleton className="h-4 w-20 ml-8" />
                       <Skeleton className="h-4 w-16 ml-8" />
                     </div>
-                    
+
                     {/* Table Rows */}
                     {[...Array(8)].map((_, i) => (
                       <div key={i} className="flex items-center border-b p-4">
                         {/* Checkbox */}
                         <Skeleton className="h-4 w-4 ml-4" />
-                        
+
                         {/* Customer Info */}
                         <div className="flex items-center space-x-3 ml-8">
                           <div>
                             <Skeleton className="h-5 w-32 mb-1" />
                           </div>
                         </div>
-                        
+
                         {/* Contact Info */}
                         <div className="space-y-1 ml-auto">
                           <div className="flex items-center">
@@ -313,24 +327,24 @@ export default function PropertyRequestsPage() {
                             <Skeleton className="h-3 w-20" />
                           </div>
                         </div>
-                        
+
                         {/* Type Badge */}
                         <div className="ml-8">
                           <Skeleton className="h-6 w-16 rounded-full" />
                         </div>
-                        
+
                         {/* Location */}
                         <div className="ml-8">
                           <Skeleton className="h-4 w-16 mb-1" />
                           <Skeleton className="h-3 w-12" />
                         </div>
-                        
+
                         {/* Last Contact */}
                         <div className="flex items-center ml-8">
                           <Skeleton className="h-3 w-3 ml-2" />
                           <Skeleton className="h-3 w-16" />
                         </div>
-                        
+
                         {/* Actions */}
                         <div className="flex items-center gap-1 ml-8">
                           <Skeleton className="h-8 w-8" />
@@ -374,7 +388,10 @@ export default function PropertyRequestsPage() {
     }
 
     try {
-      await axiosInstance.put(`/v1/property-requests/${editingPropertyRequestId}`, formData);
+      await axiosInstance.put(
+        `/v1/property-requests/${editingPropertyRequestId}`,
+        formData,
+      );
 
       // تحديث الـ property request داخل القائمة
       setPropertyRequestsData((prev) =>
@@ -389,27 +406,35 @@ export default function PropertyRequestsPage() {
     }
   };
 
-  const handleChange = (field: keyof PropertyRequest) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
-  };
+  const handleChange =
+    (field: keyof PropertyRequest) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+    };
 
   // Filter and sort property requests
   const filteredAndSortedPropertyRequests = propertyRequestsData
     .filter((propertyRequest) => {
       const matchesSearch =
-        propertyRequest.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        propertyRequest.full_name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
         propertyRequest.phone.includes(searchTerm) ||
-        propertyRequest.property_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        propertyRequest.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        propertyRequest.property_type
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        propertyRequest.region
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
         propertyRequest.notes.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus =
-        filterStatus === "all" || propertyRequest.is_active === (filterStatus === "نشط" ? 1 : 0);
+        filterStatus === "all" ||
+        propertyRequest.is_active === (filterStatus === "نشط" ? 1 : 0);
       const matchesType =
         filterType === "all" || propertyRequest.property_type === filterType;
-      const matchesCity = filterCity === "all" || propertyRequest.region === filterCity;
+      const matchesCity =
+        filterCity === "all" || propertyRequest.region === filterCity;
 
       return matchesSearch && matchesStatus && matchesType && matchesCity;
     })
@@ -446,10 +471,15 @@ export default function PropertyRequestsPage() {
   };
 
   const handleSelectAll = () => {
-    if (selectedPropertyRequests.length === filteredAndSortedPropertyRequests.length) {
+    if (
+      selectedPropertyRequests.length ===
+      filteredAndSortedPropertyRequests.length
+    ) {
       setSelectedPropertyRequests([]);
     } else {
-      setSelectedPropertyRequests(filteredAndSortedPropertyRequests.map((c) => c.id));
+      setSelectedPropertyRequests(
+        filteredAndSortedPropertyRequests.map((c) => c.id),
+      );
     }
   };
 
@@ -490,7 +520,9 @@ export default function PropertyRequestsPage() {
       await axiosInstance.delete(`/v1/property-requests/${propertyRequestId}`);
       // احذف طلب العقار من الواجهة
       setPropertyRequestsData((prev) =>
-        prev.filter((propertyRequest) => propertyRequest.id !== propertyRequestId),
+        prev.filter(
+          (propertyRequest) => propertyRequest.id !== propertyRequestId,
+        ),
       );
     } catch (error) {
       console.error("Failed to delete property request:", error);
@@ -519,10 +551,11 @@ export default function PropertyRequestsPage() {
               investorCount={investorCount}
             /> */}
 
-
             {/* Main Content */}
             <PropertyRequestsTable
-              filteredAndSortedPropertyRequests={filteredAndSortedPropertyRequests}
+              filteredAndSortedPropertyRequests={
+                filteredAndSortedPropertyRequests
+              }
               selectedPropertyRequests={selectedPropertyRequests}
               handleSelectAll={handleSelectAll}
               handleSelectPropertyRequest={handleSelectPropertyRequest}
@@ -542,7 +575,6 @@ export default function PropertyRequestsPage() {
               setShowBulkActionsDialog={setShowBulkActionsDialog}
               setSelectedPropertyRequests={setSelectedPropertyRequests}
             />
-
 
             {/* Property Request Detail Dialog */}
             <PropertyRequestDetailDialog

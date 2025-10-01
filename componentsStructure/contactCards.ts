@@ -183,7 +183,6 @@ export const contactCardsStructure: ComponentStructure = {
                   key: "text",
                   label: "Text Content",
                   type: "text",
-                  showWhen: "content.type === 'text'",
                 },
                 {
                   key: "links",
@@ -191,7 +190,6 @@ export const contactCardsStructure: ComponentStructure = {
                   type: "array",
                   addLabel: "Add Link",
                   itemLabel: "Link",
-                  showWhen: "content.type === 'links'",
                   of: [
                     { key: "text", label: "Link Text", type: "text" },
                     { key: "href", label: "Link URL", type: "url" },

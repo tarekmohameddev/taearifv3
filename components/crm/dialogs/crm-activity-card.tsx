@@ -29,15 +29,15 @@ import { format } from "date-fns";
 import axiosInstance from "@/lib/axiosInstance";
 
 // Helper function to detect text direction
-const getTextDirection = (text: string): 'rtl' | 'ltr' => {
-  if (!text || text.length === 0) return 'rtl'; // Default to RTL for empty text
-  
+const getTextDirection = (text: string): "rtl" | "ltr" => {
+  if (!text || text.length === 0) return "rtl"; // Default to RTL for empty text
+
   const firstChar = text.trim()[0];
-  
+
   // Check if first character is Latin (English, numbers, symbols)
   const latinRegex = /[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
-  
-  return latinRegex.test(firstChar) ? 'ltr' : 'rtl';
+
+  return latinRegex.test(firstChar) ? "ltr" : "rtl";
 };
 
 // Interfaces for the data structures
@@ -88,7 +88,7 @@ export function CrmActivityCard({
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [date, setDate] = useState<Date | undefined>(
-    card.card_date ? new Date(card.card_date) : undefined
+    card.card_date ? new Date(card.card_date) : undefined,
   );
   const [procedure, setProcedure] = useState(card.card_procedure);
   const [project, setProject] = useState(card.card_project?.toString());
@@ -105,20 +105,20 @@ export function CrmActivityCard({
   });
 
   // Check if any values have changed
-  const hasChanges = 
+  const hasChanges =
     content !== originalValues.content ||
     procedure !== originalValues.procedure ||
     project !== originalValues.project ||
     property !== originalValues.property ||
-    (date?.getTime() !== originalValues.date?.getTime());
+    date?.getTime() !== originalValues.date?.getTime();
 
   // Detect text direction for the card content
   const textDirection = getTextDirection(content);
-  const textAlignment = textDirection === 'ltr' ? 'text-left' : 'text-right';
+  const textAlignment = textDirection === "ltr" ? "text-left" : "text-right";
 
   const handleSave = async () => {
     if (!hasChanges) return;
-    
+
     setIsSaving(true);
     try {
       const payload = {
@@ -130,33 +130,40 @@ export function CrmActivityCard({
         card_date: date ? date.toISOString() : new Date().toISOString(),
       };
 
-      const response = await axiosInstance.put(`/v1/crm/cards/${card.id}`, payload);
-      
+      const response = await axiosInstance.put(
+        `/v1/crm/cards/${card.id}`,
+        payload,
+      );
+
       if (response.data.status === "success") {
         // Get the updated card data from the response
         const updatedCard = response.data.data.card;
-        
+
         // Update the original values to reflect the saved state
         setOriginalValues({
-          date: updatedCard.card_date ? new Date(updatedCard.card_date) : undefined,
+          date: updatedCard.card_date
+            ? new Date(updatedCard.card_date)
+            : undefined,
           procedure: updatedCard.card_procedure,
           project: updatedCard.card_project?.toString(),
           property: updatedCard.card_property?.toString(),
           content: updatedCard.card_content,
         });
-        
+
         // Update local state with the server response data
-        setDate(updatedCard.card_date ? new Date(updatedCard.card_date) : undefined);
+        setDate(
+          updatedCard.card_date ? new Date(updatedCard.card_date) : undefined,
+        );
         setProcedure(updatedCard.card_procedure);
         setProject(updatedCard.card_project?.toString());
         setProperty(updatedCard.card_property?.toString());
         setContent(updatedCard.card_content);
-        
+
         // Call the parent callback if provided
         if (onCardUpdate) {
           onCardUpdate(updatedCard);
         }
-        
+
         setIsEditing(false);
       } else {
         console.error("Failed to update card:\n", response.data.message);
@@ -197,7 +204,9 @@ export function CrmActivityCard({
               onClick={() => setIsEditing(true)}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsEditing(true); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") setIsEditing(true);
+              }}
             >
               {content}
             </p>

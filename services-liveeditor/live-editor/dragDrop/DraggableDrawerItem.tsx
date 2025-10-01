@@ -19,9 +19,10 @@ export const DraggableDrawerItem = ({
   data: any;
 }) => {
   // إنشاء ID فريد مرة واحدة فقط
-  const uniqueId = useMemo(() => 
-    `drawer-item-${componentType}-${section}-${Math.random().toString(36).substr(2, 9)}`, 
-    [componentType, section]
+  const uniqueId = useMemo(
+    () =>
+      `drawer-item-${componentType}-${section}-${Math.random().toString(36).substr(2, 9)}`,
+    [componentType, section],
   );
 
   const { ref, isDragging } = useDraggable({
@@ -33,8 +34,6 @@ export const DraggableDrawerItem = ({
       data,
     } as DrawerItemDndData,
   });
-
-
 
   const style = {
     opacity: isDragging ? 0.4 : 1,
@@ -48,4 +47,3 @@ export const DraggableDrawerItem = ({
     </div>
   );
 };
-

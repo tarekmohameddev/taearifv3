@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import axiosInstance from '@/lib/axiosInstance';
-import useAuthStore from '@/context/AuthContext';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 interface TokenValidation {
   isValid: boolean | null;
@@ -18,7 +18,7 @@ export const useTokenValidation = () => {
   const [isSameAccount, setIsSameAccount] = useState(false);
   const [newUserData, setNewUserData] = useState<any>(null);
   const [userData, setUserDataState] = useState<any>(null);
-  
+
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
   const setUserData = useAuthStore((state) => state.setUserData);
@@ -40,11 +40,11 @@ export const useTokenValidation = () => {
 
   const validateToken = async (token: string) => {
     setTokenValidation({ isValid: null, message: "", loading: true });
-    
+
     try {
       const response = await axiosInstance.get("/user", {
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -52,12 +52,12 @@ export const useTokenValidation = () => {
         const userData = response.data;
         const newUser = userData.data || userData;
         setNewUserData(newUser);
-        
+
         // التحقق من تطابق الحساب
         const currentUser = userData;
         const isSame = currentUser && currentUser.email === newUser.email;
         setIsSameAccount(isSame);
-        
+
         if (isSame) {
           setTokenValidation({
             isValid: true,
@@ -76,17 +76,17 @@ export const useTokenValidation = () => {
       }
     } catch (error: any) {
       let errorMessage = "الـ token غير صالح";
-      
+
       if (error.response?.status === 401) {
         errorMessage = "الـ token منتهي الصلاحية أو غير صحيح";
-        
+
         // حذف authToken cookie عند الحصول على 401
         clearAuthCookie();
         console.log("🍪 authToken cookie cleared due to 401 error");
-        
+
         // حذف جميع البيانات من AuthContext مباشرة
         clearAuthContextData();
-        
+
         // تسجيل الخروج من AuthContext (كإجراء إضافي)
         try {
           await logout({ redirect: false, clearStore: true });
@@ -101,7 +101,7 @@ export const useTokenValidation = () => {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       setTokenValidation({
         isValid: false,
         message: errorMessage,
@@ -143,7 +143,7 @@ export const useTokenValidation = () => {
   const clearAllCookies = () => {
     // حذف authToken cookie أولاً
     clearAuthCookie();
-    
+
     // حذف جميع الـ cookies الأخرى
     document.cookie.split(";").forEach((cookie) => {
       const eqPos = cookie.indexOf("=");
@@ -151,10 +151,10 @@ export const useTokenValidation = () => {
       document.cookie = `${name.trim()}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
       document.cookie = `${name.trim()}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
     });
-    
+
     // حذف localStorage
     localStorage.clear();
-    
+
     // حذف sessionStorage
     sessionStorage.clear();
   };
@@ -162,7 +162,7 @@ export const useTokenValidation = () => {
   const handleInvalidToken = () => {
     clearAllCookies();
     console.log("🔄 handleInvalidToken: Redirecting to login");
-    router.push('/login');
+    router.push("/login");
   };
 
   useEffect(() => {
@@ -170,10 +170,11 @@ export const useTokenValidation = () => {
       // التحقق من أن المستخدم ليس في صفحة register
       const currentPath = window.location.pathname;
       // فحص register مع أو بدون locale (مثل /register أو /en/register أو /ar/register)
-      const isRegisterPage = currentPath === '/register' || 
-                             currentPath.startsWith('/register/') ||
-                             /^\/[a-z]{2}\/register(\/|$)/.test(currentPath);
-      
+      const isRegisterPage =
+        currentPath === "/register" ||
+        currentPath.startsWith("/register/") ||
+        /^\/[a-z]{2}\/register(\/|$)/.test(currentPath);
+
       if (isRegisterPage) {
         setTokenValidation({
           isValid: null,
@@ -185,7 +186,7 @@ export const useTokenValidation = () => {
 
       // جلب بيانات المستخدم من API
       const userInfo = await fetchUserInfo();
-      
+
       if (!userInfo || !userInfo.token) {
         setTokenValidation({
           isValid: false,
@@ -207,10 +208,11 @@ export const useTokenValidation = () => {
     // التحقق من أن المستخدم ليس في صفحة register قبل إعادة التوجيه
     const currentPath = window.location.pathname;
     // فحص register مع أو بدون locale (مثل /register أو /en/register أو /ar/register)
-    const isRegisterPage = currentPath === '/register' || 
-                           currentPath.startsWith('/register/') ||
-                           /^\/[a-z]{2}\/register(\/|$)/.test(currentPath);
-    
+    const isRegisterPage =
+      currentPath === "/register" ||
+      currentPath.startsWith("/register/") ||
+      /^\/[a-z]{2}\/register(\/|$)/.test(currentPath);
+
     if (isRegisterPage) {
       return;
     }
@@ -228,6 +230,6 @@ export const useTokenValidation = () => {
     clearAuthCookie,
     clearAuthContextData,
     clearAllCookies,
-    handleInvalidToken
+    handleInvalidToken,
   };
 };

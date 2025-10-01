@@ -191,12 +191,18 @@ export default function AddAppointmentDialog({
               >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر العميل">
-                    {appointmentData.customer_id && customers.find(c => c.id.toString() === appointmentData.customer_id)?.name}
+                    {appointmentData.customer_id &&
+                      customers.find(
+                        (c) => c.id.toString() === appointmentData.customer_id,
+                      )?.name}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id.toString()}>
+                    <SelectItem
+                      key={customer.id}
+                      value={customer.id.toString()}
+                    >
                       {customer.name}
                     </SelectItem>
                   ))}

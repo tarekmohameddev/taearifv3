@@ -58,7 +58,10 @@ interface MobileCustomersViewProps {
   onAddNote: (customer: Customer) => void;
   onAddReminder: (customer: Customer) => void;
   onAddInteraction: (customer: Customer) => void;
-  onUpdateCustomerStage: (customerId: string, stageId: string) => Promise<boolean>;
+  onUpdateCustomerStage: (
+    customerId: string,
+    stageId: string,
+  ) => Promise<boolean>;
 }
 
 const getStageIcon = (iconName: string) => {
@@ -116,7 +119,9 @@ export default function MobileCustomersView({
   onUpdateCustomerStage,
 }: MobileCustomersViewProps) {
   const [selectedStage, setSelectedStage] = useState<string>("all");
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null,
+  );
   const [isMovingCustomer, setIsMovingCustomer] = useState(false);
 
   // تصفية العملاء حسب المرحلة المحددة
@@ -126,24 +131,27 @@ export default function MobileCustomersView({
     }
     if (stageId === "unassigned") {
       return filteredCustomers.filter(
-        (customer) => !customer.pipelineStage && !customer.stage_id
+        (customer) => !customer.pipelineStage && !customer.stage_id,
       );
     }
     return filteredCustomers.filter(
       (customer) =>
         customer.pipelineStage === stageId ||
-        (customer.stage_id && String(customer.stage_id) === stageId)
+        (customer.stage_id && String(customer.stage_id) === stageId),
     );
   };
 
   const handleMoveCustomer = async (customer: Customer, newStageId: string) => {
     if (customer.pipelineStage === newStageId) return;
-    
+
     setIsMovingCustomer(true);
     const loadingToast = toast.loading(`جاري نقل العميل ${customer.name}...`);
-    
+
     try {
-      const success = await onUpdateCustomerStage(customer.id.toString(), newStageId);
+      const success = await onUpdateCustomerStage(
+        customer.id.toString(),
+        newStageId,
+      );
       if (success) {
         toast.dismiss(loadingToast);
         toast.success(`تم نقل العميل ${customer.name} بنجاح`);
@@ -161,7 +169,9 @@ export default function MobileCustomersView({
   };
 
   const currentCustomers = getCustomersForStage(selectedStage);
-  const selectedStageData = pipelineStages.find(stage => stage.id === selectedStage);
+  const selectedStageData = pipelineStages.find(
+    (stage) => stage.id === selectedStage,
+  );
 
   return (
     <div className="space-y-4">
@@ -186,20 +196,24 @@ export default function MobileCustomersView({
                 const IconComponent = getStageIcon(stage.icon);
                 const stageCustomers = getCustomersForStage(stage.id);
                 return (
-                                     <SelectItem key={stage.id} value={stage.id}>
-                     <div className="flex items-center gap-2">
-                       <IconComponent className="h-4 w-4" style={{ color: stage.color }} />
-                       <span>
-                         {typeof stage.name === 'object' && stage.name !== null
-                           ? (stage.name as any).name_ar || (stage.name as any).name_en || 'غير محدد'
-                           : stage.name || 'غير محدد'
-                         }
-                       </span>
-                       <Badge variant="secondary" className="text-xs">
-                         {stageCustomers.length}
-                       </Badge>
-                     </div>
-                   </SelectItem>
+                  <SelectItem key={stage.id} value={stage.id}>
+                    <div className="flex items-center gap-2">
+                      <IconComponent
+                        className="h-4 w-4"
+                        style={{ color: stage.color }}
+                      />
+                      <span>
+                        {typeof stage.name === "object" && stage.name !== null
+                          ? (stage.name as any).name_ar ||
+                            (stage.name as any).name_en ||
+                            "غير محدد"
+                          : stage.name || "غير محدد"}
+                      </span>
+                      <Badge variant="secondary" className="text-xs">
+                        {stageCustomers.length}
+                      </Badge>
+                    </div>
+                  </SelectItem>
                 );
               })}
             </SelectContent>
@@ -214,19 +228,26 @@ export default function MobileCustomersView({
             <div className="flex items-center gap-3">
               {(() => {
                 const IconComponent = getStageIcon(selectedStageData.icon);
-                return <IconComponent className="h-6 w-6" style={{ color: selectedStageData.color }} />;
+                return (
+                  <IconComponent
+                    className="h-6 w-6"
+                    style={{ color: selectedStageData.color }}
+                  />
+                );
               })()}
-                             <div>
-                 <h3 className="font-semibold">
-                   {typeof selectedStageData.name === 'object' && selectedStageData.name !== null
-                     ? (selectedStageData.name as any).name_ar || (selectedStageData.name as any).name_en || 'غير محدد'
-                     : selectedStageData.name || 'غير محدد'
-                   }
-                 </h3>
-                 <p className="text-sm text-muted-foreground">
-                   {currentCustomers.length} عميل
-                 </p>
-               </div>
+              <div>
+                <h3 className="font-semibold">
+                  {typeof selectedStageData.name === "object" &&
+                  selectedStageData.name !== null
+                    ? (selectedStageData.name as any).name_ar ||
+                      (selectedStageData.name as any).name_en ||
+                      "غير محدد"
+                    : selectedStageData.name || "غير محدد"}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {currentCustomers.length} عميل
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -239,16 +260,19 @@ export default function MobileCustomersView({
             <CardContent className="p-8 text-center">
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">لا يوجد عملاء</h3>
-                             <p className="text-muted-foreground">
-                 {selectedStage === "all" 
-                   ? "لا يوجد عملاء في النظام" 
-                   : `لا يوجد عملاء في مرحلة ${
-                       selectedStageData?.name && typeof selectedStageData.name === 'object' && selectedStageData.name !== null
-                         ? (selectedStageData.name as any).name_ar || (selectedStageData.name as any).name_en || 'غير محدد'
-                         : selectedStageData?.name || "المحددة"
-                     }`
-                 }
-               </p>
+              <p className="text-muted-foreground">
+                {selectedStage === "all"
+                  ? "لا يوجد عملاء في النظام"
+                  : `لا يوجد عملاء في مرحلة ${
+                      selectedStageData?.name &&
+                      typeof selectedStageData.name === "object" &&
+                      selectedStageData.name !== null
+                        ? (selectedStageData.name as any).name_ar ||
+                          (selectedStageData.name as any).name_en ||
+                          "غير محدد"
+                        : selectedStageData?.name || "المحددة"
+                    }`}
+              </p>
             </CardContent>
           </Card>
         ) : (
@@ -257,21 +281,23 @@ export default function MobileCustomersView({
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                                         <div className="flex items-center gap-2 mb-2">
-                       <h3 className="font-semibold text-lg truncate">
-                         {typeof customer.name === 'object' && customer.name !== null
-                           ? (customer.name as any).name_ar || (customer.name as any).name_en || 'غير محدد'
-                           : customer.name || 'غير محدد'
-                         }
-                       </h3>
-                      <Badge 
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-semibold text-lg truncate">
+                        {typeof customer.name === "object" &&
+                        customer.name !== null
+                          ? (customer.name as any).name_ar ||
+                            (customer.name as any).name_en ||
+                            "غير محدد"
+                          : customer.name || "غير محدد"}
+                      </h3>
+                      <Badge
                         className={getPriorityColor(customer.priority || 1)}
                         variant="secondary"
                       >
                         {getPriorityLabel(customer.priority || 1)}
                       </Badge>
                     </div>
-                    
+
                     <div className="space-y-1 text-sm text-muted-foreground">
                       {customer.phone_number && (
                         <div className="flex items-center gap-2">
@@ -285,85 +311,106 @@ export default function MobileCustomersView({
                           <span className="truncate">{customer.email}</span>
                         </div>
                       )}
-                                             {customer.city && (
-                         <div className="flex items-center gap-2">
-                           <MapPin className="h-3 w-3" />
-                           <span>
-                             {typeof customer.city === 'object' && customer.city !== null
-                               ? (customer.city as any).name_ar || (customer.city as any).name_en || 'غير محدد'
-                               : customer.city
-                             }
-                           </span>
-                           {customer.district && (
-                             <span> - {
-                               typeof customer.district === 'object' && customer.district !== null
-                                 ? (customer.district as any).name_ar || (customer.district as any).name_en || 'غير محدد'
-                                 : customer.district
-                             }</span>
-                           )}
-                         </div>
-                       )}
+                      {customer.city && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-3 w-3" />
+                          <span>
+                            {typeof customer.city === "object" &&
+                            customer.city !== null
+                              ? (customer.city as any).name_ar ||
+                                (customer.city as any).name_en ||
+                                "غير محدد"
+                              : customer.city}
+                          </span>
+                          {customer.district && (
+                            <span>
+                              {" "}
+                              -{" "}
+                              {typeof customer.district === "object" &&
+                              customer.district !== null
+                                ? (customer.district as any).name_ar ||
+                                  (customer.district as any).name_en ||
+                                  "غير محدد"
+                                : customer.district}
+                            </span>
+                          )}
+                        </div>
+                      )}
                       {customer.dealValue && customer.dealValue > 0 && (
                         <div className="flex items-center gap-2">
                           <TrendingUp className="h-3 w-3" />
-                          <span>{customer.dealValue.toLocaleString()} ريال</span>
+                          <span>
+                            {customer.dealValue.toLocaleString()} ريال
+                          </span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-1">
-                                         {/* Move Customer Dialog */}
-                     <Dialog>
-                       <DialogTrigger asChild>
-                         <Button
-                           variant="outline"
-                           size="sm"
-                           disabled={isMovingCustomer}
-                           className="h-8 w-8 p-0"
-                           title="نقل العميل"
-                         >
-                           <ArrowRight className="h-4 w-4" />
-                         </Button>
-                       </DialogTrigger>
-                                             <DialogContent className="max-w-sm mx-auto">
-                         <DialogHeader>
-                           <DialogTitle>نقل العميل</DialogTitle>
-                           <DialogDescription>
-                             اختر المرحلة الجديدة للعميل {customer.name}
-                           </DialogDescription>
-                         </DialogHeader>
-                         <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-                           <div className="grid gap-2">
+                    {/* Move Customer Dialog */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={isMovingCustomer}
+                          className="h-8 w-8 p-0"
+                          title="نقل العميل"
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-sm mx-auto">
+                        <DialogHeader>
+                          <DialogTitle>نقل العميل</DialogTitle>
+                          <DialogDescription>
+                            اختر المرحلة الجديدة للعميل {customer.name}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                          <div className="grid gap-2">
                             {pipelineStages.map((stage) => {
                               const IconComponent = getStageIcon(stage.icon);
                               return (
-                                                                 <Button
-                                   key={stage.id}
-                                   variant={customer.pipelineStage === stage.id ? "default" : "outline"}
-                                   className="justify-start h-auto p-3 w-full"
-                                   onClick={() => handleMoveCustomer(customer, stage.id)}
-                                   disabled={customer.pipelineStage === stage.id || isMovingCustomer}
-                                 >
-                                   <IconComponent 
-                                     className="h-4 w-4 ml-2 flex-shrink-0" 
-                                     style={{ color: stage.color }} 
-                                   />
-                                                                       <div className="text-right flex-1 min-w-0">
-                                      <div className="font-medium truncate">
-                                        {typeof stage.name === 'object' && stage.name !== null
-                                          ? (stage.name as any).name_ar || (stage.name as any).name_en || 'غير محدد'
-                                          : stage.name || 'غير محدد'
-                                        }
-                                      </div>
-                                      <div className="text-xs text-muted-foreground">
-                                        {getCustomersForStage(stage.id).length} عميل
-                                      </div>
+                                <Button
+                                  key={stage.id}
+                                  variant={
+                                    customer.pipelineStage === stage.id
+                                      ? "default"
+                                      : "outline"
+                                  }
+                                  className="justify-start h-auto p-3 w-full"
+                                  onClick={() =>
+                                    handleMoveCustomer(customer, stage.id)
+                                  }
+                                  disabled={
+                                    customer.pipelineStage === stage.id ||
+                                    isMovingCustomer
+                                  }
+                                >
+                                  <IconComponent
+                                    className="h-4 w-4 ml-2 flex-shrink-0"
+                                    style={{ color: stage.color }}
+                                  />
+                                  <div className="text-right flex-1 min-w-0">
+                                    <div className="font-medium truncate">
+                                      {typeof stage.name === "object" &&
+                                      stage.name !== null
+                                        ? (stage.name as any).name_ar ||
+                                          (stage.name as any).name_en ||
+                                          "غير محدد"
+                                        : stage.name || "غير محدد"}
                                     </div>
-                                   {customer.pipelineStage === stage.id && (
-                                     <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-                                   )}
-                                 </Button>
+                                    <div className="text-xs text-muted-foreground">
+                                      {getCustomersForStage(stage.id).length}{" "}
+                                      عميل
+                                    </div>
+                                  </div>
+                                  {customer.pipelineStage === stage.id && (
+                                    <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+                                  )}
+                                </Button>
                               );
                             })}
                           </div>
@@ -374,12 +421,18 @@ export default function MobileCustomersView({
                     {/* Actions Menu */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onViewDetails(customer)}>
+                        <DropdownMenuItem
+                          onClick={() => onViewDetails(customer)}
+                        >
                           <Eye className="h-4 w-4 ml-2" />
                           عرض التفاصيل
                         </DropdownMenuItem>
@@ -387,11 +440,15 @@ export default function MobileCustomersView({
                           <Edit className="h-4 w-4 ml-2" />
                           إضافة ملاحظة
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onAddReminder(customer)}>
+                        <DropdownMenuItem
+                          onClick={() => onAddReminder(customer)}
+                        >
                           <Bell className="h-4 w-4 ml-2" />
                           إضافة تذكير
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onAddInteraction(customer)}>
+                        <DropdownMenuItem
+                          onClick={() => onAddInteraction(customer)}
+                        >
                           <MessageSquare className="h-4 w-4 ml-2" />
                           إضافة تفاعل
                         </DropdownMenuItem>
@@ -400,39 +457,39 @@ export default function MobileCustomersView({
                   </div>
                 </div>
 
-                                 {/* Quick Actions */}
-                 <div className="flex gap-2 mt-3 pt-3 border-t">
-                   <Button
-                     variant="outline"
-                     size="sm"
-                     onClick={() => onViewDetails(customer)}
-                     className="flex-1 text-xs"
-                   >
-                     <Eye className="h-3 w-3 ml-1" />
-                     <span className="hidden sm:inline">التفاصيل</span>
-                     <span className="sm:hidden">تفاصيل</span>
-                   </Button>
-                   <Button
-                     variant="outline"
-                     size="sm"
-                     onClick={() => onAddNote(customer)}
-                     className="flex-1 text-xs"
-                   >
-                     <Edit className="h-3 w-3 ml-1" />
-                     <span className="hidden sm:inline">ملاحظة</span>
-                     <span className="sm:hidden">ملاحظة</span>
-                   </Button>
-                   <Button
-                     variant="outline"
-                     size="sm"
-                     onClick={() => onAddReminder(customer)}
-                     className="flex-1 text-xs"
-                   >
-                     <Bell className="h-3 w-3 ml-1" />
-                     <span className="hidden sm:inline">تذكير</span>
-                     <span className="sm:hidden">تذكير</span>
-                   </Button>
-                 </div>
+                {/* Quick Actions */}
+                <div className="flex gap-2 mt-3 pt-3 border-t">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onViewDetails(customer)}
+                    className="flex-1 text-xs"
+                  >
+                    <Eye className="h-3 w-3 ml-1" />
+                    <span className="hidden sm:inline">التفاصيل</span>
+                    <span className="sm:hidden">تفاصيل</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onAddNote(customer)}
+                    className="flex-1 text-xs"
+                  >
+                    <Edit className="h-3 w-3 ml-1" />
+                    <span className="hidden sm:inline">ملاحظة</span>
+                    <span className="sm:hidden">ملاحظة</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onAddReminder(customer)}
+                    className="flex-1 text-xs"
+                  >
+                    <Bell className="h-3 w-3 ml-1" />
+                    <span className="hidden sm:inline">تذكير</span>
+                    <span className="sm:hidden">تذكير</span>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))
@@ -448,7 +505,11 @@ export default function MobileCustomersView({
                 إجمالي العملاء: {currentCustomers.length}
               </span>
               <span className="text-muted-foreground">
-                القيمة الإجمالية: {currentCustomers.reduce((sum, c) => sum + (c.dealValue || 0), 0).toLocaleString()} ريال
+                القيمة الإجمالية:{" "}
+                {currentCustomers
+                  .reduce((sum, c) => sum + (c.dealValue || 0), 0)
+                  .toLocaleString()}{" "}
+                ريال
               </span>
             </div>
           </CardContent>

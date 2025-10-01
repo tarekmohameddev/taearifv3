@@ -5,7 +5,7 @@ import { DragAxis, Direction } from "../../types";
  */
 export const getDirection = (
   dragAxis: DragAxis,
-  offset: { x: number; y: number }
+  offset: { x: number; y: number },
 ): Direction => {
   if (dragAxis === "y") {
     // للمحور الرأسي، نعتمد على الإزاحة الرأسية

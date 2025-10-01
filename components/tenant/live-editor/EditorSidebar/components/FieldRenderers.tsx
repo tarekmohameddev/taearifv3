@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { FieldRendererProps } from "../types";
+import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 
 // مكون عرض حقل اللون
 export const ColorFieldRenderer: React.FC<{
@@ -9,6 +10,7 @@ export const ColorFieldRenderer: React.FC<{
   value: string;
   updateValue: (path: string, value: any) => void;
 }> = ({ label, path, value, updateValue }) => {
+  const t = useEditorT();
   const hasHex = typeof value === "string" && value.startsWith("#");
   const colorValue = hasHex ? value : "#000000";
 
@@ -23,11 +25,11 @@ export const ColorFieldRenderer: React.FC<{
           <div
             className="absolute inset-0 rounded-full border-4 border-slate-200 shadow-lg transition-all duration-300 group-hover:shadow-xl group-hover:scale-110"
             style={{ backgroundColor: hasHex ? colorValue : "transparent" }}
-            title="Pick color"
+            title={t("editor_sidebar.pick_color")}
           >
             {!hasHex && (
               <span className="absolute inset-0 grid place-items-center text-xs text-slate-400">
-                transparent
+                {t("editor_sidebar.transparent")}
               </span>
             )}
           </div>
@@ -59,9 +61,9 @@ export const ColorFieldRenderer: React.FC<{
               ? "bg-slate-100 border-slate-400 text-slate-700 shadow-inner"
               : "bg-white border-slate-300 text-slate-600 hover:bg-slate-50 hover:border-slate-400 shadow-sm"
           }`}
-          title="Make color transparent"
+          title={t("editor_sidebar.make_color_transparent")}
         >
-          Transparent
+          {t("editor_sidebar.transparent")}
         </button>
 
         {/* زر النسخ */}
@@ -69,7 +71,7 @@ export const ColorFieldRenderer: React.FC<{
           type="button"
           onClick={() => navigator.clipboard?.writeText(value || "")}
           className="group/btn p-2 rounded-lg bg-slate-100 hover:bg-blue-100 border-2 border-transparent hover:border-blue-300 transition-all duration-200"
-          title="Copy color"
+          title={t("editor_sidebar.copy_color")}
         >
           <svg
             className="w-4 h-4 text-slate-600 group-hover/btn:text-blue-600 transition-colors duration-200"
@@ -97,6 +99,7 @@ export const ImageFieldRenderer: React.FC<{
   value: string;
   updateValue: (path: string, value: any) => void;
 }> = ({ label, path, value, updateValue }) => {
+  const t = useEditorT();
   return (
     <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
       <label className="flex items-center space-x-3 mb-3">
@@ -172,7 +175,7 @@ export const ImageFieldRenderer: React.FC<{
                   d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                 />
               </svg>
-              <span>Open Image</span>
+              <span>{t("editor_sidebar.open_image")}</span>
             </a>
           )}
         </div>
@@ -188,6 +191,7 @@ export const BooleanFieldRenderer: React.FC<{
   value: boolean;
   updateValue: (path: string, value: any) => void;
 }> = ({ label, path, value, updateValue }) => {
+  const t = useEditorT();
   return (
     <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
       <div className="flex items-center justify-between">
@@ -249,7 +253,7 @@ export const BooleanFieldRenderer: React.FC<{
         </button>
       </div>
       <p className="text-xs text-slate-500 mt-2">
-        {value ? "Enabled" : "Disabled"}
+        {value ? t("editor_sidebar.enabled") : t("editor_sidebar.disabled")}
       </p>
     </div>
   );
@@ -262,6 +266,7 @@ export const NumberFieldRenderer: React.FC<{
   value: number;
   updateValue: (path: string, value: any) => void;
 }> = ({ label, path, value, updateValue }) => {
+  const t = useEditorT();
   return (
     <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
       <label className="flex items-center space-x-3 mb-3">
@@ -317,7 +322,7 @@ export const NumberFieldRenderer: React.FC<{
         </button>
       </div>
       <p className="text-xs text-slate-500 mt-2 text-center">
-        Current value: {value ?? 0}
+        {t("editor_sidebar.current_value")}: {value ?? 0}
       </p>
     </div>
   );

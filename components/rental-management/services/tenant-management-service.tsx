@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,10 +20,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users,
   Plus,
@@ -32,62 +38,67 @@ import {
   MessageSquare,
   FileText,
   MoreHorizontal,
-} from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import useAuthStore from "@/context/AuthContext"
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import useAuthStore from "@/context/AuthContext";
 
 interface Tenant {
-  id: string
-  name: string
-  nameAr: string
-  email: string
-  phone: string
-  nationalId: string
-  unit: string
-  property: string
-  propertyAr: string
-  leaseStart: string
-  leaseEnd: string
-  monthlyRent: number
-  status: "active" | "pending" | "expired" | "terminated"
-  statusAr: string
-  paymentStatus: "current" | "late" | "overdue"
-  paymentStatusAr: string
-  avatar: string
-  nationality: string
-  nationalityAr: string
+  id: string;
+  name: string;
+  nameAr: string;
+  email: string;
+  phone: string;
+  nationalId: string;
+  unit: string;
+  property: string;
+  propertyAr: string;
+  leaseStart: string;
+  leaseEnd: string;
+  monthlyRent: number;
+  status: "active" | "pending" | "expired" | "terminated";
+  statusAr: string;
+  paymentStatus: "current" | "late" | "overdue";
+  paymentStatusAr: string;
+  avatar: string;
+  nationality: string;
+  nationalityAr: string;
   emergencyContact: {
-    name: string
-    nameAr: string
-    phone: string
-    relationship: string
-    relationshipAr: string
-  }
-  notes: string
-  notesAr: string
+    name: string;
+    nameAr: string;
+    phone: string;
+    relationship: string;
+    relationshipAr: string;
+  };
+  notes: string;
+  notesAr: string;
 }
 
 export function TenantManagementService() {
-  const [tenants, setTenants] = useState<Tenant[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [filterNationality, setFilterNationality] = useState("all")
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null)
-  const { userData } = useAuthStore()
+  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterNationality, setFilterNationality] = useState("all");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+  const { userData } = useAuthStore();
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchTenants")
-      return
+      console.log("No token available, skipping fetchTenants");
+      return;
     }
 
     // Simulate API call to tenant management microservice
     const fetchTenants = async () => {
-      setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setTenants([
         {
@@ -210,51 +221,54 @@ export function TenantManagementService() {
           notes: "Lease expired, needs renewal discussion",
           notesAr: "انتهى العقد، يحتاج مناقشة التجديد",
         },
-      ])
-      setLoading(false)
-    }
+      ]);
+      setLoading(false);
+    };
 
-    fetchTenants()
-  }, [userData?.token])
+    fetchTenants();
+  }, [userData?.token]);
 
   const filteredTenants = tenants.filter((tenant) => {
     const matchesSearch =
       tenant.nameAr.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tenant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tenant.unit.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.phone.includes(searchTerm)
-    const matchesStatus = filterStatus === "all" || tenant.status === filterStatus
-    const matchesNationality = filterNationality === "all" || tenant.nationality.toLowerCase() === filterNationality
-    return matchesSearch && matchesStatus && matchesNationality
-  })
+      tenant.phone.includes(searchTerm);
+    const matchesStatus =
+      filterStatus === "all" || tenant.status === filterStatus;
+    const matchesNationality =
+      filterNationality === "all" ||
+      tenant.nationality.toLowerCase() === filterNationality;
+    return matchesSearch && matchesStatus && matchesNationality;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "expired":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       case "terminated":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getPaymentStatusColor = (status: string) => {
     switch (status) {
       case "current":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "late":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "overdue":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
@@ -262,11 +276,13 @@ export function TenantManagementService() {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+            <p className="text-lg text-gray-500">
+              يرجى تسجيل الدخول لعرض المحتوى
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -292,7 +308,7 @@ export function TenantManagementService() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -301,7 +317,9 @@ export function TenantManagementService() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">إدارة المستأجرين</h2>
-          <p className="text-muted-foreground">إدارة معلومات المستأجرين والتواصل معهم</p>
+          <p className="text-muted-foreground">
+            إدارة معلومات المستأجرين والتواصل معهم
+          </p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
@@ -329,7 +347,11 @@ export function TenantManagementService() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="tenant-email">البريد الإلكتروني</Label>
-                  <Input id="tenant-email" type="email" placeholder="ahmed@email.com" />
+                  <Input
+                    id="tenant-email"
+                    type="email"
+                    placeholder="ahmed@email.com"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="tenant-phone">رقم الهاتف</Label>
@@ -389,10 +411,15 @@ export function TenantManagementService() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsAddDialogOpen(false)}
+              >
                 إلغاء
               </Button>
-              <Button onClick={() => setIsAddDialogOpen(false)}>إضافة المستأجر</Button>
+              <Button onClick={() => setIsAddDialogOpen(false)}>
+                إضافة المستأجر
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -444,7 +471,10 @@ export function TenantManagementService() {
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4 space-x-reverse">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={tenant.avatar || "/placeholder.svg"} alt={tenant.nameAr} />
+                    <AvatarImage
+                      src={tenant.avatar || "/placeholder.svg"}
+                      alt={tenant.nameAr}
+                    />
                     <AvatarFallback>
                       {tenant.nameAr
                         .split(" ")
@@ -455,8 +485,14 @@ export function TenantManagementService() {
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2 space-x-reverse">
                       <h3 className="font-semibold">{tenant.nameAr}</h3>
-                      <Badge className={getStatusColor(tenant.status)}>{tenant.statusAr}</Badge>
-                      <Badge className={getPaymentStatusColor(tenant.paymentStatus)}>{tenant.paymentStatusAr}</Badge>
+                      <Badge className={getStatusColor(tenant.status)}>
+                        {tenant.statusAr}
+                      </Badge>
+                      <Badge
+                        className={getPaymentStatusColor(tenant.paymentStatus)}
+                      >
+                        {tenant.paymentStatusAr}
+                      </Badge>
                       <Badge variant="outline">{tenant.nationalityAr}</Badge>
                     </div>
                     <div className="flex items-center space-x-4 space-x-reverse text-sm text-muted-foreground">
@@ -499,7 +535,9 @@ export function TenantManagementService() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setSelectedTenant(tenant)}>
+                      <DropdownMenuItem
+                        onClick={() => setSelectedTenant(tenant)}
+                      >
                         <FileText className="ml-2 h-4 w-4" />
                         عرض التفاصيل
                       </DropdownMenuItem>
@@ -519,7 +557,9 @@ export function TenantManagementService() {
                 <div className="mt-3 p-3 bg-muted rounded-md">
                   <div className="flex items-start space-x-2 space-x-reverse">
                     <AlertCircle className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">{tenant.notesAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {tenant.notesAr}
+                    </p>
                   </div>
                 </div>
               )}
@@ -529,11 +569,16 @@ export function TenantManagementService() {
       </div>
 
       {/* Tenant Details Dialog */}
-      <Dialog open={!!selectedTenant} onOpenChange={() => setSelectedTenant(null)}>
+      <Dialog
+        open={!!selectedTenant}
+        onOpenChange={() => setSelectedTenant(null)}
+      >
         <DialogContent className="sm:max-w-[700px]">
           <DialogHeader>
             <DialogTitle>تفاصيل المستأجر</DialogTitle>
-            <DialogDescription>معلومات كاملة عن {selectedTenant?.nameAr}</DialogDescription>
+            <DialogDescription>
+              معلومات كاملة عن {selectedTenant?.nameAr}
+            </DialogDescription>
           </DialogHeader>
           {selectedTenant && (
             <Tabs defaultValue="info" className="w-full">
@@ -546,33 +591,50 @@ export function TenantManagementService() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">الاسم الكامل</Label>
-                    <p className="text-sm text-muted-foreground">{selectedTenant.nameAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTenant.nameAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">رقم الهوية</Label>
-                    <p className="text-sm text-muted-foreground">{selectedTenant.nationalId}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTenant.nationalId}
+                    </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">البريد الإلكتروني</Label>
-                    <p className="text-sm text-muted-foreground">{selectedTenant.email}</p>
+                    <Label className="text-sm font-medium">
+                      البريد الإلكتروني
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTenant.email}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">رقم الهاتف</Label>
-                    <p className="text-sm text-muted-foreground">{selectedTenant.phone}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTenant.phone}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">الجنسية</Label>
-                    <p className="text-sm text-muted-foreground">{selectedTenant.nationalityAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTenant.nationalityAr}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">رقم الوحدة</Label>
-                    <p className="text-sm text-muted-foreground">{selectedTenant.unit}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTenant.unit}
+                    </p>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">جهة الاتصال في حالات الطوارئ</Label>
+                  <Label className="text-sm font-medium">
+                    جهة الاتصال في حالات الطوارئ
+                  </Label>
                   <p className="text-sm text-muted-foreground">
-                    {selectedTenant.emergencyContact.nameAr} ({selectedTenant.emergencyContact.relationshipAr}) -{" "}
+                    {selectedTenant.emergencyContact.nameAr} (
+                    {selectedTenant.emergencyContact.relationshipAr}) -{" "}
                     {selectedTenant.emergencyContact.phone}
                   </p>
                 </div>
@@ -581,24 +643,36 @@ export function TenantManagementService() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">المشروع</Label>
-                    <p className="text-sm text-muted-foreground">{selectedTenant.propertyAr}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTenant.propertyAr}
+                    </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">الإيجار الشهري</Label>
-                    <p className="text-sm text-muted-foreground">{selectedTenant.monthlyRent.toLocaleString()} ر.س</p>
+                    <Label className="text-sm font-medium">
+                      الإيجار الشهري
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTenant.monthlyRent.toLocaleString()} ر.س
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">بداية العقد</Label>
-                    <p className="text-sm text-muted-foreground">{selectedTenant.leaseStart}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTenant.leaseStart}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">نهاية العقد</Label>
-                    <p className="text-sm text-muted-foreground">{selectedTenant.leaseEnd}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTenant.leaseEnd}
+                    </p>
                   </div>
                 </div>
               </TabsContent>
               <TabsContent value="history" className="space-y-4">
-                <p className="text-sm text-muted-foreground">سيتم عرض سجل المدفوعات وسجل التواصل هنا.</p>
+                <p className="text-sm text-muted-foreground">
+                  سيتم عرض سجل المدفوعات وسجل التواصل هنا.
+                </p>
               </TabsContent>
             </Tabs>
           )}
@@ -608,7 +682,9 @@ export function TenantManagementService() {
       {filteredTenants.length === 0 && (
         <div className="text-center py-12">
           <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">لم يتم العثور على مستأجرين</h3>
+          <h3 className="text-lg font-medium mb-2">
+            لم يتم العثور على مستأجرين
+          </h3>
           <p className="text-muted-foreground mb-4">
             {searchTerm || filterStatus !== "all" || filterNationality !== "all"
               ? "جرب تعديل معايير البحث أو التصفية"
@@ -621,5 +697,5 @@ export function TenantManagementService() {
         </div>
       )}
     </div>
-  )
+  );
 }

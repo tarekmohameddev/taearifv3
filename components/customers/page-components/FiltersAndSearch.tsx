@@ -16,10 +16,32 @@ import useAuthStore from "@/context/AuthContext";
 // Interface for filter data from API
 interface FilterData {
   cities: Array<{ id: number; name_ar: string; name_en: string }>;
-  districts: Array<{ id: number; city_id: number; name_ar: string; name_en: string }>;
-  types: Array<{ id: number; name: string; value: string; icon: string; color: string }>;
-  priorities: Array<{ id: number; name: string; value: number; icon: string; color: string }>;
-  stages: Array<{ id: number; name: string; icon: string | null; color: string | null }>;
+  districts: Array<{
+    id: number;
+    city_id: number;
+    name_ar: string;
+    name_en: string;
+  }>;
+  types: Array<{
+    id: number;
+    name: string;
+    value: string;
+    icon: string;
+    color: string;
+  }>;
+  priorities: Array<{
+    id: number;
+    name: string;
+    value: number;
+    icon: string;
+    color: string;
+  }>;
+  stages: Array<{
+    id: number;
+    name: string;
+    icon: string | null;
+    color: string | null;
+  }>;
   procedures: Array<{ id: number; name: string; icon: string; color: string }>;
 }
 
@@ -33,7 +55,7 @@ export const FiltersAndSearch = ({
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
   const { userData } = useAuthStore();
-  
+
   // Get filter states and actions from the Zustand store
   const {
     searchTerm,
@@ -51,7 +73,7 @@ export const FiltersAndSearch = ({
     setFilterData,
     setLoadingFilters,
     clearAllFilters,
-    hasActiveFilters
+    hasActiveFilters,
   } = useCustomersFiltersStore();
 
   // Effect to fetch initial filter data from the API
@@ -66,7 +88,7 @@ export const FiltersAndSearch = ({
       try {
         setLoadingFilters(true);
         const response = await axiosInstance.get("/customers/filters");
-        
+
         if (response.data.status === "success") {
           setFilterData(response.data.data);
         } else {
@@ -100,34 +122,34 @@ export const FiltersAndSearch = ({
       // Get the latest state directly from the store to avoid stale state issues in callbacks
       const currentState = useCustomersFiltersStore.getState();
       const params = new URLSearchParams();
-      
+
       // Build parameters object only with active filters
       if (currentState.searchTerm.trim()) {
-        params.append('q', currentState.searchTerm.trim());
+        params.append("q", currentState.searchTerm.trim());
       }
       if (currentState.filterCity !== "all") {
-        params.append('city_id', currentState.filterCity);
+        params.append("city_id", currentState.filterCity);
       }
       if (currentState.filterDistrict !== "all") {
-        params.append('district_id', currentState.filterDistrict);
+        params.append("district_id", currentState.filterDistrict);
       }
-             if (currentState.filterType !== "all") {
-         params.append('type_id', currentState.filterType);
-       }
+      if (currentState.filterType !== "all") {
+        params.append("type_id", currentState.filterType);
+      }
       // **FIX**: Send the `id` for priority with the correct parameter name `priority_id`.
       if (currentState.filterPriority !== "all") {
-        params.append('priority_id', currentState.filterPriority);
+        params.append("priority_id", currentState.filterPriority);
       }
-      
+
       let response;
       // If there are any active filters or a search term, use the search endpoint.
       if (params.toString()) {
-        response = await axiosInstance.get('/customers/search', { params });
+        response = await axiosInstance.get("/customers/search", { params });
       } else {
         // Otherwise, fetch all customers.
         response = await axiosInstance.get("/customers");
       }
-      
+
       if (response.data.status === "success") {
         const { customers, summary, pagination } = response.data.data;
         setCustomersData(customers || []);
@@ -145,17 +167,22 @@ export const FiltersAndSearch = ({
       setIsSearching(false);
       setLoading(false);
     }
-  }, [setCustomersData, setTotalCustomers, setLoading, setError, userData?.token]);
-
+  }, [
+    setCustomersData,
+    setTotalCustomers,
+    setLoading,
+    setError,
+    userData?.token,
+  ]);
 
   // Debounced search on input change
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    
+
     if (searchTimeout.current) {
       clearTimeout(searchTimeout.current);
     }
-    
+
     searchTimeout.current = setTimeout(() => {
       performSearch();
     }, 500); // 500ms delay
@@ -164,22 +191,22 @@ export const FiltersAndSearch = ({
   // Handle changes in any of the select filters
   const handleFilterChange = (filterName: string, value: string) => {
     switch (filterName) {
-      case 'city':
+      case "city":
         setFilterCity(value);
         // Reset district when city changes to avoid inconsistent state
         setFilterDistrict("all");
         break;
-      case 'district':
+      case "district":
         setFilterDistrict(value);
         break;
-      case 'type':
+      case "type":
         setFilterType(value);
         break;
-      case 'priority':
+      case "priority":
         setFilterPriority(value);
         break;
     }
-    
+
     // Use setTimeout to ensure the state update is processed before triggering the search
     setTimeout(performSearch, 0);
   };
@@ -188,7 +215,7 @@ export const FiltersAndSearch = ({
   const handleResetFilters = () => {
     clearAllFilters();
     setTimeout(performSearch, 0);
-  }
+  };
 
   // Cleanup timeout on component unmount
   useEffect(() => {
@@ -205,9 +232,9 @@ export const FiltersAndSearch = ({
     if (!filterData?.districts || filterCity === "all") {
       return filterData?.districts || [];
     }
-         return filterData.districts.filter((district: any) => 
-       district.city_id.toString() === filterCity
-     );
+    return filterData.districts.filter(
+      (district: any) => district.city_id.toString() === filterCity,
+    );
   }, [filterData?.districts, filterCity]);
 
   // Loading state for filters
@@ -217,7 +244,10 @@ export const FiltersAndSearch = ({
         <div className="h-10 w-[300px] bg-gray-200 rounded-md animate-pulse" />
         <div className="flex items-center gap-2">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-10 w-[120px] bg-gray-200 rounded-md animate-pulse" />
+            <div
+              key={i}
+              className="h-10 w-[120px] bg-gray-200 rounded-md animate-pulse"
+            />
           ))}
         </div>
       </div>
@@ -242,73 +272,82 @@ export const FiltersAndSearch = ({
       </div>
       <div className="flex items-center gap-2">
         {/* Type Filter */}
-        <Select value={filterType} onValueChange={(value) => handleFilterChange('type', value)}>
+        <Select
+          value={filterType}
+          onValueChange={(value) => handleFilterChange("type", value)}
+        >
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="النوع" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع الأنواع</SelectItem>
-                         {filterData?.types?.map((type: any) => (
-               <SelectItem key={type.id} value={type.id.toString()}>
-                 {type.name}
-               </SelectItem>
-             ))}
+            {filterData?.types?.map((type: any) => (
+              <SelectItem key={type.id} value={type.id.toString()}>
+                {type.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        
+
         {/* City Filter */}
-        <Select value={filterCity} onValueChange={(value) => handleFilterChange('city', value)}>
+        <Select
+          value={filterCity}
+          onValueChange={(value) => handleFilterChange("city", value)}
+        >
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="المدينة" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع المدن</SelectItem>
-                         {filterData?.cities?.map((city: any) => (
-               <SelectItem key={city.id} value={city.id.toString()}>
-                 {city.name_ar}
-               </SelectItem>
-             ))}
+            {filterData?.cities?.map((city: any) => (
+              <SelectItem key={city.id} value={city.id.toString()}>
+                {city.name_ar}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        
+
         {/* District Filter */}
-        <Select 
-          value={filterDistrict} 
-          onValueChange={(value) => handleFilterChange('district', value)}
-          disabled={filterCity === 'all'} // Disable if no city is selected
+        <Select
+          value={filterDistrict}
+          onValueChange={(value) => handleFilterChange("district", value)}
+          disabled={filterCity === "all"} // Disable if no city is selected
         >
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="الحي" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع الأحياء</SelectItem>
-                         {getFilteredDistricts()?.map((district: any) => (
-               <SelectItem key={district.id} value={district.id.toString()}>
-                 {district.name_ar}
-               </SelectItem>
-             ))}
+            {getFilteredDistricts()?.map((district: any) => (
+              <SelectItem key={district.id} value={district.id.toString()}>
+                {district.name_ar}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        
+
         {/* Priority Filter */}
-        <Select value={filterPriority} onValueChange={(value) => handleFilterChange('priority', value)}>
+        <Select
+          value={filterPriority}
+          onValueChange={(value) => handleFilterChange("priority", value)}
+        >
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="الأولوية" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع الأولويات</SelectItem>
-                         {filterData?.priorities?.map((priority: any) => (
-               // **FIX**: The value is now `priority.id` as requested by the user.
-               <SelectItem key={priority.id} value={priority.id.toString()}>
-                 {priority.name}
-               </SelectItem>
-             ))}
+            {filterData?.priorities?.map((priority: any) => (
+              // **FIX**: The value is now `priority.id` as requested by the user.
+              <SelectItem key={priority.id} value={priority.id.toString()}>
+                {priority.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        
+
         {/* Reset Button */}
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="icon"
           onClick={handleResetFilters}
           disabled={!hasActiveFilters()} // Disable if no filters are active

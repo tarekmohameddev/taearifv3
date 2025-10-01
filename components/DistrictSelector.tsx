@@ -67,10 +67,7 @@ const DistrictSelector: React.FC<DistrictSelectorProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className={cn(
-            "w-full justify-between text-black",
-            className,
-          )}
+          className={cn("w-full justify-between text-black", className)}
           disabled={!selectedCityId || loading}
         >
           {loading

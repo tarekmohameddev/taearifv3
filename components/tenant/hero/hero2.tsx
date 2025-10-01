@@ -1,80 +1,91 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import { useEditorStore } from "@/context-liveeditor/editorStore"
-import useTenantStore from "@/context-liveeditor/tenantStore"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useEditorStore } from "@/context-liveeditor/editorStore";
+import useTenantStore from "@/context-liveeditor/tenantStore";
 
 interface HeroSection2Props {
-  title?: string
-  description?: string
-  imageSrc?: string
-  imageAlt?: string
-  variant?: string
-  useStore?: boolean
-  id?: string
+  title?: string;
+  description?: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  variant?: string;
+  useStore?: boolean;
+  id?: string;
 }
 
 export default function HeroSection2(props: HeroSection2Props = {}) {
   // Initialize variant id early so hooks can depend on it
-  const variantId = props.variant || "hero2"
-  
+  const variantId = props.variant || "hero2";
+
   // Subscribe to editor store updates for this component variant
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant)
-  const getComponentData = useEditorStore((s) => s.getComponentData)
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
 
   useEffect(() => {
     if (props.useStore) {
-      ensureComponentVariant('hero', variantId, props)
+      ensureComponentVariant("hero", variantId, props);
     }
-  }, [variantId, props.useStore, ensureComponentVariant])
+  }, [variantId, props.useStore, ensureComponentVariant]);
 
   // Get tenant data
-  const tenantData = useTenantStore((s: any) => s.tenantData)
-  const fetchTenantData = useTenantStore((s: any) => s.fetchTenantData)
-  const tenantId = useTenantStore((s) => s.tenantId)
-  const router = useRouter()
+  const tenantData = useTenantStore((s: any) => s.tenantData);
+  const fetchTenantData = useTenantStore((s: any) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+  const router = useRouter();
 
   useEffect(() => {
     if (tenantId) {
-      fetchTenantData(tenantId)
+      fetchTenantData(tenantId);
     }
-  }, [tenantId, fetchTenantData])
+  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore ? (getComponentData('hero', variantId) || {}) : {}
-  
+  const storeData = props.useStore
+    ? getComponentData("hero", variantId) || {}
+    : {};
+
   // Subscribe to store updates to re-render when data changes
-  const heroStates = useEditorStore((s) => s.heroStates)
-  const currentStoreData = props.useStore ? (heroStates[variantId] || {}) : {}
-  
+  const heroStates = useEditorStore((s) => s.heroStates);
+  const currentStoreData = props.useStore ? heroStates[variantId] || {} : {};
+
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
-      return {}
+      return {};
     }
     // Search through all pages for this component variant
-    for (const [pageSlug, pageComponents] of Object.entries(tenantData.componentSettings)) {
-      
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
       // Check if pageComponents is an object (not array)
-      if (typeof pageComponents === 'object' && !Array.isArray(pageComponents)) {
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
         // Search through all components in this page
-        for (const [componentId, component] of Object.entries(pageComponents as any)) {
-          
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
           // Check if this is the exact component we're looking for by ID
-          if ((component as any).type === 'hero' && 
-              (component as any).componentName === variantId &&
-              componentId === props.id) {
-            return (component as any).data
+          if (
+            (component as any).type === "hero" &&
+            (component as any).componentName === variantId &&
+            componentId === props.id
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-    return {}
-  }
-  
-  const tenantComponentData = getTenantComponentData()
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
 
   // Default data for hero2
   const getDefaultHero2Data = () => ({
@@ -85,13 +96,13 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
     imageAlt: "Background",
     height: {
       desktop: "229px",
-      tablet: "229px", 
+      tablet: "229px",
       mobile: "229px",
     },
     minHeight: {
       desktop: "229px",
       tablet: "229px",
-      mobile: "229px", 
+      mobile: "229px",
     },
     background: {
       image: "https://dalel-lovat.vercel.app/images/hero.webp",
@@ -137,20 +148,20 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
         delay: 400,
       },
     },
-  })
+  });
 
   // Merge data with priority: storeData > tenantComponentData > props > default
-  const mergedData = { 
-    ...getDefaultHero2Data(), 
-    ...props, 
+  const mergedData = {
+    ...getDefaultHero2Data(),
+    ...props,
     ...tenantComponentData,
-    ...currentStoreData 
-  }
+    ...currentStoreData,
+  };
 
   // Extract values from merged data
   const {
     title = "عنوان الصفحة",
-    description = "وصف الصفحة", 
+    description = "وصف الصفحة",
     imageSrc = "https://dalel-lovat.vercel.app/images/hero.webp",
     imageAlt = "صورة خلفية",
     visible = true,
@@ -159,7 +170,7 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
     background = {
       image: "https://dalel-lovat.vercel.app/images/hero.webp",
       alt: "صورة خلفية",
-      overlay: { enabled: true, opacity: "0.6", color: "#000000" }
+      overlay: { enabled: true, opacity: "0.6", color: "#000000" },
     },
     content = {
       title: "عنوان الصفحة",
@@ -167,18 +178,29 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
       alignment: "center",
       maxWidth: "5xl",
       font: {
-        title: { family: "Inter", size: { desktop: "36px", tablet: "36px", mobile: "36px" }, weight: "bold", color: "#ffffff", lineHeight: "1.25" },
-        description: { family: "Inter", size: { desktop: "15px", tablet: "15px", mobile: "15px" }, weight: "normal", color: "#ffffff" }
-      }
-    }
-  } = mergedData
+        title: {
+          family: "Inter",
+          size: { desktop: "36px", tablet: "36px", mobile: "36px" },
+          weight: "bold",
+          color: "#ffffff",
+          lineHeight: "1.25",
+        },
+        description: {
+          family: "Inter",
+          size: { desktop: "15px", tablet: "15px", mobile: "15px" },
+          weight: "normal",
+          color: "#ffffff",
+        },
+      },
+    },
+  } = mergedData;
 
-  if (!visible) return null
+  if (!visible) return null;
 
   return (
     <section className="relative w-full min-h-[229px] md:min-h-[368px] flex items-center justify-center overflow-hidden">
-      <Image 
-        src={background.image || imageSrc} 
+      <Image
+        src={background.image || imageSrc}
         alt={background.alt || imageAlt}
         fill
         sizes="100vw"
@@ -195,5 +217,5 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
         </p>
       </div>
     </section>
-  )
+  );
 }

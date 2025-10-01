@@ -332,7 +332,7 @@ export const contactCardsFunctions = {
   // Update contact cards data
   update: (
     currentData: ComponentData,
-    updates: Partial<ComponentData>
+    updates: Partial<ComponentData>,
   ): ComponentData => ({
     ...currentData,
     ...updates,
@@ -347,7 +347,7 @@ export const contactCardsFunctions = {
   // Remove contact card
   removeContactCard: (
     currentData: ComponentData,
-    index: number
+    index: number,
   ): ComponentData => ({
     ...currentData,
     cards: (currentData.cards || []).filter((_, i) => i !== index),
@@ -357,11 +357,11 @@ export const contactCardsFunctions = {
   updateContactCard: (
     currentData: ComponentData,
     index: number,
-    updates: any
+    updates: any,
   ): ComponentData => ({
     ...currentData,
     cards: (currentData.cards || []).map((card, i) =>
-      i === index ? { ...card, ...updates } : card
+      i === index ? { ...card, ...updates } : card,
     ),
   }),
 
@@ -369,7 +369,7 @@ export const contactCardsFunctions = {
   addLinkToCard: (
     currentData: ComponentData,
     cardIndex: number,
-    link: any
+    link: any,
   ): ComponentData => ({
     ...currentData,
     cards: (currentData.cards || []).map((card, i) => {
@@ -390,7 +390,7 @@ export const contactCardsFunctions = {
   removeLinkFromCard: (
     currentData: ComponentData,
     cardIndex: number,
-    linkIndex: number
+    linkIndex: number,
   ): ComponentData => ({
     ...currentData,
     cards: (currentData.cards || []).map((card, i) => {
@@ -400,7 +400,7 @@ export const contactCardsFunctions = {
           content: {
             ...card.content,
             links: (card.content?.links || []).filter(
-              (_, li) => li !== linkIndex
+              (_, li) => li !== linkIndex,
             ),
           },
         };
@@ -413,11 +413,11 @@ export const contactCardsFunctions = {
   updateCardIcon: (
     currentData: ComponentData,
     cardIndex: number,
-    icon: any
+    icon: any,
   ): ComponentData => ({
     ...currentData,
     cards: (currentData.cards || []).map((card, i) =>
-      i === cardIndex ? { ...card, icon: { ...card.icon, ...icon } } : card
+      i === cardIndex ? { ...card, icon: { ...card.icon, ...icon } } : card,
     ),
   }),
 
@@ -425,11 +425,11 @@ export const contactCardsFunctions = {
   updateCardTitle: (
     currentData: ComponentData,
     cardIndex: number,
-    title: any
+    title: any,
   ): ComponentData => ({
     ...currentData,
     cards: (currentData.cards || []).map((card, i) =>
-      i === cardIndex ? { ...card, title: { ...card.title, ...title } } : card
+      i === cardIndex ? { ...card, title: { ...card.title, ...title } } : card,
     ),
   }),
 
@@ -437,13 +437,13 @@ export const contactCardsFunctions = {
   updateCardContent: (
     currentData: ComponentData,
     cardIndex: number,
-    content: any
+    content: any,
   ): ComponentData => ({
     ...currentData,
     cards: (currentData.cards || []).map((card, i) =>
       i === cardIndex
         ? { ...card, content: { ...card.content, ...content } }
-        : card
+        : card,
     ),
   }),
 
@@ -451,13 +451,13 @@ export const contactCardsFunctions = {
   updateCardStyle: (
     currentData: ComponentData,
     cardIndex: number,
-    style: any
+    style: any,
   ): ComponentData => ({
     ...currentData,
     cards: (currentData.cards || []).map((card, i) =>
       i === cardIndex
         ? { ...card, cardStyle: { ...card.cardStyle, ...style } }
-        : card
+        : card,
     ),
   }),
 
@@ -473,7 +473,7 @@ export const contactCardsFunctions = {
   // Update animations
   updateAnimations: (
     currentData: ComponentData,
-    animations: any
+    animations: any,
   ): ComponentData => ({
     ...currentData,
     animations: {
@@ -485,7 +485,7 @@ export const contactCardsFunctions = {
   // Update responsive settings
   updateResponsive: (
     currentData: ComponentData,
-    responsive: any
+    responsive: any,
   ): ComponentData => ({
     ...currentData,
     responsive: {
@@ -518,12 +518,12 @@ export const contactCardsFunctions = {
           (!card.content.links || card.content.links.length === 0)
         ) {
           errors.push(
-            `Card ${index + 1} with links type must have at least one link`
+            `Card ${index + 1} with links type must have at least one link`,
           );
         }
         if (card.content?.type === "text" && !card.content.text) {
           errors.push(
-            `Card ${index + 1} with text type must have text content`
+            `Card ${index + 1} with text type must have text content`,
           );
         }
       });
@@ -549,7 +549,7 @@ export const contactCardsFunctions = {
   reorderCards: (
     currentData: ComponentData,
     fromIndex: number,
-    toIndex: number
+    toIndex: number,
   ): ComponentData => {
     const cards = [...(currentData.cards || [])];
     const [movedCard] = cards.splice(fromIndex, 1);

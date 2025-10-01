@@ -7,7 +7,7 @@ const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
 >(({ className, value, ...props }, ref) => {
-  const [dir, setDir] = React.useState('ltr');
+  const [dir, setDir] = React.useState("ltr");
   const progressRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -16,13 +16,14 @@ const Progress = React.forwardRef<
     }
   }, []);
 
-  const translateValue = dir === 'rtl' ? (100 - (value ?? 0)) : -(100 - (value ?? 0));
+  const translateValue =
+    dir === "rtl" ? 100 - (value ?? 0) : -(100 - (value ?? 0));
 
   return (
     <ProgressPrimitive.Root
       ref={(el) => {
         progressRef.current = el;
-        if (typeof ref === 'function') ref(el);
+        if (typeof ref === "function") ref(el);
         else if (ref) ref.current = el;
       }}
       className={cn(

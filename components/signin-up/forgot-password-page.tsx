@@ -4,7 +4,21 @@ import type React from "react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, Mail, Phone, ArrowRight, ArrowLeft, Copy, Check, Eye, EyeOff, ExternalLink, Shield, Lock, Key } from "lucide-react";
+import {
+  AlertCircle,
+  Mail,
+  Phone,
+  ArrowRight,
+  ArrowLeft,
+  Copy,
+  Check,
+  Eye,
+  EyeOff,
+  ExternalLink,
+  Shield,
+  Lock,
+  Key,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +33,7 @@ import { countries } from "./countries";
 export function ForgotPasswordPage() {
   const router = useRouter();
   const { executeRecaptcha } = useGoogleReCaptcha();
-  
+
   // Zustand store
   const {
     userIdentifier,
@@ -121,10 +135,10 @@ export function ForgotPasswordPage() {
   const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setIdentifier(value);
-    
+
     // Simple validation for email only
     const trimmedValue = value.trim();
-    
+
     if (!trimmedValue) {
       setValidationMessage("");
       setPhoneNumber("");
@@ -142,21 +156,24 @@ export function ForgotPasswordPage() {
     }
 
     // If not email, check if it's a phone number with country code
-    const cleanPhone = trimmedValue.replace(/[\s-()]/g, '');
+    const cleanPhone = trimmedValue.replace(/[\s-()]/g, "");
     const hasOnlyDigitsAndPlus = /^\+?[0-9]+$/.test(cleanPhone);
-    const digitCount = cleanPhone.replace(/^\+/, '').length;
+    const digitCount = cleanPhone.replace(/^\+/, "").length;
     const isValidLength = digitCount >= 7 && digitCount <= 15;
-    const hasValidFormat = !cleanPhone.startsWith('+0') && !cleanPhone.startsWith('00');
-    
+    const hasValidFormat =
+      !cleanPhone.startsWith("+0") && !cleanPhone.startsWith("00");
+
     if (hasOnlyDigitsAndPlus && isValidLength && hasValidFormat) {
       // Check if phone number starts with country code
-      const foundCountry = countries.find(country => 
-        cleanPhone.startsWith(country.dialCode)
+      const foundCountry = countries.find((country) =>
+        cleanPhone.startsWith(country.dialCode),
       );
-      
+
       if (foundCountry) {
         // Phone number contains country code - show error
-        setValidationMessage("❌ يرجى إزالة كود الدولة واختيارها من القائمة المنسدلة");
+        setValidationMessage(
+          "❌ يرجى إزالة كود الدولة واختيارها من القائمة المنسدلة",
+        );
         setMethod("phone");
         setPhoneNumber("");
         return;
@@ -170,15 +187,21 @@ export function ForgotPasswordPage() {
     }
 
     // Invalid input
-    if (trimmedValue.includes('@')) {
+    if (trimmedValue.includes("@")) {
       setValidationMessage("❌ البريد الإلكتروني غير صحيح");
     } else if (/[0-9]/.test(trimmedValue)) {
       if (digitCount < 7) {
-        setValidationMessage("❌ رقم الهاتف قصير جداً (يجب أن يكون 7 أرقام على الأقل)");
+        setValidationMessage(
+          "❌ رقم الهاتف قصير جداً (يجب أن يكون 7 أرقام على الأقل)",
+        );
       } else if (digitCount > 15) {
-        setValidationMessage("❌ رقم الهاتف طويل جداً (يجب أن يكون 15 رقم على الأكثر)");
-      } else if (cleanPhone.startsWith('+0') || cleanPhone.startsWith('00')) {
-        setValidationMessage("❌ رقم الهاتف غير صحيح (لا يمكن أن يبدأ بـ +0 أو 00)");
+        setValidationMessage(
+          "❌ رقم الهاتف طويل جداً (يجب أن يكون 15 رقم على الأكثر)",
+        );
+      } else if (cleanPhone.startsWith("+0") || cleanPhone.startsWith("00")) {
+        setValidationMessage(
+          "❌ رقم الهاتف غير صحيح (لا يمكن أن يبدأ بـ +0 أو 00)",
+        );
       } else {
         setValidationMessage("❌ رقم الهاتف غير صحيح");
       }
@@ -219,10 +242,11 @@ export function ForgotPasswordPage() {
     // Simple validation
     const trimmedValue = identifier.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
+
     const isValidEmail = emailRegex.test(trimmedValue);
-    const isValidPhone = method === "phone" && phoneNumber && phoneNumber.length >= 7;
-    
+    const isValidPhone =
+      method === "phone" && phoneNumber && phoneNumber.length >= 7;
+
     if (!isValidEmail && !isValidPhone) {
       toast.error("يرجى إدخال بريد إلكتروني أو رقم هاتف صحيح");
       return;
@@ -238,18 +262,19 @@ export function ForgotPasswordPage() {
       const recaptchaToken = await executeRecaptcha("forgot_password");
 
       // Prepare request body based on method
-      const requestBody = method === "phone" 
-        ? {
-            identifier: phoneNumber,
-            country_code: selectedCountry.dialCode,
-            method: method,
-            recaptcha_token: recaptchaToken,
-          }
-        : {
-            identifier: identifier.trim(),
-            method: method,
-            recaptcha_token: recaptchaToken,
-          };
+      const requestBody =
+        method === "phone"
+          ? {
+              identifier: phoneNumber,
+              country_code: selectedCountry.dialCode,
+              method: method,
+              recaptcha_token: recaptchaToken,
+            }
+          : {
+              identifier: identifier.trim(),
+              method: method,
+              recaptcha_token: recaptchaToken,
+            };
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_Backend_URL}/auth/forgot-password`,
@@ -259,13 +284,15 @@ export function ForgotPasswordPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestBody),
-        }
+        },
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "حدث خطأ أثناء إرسال رمز إعادة التعيين");
+        throw new Error(
+          data.message || "حدث خطأ أثناء إرسال رمز إعادة التعيين",
+        );
       }
 
       // حفظ البيانات في Zustand store
@@ -274,26 +301,32 @@ export function ForgotPasswordPage() {
       setResetAttempts(data.attempts_remaining);
       setCountdown(60);
       setResendCountdown(60); // إضافة countdown لإعادة الإرسال
-      
+
       if (data.attempts_remaining === 0) {
         setIsBlocked(true);
-        toast.error("تم تجاوز الحد الأقصى للمحاولات. يرجى التواصل مع فريق الدعم.");
+        toast.error(
+          "تم تجاوز الحد الأقصى للمحاولات. يرجى التواصل مع فريق الدعم.",
+        );
       } else {
-        toast.success(`تم إرسال رمز إعادة التعيين بنجاح (المحاولة ${data.attempts_used}/3)`);
+        toast.success(
+          `تم إرسال رمز إعادة التعيين بنجاح (المحاولة ${data.attempts_used}/3)`,
+        );
         setShowCodeForm(true);
-        
+
         // إنشاء رابط إعادة التعيين
         const resetUrl = `app.taearif.com/reset?code=${data.code_for_testing || data.code}`;
         setResetUrl(resetUrl);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الاتصال بالخادم";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "حدث خطأ أثناء الاتصال بالخادم";
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
-
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -340,7 +373,7 @@ export function ForgotPasswordPage() {
             new_password_confirmation: confirmPassword,
             recaptcha_token: recaptchaToken,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -349,7 +382,9 @@ export function ForgotPasswordPage() {
         if (data.message === "Invalid or expired code") {
           toast.error("الكود غير صحيح أو منتهي الصلاحية");
         } else {
-          throw new Error(data.message || "حدث خطأ أثناء إعادة تعيين كلمة المرور");
+          throw new Error(
+            data.message || "حدث خطأ أثناء إعادة تعيين كلمة المرور",
+          );
         }
         return;
       }
@@ -360,7 +395,10 @@ export function ForgotPasswordPage() {
         router.push("/login");
       }, 2000);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الاتصال بالخادم";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "حدث خطأ أثناء الاتصال بالخادم";
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -380,18 +418,19 @@ export function ForgotPasswordPage() {
       const recaptchaToken = await executeRecaptcha("forgot_password");
 
       // Prepare request body based on method
-      const requestBody = userMethod === "phone" 
-        ? {
-            identifier: phoneNumber,
-            country_code: selectedCountry.dialCode,
-            method: userMethod,
-            recaptcha_token: recaptchaToken,
-          }
-        : {
-            identifier: userIdentifier,
-            method: userMethod,
-            recaptcha_token: recaptchaToken,
-          };
+      const requestBody =
+        userMethod === "phone"
+          ? {
+              identifier: phoneNumber,
+              country_code: selectedCountry.dialCode,
+              method: userMethod,
+              recaptcha_token: recaptchaToken,
+            }
+          : {
+              identifier: userIdentifier,
+              method: userMethod,
+              recaptcha_token: recaptchaToken,
+            };
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_Backend_URL}/auth/forgot-password`,
@@ -401,26 +440,35 @@ export function ForgotPasswordPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestBody),
-        }
+        },
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "حدث خطأ أثناء إرسال رمز إعادة التعيين");
+        throw new Error(
+          data.message || "حدث خطأ أثناء إرسال رمز إعادة التعيين",
+        );
       }
 
       setResetAttempts(data.attempts_remaining);
       setResendCountdown(60);
-      
+
       if (data.attempts_remaining === 0) {
         setIsBlocked(true);
-        toast.error("تم تجاوز الحد الأقصى للمحاولات. يرجى التواصل مع فريق الدعم.");
+        toast.error(
+          "تم تجاوز الحد الأقصى للمحاولات. يرجى التواصل مع فريق الدعم.",
+        );
       } else {
-        toast.success(`تم إرسال رمز إعادة التعيين بنجاح (المحاولة ${data.attempts_used}/3)`);
+        toast.success(
+          `تم إرسال رمز إعادة التعيين بنجاح (المحاولة ${data.attempts_used}/3)`,
+        );
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الاتصال بالخادم";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "حدث خطأ أثناء الاتصال بالخادم";
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -439,7 +487,7 @@ export function ForgotPasswordPage() {
   };
 
   const openResetLink = () => {
-    window.open(`http://${resetUrl}`, '_blank');
+    window.open(`http://${resetUrl}`, "_blank");
   };
 
   const formatTime = (seconds: number) => {
@@ -451,7 +499,10 @@ export function ForgotPasswordPage() {
   // إذا كان المستخدم في مرحلة إدخال الكود وكلمة المرور
   if (showCodeForm) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4" dir="rtl">
+      <div
+        className="min-h-screen flex flex-col items-center justify-center bg-white p-4"
+        dir="rtl"
+      >
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
@@ -496,7 +547,9 @@ export function ForgotPasswordPage() {
                 {/* Identifier Display */}
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-black">
-                    {userMethod === "email" ? "البريد الإلكتروني" : "رقم الهاتف"}
+                    {userMethod === "email"
+                      ? "البريد الإلكتروني"
+                      : "رقم الهاتف"}
                   </Label>
                   <Input
                     value={userIdentifier}
@@ -507,7 +560,10 @@ export function ForgotPasswordPage() {
 
                 {/* Verification Code */}
                 <div className="space-y-2">
-                  <Label htmlFor="resetCode" className="text-sm font-medium text-black">
+                  <Label
+                    htmlFor="resetCode"
+                    className="text-sm font-medium text-black"
+                  >
                     رمز التحقق
                   </Label>
                   <div className="relative">
@@ -526,7 +582,7 @@ export function ForgotPasswordPage() {
                     />
                     <Key className="absolute inset-y-0 left-0 flex items-center pl-3 h-5 w-5 text-gray-400" />
                   </div>
-                  
+
                   {/* Resend Code Button with Countdown */}
                   <div className="flex justify-center mt-4">
                     {resendCountdown > 0 ? (
@@ -537,7 +593,7 @@ export function ForgotPasswordPage() {
                             <div className="w-8 h-8 border-4 border-gray-200 border-t-black rounded-full animate-spin"></div>
                             <div className="absolute inset-0 w-8 h-8 border-4 border-transparent border-t-gray-400 rounded-full animate-ping"></div>
                           </div>
-                          
+
                           {/* Text */}
                           <div className="flex flex-col items-center">
                             <span className="text-sm font-medium text-black">
@@ -547,18 +603,25 @@ export function ForgotPasswordPage() {
                               {/* Countdown Timer */}
                               <div className="relative">
                                 <div className="flex items-center justify-center w-12 h-12 bg-black text-white rounded-xl shadow-lg">
-                                  <span className="text-xl font-bold">{resendCountdown}</span>
+                                  <span className="text-xl font-bold">
+                                    {resendCountdown}
+                                  </span>
                                 </div>
                                 {/* Pulse Effect */}
                                 <div className="absolute inset-0 w-12 h-12 bg-gray-400 rounded-xl animate-ping opacity-30"></div>
                               </div>
-                              <span className="text-sm font-medium text-gray-600">ثانية</span>
+                              <span className="text-sm font-medium text-gray-600">
+                                ثانية
+                              </span>
                             </div>
                           </div>
-                          
+
                           {/* Progress Ring */}
                           <div className="relative w-8 h-8">
-                            <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 36 36">
+                            <svg
+                              className="w-8 h-8 transform -rotate-90"
+                              viewBox="0 0 36 36"
+                            >
                               <path
                                 className="text-gray-200"
                                 stroke="currentColor"
@@ -587,8 +650,18 @@ export function ForgotPasswordPage() {
                         className="group flex items-center gap-3 px-8 py-3 bg-white border border-gray-300 text-black hover:bg-gray-50 hover:border-gray-400 hover:shadow-lg transition-all duration-300 rounded-2xl shadow-md hover:scale-105"
                       >
                         <div className="relative">
-                          <svg className="w-5 h-5 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          <svg
+                            className="w-5 h-5 transition-transform duration-300 group-hover:rotate-180"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            />
                           </svg>
                           <div className="absolute inset-0 w-5 h-5 bg-gray-400 rounded-full animate-ping opacity-20"></div>
                         </div>
@@ -601,7 +674,10 @@ export function ForgotPasswordPage() {
 
                 {/* New Password */}
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword" className="text-sm font-medium text-black">
+                  <Label
+                    htmlFor="newPassword"
+                    className="text-sm font-medium text-black"
+                  >
                     كلمة المرور الجديدة
                   </Label>
                   <div className="relative">
@@ -640,8 +716,8 @@ export function ForgotPasswordPage() {
                                 ? passwordStrength <= 2
                                   ? "bg-red-500"
                                   : passwordStrength <= 3
-                                  ? "bg-yellow-500"
-                                  : "bg-green-500"
+                                    ? "bg-yellow-500"
+                                    : "bg-green-500"
                                 : "bg-gray-200"
                             }`}
                           />
@@ -658,7 +734,10 @@ export function ForgotPasswordPage() {
 
                 {/* Confirm Password */}
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium text-black">
+                  <Label
+                    htmlFor="confirmPassword"
+                    className="text-sm font-medium text-black"
+                  >
                     تأكيد كلمة المرور
                   </Label>
                   <div className="relative">
@@ -676,7 +755,9 @@ export function ForgotPasswordPage() {
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute inset-y-0 left-0 flex items-center pl-3"
                     >
                       {showConfirmPassword ? (
@@ -691,7 +772,12 @@ export function ForgotPasswordPage() {
                 <Button
                   type="submit"
                   className="w-full py-6 mt-2 bg-black hover:bg-gray-800 text-white"
-                  disabled={isLoading || !resetCode.trim() || !newPassword.trim() || !confirmPassword.trim()}
+                  disabled={
+                    isLoading ||
+                    !resetCode.trim() ||
+                    !newPassword.trim() ||
+                    !confirmPassword.trim()
+                  }
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
@@ -730,7 +816,10 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4" dir="rtl">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center bg-white p-4"
+      dir="rtl"
+    >
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
@@ -748,7 +837,11 @@ export function ForgotPasswordPage() {
         <Card className="border-0 shadow-2xl bg-white">
           <CardHeader className="text-center pb-4">
             <Link href="/login" className="absolute right-4 top-4">
-              <Button variant="ghost" size="sm" className="text-black hover:bg-gray-100">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-black hover:bg-gray-100"
+              >
                 <ArrowLeft className="h-4 w-4 ml-1" />
                 رجوع
               </Button>
@@ -775,7 +868,9 @@ export function ForgotPasswordPage() {
                   </p>
                 </div>
                 <Button
-                  onClick={() => window.location.href = "mailto:support@taearif.com"}
+                  onClick={() =>
+                    (window.location.href = "mailto:support@taearif.com")
+                  }
                   className="w-full bg-black hover:bg-gray-800 text-white"
                 >
                   التواصل مع الدعم
@@ -786,10 +881,13 @@ export function ForgotPasswordPage() {
                 <form onSubmit={handleSubmit} className="space-y-5" dir="ltr">
                   {/* Smart Input Field */}
                   <div className="space-y-2">
-                    <Label htmlFor="identifier" className="text-sm font-medium text-black">
+                    <Label
+                      htmlFor="identifier"
+                      className="text-sm font-medium text-black"
+                    >
                       البريد الإلكتروني أو رقم الهاتف
                     </Label>
-                    
+
                     {method === "phone" ? (
                       // Phone input with country selector
                       <div className="flex relative" ref={dropdownRef}>
@@ -805,31 +903,33 @@ export function ForgotPasswordPage() {
                             if (/^[\d]*$/.test(value)) {
                               setPhoneNumber(value);
                               setIdentifier(value);
-                              
+
                               // If phone number is empty, reset to email mode
                               if (value === "") {
                                 setMethod("email");
                                 setValidationMessage("");
                                 return;
                               }
-                              
+
                               // Validate phone number
                               if (value.length >= 7 && value.length <= 15) {
                                 setValidationMessage("✓ رقم هاتف صحيح");
                               } else if (value.length > 0) {
-                                setValidationMessage("❌ رقم الهاتف يجب أن يكون بين 7-15 رقم");
+                                setValidationMessage(
+                                  "❌ رقم الهاتف يجب أن يكون بين 7-15 رقم",
+                                );
                               } else {
                                 setValidationMessage("");
                               }
                             }
                           }}
-                           className={`flex-1 py-5 text-left rounded-r-none border-r-0 focus:ring-0 focus:border-gray-300 focus:outline-none ${
-                             validationMessage.includes('✓') 
-                               ? 'border-green-500 bg-green-50' 
-                               : validationMessage.includes('❌') 
-                               ? 'border-red-500 bg-red-50' 
-                               : ''
-                           }`}
+                          className={`flex-1 py-5 text-left rounded-r-none border-r-0 focus:ring-0 focus:border-gray-300 focus:outline-none ${
+                            validationMessage.includes("✓")
+                              ? "border-green-500 bg-green-50"
+                              : validationMessage.includes("❌")
+                                ? "border-red-500 bg-red-50"
+                                : ""
+                          }`}
                           autoComplete="off"
                           autoCorrect="off"
                           autoCapitalize="off"
@@ -860,7 +960,9 @@ export function ForgotPasswordPage() {
                                 <span className="text-sm text-gray-600 min-w-[45px]">
                                   {country.dialCode}
                                 </span>
-                                <span className="text-sm flex-1">{country.name}</span>
+                                <span className="text-sm flex-1">
+                                  {country.name}
+                                </span>
                               </button>
                             ))}
                           </div>
@@ -875,13 +977,13 @@ export function ForgotPasswordPage() {
                           placeholder="example@gmail.com"
                           value={identifier}
                           onChange={handleIdentifierChange}
-                           className={`py-5 text-left focus:ring-0 focus:border-gray-300 focus:outline-none ${
-                             validationMessage.includes('✓') 
-                               ? 'border-green-500 bg-green-50' 
-                               : validationMessage.includes('❌') 
-                               ? 'border-red-500 bg-red-50' 
-                               : ''
-                           }`}
+                          className={`py-5 text-left focus:ring-0 focus:border-gray-300 focus:outline-none ${
+                            validationMessage.includes("✓")
+                              ? "border-green-500 bg-green-50"
+                              : validationMessage.includes("❌")
+                                ? "border-red-500 bg-red-50"
+                                : ""
+                          }`}
                           dir="ltr"
                           autoComplete="off"
                           autoCorrect="off"
@@ -890,49 +992,64 @@ export function ForgotPasswordPage() {
                         />
                       </div>
                     )}
-                    
+
                     {/* Validation Message */}
                     {validationMessage && (
-                      <div className={`text-sm ${
-                        validationMessage.includes('✓') 
-                          ? 'text-green-600' 
-                          : 'text-red-600'
-                      }`}
-                      dir="ltr"
+                      <div
+                        className={`text-sm ${
+                          validationMessage.includes("✓")
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                        dir="ltr"
                       >
                         {validationMessage}
                       </div>
                     )}
-                    
+
                     {/* Phone Warning Message */}
                     {method === "phone" && (
                       <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
                         <div className="flex items-start gap-2">
                           <div className="flex-shrink-0">
-                            <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            <svg
+                              className="w-5 h-5 text-yellow-600 mt-0.5"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           </div>
                           <div className="text-sm text-yellow-800">
                             <p className="font-medium">تنبيه مهم:</p>
-                            <p>يرجى كتابة رقم الهاتف فقط بدون كود الدولة (+966، +971، إلخ)</p>
-                            <p className="text-xs mt-1 text-yellow-700">سيتم إضافة كود الدولة تلقائياً من القائمة المنسدلة</p>
+                            <p>
+                              يرجى كتابة رقم الهاتف فقط بدون كود الدولة (+966،
+                              +971، إلخ)
+                            </p>
+                            <p className="text-xs mt-1 text-yellow-700">
+                              سيتم إضافة كود الدولة تلقائياً من القائمة المنسدلة
+                            </p>
                           </div>
                         </div>
                       </div>
                     )}
-                    
+
                     {/* Input Type Indicator */}
                     {(identifier || phoneNumber) && (
                       <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <div className={`w-2 h-2 rounded-full ${
-                          method === "email" ? "bg-blue-500" : "bg-green-500"
-                        }`}></div>
+                        <div
+                          className={`w-2 h-2 rounded-full ${
+                            method === "email" ? "bg-blue-500" : "bg-green-500"
+                          }`}
+                        ></div>
                         <span>
-                          {method === "email" 
-                            ? "سيتم الإرسال عبر البريد الإلكتروني" 
-                            : `سيتم الإرسال عبر الرسائل النصية إلى ${selectedCountry.dialCode}${phoneNumber}`
-                          }
+                          {method === "email"
+                            ? "سيتم الإرسال عبر البريد الإلكتروني"
+                            : `سيتم الإرسال عبر الرسائل النصية إلى ${selectedCountry.dialCode}${phoneNumber}`}
                         </span>
                       </div>
                     )}
@@ -947,14 +1064,21 @@ export function ForgotPasswordPage() {
                   {countdown > 0 && (
                     <div className="p-3 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-md text-sm text-center">
                       <p>يرجى الانتظار قبل إعادة المحاولة</p>
-                      <p className="font-mono text-lg font-bold">{formatTime(countdown)}</p>
+                      <p className="font-mono text-lg font-bold">
+                        {formatTime(countdown)}
+                      </p>
                     </div>
                   )}
 
                   <Button
                     type="submit"
                     className="w-full py-6 mt-2 bg-black hover:bg-gray-800 text-white"
-                    disabled={isLoading || countdown > 0 || (!identifier.trim() && !phoneNumber) || !validationMessage.includes('✓')}
+                    disabled={
+                      isLoading ||
+                      countdown > 0 ||
+                      (!identifier.trim() && !phoneNumber) ||
+                      !validationMessage.includes("✓")
+                    }
                   >
                     {isLoading ? (
                       <div className="flex items-center justify-center">
@@ -986,7 +1110,6 @@ export function ForgotPasswordPage() {
                   </Button>
                 </form>
 
-
                 <div className="text-center mt-6">
                   <p className="text-sm text-gray-600">
                     تذكر كلمة المرور؟{" "}
@@ -1005,4 +1128,4 @@ export function ForgotPasswordPage() {
       </div>
     </div>
   );
-} 
+}

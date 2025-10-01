@@ -8,18 +8,21 @@ import { getPageDefinition } from "./pageDefinitionService";
 export const createInitialComponents = (
   pageSlug: string,
 ): ComponentInstance[] => {
-  console.log("🔧 createInitialComponents - Creating components for page:", pageSlug);
+  console.log(
+    "🔧 createInitialComponents - Creating components for page:",
+    pageSlug,
+  );
   const pageDefinition = getPageDefinition(pageSlug);
   console.log("🔧 createInitialComponents - Page definition:", pageDefinition);
-  
+
   if (pageDefinition) {
     const components = pageDefinition.map((definition, index) => {
       console.log("🔧 createInitialComponents - Processing component:", {
         type: definition.type,
         componentName: definition.componentName,
-        name: definition.name
+        name: definition.name,
       });
-      
+
       // استخدام componentName من البيانات الافتراضية بدلاً من إنشاء اسم افتراضي
       return {
         id: uuidv4(),
@@ -35,12 +38,15 @@ export const createInitialComponents = (
         },
       } as ComponentInstance;
     });
-    
+
     console.log("🔧 createInitialComponents - Created components:", components);
     return components;
   }
 
-  console.log("🔧 createInitialComponents - No page definition found for:", pageSlug);
+  console.log(
+    "🔧 createInitialComponents - No page definition found for:",
+    pageSlug,
+  );
   // إذا لم تكن الصفحة معرفة، إرجاع مصفوفة فارغة
   return [];
 };
@@ -134,11 +140,11 @@ export const createCustomPageComponents = (
     // استخدام PAGE_DEFINITIONS للبحث عن componentName الصحيح
     const pageData = (PAGE_DEFINITIONS as any)[pageSlug];
     let defaultName = `${type}1`; // افتراضي
-    
+
     if (pageData) {
       // البحث عن المكون في البيانات الافتراضية
-      const componentEntry = Object.entries(pageData).find(([id, comp]: [string, any]) => 
-        comp.type === type
+      const componentEntry = Object.entries(pageData).find(
+        ([id, comp]: [string, any]) => comp.type === type,
       );
       if (componentEntry) {
         defaultName = componentEntry[1].componentName;
@@ -172,17 +178,17 @@ export const createComponentWithCustomData = (
     span?: number;
   },
 ): ComponentInstance => {
-      return {
-      id: uuidv4(),
-      type,
-      name: type.charAt(0).toUpperCase() + type.slice(1),
-      componentName,
-      data: { ...createDefaultData(type), ...customData },
-      position: layout?.row ?? 0, // إضافة خاصية position
-      layout: {
-        row: layout?.row ?? 0,
-        col: layout?.col ?? 0,
-        span: layout?.span ?? 2,
-      },
-    } as ComponentInstance;
+  return {
+    id: uuidv4(),
+    type,
+    name: type.charAt(0).toUpperCase() + type.slice(1),
+    componentName,
+    data: { ...createDefaultData(type), ...customData },
+    position: layout?.row ?? 0, // إضافة خاصية position
+    layout: {
+      row: layout?.row ?? 0,
+      col: layout?.col ?? 0,
+      span: layout?.span ?? 2,
+    },
+  } as ComponentInstance;
 };

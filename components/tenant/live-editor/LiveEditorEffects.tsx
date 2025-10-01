@@ -57,9 +57,10 @@ export function useLiveEditorEffects(state: any) {
     if (!initialized && !authLoading && !tenantLoading && tenantData) {
       // Only load data into editorStore if not already loaded
       const editorStore = useEditorStore.getState();
-      const hasGlobalComponentsData = editorStore.globalComponentsData && 
+      const hasGlobalComponentsData =
+        editorStore.globalComponentsData &&
         Object.keys(editorStore.globalComponentsData).length > 0;
-      
+
       if (!hasGlobalComponentsData) {
         // Load data into editorStore
         editorStore.loadFromDatabase(tenantData);
@@ -81,9 +82,12 @@ export function useLiveEditorEffects(state: any) {
                 const componentName = comp.componentName.replace(/^\d+$/, ""); // إزالة الأرقام من البداية
                 if (componentName.startsWith("header")) correctType = "header";
                 else if (componentName.startsWith("hero")) correctType = "hero";
-                else if (componentName.startsWith("halfTextHalfImage")) correctType = "halfTextHalfImage";
-                else if (componentName.startsWith("propertySlider")) correctType = "propertySlider";
-                else if (componentName.startsWith("ctaValuation")) correctType = "ctaValuation";
+                else if (componentName.startsWith("halfTextHalfImage"))
+                  correctType = "halfTextHalfImage";
+                else if (componentName.startsWith("propertySlider"))
+                  correctType = "propertySlider";
+                else if (componentName.startsWith("ctaValuation"))
+                  correctType = "ctaValuation";
               }
 
               // إذا لم نتمكن من استخراج النوع من componentName، جرب من id
@@ -94,19 +98,20 @@ export function useLiveEditorEffects(state: any) {
                   if (idType === "header") correctType = "header";
                   else if (idType === "hero") correctType = "hero";
                   else if (idType === "half") correctType = "halfTextHalfImage";
-                  else if (idType === "property") correctType = "propertySlider";
+                  else if (idType === "property")
+                    correctType = "propertySlider";
                   else if (idType === "cta") correctType = "ctaValuation";
                   else if (idType === "22821795") {
                     // هذا يبدو أنه UUID، نحتاج إلى تحديد النوع بناءً على position والصفحة
                     const position = comp.position || 0;
 
                     // تحديد النوع بناءً على الصفحة والموقع
-                      if (position === 0) correctType = "header";
-                      else if (position === 1) correctType = "hero";
-                      else if (position === 2) correctType = "halfTextHalfImage";
-                      else if (position === 3) correctType = "propertySlider";
-                      else if (position === 4) correctType = "ctaValuation";
-                      else correctType = "header";
+                    if (position === 0) correctType = "header";
+                    else if (position === 1) correctType = "hero";
+                    else if (position === 2) correctType = "halfTextHalfImage";
+                    else if (position === 3) correctType = "propertySlider";
+                    else if (position === 4) correctType = "ctaValuation";
+                    else correctType = "header";
                   }
                 }
               }
@@ -132,7 +137,7 @@ export function useLiveEditorEffects(state: any) {
                 // إذا كان componentName undefined أو "undefined"، أنشئ واحد جديد
                 if (!comp.componentName || comp.componentName === "undefined") {
                   if (correctType && correctType !== "unknown") {
-                      return `${correctType}1`;
+                    return `${correctType}1`;
                   } else {
                     // إذا لم نتمكن من تحديد النوع، استخدم "unknown1"
                     return "unknown1";
@@ -180,7 +185,9 @@ export function useLiveEditorEffects(state: any) {
         setPageComponents(dbComponents as ComponentInstance[]);
       } else {
         // استيراد createInitialComponents من الخدمة
-        const { createInitialComponents } = require("@/services-liveeditor/live-editor");
+        const {
+          createInitialComponents,
+        } = require("@/services-liveeditor/live-editor");
         setPageComponents(createInitialComponents(slug));
       }
 
@@ -265,10 +272,10 @@ export function useLiveEditorEffects(state: any) {
       // Force update the store with current pageComponents state
       useEditorStore.getState().forceUpdatePageComponents(slug, pageComponents);
     };
-    
+
     // Set the save function in the store
     useEditorStore.getState().setOpenSaveDialog(saveFn);
-    
+
     // Cleanup: reset to empty function when component unmounts or slug changes
     return () => {
       useEditorStore.getState().setOpenSaveDialog(() => {});

@@ -10,7 +10,9 @@ interface SignInPageWrapperProps {
   tenantId: string | null;
 }
 
-export default function SignInPageWrapper({ tenantId }: SignInPageWrapperProps) {
+export default function SignInPageWrapper({
+  tenantId,
+}: SignInPageWrapperProps) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);

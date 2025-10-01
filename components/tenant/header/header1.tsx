@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
-;
 import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
@@ -230,41 +229,43 @@ const Header1 = (props: HeaderProps = {}) => {
   // Initialize variant id early so hooks can depend on it
   const variantId = props.variant || "header1";
   const uniqueId = props.id || variantId;
-  
+
   // Force re-render state
   const [forceUpdate, setForceUpdate] = useState(0);
-  
+
   // Check if this is a global header
-  const isGlobalHeader = variantId === "global-header" || uniqueId === "global-header";
+  const isGlobalHeader =
+    variantId === "global-header" || uniqueId === "global-header";
 
   // Debug: Log component render
-  console.log('🎯 Header1 Component Rendered:', {
+  console.log("🎯 Header1 Component Rendered:", {
     variantId,
     uniqueId,
     isGlobalHeader,
-    forceUpdate
+    forceUpdate,
   });
-  
+
   // Subscribe to editor store updates for this header variant
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
   const getComponentData = useEditorStore((s) => s.getComponentData);
 
   // Subscribe to global components data with explicit selector
   const globalHeaderData = useEditorStore(
-    useCallback((state) => state.globalHeaderData, [])
+    useCallback((state) => state.globalHeaderData, []),
   );
-  
+
   // Debug: Log globalHeaderData changes
-  useEffect(() => {
-  }, [globalHeaderData, isGlobalHeader, uniqueId]);
-  
+  useEffect(() => {}, [globalHeaderData, isGlobalHeader, uniqueId]);
+
   // Subscribe to header states for real-time updates
   const headerStates = useEditorStore((s) => s.headerStates);
   const currentStoreData = headerStates[uniqueId] || {};
 
   useEffect(() => {
     if (props.useStore) {
-      ensureComponentVariant('header', uniqueId, props);
+      ensureComponentVariant("header", uniqueId, props);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant]);
 
@@ -281,25 +282,34 @@ const Header1 = (props: HeaderProps = {}) => {
   }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore ? (getComponentData('header', uniqueId) || {}) : {};
-  
+  const storeData = props.useStore
+    ? getComponentData("header", uniqueId) || {}
+    : {};
+
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
       return {};
     }
     // Search through all pages for this component variant
-    for (const [pageSlug, pageComponents] of Object.entries(tenantData.componentSettings)) {
-      
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
       // Check if pageComponents is an object (not array)
-      if (typeof pageComponents === 'object' && !Array.isArray(pageComponents)) {
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
         // Search through all components in this page
-        for (const [componentId, component] of Object.entries(pageComponents as any)) {
-          
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
           // Check if this is the exact component we're looking for by ID
-          if ((component as any).type === 'header' && 
-              (component as any).componentName === variantId &&
-              componentId === uniqueId) {
+          if (
+            (component as any).type === "header" &&
+            (component as any).componentName === variantId &&
+            componentId === uniqueId
+          ) {
             return (component as any).data;
           }
         }
@@ -307,13 +317,13 @@ const Header1 = (props: HeaderProps = {}) => {
     }
     return {};
   };
-  
+
   const tenantComponentData = getTenantComponentData();
-  
+
   // Get default data once
   const defaultData = useMemo(() => getDefaultHeaderDataFromFunctions(), []);
-  
-  // Merge data with priority: 
+
+  // Merge data with priority:
   // For global header: globalHeaderData > currentStoreData > default
   // For regular header: currentStoreData > storeData > tenantComponentData > props > default
   const mergedData = useMemo(() => {
@@ -321,31 +331,39 @@ const Header1 = (props: HeaderProps = {}) => {
       // For global headers, prioritize globalHeaderData over everything else
       const result = {
         ...defaultData,
-        ...currentStoreData,  // Apply currentStoreData first
-        ...globalHeaderData   // Then globalHeaderData overrides everything
+        ...currentStoreData, // Apply currentStoreData first
+        ...globalHeaderData, // Then globalHeaderData overrides everything
       };
       return result;
     } else {
       return {
-        ...defaultData, 
-        ...props, 
+        ...defaultData,
+        ...props,
         ...tenantComponentData,
         ...storeData,
-        ...currentStoreData
+        ...currentStoreData,
       };
     }
-  }, [isGlobalHeader, defaultData, globalHeaderData, currentStoreData, props, tenantComponentData, storeData]);
+  }, [
+    isGlobalHeader,
+    defaultData,
+    globalHeaderData,
+    currentStoreData,
+    props,
+    tenantComponentData,
+    storeData,
+  ]);
 
   // Force re-render when globalHeaderData changes
   useEffect(() => {
     if (globalHeaderData) {
-      setForceUpdate(prev => prev + 1);
+      setForceUpdate((prev) => prev + 1);
     }
   }, [globalHeaderData]);
 
   // Debug logging for global header changes
   useEffect(() => {
-    logChange(uniqueId, 'header1', 'header', mergedData, 'GLOBAL_HEADER');
+    logChange(uniqueId, "header1", "header", mergedData, "GLOBAL_HEADER");
   }, [uniqueId, mergedData, forceUpdate]);
 
   // Force re-render when globalHeaderData changes
@@ -354,7 +372,6 @@ const Header1 = (props: HeaderProps = {}) => {
       // This will trigger a re-render when globalHeaderData changes
     }
   }, [globalHeaderData, mergedData, forceUpdate]);
-
 
   const { user, loading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -367,43 +384,55 @@ const Header1 = (props: HeaderProps = {}) => {
   }, [pathname]);
 
   // Generate nav links from merged data
-  const navLinks = useMemo(() =>
-    mergedData.menu?.map((item: any) => ({
-      name: item.text || item.id || "Link",
-      href: item.url?.startsWith("http")
-        ? item.url
-        : tenantId
-          ? `${item.url}`
-          : item.url || "/",
-      type: item.type,
-      id: item.id,
-    })) || [], [mergedData.menu, tenantId]);
+  const navLinks = useMemo(
+    () =>
+      mergedData.menu?.map((item: any) => ({
+        name: item.text || item.id || "Link",
+        href: item.url?.startsWith("http")
+          ? item.url
+          : tenantId
+            ? `${item.url}`
+            : item.url || "/",
+        type: item.type,
+        id: item.id,
+      })) || [],
+    [mergedData.menu, tenantId],
+  );
 
   // Generate dynamic styles
-  const headerStyles = useMemo(() => ({
-    position: mergedData.position?.type || "sticky",
-    top: `${mergedData.position?.top || 0}px`,
-    zIndex: mergedData.position?.zIndex || 50,
-    background:
-      mergedData.background?.type === "gradient"
-        ? `linear-gradient(90deg, ${mergedData.background?.colors?.from || "#ffffff"} 0%, ${mergedData.background?.colors?.to || "#ffffff"} 100%)`
-        : mergedData.background?.colors?.from || mergedData.styling?.bgColor || "#ffffff",
-    opacity: mergedData.background?.opacity || "0.8",
-    backdropFilter: mergedData.background?.blur ? "blur(8px)" : undefined,
-    height: `${mergedData.height?.desktop || 96}px`,
-    borderBottom: `1px solid ${mergedData.colors?.border || "#e5e7eb"}`,
-  }), [mergedData]);
+  const headerStyles = useMemo(
+    () => ({
+      position: mergedData.position?.type || "sticky",
+      top: `${mergedData.position?.top || 0}px`,
+      zIndex: mergedData.position?.zIndex || 50,
+      background:
+        mergedData.background?.type === "gradient"
+          ? `linear-gradient(90deg, ${mergedData.background?.colors?.from || "#ffffff"} 0%, ${mergedData.background?.colors?.to || "#ffffff"} 100%)`
+          : mergedData.background?.colors?.from ||
+            mergedData.styling?.bgColor ||
+            "#ffffff",
+      opacity: mergedData.background?.opacity || "0.8",
+      backdropFilter: mergedData.background?.blur ? "blur(8px)" : undefined,
+      height: `${mergedData.height?.desktop || 96}px`,
+      borderBottom: `1px solid ${mergedData.colors?.border || "#e5e7eb"}`,
+    }),
+    [mergedData],
+  );
 
   // Debug: Log header styles when they change
-  console.log('🎨 Header Styles:', headerStyles);
-  console.log('🎨 Background Color:', headerStyles.background);
+  console.log("🎨 Header Styles:", headerStyles);
+  console.log("🎨 Background Color:", headerStyles.background);
 
-  const logoStyles = useMemo(() => ({
-    fontFamily: mergedData.logo?.font?.family || "Inter",
-    fontWeight: mergedData.logo?.font?.weight || "600",
-    fontSize: `${mergedData.logo?.font?.size || 24}px`,
-    color: mergedData.colors?.text || mergedData.styling?.textColor || "#1f2937",
-  }), [mergedData]);
+  const logoStyles = useMemo(
+    () => ({
+      fontFamily: mergedData.logo?.font?.family || "Inter",
+      fontWeight: mergedData.logo?.font?.weight || "600",
+      fontSize: `${mergedData.logo?.font?.size || 24}px`,
+      color:
+        mergedData.colors?.text || mergedData.styling?.textColor || "#1f2937",
+    }),
+    [mergedData],
+  );
 
   // Don't render if not visible
   if (!mergedData.visible) {
@@ -421,71 +450,88 @@ const Header1 = (props: HeaderProps = {}) => {
       >
         <div className="mx-auto flex h-full max-w-[1600px] items-center gap-4 px-4">
           {/* Logo */}
-          <Link 
-            href={
-              mergedData.logo?.url || 
-              "/"
-            }
+          <Link
+            href={mergedData.logo?.url || "/"}
             className="flex items-center gap-2"
-            style={{ color: mergedData.colors?.text || mergedData.styling?.textColor || "#1f2937" }}
+            style={{
+              color:
+                mergedData.colors?.text ||
+                mergedData.styling?.textColor ||
+                "#1f2937",
+            }}
           >
             {mergedData.logo?.type !== "text" && mergedData.logo?.image && (
               <img
                 src={mergedData.logo.image}
                 alt={mergedData.logo?.text || "Logo"}
                 className="h-full max-h-16 w-auto object-contain"
-                style={{ 
+                style={{
                   maxHeight: "4rem", // 64px
                   height: "100%",
-                  width: "auto"
+                  width: "auto",
                 }}
               />
             )}
-            {(mergedData.logo?.type === "text" || mergedData.logo?.type === "image+text") && (
+            {(mergedData.logo?.type === "text" ||
+              mergedData.logo?.type === "image+text") && (
               <span style={logoStyles}>
-                {mergedData.logo?.text || tenantData?.websiteName || "مكتب دليل الجواء"}
+                {mergedData.logo?.text ||
+                  tenantData?.websiteName ||
+                  "مكتب دليل الجواء"}
               </span>
             )}
-        </Link>
+          </Link>
 
           {/* Desktop Navigation */}
-        <nav className="mx-auto hidden items-center gap-6 md:flex">
+          <nav className="mx-auto hidden items-center gap-6 md:flex">
             {navLinks.map((link: any, i: number) => (
-            <Link
+              <Link
                 key={link.href}
                 href={link.href}
                 aria-current={pathname === link.href ? "page" : undefined}
-              className={cn(
-                "relative pb-2 text-xl font-medium transition-colors",
-                  pathname === link.href 
-                    ? "text-emerald-700" 
-                    : "text-muted-foreground hover:text-foreground"
+                className={cn(
+                  "relative pb-2 text-xl font-medium transition-colors",
+                  pathname === link.href
+                    ? "text-emerald-700"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
                 style={{
-                  color: pathname === link.href
-                    ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
-                    : mergedData.colors?.link || mergedData.styling?.textColor || "#374151",
+                  color:
+                    pathname === link.href
+                      ? mergedData.colors?.linkActive ||
+                        mergedData.styling?.textColor ||
+                        "#059669"
+                      : mergedData.colors?.link ||
+                        mergedData.styling?.textColor ||
+                        "#374151",
                 }}
               >
                 {link.name}
                 {pathname === link.href && (
-                  <span 
+                  <span
                     className="pointer-events-none absolute inset-x-0 -bottom-[6px] mx-auto block h-[2px] w-8 rounded-full"
-                    style={{ backgroundColor: mergedData.colors?.accent || "#059669" }}
+                    style={{
+                      backgroundColor: mergedData.colors?.accent || "#059669",
+                    }}
                   />
-              )}
-            </Link>
-          ))}
-        </nav>
+                )}
+              </Link>
+            ))}
+          </nav>
 
           {/* Actions */}
-        <div className="ms-auto flex items-center gap-2">
+          <div className="ms-auto flex items-center gap-2">
             {/* User Profile */}
             {mergedData.actions?.user?.showProfile && (
               <Link
                 href="/account"
                 className="p-1.5 md:p-2 transition-colors hover:opacity-80"
-                style={{ color: mergedData.colors?.icon || mergedData.styling?.textColor || "#374151" }}
+                style={{
+                  color:
+                    mergedData.colors?.icon ||
+                    mergedData.styling?.textColor ||
+                    "#374151",
+                }}
               >
                 <svg
                   className="size-5"
@@ -508,7 +554,12 @@ const Header1 = (props: HeaderProps = {}) => {
               <Link
                 href="/cart"
                 className="p-1.5 md:p-2 transition-colors hover:opacity-80 relative"
-                style={{ color: mergedData.colors?.icon || mergedData.styling?.textColor || "#374151" }}
+                style={{
+                  color:
+                    mergedData.colors?.icon ||
+                    mergedData.styling?.textColor ||
+                    "#374151",
+                }}
               >
                 <svg
                   className="size-5"
@@ -532,71 +583,101 @@ const Header1 = (props: HeaderProps = {}) => {
             )}
 
             {/* Mobile Menu Button */}
-          <Sheet>
-            <SheetTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
                   className="md:hidden bg-transparent"
-                  style={{ 
-                    borderColor: mergedData.colors?.border || mergedData.styling?.borderColor || "#e5e7eb",
-                    color: mergedData.colors?.icon || mergedData.styling?.textColor || "#374151"
+                  style={{
+                    borderColor:
+                      mergedData.colors?.border ||
+                      mergedData.styling?.borderColor ||
+                      "#e5e7eb",
+                    color:
+                      mergedData.colors?.icon ||
+                      mergedData.styling?.textColor ||
+                      "#374151",
                   }}
                 >
-                <Menu className="size-5" />
-                <span className="sr-only">فتح القائمة</span>
-              </Button>
-            </SheetTrigger>
-                             <SheetContent 
-                 side={(mergedData.responsive?.mobileMenu?.side as "left" | "right") || "right"} 
-                 className="w-80" 
-                 aria-describedby={undefined}
-                 style={{ 
-                   width: `${mergedData.responsive?.mobileMenu?.width || 320}px`,
-                   backgroundColor: mergedData.background?.colors?.from || mergedData.styling?.bgColor || "#ffffff"
-                 }}
-               >
-              <div className="flex items-center justify-between">
+                  <Menu className="size-5" />
+                  <span className="sr-only">فتح القائمة</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side={
+                  (mergedData.responsive?.mobileMenu?.side as
+                    | "left"
+                    | "right") || "right"
+                }
+                className="w-80"
+                aria-describedby={undefined}
+                style={{
+                  width: `${mergedData.responsive?.mobileMenu?.width || 320}px`,
+                  backgroundColor:
+                    mergedData.background?.colors?.from ||
+                    mergedData.styling?.bgColor ||
+                    "#ffffff",
+                }}
+              >
+                <div className="flex items-center justify-between">
                   {mergedData.actions?.mobile?.showLogo && (
-                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       {mergedData.logo?.image && (
                         <img
                           src={mergedData.logo.image}
                           alt={mergedData.logo?.text || "Logo"}
-                    className="size-8"
-                  />
+                          className="size-8"
+                        />
                       )}
-                      <span className="text-sm font-semibold" style={{ color: mergedData.colors?.text || mergedData.styling?.textColor || "#1f2937" }}>
-                        {mergedData.logo?.text || tenantData?.websiteName || "مكتب دليل الجواء"}
+                      <span
+                        className="text-sm font-semibold"
+                        style={{
+                          color:
+                            mergedData.colors?.text ||
+                            mergedData.styling?.textColor ||
+                            "#1f2937",
+                        }}
+                      >
+                        {mergedData.logo?.text ||
+                          tenantData?.websiteName ||
+                          "مكتب دليل الجواء"}
                       </span>
-                </div>
+                    </div>
                   )}
-              </div>
+                </div>
 
-              <div className="mt-6 grid gap-2">
+                <div className="mt-6 grid gap-2">
                   {navLinks.map((link: any, i: number) => (
-                  <Link
+                    <Link
                       key={link.href}
                       href={link.href}
-                    className={cn(
-                      "rounded-md px-3 py-2 text-sm font-medium hover:bg-muted",
-                        pathname === link.href ? "text-emerald-700" : "text-foreground",
-                    )}
+                      className={cn(
+                        "rounded-md px-3 py-2 text-sm font-medium hover:bg-muted",
+                        pathname === link.href
+                          ? "text-emerald-700"
+                          : "text-foreground",
+                      )}
                       style={{
-                        color: pathname === link.href
-                          ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
-                          : mergedData.colors?.link || mergedData.styling?.textColor || "#374151",
+                        color:
+                          pathname === link.href
+                            ? mergedData.colors?.linkActive ||
+                              mergedData.styling?.textColor ||
+                              "#059669"
+                            : mergedData.colors?.link ||
+                              mergedData.styling?.textColor ||
+                              "#374151",
                       }}
-                  >
+                    >
                       {link.name}
-                  </Link>
-                ))}
-              </div>
-            </SheetContent>
-          </Sheet>
+                    </Link>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
     </>
   );
 };

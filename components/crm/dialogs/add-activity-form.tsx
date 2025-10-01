@@ -24,21 +24,21 @@ import {
   ListChecks,
   Save,
   X,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { Project, Property } from "./crm-activity-card";
 
 // Helper function to detect text direction
-const getTextDirection = (text: string): 'rtl' | 'ltr' => {
-  if (!text || text.length === 0) return 'rtl'; // Default to RTL for empty text
-  
+const getTextDirection = (text: string): "rtl" | "ltr" => {
+  if (!text || text.length === 0) return "rtl"; // Default to RTL for empty text
+
   const firstChar = text.trim()[0];
-  
+
   // Check if first character is Latin (English, numbers, symbols)
   const latinRegex = /[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
-  
-  return latinRegex.test(firstChar) ? 'ltr' : 'rtl';
+
+  return latinRegex.test(firstChar) ? "ltr" : "rtl";
 };
 
 interface AddActivityFormProps {
@@ -72,7 +72,7 @@ export function AddActivityForm({
 
   // Detect text direction for the content
   const textDirection = getTextDirection(content);
-  const textAlignment = textDirection === 'ltr' ? 'text-left' : 'text-right';
+  const textAlignment = textDirection === "ltr" ? "text-left" : "text-right";
 
   const handleSubmit = () => {
     if (!content.trim()) {

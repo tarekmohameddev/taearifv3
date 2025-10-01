@@ -65,8 +65,9 @@ export const PropertyRequestStageAssignmentDialog = ({
   useEffect(() => {
     if (stages.length > 0 && customer) {
       // إذا كان للعميل مرحلة موجودة، استخدمها، وإلا استخدم أول مرحلة
-      const defaultStage = customer.stage_id 
-        ? stages.find(stage => stage.id === customer.stage_id)?.id || stages[0].id
+      const defaultStage = customer.stage_id
+        ? stages.find((stage) => stage.id === customer.stage_id)?.id ||
+          stages[0].id
         : stages[0].id;
       setSelectedStageId(defaultStage);
     }
@@ -84,7 +85,9 @@ export const PropertyRequestStageAssignmentDialog = ({
       const response = await axiosInstance.get("/crm/stages");
       if (response.data.status === "success") {
         // ترتيب المراحل حسب order
-        const sortedStages = response.data.data.sort((a: Stage, b: Stage) => a.order - b.order);
+        const sortedStages = response.data.data.sort(
+          (a: Stage, b: Stage) => a.order - b.order,
+        );
         setStages(sortedStages);
       }
     } catch (error) {
@@ -139,7 +142,7 @@ export const PropertyRequestStageAssignmentDialog = ({
     }
   };
 
-  const selectedStage = stages.find(stage => stage.id === selectedStageId);
+  const selectedStage = stages.find((stage) => stage.id === selectedStageId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -183,7 +186,9 @@ export const PropertyRequestStageAssignmentDialog = ({
             {fetchingStages ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                <span className="mr-2 text-sm text-muted-foreground">جاري تحميل المراحل...</span>
+                <span className="mr-2 text-sm text-muted-foreground">
+                  جاري تحميل المراحل...
+                </span>
               </div>
             ) : (
               <Select
@@ -269,4 +274,4 @@ export const PropertyRequestStageAssignmentDialog = ({
       </DialogContent>
     </Dialog>
   );
-}; 
+};

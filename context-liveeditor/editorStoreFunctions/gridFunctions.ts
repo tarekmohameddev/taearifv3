@@ -43,13 +43,13 @@ export const gridFunctions = {
 
     const defaultData = getDefaultGridData();
     const data: ComponentData = initial || state.tempData || defaultData;
-    
-    return { 
-      gridStates: { ...state.gridStates, [variantId]: data } 
+
+    return {
+      gridStates: { ...state.gridStates, [variantId]: data },
     } as any;
   },
 
-  getData: (state: any, variantId: string) => 
+  getData: (state: any, variantId: string) =>
     state.gridStates[variantId] || getDefaultGridData(),
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
@@ -59,7 +59,7 @@ export const gridFunctions = {
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source = state.gridStates[variantId] || getDefaultGridData();
     const newData = updateDataByPath(source, path, value);
-    
+
     return {
       gridStates: { ...state.gridStates, [variantId]: newData },
     } as any;

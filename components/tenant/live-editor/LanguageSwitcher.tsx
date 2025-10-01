@@ -9,7 +9,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useEditorLocale } from "@/context-liveeditor/editorI18nStore";
-import { locales, localeNames, localeFlags } from "@/lib-liveeditor/i18n/config";
+import {
+  locales,
+  localeNames,
+  localeFlags,
+} from "@/lib-liveeditor/i18n/config";
 import { Globe } from "lucide-react";
 
 export function LanguageSwitcher() {
@@ -22,18 +26,12 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2"
-        >
+        <Button variant="outline" size="sm" className="flex items-center gap-2">
           <Globe className="h-4 w-4" />
           <span className="hidden sm:inline">
             {localeFlags[locale]} {localeNames[locale]}
           </span>
-          <span className="sm:hidden">
-            {localeFlags[locale]}
-          </span>
+          <span className="sm:hidden">{localeFlags[locale]}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
@@ -48,9 +46,7 @@ export function LanguageSwitcher() {
             <span className="text-lg">{localeFlags[loc]}</span>
             <span>{localeNames[loc]}</span>
             {locale === loc && (
-              <span className="ml-auto text-xs text-muted-foreground">
-                ✓
-              </span>
+              <span className="ml-auto text-xs text-muted-foreground">✓</span>
             )}
           </DropdownMenuItem>
         ))}

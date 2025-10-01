@@ -1,6 +1,11 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
-import { getErrorInfo, retryWithBackoff, logError, formatErrorMessage } from "@/utils/errorHandler";
+import {
+  getErrorInfo,
+  retryWithBackoff,
+  logError,
+  formatErrorMessage,
+} from "@/utils/errorHandler";
 import toast from "react-hot-toast";
 import {
   Bath,
@@ -446,7 +451,7 @@ export function PropertiesManagementPage() {
     clickedONSubButton();
     router.push("/settings");
   };
-  const fetchProperties = async (page = 1, filters = {}) =>  {
+  const fetchProperties = async (page = 1, filters = {}) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     const { userData } = useAuthStore.getState();
     if (!userData?.token) {
@@ -463,34 +468,38 @@ export function PropertiesManagementPage() {
       loading: true,
       error: null,
     });
-  
+
     try {
       // بناء معاملات الفلترة
       const params = new URLSearchParams();
-      params.set('page', page.toString());
-  
+      params.set("page", page.toString());
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value && value.length > 0) {
           if (Array.isArray(value)) {
-            params.set(key, value.join(','));
+            params.set(key, value.join(","));
           } else {
             params.set(key, value.toString());
           }
         }
       });
-  
-  
+
       // استخدام نظام إعادة المحاولة
-      const response = await retryWithBackoff(async () => {
-        const res = await axiosInstance.get(`/properties?${params.toString()}`);
-        return res;
-      }, 3, 1000);
-  
-  
+      const response = await retryWithBackoff(
+        async () => {
+          const res = await axiosInstance.get(
+            `/properties?${params.toString()}`,
+          );
+          return res;
+        },
+        3,
+        1000,
+      );
+
       const propertiesList = response.data?.data?.properties || [];
       const pagination = response.data?.data?.pagination || null;
       const propertiesAllData = response.data?.data || null;
-  
+
       const mappedProperties = propertiesList.map((property, index) => ({
         ...property,
         thumbnail: property.featured_image,
@@ -503,8 +512,7 @@ export function PropertiesManagementPage() {
         lastUpdated: new Date(property.updated_at).toLocaleDateString("ar-AE"),
         features: Array.isArray(property.features) ? property.features : [],
       }));
-  
-  
+
       setPropertiesManagement({
         properties: mappedProperties,
         pagination,
@@ -512,12 +520,9 @@ export function PropertiesManagementPage() {
         loading: false,
         isInitialized: true,
       });
-  
-  
     } catch (error) {
-  
-      const errorInfo = logError(error, 'fetchProperties');
-  
+      const errorInfo = logError(error, "fetchProperties");
+
       setPropertiesManagement({
         error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات العقارات"),
         loading: false,
@@ -571,7 +576,6 @@ export function PropertiesManagementPage() {
     }
   };
 
-  
   const handleDuplicateProperty = async (property: any) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     const { userData } = useAuthStore.getState();
@@ -589,7 +593,7 @@ export function PropertiesManagementPage() {
 
       await axiosInstance.post(
         `/properties/${property.id}/duplicate`,
-        duplicateData
+        duplicateData,
       );
       toast.success("تم مضاعفة العقار بنجاح");
 
@@ -615,13 +619,13 @@ export function PropertiesManagementPage() {
 
       const newStatus = property.status === "منشور" ? "مسودة" : "منشور";
       toast.success(
-        `تم ${property.status === "منشور" ? "إلغاء النشر" : "النشر"} بنجاح`
+        `تم ${property.status === "منشور" ? "إلغاء النشر" : "النشر"} بنجاح`,
       );
 
       // تحديث حالة العقار في القائمة المحلية
       setPropertiesManagement({
         properties: properties.map((p: any) =>
-          p.id === property.id ? { ...p, status: newStatus } : p
+          p.id === property.id ? { ...p, status: newStatus } : p,
         ),
       });
     } catch (error) {
@@ -651,7 +655,7 @@ export function PropertiesManagementPage() {
 
     if (Array.isArray(newFilters[filterKey])) {
       newFilters[filterKey] = newFilters[filterKey].filter(
-        (item: any) => item !== filterValue
+        (item: any) => item !== filterValue,
       );
       if (newFilters[filterKey].length === 0) {
         delete newFilters[filterKey];
@@ -678,7 +682,7 @@ export function PropertiesManagementPage() {
       console.log("No token available, skipping fetchProperties in useEffect");
       return;
     }
-    
+
     if (!isInitialized && !loading) {
       fetchProperties(1);
     }
@@ -707,7 +711,9 @@ export function PropertiesManagementPage() {
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
+                <p className="text-lg text-gray-500">
+                  يرجى تسجيل الدخول لعرض المحتوى
+                </p>
               </div>
             </div>
           </main>
@@ -960,7 +966,7 @@ export function PropertiesManagementPage() {
                               key={property.id}
                               property={property}
                               isFavorite={favorites.includes(
-                                property.id.toString()
+                                property.id.toString(),
                               )}
                               onToggleFavorite={toggleFavorite}
                               onDelete={handleDeleteProperty}
@@ -978,7 +984,7 @@ export function PropertiesManagementPage() {
                               key={property.id}
                               property={property}
                               isFavorite={favorites.includes(
-                                property.id.toString()
+                                property.id.toString(),
                               )}
                               onToggleFavorite={toggleFavorite}
                               onDelete={handleDeleteProperty}
@@ -1076,7 +1082,7 @@ export function PropertiesManagementPage() {
                                     type: reorderPopup.type,
                                   });
                                   const toastId = toast.loading(
-                                    "جاري تحديث الترتيب..."
+                                    "جاري تحديث الترتيب...",
                                   );
                                   try {
                                     if (reorderPopup.type === "featured") {
@@ -1087,12 +1093,12 @@ export function PropertiesManagementPage() {
                                             id: property.id,
                                             reorder_featured: i + 1,
                                           },
-                                        ]
+                                        ],
                                       );
                                     } else {
                                       await axiosInstance.post(
                                         "/properties/reorder",
-                                        [{ id: property.id, reorder: i + 1 }]
+                                        [{ id: property.id, reorder: i + 1 }],
                                       );
                                     }
                                     toast.success("تم تحديث الترتيب");
