@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { GoogleRegisterPage } from "@/components/signin-up/google-register-page";
 import { notFound } from "next/navigation";
-import TenantPageWrapper from "../../TenantPageWrapper";
+import TenantPageWrapper from "../../../TenantPageWrapper";
 export const metadata = {
   title: "تسجيل حساب جديد",
 };
