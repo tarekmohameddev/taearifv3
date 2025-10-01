@@ -105,6 +105,7 @@ export function middleware(request: NextRequest) {
     const response = NextResponse.rewrite(url);
     response.headers.set("x-locale", locale);
     response.headers.set("x-html-lang", locale);
+    response.headers.set("x-pathname", "/");
 
     if (tenantId) {
       response.headers.set("x-tenant-id", tenantId);
@@ -122,6 +123,7 @@ export function middleware(request: NextRequest) {
   // Set locale headers
   response.headers.set("x-locale", locale);
   response.headers.set("x-html-lang", locale);
+  response.headers.set("x-pathname", pathnameWithoutLocale);
 
   // Set tenantId header if found
   if (tenantId) {
