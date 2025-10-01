@@ -5,8 +5,8 @@ import useAuthStore from "@/context/AuthContext";
 import axiosInstance from "@/lib/axiosInstance";
 import { Check, AlertCircle } from "lucide-react";
 import Image from "next/image";
-
-export default function OAuthSuccessPage() {
+import TenantPageWrapper from "../../TenantPageWrapper";
+function OAuthSuccessPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState("loading");
@@ -231,4 +231,20 @@ export default function OAuthSuccessPage() {
       `}</style>
     </div>
   );
+}
+
+// Server component wrapper للتحقق من tenantId
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
+
+export default async function OAuthSuccessPage() {
+  const headersList = await headers();
+  const tenantId = headersList.get("x-tenant-id");
+
+  // إذا كان هناك tenantId، فهذه صفحة tenant خاصة - لا نعرض صفحة OAuth العامة
+  if (tenantId) {
+    return <TenantPageWrapper tenantId={tenantId} slug={"oauth/token/success"} />;
+  }
+
+  return <OAuthSuccessPageContent />;
 }
