@@ -38,10 +38,16 @@ import { toast } from "react-hot-toast";
 // مكون إضافة صفحة جديدة
 function AddPageDialog({
   onPageCreated,
+  open: externalOpen,
+  onOpenChange,
 }: {
   onPageCreated?: (pageSlug: string) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     pageName: "",
@@ -618,7 +624,42 @@ function EditorNavBar() {
   } = useAuthStore();
   const router = useRouter();
   const [recentlyAddedPages, setRecentlyAddedPages] = useState<string[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
+  const [isAddPageDialogOpen, setIsAddPageDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    pageName: "",
+    slug: "",
+    metaTitle: "",
+    metaDescription: "",
+    metaKeywords: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const t = useEditorT();
+
+  // إغلاق الـ dropdown عند النقر خارجه
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isDropdownOpen) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.dropdown-container')) {
+          setIsDropdownOpen(false);
+        }
+      }
+      if (isPagesDropdownOpen) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.pages-dropdown-container')) {
+          setIsPagesDropdownOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen, isPagesDropdownOpen]);
 
   const tenantId = userData?.username || "";
   const basePath = `/live-editor`;
@@ -715,6 +756,105 @@ function EditorNavBar() {
     setRecentlyAddedPages((prev) => [...prev, pageSlug]);
   };
 
+  // التحقق من صحة البيانات
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.pageName.trim()) {
+      newErrors.pageName = t("validation.page_name_required");
+    }
+
+    if (!formData.slug.trim()) {
+      newErrors.slug = t("validation.slug_required");
+    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
+      newErrors.slug = t("validation.slug_format");
+    }
+
+    // التحقق من عدم تكرار الـ slug
+    const existingSlugs = tenantData?.componentSettings
+      ? Object.keys(tenantData.componentSettings)
+      : [];
+    if (existingSlugs.includes(formData.slug)) {
+      newErrors.slug = t("validation.slug_exists");
+    }
+
+    if (!formData.metaTitle.trim()) {
+      newErrors.metaTitle = t("validation.meta_title_required");
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // إنشاء صفحة جديدة
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    try {
+      // استخدام createPage من editorStore
+      const { createPage } = useEditorStore.getState();
+
+      createPage({
+        slug: formData.slug,
+        name: formData.pageName,
+        metaTitle: formData.metaTitle,
+        metaDescription: formData.metaDescription,
+        metaKeywords: formData.metaKeywords,
+      });
+
+      // تحديث tenantStore لإضافة الصفحة الجديدة إلى componentSettings
+      const { tenantData } = useTenantStore.getState();
+      const updatedTenantData = {
+        ...tenantData,
+        componentSettings: {
+          ...tenantData?.componentSettings,
+          [formData.slug]: {}, // إضافة الصفحة الجديدة مع object فارغ للمكونات
+        },
+      };
+
+      // تحديث الـ store
+      useTenantStore.setState({ tenantData: updatedTenantData });
+
+      // التحقق من نوع الصفحة
+      const predefinedPages = [
+        "homepage",
+        "about",
+        "contact",
+        "products",
+        "collections",
+      ];
+      const isPredefinedPage = predefinedPages.includes(formData.slug);
+
+      // إضافة الصفحة إلى القائمة المحلية
+      addPageToLocalList(formData.slug);
+
+      // إعادة تعيين النموذج
+      setFormData({
+        pageName: "",
+        slug: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: "",
+      });
+      setErrors({});
+
+      // إغلاق الـ dialog
+      setIsAddPageDialogOpen(false);
+
+      // إظهار رسالة نجاح
+      toast.success(t("editor.page_created_successfully"));
+
+      // التنقل إلى الصفحة الجديدة
+      router.push(`${basePath}/${formData.slug}`);
+    } catch (error) {
+      console.error("Error creating page:", error);
+      toast.error(t("editor.error_creating_page"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (tenantId && !tenantData && !loadingTenantData) {
       fetchTenantData(tenantId);
@@ -794,13 +934,15 @@ function EditorNavBar() {
   return (
     <nav className="bg-white border-b-[1.5px] border-red-300 sticky top-0 z-[9999]" dir="ltr">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-1">
-        <div className="flex justify-between h-16">
+        {/* Desktop Layout - Single Row */}
+        <div className="hidden md:flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <h1 className="text-xl font-bold text-gray-900">{t("editor.title")}</h1>
               <span className="ml-2 text-sm text-gray-500">({tenantId})</span>
             </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+            {/* Desktop Pages Navigation - Hidden on screens < 1100px */}
+            <div className="hidden xl:ml-6 xl:flex xl:space-x-8">
               {availablePages.map((page) => (
                 <Link
                   key={page.slug || "homepage"}
@@ -815,13 +957,109 @@ function EditorNavBar() {
                 </Link>
               ))}
             </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <AddPageDialog onPageCreated={addPageToLocalList} />
 
+            {/* Mobile Pages Dropdown - Visible on screens < 1100px */}
+            <div className="xl:hidden flex items-center mx-2">
+              <div className="relative pages-dropdown-container">
+                <button
+                  onClick={() => setIsPagesDropdownOpen(!isPagesDropdownOpen)}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+                  aria-expanded={isPagesDropdownOpen}
+                  aria-haspopup="true"
+                >
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  </svg>
+                  {t("editor.pages")}
+                  <svg
+                    className="w-4 h-4 ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* Pages Dropdown Menu */}
+                {isPagesDropdownOpen && (
+                  <div className="absolute  mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                    <div className="px-3 py-2">
+                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        {t("editor.pages")}
+                      </h3>
+                      <div className="space-y-1">
+                        {availablePages.map((page) => (
+                          <Link
+                            key={page.slug || "homepage"}
+                            href={`${basePath}${page.path}`}
+                            onClick={() => setIsPagesDropdownOpen(false)}
+                            className={`flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${
+                              currentPath === page.path
+                                ? "bg-blue-50 text-blue-700 border border-blue-200"
+                                : "text-gray-700 hover:bg-gray-50"
+                            }`}
+                          >
+                            <svg
+                              className="w-4 h-4 mr-3 flex-shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
+                            </svg>
+                            <span className="truncate">{page.name}</span>
+                            {currentPath === page.path && (
+                              <svg
+                                className="w-4 h-4 ml-auto text-blue-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {/* Desktop Actions - Hidden on screens <= 1400px */}
+          <div className="hidden xl:flex items-center space-x-4">
+            {/* Save Button - Always visible */}
             <button
-              onClick={requestSave} // عند الضغط، يتم استدعاء الدالة من السياق
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 focus:ring-blue-500 "
+              onClick={requestSave}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 focus:ring-blue-500"
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -838,6 +1076,28 @@ function EditorNavBar() {
               </svg>
               {t("editor.save_changes")}
             </button>
+
+            {/* Add Page Button for Desktop */}
+            <button
+              onClick={() => setIsAddPageDialogOpen(true)}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-[calc(1.02)]"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              {t("editor.add_page")}
+            </button>
+
             <Link
               href={getTenantUrl(currentPath)}
               target="_blank"
@@ -884,8 +1144,588 @@ function EditorNavBar() {
             {/* Language Dropdown */}
             <LanguageDropdown />
           </div>
+
+          {/* Mobile/Tablet Actions Dropdown - Visible on screens <= 1400px */}
+          <div className="xl:hidden flex items-center space-x-2">
+            {/* Save Button - Outside dropdown */}
+            <button
+              onClick={requestSave}
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 focus:ring-blue-500"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                />
+              </svg>
+              {t("editor.save_changes")}
+            </button>
+
+            <LanguageDropdown />
+            
+            {/* Modern Dropdown Menu */}
+            <div className="relative dropdown-container">
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                aria-expanded={isDropdownOpen}
+                aria-haspopup="true"
+              >
+                <svg
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                  />
+                </svg>
+              </button>
+
+              {/* Dropdown Menu */}
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                  {/* Add Page Button */}
+                  <button
+                    onClick={() => {
+                      setIsAddPageDialogOpen(true);
+                      setIsDropdownOpen(false);
+                    }}
+                    className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    {t("editor.add_page")}
+                  </button>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-100 my-1"></div>
+
+                  {/* Preview Button */}
+                  <Link
+                    href={getTenantUrl(currentPath)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    {t("editor.preview")}
+                  </Link>
+
+                  {/* Live Preview Button */}
+                  <Link
+                    href={getTenantUrl("/")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                    {t("editor.live_preview")}
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Layout - Two Rows for screens < 820px */}
+        <div className="md:hidden">
+          {/* First Row - Title */}
+          <div className="flex items-center justify-center py-3">
+            <div className="flex-shrink-0 flex items-center pb-2 relative">
+              <h1 className="text-lg font-bold text-gray-900">{t("editor.title")}</h1>
+              <span className="ml-2 text-sm text-gray-500">({tenantId})</span>
+              {/* Custom border width - يمكن تعديل العرض هنا */}
+              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[400px] h-px bg-gray-200"></div>
+            </div>
+          </div>
+
+          {/* Second Row - Navigation and Actions */}
+          <div className="flex items-center justify-between py-2">
+            {/* Pages Dropdown */}
+            <div className="flex items-center">
+              <div className="relative pages-dropdown-container">
+                <button
+                  onClick={() => setIsPagesDropdownOpen(!isPagesDropdownOpen)}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+                  aria-expanded={isPagesDropdownOpen}
+                  aria-haspopup="true"
+                >
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  </svg>
+                  {t("editor.pages")}
+                  <svg
+                    className="w-4 h-4 ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* Pages Dropdown Menu */}
+                {isPagesDropdownOpen && (
+                  <div className="absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                    <div className="px-3 py-2">
+                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        {t("editor.pages")}
+                      </h3>
+                      <div className="space-y-1">
+                        {availablePages.map((page) => (
+                          <Link
+                            key={page.slug || "homepage"}
+                            href={`${basePath}${page.path}`}
+                            onClick={() => setIsPagesDropdownOpen(false)}
+                            className={`flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${
+                              currentPath === page.path
+                                ? "bg-blue-50 text-blue-700 border border-blue-200"
+                                : "text-gray-700 hover:bg-gray-50"
+                            }`}
+                          >
+                            <svg
+                              className="w-4 h-4 mr-3 flex-shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
+                            </svg>
+                            <span className="truncate">{page.name}</span>
+                            {currentPath === page.path && (
+                              <svg
+                                className="w-4 h-4 ml-auto text-blue-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center space-x-2">
+              {/* Save Button */}
+              <button
+                onClick={requestSave}
+                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 focus:ring-blue-500"
+              >
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                  />
+                </svg>
+                <span className="hidden xs:inline">{t("editor.save_changes")}</span>
+              </button>
+
+              <LanguageDropdown />
+              
+              {/* Actions Dropdown */}
+              <div className="relative dropdown-container">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                  aria-expanded={isDropdownOpen}
+                  aria-haspopup="true"
+                >
+                  <svg
+                    className="w-5 h-5 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                    />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                    {/* Add Page Button */}
+                    <button
+                      onClick={() => {
+                        setIsAddPageDialogOpen(true);
+                        setIsDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                    >
+                      <svg
+                        className="w-4 h-4 mr-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                      {t("editor.add_page")}
+                    </button>
+
+                    {/* Divider */}
+                    <div className="border-t border-gray-100 my-1"></div>
+
+                    {/* Preview Button */}
+                    <Link
+                      href={getTenantUrl(currentPath)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                    >
+                      <svg
+                        className="w-4 h-4 mr-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      {t("editor.preview")}
+                    </Link>
+
+                    {/* Live Preview Button */}
+                    <Link
+                      href={getTenantUrl("/")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                    >
+                      <svg
+                        className="w-4 h-4 mr-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                      {t("editor.live_preview")}
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      
+      {/* Add Page Dialog */}
+      <Dialog open={isAddPageDialogOpen} onOpenChange={setIsAddPageDialogOpen}>
+        <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto" dir="ltr">
+          <DialogHeader className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </div>
+              <div>
+                <DialogTitle className="text-2xl font-bold text-gray-900">
+                  {t("editor.add_component")}
+                </DialogTitle>
+                <DialogDescription className="text-gray-600 mt-1">
+                  {t("editor.page_settings")}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* معلومات الصفحة الأساسية */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="bg-blue-50 text-blue-700">
+                  <svg
+                    className="w-3 h-3 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  {t("editor.basic_info")}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="pageName" className="text-sm font-medium">
+                    {t("editor.page_name")} *
+                  </Label>
+                  <Input
+                    id="pageName"
+                    value={formData.pageName}
+                    onChange={(e) => setFormData({ ...formData, pageName: e.target.value })}
+                    placeholder={t("editor.page_name_placeholder")}
+                    className={errors.pageName ? "border-red-500" : ""}
+                  />
+                  {errors.pageName && (
+                    <p className="text-sm text-red-500">{errors.pageName}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="slug" className="text-sm font-medium">
+                    {t("editor.slug")} *
+                  </Label>
+                  <Input
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    placeholder={t("editor.slug_placeholder")}
+                    className={errors.slug ? "border-red-500" : ""}
+                  />
+                  {errors.slug && (
+                    <p className="text-sm text-red-500">{errors.slug}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* معلومات SEO */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="bg-green-50 text-green-700">
+                  <svg
+                    className="w-3 h-3 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  {t("editor.seo_settings")}
+                </Badge>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="metaTitle" className="text-sm font-medium">
+                    {t("editor.meta_title")} *
+                  </Label>
+                  <Input
+                    id="metaTitle"
+                    value={formData.metaTitle}
+                    onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
+                    placeholder={t("editor.meta_title_placeholder")}
+                    className={errors.metaTitle ? "border-red-500" : ""}
+                  />
+                  {errors.metaTitle && (
+                    <p className="text-sm text-red-500">{errors.metaTitle}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="metaDescription" className="text-sm font-medium">
+                    {t("editor.meta_description")}
+                  </Label>
+                  <Textarea
+                    id="metaDescription"
+                    value={formData.metaDescription}
+                    onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
+                    placeholder={t("editor.meta_description_placeholder")}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="metaKeywords" className="text-sm font-medium">
+                    {t("editor.meta_keywords")}
+                  </Label>
+                  <Input
+                    id="metaKeywords"
+                    value={formData.metaKeywords}
+                    onChange={(e) => setFormData({ ...formData, metaKeywords: e.target.value })}
+                    placeholder={t("editor.meta_keywords_placeholder")}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsAddPageDialogOpen(false)}
+              disabled={isLoading}
+            >
+              {t("editor.cancel")}
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600"
+            >
+              {isLoading ? (
+                <>
+                  <svg
+                    className="w-4 h-4 mr-2 animate-spin"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  {t("editor.creating")}
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                  {t("editor.create_page")}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </nav>
   );
 }
@@ -909,6 +1749,7 @@ export default function LiveEditorLayout({
       setLocale(currentLang as any);
     }
   }, [pathname, setLocale]);
+
 
   // Show loading while validating token
   if (tokenValidation.loading) {

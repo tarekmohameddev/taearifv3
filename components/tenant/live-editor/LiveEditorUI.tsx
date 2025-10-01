@@ -349,11 +349,12 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const [sidebarWidth, setSidebarWidth] = useState(state.sidebarWidth);
   const [selectedDevice, setSelectedDevice] = useState<DeviceType>("laptop");
   const [iframeReady, setIframeReady] = useState(false);
-  const [isComponentsSidebarOpen, setIsComponentsSidebarOpen] = useState(true);
+  const [isComponentsSidebarOpen, setIsComponentsSidebarOpen] = useState(false);
   const [
     wasComponentsSidebarManuallyClosed,
     setWasComponentsSidebarManuallyClosed,
   ] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Enhanced debugging state
@@ -365,6 +366,28 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const [showDebugControls, setShowDebugControls] = useState(false);
 
   // Debug panels are now independent - no auto-opening
+
+  // تتبع عرض الشاشة
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    // تعيين العرض الأولي
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // التحكم في فتح الـ sidebar بناءً على عرض الشاشة
+  useEffect(() => {
+    if (screenWidth >= 1300 && !wasComponentsSidebarManuallyClosed) {
+      setIsComponentsSidebarOpen(true);
+    } else if (screenWidth < 1300) {
+      setIsComponentsSidebarOpen(false);
+    }
+  }, [screenWidth, wasComponentsSidebarManuallyClosed]);
 
   // إغلاق Components Sidebar عند فتح Editor Sidebar
   useEffect(() => {
@@ -1101,42 +1124,45 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
           <div className="bg-white border-b border-gray-200 px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => {
-                    const newState = !isComponentsSidebarOpen;
-                    setIsComponentsSidebarOpen(newState);
-                    // إذا تم إغلاق Components Sidebar يدوياً، ضع علامة على ذلك
-                    if (!newState) {
-                      setWasComponentsSidebarManuallyClosed(true);
-                    } else {
-                      setWasComponentsSidebarManuallyClosed(false);
-                    }
-                  }}
-                  className="p-2 rounded-md hover:bg-gray-100 transition-colors"
-                  title={
-                    isComponentsSidebarOpen
-                      ? t("live_editor.hide_components")
-                      : t("live_editor.show_components")
-                  }
-                >
-                  <svg
-                    className="w-6 h-6 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d={
-                        isComponentsSidebarOpen
-                          ? "M11 19l-7-7 7-7m8 14l-7-7 7-7"
-                          : "M13 5l7 7-7 7M5 5l7 7-7 7"
+                {/* Components Sidebar Toggle - Only show on screens < 1300px */}
+                {/* {screenWidth < 1300 && ( */}
+                  <button
+                    onClick={() => {
+                      const newState = !isComponentsSidebarOpen;
+                      setIsComponentsSidebarOpen(newState);
+                      // إذا تم إغلاق Components Sidebar يدوياً، ضع علامة على ذلك
+                      if (!newState) {
+                        setWasComponentsSidebarManuallyClosed(true);
+                      } else {
+                        setWasComponentsSidebarManuallyClosed(false);
                       }
-                    />
-                  </svg>
-                </button>
+                    }}
+                    className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+                    title={
+                      isComponentsSidebarOpen
+                        ? t("live_editor.hide_components")
+                        : t("live_editor.show_components")
+                    }
+                  >
+                    <svg
+                      className="w-6 h-6 text-gray-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d={
+                          isComponentsSidebarOpen
+                            ? "M11 19l-7-7 7-7m8 14l-7-7 7-7"
+                            : "M13 5l7 7-7 7M5 5l7 7-7 7"
+                        }
+                      />
+                    </svg>
+                  </button>
+                {/* )} */}
                 <h1 className="text-2xl font-bold text-gray-900">
                   {pageTitle} {t("live_editor.editor")}
                 </h1>
