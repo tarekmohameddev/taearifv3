@@ -28,22 +28,34 @@ function removeLocaleFromPathname(pathname: string) {
 function getTenantIdFromHost(host: string): string | null {
   const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
   const productionDomain =
-    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "mandhoor.com";
   const isDevelopment = process.env.NODE_ENV === "development";
+
+  // قائمة بالكلمات المحجوزة التي لا يجب أن تكون tenantId
+  const reservedWords = ["www", "api", "admin", "app", "mail", "ftp", "blog", "shop", "store"];
 
   // For localhost development: tenant1.localhost:3000 -> tenant1
   if (host.includes(localDomain)) {
     const parts = host.split(".");
     if (parts.length > 1 && parts[0] !== localDomain) {
-      return parts[0];
+      const potentialTenantId = parts[0];
+      // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
+      if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
+        return potentialTenantId;
+      }
     }
   }
 
-  // For production: tenant1.example.com -> tenant1
-  if (!isDevelopment && host.includes(productionDomain)) {
+  // For production: tenant1.mandhoor.com -> tenant1
+  // تحقق من أن الـ host يحتوي على mandhoor.com أو taearif.com
+  if (!isDevelopment && (host.includes("mandhoor.com") || host.includes("taearif.com"))) {
     const parts = host.split(".");
     if (parts.length > 2) {
-      return parts[0];
+      const potentialTenantId = parts[0];
+      // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
+      if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
+        return potentialTenantId;
+      }
     }
   }
 
