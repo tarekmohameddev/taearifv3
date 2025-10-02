@@ -445,7 +445,7 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
 
   return (
     <section
-      className="mx-auto max-w-[1600px] px-4"
+      className="mx-auto max-w-[1600px] px-4 "
       style={sectionStyles as any}
       dir={mergedData.layout?.direction || "rtl"}
       data-debug="halfTextHalfImage-component"

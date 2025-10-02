@@ -22,6 +22,7 @@ import {
   HalfTextHalfImageSkeleton1, 
   ContactCardsSkeleton1 
 } from "@/components/skeleton";
+import { shouldCenterComponent, getCenterWrapperClasses } from "@/lib/ComponentsInCenter";
 
 const loadComponent = (section: string, componentName: string) => {
   console.log("📄 TenantPageWrapper - loadComponent called with:", {
@@ -278,7 +279,10 @@ export default function TenantPageWrapper({
                 return <Fragment key={comp.id} />;
               }
 
-              return (
+              // التحقق من ما إذا كان المكون يحتاج للتوسيط
+              const centerWrapperClasses = getCenterWrapperClasses(comp.componentName);
+              
+              const componentElement = (
                 <Suspense 
                   key={comp.id} 
                   fallback={<SkeletonLoader componentName={comp.componentName} />}
@@ -286,6 +290,17 @@ export default function TenantPageWrapper({
                   <Cmp {...(comp.data as any)} useStore variant={comp.id} />
                 </Suspense>
               );
+
+              // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات المناسبة
+              if (shouldCenterComponent(comp.componentName)) {
+                return (
+                  <div key={comp.id} className={centerWrapperClasses}>
+                    {componentElement}
+                  </div>
+                );
+              }
+
+              return componentElement;
             })
           ) : (
             <div className="p-8 text-center text-gray-500">No components</div>

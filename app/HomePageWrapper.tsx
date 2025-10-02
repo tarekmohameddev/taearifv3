@@ -32,6 +32,7 @@ import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageSwitcher } from "@/components/tenant/LanguageSwitcher";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
+import { shouldCenterComponent, getCenterWrapperClasses } from "@/lib/ComponentsInCenter";
 
 // دالة لتحميل المكونات ديناميكيًا بناءً على الاسم والرقم الأخير
 const loadComponent = (section: string, componentName: string) => {
@@ -292,7 +293,7 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
 
   return (
     <I18nProvider>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col" dir="rtl">
         {/* Header from globalComponentsData */}
         <div className="relative">
           <StaticHeader1 />
@@ -312,7 +313,10 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
                 return <Fragment key={comp.id} />;
               }
 
-              return (
+              // التحقق من ما إذا كان المكون يحتاج للتوسيط
+              const centerWrapperClasses = getCenterWrapperClasses(comp.componentName);
+              
+              const componentElement = (
                 <Suspense 
                   key={comp.id} 
                   fallback={<SkeletonLoader componentName={comp.componentName} />}
@@ -320,6 +324,17 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
                   <Cmp {...(comp.data as any)} useStore variant={comp.id} />
                 </Suspense>
               );
+
+              // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات المناسبة
+              if (shouldCenterComponent(comp.componentName)) {
+                return (
+                  <div key={comp.id} className={centerWrapperClasses}>
+                    {componentElement}
+                  </div>
+                );
+              }
+
+              return componentElement;
             })
           ) : (
             <div className="p-8 text-center text-gray-500">No components</div>
