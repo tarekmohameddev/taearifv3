@@ -50,7 +50,20 @@
     "page_information": "معلومات الصفحة",
     "seo_settings": "إعدادات SEO",
     "quick_preview": "معاينة سريعة",
-    "no_components_found": "لم يتم العثور على مكونات"
+    "no_components_found": "لم يتم العثور على مكونات",
+    "basic_info": "المعلومات الأساسية",
+    "page_name": "اسم الصفحة",
+    "page_name_placeholder": "أدخل اسم الصفحة",
+    "slug": "رابط الصفحة",
+    "slug_placeholder": "أدخل رابط الصفحة",
+    "meta_title": "عنوان الصفحة",
+    "meta_title_placeholder": "أدخل عنوان الصفحة لمحركات البحث",
+    "meta_description": "وصف الصفحة",
+    "meta_description_placeholder": "أدخل وصف الصفحة لمحركات البحث",
+    "meta_keywords": "الكلمات المفتاحية",
+    "meta_keywords_placeholder": "أدخل الكلمات المفتاحية مفصولة بفواصل",
+    "cancel": "إلغاء",
+    "create_page": "إنشاء صفحة"
   },
   "validation": {
     "page_name_required": "اسم الصفحة مطلوب",

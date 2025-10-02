@@ -361,7 +361,7 @@ export const PAGE_DEFINITIONS = {
           viewAllUrl: "#",
         },
         dataSource: {
-          apiUrl: "/api/properties/latestSales",
+          apiUrl: "/v1/tenant-website/{tenantId}/properties?purpose=sale&latest=1&limit=10",
           enabled: true,
         },
         typography: {

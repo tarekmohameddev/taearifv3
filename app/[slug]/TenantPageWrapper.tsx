@@ -210,7 +210,7 @@ export default function TenantPageWrapper({
 
   return (
     <I18nProvider>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col" dir="rtl">
         {/* Header with i18n support */}
         <div className="relative">
           <Header1 />

@@ -43,7 +43,21 @@
     "preview_mode": "Preview Mode",
     "edit_mode": "Edit Mode",
     "add_section": "Add Section",
-    "reset_component": "Reset Component"
+    "reset_component": "Reset Component",
+    "basic_info": "Basic Information",
+    "page_name": "Page Name",
+    "page_name_placeholder": "Enter page name",
+    "slug": "URL Slug",
+    "slug_placeholder": "Enter URL slug",
+    "seo_settings": "SEO Settings",
+    "meta_title": "Meta Title",
+    "meta_title_placeholder": "Enter meta title for SEO",
+    "meta_description": "Meta Description",
+    "meta_description_placeholder": "Enter meta description for SEO",
+    "meta_keywords": "Meta Keywords",
+    "meta_keywords_placeholder": "Enter keywords separated by commas",
+    "cancel": "Cancel",
+    "create_page": "Create Page"
   },
   "components": {
     "header": "Header",

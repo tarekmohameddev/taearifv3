@@ -50,7 +50,20 @@
     "page_information": "Page Information",
     "seo_settings": "SEO Settings",
     "quick_preview": "Quick Preview",
-    "no_components_found": "No components found"
+    "no_components_found": "No components found",
+    "basic_info": "Basic Information",
+    "page_name": "Page Name",
+    "page_name_placeholder": "Enter page name",
+    "slug": "URL Slug",
+    "slug_placeholder": "Enter URL slug",
+    "meta_title": "Meta Title",
+    "meta_title_placeholder": "Enter meta title for SEO",
+    "meta_description": "Meta Description",
+    "meta_description_placeholder": "Enter meta description for SEO",
+    "meta_keywords": "Meta Keywords",
+    "meta_keywords_placeholder": "Enter keywords separated by commas",
+    "cancel": "Cancel",
+    "create_page": "Create Page"
   },
   "validation": {
     "page_name_required": "Page name is required",

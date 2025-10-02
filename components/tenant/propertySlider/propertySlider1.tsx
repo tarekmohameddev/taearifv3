@@ -7,16 +7,32 @@ import { useEditorStore } from "@/context-liveeditor/editorStore";
 import SwiperCarousel from "@/components/ui/swiper-carousel";
 import { PropertyCard } from "@/components/property-card";
 import Link from "next/link";
+import axiosInstance from "@/lib/axiosInstance";
+import { useTenantId } from "@/hooks/useTenantId";
 
 type Property = {
   id: string;
+  slug: string;
   title: string;
   district: string;
   price: string;
   views: number;
   bedrooms: number;
+  bathrooms: number;
+  area: string;
+  type: string;
+  transactionType: string;
   image: string;
-  status: "available" | "rented";
+  status: string;
+  createdAt: string;
+  description: string;
+  features: string[];
+  location: {
+    lat: number;
+    lng: number;
+    address: string;
+  };
+  images: string[];
 };
 
 // Default data for the component
@@ -74,64 +90,12 @@ const getDefaultPropertySliderData = () => ({
     color: "transparent",
   },
   dataSource: {
-    apiUrl: "/api/properties/latestRentals",
+    apiUrl: "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
     enabled: true,
   },
 });
 
-// Default properties data from API
-const defaultProperties: Property[] = [
-  {
-    id: "1",
-    title: "شقة أرضية",
-    district: "حي الجواخي - عيون الجواخي المنزه",
-    price: "18000",
-    views: 134,
-    bedrooms: 3,
-    image: "/placeholder.svg",
-    status: "available",
-  },
-  {
-    id: "2",
-    title: "شقة عوائل",
-    district: "حي الازهة - مخطط الرياح",
-    price: "15000",
-    views: 211,
-    bedrooms: 2,
-    image: "/placeholder.svg",
-    status: "available",
-  },
-  {
-    id: "3",
-    title: "شقة عوائل",
-    district: "حي التعليم قريب من جامع ابن الخطابي التعليم",
-    price: "6000",
-    views: 140,
-    bedrooms: 2,
-    image: "/placeholder.svg",
-    status: "rented",
-  },
-  {
-    id: "4",
-    title: "شقة عوائل",
-    district: "الخزان - قرب مسجد العيدي",
-    price: "13000",
-    views: 189,
-    bedrooms: 4,
-    image: "/placeholder.svg",
-    status: "available",
-  },
-  {
-    id: "5",
-    title: "دور علوي واسع",
-    district: "حي الروابي - شارع الملك",
-    price: "22000",
-    views: 93,
-    bedrooms: 5,
-    image: "/placeholder.svg",
-    status: "available",
-  },
-];
+// No default properties - will fetch from API only
 
 interface PropertySliderProps {
   title?: string;
@@ -142,13 +106,31 @@ interface PropertySliderProps {
   id?: string;
 }
 
+// Helper function to convert old API URLs to new format
+const convertLegacyApiUrl = (url: string, tenantId: string): string => {
+  if (url === "/api/properties/latestSales") {
+    const newUrl = `/v1/tenant-website/${tenantId}/properties?purpose=sale&latest=1&limit=10`;
+    console.log(`🔄 Converting legacy URL: ${url} → ${newUrl}`);
+    return newUrl;
+  } else if (url === "/api/properties/latestRentals") {
+    const newUrl = `/v1/tenant-website/${tenantId}/properties?purpose=rent&latest=1&limit=10`;
+    console.log(`🔄 Converting legacy URL: ${url} → ${newUrl}`);
+    return newUrl;
+  }
+  // If it's already the new format with placeholder, replace tenantId
+  return url.replace("{tenantId}", tenantId);
+};
+
 export default function PropertySlider(props: PropertySliderProps = {}) {
   // Initialize variant id early so hooks can depend on it
   const variantId = props.variant || "propertySlider1";
 
+  // Tenant ID hook
+  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+
   // State for API data
   const [apiProperties, setApiProperties] =
-    useState<Property[]>(defaultProperties);
+    useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Subscribe to editor store updates for this component variant
@@ -161,17 +143,40 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   const fetchProperties = async (apiUrl?: string) => {
     try {
       setLoading(true);
-      const url = apiUrl || "/api/properties/latestRentals";
-      const response = await fetch(url);
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data) {
-          setApiProperties(result.data);
+      console.log("PropertySlider: 🚀 Starting fetch properties...");
+
+      if (!currentTenantId) {
+        console.log("PropertySlider: ❌ No tenant ID available, skipping fetch");
+        setLoading(false);
+        return;
+      }
+
+      // Convert legacy API URLs to new format and replace tenantId
+      const defaultUrl = "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10";
+      const url = convertLegacyApiUrl(apiUrl || defaultUrl, currentTenantId);
+      
+      console.log(`PropertySlider: 🌐 Fetching from URL: ${url}`);
+      
+      const response = await axiosInstance.get(url);
+      
+      console.log("PropertySlider: API Response:", response.data);
+      
+      // Handle new API response format
+      if (response.data && response.data.properties) {
+        setApiProperties(response.data.properties);
+        console.log(`PropertySlider: ✅ Properties loaded: ${response.data.properties.length} items`);
+        if (response.data.pagination) {
+          console.log(`PropertySlider: 📊 Pagination info:`, response.data.pagination);
         }
+      } else {
+        console.log("PropertySlider: ⚠️ No properties found in response");
+        setApiProperties([]);
       }
     } catch (error) {
-      console.error("Error fetching properties:", error);
-      // Keep default properties on error
+      console.error("PropertySlider: Error fetching properties:", error);
+      console.error("PropertySlider: URL that failed:", apiUrl);
+      // Set empty array on error
+      setApiProperties([]);
     } finally {
       setLoading(false);
     }
@@ -245,19 +250,19 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   // Fetch properties on component mount and when API URL changes
   useEffect(() => {
     const apiUrl =
-      mergedData.dataSource?.apiUrl || "/api/properties/latestRentals";
+      mergedData.dataSource?.apiUrl || "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10";
     const useApiData = mergedData.dataSource?.enabled !== false;
 
-    if (useApiData) {
+    if (useApiData && currentTenantId) {
       fetchProperties(apiUrl);
     }
-  }, [mergedData.dataSource?.apiUrl, mergedData.dataSource?.enabled]);
+  }, [mergedData.dataSource?.apiUrl, mergedData.dataSource?.enabled, currentTenantId]);
 
   // Use API data if enabled, otherwise use static data
   const useApiData = mergedData.dataSource?.enabled !== false;
   const properties = useApiData
     ? apiProperties
-    : mergedData.items || mergedData.properties || defaultProperties;
+    : mergedData.items || mergedData.properties || [];
 
   // Generate dynamic styles
   const titleStyles = {
@@ -295,6 +300,39 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   // Check if component should be visible
   if (!mergedData.visible) {
     return null;
+  }
+
+  // Show loading state while tenant is loading
+  if (tenantLoading) {
+    return (
+      <section className="w-full bg-background py-14 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+            <p className="text-lg text-gray-600 mt-4">جاري تحميل بيانات الموقع...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Show error if no tenant ID
+  if (!currentTenantId) {
+    return (
+      <section className="w-full bg-background py-14 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <p className="text-lg text-yellow-600 font-medium">لم يتم العثور على معرف الموقع</p>
+            <p className="text-sm text-gray-500 mt-2">تأكد من أنك تصل إلى الموقع من الرابط الصحيح</p>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -428,7 +466,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
                 <p className="text-gray-600">جاري تحميل العقارات...</p>
               </div>
             </div>
-          ) : (
+          ) : properties.length > 0 ? (
             <SwiperCarousel
               desktopCount={mergedData.carousel?.desktopCount || 4}
               slideClassName="!h-[360px] sm:!h-[400px] md:!h-[420px]"
@@ -440,6 +478,18 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
               space={parseInt(slideGap) || 16}
               autoplay={mergedData.carousel?.autoplay || true}
             />
+          ) : (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <p className="text-gray-600 text-lg font-medium">لا توجد عقارات متاحة حالياً</p>
+                <p className="text-gray-500 text-sm mt-2">يرجى المحاولة مرة أخرى لاحقاً</p>
+              </div>
+            </div>
           )}
         </div>
       </div>

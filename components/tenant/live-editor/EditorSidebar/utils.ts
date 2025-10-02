@@ -345,7 +345,7 @@ export const createDefaultData = (
           viewAllUrl: "#",
         },
         dataSource: {
-          apiUrl: "/api/properties/latestRentals",
+          apiUrl: "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
           enabled: true,
         },
         typography: {

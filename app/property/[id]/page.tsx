@@ -9,5 +9,5 @@ export default async function PropertyPage({
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
 
-  return <PropertyPageWrapper tenantId={tenantId} propertyId={params.id} />;
+  return <PropertyPageWrapper tenantId={tenantId} propertySlug={params.id} />;
 }

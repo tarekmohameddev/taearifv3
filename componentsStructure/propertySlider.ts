@@ -117,13 +117,16 @@ export const propertySliderStructure: ComponentStructure = {
               key: "apiUrl",
               label: "API URL",
               type: "select",
-              defaultValue: "/api/properties/latestRentals",
+              defaultValue: "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
               options: [
                 {
-                  value: "/api/properties/latestRentals",
+                  value: "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
                   label: "Latest Rentals",
                 },
-                { value: "/api/properties/latestSales", label: "Latest Sales" },
+                { 
+                  value: "/v1/tenant-website/{tenantId}/properties?purpose=sale&latest=1&limit=10", 
+                  label: "Latest Sales" 
+                },
               ],
               description: "API endpoint to fetch properties data",
             },
@@ -618,10 +621,16 @@ export const propertySliderStructure: ComponentStructure = {
           key: "dataSource.apiUrl",
           label: "API URL",
           type: "select",
-          defaultValue: "/api/properties/latestRentals",
+          defaultValue: "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
           options: [
-            { value: "/api/properties/latestRentals", label: "Latest Rentals" },
-            { value: "/api/properties/latestSales", label: "Latest Sales" },
+            { 
+              value: "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10", 
+              label: "Latest Rentals" 
+            },
+            { 
+              value: "/v1/tenant-website/{tenantId}/properties?purpose=sale&latest=1&limit=10", 
+              label: "Latest Sales" 
+            },
           ],
           description: "API endpoint to fetch properties data",
         },

@@ -437,9 +437,46 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     return pageComponents.map((component: any) => component.id);
   }, [pageComponents]);
 
-  // دالة تغيير الجهاز
+  // دالة تغيير الجهاز مع إعادة تصيير المكونات المحددة
   const handleDeviceChange = (device: DeviceType) => {
     setSelectedDevice(device);
+    
+    // إعادة تصيير المكونات المحددة عند تغيير الجهاز
+    setTimeout(() => {
+      const { componentsToRefresh } = require("@/lib-liveeditor/refreshComponents.js");
+      
+      // إعادة تصيير المكونات المحددة
+      componentsToRefresh.forEach((componentName: string) => {
+        // البحث عن المكونات في pageComponents وإعادة تصييرها
+        const componentsToUpdate = pageComponents.filter((comp: any) => 
+          comp.componentName === componentName
+        );
+        
+        if (componentsToUpdate.length > 0) {
+          // إضافة forceUpdate للمكونات المحددة
+          const updatedComponents = pageComponents.map((comp: any) => {
+            if (componentsToRefresh.includes(comp.componentName)) {
+              return {
+                ...comp,
+                forceUpdate: Date.now(), // إضافة timestamp لإجبار إعادة التصيير
+                deviceType: device, // تحديث نوع الجهاز
+              };
+            }
+            return comp;
+          });
+          
+          // تحديث الحالة
+          state.setPageComponents(updatedComponents);
+          
+          // تحديث pageComponentsByPage في الـ store
+          setTimeout(() => {
+            const store = useEditorStore.getState();
+            const currentPage = store.currentPage;
+            store.forceUpdatePageComponents(currentPage, updatedComponents);
+          }, 0);
+        }
+      });
+    }, 100); // تأخير قصير لضمان تحديث الحالة
   };
 
   // دالة بسيطة لإضافة رقم 1 لكل مكون
@@ -805,6 +842,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                       }`}
                     >
                       <CachedComponent
+                        key={`${component.id}-${component.forceUpdate || 0}-${selectedDevice}`}
                         componentName={component.componentName}
                         section={state.slug}
                         data={
@@ -813,6 +851,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                             useStore: true,
                             variant: component.id,
                             deviceType: selectedDevice,
+                            forceUpdate: component.forceUpdate,
                           } as any
                         }
                       />

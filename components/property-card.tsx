@@ -3,28 +3,48 @@
 import Image from "next/image";
 import { Eye, Bed } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useTenantId } from "@/hooks/useTenantId";
 
 type Property = {
   id: string;
+  slug?: string;
   title: string;
   district: string;
   price: string;
   views: number;
   bedrooms?: number;
+  bathrooms?: number;
+  area?: string;
+  type?: string;
+  transactionType?: string;
   image: string;
-  status?: "available" | "rented" | "sold";
+  status?: string;
+  createdAt?: string;
+  description?: string;
+  features?: string[];
+  location?: {
+    lat: number;
+    lng: number;
+    address: string;
+  };
+  images?: string[];
 };
 
 export function PropertyCard({ p }: { p: Property }) {
-  const params = useParams<{ tenantId: string }>();
   const router = useRouter();
-  const tenantId = params?.tenantId;
-  const isUnavailable = p.status === "rented" || p.status === "sold";
+  const { tenantId } = useTenantId();
+  const isUnavailable = p.status?.toLowerCase() === "rented" || p.status?.toLowerCase() === "sold";
 
   const handleClick = () => {
     if (!isUnavailable && tenantId) {
-      router.push(`/property/${p.id}`);
+      const propertySlug = p.slug || p.id; // Use slug if available, fallback to id
+      console.log(`PropertyCard: Navigating to property ${propertySlug} with tenantId: ${tenantId}`);
+      router.push(`/property/${propertySlug}`);
+    } else if (!tenantId) {
+      console.log("PropertyCard: No tenantId available, cannot navigate");
+    } else if (isUnavailable) {
+      console.log("PropertyCard: Property is unavailable, cannot navigate");
     }
   };
 

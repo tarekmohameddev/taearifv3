@@ -9,12 +9,12 @@ import PropertyDetail from "@/components/property-detail";
 
 interface PropertyPageWrapperProps {
   tenantId: string | null;
-  propertyId: string;
+  propertySlug: string;
 }
 
 export default function PropertyPageWrapper({
   tenantId,
-  propertyId,
+  propertySlug,
 }: PropertyPageWrapperProps) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
@@ -37,10 +37,10 @@ export default function PropertyPageWrapper({
 
   return (
     <I18nProvider>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col" dir="rtl">
         <Header1 />
         <main className="flex-1">
-          <PropertyDetail propertyId={propertyId} />
+          <PropertyDetail propertySlug={propertySlug} />
         </main>
         <Footer1 />
       </div>

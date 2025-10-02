@@ -515,7 +515,10 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
             )}
             {(mergedData.logo?.type === "text" ||
               mergedData.logo?.type === "image+text") && (
-              <span style={logoStyles}>
+              <span 
+                style={logoStyles}
+                className={mergedData.logo?.type === "image+text" ? "hidden sm:inline" : ""}
+              >
                 {mergedData.logo?.text ||
                   tenantData?.websiteName ||
                   "مكتب دليل الجواء"}

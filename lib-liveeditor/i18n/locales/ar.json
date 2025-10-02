@@ -43,7 +43,21 @@
     "preview_mode": "وضع المعاينة",
     "edit_mode": "وضع التعديل",
     "add_section": "إضافة قسم",
-    "reset_component": "إعادة تعيين المكون"
+    "reset_component": "إعادة تعيين المكون",
+    "basic_info": "المعلومات الأساسية",
+    "page_name": "اسم الصفحة",
+    "page_name_placeholder": "أدخل اسم الصفحة",
+    "slug": "رابط الصفحة",
+    "slug_placeholder": "أدخل رابط الصفحة",
+    "seo_settings": "إعدادات SEO",
+    "meta_title": "عنوان الصفحة",
+    "meta_title_placeholder": "أدخل عنوان الصفحة لمحركات البحث",
+    "meta_description": "وصف الصفحة",
+    "meta_description_placeholder": "أدخل وصف الصفحة لمحركات البحث",
+    "meta_keywords": "الكلمات المفتاحية",
+    "meta_keywords_placeholder": "أدخل الكلمات المفتاحية مفصولة بفواصل",
+    "cancel": "إلغاء",
+    "create_page": "إنشاء صفحة"
   },
   "components": {
     "header": "الهيدر",
