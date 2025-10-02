@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom styles for centered components */
+.center-component-wrapper {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+@media (min-width: 640px) {
+  .center-component-wrapper {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+}
+
+@media (min-width: 768px) {
+  .center-component-wrapper {
+    padding-left: 64px;
+    padding-right: 64px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .center-component-wrapper {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .center-component-wrapper {
+    padding-left: 96px;
+    padding-right: 96px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .center-component-wrapper {
+    padding-left: 96px;
+    padding-right: 96px;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

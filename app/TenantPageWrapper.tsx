@@ -22,7 +22,7 @@ import {
   HalfTextHalfImageSkeleton1, 
   ContactCardsSkeleton1 
 } from "@/components/skeleton";
-import { shouldCenterComponent, getCenterWrapperClasses } from "@/lib/ComponentsInCenter";
+import { shouldCenterComponent, getCenterWrapperClasses, getCenterWrapperStyles } from "@/lib/ComponentsInCenter";
 
 const loadComponent = (section: string, componentName: string) => {
   console.log("📄 TenantPageWrapper - loadComponent called with:", {
@@ -281,6 +281,7 @@ export default function TenantPageWrapper({
 
               // التحقق من ما إذا كان المكون يحتاج للتوسيط
               const centerWrapperClasses = getCenterWrapperClasses(comp.componentName);
+              const centerWrapperStyles = getCenterWrapperStyles(comp.componentName);
               
               const componentElement = (
                 <Suspense 
@@ -291,10 +292,10 @@ export default function TenantPageWrapper({
                 </Suspense>
               );
 
-              // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات المناسبة
+              // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات والستايل المناسب
               if (shouldCenterComponent(comp.componentName)) {
                 return (
-                  <div key={comp.id} className={centerWrapperClasses}>
+                  <div key={comp.id} className={centerWrapperClasses} style={centerWrapperStyles}>
                     {componentElement}
                   </div>
                 );

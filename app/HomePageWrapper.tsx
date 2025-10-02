@@ -32,7 +32,7 @@ import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageSwitcher } from "@/components/tenant/LanguageSwitcher";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
-import { shouldCenterComponent, getCenterWrapperClasses } from "@/lib/ComponentsInCenter";
+import { shouldCenterComponent, getCenterWrapperClasses, getCenterWrapperStyles } from "@/lib/ComponentsInCenter";
 
 // دالة لتحميل المكونات ديناميكيًا بناءً على الاسم والرقم الأخير
 const loadComponent = (section: string, componentName: string) => {
@@ -315,6 +315,7 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
 
               // التحقق من ما إذا كان المكون يحتاج للتوسيط
               const centerWrapperClasses = getCenterWrapperClasses(comp.componentName);
+              const centerWrapperStyles = getCenterWrapperStyles(comp.componentName);
               
               const componentElement = (
                 <Suspense 
@@ -325,10 +326,10 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
                 </Suspense>
               );
 
-              // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات المناسبة
+              // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات والستايل المناسب
               if (shouldCenterComponent(comp.componentName)) {
                 return (
-                  <div key={comp.id} className={centerWrapperClasses}>
+                  <div key={comp.id} className={centerWrapperClasses} style={centerWrapperStyles}>
                     {componentElement}
                   </div>
                 );
