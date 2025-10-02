@@ -23,13 +23,56 @@ const config = {
       },
       animation: {
         "bounce-in": "bounce-in 0.5s ease-out",
-        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        pulse: "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        shimmer: "shimmer 3s ease-in-out infinite",
+        "shimmer-slow": "shimmer-slow 4s ease-in-out infinite",
+        "shimmer-ultra": "shimmer-ultra 5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite",
+        "enhanced-pulse": "enhanced-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        wave: "wave 2.5s ease-in-out infinite",
+        "gentle-fade": "gentle-fade 2.5s ease-in-out infinite",
+        breathing: "breathing 3s ease-in-out infinite",
       },
       keyframes: {
         "bounce-in": {
           "0%": { transform: "scale(0)", opacity: "0" },
           "60%": { transform: "scale(1.1)", opacity: "1" },
           "100%": { transform: "scale(1)" },
+        },
+        shimmer: {
+          "0%": { transform: "translateX(-100%)", opacity: "0" },
+          "50%": { opacity: "0.8" },
+          "100%": { transform: "translateX(100%)", opacity: "0" },
+        },
+        "shimmer-slow": {
+          "0%": { transform: "translateX(-100%)", opacity: "0" },
+          "30%": { opacity: "0.4" },
+          "70%": { opacity: "0.6" },
+          "100%": { transform: "translateX(100%)", opacity: "0" },
+        },
+        "shimmer-ultra": {
+          "0%": { transform: "translateX(-120%)", opacity: "0" },
+          "20%": { opacity: "0.3" },
+          "50%": { opacity: "0.7" },
+          "80%": { opacity: "0.3" },
+          "100%": { transform: "translateX(120%)", opacity: "0" },
+        },
+        "enhanced-pulse": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.4" },
+        },
+        wave: {
+          "0%": { transform: "translateX(-100%)", opacity: "0.2" },
+          "30%": { opacity: "0.6" },
+          "70%": { opacity: "0.8" },
+          "100%": { transform: "translateX(100%)", opacity: "0.2" },
+        },
+        "gentle-fade": {
+          "0%, 100%": { opacity: "0.3" },
+          "50%": { opacity: "0.8" },
+        },
+        breathing: {
+          "0%, 100%": { transform: "scale(1)", opacity: "0.5" },
+          "50%": { transform: "scale(1.02)", opacity: "0.8" },
         },
       },
       colors: {

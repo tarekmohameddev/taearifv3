@@ -18,6 +18,16 @@ import {
   getSectionPath,
   getComponentSubPath,
 } from "@/lib-liveeditor/ComponentsList";
+import { SkeletonLoader } from "@/components/skeleton";
+import { 
+  StaticHeaderSkeleton1, 
+  HeroSkeleton1, 
+  HeroSkeleton2, 
+  FilterButtonsSkeleton1, 
+  GridSkeleton1, 
+  HalfTextHalfImageSkeleton1, 
+  ContactCardsSkeleton1 
+} from "@/components/skeleton";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageSwitcher } from "@/components/tenant/LanguageSwitcher";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
@@ -233,9 +243,29 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
     );
   }
 
-  // إذا كان التحميل جارياً أو لا توجد بيانات بعد، أظهر شاشة التحميل
+  // إذا كان التحميل جارياً أو لا توجد بيانات بعد، أظهر skeleton loading
+  // دالة لتحديد الـ skeleton المناسب حسب الصفحة
+  const renderSkeletonContent = () => {
+    // الصفحة الرئيسية (homepage) - slug = "/"
+    return (
+      <main className="flex-1">
+        <HeroSkeleton1 />
+      </main>
+    );
+  };
+
   if (shouldShowLoading || !componentsList) {
-    return <Loading />;
+    return (
+      <I18nProvider>
+        <div className="min-h-screen flex flex-col" dir="rtl">
+          {/* Header Skeleton */}
+          <StaticHeaderSkeleton1 />
+          
+          {/* Page-specific Skeleton Content */}
+          {renderSkeletonContent()}
+        </div>
+      </I18nProvider>
+    );
   }
 
   // Filter out header and footer components since they are now global
@@ -283,7 +313,10 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
               }
 
               return (
-                <Suspense key={comp.id} fallback={<Loading />}>
+                <Suspense 
+                  key={comp.id} 
+                  fallback={<SkeletonLoader componentName={comp.componentName} />}
+                >
                   <Cmp {...(comp.data as any)} useStore variant={comp.id} />
                 </Suspense>
               );

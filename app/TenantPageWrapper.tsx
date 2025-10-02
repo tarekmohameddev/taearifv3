@@ -2,7 +2,6 @@
 
 import { Suspense, lazy, Fragment, useMemo, useEffect } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
-import Loading from "@/app/loading";
 import { notFound } from "next/navigation";
 import {
   getSectionPath,
@@ -13,6 +12,16 @@ import Footer1 from "@/components/tenant/footer/footer1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/LanguageDropdown";
 import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
+import { SkeletonLoader } from "@/components/skeleton";
+import { 
+  StaticHeaderSkeleton1, 
+  HeroSkeleton1, 
+  HeroSkeleton2, 
+  FilterButtonsSkeleton1, 
+  GridSkeleton1, 
+  HalfTextHalfImageSkeleton1, 
+  ContactCardsSkeleton1 
+} from "@/components/skeleton";
 
 const loadComponent = (section: string, componentName: string) => {
   console.log("📄 TenantPageWrapper - loadComponent called with:", {
@@ -177,9 +186,54 @@ export default function TenantPageWrapper({
     return [];
   }, [tenantData?.componentSettings, slug]);
 
-  // إذا كان التحميل جارياً، أظهر شاشة التحميل
+  // دالة لتحديد الـ skeleton المناسب حسب الـ slug
+  const renderSkeletonContent = () => {
+    switch (slug) {
+      case "for-rent":
+      case "for-sale":
+        return (
+          <main className="flex-1">
+            <FilterButtonsSkeleton1 />
+            <GridSkeleton1 />
+          </main>
+        );
+      case "about-us":
+        return (
+          <main className="flex-1">
+            <HeroSkeleton2 />
+            <HalfTextHalfImageSkeleton1 />
+          </main>
+        );
+      case "contact-us":
+        return (
+          <main className="flex-1">
+            <HeroSkeleton2 />
+            <ContactCardsSkeleton1 />
+          </main>
+        );
+      default:
+        // الصفحات الأخرى تعرض HeroSkeleton1
+        return (
+          <main className="flex-1">
+            <HeroSkeleton1 />
+          </main>
+        );
+    }
+  };
+
+  // إذا كان التحميل جارياً، أظهر skeleton loading
   if (loadingTenantData) {
-    return <Loading />;
+    return (
+      <I18nProvider>
+        <div className="min-h-screen flex flex-col" dir="rtl">
+          {/* Header Skeleton */}
+          <StaticHeaderSkeleton1 />
+          
+          {/* Page-specific Skeleton Content */}
+          {renderSkeletonContent()}
+        </div>
+      </I18nProvider>
+    );
   }
 
   // إذا لم يكن الـ slug موجود في componentSettings، أظهر 404
@@ -200,7 +254,7 @@ export default function TenantPageWrapper({
 
   return (
     <I18nProvider>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col" dir="rtl">
         {/* Header with i18n support */}
         <div className="relative">
           <Header1 />
@@ -225,7 +279,10 @@ export default function TenantPageWrapper({
               }
 
               return (
-                <Suspense key={comp.id} fallback={<Loading />}>
+                <Suspense 
+                  key={comp.id} 
+                  fallback={<SkeletonLoader componentName={comp.componentName} />}
+                >
                   <Cmp {...(comp.data as any)} useStore variant={comp.id} />
                 </Suspense>
               );
