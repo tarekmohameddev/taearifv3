@@ -23,7 +23,7 @@ export default function StaticHeaderSkeleton1() {
       `}</style>
 
       <header
-        className="w-full transition-all duration-300 responsive-header-skeleton sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200 animate-pulse"
+        className="w-full transition-all duration-1000 responsive-header-skeleton sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200 animate-pulse"
         dir="rtl"
       >
         {/* Ultra Smooth Background Shimmer Effect */}
