@@ -1,23 +1,83 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import { 
+  StaticHeaderSkeleton1,
+  HeroSkeleton1,
+  HeroSkeleton2,
+  FilterButtonsSkeleton1,
+  GridSkeleton1,
+  HalfTextHalfImageSkeleton1,
+  ContactCardsSkeleton1
+} from "@/components/skeleton";
+
 export default function Loading() {
+  const pathname = usePathname();
+  
+  // استخراج الـ slug من المسار
+  const getSlugFromPathname = (pathname: string): string => {
+    if (!pathname) return "";
+    
+    // إزالة الـ / من البداية والنهاية
+    const cleanPath = pathname.replace(/^\/+|\/+$/g, "");
+    
+    // إذا كان المسار فارغ، فهو الصفحة الرئيسية
+    if (!cleanPath) return "/";
+    
+    // إذا كان المسار يحتوي على أكثر من جزء، نأخذ الجزء الأول
+    const parts = cleanPath.split("/");
+    return parts[0];
+  };
+
+  const slug = getSlugFromPathname(pathname || "");
+  
+  console.log("🔄 Loading component - pathname:", pathname, "slug:", slug);
+
+  const renderSkeletonContent = () => {
+    switch (slug) {
+      case "for-rent":
+      case "for-sale":
+        return (
+          <main className="flex-1">
+            <FilterButtonsSkeleton1 />
+            <GridSkeleton1 />
+          </main>
+        );
+      case "about-us":
+        return (
+          <main className="flex-1">
+            <HeroSkeleton2 />
+            <HalfTextHalfImageSkeleton1 />
+          </main>
+        );
+      case "contact-us":
+        return (
+          <main className="flex-1">
+            <HeroSkeleton2 />
+            <ContactCardsSkeleton1 />
+          </main>
+        );
+      case "/":
+        // الصفحة الرئيسية
+        return (
+          <main className="flex-1">
+            <HeroSkeleton1 />
+          </main>
+        );
+      default:
+        // الصفحات الأخرى تعرض HeroSkeleton1
+        return (
+          <main className="flex-1">
+            <HeroSkeleton1 />
+          </main>
+        );
+    }
+  };
+
   return (
-    <div className="animate-gentle-fade p-6 bg-gray-50 min-h-[200px] relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-ultra"></div>
-      <div className="space-y-4 relative z-10 max-w-md mx-auto">
-        <div className="h-6 bg-gray-200 rounded animate-breathing w-3/4 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer-slow"></div>
-        </div>
-        <div className="space-y-2">
-          <div className="h-4 bg-gray-100 rounded animate-gentle-fade w-full relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer-ultra" style={{ animationDelay: '0.5s' }}></div>
-          </div>
-          <div className="h-4 bg-gray-100 rounded animate-gentle-fade w-5/6 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer-slow" style={{ animationDelay: '1s' }}></div>
-          </div>
-          <div className="h-4 bg-gray-100 rounded animate-gentle-fade w-4/6 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer-ultra" style={{ animationDelay: '1.5s' }}></div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen flex flex-col" dir="rtl">
+      <StaticHeaderSkeleton1 />
+      {renderSkeletonContent()}
     </div>
   );
 }
