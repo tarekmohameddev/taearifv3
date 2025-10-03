@@ -279,7 +279,7 @@ export function ProjectsManagementPage() {
                       toast.error(`لا يمكنك إضافة أكثر من ${limit} مشاريع`);
                       setIsLimitReached(true);
                     } else {
-                      router.push("/projects/add");
+                      router.push("projects/add");
                     }
                   }}
                 >

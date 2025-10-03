@@ -901,7 +901,7 @@ export function PropertiesManagementPage() {
                     if (propertiesLength >= limit) {
                       setIsLimitReached(true);
                     } else {
-                      router.push("/properties/add");
+                      router.push("properties/add");
                     }
                   }}
                 >

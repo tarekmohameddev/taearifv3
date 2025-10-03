@@ -64,6 +64,50 @@ export default function ClientLayout({
     fetchUserData();
   }, [fetchUserData]);
 
+  // دالة للتحقق من الصفحات المسموح بها لعرض InfoPopup
+  const isAllowedPageForPopup = (pathname: string) => {
+    const allowedPages = [
+      "/dashboard/affiliate",
+      "/dashboard/analytics", 
+      "/dashboard/apps",
+      "/dashboard/blog",
+      "/dashboard/blogs",
+      "/dashboard/content",
+      "/dashboard/crm",
+      "/dashboard/customers",
+      "/dashboard/forgot-password",
+      "/dashboard/marketing",
+      "/dashboard/messages",
+      "/dashboard/projects",
+      "/dashboard/properties",
+      "/dashboard/property-requests",
+      "/dashboard/purchase-management",
+      "/dashboard/rental-management",
+      "/dashboard/reset",
+      "/dashboard/settings",
+      "/dashboard/templates",
+      "/dashboard/whatsapp-ai",
+      "/dashboard",
+      "/register",
+      "/oauth",
+      "/login",
+    ];
+
+    // التحقق من الصفحات المسموح بها بدون locale
+    if (allowedPages.some((page) => pathname?.startsWith(page))) {
+      return true;
+    }
+
+    // التحقق من الصفحات المسموح بها مع locale (en/ar/أو أي locale آخر)
+    const localePattern = /^\/[a-z]{2}\//;
+    if (localePattern.test(pathname)) {
+      const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}\//, "/");
+      return allowedPages.some((page) => pathWithoutLocale.startsWith(page));
+    }
+
+    return false;
+  };
+
   // دالة للتحقق من الصفحات العامة مع دعم الـ locale
   const isPublicPageWithLocale = (pathname: string) => {
     const publicPages = [
@@ -195,7 +239,7 @@ export default function ClientLayout({
     <AuthProvider>
       {children}
 
-      {showPopup && userData?.message && (
+      {showPopup && userData?.message && isAllowedPageForPopup(pathname || "") && (
         <InfoPopup
           message={userData.message}
           isVisible={showPopup}

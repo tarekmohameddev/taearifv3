@@ -174,7 +174,7 @@ export default function EmptyState({ type }) {
             asChild
           >
             <Link
-              href={type === "مشاريع" ? "/projects/add" : "/properties/add"}
+              href={type === "مشاريع" ? "projects/add" : "properties/add"}
             >
               <Plus className="h-5 w-5 empty-state-bounce-subtle" />
               أضف {type === "مشاريع" ? "مشروعك" : "عقارك"} الأول
