@@ -83,6 +83,10 @@ interface EditorStore {
   requestSave: () => void;
   closeDialog: () => void;
 
+  // حالة تتبع التعديلات
+  hasChangesMade: boolean;
+  setHasChangesMade: (hasChanges: boolean) => void;
+
   // Current page for tracking
   currentPage: string;
   setCurrentPage: (page: string) => void;
@@ -377,6 +381,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   openSaveDialogFn: () => {},
   tempData: {},
   currentPage: "homepage",
+  hasChangesMade: false,
 
   // Initialize Global Components with default data
   globalHeaderData: getDefaultHeaderData(),
@@ -433,6 +438,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setOpenSaveDialog: (fn) => set(() => ({ openSaveDialogFn: fn })),
   requestSave: () => set(() => ({ showDialog: true })),
   closeDialog: () => set(() => ({ showDialog: false })),
+  setHasChangesMade: (hasChanges) => {
+    console.log("🏪 Store: setHasChangesMade called with:", hasChanges);
+    set(() => ({ hasChangesMade: hasChanges }));
+  },
 
   setCurrentPage: (page) => set(() => ({ currentPage: page })),
 

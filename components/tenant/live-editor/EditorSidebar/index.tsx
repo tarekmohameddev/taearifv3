@@ -100,6 +100,7 @@ export function EditorSidebar({
     setGlobalComponentsData,
     updateGlobalComponentByPath,
     setCurrentPage,
+    setHasChangesMade,
   } = useEditorStore();
 
   // Helpers to update array fields (slides, gallery) and top-level fields when needed
@@ -337,6 +338,10 @@ export function EditorSidebar({
 
   const handleSave = () => {
     if (selectedComponent) {
+      // Set hasChangesMade to true when save is triggered
+      console.log("🚀 Setting hasChangesMade to true in EditorSidebar");
+      setHasChangesMade(true);
+      
       // Get store state before saving
       const store = useEditorStore.getState();
       const currentPage = store.currentPage || "homepage";

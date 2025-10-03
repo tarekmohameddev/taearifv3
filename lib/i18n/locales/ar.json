@@ -344,7 +344,14 @@
     "timestamp": "الطابع الزمني",
     "generate_full_report": "إنشاء تقرير كامل (تحقق من وحدة التحكم)",
     "toggle_verbose_logging": "تبديل التسجيل المفصل",
-    "debug_changes": "تصحيح التغييرات"
+    "debug_changes": "تصحيح التغييرات",
+    "changes_status": "حالة التعديلات",
+    "changes_detected": "تم اكتشاف تعديلات",
+    "no_changes": "لا توجد تعديلات",
+    "changes_not_saved_title": "التعديلات غير محفوظة",
+    "changes_not_saved_description": "تم اكتشاف تعديلاتك ولكن لم يتم حفظها بعد. ستظهر على موقعك المباشر فقط بعد الضغط على 'حفظ التعديلات' وتأكيد عملية الحفظ.",
+    "understood": "فهمت",
+    "click_to_save": "اضغط لحفظ التعديلات"
   },
   "editor_sidebar": {
     "theme_settings": "إعدادات الثيم",

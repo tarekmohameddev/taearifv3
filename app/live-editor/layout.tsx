@@ -191,7 +191,7 @@ function AddPageDialog({
         <Button
           variant="outline"
           size="sm"
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:text-white hover:scale-[calc(1.05)] border-0 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 shadow-lg hover:shadow-xl"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:text-white hover:scale-[calc(1.05)] border-0 hover:from-emerald-600 hover:to-teal-600 transition-all duration-2000 shadow-lg hover:shadow-xl"
         >
           <svg
             className="w-4 h-4"
@@ -430,7 +430,7 @@ function AddPageDialog({
                       metaTitle: e.target.value,
                     }))
                   }
-                  className={`transition-all duration-300 ${errors.metaTitle ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
+                  className={`transition-all duration-2000 ${errors.metaTitle ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
                 />
                 {errors.metaTitle && (
                   <p className="text-sm text-red-600 flex items-center gap-1">
@@ -563,7 +563,7 @@ function AddPageDialog({
           <Button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+            className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-2000"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
@@ -614,7 +614,8 @@ function AddPageDialog({
 }
 
 // مكون الشريط العلوي الجديد ليستطيع الوصول للسياق
-function EditorNavBar() {
+function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
+  console.log("🎯 EditorNavBar showArrowTooltip:", showArrowTooltip);
   const pathname = usePathname();
   const requestSave = useEditorStore((state) => state.requestSave);
   const {
@@ -963,7 +964,7 @@ function EditorNavBar() {
               <div className="relative pages-dropdown-container">
                 <button
                   onClick={() => setIsPagesDropdownOpen(!isPagesDropdownOpen)}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000"
                   aria-expanded={isPagesDropdownOpen}
                   aria-haspopup="true"
                 >
@@ -1057,30 +1058,37 @@ function EditorNavBar() {
           {/* Desktop Actions - Hidden on screens <= 1400px */}
           <div className="hidden xl:flex items-center space-x-4">
             {/* Save Button - Always visible */}
-            <button
-              onClick={requestSave}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 focus:ring-blue-500"
-            >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div className="relative">
+              <button 
+                onClick={requestSave}
+                className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-2000 focus:ring-blue-500 ${
+                  showArrowTooltip 
+                    ? "bg-red-500 hover:bg-red-900 animate-pulse shadow-lg shadow-red-500/50" 
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-                />
-              </svg>
-              {t("editor.save_changes")}
-            </button>
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                  />
+                </svg>
+                {t("editor.save_changes")}
+              </button>
+              
+            </div>
 
             {/* Add Page Button for Desktop */}
             <button
               onClick={() => setIsAddPageDialogOpen(true)}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-[calc(1.02)]"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -1102,7 +1110,7 @@ function EditorNavBar() {
               href={getTenantUrl(currentPath)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-[calc(1.02)]"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -1123,7 +1131,7 @@ function EditorNavBar() {
               href={getTenantUrl("/")}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:scale-[calc(1.02)]"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -1148,25 +1156,32 @@ function EditorNavBar() {
           {/* Mobile/Tablet Actions Dropdown - Visible on screens <= 1400px */}
           <div className="xl:hidden flex items-center space-x-2">
             {/* Save Button - Outside dropdown */}
-            <button
-              onClick={requestSave}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 focus:ring-blue-500"
-            >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div className="relative">
+              <button
+                onClick={requestSave}
+                className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-2000 focus:ring-blue-500 ${
+                  showArrowTooltip 
+                    ? "bg-red-500 hover:bg-red-900 animate-pulse shadow-lg shadow-red-500/50" 
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-                />
-              </svg>
-              {t("editor.save_changes")}
-            </button>
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                  />
+                </svg>
+                {t("editor.save_changes")}
+              </button>
+              
+            </div>
 
             <LanguageDropdown />
             
@@ -1295,7 +1310,7 @@ function EditorNavBar() {
               <div className="relative pages-dropdown-container">
                 <button
                   onClick={() => setIsPagesDropdownOpen(!isPagesDropdownOpen)}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000"
                   aria-expanded={isPagesDropdownOpen}
                   aria-haspopup="true"
                 >
@@ -1388,25 +1403,32 @@ function EditorNavBar() {
             {/* Actions */}
             <div className="flex items-center space-x-2">
               {/* Save Button */}
-              <button
-                onClick={requestSave}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 focus:ring-blue-500"
-              >
-                <svg
-                  className="w-4 h-4 mr-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div className="relative">
+                <button
+                  onClick={requestSave}
+                  className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-1000 focus:ring-blue-500 ${
+                    showArrowTooltip 
+                      ? "bg-red-700 hover:bg-red-700 animate-pulse shadow-lg shadow-red-500/50" 
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-                  />
-                </svg>
-                <span className="inline">{t("editor.save_changes")}</span>
-              </button>
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                    />
+                  </svg>
+                  <span className="inline">{t("editor.save_changes")}</span>
+                </button>
+                
+              </div>
 
               <LanguageDropdown />
               
@@ -1725,7 +1747,7 @@ function EditorNavBar() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> 
     </nav>
   );
 }
@@ -1738,6 +1760,11 @@ export default function LiveEditorLayout({
   const { setLocale } = useEditorLocale();
   const t = useEditorT();
   const pathname = usePathname();
+  
+  // State for arrow tooltip
+  const [showArrowTooltip, setShowArrowTooltip] = useState(false);
+  const [previousHasChangesMade, setPreviousHasChangesMade] = useState(false);
+  const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
 
   // Token validation
   const { tokenValidation } = useTokenValidation();
@@ -1750,6 +1777,21 @@ export default function LiveEditorLayout({
     }
   }, [pathname, setLocale]);
 
+  // Detect when hasChangesMade changes from false to true
+  useEffect(() => {
+    console.log("🔍 hasChangesMade changed:", { hasChangesMade, previousHasChangesMade });
+    if (hasChangesMade && !previousHasChangesMade) {
+      console.log("✅ Showing arrow tooltip!");
+      setShowArrowTooltip(true);
+      // Auto-hide after 7 seconds
+      setTimeout(() => {
+        console.log("⏰ Hiding arrow tooltip after 7 seconds");
+        setShowArrowTooltip(false);
+      }, 15000);
+    }
+    setPreviousHasChangesMade(hasChangesMade);
+  }, [hasChangesMade, previousHasChangesMade]);
+
 
   // Show loading while validating token
   if (tokenValidation.loading) {
@@ -1760,7 +1802,7 @@ export default function LiveEditorLayout({
       >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t("common.validating_session")}</p>
+          <p className="text-gray-600">Validating session...</p>
         </div>
       </div>
     );
@@ -1777,7 +1819,7 @@ export default function LiveEditorLayout({
 
             {/* Translation Test Component - Remove in production */}
 
-            <EditorNavBar />
+            <EditorNavBar showArrowTooltip={showArrowTooltip} />
 
             <main className="flex-1" dir="ltr">{children}</main>
           </div>

@@ -154,13 +154,6 @@ export default function ClientLayout({
       !UserIslogged &&
       !isPublicPageWithLocale(pathname || "")
     ) {
-      console.log("🔄 Redirecting to login - User not logged in");
-      console.log("🔍 Auth state:", {
-        isMounted,
-        IsLoading,
-        UserIslogged,
-        pathname,
-      });
       router.push("/login");
     }
   }, [isMounted, IsLoading, UserIslogged, pathname, router]);
@@ -187,8 +180,6 @@ export default function ClientLayout({
             if (completed == undefined) {
               router.push("/onboarding");
             } else {
-              console.error("testtttttttttttttt");
-              console.warn("testtttttttttttttt");
 
               router.push("/dashboard");
             }
@@ -207,8 +198,6 @@ export default function ClientLayout({
       const urlParams = new URLSearchParams(window.location.search);
       const hasToken = urlParams.get("token");
       if (userData && userData.email && !hasToken) {
-        console.error("testtttttttttttttt 222222222222222");
-        console.warn("testtttttttttttttt 222222222222222");
         router.push("/dashboard");
       }
     }
