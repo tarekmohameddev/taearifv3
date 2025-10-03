@@ -8,7 +8,7 @@ export default function SolutionsOverview() {
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            <span className="text-black">أربعة حلول</span>
+            <span className="text-black">أربعة حلول </span>
             <span className="gradient-text">في منصة واحدة</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">

@@ -12,7 +12,6 @@ import {
 import { useRouter } from "next/navigation";
 import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
 import { useAuth } from "@/context/AuthContext";
-import Loading from "./loading";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import {
   getSectionPath,

@@ -43,7 +43,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import LoadingComp from "@/components/homepage/LoadingComp";
 import VisitorChart from "@/components/homepage/VisitorChart";
 import MostVisitedPagesTable from "@/components/homepage/MostVisitedPagesTable";
 import RecentActivity from "@/components/homepage/recent-activity";

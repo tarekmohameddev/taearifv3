@@ -134,7 +134,7 @@ export function ProjectsManagementPage() {
       viewMode,
       projects,
       pagination,
-      loading,
+      loadingProjects,
       error,
       isInitialized,
     },
@@ -162,6 +162,11 @@ export function ProjectsManagementPage() {
     }
   };
 
+  useEffect(() => {
+    console.log("loadingProjects", loadingProjects);
+  }, [loadingProjects]);
+  
+  
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
@@ -309,63 +314,80 @@ export function ProjectsManagementPage() {
               </DialogContent>
             </Dialog>
 
-            {/* Tabs for filtering by status */}
-            <Tabs defaultValue="all">
-              {/* <TabsList> */}
-              {/* <TabsTrigger value="all">جميع المشاريع</TabsTrigger> */}
-              {/* <TabsTrigger value="1">منشور</TabsTrigger>
-                <TabsTrigger value="0">مسودات</TabsTrigger>
-                <TabsTrigger value="featured">مميز</TabsTrigger> */}
-              {/* </TabsList> */}
-              <TabsContent value="all" className="mt-4">
-                {loading ? (
-                  renderSkeletons()
-                ) : projects.length === 0 ? (
-                  <EmptyState type="مشاريع" />
-                ) : (
-                  renderProjectCards(projects)
-                )}
-              </TabsContent>
-              <TabsContent value="1" className="mt-4">
-                {loading
-                  ? renderSkeletons()
-                  : renderProjectCards(
-                      projects.filter((project: IProject) => {
-                        if (typeof project.published === "boolean") {
-                          return project.published === true;
-                        } else {
-                          return project.published === 1;
-                        }
-                      }),
-                    )}
-              </TabsContent>
-              <TabsContent value="0" className="mt-4">
-                {loading
-                  ? renderSkeletons()
-                  : renderProjectCards(
-                      projects.filter((project: IProject) => {
-                        if (typeof project.published === "boolean") {
-                          return project.published === false;
-                        } else {
-                          return project.published === 0;
-                        }
-                      }),
-                    )}
-              </TabsContent>
-              <TabsContent value="featured" className="mt-4">
-                {loading
-                  ? renderSkeletons()
-                  : renderProjectCards(
-                      projects.filter((project: IProject) => {
-                        if (typeof project.featured === "boolean") {
-                          return project.featured === true;
-                        } else {
-                          return project.featured === 1;
-                        }
-                      }),
-                    )}
-              </TabsContent>
-            </Tabs>
+            {loadingProjects ? (
+              renderSkeletons()
+            ) : error ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <p className="text-lg text-red-500">خطأ في تحميل المشاريع</p>
+                  <p className="text-sm text-gray-500 mt-2">{error}</p>
+                </div>
+              </div>
+            ) : (
+              <Tabs defaultValue="all">
+                {/* <TabsList> */}
+                {/* <TabsTrigger value="all">جميع المشاريع</TabsTrigger> */}
+                {/* <TabsTrigger value="1">منشور</TabsTrigger>
+                  <TabsTrigger value="0">مسودات</TabsTrigger>
+                  <TabsTrigger value="featured">مميز</TabsTrigger> */}
+                {/* </TabsList> */}
+                <TabsContent value="all" className="mt-4">
+                  {projects && projects.length === 0 ? (
+                    <EmptyState type="مشاريع" />
+                  ) : (
+                    renderProjectCards(projects)
+                  )}
+                </TabsContent>
+                <TabsContent value="1" className="mt-4">
+                  {(() => {
+                    const publishedProjects = projects.filter((project: IProject) => {
+                      if (typeof project.published === "boolean") {
+                        return project.published === true;
+                      } else {
+                        return project.published === 1;
+                      }
+                    });
+                    return publishedProjects.length === 0 ? (
+                      <EmptyState type="مشاريع" />
+                    ) : (
+                      renderProjectCards(publishedProjects)
+                    );
+                  })()}
+                </TabsContent>
+                <TabsContent value="0" className="mt-4">
+                  {(() => {
+                    const draftProjects = projects.filter((project: IProject) => {
+                      if (typeof project.published === "boolean") {
+                        return project.published === false;
+                      } else {
+                        return project.published === 0;
+                      }
+                    });
+                    return draftProjects.length === 0 ? (
+                      <EmptyState type="مشاريع" />
+                    ) : (
+                      renderProjectCards(draftProjects)
+                    );
+                  })()}
+                </TabsContent>
+                <TabsContent value="featured" className="mt-4">
+                  {(() => {
+                    const featuredProjects = projects.filter((project: IProject) => {
+                      if (typeof project.featured === "boolean") {
+                        return project.featured === true;
+                      } else {
+                        return project.featured === 1;
+                      }
+                    });
+                    return featuredProjects.length === 0 ? (
+                      <EmptyState type="مشاريع" />
+                    ) : (
+                      renderProjectCards(featuredProjects)
+                    );
+                  })()}
+                </TabsContent>
+              </Tabs>
+            )}
 
             {pagination && pagination.total !== 0 && (
               <div className="mt-6">

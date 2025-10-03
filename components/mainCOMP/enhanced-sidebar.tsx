@@ -196,8 +196,6 @@ export function EnhancedSidebar({
 
   const SidebarContent = () => {
     const userData = useAuthStore.getState().userData;
-    console.log("🔗 SidebarContent - userData:", userData);
-    console.log("🔗 SidebarContent - domain:", userData?.domain);
 
     return (
       <div className="flex h-full flex-col gap-2">

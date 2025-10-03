@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Zap,
   ArrowDown,
@@ -20,6 +21,7 @@ import {
 import SharedHeader from "./shared/SharedHeader";
 
 export default function TaearifUpdatesPage() {
+  const router = useRouter();
 
   useEffect(() => {
     // Initialize animations
@@ -68,20 +70,20 @@ export default function TaearifUpdatesPage() {
               القطاع العقاري
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#latest-updates"
+              <button
+                onClick={() => document.getElementById('latest-updates')?.scrollIntoView({ behavior: 'smooth' })}
                 className="inline-flex items-center bg-black text-white px-8 py-4 rounded-lg hover:bg-gray-800 transition-all text-lg"
               >
                 <ArrowDown className="h-5 w-5 ml-2" />
                 شاهد التحديثات
-              </a>
-              <a
-                href={`register/`}
+              </button>
+              <button
+                onClick={() => router.push('/register')}
                 className="inline-flex items-center bg-black text-white px-8 py-4 rounded-lg hover:bg-gray-800 transition-all text-lg"
               >
                 <Rocket className="h-5 w-5 ml-2" />
                 جرّب الآن
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -92,7 +94,7 @@ export default function TaearifUpdatesPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              <span className="text-black">التحديثات</span>
+              <span className="text-black">التحديثات </span>
               <span className="bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">
                 الأخيرة
               </span>
@@ -195,7 +197,7 @@ export default function TaearifUpdatesPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              <span className="text-black">قريباً</span>
+              <span className="text-black">قريباً </span>
               <span className="bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">
                 جداً
               </span>
@@ -281,7 +283,7 @@ export default function TaearifUpdatesPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              <span className="text-black">خارطة</span>
+              <span className="text-black">خارطة </span>
               <span className="bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">
                 الطريق
               </span>
@@ -456,44 +458,44 @@ export default function TaearifUpdatesPage() {
               <h4 className="font-bold text-lg mb-4">روابط سريعة</h4>
               <ul className="space-y-2">
                 <li>
-                  <a
-                    href="/"
+                  <button
+                    onClick={() => router.push('/')}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     الرئيسية
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="/solutions"
+                  <button
+                    onClick={() => router.push('/solutions')}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     الحلول
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="/about-us"
+                  <button
+                    onClick={() => router.push('/about-us')}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     من نحن
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="/updates"
+                  <button
+                    onClick={() => router.push('/updates')}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     التحديثات
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="/privacy"
+                  <button
+                    onClick={() => router.push('/privacy')}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     سياسة الخصوصية
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>

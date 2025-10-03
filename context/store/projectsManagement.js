@@ -6,7 +6,7 @@ module.exports = (set) => ({
     viewMode: "grid",
     projects: [],
     pagination: null,
-    loading: true,
+    loadingProjects: false,
     error: null,
     isInitialized: false,
   },
@@ -53,22 +53,22 @@ module.exports = (set) => ({
     set((state) => ({
       projectsManagement: {
         ...state.projectsManagement,
-        loading: true,
+        loadingProjects: true,
         error: null,
       },
     }));
 
     try {
       const response = await axiosInstance.get(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/projects`,
+        `/projects`,
       );
-
+      
       set((state) => ({
         projectsManagement: {
           ...state.projectsManagement,
-          projects: response.data.data.projects,
-          pagination: response.data.data.pagination,
-          loading: false,
+          projects: response.data.data.projects || [],
+          pagination: response.data.data.pagination || null,
+          loadingProjects: false,
           isInitialized: true,
         },
       }));
@@ -77,7 +77,7 @@ module.exports = (set) => ({
         projectsManagement: {
           ...state.projectsManagement,
           error: error.message || "حدث خطأ أثناء جلب بيانات المشاريع",
-          loading: false,
+          loadingProjects: false,
           isInitialized: true,
         },
       }));

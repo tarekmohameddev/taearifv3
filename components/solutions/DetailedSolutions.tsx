@@ -12,8 +12,11 @@ import {
   Bell,
   Rocket,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function DetailedSolutions() {
+  const router = useRouter();
+
   return (
     <section className="py-20 bg-gray-50/30">
       <div className="container">
@@ -69,10 +72,13 @@ export default function DetailedSolutions() {
                   <span className="text-gray-700">خرائط تفاعلية</span>
                 </div>
               </div>
-              <a href={`register/`} className="btn btn-success">
+              <button 
+                onClick={() => router.push('/register')} 
+                className="btn btn-success"
+              >
                 <Rocket className="ml-2 h-5 w-5" />
                 ابدأ إنشاء موقعك
-              </a>
+              </button>
             </div>
             <div className="relative">
               <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
@@ -170,10 +176,13 @@ export default function DetailedSolutions() {
                   </span>
                 </div>
               </div>
-              <a href={`register/`} className="btn btn-primary">
+              <button 
+                onClick={() => router.push('/register')} 
+                className="btn btn-primary"
+              >
                 <Users className="ml-2 h-5 w-5" />
                 جرب نظام CRM
-              </a>
+              </button>
             </div>
           </div>
         </div>

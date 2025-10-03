@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Users,
   Target,
@@ -30,10 +31,7 @@ import {
 import SharedHeader from "./shared/SharedHeader";
 
 export default function AboutUsPage() {
-
-  useEffect(() => {
-    // Animation Observer - تم إزالة هذا الكود لأنه يسبب مشاكل في العرض
-  }, []);
+  const router = useRouter();
 
   return (
     <div
@@ -361,44 +359,44 @@ export default function AboutUsPage() {
               <h4 className="font-bold text-lg mb-4">روابط سريعة</h4>
               <ul className="space-y-2">
                 <li>
-                  <a
-                    href="/"
+                  <button
+                    onClick={() => router.push('/')}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     الرئيسية
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="/solutions"
+                  <button
+                    onClick={() => router.push('/solutions')}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     الحلول
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="/about-us"
+                  <button
+                    onClick={() => router.push('/about-us')}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     من نحن
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="/updates"
+                  <button
+                    onClick={() => router.push('/updates')}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     التحديثات
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="/privacy"
+                  <button
+                    onClick={() => router.push('/privacy')}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     سياسة الخصوصية
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
