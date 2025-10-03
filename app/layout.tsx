@@ -27,10 +27,52 @@ export default async function RootLayout({
     "/landing"
   ];
 
+  // تحديد الصفحات التي يجب أن تظهر فيها ReCaptcha
+  const recaptchaPages = [
+    "/dashboard/affiliate",
+    "/dashboard/analytics", 
+    "/dashboard/apps",
+    "/dashboard/blog",
+    "/dashboard/blogs",
+    "/dashboard/content",
+    "/dashboard/crm",
+    "/dashboard/customers",
+    "/dashboard/forgot-password",
+    "/dashboard/marketing",
+    "/dashboard/messages",
+    "/dashboard/projects",
+    "/dashboard/properties",
+    "/dashboard/property-requests",
+    "/dashboard/purchase-management",
+    "/dashboard/rental-management",
+    "/dashboard/reset",
+    "/dashboard/settings",
+    "/dashboard/templates",
+    "/dashboard/whatsapp-ai",
+    "/dashboard",
+    "/live-editor"
+  ];
+
   // التحقق من أن الصفحة مسموح بها وليس هناك subdomain
   const shouldLoadAnalytics = !tenantId && allowedPages.some(page => 
     pathname === page || pathname.startsWith(page + "/")
   );
+
+  // التحقق من أن الصفحة تحتاج ReCaptcha (مع مراعاة locale)
+  const shouldLoadReCaptcha = recaptchaPages.some(page => {
+    // التحقق من المسار المباشر
+    if (pathname === page || pathname.startsWith(page + "/")) {
+      return true;
+    }
+    // التحقق من المسارات مع locale (مثل /en/live-editor, /ar/dashboard)
+    const localePattern = /^\/(en|ar)\/(.+)$/;
+    const match = pathname.match(localePattern);
+    if (match) {
+      const [, , pathWithoutLocale] = match;
+      return pathWithoutLocale === page || pathWithoutLocale.startsWith(page + "/");
+    }
+    return false;
+  });
 
   return (
     <html lang="ar" dir="ltr" className="light" suppressHydrationWarning>
@@ -84,9 +126,13 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          <ReCaptchaWrapper>
+          {shouldLoadReCaptcha ? (
+            <ReCaptchaWrapper>
+              <ClientLayout>{children}</ClientLayout>
+            </ReCaptchaWrapper>
+          ) : (
             <ClientLayout>{children}</ClientLayout>
-          </ReCaptchaWrapper>
+          )}
         </ThemeProvider>
       </body>
     </html>
