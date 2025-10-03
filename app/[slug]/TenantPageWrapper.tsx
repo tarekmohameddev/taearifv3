@@ -7,7 +7,7 @@ import {
   getSectionPath,
   getComponentSubPath,
 } from "@/lib-liveeditor/ComponentsList";
-import Header1 from "@/components/tenant/header/header1";
+import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import Footer1 from "@/components/tenant/footer/footer1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/LanguageDropdown";
@@ -268,7 +268,7 @@ export default function TenantPageWrapper({
       <div className="min-h-screen flex flex-col" dir="rtl">
         {/* Header with i18n support */}
         <div className="relative">
-          <Header1 />
+          <StaticHeader1 />
           {/* لا اريد ازالة هذا  , فقط اريده ككومنت */}
           {/* <div className="absolute top-4 right-4 z-50"> 
             <LanguageDropdown />

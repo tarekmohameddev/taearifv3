@@ -35,7 +35,7 @@ export default function SharedHeader({ activePage = "" }: SharedHeaderProps) {
         <div className="max-w-6xl mx-auto px-4 flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div className="relative group">
+            <div className="relative group cursor-pointer" onClick={() => handleNavigation("/")}>
               <svg
                 version="1.0"
                 width="150"
