@@ -26,7 +26,7 @@ module.exports = (set) => ({
         },
       }));
     } catch (error) {
-      console.error("Error fetching traffic sources:", error);
+      // Handle error silently
     } finally {
       set({ loading: false });
     }

@@ -69,7 +69,6 @@ export function AboutCompanyPage() {
     const fetchData = async () => {
       // التحقق من وجود التوكن قبل إجراء الطلب
       if (!userData?.token) {
-        console.log("No token available, skipping fetchData");
         return;
       }
 
@@ -138,7 +137,6 @@ export function AboutCompanyPage() {
   const handleSave = async () => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping handleSave");
       alert("Authentication required. Please login.");
       return;
     }

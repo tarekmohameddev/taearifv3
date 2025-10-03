@@ -78,7 +78,6 @@ export default function AddAppointmentDialog({
 
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping handleSubmit");
       alert("Authentication required. Please login.");
       return;
     }

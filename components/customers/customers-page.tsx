@@ -172,7 +172,6 @@ export default function CustomersPage() {
     async (page = 1) => {
       // التحقق من وجود التوكن قبل إجراء الطلب
       if (!userData?.token) {
-        console.log("No token available, skipping fetchCustomersWithFilters");
         return;
       }
 
@@ -505,7 +504,6 @@ export default function CustomersPage() {
   const handleUpdateCustomer = async () => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping handleUpdateCustomer");
       alert("Authentication required. Please login.");
       return;
     }
@@ -600,7 +598,6 @@ export default function CustomersPage() {
   const handleDelete = async (customerId: number) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping handleDelete");
       alert("Authentication required. Please login.");
       return;
     }

@@ -16,7 +16,7 @@ module.exports = (set) => ({
         },
       }));
     } catch (error) {
-      console.error("Error fetching setup progress data:", error);
+      // Handle error silently
     } finally {
       set({ loading: false });
     }

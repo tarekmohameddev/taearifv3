@@ -108,7 +108,6 @@ export function ContentManagementPage() {
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchContentSections");
       return;
     }
     if (sections.length === 0) {

@@ -64,7 +64,6 @@ module.exports = (set, get) => ({
     // التحقق من وجود التوكن قبل إجراء الطلب
     const token = useAuthStore.getState().userData?.token;
     if (!token) {
-      console.log("No token available, skipping fetchPurchaseRequests");
       return;
     }
 
@@ -228,7 +227,6 @@ module.exports = (set, get) => ({
     // التحقق من وجود التوكن قبل إجراء الطلب
     const token = useAuthStore.getState().userData?.token;
     if (!token) {
-      console.log("No token available, skipping fetchPurchaseRequestStats");
       return;
     }
 
@@ -298,7 +296,6 @@ module.exports = (set, get) => ({
     // التحقق من وجود التوكن قبل إجراء الطلب
     const token = useAuthStore.getState().userData?.token;
     if (!token) {
-      console.log("No token available, skipping fetchProperties");
       return;
     }
 
@@ -350,7 +347,6 @@ module.exports = (set, get) => ({
     // التحقق من وجود التوكن قبل إجراء الطلب
     const token = useAuthStore.getState().userData?.token;
     if (!token) {
-      console.log("No token available, skipping fetchProjects");
       return;
     }
 

@@ -44,7 +44,6 @@ export function AffiliateOverviewPage() {
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchAffiliateData");
       return;
     }
     fetchAffiliateData();

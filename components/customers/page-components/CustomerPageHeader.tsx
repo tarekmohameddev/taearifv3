@@ -106,7 +106,6 @@ export const CustomerPageHeader = ({
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchStages");
       return;
     }
     fetchStages();
@@ -115,7 +114,6 @@ export const CustomerPageHeader = ({
   const fetchStages = async () => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchStages");
       return;
     }
 
@@ -161,9 +159,6 @@ export const CustomerPageHeader = ({
   const handleAddCustomerWithValidation = async () => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log(
-        "No token available, skipping handleAddCustomerWithValidation",
-      );
       alert("Authentication required. Please login.");
       return;
     }

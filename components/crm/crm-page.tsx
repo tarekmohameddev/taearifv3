@@ -833,7 +833,6 @@ export default function CrmPage() {
   const handleCompleteReminder = async (reminder: any) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping handleCompleteReminder");
       alert("Authentication required. Please login.");
       return;
     }
@@ -859,22 +858,18 @@ export default function CrmPage() {
 
   const handleViewInquiry = (inquiry: any) => {
     // TODO: Implement inquiry detail view
-    console.log("View inquiry:", inquiry);
   };
 
   const handleEditInquiry = (inquiry: any) => {
     // TODO: Implement inquiry edit
-    console.log("Edit inquiry:", inquiry);
   };
 
   const handleAddInquiry = () => {
     // TODO: Implement add inquiry
-    console.log("Add inquiry");
   };
 
   const handleContactCustomer = (inquiry: any) => {
     // TODO: Implement contact customer
-    console.log("Contact customer:", inquiry);
   };
 
   // عرض loading state

@@ -26,7 +26,7 @@ module.exports = (set) => ({
         },
       }));
     } catch (error) {
-      console.error("Error fetching dashboard summary:", error);
+      // Handle error silently
     } finally {
       set({ loading: false });
     }

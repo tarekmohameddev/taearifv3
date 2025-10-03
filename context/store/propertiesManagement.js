@@ -20,13 +20,10 @@ module.exports = (set) => ({
   },
 
   setPropertiesManagement: (newState) =>
-    set((state) => {
-      console.log("🔄 setPropertiesManagement CALLED with:", newState);
-      return {
-        propertiesManagement: {
-          ...state.propertiesManagement,
-          ...newState,
-        },
-      };
-    }),
+    set((state) => ({
+      propertiesManagement: {
+        ...state.propertiesManagement,
+        ...newState,
+      },
+    })),
 });

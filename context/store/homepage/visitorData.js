@@ -72,7 +72,7 @@ module.exports = (set) => ({
         },
       }));
     } catch (error) {
-      console.error("Error fetching visitor data:", error);
+      // Handle error silently
     } finally {
       set({ loading: false });
     }

@@ -76,7 +76,6 @@ export const StageAssignmentDialog = ({
   const fetchStages = async () => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchStages");
       return;
     }
 
@@ -106,7 +105,6 @@ export const StageAssignmentDialog = ({
 
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping handleSave");
       alert("Authentication required. Please login.");
       return;
     }

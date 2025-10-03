@@ -12,7 +12,6 @@ module.exports = (set) => ({
     // التحقق من وجود التوكن قبل إجراء الطلب
     const token = useAuthStore.getState().userData?.token;
     if (!token) {
-      console.log("No token available, skipping fetchRecentActivityData");
       return;
     }
 
@@ -23,7 +22,7 @@ module.exports = (set) => ({
       );
       set({ recentActivityData: response.data, isRecentActivityUpdated: true });
     } catch (error) {
-      console.error("Error fetching recent activity data:", error);
+      // Handle error silently
     } finally {
       set({ loading: false });
     }

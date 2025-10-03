@@ -80,7 +80,6 @@ export const FiltersAndSearch = ({
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping fetchFilters");
       return;
     }
 
@@ -110,7 +109,6 @@ export const FiltersAndSearch = ({
   const performSearch = useCallback(async () => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping performSearch");
       return;
     }
 
