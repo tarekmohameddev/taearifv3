@@ -269,17 +269,6 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
 
   // Update mergedData whenever dependencies change
   useEffect(() => {
-    console.log("🔍 [StaticHeader1] useEffect triggered:", {
-      globalHeaderData: globalHeaderData,
-      globalHeaderDataFromComponents: globalHeaderDataFromComponents,
-      tenantGlobalHeaderData: tenantGlobalHeaderData,
-      overrideData: overrideData,
-      hasGlobalHeaderData: !!globalHeaderData,
-      hasGlobalHeaderDataFromComponents: !!globalHeaderDataFromComponents,
-      hasTenantGlobalHeaderData: !!tenantGlobalHeaderData,
-      hasOverrideData: !!overrideData,
-    });
-
     // Deep merge function for nested objects
     const deepMerge = (target: any, source: any): any => {
       if (!source || typeof source !== "object") return target || source;
@@ -341,30 +330,6 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
       result.colors = defaultData.colors;
     }
 
-    console.log("🔍 [StaticHeader1] Merged header data updated:", {
-      defaultData: Object.keys(defaultData),
-      globalHeaderData: Object.keys(globalHeaderData || {}),
-      tenantGlobalHeaderData: Object.keys(tenantGlobalHeaderData || {}),
-      overrideData: Object.keys(overrideData || {}),
-      mergedData: Object.keys(result),
-      hasGlobalData:
-        !!globalHeaderData && Object.keys(globalHeaderData).length > 0,
-      hasTenantGlobalData:
-        !!tenantGlobalHeaderData &&
-        Object.keys(tenantGlobalHeaderData).length > 0,
-      hasOverrideData: !!overrideData && Object.keys(overrideData).length > 0,
-      menuItems: result.menu?.length || 0,
-      logo: result.logo,
-      colors: result.colors,
-      menuTexts: result.menu?.map((item: any) => item.text),
-      menuItemsWithIds: result.menu?.map((item: any, index: number) => ({
-        index,
-        id: item.id,
-        text: item.text,
-        url: item.url,
-      })),
-    });
-
     setMergedData(result);
     setForceUpdate((prev) => prev + 1); // Force re-render
   }, [
@@ -378,12 +343,6 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
   // Monitor globalHeaderData changes
   useEffect(() => {
     if (globalHeaderData && Object.keys(globalHeaderData).length > 0) {
-      console.log("🔍 [StaticHeader1] globalHeaderData changed:", {
-        globalHeaderData,
-        menuItems: globalHeaderData.menu?.length || 0,
-        logo: globalHeaderData.logo,
-        colors: globalHeaderData.colors,
-      });
       setForceUpdate((prev) => prev + 1);
     }
   }, [globalComponentsData]);

@@ -110,11 +110,9 @@ interface PropertySliderProps {
 const convertLegacyApiUrl = (url: string, tenantId: string): string => {
   if (url === "/api/properties/latestSales") {
     const newUrl = `/v1/tenant-website/${tenantId}/properties?purpose=sale&latest=1&limit=10`;
-    console.log(`🔄 Converting legacy URL: ${url} → ${newUrl}`);
     return newUrl;
   } else if (url === "/api/properties/latestRentals") {
     const newUrl = `/v1/tenant-website/${tenantId}/properties?purpose=rent&latest=1&limit=10`;
-    console.log(`🔄 Converting legacy URL: ${url} → ${newUrl}`);
     return newUrl;
   }
   // If it's already the new format with placeholder, replace tenantId
@@ -143,10 +141,8 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   const fetchProperties = async (apiUrl?: string) => {
     try {
       setLoading(true);
-      console.log("PropertySlider: 🚀 Starting fetch properties...");
 
       if (!currentTenantId) {
-        console.log("PropertySlider: ❌ No tenant ID available, skipping fetch");
         setLoading(false);
         return;
       }
@@ -155,21 +151,15 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
       const defaultUrl = "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10";
       const url = convertLegacyApiUrl(apiUrl || defaultUrl, currentTenantId);
       
-      console.log(`PropertySlider: 🌐 Fetching from URL: ${url}`);
       
       const response = await axiosInstance.get(url);
-      
-      console.log("PropertySlider: API Response:", response.data);
       
       // Handle new API response format
       if (response.data && response.data.properties) {
         setApiProperties(response.data.properties);
-        console.log(`PropertySlider: ✅ Properties loaded: ${response.data.properties.length} items`);
         if (response.data.pagination) {
-          console.log(`PropertySlider: 📊 Pagination info:`, response.data.pagination);
         }
       } else {
-        console.log("PropertySlider: ⚠️ No properties found in response");
         setApiProperties([]);
       }
     } catch (error) {

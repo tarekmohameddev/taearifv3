@@ -82,7 +82,6 @@ export const useTokenValidation = () => {
 
         // حذف authToken cookie عند الحصول على 401
         clearAuthCookie();
-        console.log("🍪 authToken cookie cleared due to 401 error");
 
         // حذف جميع البيانات من AuthContext مباشرة
         clearAuthContextData();
@@ -90,7 +89,6 @@ export const useTokenValidation = () => {
         // تسجيل الخروج من AuthContext (كإجراء إضافي)
         try {
           await logout({ redirect: false, clearStore: true });
-          console.log("🚪 AuthContext logout completed due to 401 error");
         } catch (logoutError) {
           console.error("❌ Error during AuthContext logout:", logoutError);
         }
@@ -137,7 +135,6 @@ export const useTokenValidation = () => {
     setUserIsLogged(false);
     setAuthenticated(false);
     setIsLoading(false);
-    console.log("🧹 AuthContext data cleared directly");
   };
 
   const clearAllCookies = () => {
@@ -161,7 +158,6 @@ export const useTokenValidation = () => {
 
   const handleInvalidToken = () => {
     clearAllCookies();
-    console.log("🔄 handleInvalidToken: Redirecting to login");
     router.push("/login");
   };
 

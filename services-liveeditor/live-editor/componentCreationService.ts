@@ -8,20 +8,10 @@ import { getPageDefinition } from "./pageDefinitionService";
 export const createInitialComponents = (
   pageSlug: string,
 ): ComponentInstance[] => {
-  console.log(
-    "🔧 createInitialComponents - Creating components for page:",
-    pageSlug,
-  );
   const pageDefinition = getPageDefinition(pageSlug);
-  console.log("🔧 createInitialComponents - Page definition:", pageDefinition);
 
   if (pageDefinition) {
     const components = pageDefinition.map((definition, index) => {
-      console.log("🔧 createInitialComponents - Processing component:", {
-        type: definition.type,
-        componentName: definition.componentName,
-        name: definition.name,
-      });
 
       // استخدام componentName من البيانات الافتراضية بدلاً من إنشاء اسم افتراضي
       return {
@@ -39,14 +29,9 @@ export const createInitialComponents = (
       } as ComponentInstance;
     });
 
-    console.log("🔧 createInitialComponents - Created components:", components);
     return components;
   }
 
-  console.log(
-    "🔧 createInitialComponents - No page definition found for:",
-    pageSlug,
-  );
   // إذا لم تكن الصفحة معرفة، إرجاع مصفوفة فارغة
   return [];
 };

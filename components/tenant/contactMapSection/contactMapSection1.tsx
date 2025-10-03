@@ -389,15 +389,6 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
     ...storeData,
   };
 
-  // Debug: Log the merged data to see what's happening
-  console.log("🔍 contactMapSection1 - mergedData:", {
-    formEnabled: mergedData.form?.enabled,
-    mapEnabled: mergedData.map?.enabled,
-    tenantComponentData,
-    storeData,
-    props,
-  });
-
   // Local state for form
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);

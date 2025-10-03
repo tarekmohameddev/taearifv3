@@ -245,19 +245,6 @@ export default function StaticFooter({
       ...(overrideData || {}), // overrideData overrides everything (for iframe)
     };
 
-    console.log("🔍 [StaticFooter1] Merged footer data:", {
-      defaultData: Object.keys(defaultData),
-      globalFooterData: Object.keys(globalFooterData || {}),
-      tenantGlobalFooterData: Object.keys(tenantGlobalFooterData || {}),
-      overrideData: Object.keys(overrideData || {}),
-      mergedData: Object.keys(result),
-      hasGlobalData:
-        !!globalFooterData && Object.keys(globalFooterData).length > 0,
-      hasTenantGlobalData:
-        !!tenantGlobalFooterData &&
-        Object.keys(tenantGlobalFooterData).length > 0,
-      hasOverrideData: !!overrideData && Object.keys(overrideData).length > 0,
-    });
 
     return result;
   }, [defaultData, globalComponentsData, tenantGlobalFooterData, overrideData]);

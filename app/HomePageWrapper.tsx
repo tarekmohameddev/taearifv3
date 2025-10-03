@@ -86,7 +86,6 @@ const loadComponent = (section: string, componentName: string) => {
 
   // جميع المكونات الآن مستقلة في مجلدات خاصة بها
   const fullPath = `${subPath}/${componentName}`;
-  console.log("🏠 HomePageWrapper - Loading component from path:", fullPath);
 
   return lazy(() =>
     import(`@/components/tenant/${fullPath}`).catch(() => ({
@@ -109,7 +108,7 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
   // Debug: Log error state
   useEffect(() => {
     if (error) {
-      console.log("🏠 HomePageWrapper - Error detected:", error);
+      console.error("🏠 HomePageWrapper - Error detected:", error);
     }
   }, [error]);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -306,10 +305,6 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
             filteredComponentsList.map((comp: any) => {
               const Cmp = loadComponent("homepage", comp.componentName);
               if (!Cmp) {
-                console.log(
-                  "❌ HomePage - Component not found:",
-                  comp.componentName,
-                );
                 return <Fragment key={comp.id} />;
               }
 

@@ -296,7 +296,6 @@ const useTenantStore = create((set) => ({
         "/v1/tenant-website/getTenant",
         { websiteName },
       );
-      console.log("[tenantStore] Response status:", response.status);
       if (response.status === 404) {
         throw new Error("Tenant not found");
       } else if (response.status === 204) {
@@ -352,7 +351,7 @@ const useTenantStore = create((set) => ({
         // Don't set anything - let the component use its default data
       }
 
-      console.log("[tenantStore] Successfully fetched data for:", websiteName);
+
       set({
         tenantData: data,
         loadingTenantData: false,
@@ -360,9 +359,7 @@ const useTenantStore = create((set) => ({
       });
     } catch (error) {
       console.error("[tenantStore] Error fetching tenant data:", error);
-      console.log("[tenantStore] Setting error in state:", error.message);
       set({ error: error.message, loadingTenantData: false });
-      console.log("[tenantStore] Error state updated");
     }
   },
 
@@ -374,13 +371,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping saveHeaderChanges",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -421,13 +414,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping saveHeroChanges",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -468,13 +457,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping saveFooterChanges",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -519,13 +504,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping savehalfTextHalfImageChanges",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -570,13 +551,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping savehalfTextHalfImage2Changes",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -621,13 +598,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping savehalfTextHalfImage3Changes",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -669,13 +642,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping savePropertySliderChanges",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -717,13 +686,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping saveCtaValuationChanges",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -796,13 +761,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping saveGridChanges",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -875,13 +836,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping saveFilterButtonsChanges",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -954,13 +911,9 @@ const useTenantStore = create((set) => ({
       const useAuthStore = authModule.default;
       userData = useAuthStore.getState().userData;
       if (!userData?.token) {
-        console.log(
-          "[tenantStore] No token available, skipping savePropertyFilterChanges",
-        );
         return false;
       }
     } catch (error) {
-      console.log("[tenantStore] Error importing AuthContext:", error);
       return false;
     }
 
@@ -979,7 +932,7 @@ const useTenantStore = create((set) => ({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save property filter changes");
+        throw new Error("Failed to save property slider changes");
       }
 
       const updatedTenant = await response.json();

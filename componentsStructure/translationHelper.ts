@@ -753,10 +753,8 @@ export function translateLabel(label: string, t: (key: string) => string): strin
   const translationKey = labelMappings[label];
   if (translationKey) {
     const translated = t(translationKey);
-    console.log(`Translating "${label}" -> "${translationKey}" -> "${translated}"`);
     return translated;
   }
-  console.log(`No translation found for label: "${label}"`);
   return label; // Return original label if no translation found
 }
 

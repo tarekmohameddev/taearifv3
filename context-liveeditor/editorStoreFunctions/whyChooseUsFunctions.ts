@@ -129,8 +129,11 @@ export const whyChooseUsFunctions = {
     };
   },
 
-  getData: (state: any, variantId: string) =>
-    state.whyChooseUsStates[variantId] || getDefaultWhyChooseUsData(),
+  getData: (state: any, variantId: string) => {
+    const data =
+      state.whyChooseUsStates[variantId] || getDefaultWhyChooseUsData();
+    return data;
+  },
 
   setData: (state: any, variantId: string, data: ComponentData) => ({
     ...state,

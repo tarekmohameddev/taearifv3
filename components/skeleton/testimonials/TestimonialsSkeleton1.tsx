@@ -1,8 +1,7 @@
 "use client";
 
 export default function TestimonialsSkeleton1() {
-  console.log("🎨 TestimonialsSkeleton1: Component is rendering!");
-  
+      
   return (
     <section className="w-full bg-background py-14 sm:py-16">
       <div className="w-full" dir="rtl">

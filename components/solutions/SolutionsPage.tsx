@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import SolutionsHeader from "./SolutionsHeader";
+import SharedHeader from "../shared/SharedHeader";
 import SolutionsHero from "./SolutionsHero";
 import SolutionsOverview from "./SolutionsOverview";
 import DetailedSolutions from "./DetailedSolutions";
@@ -31,9 +31,9 @@ export default function SolutionsPage() {
 
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-      anchor.addEventListener("click", function (e) {
+      anchor.addEventListener("click", (e: Event) => {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute("href"));
+        const target = document.querySelector((anchor as HTMLAnchorElement).getAttribute("href") || "");
         if (target) {
           target.scrollIntoView({
             behavior: "smooth",
@@ -51,7 +51,7 @@ export default function SolutionsPage() {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden" dir="rtl">
       <SolutionsStyles />
-      <SolutionsHeader />
+      <SharedHeader activePage="solutions" />
       <SolutionsHero />
       <SolutionsOverview />
       <DetailedSolutions />

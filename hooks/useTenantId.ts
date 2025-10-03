@@ -17,7 +17,6 @@ export function useTenantId() {
         const tenantFromSubdomain = extractTenantFromHostname(hostname);
         
         if (tenantFromSubdomain) {
-          console.log("🏢 Tenant ID from subdomain:", tenantFromSubdomain);
           setTenantId(tenantFromSubdomain);
           setIsLoading(false);
           return;
@@ -26,14 +25,12 @@ export function useTenantId() {
 
       // 2. محاولة الحصول على tenantId من userData
       if (userData?.username) {
-        console.log("👤 Tenant ID from userData:", userData.username);
         setTenantId(userData.username);
         setIsLoading(false);
         return;
       }
 
       // 3. إذا لم نجد tenantId، نبقى في حالة loading
-      console.log("⏳ No tenant ID found yet, waiting...");
       setIsLoading(true);
     };
 

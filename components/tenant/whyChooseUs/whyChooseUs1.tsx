@@ -296,18 +296,24 @@ interface WhyChooseUsProps {
 export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
   // Initialize variant id early so hooks can depend on it
   const variantId = props.variant || "whyChooseUs1";
+  const uniqueId = props.id || variantId;
 
   // Subscribe to editor store updates for this why choose us variant
   const ensureComponentVariant = useEditorStore(
     (s) => s.ensureComponentVariant,
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
+  const whyChooseUsStates = useEditorStore((s) => s.whyChooseUsStates);
 
   useEffect(() => {
     if (props.useStore) {
-      ensureComponentVariant("whyChooseUs", variantId, props);
+      const initialData = {
+        ...getDefaultWhyChooseUsData(),
+        ...props,
+      };
+      ensureComponentVariant("whyChooseUs", uniqueId, initialData);
     }
-  }, [variantId, props.useStore, ensureComponentVariant]);
+  }, [uniqueId, props.useStore, ensureComponentVariant]);
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -322,48 +328,160 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore
-    ? getComponentData("whyChooseUs", variantId) || {}
+    ? getComponentData("whyChooseUs", uniqueId) || {}
+    : {};
+  const currentStoreData = props.useStore
+    ? whyChooseUsStates[uniqueId] || {}
     : {};
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
-    if (!tenantData?.componentSettings) return {};
+    if (!tenantData) {
+      return {};
+    }
 
-    // Search through all pages for this component variant
-    for (const [pageSlug, pageComponents] of Object.entries(
-      tenantData.componentSettings,
-    )) {
-      // Check if pageComponents is an object (not array)
-      if (
-        typeof pageComponents === "object" &&
-        !Array.isArray(pageComponents)
-      ) {
-        // Search through all components in this page
-        for (const [componentId, component] of Object.entries(
-          pageComponents as any,
-        )) {
-          if (
-            (component as any).type === "whyChooseUs" &&
-            (component as any).componentName === variantId &&
-            componentId === props.id
-          ) {
-            return (component as any).data;
+    // First, check if data comes directly from API response (new structure)
+    if (tenantData.components && Array.isArray(tenantData.components)) {
+      for (const component of tenantData.components) {
+        if (component.type === "whyChooseUs" && component.componentName === variantId) {
+          const componentData = component.data;
+          
+          // Transform the API data structure to match component expectations
+          return {
+            visible: componentData.visible,
+            header: {
+              title: componentData.texts?.title || componentData.header?.title,
+              description: componentData.texts?.subtitle || componentData.header?.description,
+              typography: {
+                title: {
+                  className: componentData.texts?.title ? "section-title text-right" : undefined
+                },
+                description: {
+                  className: componentData.texts?.subtitle ? "section-subtitle-xl" : undefined
+                }
+              }
+            },
+            colors: {
+              background: componentData.colors?.background,
+              textColor: componentData.colors?.textColor,
+              titleColor: componentData.colors?.titleColor,
+              descriptionColor: componentData.colors?.descriptionColor
+            },
+            layout: {
+              direction: componentData.layout?.direction || "rtl",
+              maxWidth: componentData.layout?.maxWidth || "1600px"
+            }
+          };
+        }
+      }
+    }
+
+    // Fallback: check componentSettings (old structure)
+    if (tenantData?.componentSettings) {
+      // Search through all pages for this component variant
+      for (const [pageSlug, pageComponents] of Object.entries(
+        tenantData.componentSettings,
+      )) {
+        // Check if pageComponents is an object (not array)
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
+          // Search through all components in this page
+          for (const [componentId, component] of Object.entries(
+            pageComponents as any,
+          )) {
+            // Check if this is the exact component we're looking for by type and componentName
+            if (
+              (component as any).type === "whyChooseUs" &&
+              (component as any).componentName === variantId
+            ) {
+              return (component as any).data;
+            }
           }
         }
       }
     }
+    
     return {};
   };
 
   const tenantComponentData = getTenantComponentData();
 
-  // Merge data with priority: storeData > tenantComponentData > props > default
+  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
+  const defaultData = getDefaultWhyChooseUsData();
   const mergedData = {
-    ...getDefaultWhyChooseUsData(),
+    ...defaultData,
     ...props,
     ...tenantComponentData,
     ...storeData,
+    ...currentStoreData,
+    // Ensure nested objects are properly merged
+    header: {
+      ...defaultData.header,
+      ...(props.header || {}),
+      ...(tenantComponentData.header || {}),
+      ...(storeData.header || {}),
+      ...(currentStoreData.header || {}),
+      typography: {
+        ...defaultData.header?.typography,
+        ...(props.header?.typography || {}),
+        ...(tenantComponentData.header?.typography || {}),
+        ...(storeData.header?.typography || {}),
+        ...(currentStoreData.header?.typography || {}),
+      },
+    },
+    features: {
+      ...defaultData.features,
+      ...(props.features || {}),
+      ...(tenantComponentData.features || {}),
+      ...(storeData.features || {}),
+      ...(currentStoreData.features || {}),
+      grid: {
+        ...defaultData.features?.grid,
+        ...(props.features?.grid || {}),
+        ...(tenantComponentData.features?.grid || {}),
+        ...(storeData.features?.grid || {}),
+        ...(currentStoreData.features?.grid || {}),
+      },
+      card: {
+        ...defaultData.features?.card,
+        ...(props.features?.card || {}),
+        ...(tenantComponentData.features?.card || {}),
+        ...(storeData.features?.card || {}),
+        ...(currentStoreData.features?.card || {}),
+      },
+      icon: {
+        ...defaultData.features?.icon,
+        ...(props.features?.icon || {}),
+        ...(tenantComponentData.features?.icon || {}),
+        ...(storeData.features?.icon || {}),
+        ...(currentStoreData.features?.icon || {}),
+      },
+      typography: {
+        ...defaultData.features?.typography,
+        ...(props.features?.typography || {}),
+        ...(tenantComponentData.features?.typography || {}),
+        ...(storeData.features?.typography || {}),
+        ...(currentStoreData.features?.typography || {}),
+      },
+    },
+    colors: {
+      ...defaultData.colors,
+      ...(props.colors || {}),
+      ...(tenantComponentData.colors || {}),
+      ...(storeData.colors || {}),
+      ...(currentStoreData.colors || {}),
+    },
+    layout: {
+      ...defaultData.layout,
+      ...(props.layout || {}),
+      ...(tenantComponentData.layout || {}),
+      ...(storeData.layout || {}),
+      ...(currentStoreData.layout || {}),
+    },
   };
+
 
   // Don't render if not visible
   if (!mergedData.visible) {

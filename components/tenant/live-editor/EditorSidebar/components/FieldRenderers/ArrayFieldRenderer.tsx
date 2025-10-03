@@ -80,9 +80,10 @@ export function ArrayFieldRenderer({
   // Smart default value generator based on field definitions
   const generateDefaultItem = (): any => {
     const newItem: any = {};
-    for (const f of arrDef.of) {
-      // Generate smart defaults based on field type
-      switch (f.type) {
+    if (arrDef.of && Array.isArray(arrDef.of)) {
+      for (const f of arrDef.of) {
+        // Generate smart defaults based on field type
+        switch (f.type) {
         case "text":
           newItem[f.key] = f.defaultValue || "";
           break;
@@ -113,7 +114,7 @@ export function ArrayFieldRenderer({
     }
     return newItem;
   };
-
+  }
   const addItem = () => {
     const newItem = generateDefaultItem();
     updateValue(normalizedPath, [...items, newItem]);
@@ -282,15 +283,17 @@ export function ArrayFieldRenderer({
     const errors: string[] = [];
 
     // Check required fields based on field definitions
-    for (const f of arrDef.of) {
-      if (f.type === "text" && (!item[f.key] || item[f.key].trim() === "")) {
-        // Only mark as error if it's a critical field
-        if (
-          f.key.includes("title") ||
-          f.key.includes("name") ||
-          f.key.includes("text")
-        ) {
-          errors.push(`${f.label || f.key} is required`);
+    if (arrDef.of && Array.isArray(arrDef.of)) {
+      for (const f of arrDef.of) {
+        if (f.type === "text" && (!item[f.key] || item[f.key].trim() === "")) {
+          // Only mark as error if it's a critical field
+          if (
+            f.key.includes("title") ||
+            f.key.includes("name") ||
+            f.key.includes("text")
+          ) {
+            errors.push(`${f.label || f.key} is required`);
+          }
         }
       }
     }
@@ -602,7 +605,7 @@ export function ArrayFieldRenderer({
               </div>
               {isOpen && (
                 <div className="p-4 space-y-4 bg-gradient-to-b from-white to-slate-50">
-                  {arrDef.of.map((f: any) => (
+                  {arrDef.of && Array.isArray(arrDef.of) && arrDef.of.map((f: any) => (
                     <div key={f.key}>
                       {/* Render nested arrays specially */}
                       {f.type === "array"
@@ -647,7 +650,7 @@ export function ArrayFieldRenderer({
               >
                 Add {arrDef.itemLabel || "Item"}
               </button>
-              {arrDef.of && arrDef.of.length > 0 && (
+              {arrDef.of && Array.isArray(arrDef.of) && arrDef.of.length > 0 && (
                 <button
                   onClick={() => {
                     // Add multiple items at once

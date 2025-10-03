@@ -830,17 +830,156 @@ export const PAGE_DEFINITIONS = {
       componentName: "whyChooseUs1",
       data: {
         visible: true,
-        texts: {
-          title: "Why Choose Us Title",
-          subtitle: "This is a sample subtitle for the section.",
+        layout: {
+          direction: "rtl",
+          maxWidth: "1600px",
+          padding: {
+            y: "py-14",
+            smY: "sm:py-16",
+          },
+        },
+        header: {
+          title: "لماذا تختارنا؟",
+          description:
+            "مكتبنا يجمع بين الخبرة والالتزام لتقديم خدمات مميزة في مجال العقارات",
+          marginBottom: "mb-10",
+          textAlign: "text-right",
+          paddingX: "px-5",
+          typography: {
+            title: {
+              className: "section-title text-right",
+            },
+            description: {
+              className: "section-subtitle-xl",
+            },
+          },
+        },
+        features: {
+          list: [
+            {
+              title: "خدمة شخصية",
+              desc: "نحن نركز على تقديم تجربة تركز على العملاء لجعل بحثك عن العقارات سلسًا وناجحًا.",
+              icon: "https://dalel-lovat.vercel.app/images/why-choose-us/1.svg",
+            },
+            {
+              title: "مجموعة واسعة من العقارات",
+              desc: "من الشقق إلى الفلل والمكاتب والمساحات التجارية، لدينا خيارات تناسب جميع الاحتياجات.",
+              icon: "https://dalel-lovat.vercel.app/images/why-choose-us/2.svg",
+            },
+            {
+              title: "إرشادات الخبراء",
+              desc: "بفضل سنوات الخبرة، يقدم فريقنا رؤى ونصائح مخصصة لضمان قرار مناسب لتفضيلاتك.",
+              icon: "https://dalel-lovat.vercel.app/images/why-choose-us/3.svg",
+            },
+            {
+              title: "تحليل السوق",
+              desc: "تحليل متعمق للسوق يوفر رؤية قيمة حول اتجاهات العقارات والأسعار وفرص الاستثمار.",
+              icon: "https://dalel-lovat.vercel.app/images/why-choose-us/4.svg",
+            },
+            {
+              title: "الاستشارات الاستثمارية",
+              desc: "إرشادات من الخبراء لتحقيق أقصى عائد على استثماراتك العقارية واتخاذ قرارات ذكية.",
+              icon: "https://dalel-lovat.vercel.app/images/why-choose-us/5.svg",
+            },
+            {
+              title: "إدارة الممتلكات",
+              desc: "خدمات إدارة شاملة للحفاظ على قيمة ممتلكاتك وتعزيز عوائدها التأجيرية.",
+              icon: "https://dalel-lovat.vercel.app/images/why-choose-us/6.svg",
+            },
+          ],
+          grid: {
+            gap: "gap-6",
+            columns: {
+              sm: "sm:grid-cols-2",
+              xl: "xl:grid-cols-3",
+            },
+            paddingX: "px-4",
+          },
+          card: {
+            className:
+              "rounded-2xl border bg-white p-6 shadow-sm ring-1 ring-emerald-50",
+            borderRadius: "rounded-2xl",
+            border: "border",
+            backgroundColor: "bg-white",
+            padding: "p-6",
+            shadow: "shadow-sm",
+            ring: "ring-1 ring-emerald-50",
+          },
+          icon: {
+            container: {
+              className: "mx-auto flex size-20 items-center justify-center",
+              size: "size-20",
+              flex: "flex",
+              items: "items-center",
+              justify: "justify-center",
+            },
+            image: {
+              className: "h-[7rem] w-[7rem]",
+              height: "h-[7rem]",
+              width: "w-[7rem]",
+            },
+          },
+          typography: {
+            title: {
+              className: "mt-6 text-center text-lg font-bold text-emerald-700",
+              marginTop: "mt-6",
+              textAlign: "text-center",
+              fontSize: "text-lg",
+              fontWeight: "font-bold",
+              color: "text-emerald-700",
+            },
+            description: {
+              className: "mt-3 text-center text-lg leading-7 text-gray-600",
+              marginTop: "mt-3",
+              textAlign: "text-center",
+              fontSize: "text-lg",
+              lineHeight: "leading-7",
+              color: "text-gray-600",
+            },
+          },
+        },
+        responsive: {
+          mobile: {
+            padding: "py-14",
+            gridCols: "grid-cols-1",
+          },
+          tablet: {
+            padding: "sm:py-16",
+            gridCols: "sm:grid-cols-2",
+          },
+          desktop: {
+            gridCols: "xl:grid-cols-3",
+          },
+        },
+        animations: {
+          header: {
+            enabled: true,
+            type: "fade-up",
+            duration: 600,
+            delay: 200,
+          },
+          features: {
+            enabled: true,
+            type: "fade-up",
+            duration: 500,
+            delay: 300,
+            stagger: 100,
+          },
+          icons: {
+            enabled: true,
+            type: "fade-up",
+            duration: 500,
+            delay: 400,
+            stagger: 50,
+          },
         },
         colors: {
-          background: "#FFFFFF",
-          textColor: "#1F2937",
-        },
-        settings: {
-          enabled: true,
-          layout: "default",
+          background: "#ffffff",
+          cardBackground: "#ffffff",
+          titleColor: "#059669",
+          descriptionColor: "#4b5563",
+          borderColor: "#e5e7eb",
+          ringColor: "#ecfdf5",
         },
       },
       position: 7,

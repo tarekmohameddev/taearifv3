@@ -1,7 +1,6 @@
 "use client";
 
 export default function HeroSkeleton1() {
-  console.log("🎨 HeroSkeleton1: Component is rendering!");
   
   return (
     <section
