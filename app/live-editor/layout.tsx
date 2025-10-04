@@ -615,7 +615,6 @@ function AddPageDialog({
 
 // مكون الشريط العلوي الجديد ليستطيع الوصول للسياق
 function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
-  console.log("🎯 EditorNavBar showArrowTooltip:", showArrowTooltip);
   const pathname = usePathname();
   const requestSave = useEditorStore((state) => state.requestSave);
   const {
@@ -1779,13 +1778,10 @@ export default function LiveEditorLayout({
 
   // Detect when hasChangesMade changes from false to true
   useEffect(() => {
-    console.log("🔍 hasChangesMade changed:", { hasChangesMade, previousHasChangesMade });
     if (hasChangesMade && !previousHasChangesMade) {
-      console.log("✅ Showing arrow tooltip!");
       setShowArrowTooltip(true);
       // Auto-hide after 7 seconds
       setTimeout(() => {
-        console.log("⏰ Hiding arrow tooltip after 7 seconds");
         setShowArrowTooltip(false);
       }, 15000);
     }

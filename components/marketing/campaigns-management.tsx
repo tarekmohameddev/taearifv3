@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMarketingDashboardStore } from "@/context/store/marketingDashboard";
 import {
   Plus,
   BarChart3,
@@ -83,7 +84,26 @@ interface Campaign {
 }
 
 export function CampaignsManagement() {
-  const [campaigns, setCampaigns] = useState<Campaign[]>([
+  // استخدام الـ store
+  const {
+    campaigns,
+    loading,
+    error,
+    createCampaign,
+    updateCampaign,
+    deleteCampaign,
+    isCreateCampaignDialogOpen,
+    isEditCampaignDialogOpen,
+    selectedCampaign,
+    openCreateCampaignDialog,
+    closeCreateCampaignDialog,
+    openEditCampaignDialog,
+    closeEditCampaignDialog,
+    setSelectedCampaign,
+  } = useMarketingDashboardStore();
+
+  // البيانات المحلية للحوارات (للحوارات فقط)
+  const [localCampaigns, setLocalCampaigns] = useState<Campaign[]>([
     {
       id: "1",
       name: "حملة العروض الشتوية",
@@ -182,10 +202,7 @@ export function CampaignsManagement() {
     },
   ]);
 
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(
-    null,
-  );
+  // استخدام متغيرات الـ store بدلاً من المحلية
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
   const [newCampaign, setNewCampaign] = useState({
@@ -251,79 +268,60 @@ export function CampaignsManagement() {
     }
   };
 
-  const handleCreateCampaign = () => {
-    const campaign: Campaign = {
-      id: Date.now().toString(),
-      name: newCampaign.name,
-      description: newCampaign.description,
-      status: newCampaign.scheduleType === "now" ? "running" : "scheduled",
-      type: newCampaign.type,
-      audience: {
-        total: newCampaign.audience === "all" ? 1500 : 750,
-        segments:
-          newCampaign.audience === "all" ? ["جميع العملاء"] : ["عملاء مختارون"],
-      },
-      message: {
-        content: newCampaign.message,
-      },
-      schedule: {
-        startDate:
-          newCampaign.startDate || new Date().toISOString().split("T")[0],
-        sendTime: newCampaign.startTime || "10:00",
-        timezone: "Asia/Riyadh",
-      },
-      performance: {
-        sent: 0,
-        delivered: 0,
-        read: 0,
-        replied: 0,
-        failed: 0,
-      },
-      createdAt: new Date().toISOString().split("T")[0],
-      createdBy: "المستخدم الحالي",
-      phoneNumber: newCampaign.phoneNumber,
-      estimatedCost: (newCampaign.audience === "all" ? 1500 : 750) * 0.05,
-    };
+  const handleCreateCampaign = async () => {
+    try {
+      const campaignData = {
+        name: newCampaign.name,
+        description: newCampaign.description,
+        channel_type: newCampaign.type === "broadcast" ? "whatsapp" : "sms",
+        target_audience: newCampaign.audience === "all" ? "جميع العملاء" : "عملاء مختارون",
+        message_content: newCampaign.message,
+        scheduled_at: newCampaign.scheduleType === "now" ? null : newCampaign.startDate,
+        status: newCampaign.scheduleType === "now" ? "active" : "scheduled",
+      };
 
-    setCampaigns([campaign, ...campaigns]);
-    setNewCampaign({
-      name: "",
-      description: "",
-      type: "broadcast",
-      message: "",
-      audience: "all",
-      phoneNumber: "",
-      scheduleType: "now",
-      startDate: "",
-      startTime: "",
-    });
-    setIsCreateDialogOpen(false);
+      await createCampaign(campaignData);
+      
+      // إعادة تعيين النموذج
+      setNewCampaign({
+        name: "",
+        description: "",
+        type: "broadcast",
+        audience: "all",
+        message: "",
+        phoneNumber: "",
+        scheduleType: "now",
+        startDate: "",
+        startTime: "",
+      });
+      
+      closeCreateCampaignDialog();
+    } catch (error) {
+      console.error("خطأ في إنشاء الحملة:", error);
+    }
   };
 
-  const handleCampaignAction = (
+  const handleCampaignAction = async (
     campaignId: string,
     action: "play" | "pause" | "stop" | "delete",
   ) => {
-    setCampaigns(
-      campaigns.map((campaign) => {
-        if (campaign.id === campaignId) {
-          switch (action) {
-            case "play":
-              return { ...campaign, status: "running" as Campaign["status"] };
-            case "pause":
-              return { ...campaign, status: "paused" as Campaign["status"] };
-            case "stop":
-              return { ...campaign, status: "completed" as Campaign["status"] };
-            default:
-              return campaign;
-          }
-        }
-        return campaign;
-      }),
-    );
-
-    if (action === "delete") {
-      setCampaigns(campaigns.filter((campaign) => campaign.id !== campaignId));
+    try {
+      if (action === "delete") {
+        await deleteCampaign(campaignId);
+      } else {
+        // تحديث حالة الحملة
+        const statusMap = {
+          play: "active",
+          pause: "paused", 
+          stop: "completed"
+        };
+        
+        await updateCampaign(campaignId, {
+          status: statusMap[action]
+        });
+      }
+    } catch (error) {
+      console.error("خطأ في معالجة الحملة:", error);
     }
   };
 
@@ -353,7 +351,7 @@ export function CampaignsManagement() {
           </p>
         </div>
 
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <Dialog open={isCreateCampaignDialogOpen} onOpenChange={closeCreateCampaignDialog}>
           <DialogTrigger asChild>
             <Button className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
@@ -576,7 +574,7 @@ export function CampaignsManagement() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => setIsCreateDialogOpen(false)}
+                  onClick={() => closeCreateCampaignDialog()}
                 >
                   إلغاء
                 </Button>
@@ -606,7 +604,7 @@ export function CampaignsManagement() {
               <div>
                 <p className="text-sm text-muted-foreground">قيد التشغيل</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {campaigns.filter((c) => c.status === "running").length}
+                  {campaigns.filter((c: any) => c.status === "running").length}
                 </p>
               </div>
               <Play className="h-8 w-8 text-green-600" />
@@ -620,7 +618,7 @@ export function CampaignsManagement() {
               <div>
                 <p className="text-sm text-muted-foreground">مجدولة</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {campaigns.filter((c) => c.status === "scheduled").length}
+                  {campaigns.filter((c: any) => c.status === "scheduled").length}
                 </p>
               </div>
               <Clock className="h-8 w-8 text-blue-600" />
@@ -634,7 +632,7 @@ export function CampaignsManagement() {
               <div>
                 <p className="text-sm text-muted-foreground">مكتملة</p>
                 <p className="text-2xl font-bold text-purple-600">
-                  {campaigns.filter((c) => c.status === "completed").length}
+                  {campaigns.filter((c: any) => c.status === "completed").length}
                 </p>
               </div>
               <TrendingUp className="h-8 w-8 text-purple-600" />
@@ -645,7 +643,7 @@ export function CampaignsManagement() {
 
       {/* Campaigns List */}
       <div className="space-y-4">
-        {campaigns.map((campaign) => (
+        {campaigns.map((campaign: any) => (
           <Card key={campaign.id}>
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
@@ -842,7 +840,7 @@ export function CampaignsManagement() {
                       </span>
                       <div className="flex gap-1">
                         {selectedCampaign.audience.segments.map(
-                          (segment, index) => (
+                          (segment: any, index: number) => (
                             <Badge
                               key={index}
                               variant="outline"
@@ -975,7 +973,7 @@ export function CampaignsManagement() {
             <p className="text-muted-foreground mb-4">
               ابدأ بإنشاء حملتك التسويقية الأولى
             </p>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
+            <Button onClick={() => openCreateCampaignDialog()}>
               <Plus className="h-4 w-4 ml-2" />
               إنشاء حملة جديدة
             </Button>

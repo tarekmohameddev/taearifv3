@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMarketingDashboardStore } from "@/context/store/marketingDashboard";
 import {
   Plus,
   CreditCard,
@@ -32,7 +33,6 @@ import {
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import useStore from "@/context/Store";
 
 interface CreditPackage {
   id: string;
@@ -64,28 +64,32 @@ interface CreditUsage {
 }
 
 export function CreditSystemComponent() {
-  const { creditsSystem, updateCredits, addCreditTransaction } = useStore();
+  // استخدام الـ store الجديد
+  const {
+    creditSystem,
+    loading,
+    error,
+    fetchCreditPackages,
+    purchaseCredits,
+  } = useMarketingDashboardStore();
 
   const [isTopUpDialogOpen, setIsTopUpDialogOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<string>("");
 
-  const handleTopUp = () => {
-    // Simulate payment process
-    const selectedPkg = creditsSystem.creditPackages.find(
-      (pkg) => pkg.id === selectedPackage,
-    );
-    if (selectedPkg) {
-      updateCredits(selectedPkg.credits);
-      addCreditTransaction({
-        id: Date.now().toString(),
-        type: "purchase",
-        amount: selectedPkg.credits,
-        description: `شراء ${selectedPkg.name}`,
-        date: new Date().toISOString().split("T")[0],
-        status: "completed",
-      });
-      setIsTopUpDialogOpen(false);
-      setSelectedPackage("");
+  // جلب البيانات عند تحميل المكون
+  useEffect(() => {
+    fetchCreditPackages();
+  }, [fetchCreditPackages]);
+
+  const handleTopUp = async () => {
+    try {
+      if (selectedPackage) {
+        await purchaseCredits(selectedPackage);
+        setIsTopUpDialogOpen(false);
+        setSelectedPackage("");
+      }
+    } catch (error) {
+      console.error("خطأ في شراء الائتمانات:", error);
     }
   };
 
@@ -118,7 +122,7 @@ export function CreditSystemComponent() {
   };
 
   const usagePercentage =
-    (creditsSystem.monthlyUsage / creditsSystem.monthlyLimit) * 100;
+    (creditSystem.total_used / creditSystem.total_purchased) * 100;
 
   return (
     <div className="space-y-6">
@@ -150,7 +154,7 @@ export function CreditSystemComponent() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-3">
-                {creditsSystem.creditPackages.map((pkg) => (
+                {creditSystem.packages.map((pkg: any) => (
                   <div
                     key={pkg.id}
                     className={`relative cursor-pointer transition-all duration-200 ${
@@ -247,7 +251,7 @@ export function CreditSystemComponent() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold text-green-600">
-                  {creditsSystem.currentCredits.toLocaleString()}
+                  {creditSystem.available_credits.toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground">رسالة متاحة</p>
               </div>
@@ -268,10 +272,10 @@ export function CreditSystemComponent() {
             <div className="flex items-center justify-between mb-2">
               <div>
                 <div className="text-2xl font-bold text-blue-600">
-                  {creditsSystem.monthlyUsage.toLocaleString()}
+                  {creditSystem.total_used.toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  من {creditsSystem.monthlyLimit.toLocaleString()}
+                  من {creditSystem.total_purchased.toLocaleString()}
                 </p>
               </div>
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -334,7 +338,7 @@ export function CreditSystemComponent() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {creditsSystem.transactions.map((transaction) => (
+                {creditSystem.transactions.map((transaction: any) => (
                   <div
                     key={transaction.id}
                     className="flex items-center justify-between p-3 border rounded-lg"
@@ -392,7 +396,7 @@ export function CreditSystemComponent() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {creditsSystem.usageByNumber.map((usage, index) => (
+                {creditSystem.transactions.slice(0, 5).map((usage: any, index: number) => (
                   <div key={index} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-3">
                       <div>

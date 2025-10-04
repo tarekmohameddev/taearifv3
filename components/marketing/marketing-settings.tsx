@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMarketingDashboardStore } from "@/context/store/marketingDashboard";
 import {
   Settings,
   MessageSquare,
@@ -35,7 +36,6 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import useStore from "@/context/Store";
 
 interface MessageSettings {
   autoReply: boolean;
@@ -81,13 +81,23 @@ interface SystemIntegrations {
 }
 
 export function MarketingSettingsComponent() {
+  // استخدام الـ store الجديد
   const {
     marketingSettings,
-    updateMessageSettings,
-    updateNotificationSettings,
+    loading,
+    error,
+    fetchMarketingSettings,
+    updateMarketingSettings,
     updateSystemIntegrations,
     saveMarketingSettings,
-  } = useStore();
+    updateMessageSettings,
+    updateNotificationSettings,
+  } = useMarketingDashboardStore();
+
+  // جلب البيانات عند تحميل المكون
+  useEffect(() => {
+    fetchMarketingSettings();
+  }, [fetchMarketingSettings]);
 
   const availableEvents = [
     { id: "message_received", label: "رسالة واردة" },
@@ -187,19 +197,19 @@ export function MarketingSettingsComponent() {
                   </p>
                 </div>
                 <Switch
-                  checked={marketingSettings.messageSettings.autoReply}
+                  checked={marketingSettings.messageSettings?.autoReply || false}
                   onCheckedChange={(checked) =>
                     updateMessageSettings({ autoReply: checked })
                   }
                 />
               </div>
 
-              {marketingSettings.messageSettings.autoReply && (
+              {marketingSettings.messageSettings?.autoReply && (
                 <div className="space-y-2">
                   <Label htmlFor="autoReplyMessage">نص الرد التلقائي</Label>
                   <Textarea
                     id="autoReplyMessage"
-                    value={marketingSettings.messageSettings.autoReplyMessage}
+                    value={marketingSettings.messageSettings?.autoReplyMessage || ""}
                     onChange={(e) =>
                       updateMessageSettings({
                         autoReplyMessage: e.target.value,
@@ -222,12 +232,12 @@ export function MarketingSettingsComponent() {
                   </div>
                   <Switch
                     checked={
-                      marketingSettings.messageSettings.businessHours.enabled
+                      marketingSettings.messageSettings?.businessHours?.enabled || false
                     }
                     onCheckedChange={(checked) =>
                       updateMessageSettings({
                         businessHours: {
-                          ...marketingSettings.messageSettings.businessHours,
+                          ...marketingSettings.messageSettings?.businessHours,
                           enabled: checked,
                         },
                       })
@@ -235,7 +245,7 @@ export function MarketingSettingsComponent() {
                   />
                 </div>
 
-                {marketingSettings.messageSettings.businessHours.enabled && (
+                {marketingSettings.messageSettings?.businessHours?.enabled && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="startTime">بداية العمل</Label>
@@ -243,7 +253,7 @@ export function MarketingSettingsComponent() {
                         id="startTime"
                         type="time"
                         value={
-                          marketingSettings.messageSettings.businessHours.start
+                          marketingSettings.messageSettings?.businessHours?.start || "09:00"
                         }
                         onChange={(e) =>
                           updateMessageSettings({
@@ -262,7 +272,7 @@ export function MarketingSettingsComponent() {
                         id="endTime"
                         type="time"
                         value={
-                          marketingSettings.messageSettings.businessHours.end
+                          marketingSettings.messageSettings?.businessHours.end
                         }
                         onChange={(e) =>
                           updateMessageSettings({
@@ -279,7 +289,7 @@ export function MarketingSettingsComponent() {
                       <Label htmlFor="timezone">المنطقة الزمنية</Label>
                       <Select
                         value={
-                          marketingSettings.messageSettings.businessHours
+                          marketingSettings.messageSettings?.businessHours
                             .timezone
                         }
                         onValueChange={(value) =>
@@ -323,12 +333,12 @@ export function MarketingSettingsComponent() {
                   </div>
                   <Switch
                     checked={
-                      marketingSettings.messageSettings.rateLimiting.enabled
+                      marketingSettings.messageSettings?.rateLimiting?.enabled || false
                     }
                     onCheckedChange={(checked) =>
                       updateMessageSettings({
                         rateLimiting: {
-                          ...marketingSettings.messageSettings.rateLimiting,
+                          ...marketingSettings.messageSettings?.rateLimiting,
                           enabled: checked,
                         },
                       })
@@ -336,7 +346,7 @@ export function MarketingSettingsComponent() {
                   />
                 </div>
 
-                {marketingSettings.messageSettings.rateLimiting.enabled && (
+                {marketingSettings.messageSettings?.rateLimiting?.enabled && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="hourlyLimit">الحد الأقصى في الساعة</Label>
@@ -344,13 +354,13 @@ export function MarketingSettingsComponent() {
                         id="hourlyLimit"
                         type="number"
                         value={
-                          marketingSettings.messageSettings.rateLimiting
+                          marketingSettings.messageSettings?.rateLimiting
                             .maxMessagesPerHour
                         }
                         onChange={(e) =>
                           updateMessageSettings({
                             rateLimiting: {
-                              ...marketingSettings.messageSettings.rateLimiting,
+                              ...marketingSettings.messageSettings?.rateLimiting,
                               maxMessagesPerHour: Number.parseInt(
                                 e.target.value,
                               ),
@@ -365,13 +375,13 @@ export function MarketingSettingsComponent() {
                         id="dailyLimit"
                         type="number"
                         value={
-                          marketingSettings.messageSettings.rateLimiting
+                          marketingSettings.messageSettings?.rateLimiting
                             .maxMessagesPerDay
                         }
                         onChange={(e) =>
                           updateMessageSettings({
                             rateLimiting: {
-                              ...marketingSettings.messageSettings.rateLimiting,
+                              ...marketingSettings.messageSettings?.rateLimiting,
                               maxMessagesPerDay: Number.parseInt(
                                 e.target.value,
                               ),
@@ -400,12 +410,12 @@ export function MarketingSettingsComponent() {
                 <Textarea
                   id="welcomeTemplate"
                   value={
-                    marketingSettings.messageSettings.templates.welcomeMessage
+                    marketingSettings.messageSettings?.templates?.welcomeMessage || ""
                   }
                   onChange={(e) =>
                     updateMessageSettings({
                       templates: {
-                        ...marketingSettings.messageSettings.templates,
+                        ...marketingSettings.messageSettings?.templates,
                         welcomeMessage: e.target.value,
                       },
                     })
@@ -422,12 +432,12 @@ export function MarketingSettingsComponent() {
                 <Textarea
                   id="thankYouTemplate"
                   value={
-                    marketingSettings.messageSettings.templates.thankYouMessage
+                    marketingSettings.messageSettings?.templates?.thankYouMessage || ""
                   }
                   onChange={(e) =>
                     updateMessageSettings({
                       templates: {
-                        ...marketingSettings.messageSettings.templates,
+                        ...marketingSettings.messageSettings?.templates,
                         thankYouMessage: e.target.value,
                       },
                     })
@@ -441,13 +451,12 @@ export function MarketingSettingsComponent() {
                 <Textarea
                   id="orderTemplate"
                   value={
-                    marketingSettings.messageSettings.templates
-                      .orderConfirmation
+                    marketingSettings.messageSettings?.templates?.orderConfirmation || ""
                   }
                   onChange={(e) =>
                     updateMessageSettings({
                       templates: {
-                        ...marketingSettings.messageSettings.templates,
+                        ...marketingSettings.messageSettings?.templates,
                         orderConfirmation: e.target.value,
                       },
                     })
@@ -464,13 +473,12 @@ export function MarketingSettingsComponent() {
                 <Textarea
                   id="appointmentTemplate"
                   value={
-                    marketingSettings.messageSettings.templates
-                      .appointmentReminder
+                    marketingSettings.messageSettings?.templates?.appointmentReminder || ""
                   }
                   onChange={(e) =>
                     updateMessageSettings({
                       templates: {
-                        ...marketingSettings.messageSettings.templates,
+                        ...marketingSettings.messageSettings?.templates,
                         appointmentReminder: e.target.value,
                       },
                     })
@@ -510,7 +518,7 @@ export function MarketingSettingsComponent() {
                     </p>
                   </div>
                   <Switch
-                    checked={marketingSettings.notificationSettings.newMessage}
+                    checked={marketingSettings.notificationSettings?.newMessage || false}
                     onCheckedChange={(checked) =>
                       updateNotificationSettings({ newMessage: checked })
                     }
@@ -526,10 +534,10 @@ export function MarketingSettingsComponent() {
                   </div>
                   <Switch
                     checked={
-                      marketingSettings.notificationSettings.campaignComplete
+                      marketingSettings.notificationSettings?.campaignUpdate || false
                     }
                     onCheckedChange={(checked) =>
-                      updateNotificationSettings({ campaignComplete: checked })
+                      updateNotificationSettings({ campaignUpdate: checked })
                     }
                   />
                 </div>
@@ -542,9 +550,9 @@ export function MarketingSettingsComponent() {
                     </p>
                   </div>
                   <Switch
-                    checked={marketingSettings.notificationSettings.lowCredits}
+                    checked={marketingSettings.notificationSettings?.creditLow || false}
                     onCheckedChange={(checked) =>
-                      updateNotificationSettings({ lowCredits: checked })
+                      updateNotificationSettings({ creditLow: checked })
                     }
                   />
                 </div>
@@ -558,10 +566,10 @@ export function MarketingSettingsComponent() {
                   </div>
                   <Switch
                     checked={
-                      marketingSettings.notificationSettings.systemUpdates
+                      marketingSettings.notificationSettings?.systemAlert || false
                     }
                     onCheckedChange={(checked) =>
-                      updateNotificationSettings({ systemUpdates: checked })
+                      updateNotificationSettings({ systemAlert: checked })
                     }
                   />
                 </div>
@@ -580,11 +588,11 @@ export function MarketingSettingsComponent() {
                   </div>
                   <Switch
                     checked={
-                      marketingSettings.notificationSettings.emailNotifications
+                      marketingSettings.notificationSettings?.email || false
                     }
                     onCheckedChange={(checked) =>
                       updateNotificationSettings({
-                        emailNotifications: checked,
+                        email: checked,
                       })
                     }
                   />
@@ -599,10 +607,10 @@ export function MarketingSettingsComponent() {
                   </div>
                   <Switch
                     checked={
-                      marketingSettings.notificationSettings.smsNotifications
+                      marketingSettings.notificationSettings?.sms || false
                     }
                     onCheckedChange={(checked) =>
-                      updateNotificationSettings({ smsNotifications: checked })
+                      updateNotificationSettings({ sms: checked })
                     }
                   />
                 </div>
@@ -636,7 +644,7 @@ export function MarketingSettingsComponent() {
                     </div>
                   </div>
                   <Switch
-                    checked={marketingSettings.systemIntegrations.crm}
+                    checked={marketingSettings.systemIntegrations?.crm || false}
                     onCheckedChange={(checked) =>
                       updateSystemIntegrations({ crm: checked })
                     }
@@ -654,7 +662,7 @@ export function MarketingSettingsComponent() {
                     </div>
                   </div>
                   <Switch
-                    checked={marketingSettings.systemIntegrations.ecommerce}
+                    checked={marketingSettings.systemIntegrations?.ecommerce || false}
                     onCheckedChange={(checked) =>
                       updateSystemIntegrations({ ecommerce: checked })
                     }
@@ -672,7 +680,7 @@ export function MarketingSettingsComponent() {
                     </div>
                   </div>
                   <Switch
-                    checked={marketingSettings.systemIntegrations.appointments}
+                    checked={marketingSettings.systemIntegrations?.appointments || false}
                     onCheckedChange={(checked) =>
                       updateSystemIntegrations({ appointments: checked })
                     }
@@ -690,7 +698,7 @@ export function MarketingSettingsComponent() {
                     </div>
                   </div>
                   <Switch
-                    checked={marketingSettings.systemIntegrations.analytics}
+                    checked={marketingSettings.systemIntegrations?.analytics || false}
                     onCheckedChange={(checked) =>
                       updateSystemIntegrations({ analytics: checked })
                     }
@@ -709,12 +717,12 @@ export function MarketingSettingsComponent() {
                   </div>
                   <Switch
                     checked={
-                      marketingSettings.systemIntegrations.webhooks.enabled
+                      marketingSettings.systemIntegrations?.webhooks?.enabled || false
                     }
                     onCheckedChange={(checked) =>
                       updateSystemIntegrations({
                         webhooks: {
-                          ...marketingSettings.systemIntegrations.webhooks,
+                          ...marketingSettings.systemIntegrations?.webhooks,
                           enabled: checked,
                         },
                       })
@@ -722,7 +730,7 @@ export function MarketingSettingsComponent() {
                   />
                 </div>
 
-                {marketingSettings.systemIntegrations.webhooks.enabled && (
+                {marketingSettings.systemIntegrations?.webhooks?.enabled && (
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="webhookUrl">رابط Webhook</Label>
@@ -731,12 +739,12 @@ export function MarketingSettingsComponent() {
                         type="url"
                         placeholder="https://example.com/webhook"
                         value={
-                          marketingSettings.systemIntegrations.webhooks.url
+                          marketingSettings.systemIntegrations?.webhooks?.url || ""
                         }
                         onChange={(e) =>
                           updateSystemIntegrations({
                             webhooks: {
-                              ...marketingSettings.systemIntegrations.webhooks,
+                              ...marketingSettings.systemIntegrations?.webhooks,
                               url: e.target.value,
                             },
                           })
@@ -755,18 +763,17 @@ export function MarketingSettingsComponent() {
                             <input
                               type="checkbox"
                               id={event.id}
-                              checked={marketingSettings.systemIntegrations.webhooks.events.includes(
+                              checked={marketingSettings.systemIntegrations?.webhooks?.events?.includes(
                                 event.id,
-                              )}
+                              ) || false}
                               onChange={(e) => {
                                 const events = e.target.checked
                                   ? [
-                                      ...marketingSettings.systemIntegrations
-                                        .webhooks.events,
+                                      ...marketingSettings.systemIntegrations?.webhooks?.events || [],
                                       event.id,
                                     ]
-                                  : marketingSettings.systemIntegrations.webhooks.events.filter(
-                                      (id) => id !== event.id,
+                                  : (marketingSettings.systemIntegrations?.webhooks?.events || []).filter(
+                                      (id: string) => id !== event.id,
                                     );
                                 updateSystemIntegrations({
                                   webhooks: {

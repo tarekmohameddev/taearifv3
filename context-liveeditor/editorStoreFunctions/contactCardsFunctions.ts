@@ -1,4 +1,4 @@
-import { ComponentData } from "@/lib/types";
+import { ComponentData } from "@/lib-liveeditor/types";
 import { createDefaultData } from "./types";
 
 // Default data for contact cards
@@ -321,10 +321,29 @@ export const contactCardsFunctions = {
     const lastKey = segments[segments.length - 1]!;
     cursor[lastKey] = value;
 
+    // Update pageComponentsByPage with the new data
+    const currentPage = state.currentPage || "homepage";
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+    
+    // Find and update the component in pageComponents
+    const updatedComponents = updatedPageComponents.map((comp: any) => {
+      if (comp.type === "contactCards" && comp.id === variantId) {
+        return {
+          ...comp,
+          data: newData,
+        };
+      }
+      return comp;
+    });
+
     return {
       contactCardsStates: {
         ...state.contactCardsStates,
         [variantId]: newData,
+      },
+      pageComponentsByPage: {
+        ...state.pageComponentsByPage,
+        [currentPage]: updatedComponents,
       },
     };
   },
@@ -350,7 +369,7 @@ export const contactCardsFunctions = {
     index: number,
   ): ComponentData => ({
     ...currentData,
-    cards: (currentData.cards || []).filter((_, i) => i !== index),
+    cards: (currentData.cards || []).filter((_: any, i: number) => i !== index),
   }),
 
   // Update contact card
@@ -360,7 +379,7 @@ export const contactCardsFunctions = {
     updates: any,
   ): ComponentData => ({
     ...currentData,
-    cards: (currentData.cards || []).map((card, i) =>
+    cards: (currentData.cards || []).map((card: any, i: number) =>
       i === index ? { ...card, ...updates } : card,
     ),
   }),
@@ -372,7 +391,7 @@ export const contactCardsFunctions = {
     link: any,
   ): ComponentData => ({
     ...currentData,
-    cards: (currentData.cards || []).map((card, i) => {
+    cards: (currentData.cards || []).map((card: any, i: number) => {
       if (i === cardIndex) {
         return {
           ...card,
@@ -393,14 +412,14 @@ export const contactCardsFunctions = {
     linkIndex: number,
   ): ComponentData => ({
     ...currentData,
-    cards: (currentData.cards || []).map((card, i) => {
+    cards: (currentData.cards || []).map((card: any, i: number) => {
       if (i === cardIndex) {
         return {
           ...card,
           content: {
             ...card.content,
             links: (card.content?.links || []).filter(
-              (_, li) => li !== linkIndex,
+              (_: any, li: number) => li !== linkIndex,
             ),
           },
         };
@@ -416,7 +435,7 @@ export const contactCardsFunctions = {
     icon: any,
   ): ComponentData => ({
     ...currentData,
-    cards: (currentData.cards || []).map((card, i) =>
+    cards: (currentData.cards || []).map((card: any, i: number) =>
       i === cardIndex ? { ...card, icon: { ...card.icon, ...icon } } : card,
     ),
   }),
@@ -428,7 +447,7 @@ export const contactCardsFunctions = {
     title: any,
   ): ComponentData => ({
     ...currentData,
-    cards: (currentData.cards || []).map((card, i) =>
+    cards: (currentData.cards || []).map((card: any, i: number) =>
       i === cardIndex ? { ...card, title: { ...card.title, ...title } } : card,
     ),
   }),
@@ -440,7 +459,7 @@ export const contactCardsFunctions = {
     content: any,
   ): ComponentData => ({
     ...currentData,
-    cards: (currentData.cards || []).map((card, i) =>
+    cards: (currentData.cards || []).map((card: any, i: number) =>
       i === cardIndex
         ? { ...card, content: { ...card.content, ...content } }
         : card,
@@ -454,7 +473,7 @@ export const contactCardsFunctions = {
     style: any,
   ): ComponentData => ({
     ...currentData,
-    cards: (currentData.cards || []).map((card, i) =>
+    cards: (currentData.cards || []).map((card: any, i: number) =>
       i === cardIndex
         ? { ...card, cardStyle: { ...card.cardStyle, ...style } }
         : card,

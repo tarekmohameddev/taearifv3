@@ -208,10 +208,27 @@ export function EditorSidebar({
 
       // Use dynamic component initialization for all components
       // Use existing component data if available, otherwise use default data
-      const dataToUse =
-        selectedComponent.data && Object.keys(selectedComponent.data).length > 0
-          ? selectedComponent.data
-          : defaultData;
+      // For contactCards, check if cards exist in the data
+      let dataToUse;
+      if (selectedComponent.type === "contactCards") {
+        // Check if cards exist in the data
+        const hasCards = selectedComponent.data?.cards && 
+                        Array.isArray(selectedComponent.data.cards) && 
+                        selectedComponent.data.cards.length > 0;
+        
+        if (hasCards) {
+          dataToUse = selectedComponent.data;
+        } else {
+          // Use default data if no cards found
+          dataToUse = defaultData;
+        }
+      } else {
+        // For other components, use existing logic
+        dataToUse =
+          selectedComponent.data && Object.keys(selectedComponent.data).length > 0
+            ? selectedComponent.data
+            : defaultData;
+      }
 
       // Log data selection
       logSidebar("DATA_SELECTION", uniqueVariantId, componentName, {
@@ -221,11 +238,21 @@ export function EditorSidebar({
         selectedDataKeys: selectedComponent.data
           ? Object.keys(selectedComponent.data)
           : [],
+        hasCards: selectedComponent.data?.cards && 
+                 Array.isArray(selectedComponent.data.cards) && 
+                 selectedComponent.data.cards.length > 0,
+        cardsCount: selectedComponent.data?.cards?.length || 0,
         reason:
-          selectedComponent.data &&
-          Object.keys(selectedComponent.data).length > 0
-            ? "Using existing component data"
-            : "Using default data for new component",
+          selectedComponent.type === "contactCards"
+            ? (selectedComponent.data?.cards && 
+               Array.isArray(selectedComponent.data.cards) && 
+               selectedComponent.data.cards.length > 0
+                ? "Using existing component data with cards"
+                : "Using default data - no cards found in API data")
+            : (selectedComponent.data &&
+               Object.keys(selectedComponent.data).length > 0
+                ? "Using existing component data"
+                : "Using default data for new component"),
       });
 
       // Log before calling ensureComponentVariant
@@ -348,6 +375,14 @@ export function EditorSidebar({
       const pageComponentsBefore =
         store.pageComponentsByPage[currentPage] || [];
 
+      console.log("🔍 EditorSidebar Save Debug:", {
+        selectedComponent,
+        currentPage,
+        pageComponentsBefore: pageComponentsBefore.length,
+        tempData,
+        storeData: store.getComponentData(selectedComponent.type, selectedComponent.id)
+      });
+
       // Get the latest tempData from store for global components
       const latestTempData =
         selectedComponent.id === "global-header" ||
@@ -425,11 +460,18 @@ export function EditorSidebar({
         (comp: any) => comp.id === selectedComponent.id,
       );
 
-      // Merge store data with existing component data to preserve all changes
-      // Priority: storeData (latest changes) > existingComponent.data (previous changes)
+      // Merge tempData with store data to preserve all changes
+      // Priority: tempData (latest changes) > storeData (previous changes) > existingComponent.data (old changes)
       const mergedData = existingComponent?.data
-        ? deepMerge(existingComponent.data, storeData)
-        : storeData;
+        ? deepMerge(deepMerge(existingComponent.data, storeData), latestTempData)
+        : deepMerge(storeData, latestTempData);
+
+      console.log("🔧 Merge Process Debug:", {
+        existingComponentData: existingComponent?.data,
+        storeData,
+        latestTempData,
+        mergedData
+      });
 
       // Update the component data in the store using the merged data
       store.setComponentData(
@@ -461,6 +503,18 @@ export function EditorSidebar({
       const storeAfter = useEditorStore.getState();
       const pageComponentsAfter =
         storeAfter.pageComponentsByPage[currentPage] || [];
+
+      console.log("✅ EditorSidebar Save Complete:", {
+        mergedData,
+        latestTempData,
+        storeData,
+        updatedPageComponents: updatedPageComponents.length,
+        pageComponentsAfter: pageComponentsAfter.length,
+        storeAfter: {
+          contactCardsStates: storeAfter.contactCardsStates,
+          pageComponentsByPage: storeAfter.pageComponentsByPage[currentPage]
+        }
+      });
 
       onClose();
     }

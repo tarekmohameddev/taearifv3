@@ -411,6 +411,214 @@ export const createDefaultData = (
         },
       };
 
+    case "contactCards":
+      return {
+        visible: true,
+        layout: {
+          container: {
+            padding: {
+              vertical: "py-[48px] md:py-[104px]",
+              horizontal: "px-4 sm:px-10",
+            },
+          },
+          grid: {
+            columns: {
+              mobile: "grid-cols-1",
+              desktop: "md:grid-cols-3",
+            },
+            gap: "gap-[24px]",
+            borderRadius: "rounded-[10px]",
+          },
+        },
+        cards: [
+          {
+            icon: {
+              src: "https://dalel-lovat.vercel.app/images/contact-us/address.svg",
+              alt: "address Icon",
+              size: {
+                mobile: "w-[40px] h-[40px]",
+                desktop: "md:w-[60px] md:h-[60px]",
+              },
+            },
+            title: {
+              text: "العنوان",
+              style: {
+                size: {
+                  mobile: "text-[16px]",
+                  desktop: "md:text-[24px]",
+                },
+                weight: "font-bold",
+                color: "#525252",
+                lineHeight: "leading-[35px]",
+              },
+            },
+            content: {
+              type: "text",
+              text: "المملكة العربية السعودية - القصيم",
+              style: {
+                size: {
+                  mobile: "text-[16px]",
+                  desktop: "md:text-[20px]",
+                },
+                weight: "font-normal",
+                color: "#525252",
+                lineHeight: "leading-[35px]",
+              },
+            },
+            cardStyle: {
+              height: {
+                mobile: "h-[182px]",
+                desktop: "md:h-[210px]",
+              },
+              gap: {
+                main: "gap-y-[16px]",
+                content: {
+                  mobile: "gap-y-[8px]",
+                  desktop: "md:gap-y-[16px]",
+                },
+                links: "gap-x-[50px]",
+              },
+              shadow: {
+                enabled: true,
+                value: "rgba(9, 46, 114, 0.32) 0px 2px 16px 0px",
+              },
+              alignment: {
+                horizontal: "items-center",
+                vertical: "justify-center",
+              },
+            },
+          },
+          {
+            icon: {
+              src: "https://dalel-lovat.vercel.app/images/contact-us/envelope.svg",
+              alt: "email Icon",
+              size: {
+                mobile: "w-[40px] h-[40px]",
+                desktop: "md:w-[60px] md:h-[60px]",
+              },
+            },
+            title: {
+              text: "الايميل",
+              style: {
+                size: {
+                  mobile: "text-[16px]",
+                  desktop: "md:text-[24px]",
+                },
+                weight: "font-bold",
+                color: "#525252",
+                lineHeight: "leading-[35px]",
+              },
+            },
+            content: {
+              type: "links",
+              links: [
+                {
+                  text: "guidealjiwa22@gmail.com",
+                  href: "mailto:guidealjiwa22@gmail.com",
+                },
+              ],
+              style: {
+                size: {
+                  mobile: "text-[16px]",
+                  desktop: "md:text-[20px]",
+                },
+                weight: "font-normal",
+                color: "#525252",
+                lineHeight: "leading-[35px]",
+              },
+            },
+            cardStyle: {
+              height: {
+                mobile: "h-[182px]",
+                desktop: "md:h-[210px]",
+              },
+              gap: {
+                main: "gap-y-[16px]",
+                content: {
+                  mobile: "gap-y-[8px]",
+                  desktop: "md:gap-y-[16px]",
+                },
+                links: "gap-x-[50px]",
+              },
+              shadow: {
+                enabled: true,
+                value: "rgba(9, 46, 114, 0.32) 0px 2px 16px 0px",
+              },
+              alignment: {
+                horizontal: "items-center",
+                vertical: "justify-center",
+              },
+            },
+          },
+          {
+            icon: {
+              src: "https://dalel-lovat.vercel.app/images/contact-us/phone.svg",
+              alt: "phone Icon",
+              size: {
+                mobile: "w-[40px] h-[40px]",
+                desktop: "md:w-[60px] md:h-[60px]",
+              },
+            },
+            title: {
+              text: "الجوال",
+              style: {
+                size: {
+                  mobile: "text-[16px]",
+                  desktop: "md:text-[24px]",
+                },
+                weight: "font-bold",
+                color: "#525252",
+                lineHeight: "leading-[35px]",
+              },
+            },
+            content: {
+              type: "links",
+              links: [
+                {
+                  text: "0535150222",
+                  href: "tel:0535150222",
+                },
+                {
+                  text: "0537180774",
+                  href: "tel:0537180774",
+                },
+              ],
+              style: {
+                size: {
+                  mobile: "text-[16px]",
+                  desktop: "md:text-[20px]",
+                },
+                weight: "font-normal",
+                color: "#525252",
+                lineHeight: "leading-[35px]",
+              },
+            },
+            cardStyle: {
+              height: {
+                mobile: "h-[182px]",
+                desktop: "md:h-[210px]",
+              },
+              gap: {
+                main: "gap-y-[16px]",
+                content: {
+                  mobile: "gap-y-[8px]",
+                  desktop: "md:gap-y-[16px]",
+                },
+                links: "gap-x-[50px]",
+              },
+              shadow: {
+                enabled: true,
+                value: "rgba(9, 46, 114, 0.32) 0px 2px 16px 0px",
+              },
+              alignment: {
+                horizontal: "items-center",
+                vertical: "justify-center",
+              },
+            },
+          },
+        ],
+      };
+
     case "footer":
       return {
         visible: true,
