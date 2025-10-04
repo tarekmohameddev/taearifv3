@@ -449,7 +449,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
               mergedData.logo?.url?.startsWith("http")
                 ? mergedData.logo.url
                 : tenantId
-                  ? `${mergedData.logo?.url === "/" ? "" : mergedData.logo?.url || ""}`
+                  ? `${mergedData.logo?.url === "/" ? "/" : mergedData.logo?.url || "/"}`
                   : mergedData.logo?.url || "/"
             }
             className="flex items-center gap-2"
@@ -493,7 +493,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                 href: item.url?.startsWith("http")
                   ? item.url
                   : tenantId
-                    ? `${item.url === "/" ? "" : item.url}`
+                    ? `${item.url === "/" ? "/" : item.url}`
                     : item.url || "/",
                 type: item.type,
                 id: item.id,
@@ -834,7 +834,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                       href: item.url?.startsWith("http")
                         ? item.url
                         : tenantId
-                          ? `${item.url === "/" ? "" : item.url}`
+                          ? `${item.url === "/" ? "/" : item.url}`
                           : item.url || "/",
                       type: item.type,
                       id: item.id,

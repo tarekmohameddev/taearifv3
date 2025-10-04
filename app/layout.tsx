@@ -50,7 +50,12 @@ export default async function RootLayout({
     "/dashboard/templates",
     "/dashboard/whatsapp-ai",
     "/dashboard",
-    "/live-editor"
+    "/register",
+    "/login",
+    "/live-editor",
+    "/oauth/token/success",
+    "/oauth/social/extra-info",
+    "/onboarding"
   ];
 
   // التحقق من أن الصفحة مسموح بها وليس هناك subdomain
