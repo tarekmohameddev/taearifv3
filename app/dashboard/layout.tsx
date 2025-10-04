@@ -3,6 +3,33 @@
 import { useEffect } from "react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
 
+/*
+ * ========================================
+ * DASHBOARD LAYOUT - ARABIC RTL ENFORCEMENT
+ * ========================================
+ * 
+ * This layout component is specifically designed for Arabic RTL dashboard pages.
+ * 
+ * PURPOSE:
+ * - Enforces RTL (Right-to-Left) direction for all dashboard pages
+ * - Ensures consistent Arabic language experience
+ * - Applies RTL styling automatically to all dashboard content
+ * 
+ * HOW IT WORKS:
+ * 1. Automatically applies RTL direction to HTML, body, and all elements
+ * 2. Validates user authentication before rendering content
+ * 3. Provides loading state during token validation
+ * 
+ * NOTE:
+ * This layout works in conjunction with middleware.ts which automatically
+ * redirects all dashboard pages to Arabic locale (/ar/dashboard/*)
+ * 
+ * MODIFICATION NOTES:
+ * - To disable RTL enforcement: Remove the useEffect with RTL styling
+ * - To change language direction: Modify the direction CSS properties
+ * - To add LTR support: Add conditional logic based on locale detection
+ */
+
 export default function DashboardLayout({
   children,
 }: {

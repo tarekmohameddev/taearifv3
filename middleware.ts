@@ -81,6 +81,59 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  /*
+   * ========================================
+   * DASHBOARD AUTO-REDIRECT TO ARABIC LOCALE
+   * ========================================
+   * 
+   * This section handles automatic redirection of dashboard pages to Arabic locale.
+   * 
+   * PURPOSE:
+   * - Force all dashboard pages to use Arabic locale (ar) regardless of the original URL
+   * - Ensures consistent RTL experience across all dashboard sections
+   * - Prevents users from accessing dashboard in English locale
+   * 
+   * HOW IT WORKS:
+   * 1. Detects if the current path is a dashboard page (starts with /dashboard)
+   * 2. Checks if the current locale is English (en)
+   * 3. If both conditions are true, redirects to the same path with Arabic locale
+   * 
+   * AFFECTED PAGES:
+   * - /en/dashboard/* -> /ar/dashboard/*
+   * - All dashboard subpages (affiliate, analytics, apps, blog, etc.)
+   * 
+   * MODIFICATION NOTES:
+   * - To disable this feature: Comment out the entire dashboard redirect section
+   * - To change target locale: Replace "ar" with desired locale code
+   * - To modify affected paths: Update the dashboard path check condition
+   * 
+   * EXAMPLE:
+   * User visits: /en/dashboard/analytics
+   * System redirects to: /ar/dashboard/analytics
+   */
+  
+  // Check if this is a dashboard page and current locale is English
+  const isDashboardPage = pathname.startsWith("/en/dashboard") || 
+                         pathname.startsWith("/dashboard");
+  
+  if (isDashboardPage) {
+    // Extract the path without locale for dashboard pages
+    let dashboardPath = pathname;
+    
+    // If path starts with /en/dashboard, remove /en prefix
+    if (pathname.startsWith("/en/dashboard")) {
+      dashboardPath = pathname.replace("/en", "");
+    }
+    // If path starts with /dashboard (no locale), keep as is
+    else if (pathname.startsWith("/dashboard")) {
+      dashboardPath = pathname;
+    }
+    
+    // Redirect to Arabic version of the dashboard page
+    const newUrl = new URL(`/ar${dashboardPath}`, request.url);
+    return NextResponse.redirect(newUrl);
+  }
+
   // Check if pathname starts with a locale
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
