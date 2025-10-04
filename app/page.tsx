@@ -2,6 +2,9 @@ import { headers } from "next/headers";
 import HomePageWrapper from "./HomePageWrapper";
 import TaearifLandingPageSimple from "../components/TaearifLandingPageSimple";
 
+// إبقاء الصفحة dynamic لتتمكن من التحقق من tenantId
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");

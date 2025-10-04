@@ -81,6 +81,22 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // تحسين الأداء للمكونات الثابتة - إضافة cache headers
+  let response = NextResponse.next();
+  
+  // إضافة cache headers للمكونات الثابتة (عندما لا يوجد tenantId)
+  if (!tenantId && (
+    pathname === "/" ||
+    pathname === "/solutions" ||
+    pathname === "/updates" ||
+    pathname === "/landing" ||
+    pathname === "/about-us"
+  )) {
+    // تحسين cache للمكونات Taearif
+    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    response.headers.set('X-Component-Type', 'taearif-static');
+  }
+
   /*
    * ========================================
    * DASHBOARD AUTO-REDIRECT TO ARABIC LOCALE
@@ -171,7 +187,7 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   url.pathname = pathnameWithoutLocale;
 
-  const response = NextResponse.rewrite(url);
+  response = NextResponse.rewrite(url);
 
   // Set locale headers
   response.headers.set("x-locale", locale);

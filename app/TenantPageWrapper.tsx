@@ -23,6 +23,7 @@ import {
   ContactCardsSkeleton1 
 } from "@/components/skeleton";
 import { shouldCenterComponent, getCenterWrapperClasses, getCenterWrapperStyles } from "@/lib/ComponentsInCenter";
+import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
 
 const loadComponent = (section: string, componentName: string) => {
   console.log("📄 TenantPageWrapper - loadComponent called with:", {
@@ -112,10 +113,34 @@ export default function TenantPageWrapper({
     }
   }, [tenantId, setTenantId]);
 
+  // تنظيف cache المنتهية الصلاحية عند تحميل المكون
+  useEffect(() => {
+    clearExpiredCache();
+  }, []);
+
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
     if (tenantId && !tenantData && !loadingTenantData) {
-      fetchTenantData(tenantId);
+      console.log("📄 TenantPageWrapper - Fetching tenant data for:", tenantId);
+      
+      // محاولة تحميل البيانات من cache أولاً
+      const loadData = async () => {
+        try {
+          const cachedData = await preloadTenantData(tenantId);
+          if (cachedData) {
+            // إذا كانت البيانات موجودة في cache، استخدمها مباشرة
+            console.log("📄 TenantPageWrapper - Using cached data for:", tenantId);
+            return;
+          }
+        } catch (error) {
+          console.warn("📄 TenantPageWrapper - Cache failed, fetching from API:", error);
+        }
+        
+        // إذا لم تكن البيانات في cache، جلبها من API
+        fetchTenantData(tenantId);
+      };
+      
+      loadData();
     }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
 
@@ -295,7 +320,7 @@ export default function TenantPageWrapper({
               // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات والستايل المناسب
               if (shouldCenterComponent(comp.componentName)) {
                 return (
-                  <div key={comp.id} className={centerWrapperClasses} style={centerWrapperStyles}>
+                  <div key={comp.id} className={centerWrapperClasses} style={centerWrapperStyles as React.CSSProperties}>
                     {componentElement}
                   </div>
                 );

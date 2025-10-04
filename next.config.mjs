@@ -20,7 +20,21 @@ const nextConfig = {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+    // تحسينات للأداء
+    optimizeCss: true,
+    scrollRestoration: true,
   },
+  // تحسينات للأداء
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // تحسين cache
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
+  // تحسين البناء للصفحات الثابتة
+  output: 'standalone',
 };
 
 mergeConfig(nextConfig, userConfig);

@@ -32,6 +32,7 @@ import { LanguageSwitcher } from "@/components/tenant/LanguageSwitcher";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import { shouldCenterComponent, getCenterWrapperClasses, getCenterWrapperStyles } from "@/lib/ComponentsInCenter";
+import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
 
 // دالة لتحميل المكونات ديناميكيًا بناءً على الاسم والرقم الأخير
 const loadComponent = (section: string, componentName: string) => {
@@ -127,6 +128,11 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
     }
   }, [tenantId]);
 
+  // تنظيف cache المنتهية الصلاحية عند تحميل المكون
+  useEffect(() => {
+    clearExpiredCache();
+  }, []);
+
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
     if (
@@ -135,11 +141,29 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
       !loadingTenantData &&
       !hasFetchedRef.current
     ) {
-      console.warn("heyyyyyy333");
+      console.warn("🏠 HomePageWrapper - Fetching tenant data for:", tenantId);
       hasFetchedRef.current = true;
-      fetchTenantData(tenantId);
+      
+      // محاولة تحميل البيانات من cache أولاً
+      const loadData = async () => {
+        try {
+          const cachedData = await preloadTenantData(tenantId);
+          if (cachedData) {
+            // إذا كانت البيانات موجودة في cache، استخدمها مباشرة
+            console.log("🏠 HomePageWrapper - Using cached data for:", tenantId);
+            return;
+          }
+        } catch (error) {
+          console.warn("🏠 HomePageWrapper - Cache failed, fetching from API:", error);
+        }
+        
+        // إذا لم تكن البيانات في cache، جلبها من API
+        fetchTenantData(tenantId);
+      };
+      
+      loadData();
     }
-  }, [tenantId, tenantData, loadingTenantData]);
+  }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
 
   // Reset fetch flag when tenantId changes
   useEffect(() => {
@@ -323,7 +347,7 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
               // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات والستايل المناسب
               if (shouldCenterComponent(comp.componentName)) {
                 return (
-                  <div key={comp.id} className={centerWrapperClasses} style={centerWrapperStyles}>
+                  <div key={comp.id} className={centerWrapperClasses} style={centerWrapperStyles as React.CSSProperties}>
                     {componentElement}
                   </div>
                 );
