@@ -38,6 +38,7 @@ import { z } from "zod";
 import axios from "axios";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { trackFormSubmission, trackButtonClick, trackEvent } from "@/lib/gtm";
 
 // Zod schema for form validation
 const registerSchema = z.object({
@@ -276,6 +277,14 @@ export function LandingPage() {
         });
 
         toast.success("تم إنشاء حسابك بنجاح! سيتم تحويلك الآن.");
+        
+        // Track successful registration
+        trackFormSubmission("landing_page_register", "signup");
+        trackEvent("signup_completed", {
+          method: "landing_page",
+          user_email: user.email,
+        });
+        
         setTimeout(() => {
           router.push("/onboarding");
         }, 1500);
@@ -307,10 +316,17 @@ export function LandingPage() {
           general: translatedMessage,
         }));
       } else {
+        const errorMsg = "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.";
         setErrors((prev) => ({
           ...prev,
-          general: "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
+          general: errorMsg,
         }));
+        
+        // Track error
+        trackEvent("registration_error", {
+          error_type: "unexpected_error",
+          error_message: errorMsg,
+        });
       }
     } finally {
       setIsSubmitting(false);

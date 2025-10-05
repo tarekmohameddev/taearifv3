@@ -13,7 +13,7 @@ import {
   locales,
   localeNames,
   localeFlags,
-} from "@/lib-liveeditor/i18n/config";
+} from "@/lib/i18n/config";
 import { Globe } from "lucide-react";
 
 export function LanguageSwitcher() {

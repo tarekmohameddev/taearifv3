@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
+import { trackSignup, trackError, trackFormSubmission } from "@/lib/gtm";
 
 // تعريف واجهة البيانات الخاصة بالنموذج
 interface FormData {
@@ -246,6 +247,11 @@ export function GoogleRegisterPage() {
             },
           });
           setFormSubmitted(true);
+          
+          // Track successful signup
+          trackSignup("google");
+          trackFormSubmission("google_register", "signup");
+          
           setTimeout(() => {
             router.push("/onboarding");
           }, 1500);
@@ -273,10 +279,14 @@ export function GoogleRegisterPage() {
           }
         } else {
           console.error("❌ Unexpected error:", error);
+          const errorMsg = "حدث خطأ غير متوقع. يرجى المحاولة لاحقًا.";
           setErrors((prevErrors) => ({
             ...prevErrors,
-            general: "حدث خطأ غير متوقع. يرجى المحاولة لاحقًا.",
+            general: errorMsg,
           }));
+          
+          // Track error
+          trackError(errorMsg, "google_register_error");
         }
       } finally {
         setIsSubmitting(false);

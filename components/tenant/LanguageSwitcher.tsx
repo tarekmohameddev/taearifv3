@@ -13,13 +13,13 @@ import {
   locales,
   localeNames,
   localeFlags,
-} from "@/lib-liveeditor/i18n/config";
+} from "@/lib/i18n/config";
 import { Globe } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import {
   addLocaleToPathname,
   removeLocaleFromPathname,
-} from "@/lib-liveeditor/i18n/config";
+} from "@/lib/i18n/config";
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useClientLocale();

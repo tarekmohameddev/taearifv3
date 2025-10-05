@@ -1050,7 +1050,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
           </AnimatePresence>
         </div>
 
-        {/* Components List */}
+        {/* Components List - Coming Soon Overlay */}
         <AnimatePresence initial={false}>
           {isExpanded && (
             <motion.div
@@ -1059,15 +1059,16 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
               initial="hidden"
               animate="show"
               exit="exit"
-              className="flex-1 overflow-y-auto p-4"
+              className="flex-1 overflow-y-auto p-4 relative"
               layout
             >
-              <motion.div
-                variants={listContainer}
-                initial="hidden"
-                animate="show"
-                className="space-y-2"
-              >
+              <div className="relative">
+                <motion.div
+                  variants={listContainer}
+                  initial="hidden"
+                  animate="show"
+                  className="space-y-2"
+                >
                 {filteredSections.length > 0 ? (
                   filteredSections.map((section) => (
                     <motion.div
@@ -1138,7 +1139,18 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                     <p>{t("live_editor.no_components_found")}</p>
                   </motion.div>
                 )}
-              </motion.div>
+                </motion.div>
+                
+                {/* Coming Soon Overlay - Disabled all components */}
+                <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto" style={{ paddingTop: "250px" }}
+                >
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">🚧</div>
+                    <h2 className="text-2xl font-bold text-red-600 mb-2">{t("live_editor.coming_soon")}</h2>
+                    <p className="text-red-500 font-medium">{t("live_editor.components_disabled")}</p>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

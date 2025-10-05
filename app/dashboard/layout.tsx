@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
+import { GTMProvider } from "@/components/GTMProvider";
 
 /*
  * ========================================
@@ -85,8 +86,10 @@ export default function DashboardLayout({
   }
 
   return (
-    <div dir="rtl" style={{ direction: "rtl" }}>
-      {children}
-    </div>
+    <GTMProvider containerId="GTM-KBL37C9T">
+      <div dir="rtl" style={{ direction: "rtl" }}>
+        {children}
+      </div>
+    </GTMProvider>
   );
 }

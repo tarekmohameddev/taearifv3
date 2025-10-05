@@ -8,9 +8,13 @@ import DetailedSolutions from "./DetailedSolutions";
 import BenefitsSection from "./BenefitsSection";
 import SolutionsFooter from "./SolutionsFooter";
 import SolutionsStyles from "./SolutionsStyles";
+import { trackPageView } from "@/lib/gtm";
 
 export default function SolutionsPage() {
   useEffect(() => {
+    // Track page view
+    trackPageView("/solutions", "Solutions Page");
+    
     // Animation Observer
     const observer = new IntersectionObserver(
       (entries) => {

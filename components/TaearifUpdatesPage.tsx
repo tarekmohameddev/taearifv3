@@ -19,11 +19,15 @@ import {
   Instagram,
 } from "lucide-react";
 import SharedHeader from "./shared/SharedHeader";
+import { trackPageView } from "@/lib/gtm";
 
 export default function TaearifUpdatesPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // Track page view
+    trackPageView("/updates", "Updates Page");
+    
     // Initialize animations
     const observer = new IntersectionObserver(
       (entries) => {

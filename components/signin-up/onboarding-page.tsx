@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import toast from "react-hot-toast";
 import ColorPicker from "../color-picker";
+import { trackPageView, trackFormSubmission, trackEvent } from "@/lib/gtm";
 
 const WEBSITE_CATEGORIES = [
   {
@@ -93,6 +94,11 @@ const OnboardingPage: React.FC = () => {
       router.push("/dashboard");
     }
   }, [onboarding_completed, router]);
+
+  // Track page view
+  useEffect(() => {
+    trackPageView("/onboarding", "Onboarding Page");
+  }, []);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWhereError("");

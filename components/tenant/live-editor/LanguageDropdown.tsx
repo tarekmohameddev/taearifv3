@@ -16,7 +16,7 @@ import {
   localeFlags,
   getDirectionForLocale,
   getDefaultDirection,
-} from "@/lib-liveeditor/i18n/config";
+} from "@/lib/i18n/config";
 import { useEditorLocale } from "@/context-liveeditor/editorI18nStore";
 
 export function LanguageDropdown() {

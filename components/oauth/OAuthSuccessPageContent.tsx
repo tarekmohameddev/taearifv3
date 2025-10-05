@@ -5,6 +5,7 @@ import useAuthStore from "@/context/AuthContext";
 import axiosInstance from "@/lib/axiosInstance";
 import { Check, AlertCircle } from "lucide-react";
 import Image from "next/image";
+import { trackLogin, trackError } from "@/lib/gtm";
 
 export default function OAuthSuccessPageContent() {
   const router = useRouter();
@@ -92,6 +93,9 @@ export default function OAuthSuccessPageContent() {
 
         setStatus("success");
 
+        // Track successful login
+        trackLogin("oauth");
+
         // التحقق من الصفحة المرجعية لتحديد وجهة التوجيه
         const returnPage = localStorage.getItem("oauth_return_page");
         localStorage.removeItem("oauth_return_page");
@@ -107,11 +111,13 @@ export default function OAuthSuccessPageContent() {
       } catch (error) {
         console.error("OAuth success handling error:", error);
         setStatus("error");
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "حدث خطأ أثناء معالجة تسجيل الدخول",
-        );
+        const errorMsg = error instanceof Error
+          ? error.message
+          : "حدث خطأ أثناء معالجة تسجيل الدخول";
+        setErrorMessage(errorMsg);
+        
+        // Track error
+        trackError(errorMsg, "oauth_error");
       }
     };
 

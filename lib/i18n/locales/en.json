@@ -351,7 +351,9 @@
     "changes_not_saved_title": "Changes Not Saved",
     "changes_not_saved_description": "Your changes have been detected but are not yet saved. They will only appear on your live website after you click 'Save Changes' and confirm the save operation.",
     "understood": "Understood",
-    "click_to_save": "Click to Save Changes"
+    "click_to_save": "Click to Save Changes",
+    "coming_soon": "Coming Soon",
+    "components_disabled": "This feature will be available soon"
   },
   "editor_sidebar": {
     "theme_settings": "Theme Settings",

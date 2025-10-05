@@ -7,7 +7,7 @@ import {
   defaultLocale,
   locales,
   isValidLocale,
-} from "@/lib-liveeditor/i18n/config";
+} from "@/lib/i18n/config";
 
 // Import translation files
 import arTranslations from "@/lib/i18n/locales/ar.json";

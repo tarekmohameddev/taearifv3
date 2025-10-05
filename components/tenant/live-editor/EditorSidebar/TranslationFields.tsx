@@ -6,7 +6,7 @@ import {
   locales,
   localeNames,
   localeFlags,
-} from "@/lib-liveeditor/i18n/config";
+} from "@/lib/i18n/config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
