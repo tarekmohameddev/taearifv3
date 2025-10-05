@@ -22,6 +22,7 @@ const useAuthStore = create((set, get) => ({
     first_name: null,
     last_name: null,
     is_free_plan: null,
+    is_expired: false,
     days_remaining: null,
     package_title: null,
     package_features: [],
@@ -80,6 +81,7 @@ const useAuthStore = create((set, get) => ({
             ...userData,
             days_remaining: subscriptionDATA.membership.days_remaining || null,
             is_free_plan: subscriptionDATA.membership.is_free_plan || false,
+            is_expired: subscriptionDATA.membership.is_expired || false,
             package_title: subscriptionDATA.membership.package.title || null,
             package_features:
               subscriptionDATA.membership.package.features || [],

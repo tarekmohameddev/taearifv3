@@ -79,6 +79,7 @@ export default function OAuthSuccessPageContent() {
             // إضافة بيانات العضوية إذا كانت موجودة
             domain: userData.domain || null,
             is_free_plan: userData.membership?.is_free_plan || null,
+            is_expired: userData.membership?.is_expired || false,
             days_remaining: userData.membership?.days_remaining || null,
             package_title: userData.membership?.package?.title || null,
             package_features: userData.membership?.package?.features || [],

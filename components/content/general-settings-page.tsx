@@ -16,6 +16,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
+import useAuthStore from "@/context/AuthContext";
 
 interface AdditionalSettings {
   theme_color: string;
@@ -31,6 +32,7 @@ interface AdditionalSettings {
 
 export function GeneralSettingsPage() {
   const router = useRouter();
+  const { userData } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     site_name: "",
@@ -432,6 +434,7 @@ export function GeneralSettingsPage() {
                     onCheckedChange={(checked) =>
                       setFormData({ ...formData, maintenance_mode: checked })
                     }
+                    disabled={userData.is_expired}
                   />
                 </div>
 
