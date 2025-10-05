@@ -228,17 +228,17 @@ const MapSection1: React.FC<MapSectionProps> = ({
       )}
       
       {mergedData.map?.enabled && (
-        <div className="w-full max-w-[1600px] mx-auto">
-          <iframe
-            src={mapSrc}
-            width="100%"
+      <div className="w-full max-w-[1600px] mx-auto">
+        <iframe
+          src={mapSrc}
+          width="100%"
             height={mapHeight}
-            style={{ border: 0 }}
-            allowFullScreen={true}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </div>
+          style={{ border: 0 }}
+          allowFullScreen={true}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
       )}
     </section>
   );

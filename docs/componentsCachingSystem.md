@@ -219,19 +219,19 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   }, [uniqueId, props.useStore, ensureComponentVariant]);
 
   // Add effect to listen for store updates
-  useEffect(() => {
+useEffect(() => {
     if (props.useStore) {
       // Force re-render when store data changes
-      const unsubscribe = useEditorStore.subscribe((state) => {
-        const newContactCardsStates = state.contactCardsStates;
-        if (newContactCardsStates[uniqueId]) {
-          setForceUpdate(prev => prev + 1);
-        }
-      });
-      
-      return unsubscribe;
+  const unsubscribe = useEditorStore.subscribe((state) => {
+    const newContactCardsStates = state.contactCardsStates;
+    if (newContactCardsStates[uniqueId]) {
+      setForceUpdate(prev => prev + 1);
     }
-  }, [props.useStore, uniqueId]);
+  });
+      
+  return unsubscribe;
+    }
+}, [props.useStore, uniqueId]);
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -271,17 +271,17 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   }
 
   // Use merged data for cards with proper fallbacks
-  const cards: ContactCardProps[] = (mergedData.cards || defaultData.cards).map((card: ContactCardProps) => ({
-    ...card,
-    icon: {
-      ...card.icon,
+const cards: ContactCardProps[] = (mergedData.cards || defaultData.cards).map((card: ContactCardProps) => ({
+  ...card,
+  icon: {
+    ...card.icon,
       src: card.icon.src || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCA0NUw0NSA0MEw0MCAzNUwzMCA0MFYyMEw0MCAyNVY0MEwzMCA0NVoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+"
-    },
-    cardStyle: {
-      ...defaultData.cards[0]?.cardStyle,
-      ...card.cardStyle
-    }
-  }));
+  },
+  cardStyle: {
+    ...defaultData.cards[0]?.cardStyle,
+    ...card.cardStyle
+  }
+}));
 
   return (
     <div 
@@ -660,7 +660,7 @@ const mergedData = {
     ...(storeData?.styling || {}),
     ...(currentStoreData?.styling || {}),
   },
-};
+  };
 ```
 
 ### **3. Dynamic Form Rendering**
