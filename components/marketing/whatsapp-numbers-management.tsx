@@ -15,6 +15,7 @@ import {
   Users,
   Calendar,
   Activity,
+  Settings,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,6 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -59,7 +61,7 @@ interface WhatsAppNumber {
 }
 
 export function WhatsAppNumbersManagement() {
-  const { marketingChannels, fetchMarketingChannels, createMarketingChannel, deleteMarketingChannel } = useStore()
+  const { marketingChannels, fetchMarketingChannels, createMarketingChannel, deleteMarketingChannel, updateChannelStatus } = useStore()
   const [numbers, setNumbers] = useState<WhatsAppNumber[]>([])
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -74,6 +76,15 @@ export function WhatsAppNumbersManagement() {
     template_namespace: "",
   })
   const [isConnecting, setIsConnecting] = useState(false)
+  
+  // Status Dialog States
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false)
+  const [selectedChannel, setSelectedChannel] = useState<WhatsAppNumber | null>(null)
+  const [tempStatus, setTempStatus] = useState({
+    is_connected: false,
+    is_verified: false
+  })
+  const [isSavingStatus, setIsSavingStatus] = useState(false)
 
   // جلب البيانات عند تحميل المكون
   useEffect(() => {
@@ -135,6 +146,72 @@ export function WhatsAppNumbersManagement() {
     } catch (error) {
       console.error("Error deleting channel:", error)
     }
+  }
+
+  const handleStatusChange = async (channelId: number, field: 'is_connected' | 'is_verified', value: boolean) => {
+    try {
+      const result = await updateChannelStatus(channelId, { [field]: value })
+      if (result.success) {
+        // تحديث الحالة المحلية
+        setNumbers(prevNumbers => 
+          prevNumbers.map(num => 
+            num.id === channelId 
+              ? { ...num, [field]: value }
+              : num
+          )
+        )
+      }
+    } catch (error) {
+      console.error('Error updating channel status:', error)
+    }
+  }
+
+  const openStatusDialog = (channel: WhatsAppNumber) => {
+    setSelectedChannel(channel)
+    setTempStatus({
+      is_connected: channel.is_connected,
+      is_verified: channel.is_verified
+    })
+    setIsStatusDialogOpen(true)
+  }
+
+  const handleSaveStatus = async () => {
+    if (!selectedChannel || isSavingStatus) return
+
+    setIsSavingStatus(true)
+    try {
+      const result = await updateChannelStatus(selectedChannel.id, tempStatus)
+      if (result.success) {
+        // تحديث الحالة المحلية
+        setNumbers(prevNumbers => 
+          prevNumbers.map(num => 
+            num.id === selectedChannel.id 
+              ? { ...num, ...tempStatus }
+              : num
+          )
+        )
+        // إغلاق الـ popup
+        setIsStatusDialogOpen(false)
+        setSelectedChannel(null)
+        setTempStatus({
+          is_connected: false,
+          is_verified: false
+        })
+      }
+    } catch (error) {
+      console.error('Error updating channel status:', error)
+    } finally {
+      setIsSavingStatus(false)
+    }
+  }
+
+  const handleCancelStatus = () => {
+    setIsStatusDialogOpen(false)
+    setSelectedChannel(null)
+    setTempStatus({
+      is_connected: false,
+      is_verified: false
+    })
   }
 
   const getStatusColor = (isConnected: boolean, isVerified: boolean) => {
@@ -345,26 +422,30 @@ export function WhatsAppNumbersManagement() {
 
             <CardContent className="space-y-4">
               {/* Status Details */}
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-muted-foreground">حالة التحقق:</span>
-                  <div className="flex items-center gap-1 mt-1">
-                    {number.is_verified ? (
-                      <CheckCircle className="h-3 w-3 text-green-600" />
-                    ) : (
-                      <XCircle className="h-3 w-3 text-red-600" />
-                    )}
-                    <span className="text-xs">
-                      {number.is_verified ? "مُحقق" : "غير مُحقق"}
-                    </span>
+              <div className="space-y-4">
+                {/* Status Management */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-gray-900">إدارة الحالة</p>
+                    <p className="text-xs text-gray-500">تغيير حالة الاتصال والتحقق</p>
                   </div>
+                  <Button
+                    onClick={() => openStatusDialog(number)}
+                    variant="outline"
+                    size="sm"
+                    className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                  >
+                    <Settings className="h-4 w-4 ml-2" />
+                    تغيير الحالة
+                  </Button>
                 </div>
 
-                <div>
+                {/* Date Info */}
+                <div className="text-sm">
                   <span className="text-muted-foreground">تاريخ الإضافة:</span>
                   <div className="flex items-center gap-1 mt-1">
                     <Calendar className="h-3 w-3" />
-                    <span className="text-xs">{new Date(number.created_at).toLocaleDateString('ar-SA')}</span>
+                    <span className="text-xs">{new Date(number.created_at).toLocaleDateString('ar-US')}</span>
                   </div>
                 </div>
               </div>
@@ -443,6 +524,113 @@ export function WhatsAppNumbersManagement() {
           Business API. تأكد من أن رقمك مُحقق ومُعتمد من Meta قبل البدء في إرسال الرسائل.
         </AlertDescription>
       </Alert>
+
+      {/* Status Change Dialog */}
+      <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
+        <DialogContent className="max-w-md bg-white border-0 shadow-2xl" dir="rtl">
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="text-xl font-bold text-gray-900 text-center">
+              تغيير حالة الرقم
+            </DialogTitle>
+            <DialogDescription className="text-center text-gray-600">
+              {selectedChannel?.name} - {selectedChannel?.number}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Connection Status */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h4 className="text-sm font-semibold text-gray-900">حالة الاتصال</h4>
+                  <p className="text-xs text-gray-500">تحديد ما إذا كان الرقم متصل أم لا</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={tempStatus.is_connected}
+                    onChange={(e) => setTempStatus(prev => ({ ...prev, is_connected: e.target.checked }))}
+                  />
+                  <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                </label>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                {tempStatus.is_connected ? (
+                  <div className="flex items-center gap-1 text-green-600">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>متصل</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-red-600">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span>غير متصل</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200"></div>
+
+            {/* Verification Status */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h4 className="text-sm font-semibold text-gray-900">حالة التحقق</h4>
+                  <p className="text-xs text-gray-500">تحديد ما إذا كان الرقم مُحقق أم لا</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={tempStatus.is_verified}
+                    onChange={(e) => setTempStatus(prev => ({ ...prev, is_verified: e.target.checked }))}
+                  />
+                  <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                </label>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                {tempStatus.is_verified ? (
+                  <div className="flex items-center gap-1 text-green-600">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>مُحقق</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-red-600">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span>غير مُحقق</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-3 pt-4">
+            <Button
+              onClick={handleCancelStatus}
+              variant="outline"
+              className="flex-1 bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+            >
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleSaveStatus}
+              disabled={isSavingStatus}
+              className="flex-1 bg-black text-white hover:bg-gray-800 transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isSavingStatus ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                  جاري الحفظ...
+                </>
+              ) : (
+                "حفظ التغييرات"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

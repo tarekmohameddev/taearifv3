@@ -28,7 +28,7 @@ export function MarketingPage() {
             </div>
 
             <Tabs defaultValue="whatsapp" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="whatsapp" className="flex items-center gap-2">
                   <MessageSquare className="h-4 w-4" />
                   <span className="hidden sm:inline">واتساب</span>
@@ -36,10 +36,6 @@ export function MarketingPage() {
                 <TabsTrigger value="credits" className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
                   <span className="hidden sm:inline">الرصيد</span>
-                </TabsTrigger>
-                <TabsTrigger value="settings" className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  <span className="hidden sm:inline">الإعدادات</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -51,9 +47,6 @@ export function MarketingPage() {
                 <CreditSystemComponent />
               </TabsContent>
 
-              <TabsContent value="settings">
-                <MarketingSettingsComponent />
-              </TabsContent>
             </Tabs>
           </div>
         </main>

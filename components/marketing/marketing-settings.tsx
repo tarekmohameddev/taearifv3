@@ -546,20 +546,6 @@ export function MarketingSettingsComponent() {
 
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center gap-3">
-                    <Globe className="h-5 w-5 text-green-600" />
-                    <div>
-                      <Label className="text-base">التجارة الإلكترونية</Label>
-                      <p className="text-sm text-muted-foreground">ربط مع المتجر الإلكتروني</p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={systemIntegrations.ecommerce}
-                    onCheckedChange={(checked) => setSystemIntegrations((prev) => ({ ...prev, ecommerce: checked }))}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
                     <Clock className="h-5 w-5 text-purple-600" />
                     <div>
                       <Label className="text-base">نظام المواعيد</Label>
@@ -572,38 +558,6 @@ export function MarketingSettingsComponent() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Settings className="h-5 w-5 text-orange-600" />
-                    <div>
-                      <Label className="text-base">التحليلات</Label>
-                      <p className="text-sm text-muted-foreground">تتبع أداء الحملات</p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={systemIntegrations.analytics}
-                    onCheckedChange={(checked) => setSystemIntegrations((prev) => ({ ...prev, analytics: checked }))}
-                  />
-                </div>
-              </div>
-
-              {/* Webhooks */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Webhooks</Label>
-                    <p className="text-sm text-muted-foreground">إرسال إشعارات إلى URL خارجي</p>
-                  </div>
-                  <Switch
-                    checked={systemIntegrations.webhooks.enabled}
-                    onCheckedChange={(checked) =>
-                      setSystemIntegrations((prev) => ({
-                        ...prev,
-                        webhooks: { ...prev.webhooks, enabled: checked },
-                      }))
-                    }
-                  />
-                </div>
 
                 {systemIntegrations.webhooks.enabled && (
                   <div className="space-y-4">

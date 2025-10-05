@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import useStore from "@/context/Store"
 import {
   Plus,
   CreditCard,
@@ -11,6 +12,8 @@ import {
   CheckCircle,
   Clock,
   DollarSign,
+  XCircle,
+  AlertCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,26 +29,50 @@ import {
 } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface CreditPackage {
-  id: string
+  id: number
   name: string
+  description: string | null
   credits: number
-  price: number
+  price: string
   currency: string
-  discount?: number
-  popular?: boolean
+  discounted_price: string
+  savings_amount: number
+  savings_percentage: number | null
+  price_per_credit: number
+  is_popular: boolean
+  features: string[]
+  is_recommended: boolean
 }
 
 interface CreditTransaction {
-  id: string
-  type: "purchase" | "usage" | "refund" | "bonus"
-  amount: number
+  id: number
+  reference_number: string | null
+  transaction_type: string
+  transaction_type_display: string
+  credits_amount: number
+  absolute_credits: number
+  amount_paid: string | null
+  currency: string
+  payment_method: string | null
+  status: string
+  status_display: string
   description: string
-  date: string
-  phoneNumber?: string
-  campaignName?: string
-  status: "completed" | "pending" | "failed"
+  created_at: string
+  package: {
+    id: number
+    name: string
+    credits: number
+  }
+  is_positive: boolean
+  is_negative: boolean
 }
 
 interface CreditUsage {
@@ -57,100 +84,75 @@ interface CreditUsage {
 }
 
 export function CreditSystemComponent() {
-  const [currentCredits, setCurrentCredits] = useState(2450)
-  const [monthlyUsage, setMonthlyUsage] = useState(1250)
-  const [monthlyLimit, setMonthlyLimit] = useState(5000)
+  const { creditPackages, fetchCreditPackages, purchaseCredits, creditTransactions, fetchCreditTransactions, creditAnalytics, fetchCreditAnalytics, creditBalance, fetchCreditBalance } = useStore()
+  // استخدام البيانات من API بدلاً من المتغيرات المحلية
+  const currentCredits = creditBalance.data?.available_credits || 0
+  const monthlyUsage = creditBalance.data?.used_credits || 0
+  const monthlyLimit = creditBalance.data?.monthly_limit || 0
   const [isTopUpDialogOpen, setIsTopUpDialogOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<string>("")
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("")
+  const [isPaymentPopupOpen, setIsPaymentPopupOpen] = useState(false)
+  const [paymentUrl, setPaymentUrl] = useState<string>("")
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
 
-  const creditPackages: CreditPackage[] = [
-    { id: "1", name: "الباقة الأساسية", credits: 1000, price: 50, currency: "SAR" },
-    { id: "2", name: "الباقة المتوسطة", credits: 2500, price: 100, currency: "SAR", discount: 20 },
-    { id: "3", name: "الباقة المتقدمة", credits: 5000, price: 180, currency: "SAR", discount: 28, popular: true },
-    { id: "4", name: "الباقة الاحترافية", credits: 10000, price: 300, currency: "SAR", discount: 40 },
-  ]
+  // جلب البيانات عند تحميل المكون
+  useEffect(() => {
+    fetchCreditPackages()
+    fetchCreditTransactions()
+    fetchCreditAnalytics()
+    fetchCreditBalance()
+  }, [fetchCreditPackages, fetchCreditTransactions, fetchCreditAnalytics, fetchCreditBalance])
 
-  const recentTransactions: CreditTransaction[] = [
-    {
-      id: "1",
-      type: "purchase",
-      amount: 2500,
-      description: "شراء الباقة المتوسطة",
-      date: "2024-01-20",
-      status: "completed",
-    },
-    {
-      id: "2",
-      type: "usage",
-      amount: -150,
-      description: "إرسال رسائل حملة العروض الشتوية",
-      date: "2024-01-19",
-      phoneNumber: "+966501234567",
-      campaignName: "العروض الشتوية",
-      status: "completed",
-    },
-    {
-      id: "3",
-      type: "usage",
-      amount: -75,
-      description: "رسائل خدمة العملاء",
-      date: "2024-01-18",
-      phoneNumber: "+966559876543",
-      status: "completed",
-    },
-    {
-      id: "4",
-      type: "bonus",
-      amount: 100,
-      description: "مكافأة العضوية الذهبية",
-      date: "2024-01-15",
-      status: "completed",
-    },
-  ]
 
-  const creditUsageByNumber: CreditUsage[] = [
-    {
-      phoneNumber: "+966501234567",
-      displayName: "الرقم الرئيسي للشركة",
-      messagesThisMonth: 850,
-      creditsUsed: 850,
-      lastUsed: "2024-01-20",
-    },
-    {
-      phoneNumber: "+966559876543",
-      displayName: "رقم خدمة العملاء",
-      messagesThisMonth: 400,
-      creditsUsed: 400,
-      lastUsed: "2024-01-19",
-    },
-  ]
 
-  const handleTopUp = () => {
-    // Simulate payment process
-    const selectedPkg = creditPackages.find((pkg) => pkg.id === selectedPackage)
-    if (selectedPkg) {
-      setCurrentCredits((prev) => prev + selectedPkg.credits)
-      setIsTopUpDialogOpen(false)
-      setSelectedPackage("")
+  const handleTopUp = async () => {
+    const selectedPkg = creditPackages.packages.find((pkg: CreditPackage) => pkg.id.toString() === selectedPackage)
+    if (selectedPkg && selectedPaymentMethod) {
+      setIsProcessingPayment(true)
+      try {
+        // تحديد طريقة الدفع للـ API
+        const paymentMethod = selectedPaymentMethod === 'alrajhi' ? 'arb' : 'myfatoorah'
+        
+        // إرسال طلب الشراء
+        const result = await purchaseCredits(selectedPkg.id, paymentMethod)
+        
+        if (result.success && result.data.redirect_url) {
+          // فتح popup للدفع
+          setPaymentUrl(result.data.redirect_url)
+          setIsPaymentPopupOpen(true)
+          setIsTopUpDialogOpen(false)
+        }
+      } catch (error) {
+        console.error('Error processing payment:', error)
+      } finally {
+        setIsProcessingPayment(false)
+      }
     }
   }
 
-  const getTransactionIcon = (type: CreditTransaction["type"]) => {
-    switch (type) {
-      case "purchase":
-        return <Plus className="h-4 w-4 text-green-600" />
-      case "usage":
-        return <MessageSquare className="h-4 w-4 text-blue-600" />
-      case "refund":
-        return <TrendingUp className="h-4 w-4 text-green-600" />
-      case "bonus":
-        return <CheckCircle className="h-4 w-4 text-purple-600" />
-      default:
-        return <Clock className="h-4 w-4 text-gray-600" />
+  const handlePaymentSuccess = () => {
+    // إعادة تحميل بيانات الرصيد عند نجاح الدفع
+    fetchCreditBalance()
+    
+    // إغلاق popup وإعادة تعيين الحالة
+    setIsPaymentPopupOpen(false)
+    setSelectedPackage("")
+    setSelectedPaymentMethod("")
+    setPaymentUrl("")
+  }
+
+  const getTransactionIcon = (transaction: CreditTransaction) => {
+    if (transaction.is_positive) {
+      return <Plus className="h-4 w-4 text-green-600" />
+    } else if (transaction.is_negative) {
+      return <MessageSquare className="h-4 w-4 text-blue-600" />
+    } else {
+      return <DollarSign className="h-4 w-4 text-gray-600" />
     }
   }
 
-  const getStatusColor = (status: CreditTransaction["status"]) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
         return "bg-green-100 text-green-800 border-green-200"
@@ -178,26 +180,86 @@ export function CreditSystemComponent() {
         </div>
 
         <Dialog open={isTopUpDialogOpen} onOpenChange={setIsTopUpDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              شحن الرصيد
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DialogTrigger asChild>
+            <Button 
+              className="flex items-center gap-2" 
+              disabled={creditPackages.packages.length === 0 || creditPackages.loading}
+            >
+              {creditPackages.loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  جاري تحميل الباقات
+                </>
+              ) : creditPackages.packages.length === 0 ? (
+                <>
+                  <Plus className="h-4 w-4" />
+                  لا توجد باقات متاحة
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4" />
+                  شحن الرصيد
+                </>
+              )}
             </Button>
-          </DialogTrigger>
+                </DialogTrigger>
+              </TooltipTrigger>
+              {(creditPackages.packages.length === 0 || creditPackages.loading) && (
+                <TooltipContent>
+                  <p>
+                    {creditPackages.loading 
+                      ? "جاري تحميل الباقات، يرجى الانتظار..." 
+                      : "لا توجد باقات ائتمان متاحة للشراء"
+                    }
+                  </p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
           <DialogContent className="sm:max-w-lg" dir="rtl">
             <DialogHeader>
               <DialogTitle>شحن رصيد الرسائل</DialogTitle>
               <DialogDescription>اختر الباقة المناسبة لاحتياجاتك</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
+              {/* Loading State */}
+              {creditPackages.loading && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <span className="mr-2">جاري تحميل الباقات...</span>
+                </div>
+              )}
+
+              {/* Error State */}
+              {creditPackages.error && (
+                <Alert className="mb-4">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>خطأ:</strong> {creditPackages.error}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Empty State - No Packages Available */}
+              {!creditPackages.loading && creditPackages.packages.length === 0 && (
+                <div className="text-center py-8">
+                  <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">لا توجد باقات متاحة</h3>
+                  <p className="text-muted-foreground mb-4">لا يمكن شحن الرصيد في الوقت الحالي</p>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 gap-3">
-                {creditPackages.map((pkg) => (
+                {creditPackages.packages.map((pkg: CreditPackage) => (
                   <div
                     key={pkg.id}
                     className={`relative cursor-pointer transition-all duration-200 ${
-                      selectedPackage === pkg.id ? "ring-2 ring-primary shadow-md" : "hover:shadow-sm hover:bg-gray-50"
+                      selectedPackage === pkg.id.toString() ? "ring-2 ring-primary shadow-md" : "hover:shadow-sm hover:bg-gray-50"
                     }`}
-                    onClick={() => setSelectedPackage(pkg.id)}
+                    onClick={() => setSelectedPackage(pkg.id.toString())}
                   >
                     <Card className="border-0 shadow-none bg-transparent">
                       <CardContent className="p-4">
@@ -205,24 +267,26 @@ export function CreditSystemComponent() {
                           <div className="flex items-center gap-3">
                             <div
                               className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                selectedPackage === pkg.id ? "border-primary bg-primary" : "border-gray-300"
+                                selectedPackage === pkg.id.toString() ? "border-primary bg-primary" : "border-gray-300"
                               }`}
                             >
-                              {selectedPackage === pkg.id && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                              {selectedPackage === pkg.id.toString() && <div className="w-2 h-2 bg-white rounded-full"></div>}
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
                                 <h3 className="font-medium">{pkg.name}</h3>
-                                {pkg.popular && <Badge className="bg-primary text-white text-xs">الأكثر شعبية</Badge>}
+                                {pkg.is_popular && <Badge className="bg-primary text-white text-xs">الأكثر شعبية</Badge>}
                               </div>
                               <p className="text-sm text-muted-foreground">{pkg.credits.toLocaleString()} رسالة</p>
                             </div>
                           </div>
                           <div className="text-left">
                             <div className="font-semibold">
-                              {pkg.price} {pkg.currency}
+                              {pkg.discounted_price} {pkg.currency}
                             </div>
-                            {pkg.discount && <div className="text-xs text-green-600">وفر {pkg.discount}%</div>}
+                            {pkg.savings_percentage && pkg.savings_percentage > 0 && (
+                              <div className="text-xs text-green-600">وفر {pkg.savings_percentage}%</div>
+                            )}
                           </div>
                         </div>
                       </CardContent>
@@ -231,21 +295,144 @@ export function CreditSystemComponent() {
                 ))}
               </div>
 
+              {/* Payment Methods Selection */}
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm">اختر طريقة الدفع</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* My Fatoorah */}
+                  <div 
+                    className={`border-2 rounded-lg p-3 cursor-pointer transition-all ${
+                      selectedPaymentMethod === 'myfatoorah' 
+                        ? 'border-primary bg-primary/5' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => setSelectedPaymentMethod('myfatoorah')}
+                  >
+                    <div className="flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-24 h-24 rounded-lg flex items-center justify-center mb-2 mx-auto overflow-hidden">
+                          <img 
+                            src="/images/myfatoorah.png" 
+                            alt="My Fatoorah" 
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <span className="text-sm font-medium">ماي فاتورة</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Al Rajhi Bank */}
+                  <div 
+                    className={`border-2 rounded-lg p-3 cursor-pointer transition-all ${
+                      selectedPaymentMethod === 'alrajhi' 
+                        ? 'border-primary bg-primary/5' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => setSelectedPaymentMethod('alrajhi')}
+                  >
+                    <div className="flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-24 h-24 rounded-lg flex items-center justify-center mb-2 mx-auto overflow-hidden">
+                          <img 
+                            src="/images/Alrajhi-Bank.webp" 
+                            alt="Al Rajhi Bank" 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <span className="text-sm font-medium">بنك الراجحي</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <Alert>
                 <CreditCard className="h-4 w-4" />
                 <AlertDescription>
-                  سيتم خصم المبلغ من طريقة الدفع المحفوظة. يمكنك تغيير طريقة الدفع من الإعدادات.
+                  سيتم توجيهك إلى صفحة الدفع المختارة لإكمال عملية الشراء.
                 </AlertDescription>
               </Alert>
 
               <div className="flex gap-2 pt-4">
-                <Button onClick={handleTopUp} disabled={!selectedPackage} className="flex-1">
-                  <CreditCard className="h-4 w-4 ml-2" />
-                  تأكيد الشراء
+                <Button 
+                  onClick={handleTopUp} 
+                  disabled={!selectedPackage || !selectedPaymentMethod || creditPackages.packages.length === 0 || creditPackages.loading || isProcessingPayment} 
+                  className="flex-1"
+                >
+                  {isProcessingPayment ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                      جاري المعالجة...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-4 w-4 ml-2" />
+                      {creditPackages.packages.length === 0 ? "لا توجد باقات متاحة" : "تأكيد الشراء"}
+                    </>
+                  )}
                 </Button>
-                <Button variant="outline" onClick={() => setIsTopUpDialogOpen(false)}>
+                <Button variant="outline" onClick={() => {
+                  setIsTopUpDialogOpen(false)
+                  setSelectedPackage("")
+                  setSelectedPaymentMethod("")
+                  setIsProcessingPayment(false)
+                }}>
                   إلغاء
                 </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Payment Popup */}
+        <Dialog open={isPaymentPopupOpen} onOpenChange={setIsPaymentPopupOpen}>
+          <DialogContent className="max-w-4xl h-[80vh] p-0" dir="rtl">
+            <DialogHeader className="sr-only">
+              <DialogTitle>إتمام عملية الدفع</DialogTitle>
+            </DialogHeader>
+            <div className="bg-white text-gray-900">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <CreditCard className="h-5 w-5" />
+                  <h3 className="text-lg font-semibold">إتمام عملية الدفع</h3>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsPaymentPopupOpen(false)}
+                  className="text-gray-600 hover:bg-gray-100"
+                >
+                  <XCircle className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="h-full">
+                {paymentUrl && (
+                  <iframe
+                    src={paymentUrl}
+                    className="w-full h-[calc(80vh-80px)] border-0"
+                    title="Payment Gateway"
+                    sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
+                  />
+                )}
+              </div>
+              
+              <div className="p-4 border-t border-gray-200 bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>لا تغلق هذه النافذة حتى تكتمل عملية الدفع</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsPaymentPopupOpen(false)}
+                    className="border-gray-300 text-gray-700 hover:bg-gray-100"
+                  >
+                    إلغاء الدفع
+                  </Button>
+                </div>
               </div>
             </div>
           </DialogContent>
@@ -254,58 +441,92 @@ export function CreditSystemComponent() {
 
       {/* Credit Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">الرصيد الحالي</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold text-green-600">{currentCredits.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">رسالة متاحة</p>
-              </div>
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CreditCard className="h-5 w-5 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Loading State */}
+        {creditBalance.loading && (
+          <div className="col-span-full flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="mr-2">جاري تحميل بيانات الرصيد...</span>
+          </div>
+        )}
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">الاستخدام الشهري</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <div className="text-2xl font-bold text-blue-600">{monthlyUsage.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">من {monthlyLimit.toLocaleString()}</p>
-              </div>
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <MessageSquare className="h-5 w-5 text-blue-600" />
-              </div>
-            </div>
-            <Progress value={usagePercentage} className="h-2" />
-            <p className="text-xs text-muted-foreground mt-1">{usagePercentage.toFixed(1)}% من الحد الشهري</p>
-          </CardContent>
-        </Card>
+        {/* Error State */}
+        {creditBalance.error && (
+          <div className="col-span-full">
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>خطأ:</strong> {creditBalance.error}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">متوسط التكلفة</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold text-purple-600">0.05 ر.س</div>
-                <p className="text-xs text-muted-foreground">لكل رسالة</p>
-              </div>
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-purple-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Cards Data */}
+        {!creditBalance.loading && creditBalance.data && (
+          <>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">الرصيد الحالي</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-2xl font-bold text-green-600">{creditBalance.data.available_credits?.toLocaleString() || 0}</div>
+                    <p className="text-xs text-muted-foreground">رسالة متاحة</p>
+                  </div>
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <CreditCard className="h-5 w-5 text-green-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">الاستخدام الشهري</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <div className="text-2xl font-bold text-blue-600">{creditBalance.data.used_credits?.toLocaleString() || 0}</div>
+                    <p className="text-xs text-muted-foreground">من {creditBalance.data.monthly_limit?.toLocaleString() || 0}</p>
+                  </div>
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <MessageSquare className="h-5 w-5 text-blue-600" />
+                  </div>
+                </div>
+                <Progress value={creditBalance.data.monthly_usage_percentage || 0} className="h-2" />
+                <p className="text-xs text-muted-foreground mt-1">{creditBalance.data.monthly_usage_percentage?.toFixed(1) || 0}% من الحد الشهري</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">متوسط التكلفة</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-2xl font-bold text-purple-600">{creditBalance.data.average_cost_per_credit || '0.00'} ر.س</div>
+                    <p className="text-xs text-muted-foreground">لكل رسالة</p>
+                  </div>
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <DollarSign className="h-5 w-5 text-purple-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {/* Empty State */}
+        {!creditBalance.loading && !creditBalance.data && (
+          <div className="col-span-full text-center py-8">
+            <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">لا توجد بيانات رصيد</h3>
+            <p className="text-muted-foreground">لم يتم العثور على أي بيانات رصيد</p>
+          </div>
+        )}
       </div>
 
       {/* Usage Alert */}
@@ -334,41 +555,67 @@ export function CreditSystemComponent() {
               <CardDescription>آخر العمليات على رصيدك</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentTransactions.map((transaction) => (
-                  <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      {getTransactionIcon(transaction.type)}
-                      <div>
-                        <div className="font-medium">{transaction.description}</div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-2">
-                          <Calendar className="h-3 w-3" />
-                          {transaction.date}
-                          {transaction.phoneNumber && (
-                            <>
-                              <span>•</span>
-                              <span>{transaction.phoneNumber}</span>
-                            </>
-                          )}
+              {/* Loading State */}
+              {creditTransactions.loading && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <span className="mr-2">جاري تحميل المعاملات...</span>
+                </div>
+              )}
+
+              {/* Error State */}
+              {creditTransactions.error && (
+                <Alert className="mb-4">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>خطأ:</strong> {creditTransactions.error}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Empty State */}
+              {!creditTransactions.loading && creditTransactions.transactions.length === 0 && (
+                <div className="text-center py-8">
+                  <DollarSign className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">لا توجد معاملات</h3>
+                  <p className="text-muted-foreground">لم يتم العثور على أي معاملات ائتمان</p>
+                </div>
+              )}
+
+              {/* Transactions List */}
+              {!creditTransactions.loading && creditTransactions.transactions.length > 0 && (
+                <div className="space-y-4">
+                  {creditTransactions.transactions.map((transaction: CreditTransaction) => (
+                    <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        {getTransactionIcon(transaction)}
+                        <div>
+                          <div className="font-medium">{transaction.description}</div>
+                          <div className="text-sm text-muted-foreground flex items-center gap-2">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(transaction.created_at).toLocaleDateString('ar-US')}
+                            {transaction.reference_number && (
+                              <>
+                                <span>•</span>
+                                <span>{transaction.reference_number}</span>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="text-left">
-                      <div className={`font-semibold ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}>
-                        {transaction.amount > 0 ? "+" : ""}
-                        {transaction.amount.toLocaleString()}
+                      <div className="text-left">
+                        <div className={`font-semibold ${transaction.is_positive ? "text-green-600" : "text-red-600"}`}>
+                          {transaction.is_positive ? "+" : ""}
+                          {transaction.credits_amount.toLocaleString()}
+                        </div>
+                        <Badge className={getStatusColor(transaction.status)} variant="outline">
+                          {transaction.status_display}
+                        </Badge>
                       </div>
-                      <Badge className={getStatusColor(transaction.status)} variant="outline">
-                        {transaction.status === "completed"
-                          ? "مكتمل"
-                          : transaction.status === "pending"
-                            ? "في الانتظار"
-                            : "فشل"}
-                      </Badge>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -380,83 +627,220 @@ export function CreditSystemComponent() {
               <CardDescription>توزيع استخدام الرصيد على أرقام الواتساب</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {creditUsageByNumber.map((usage, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <div className="font-medium">{usage.displayName}</div>
-                        <div className="text-sm text-muted-foreground">{usage.phoneNumber}</div>
-                      </div>
-                      <div className="text-left">
-                        <div className="font-semibold">{usage.creditsUsed.toLocaleString()}</div>
-                        <div className="text-xs text-muted-foreground">رصيد مُستخدم</div>
-                      </div>
-                    </div>
+              {/* Loading State */}
+              {creditAnalytics.loading && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <span className="mr-2">جاري تحميل بيانات الاستخدام...</span>
+                </div>
+              )}
 
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">الرسائل هذا الشهر:</span>
-                        <div className="font-medium">{usage.messagesThisMonth.toLocaleString()}</div>
+              {/* Error State */}
+              {creditAnalytics.error && (
+                <Alert className="mb-4">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>خطأ:</strong> {creditAnalytics.error}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Empty State */}
+              {!creditAnalytics.loading && creditAnalytics.data?.usage_by_number?.length === 0 && (
+                <div className="text-center py-8">
+                  <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">لا يوجد استخدام</h3>
+                  <p className="text-muted-foreground">لم يتم العثور على أي استخدام للرصيد</p>
+                </div>
+              )}
+
+              {/* Usage Data */}
+              {!creditAnalytics.loading && creditAnalytics.data?.usage_by_number && creditAnalytics.data.usage_by_number.length > 0 && (
+                <div className="space-y-4">
+                  {creditAnalytics.data.usage_by_number.map((usage: any, index: number) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <div className="font-medium">{usage.channel_name}</div>
+                          <div className="text-sm text-muted-foreground">{usage.number}</div>
+                        </div>
+                        <div className="text-left">
+                          <div className="font-semibold">{usage.credits_used.toLocaleString()}</div>
+                          <div className="text-xs text-muted-foreground">رصيد مُستخدم</div>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-muted-foreground">آخر استخدام:</span>
-                        <div className="font-medium">{usage.lastUsed}</div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">الرسائل المُرسلة:</span>
+                          <div className="font-medium">{usage.messages_sent.toLocaleString()}</div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">تكلفة الرسالة:</span>
+                          <div className="font-medium">{usage.cost_per_message} رصيد</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">الاتجاه الشهري</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">يناير 2024</span>
-                    <span className="font-medium">1,250 رسالة</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">ديسمبر 2023</span>
-                    <span className="font-medium">980 رسالة</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">نوفمبر 2023</span>
-                    <span className="font-medium">1,100 رسالة</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Loading State */}
+          {creditAnalytics.loading && (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <span className="mr-2">جاري تحميل التحليلات...</span>
+            </div>
+          )}
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">توقعات الاستخدام</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">الاستخدام المتوقع هذا الشهر</span>
-                    <span className="font-medium text-blue-600">2,100 رسالة</span>
+          {/* Error State */}
+          {creditAnalytics.error && (
+            <Alert className="mb-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>خطأ:</strong> {creditAnalytics.error}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Analytics Data */}
+          {!creditAnalytics.loading && creditAnalytics.data && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Current Balance */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">الرصيد الحالي</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">إجمالي الرصيد</span>
+                      <span className="font-medium">{creditAnalytics.data.current_balance?.total_credits?.toLocaleString() || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">الرصيد المتاح</span>
+                      <span className="font-medium text-green-600">{creditAnalytics.data.current_balance?.available_credits?.toLocaleString() || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">الرصيد المُستخدم</span>
+                      <span className="font-medium text-red-600">{creditAnalytics.data.current_balance?.used_credits?.toLocaleString() || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">نسبة الاستخدام الشهري</span>
+                      <span className="font-medium">{creditAnalytics.data.current_balance?.monthly_usage_percentage || 0}%</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">الرصيد المطلوب</span>
-                    <span className="font-medium text-green-600">850 رسالة إضافية</span>
+                </CardContent>
+              </Card>
+
+              {/* Statistics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">الإحصائيات</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">إجمالي المشتريات</span>
+                      <span className="font-medium">{creditAnalytics.data.statistics?.total_purchases || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">إجمالي الاستخدام</span>
+                      <span className="font-medium">{creditAnalytics.data.statistics?.total_usage || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">إجمالي الرصيد المُشترى</span>
+                      <span className="font-medium text-green-600">{creditAnalytics.data.statistics?.total_credits_purchased?.toLocaleString() || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">إجمالي الرصيد المُستخدم</span>
+                      <span className="font-medium text-red-600">{creditAnalytics.data.statistics?.total_credits_used?.toLocaleString() || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">إجمالي المبلغ المدفوع</span>
+                      <span className="font-medium text-blue-600">{creditAnalytics.data.statistics?.total_amount_paid || 0} ر.س</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">المعاملات المعلقة</span>
+                      <span className="font-medium text-yellow-600">{creditAnalytics.data.statistics?.pending_transactions || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">المعاملات الفاشلة</span>
+                      <span className="font-medium text-red-600">{creditAnalytics.data.statistics?.failed_transactions || 0}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">التكلفة المتوقعة</span>
-                    <span className="font-medium text-purple-600">42.50 ر.س</span>
+                </CardContent>
+              </Card>
+
+              {/* Message Type Costs */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">تكلفة أنواع الرسائل</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {creditAnalytics.data.message_type_costs && Object.entries(creditAnalytics.data.message_type_costs).map(([type, cost]: [string, any]) => (
+                      <div key={type} className="flex justify-between items-center">
+                        <span className="text-sm capitalize">{type}</span>
+                        <span className="font-medium">{cost} رصيد</span>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                </CardContent>
+              </Card>
+
+              {/* Period Info */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">فترة التقرير</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">من تاريخ</span>
+                      <span className="font-medium">
+                        {creditAnalytics.data.period?.from_date ? 
+                          new Date(creditAnalytics.data.period.from_date).toLocaleDateString('ar-US') : 
+                          'غير محدد'
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">إلى تاريخ</span>
+                      <span className="font-medium">
+                        {creditAnalytics.data.period?.to_date ? 
+                          new Date(creditAnalytics.data.period.to_date).toLocaleDateString('ar-US') : 
+                          'غير محدد'
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">تم إنشاء التقرير</span>
+                      <span className="font-medium text-muted-foreground">
+                        {creditAnalytics.data.generated_at ? 
+                          new Date(creditAnalytics.data.generated_at).toLocaleDateString('ar-US') : 
+                          'غير محدد'
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!creditAnalytics.loading && !creditAnalytics.data && (
+            <div className="text-center py-8">
+              <TrendingUp className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">لا توجد بيانات تحليلية</h3>
+              <p className="text-muted-foreground">لم يتم العثور على أي بيانات تحليلية</p>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
