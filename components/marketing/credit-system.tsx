@@ -84,7 +84,7 @@ interface CreditUsage {
 }
 
 export function CreditSystemComponent() {
-  const { creditPackages, fetchCreditPackages, purchaseCredits, creditTransactions, fetchCreditTransactions, creditAnalytics, fetchCreditAnalytics, creditBalance, fetchCreditBalance } = useStore()
+  const { creditPackages, fetchCreditPackages, purchaseCredits, creditTransactions, fetchCreditTransactions, creditAnalytics, fetchCreditAnalytics, creditBalance, fetchCreditBalance, channelUsage, fetchChannelUsage } = useStore()
   // استخدام البيانات من API بدلاً من المتغيرات المحلية
   const currentCredits = creditBalance.data?.available_credits || 0
   const monthlyUsage = creditBalance.data?.used_credits || 0
@@ -102,7 +102,8 @@ export function CreditSystemComponent() {
     fetchCreditTransactions()
     fetchCreditAnalytics()
     fetchCreditBalance()
-  }, [fetchCreditPackages, fetchCreditTransactions, fetchCreditAnalytics, fetchCreditBalance])
+    fetchChannelUsage()
+  }, [fetchCreditPackages, fetchCreditTransactions, fetchCreditAnalytics, fetchCreditBalance, fetchChannelUsage])
 
 
 
@@ -219,12 +220,12 @@ export function CreditSystemComponent() {
               )}
             </Tooltip>
           </TooltipProvider>
-          <DialogContent className="sm:max-w-lg" dir="rtl">
+          <DialogContent className="w-[95vw] max-w-4xl mx-auto sm:w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl max-h-[90vh] overflow-y-auto" dir="rtl">
             <DialogHeader>
               <DialogTitle>شحن رصيد الرسائل</DialogTitle>
               <DialogDescription>اختر الباقة المناسبة لاحتياجاتك</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[calc(90vh-120px)] overflow-y-auto">
               {/* Loading State */}
               {creditPackages.loading && (
                 <div className="flex items-center justify-center py-8">
@@ -252,18 +253,20 @@ export function CreditSystemComponent() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {creditPackages.packages.map((pkg: CreditPackage) => (
                   <div
                     key={pkg.id}
-                    className={`relative cursor-pointer transition-all duration-200 ${
-                      selectedPackage === pkg.id.toString() ? "ring-2 ring-primary shadow-md" : "hover:shadow-sm hover:bg-gray-50"
+                    className={`relative cursor-pointer transition-all duration-200 border-2 rounded-lg ${
+                      selectedPackage === pkg.id.toString() 
+                        ? "border-primary bg-primary/5 shadow-lg ring-2 ring-primary/20" 
+                        : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md hover:bg-gray-50"
                     }`}
                     onClick={() => setSelectedPackage(pkg.id.toString())}
                   >
-                    <Card className="border-0 shadow-none bg-transparent">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
+                    <Card className="border-0 shadow-none bg-transparent h-full">
+                      <CardContent className="p-4 h-full flex flex-col">
+                        <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <div
                               className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
@@ -277,7 +280,7 @@ export function CreditSystemComponent() {
                                 <h3 className="font-medium">{pkg.name}</h3>
                                 {pkg.is_popular && <Badge className="bg-primary text-white text-xs">الأكثر شعبية</Badge>}
                               </div>
-                              <p className="text-sm text-muted-foreground">{pkg.credits.toLocaleString()} رسالة</p>
+                              <p className="text-sm text-muted-foreground">{pkg.credits.toLocaleString()} كريديت</p>
                             </div>
                           </div>
                           <div className="text-left">
@@ -289,6 +292,20 @@ export function CreditSystemComponent() {
                             )}
                           </div>
                         </div>
+                        
+                        {/* Package Features */}
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground">السعر لكل كريديت:</span>
+                            <span className="font-medium">{pkg.price_per_credit} {pkg.currency}</span>
+                          </div>
+                          {pkg.is_recommended && (
+                            <div className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
+                              <span>⭐</span>
+                              <span>موصى به</span>
+                            </div>
+                          )}
+                        </div>
                       </CardContent>
                     </Card>
                   </div>
@@ -298,7 +315,7 @@ export function CreditSystemComponent() {
               {/* Payment Methods Selection */}
               <div className="space-y-3">
                 <h4 className="font-medium text-sm">اختر طريقة الدفع</h4>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* My Fatoorah */}
                   <div 
                     className={`border-2 rounded-lg p-3 cursor-pointer transition-all ${
@@ -387,7 +404,7 @@ export function CreditSystemComponent() {
 
         {/* Payment Popup */}
         <Dialog open={isPaymentPopupOpen} onOpenChange={setIsPaymentPopupOpen}>
-          <DialogContent className="max-w-4xl h-[80vh] p-0" dir="rtl">
+          <DialogContent className="w-[95vw] max-w-6xl mx-auto sm:w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl h-[80vh] sm:h-[85vh] md:h-[90vh] p-0 overflow-hidden" dir="rtl">
             <DialogHeader className="sr-only">
               <DialogTitle>إتمام عملية الدفع</DialogTitle>
             </DialogHeader>
@@ -407,11 +424,11 @@ export function CreditSystemComponent() {
                 </Button>
               </div>
               
-              <div className="h-full">
+              <div className="h-full overflow-y-auto">
                 {paymentUrl && (
                   <iframe
                     src={paymentUrl}
-                    className="w-full h-[calc(80vh-80px)] border-0"
+                    className="w-full h-[calc(80vh-80px)] sm:h-[calc(85vh-80px)] md:h-[calc(90vh-80px)] border-0 min-h-[400px] sm:min-h-[500px] md:min-h-[600px]"
                     title="Payment Gateway"
                     sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
                   />
@@ -471,8 +488,7 @@ export function CreditSystemComponent() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-2xl font-bold text-green-600">{creditBalance.data.available_credits?.toLocaleString() || 0}</div>
-                    <p className="text-xs text-muted-foreground">رسالة متاحة</p>
+                    <div className="text-2xl font-bold text-green-600">{creditBalance.data.available_credits?.toLocaleString() || 0} كريديت</div>
                   </div>
                   <div className="p-2 bg-green-100 rounded-lg">
                     <CreditCard className="h-5 w-5 text-green-600" />
@@ -628,7 +644,7 @@ export function CreditSystemComponent() {
             </CardHeader>
             <CardContent>
               {/* Loading State */}
-              {creditAnalytics.loading && (
+              {channelUsage.loading && (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   <span className="mr-2">جاري تحميل بيانات الاستخدام...</span>
@@ -636,17 +652,17 @@ export function CreditSystemComponent() {
               )}
 
               {/* Error State */}
-              {creditAnalytics.error && (
+              {channelUsage.error && (
                 <Alert className="mb-4">
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>خطأ:</strong> {creditAnalytics.error}
+                    <strong>خطأ:</strong> {channelUsage.error}
                   </AlertDescription>
                 </Alert>
               )}
 
               {/* Empty State */}
-              {!creditAnalytics.loading && creditAnalytics.data?.usage_by_number?.length === 0 && (
+              {!channelUsage.loading && (!channelUsage.data || channelUsage.data.length === 0) && (
                 <div className="text-center py-8">
                   <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold mb-2">لا يوجد استخدام</h3>
@@ -655,14 +671,14 @@ export function CreditSystemComponent() {
               )}
 
               {/* Usage Data */}
-              {!creditAnalytics.loading && creditAnalytics.data?.usage_by_number && creditAnalytics.data.usage_by_number.length > 0 && (
+              {!channelUsage.loading && channelUsage.data && channelUsage.data.length > 0 && (
                 <div className="space-y-4">
-                  {creditAnalytics.data.usage_by_number.map((usage: any, index: number) => (
+                  {channelUsage.data.map((usage: any, index: number) => (
                     <div key={index} className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <div className="font-medium">{usage.channel_name}</div>
-                          <div className="text-sm text-muted-foreground">{usage.number}</div>
+                          <div className="text-sm text-muted-foreground">{usage.channel_type}</div>
                         </div>
                         <div className="text-left">
                           <div className="font-semibold">{usage.credits_used.toLocaleString()}</div>
@@ -676,8 +692,19 @@ export function CreditSystemComponent() {
                           <div className="font-medium">{usage.messages_sent.toLocaleString()}</div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">تكلفة الرسالة:</span>
-                          <div className="font-medium">{usage.cost_per_message} رصيد</div>
+                          <span className="text-muted-foreground">الرسائل المستقبلة:</span>
+                          <div className="font-medium">{usage.messages_received.toLocaleString()}</div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm mt-2">
+                        <div>
+                          <span className="text-muted-foreground">التكلفة لكل رسالة:</span>
+                          <div className="font-medium">{usage.cost_per_message_currency} ريال</div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">إجمالي التكلفة:</span>
+                          <div className="font-medium">{usage.total_cost_currency} ريال</div>
                         </div>
                       </div>
                     </div>

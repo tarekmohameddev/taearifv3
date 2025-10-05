@@ -470,4 +470,95 @@ module.exports = (set, get) => ({
         ...updates,
       },
     })),
+
+  updateChannelSystemIntegrations: async (channelId, integrationData) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    const token = useAuthStore.getState().userData?.token;
+    if (!token) {
+      return { success: false, error: "لا يوجد توكن" };
+    }
+
+    const loadingToast = toast.loading("جاري تحديث إعدادات التكامل...");
+
+    try {
+      const response = await axiosInstance.patch(
+        `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels/${channelId}/system-integrations`,
+        integrationData
+      );
+
+      // تحديث القناة في القائمة
+      set((state) => ({
+        marketingChannels: {
+          ...state.marketingChannels,
+          channels: state.marketingChannels.channels.map((channel) =>
+            channel.id === channelId
+              ? { 
+                  ...channel, 
+                  crm_integration_enabled: integrationData.crm_integration_enabled,
+                  appointment_system_integration_enabled: integrationData.appointment_system_integration_enabled,
+                  integration_settings: integrationData.integration_settings
+                }
+              : channel
+          ),
+        },
+      }));
+
+      toast.success("تم تحديث إعدادات التكامل بنجاح", { id: loadingToast });
+      return { success: true, data: response.data.data };
+    } catch (error) {
+      toast.error(error.message || "حدث خطأ أثناء تحديث إعدادات التكامل", {
+        id: loadingToast,
+      });
+      return { success: false, error: error.message || "حدث خطأ أثناء تحديث إعدادات التكامل" };
+    }
+  },
+
+  // إضافة state للاستخدام حسب الرقم
+  channelUsage: {
+    data: [],
+    loading: false,
+    error: null,
+  },
+
+  // دالة جلب الاستخدام حسب الرقم
+  fetchChannelUsage: async () => {
+    const { channelUsage } = get();
+    if (channelUsage.data.length > 0 && !channelUsage.loading) {
+      return;
+    }
+
+    set((state) => ({
+      channelUsage: { ...state.channelUsage, loading: true, error: null },
+    }));
+
+    try {
+      const response = await axiosInstance.get(
+        `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels/usage`
+      );
+
+      set((state) => ({
+        channelUsage: {
+          ...state.channelUsage,
+          data: response.data.data,
+          loading: false,
+          error: null,
+        },
+      }));
+    } catch (error) {
+      set((state) => ({
+        channelUsage: {
+          ...state.channelUsage,
+          loading: false,
+          error: error.message || "حدث خطأ أثناء جلب بيانات الاستخدام",
+        },
+      }));
+    }
+  },
+
+  // دالة تحديث بيانات الاستخدام
+  setChannelUsage: (data) => {
+    set((state) => ({
+      channelUsage: { ...state.channelUsage, data },
+    }));
+  },
 });

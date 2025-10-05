@@ -61,7 +61,7 @@ interface WhatsAppNumber {
 }
 
 export function WhatsAppNumbersManagement() {
-  const { marketingChannels, fetchMarketingChannels, createMarketingChannel, deleteMarketingChannel, updateChannelStatus } = useStore()
+  const { marketingChannels, fetchMarketingChannels, createMarketingChannel, deleteMarketingChannel, updateChannelStatus, updateChannelSystemIntegrations } = useStore()
   const [numbers, setNumbers] = useState<WhatsAppNumber[]>([])
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -85,6 +85,23 @@ export function WhatsAppNumbersManagement() {
     is_verified: false
   })
   const [isSavingStatus, setIsSavingStatus] = useState(false)
+  
+  // Edit Dialog States
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editingChannel, setEditingChannel] = useState<WhatsAppNumber | null>(null)
+  const [editFormData, setEditFormData] = useState({
+    crm_integration_enabled: false,
+    appointment_system_integration_enabled: false,
+    integration_settings: {
+      webhook_url: "",
+      sync_frequency: "realtime",
+      custom_fields: {
+        customer_id: "",
+        appointment_id: ""
+      }
+    }
+  })
+  const [isSavingEdit, setIsSavingEdit] = useState(false)
 
   // جلب البيانات عند تحميل المكون
   useEffect(() => {
@@ -211,6 +228,83 @@ export function WhatsAppNumbersManagement() {
     setTempStatus({
       is_connected: false,
       is_verified: false
+    })
+  }
+
+  const openEditDialog = (channel: WhatsAppNumber) => {
+    setEditingChannel(channel)
+    setEditFormData({
+      crm_integration_enabled: channel.crm_integration_enabled || false,
+      appointment_system_integration_enabled: channel.appointment_system_integration_enabled || false,
+      integration_settings: {
+        webhook_url: channel.integration_settings?.webhook_url || "",
+        sync_frequency: channel.integration_settings?.sync_frequency || "realtime",
+        custom_fields: {
+          customer_id: channel.integration_settings?.custom_fields?.customer_id || "",
+          appointment_id: channel.integration_settings?.custom_fields?.appointment_id || ""
+        }
+      }
+    })
+    setIsEditDialogOpen(true)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingChannel || isSavingEdit) return
+
+    setIsSavingEdit(true)
+    try {
+      const result = await updateChannelSystemIntegrations(editingChannel.id, editFormData)
+      if (result.success) {
+        // تحديث الحالة المحلية
+        setNumbers(prevNumbers => 
+          prevNumbers.map(num => 
+            num.id === editingChannel.id 
+              ? { 
+                  ...num, 
+                  crm_integration_enabled: editFormData.crm_integration_enabled,
+                  appointment_system_integration_enabled: editFormData.appointment_system_integration_enabled,
+                  integration_settings: editFormData.integration_settings
+                }
+              : num
+          )
+        )
+        // إغلاق الـ dialog
+        setIsEditDialogOpen(false)
+        setEditingChannel(null)
+        setEditFormData({
+          crm_integration_enabled: false,
+          appointment_system_integration_enabled: false,
+          integration_settings: {
+            webhook_url: "",
+            sync_frequency: "realtime",
+            custom_fields: {
+              customer_id: "",
+              appointment_id: ""
+            }
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Error updating channel integrations:', error)
+    } finally {
+      setIsSavingEdit(false)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditDialogOpen(false)
+    setEditingChannel(null)
+    setEditFormData({
+      crm_integration_enabled: false,
+      appointment_system_integration_enabled: false,
+      integration_settings: {
+        webhook_url: "",
+        sync_frequency: "realtime",
+        custom_fields: {
+          customer_id: "",
+          appointment_id: ""
+        }
+      }
     })
   }
 
@@ -479,7 +573,9 @@ export function WhatsAppNumbersManagement() {
 
               {/* Actions */}
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                <Button variant="outline" size="sm" className="flex-1 bg-transparent"
+                  onClick={() => openEditDialog(number)}
+                >
                   <Edit className="h-3 w-3 ml-1" />
                   تعديل
                 </Button>
@@ -620,6 +716,183 @@ export function WhatsAppNumbersManagement() {
               className="flex-1 bg-black text-white hover:bg-gray-800 transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {isSavingStatus ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                  جاري الحفظ...
+                </>
+              ) : (
+                "حفظ التغييرات"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Integration Settings Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl bg-white border-0 shadow-2xl" dir="rtl">
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="text-xl font-bold text-gray-900 text-center">
+              تعديل إعدادات التكامل
+            </DialogTitle>
+            <DialogDescription className="text-center text-gray-600">
+              {editingChannel?.name} - {editingChannel?.number}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* CRM Integration */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h4 className="text-sm font-semibold text-gray-900">تكامل CRM</h4>
+                  <p className="text-xs text-gray-500">تفعيل تكامل نظام إدارة العملاء</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={editFormData.crm_integration_enabled}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, crm_integration_enabled: e.target.checked }))}
+                  />
+                  <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                </label>
+              </div>
+            </div>
+
+            {/* Appointment System Integration */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h4 className="text-sm font-semibold text-gray-900">تكامل نظام المواعيد</h4>
+                  <p className="text-xs text-gray-500">تفعيل تكامل نظام إدارة المواعيد</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={editFormData.appointment_system_integration_enabled}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, appointment_system_integration_enabled: e.target.checked }))}
+                  />
+                  <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                </label>
+              </div>
+            </div>
+
+            {/* Integration Settings */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-900">إعدادات التكامل</h4>
+              
+              {/* Webhook URL */}
+              <div className="space-y-2">
+                <Label htmlFor="webhook_url" className="text-sm font-medium text-gray-700">
+                  رابط Webhook
+                </Label>
+                <Input
+                  id="webhook_url"
+                  type="url"
+                  placeholder="https://example.com/webhook"
+                  value={editFormData.integration_settings.webhook_url}
+                  onChange={(e) => setEditFormData(prev => ({
+                    ...prev,
+                    integration_settings: {
+                      ...prev.integration_settings,
+                      webhook_url: e.target.value
+                    }
+                  }))}
+                  className="bg-white border-gray-300 focus:border-black focus:ring-black"
+                />
+              </div>
+
+              {/* Sync Frequency */}
+              <div className="space-y-2">
+                <Label htmlFor="sync_frequency" className="text-sm font-medium text-gray-700">
+                  تكرار المزامنة
+                </Label>
+                <select
+                  id="sync_frequency"
+                  value={editFormData.integration_settings.sync_frequency}
+                  onChange={(e) => setEditFormData(prev => ({
+                    ...prev,
+                    integration_settings: {
+                      ...prev.integration_settings,
+                      sync_frequency: e.target.value
+                    }
+                  }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                >
+                  <option value="realtime">فوري</option>
+                  <option value="hourly">كل ساعة</option>
+                  <option value="daily">يومي</option>
+                  <option value="weekly">أسبوعي</option>
+                </select>
+              </div>
+
+              {/* Custom Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="customer_id" className="text-sm font-medium text-gray-700">
+                    معرف العميل
+                  </Label>
+                  <Input
+                    id="customer_id"
+                    type="text"
+                    placeholder="crm_customer_id"
+                    value={editFormData.integration_settings.custom_fields.customer_id}
+                    onChange={(e) => setEditFormData(prev => ({
+                      ...prev,
+                      integration_settings: {
+                        ...prev.integration_settings,
+                        custom_fields: {
+                          ...prev.integration_settings.custom_fields,
+                          customer_id: e.target.value
+                        }
+                      }
+                    }))}
+                    className="bg-white border-gray-300 focus:border-black focus:ring-black"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="appointment_id" className="text-sm font-medium text-gray-700">
+                    معرف الموعد
+                  </Label>
+                  <Input
+                    id="appointment_id"
+                    type="text"
+                    placeholder="appointment_system_id"
+                    value={editFormData.integration_settings.custom_fields.appointment_id}
+                    onChange={(e) => setEditFormData(prev => ({
+                      ...prev,
+                      integration_settings: {
+                        ...prev.integration_settings,
+                        custom_fields: {
+                          ...prev.integration_settings.custom_fields,
+                          appointment_id: e.target.value
+                        }
+                      }
+                    }))}
+                    className="bg-white border-gray-300 focus:border-black focus:ring-black"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-3 pt-4">
+            <Button
+              onClick={handleCancelEdit}
+              variant="outline"
+              className="flex-1 bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+            >
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleSaveEdit}
+              disabled={isSavingEdit}
+              className="flex-1 bg-black text-white hover:bg-gray-800 transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isSavingEdit ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
                   جاري الحفظ...
