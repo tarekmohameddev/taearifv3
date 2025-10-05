@@ -100,7 +100,6 @@ export function UpdatedAddRentalForm({
     property_number: "",
     property_id: "",
     project_id: "",
-    unit_label: "",
     move_in_date: "",
     rental_period: 12,
     rental_period_type: "",
@@ -682,26 +681,6 @@ export function UpdatedAddRentalForm({
               </Popover>
             </div>
 
-            <div className="space-y-2">
-              <Label
-                htmlFor="unit_label"
-                className="text-sm font-medium text-gray-700"
-              >
-                رمز الوحدة
-              </Label>
-              <Input
-                id="unit_label"
-                value={formData.unit_label}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    unit_label: e.target.value,
-                  }))
-                }
-                placeholder="A-12"
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
-              />
-            </div>
 
             <div className="space-y-2">
               <Label

@@ -1045,7 +1045,7 @@ export function RentalApplicationsService({
                     <div className="space-y-3">
                       <div>
                         <Label className="text-sm font-medium text-gray-700">
-                          رقم العقار
+                        العمارة
                         </Label>
                         <p className="text-sm text-gray-900">
                           {selectedRental.property?.id}
@@ -1934,27 +1934,6 @@ function AddRentalForm({
 
             <div className="space-y-2">
               <Label
-                htmlFor="unit_label"
-                className="text-sm font-medium text-gray-700"
-              >
-                رمز الوحدة
-              </Label>
-              <Input
-                id="unit_label"
-                value={formData.unit_label}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    unit_label: e.target.value,
-                  }))
-                }
-                placeholder="A-12"
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label
                 htmlFor="move_in_date"
                 className="text-sm font-medium text-gray-700"
               >
@@ -2628,20 +2607,6 @@ function EditRentalForm({
               </Popover>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="edit_unit_label">رمز الوحدة *</Label>
-              <Input
-                id="edit_unit_label"
-                value={formData.unit_label}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    unit_label: e.target.value,
-                  }))
-                }
-                placeholder="A-12"
-              />
-            </div>
 
             <div className="space-y-2">
               <Label htmlFor="edit_move_in_date">تاريخ الانتقال *</Label>

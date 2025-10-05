@@ -1246,7 +1246,7 @@ export default function PropertyForm({ mode }) {
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="building">اسم المبنى</Label>
+                      <Label htmlFor="building">العمارة</Label>
                       <Input
                         id="building"
                         name="building"
