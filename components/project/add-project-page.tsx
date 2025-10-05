@@ -201,7 +201,7 @@ export default function AddProjectPage(): JSX.Element {
       hasReachedLimit =
         projects.length >=
         (useAuthStore.getState().userData?.project_limit_number || 10);
-      router.push("/projects");
+      router.push("/dashboard/projects");
     }
   }, [projects, router]);
 
@@ -669,7 +669,7 @@ export default function AddProjectPage(): JSX.Element {
       await axiosInstance.post("/steps/complete", setpOB);
       await fetchSetupProgressData();
 
-      router.push("/projects");
+      router.push("/dashboard/projects");
     } catch (error: any) {
       setSubmitError("حدث خطأ أثناء حفظ العقار. يرجى المحاولة مرة أخرى.");
       toast.error("حدث خطأ فالسيرفر");
@@ -724,7 +724,7 @@ export default function AddProjectPage(): JSX.Element {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => router.push("/projects")}
+                  onClick={() => router.push("/dashboard/projects")}
                   className="h-8 w-8"
                 >
                   <ArrowRight className="h-4 w-4" />

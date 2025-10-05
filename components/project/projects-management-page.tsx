@@ -493,7 +493,7 @@ function ProjectCard({ project }: { project: IProject }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                onClick={() => router.push("/projects/" + project.id + "/edit")}
+                onClick={() => router.push("/dashboard/projects/" + project.id + "/edit")}
               >
                 <Edit className="mr-2 h-4 w-4" />
                 تعديل
@@ -574,7 +574,7 @@ function ProjectCard({ project }: { project: IProject }) {
           variant="outline"
           size="sm"
           className="w-full gap-1"
-          onClick={() => router.push("/projects/" + project.id + "/edit")}
+          onClick={() => router.push("/dashboard/projects/" + project.id + "/edit")}
         >
           <Edit className="h-3.5 w-3.5" />
           تعديل
@@ -676,7 +676,7 @@ function ProjectListItem({ project }: { project: IProject }) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push("/projects/" + project.id + "/edit")}
+                onClick={() => router.push("/dashboard/projects/" + project.id + "/edit")}
               >
                 <Edit className="mr-1 h-3.5 w-3.5" />
                 تعديل

@@ -1226,7 +1226,7 @@ function PropertyCard({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
-                  router.push("/properties/" + property.id + "/edit")
+                  router.push("/dashboard/properties/" + property.id + "/edit")
                 }
               >
                 <Edit className="mr-2 h-4 w-4" />
@@ -1348,7 +1348,7 @@ function PropertyCard({
           variant="outline"
           size="sm"
           className="w-full gap-1"
-          onClick={() => router.push("/properties/" + property.id + "/edit")}
+          onClick={() => router.push("/dashboard/properties/" + property.id + "/edit")}
         >
           <Edit className="h-3.5 w-3.5" />
           تعديل
@@ -1492,7 +1492,7 @@ function PropertyListItem({
               variant="outline"
               size="sm"
               onClick={() =>
-                router.push("/properties/" + property.id + "/edit")
+                router.push("/dashboard/properties/" + property.id + "/edit")
               }
             >
               <Edit className="mr-1 h-3.5 w-3.5" />

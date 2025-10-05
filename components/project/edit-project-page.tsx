@@ -270,7 +270,7 @@ export default function EditProjectPage(): JSX.Element {
       } catch (error) {
         console.error("Failed to fetch project data:", error);
         toast.error("فشل في تحميل بيانات المشروع");
-        router.push("/projects");
+        router.push("/dashboard/projects");
       } finally {
         setIsLoading(false);
       }
@@ -664,7 +664,7 @@ export default function EditProjectPage(): JSX.Element {
       );
 
       toast.success("تم تحديث المشروع بنجاح");
-      router.push("/projects");
+      router.push("/dashboard/projects");
     } catch (error) {
       setSubmitError("حدث خطأ أثناء حفظ المشروع. يرجى المحاولة مرة أخرى.");
       console.error("Update failed:", error);
@@ -777,7 +777,7 @@ export default function EditProjectPage(): JSX.Element {
   }
 
   if (!id) {
-    router.push("/projects");
+    router.push("/dashboard/projects");
     return null;
   }
 
@@ -794,7 +794,7 @@ export default function EditProjectPage(): JSX.Element {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => router.push("/projects")}
+                  onClick={() => router.push("/dashboard/projects")}
                   className="h-8 w-8"
                 >
                   <ArrowRight className="h-4 w-4" />
