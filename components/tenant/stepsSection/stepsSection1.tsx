@@ -7,10 +7,28 @@ import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 
+// Function to get icon URL based on type
+const getStepIconUrl = (type: string): string => {
+  const iconMap: Record<string, string> = {
+    step1: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/1.svg",
+    step2: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/2.svg",
+    step3: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/3.svg",
+    step4: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/4.svg",
+    step5: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/5.svg",
+    step6: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/6.svg",
+  };
+  
+  return iconMap[type] || iconMap.step1;
+};
+
 type Step = {
   title: string;
   desc: string;
-  image: string;
+  image: string | {
+    type: string;
+    size?: string;
+    className?: string;
+  };
   titleStyle?: {
     color?: string;
     size?: { mobile?: string; desktop?: string };
@@ -59,8 +77,11 @@ const getDefaultStepsSectionData = () => ({
     {
       title: "المعاينة الأولية للعقار",
       desc: "زيارة العقار وتقييم حالته ومعرفة ميزاته ومراجعة التفاصيل التي تحتاج إلى توضيح.",
-      image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/1.svg",
+      image: {
+        type: "step1",
+        size: "80",
+        className: "w-20 h-20",
+      },
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -75,8 +96,11 @@ const getDefaultStepsSectionData = () => ({
     {
       title: "كتابة تفصيل العقار",
       desc: "وصف دقيق للممتلكات بما في ذلك الموقع، المساحة، المرافق، والحالة العامة.",
-      image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/2.svg",
+      image: {
+        type: "step2",
+        size: "80",
+        className: "w-20 h-20",
+      },
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -91,8 +115,11 @@ const getDefaultStepsSectionData = () => ({
     {
       title: "التصوير الاحترافي للعقار",
       desc: "الاستعانة بمصور محترف لالتقاط صور عالية الجودة مع الاهتمام بالإضاءة والزوايا.",
-      image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/3.svg",
+      image: {
+        type: "step3",
+        size: "80",
+        className: "w-20 h-20",
+      },
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -107,8 +134,11 @@ const getDefaultStepsSectionData = () => ({
     {
       title: "توقيع اتفاقية الوساطة والتسويق",
       desc: "توقيع عقد رسمي بينك وبين المالك لتنظيم عملية تسويق العقار وحقوق الطرفين.",
-      image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/4.svg",
+      image: {
+        type: "step4",
+        size: "80",
+        className: "w-20 h-20",
+      },
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -123,8 +153,11 @@ const getDefaultStepsSectionData = () => ({
     {
       title: "تصميم بوستر للعقار وإضافته لموقعنا",
       desc: "إعداد بوستر يحتوي على الصور والتفاصيل الرئيسية ونشره على موقعنا الإلكتروني.",
-      image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/5.svg",
+      image: {
+        type: "step5",
+        size: "80",
+        className: "w-20 h-20",
+      },
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -139,8 +172,11 @@ const getDefaultStepsSectionData = () => ({
     {
       title: "جذب العملاء المحتملين",
       desc: "استخدام وسائل الاتصال المختلفة لجذب المشترين المهتمين مثل الإعلانات.",
-      image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/6.svg",
+      image: {
+        type: "step6",
+        size: "80",
+        className: "w-20 h-20",
+      },
       titleStyle: {
         color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
@@ -381,11 +417,11 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
             <div key={i} className="flex items-start gap-4">
               <div className="mt-1 shrink-0">
                 <Image
-                  src={step.image}
+                  src={typeof step.image === 'string' ? step.image : getStepIconUrl(step.image.type)}
                   alt={step.title}
-                  width={24}
-                  height={24}
-                  className="size-10 sm:size-15"
+                  width={typeof step.image === 'string' ? 24 : parseInt(step.image.size || '80')}
+                  height={typeof step.image === 'string' ? 24 : parseInt(step.image.size || '80')}
+                  className={typeof step.image === 'string' ? "size-10 sm:size-15" : (step.image.className || "w-20 h-20")}
                 />
               </div>
               <div>

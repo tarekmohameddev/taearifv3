@@ -39,6 +39,7 @@ export function translateLabel(label: string, t: (key: string) => string): strin
     "Delay (ms)": "components_structure.basic.delay_ms",
     "Stagger (ms)": "components_structure.basic.stagger_ms",
     "Stagger Delay (ms)": "components_structure.basic.stagger_delay_ms",
+    "Add": "components_structure.basic.add",
     "Add Step": "components_structure.basic.add_step",
     "Step": "components_structure.basic.step",
     "Header Animation Enabled": "components_structure.basic.header_animation_enabled",

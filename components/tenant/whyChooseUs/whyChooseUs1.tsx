@@ -4,11 +4,31 @@ import { useEffect } from "react";
 import type React from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
+import Image from "next/image";
+
+// Function to get icon URL based on type
+const getWhyChooseUsIconUrl = (type: string): string => {
+  const iconMap: Record<string, string> = {
+    icon1: "https://dalel-lovat.vercel.app/images/why-choose-us/1.svg",
+    icon2: "https://dalel-lovat.vercel.app/images/why-choose-us/2.svg",
+    icon3: "https://dalel-lovat.vercel.app/images/why-choose-us/3.svg",
+    icon4: "https://dalel-lovat.vercel.app/images/why-choose-us/4.svg",
+    icon5: "https://dalel-lovat.vercel.app/images/why-choose-us/5.svg",
+    icon6: "https://dalel-lovat.vercel.app/images/why-choose-us/6.svg",
+  };
+  
+  return iconMap[type] || iconMap.icon1;
+};
 
 type Feature = {
   title: string;
   desc: string;
-  icon: string;
+  icon: {
+    type: string;
+    size?: string;
+    color?: string;
+    className?: string;
+  };
 };
 
 // Default why choose us data
@@ -43,32 +63,56 @@ const getDefaultWhyChooseUsData = () => ({
       {
         title: "خدمة شخصية",
         desc: "نحن نركز على تقديم تجربة تركز على العملاء لجعل بحثك عن العقارات سلسًا وناجحًا.",
-        icon: "https://dalel-lovat.vercel.app/images/why-choose-us/1.svg",
+        icon: {
+          type: "icon1",
+          size: "80",
+          className: "w-20 h-20",
+        },
       },
       {
         title: "مجموعة واسعة من العقارات",
         desc: "من الشقق إلى الفلل والمكاتب والمساحات التجارية، لدينا خيارات تناسب جميع الاحتياجات.",
-        icon: "https://dalel-lovat.vercel.app/images/why-choose-us/2.svg",
+        icon: {
+          type: "icon2",
+          size: "80",
+          className: "w-20 h-20",
+        },
       },
       {
         title: "إرشادات الخبراء",
         desc: "بفضل سنوات الخبرة، يقدم فريقنا رؤى ونصائح مخصصة لضمان قرار مناسب لتفضيلاتك.",
-        icon: "https://dalel-lovat.vercel.app/images/why-choose-us/3.svg",
+        icon: {
+          type: "icon3",
+          size: "80",
+          className: "w-20 h-20",
+        },
       },
       {
         title: "تحليل السوق",
         desc: "تحليل متعمق للسوق يوفر رؤية قيمة حول اتجاهات العقارات والأسعار وفرص الاستثمار.",
-        icon: "https://dalel-lovat.vercel.app/images/why-choose-us/4.svg",
+        icon: {
+          type: "icon4",
+          size: "80",
+          className: "w-20 h-20",
+        },
       },
       {
         title: "الاستشارات الاستثمارية",
         desc: "إرشادات من الخبراء لتحقيق أقصى عائد على استثماراتك العقارية واتخاذ قرارات ذكية.",
-        icon: "https://dalel-lovat.vercel.app/images/why-choose-us/5.svg",
+        icon: {
+          type: "icon5",
+          size: "80",
+          className: "w-20 h-20",
+        },
       },
       {
         title: "إدارة الممتلكات",
         desc: "خدمات إدارة شاملة للحفاظ على قيمة ممتلكاتك وتعزيز عوائدها التأجيرية.",
-        icon: "https://dalel-lovat.vercel.app/images/why-choose-us/6.svg",
+        icon: {
+          type: "icon6",
+          size: "80",
+          className: "w-20 h-20",
+        },
       },
     ],
     grid: {
@@ -570,14 +614,24 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                   "mx-auto flex size-20 items-center justify-center"
                 }
               >
-                <img
-                  src={f.icon}
-                  alt={f.title}
-                  className={
-                    mergedData.features?.icon?.image?.className ||
-                    "h-[7rem] w-[7rem]"
-                  }
-                />
+                {typeof f.icon === 'string' ? (
+                  <img
+                    src={f.icon}
+                    alt={f.title}
+                    className={
+                      mergedData.features?.icon?.image?.className ||
+                      "h-[7rem] w-[7rem]"
+                    }
+                  />
+                ) : (
+                  <Image
+                    src={getWhyChooseUsIconUrl(f.icon?.type || 'icon1')}
+                    alt={f.title}
+                    width={parseInt(f.icon?.size || '80')}
+                    height={parseInt(f.icon?.size || '80')}
+                    className={f.icon?.className || 'w-20 h-20'}
+                  />
+                )}
               </div>
               <h3
                 className={

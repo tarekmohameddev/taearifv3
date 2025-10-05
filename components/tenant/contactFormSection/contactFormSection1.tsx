@@ -105,14 +105,7 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
       // Force re-render when store data changes
       const unsubscribe = useEditorStore.subscribe((state) => {
         const newContactFormSectionStates = state.contactFormSectionStates;
-        console.log('🔄 ContactFormSection Store subscription triggered:', {
-          uniqueId,
-          newContactFormSectionStates,
-          hasData: !!newContactFormSectionStates[uniqueId],
-          allKeys: Object.keys(newContactFormSectionStates)
-        });
         if (newContactFormSectionStates[uniqueId]) {
-          console.log('🔄 ContactFormSection Store subscription triggered for:', uniqueId, newContactFormSectionStates[uniqueId]);
           // Force re-render by updating state
           setForceUpdate(prev => prev + 1);
         }
@@ -141,20 +134,6 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
     ? contactFormSectionStates[uniqueId] || {}
     : {};
 
-  // Debug: Log when data changes
-  useEffect(() => {
-    if (props.useStore) {
-      console.log('🔄 ContactFormSection Data Updated:', {
-        uniqueId,
-        storeData,
-        currentStoreData,
-        forceUpdate,
-        contactFormSectionStates,
-        allContactFormSectionStates: Object.keys(contactFormSectionStates),
-        getComponentDataResult: getComponentData("contactFormSection", uniqueId)
-      });
-    }
-  }, [storeData, currentStoreData, forceUpdate, props.useStore, uniqueId, contactFormSectionStates, getComponentData]);
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
@@ -233,19 +212,6 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
       ...(currentStoreData?.styling || {}),
     },
   };
-
-  // Debug: Log the final merged data
-  console.log('🔍 ContactFormSection Final Merge:', {
-    uniqueId,
-    currentStoreData,
-    storeData,
-    mergedData,
-    contentTitle: mergedData.content?.title,
-    socialLinksCount: mergedData.content?.socialLinks?.length || 0,
-    formFieldsCount: mergedData.form?.fields?.length || 0,
-    contactFormSectionStatesKeys: Object.keys(contactFormSectionStates),
-    getComponentDataResult: getComponentData("contactFormSection", uniqueId)
-  });
 
   // Don't render if not visible
   if (!mergedData.visible) {

@@ -123,7 +123,38 @@ export const whyChooseUsStructure: ComponentStructure = {
               of: [
                 { key: "title", label: "Title", type: "text" },
                 { key: "desc", label: "Description", type: "text" },
-                { key: "icon", label: "Icon URL", type: "image" },
+                {
+                  key: "icon",
+                  label: "Icon Settings",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "type",
+                      label: "Icon Type",
+                      type: "select",
+                      options: [
+                        { value: "icon1", label: "Personal Service" },
+                        { value: "icon2", label: "Wide Range of Properties" },
+                        { value: "icon3", label: "Extensive Experience" },
+                        { value: "icon4", label: "Market Analysis" },
+                        { value: "icon5", label: "Investment Consultations" },
+                        { value: "icon6", label: "Property Management" },
+                      ],
+                    },
+                    {
+                      key: "size",
+                      label: "Size",
+                      type: "text",
+                      placeholder: "80",
+                    },
+                    {
+                      key: "className",
+                      label: "CSS Classes",
+                      type: "text",
+                      placeholder: "w-20 h-20",
+                    },
+                  ],
+                },
               ],
             },
             {

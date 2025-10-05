@@ -1,8 +1,7 @@
-import { ComponentData } from "@/lib/types";
 import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 
 // Default why choose us data structure
-export const getDefaultWhyChooseUsData = (): ComponentData => ({
+export const getDefaultWhyChooseUsData = (): any => ({
   visible: true,
   layout: {
     direction: "rtl",
@@ -33,17 +32,29 @@ export const getDefaultWhyChooseUsData = (): ComponentData => ({
       {
         title: "خدمة شخصية",
         desc: "نحن نركز على تقديم تجربة تركز على العملاء لجعل بحثك عن العقارات سلسًا وناجحًا.",
-        icon: "https://dalel-lovat.vercel.app/images/why-choose-us/1.svg",
+        icon: {
+          type: "icon1",
+          size: "80",
+          className: "w-20 h-20",
+        },
       },
       {
         title: "مجموعة واسعة من العقارات",
         desc: "من الشقق إلى الفلل والمكاتب والمساحات التجارية، لدينا خيارات تناسب جميع الاحتياجات.",
-        icon: "https://dalel-lovat.vercel.app/images/why-choose-us/2.svg",
+        icon: {
+          type: "icon2",
+          size: "80",
+          className: "w-20 h-20",
+        },
       },
       {
         title: "خبرة واسعة",
         desc: "فريقنا من الخبراء لديه سنوات من الخبرة في السوق العقاري المحلي والدولي.",
-        icon: "https://dalel-lovat.vercel.app/images/why-choose-us/3.svg",
+        icon: {
+          type: "icon3",
+          size: "80",
+          className: "w-20 h-20",
+        },
       },
     ],
     grid: {
@@ -115,13 +126,13 @@ export const getDefaultWhyChooseUsData = (): ComponentData => ({
 });
 
 export const whyChooseUsFunctions = {
-  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
+  ensureVariant: (state: any, variantId: string, initial?: any) => {
     if (state.whyChooseUsStates[variantId]) {
       return state;
     }
 
     const defaultData = getDefaultWhyChooseUsData();
-    const data: ComponentData = initial || state.tempData || defaultData;
+    const data: any = initial || state.tempData || defaultData;
 
     return {
       ...state,
@@ -135,7 +146,7 @@ export const whyChooseUsFunctions = {
     return data;
   },
 
-  setData: (state: any, variantId: string, data: ComponentData) => ({
+  setData: (state: any, variantId: string, data: any) => ({
     ...state,
     whyChooseUsStates: { ...state.whyChooseUsStates, [variantId]: data },
   }),

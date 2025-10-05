@@ -146,7 +146,38 @@ export const stepsSectionStructure: ComponentStructure = {
           of: [
             { key: "title", label: "Step Title", type: "text" },
             { key: "desc", label: "Step Description", type: "text" },
-            { key: "image", label: "Image URL", type: "image" },
+            {
+              key: "image",
+              label: "Step Icon",
+              type: "object",
+              fields: [
+                {
+                  key: "type",
+                  label: "Icon Type",
+                  type: "select",
+                  options: [
+                    { value: "step1", label: "Step 1 - Property Inspection" },
+                    { value: "step2", label: "Step 2 - Property Description" },
+                    { value: "step3", label: "Step 3 - Professional Photography" },
+                    { value: "step4", label: "Step 4 - Marketing Strategy" },
+                    { value: "step5", label: "Step 5 - Online Listing" },
+                    { value: "step6", label: "Step 6 - Client Communication" },
+                  ],
+                },
+                {
+                  key: "size",
+                  label: "Size",
+                  type: "text",
+                  placeholder: "80",
+                },
+                {
+                  key: "className",
+                  label: "CSS Classes",
+                  type: "text",
+                  placeholder: "w-20 h-20",
+                },
+              ],
+            },
             {
               key: "titleStyle",
               label: "Title Style",
