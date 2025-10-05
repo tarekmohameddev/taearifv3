@@ -56,8 +56,8 @@ import { gridFunctions } from "./editorStoreFunctions/gridFunctions";
 import { filterButtonsFunctions } from "./editorStoreFunctions/filterButtonsFunctions";
 import { propertyFilterFunctions } from "./editorStoreFunctions/propertyFilterFunctions";
 import { mapSectionFunctions } from "./editorStoreFunctions/mapSectionFunctions";
-import { contactFormSectionFunctions } from "./editorStoreFunctions/contactFormSectionFunctions";
 import { contactCardsFunctions } from "./editorStoreFunctions/contactCardsFunctions";
+import { contactFormSectionFunctions } from "./editorStoreFunctions/contactFormSectionFunctions";
 import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
@@ -414,8 +414,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   filterButtonsStates: {},
   propertyFilterStates: {},
   mapSectionStates: {},
-  contactFormSectionStates: {},
   contactCardsStates: {},
+  contactFormSectionStates: {},
 
   // Dynamic component states
   componentStates: {},
@@ -815,6 +815,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           );
         case "contactCards":
           return contactCardsFunctions.ensureVariant(state, variantId, initial);
+        case "contactFormSection":
+          return contactFormSectionFunctions.ensureVariant(state, variantId, initial);
         default:
           // Fallback to generic component handling
           if (!state.componentStates[componentType]) {
@@ -877,11 +879,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return propertyFilterFunctions.getData(state, variantId);
       case "mapSection":
         return mapSectionFunctions.getData(state, variantId);
-      case "contactFormSection":
-        return contactFormSectionFunctions.getData(state, variantId);
       case "contactCards":
         return contactCardsFunctions.getData(state, variantId);
-      default:
+      case "contactFormSection":
+        return contactFormSectionFunctions.getData(state, variantId);
+        default:
         // Fallback to generic component data with default data creation
         const data = state.componentStates[componentType]?.[variantId];
         if (!data || Object.keys(data).length === 0) {
@@ -949,6 +951,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "contactCards":
           newState = contactCardsFunctions.setData(state, variantId, data);
+          break;
+        case "contactFormSection":
+          newState = contactFormSectionFunctions.setData(state, variantId, data);
           break;
         default:
           // Fallback to generic component handling
@@ -1106,6 +1111,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "contactCards":
           newState = contactCardsFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "contactFormSection":
+          newState = contactFormSectionFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -1363,19 +1376,34 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   // Contact Form Section functions using modular approach
   ensureContactFormSectionVariant: (variantId, initial) =>
-    set((state) =>
-      contactFormSectionFunctions.ensureVariant(state, variantId, initial),
-    ),
+    set((state) => {
+      const newState = contactFormSectionFunctions.ensureVariant(state, variantId, initial);
+      return {
+        ...state,
+        contactFormSectionStates: newState.contactFormSectionStates,
+      };
+    }),
   getContactFormSectionData: (variantId) => {
     const state = get();
     return contactFormSectionFunctions.getData(state, variantId);
   },
   setContactFormSectionData: (variantId, data) =>
-    set((state) => contactFormSectionFunctions.setData(state, variantId, data)),
+    set((state) => {
+      const newState = contactFormSectionFunctions.setData(state, variantId, data);
+      return {
+        ...state,
+        contactFormSectionStates: newState.contactFormSectionStates,
+      };
+    }),
   updateContactFormSectionByPath: (variantId, path, value) =>
-    set((state) =>
-      contactFormSectionFunctions.updateByPath(state, variantId, path, value),
-    ),
+    set((state) => {
+      const newState = contactFormSectionFunctions.updateByPath(state, variantId, path, value);
+      return {
+        ...state,
+        contactFormSectionStates: newState.contactFormSectionStates,
+        pageComponentsByPage: newState.pageComponentsByPage,
+      };
+    }),
 
   // Contact Cards functions using modular approach
   ensureContactCardsVariant: (variantId, initial) =>
@@ -1392,6 +1420,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) =>
       contactCardsFunctions.updateByPath(state, variantId, path, value),
     ),
+
+  // Contact Form Section functions (second set removed - using the one above)
 
   // Page components management
   setPageComponentsForPage: (page, components) =>
@@ -1759,6 +1789,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.componentName,
                 comp.data,
               ).contactCardsStates;
+              break;
+            case "contactFormSection":
+              newState.contactFormSectionStates = contactFormSectionFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).contactFormSectionStates;
               break;
           }
         });

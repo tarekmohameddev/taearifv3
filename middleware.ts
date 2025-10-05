@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 const locales = ["ar", "en"];
 const defaultLocale = "en";
 
+// Default locale for live-editor pages
+const liveEditorDefaultLocale = "ar";
+
 function getLocale(pathname: string) {
   const segments = pathname.split("/");
   const firstSegment = segments[1];
@@ -99,65 +102,67 @@ export function middleware(request: NextRequest) {
 
   /*
    * ========================================
-   * DASHBOARD AUTO-REDIRECT TO ARABIC LOCALE
+   * AUTO-REDIRECT TO ARABIC LOCALE (EXCEPT LIVE-EDITOR)
    * ========================================
    * 
-   * This section handles automatic redirection of dashboard pages to Arabic locale.
+   * This section handles automatic redirection of all pages to Arabic locale,
+   * except for the live-editor page.
    * 
    * PURPOSE:
-   * - Force all dashboard pages to use Arabic locale (ar) regardless of the original URL
-   * - Ensures consistent RTL experience across all dashboard sections
-   * - Prevents users from accessing dashboard in English locale
+   * - Force all pages to use Arabic locale (ar) regardless of the original URL
+   * - Ensures consistent RTL experience across all sections
+   * - Prevents users from accessing pages in English locale
+   * - Excludes live-editor page from this redirection
    * 
    * HOW IT WORKS:
-   * 1. Detects if the current path is a dashboard page (starts with /dashboard)
-   * 2. Checks if the current locale is English (en)
+   * 1. Detects if the current path is an English page (starts with /en)
+   * 2. Checks if the page is NOT live-editor
    * 3. If both conditions are true, redirects to the same path with Arabic locale
    * 
    * AFFECTED PAGES:
-   * - /en/dashboard/* -> /ar/dashboard/*
-   * - All dashboard subpages (affiliate, analytics, apps, blog, etc.)
+   * - /en/* -> /ar/* (except /en/live-editor)
+   * - All pages except live-editor
+   * 
+   * LIVE-EDITOR HANDLING:
+   * - /en/live-editor -> stays in English (no redirect)
+   * - /live-editor (no locale) -> redirects to: /ar/live-editor
+   * - Arabic is the default locale for live-editor when no locale is specified
    * 
    * MODIFICATION NOTES:
-   * - To disable this feature: Comment out the entire dashboard redirect section
+   * - To disable this feature: Comment out the entire redirect section
    * - To change target locale: Replace "ar" with desired locale code
-   * - To modify affected paths: Update the dashboard path check condition
+   * - To modify live-editor default: Change liveEditorDefaultLocale variable
    * 
    * EXAMPLE:
-   * User visits: /en/dashboard/analytics
-   * System redirects to: /ar/dashboard/analytics
+   * User visits: /en/dashboard/analytics -> redirects to: /ar/dashboard/analytics
+   * User visits: /en/live-editor -> stays: /en/live-editor
+   * User visits: /live-editor -> redirects to: /ar/live-editor
    */
   
-  // Check if this is a dashboard page and current locale is English
-  const isDashboardPage = pathname.startsWith("/en/dashboard") || 
-                         pathname.startsWith("/dashboard");
+  // Check if this is an English page and NOT live-editor
+  const isEnglishPage = pathname.startsWith("/en/");
+  const isLiveEditor = pathname.startsWith("/en/live-editor");
   
-  if (isDashboardPage) {
-    // Extract the path without locale for dashboard pages
-    let dashboardPath = pathname;
+  if (isEnglishPage && !isLiveEditor) {
+    // Extract the path without locale
+    const pathWithoutLocale = pathname.replace("/en", "");
     
-    // If path starts with /en/dashboard, remove /en prefix
-    if (pathname.startsWith("/en/dashboard")) {
-      dashboardPath = pathname.replace("/en", "");
-    }
-    // If path starts with /dashboard (no locale), keep as is
-    else if (pathname.startsWith("/dashboard")) {
-      dashboardPath = pathname;
-    }
-    
-    // Redirect to Arabic version of the dashboard page
-    const newUrl = new URL(`/ar${dashboardPath}`, request.url);
+    // Redirect to Arabic version of the page
+    const newUrl = new URL(`/ar${pathWithoutLocale}`, request.url);
     return NextResponse.redirect(newUrl);
   }
+
+  // No special handling needed for /en/live-editor - let it stay in English
 
   // Check if pathname starts with a locale
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
-  // If no locale in pathname, redirect to default locale
+  // If no locale in pathname, redirect to appropriate default locale
   if (!pathnameHasLocale) {
-    const locale = defaultLocale;
+    // Use Arabic as default for live-editor, English for other pages
+    const locale = pathname.startsWith("/live-editor") ? liveEditorDefaultLocale : defaultLocale;
     const newUrl = new URL(`/${locale}${pathname}`, request.url);
     return NextResponse.redirect(newUrl);
   }

@@ -4,6 +4,7 @@ import ClientLayout from "./ClientLayout";
 import { Toaster } from "react-hot-toast";
 import { ReCaptchaWrapper } from "@/components/ReCaptchaWrapper";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function RootLayout({
   children,
@@ -13,6 +14,12 @@ export default async function RootLayout({
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const pathname = headersList.get("x-pathname") || "";
+  const locale = headersList.get("x-locale") || "";
+
+  // إعادة التوجيه من الإنجليزية إلى العربية (استثناء live-editor)
+  if (locale === "en" && pathname !== "/live-editor" && !pathname.startsWith("/live-editor/")) {
+    redirect(`/ar${pathname}`);
+  }
 
   // تحديد الصفحات المسموح بها لـ GTM و Clarity
   const allowedPages = [

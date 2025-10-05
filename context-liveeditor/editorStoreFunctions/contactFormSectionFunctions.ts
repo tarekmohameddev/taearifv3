@@ -1,43 +1,35 @@
-import { ComponentData } from "@/lib/types";
+import { ComponentData } from "@/lib-liveeditor/types";
 import { createDefaultData } from "./types";
 
-// Default data for contact form section
+// Default data for contactFormSection component
 export const getDefaultContactFormSectionData = (): ComponentData => ({
   visible: true,
   layout: {
     container: {
+      padding: {
+        vertical: "py-8",
+        horizontal: "px-4",
+      },
       maxWidth: "1600px",
-      padding: "px-4 py-8",
     },
     grid: {
-      desktop: "md:flex-row",
-      tablet: "md:flex-row",
-      mobile: "flex-col",
-    },
-    gap: {
-      desktop: "gap-[16px]",
-      tablet: "gap-[16px]",
-      mobile: "gap-[16px]",
+      columns: {
+        mobile: "flex-col",
+        desktop: "md:flex-row",
+      },
+      gap: "gap-[16px]",
     },
   },
   content: {
-    title: {
-      text: "زوروا صفحتنا على",
-      style: {
-        size: "text-[15px] md:text-[24px]",
-        color: "#1f2937",
-        weight: "font-normal",
-        margin: "mb-[24px]",
-      },
-    },
+    title: "زوروا صفحتنا على",
     socialLinks: [
       {
         href: "https://facebook.com",
         alt: "facebook",
         text: "مكتب دليل الجواء التلقائي",
-        icon: {
-          size: "24",
-          color: "#1f2937",
+        icon: { 
+          size: "24", 
+          color: "#1f2937" 
         },
         textStyle: {
           size: "text-[14px] md:text-[16px]",
@@ -49,9 +41,9 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
         href: "https://x.com",
         alt: "x",
         text: "مكتب دليل الجواء التلقائي",
-        icon: {
-          size: "24",
-          color: "#1f2937",
+        icon: { 
+          size: "24", 
+          color: "#1f2937" 
         },
         textStyle: {
           size: "text-[14px] md:text-[16px]",
@@ -63,9 +55,9 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
         href: "https://www.instagram.com/guide__aljiwa?igsh=MWY1amdsaGlhZm1xOA==",
         alt: "instagram",
         text: "مكتب دليل الجواء التلقائي",
-        icon: {
-          size: "24",
-          color: "#1f2937",
+        icon: { 
+          size: "24", 
+          color: "#1f2937" 
         },
         textStyle: {
           size: "text-[14px] md:text-[16px]",
@@ -77,9 +69,9 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
         href: "https://linkedin.com",
         alt: "linkedin",
         text: "مكتب دليل الجواء التلقائي",
-        icon: {
-          size: "24",
-          color: "#1f2937",
+        icon: { 
+          size: "24", 
+          color: "#1f2937" 
         },
         textStyle: {
           size: "text-[14px] md:text-[16px]",
@@ -91,9 +83,9 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
         href: "https://wa.me/966537120774",
         alt: "whatsapp",
         text: "مكتب دليل الجواء التلقائي",
-        icon: {
-          size: "24",
-          color: "#1f2937",
+        icon: { 
+          size: "24", 
+          color: "#1f2937" 
         },
         textStyle: {
           size: "text-[14px] md:text-[16px]",
@@ -104,188 +96,95 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
     ],
   },
   form: {
-    layout: {
-      width: "w-full md:w-[50%]",
-      gap: "gap-[12px] md:gap-[24px]",
-    },
-    fields: {
-      name: {
-        enabled: true,
+    fields: [
+      {
+        id: "name",
+        type: "text",
         placeholder: "أدخل اسمك",
         required: true,
         style: {
-          border: "border rounded-[6px]",
-          padding: "p-2",
-          outline: "outline-custom-secondarycolor",
+          className: "border rounded-[6px] p-2 outline-custom-secondarycolor",
         },
       },
-      email: {
-        enabled: true,
+      {
+        id: "email",
+        type: "email",
         placeholder: "بريدك الإلكتروني",
         required: true,
         style: {
-          border: "border rounded-[6px]",
-          padding: "p-2",
-          outline: "outline-custom-secondarycolor",
+          className: "border rounded-[6px] p-2 outline-custom-secondarycolor",
         },
       },
-      message: {
-        enabled: true,
+      {
+        id: "message",
+        type: "textarea",
         placeholder: "رسالتك",
-        required: true,
         rows: 2,
+        required: true,
         style: {
-          border: "border rounded",
-          padding: "p-2",
-          margin: "mb-[12px]",
-          outline: "outline-custom-secondarycolor",
+          className: "border rounded p-2 mb-[12px] outline-custom-secondarycolor",
         },
       },
-    },
+    ],
     submitButton: {
       text: "إرسال",
-      enabled: true,
       style: {
-        background: "#10b981",
-        textColor: "#ffffff",
-        borderRadius: "rounded-[6px]",
-        width: "w-full",
-        padding: "py-2 md:py-1",
-        fontSize: "text-[14px] md:text-[20px]",
-        hover: "hover:scale-105 transition duration-300",
+        className: "bg-custom-secondarycolor text-white rounded-[6px] w-full text-[14px] md:text-[20px] bg-emerald-700 hover:scale-105 transition duration-300 py-2 md:py-1",
       },
     },
   },
-  responsive: {
-    breakpoints: {
-      mobile: "768px",
-      tablet: "1024px",
-      desktop: "1280px",
+  styling: {
+    title: {
+      size: "text-[15px] md:text-[24px]",
+      color: "text-custom-maincolor",
+      weight: "font-normal",
     },
     layout: {
-      socialSection: {
-        mobile: "w-full",
-        tablet: "w-full md:w-[35%]",
-        desktop: "w-full md:w-[35%]",
-      },
-      formSection: {
-        mobile: "w-full",
-        tablet: "w-full md:w-[50%]",
-        desktop: "w-full md:w-[50%]",
-      },
-    },
-  },
-  animations: {
-    title: {
-      enabled: true,
-      type: "fadeIn",
-      duration: 500,
-      delay: 0,
-    },
-    socialLinks: {
-      enabled: true,
-      type: "fadeInUp",
-      duration: 400,
-      delay: 100,
-      stagger: 50,
-    },
-    form: {
-      enabled: true,
-      type: "fadeInUp",
-      duration: 600,
-      delay: 200,
+      detailsWidth: "w-full md:w-[35%]",
+      formWidth: "w-full md:w-[50%]",
+      gap: "gap-[16px] md:gap-[10px]",
     },
   },
 });
 
-// Contact form section functions
+// ContactFormSection store functions
 export const contactFormSectionFunctions = {
   // Get default data
   getDefaultData: getDefaultContactFormSectionData,
 
-  // Create new contact form section data
-  createNew: (): ComponentData => getDefaultContactFormSectionData(),
-
-  // Ensure variant exists in store
-  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (!state.contactFormSectionStates) {
-      state.contactFormSectionStates = {};
+  // Ensure variant exists
+  ensureVariant: (
+    state: any,
+    variantId: string,
+    initial?: ComponentData,
+  ): any => {
+    const currentData = state.contactFormSectionStates?.[variantId];
+    if (!currentData || Object.keys(currentData).length === 0) {
+      const defaultData = initial || getDefaultContactFormSectionData();
+      return {
+        contactFormSectionStates: {
+          ...state.contactFormSectionStates,
+          [variantId]: defaultData,
+        },
+      };
     }
-
-    if (!state.contactFormSectionStates[variantId]) {
-      const defaultData = getDefaultContactFormSectionData();
-      const data: ComponentData = initial || defaultData;
-      state.contactFormSectionStates[variantId] = data;
-    }
-
-    return {
-      contactFormSectionStates: {
-        ...state.contactFormSectionStates,
-        [variantId]: state.contactFormSectionStates[variantId],
-      },
-    };
+    return state;
   },
 
-  // Get data for variant
-  getData: (state: any, variantId: string): ComponentData => {
-    const data = state.contactFormSectionStates?.[variantId];
-    if (!data || Object.keys(data).length === 0) {
-      return getDefaultContactFormSectionData();
-    }
-    return data;
+  // Get data
+  getData: (
+    state: any,
+    variantId: string,
+  ): ComponentData => {
+    return state.contactFormSectionStates?.[variantId] || getDefaultContactFormSectionData();
   },
 
-  // Set data for variant
-  setData: (state: any, variantId: string, data: ComponentData) => {
-    return {
-      contactFormSectionStates: {
-        ...state.contactFormSectionStates,
-        [variantId]: data,
-      },
-    };
-  },
-
-  // Update data by path
-  updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const currentData =
-      state.contactFormSectionStates?.[variantId] ||
-      getDefaultContactFormSectionData();
-
-    const segments = path
-      .replace(/\[(\d+)\]/g, ".$1")
-      .split(".")
-      .filter(Boolean);
-
-    const newData: any = { ...currentData };
-    let cursor: any = newData;
-
-    for (let i = 0; i < segments.length - 1; i++) {
-      const key = segments[i]!;
-      const nextIsIndex = !Number.isNaN(Number(segments[i + 1]));
-      const existing = cursor[key];
-
-      if (
-        existing == null ||
-        typeof existing === "string" ||
-        typeof existing === "number" ||
-        typeof existing === "boolean"
-      ) {
-        cursor[key] = nextIsIndex ? [] : {};
-      } else if (Array.isArray(existing) && !nextIsIndex) {
-        cursor[key] = {};
-      } else if (
-        typeof existing === "object" &&
-        !Array.isArray(existing) &&
-        nextIsIndex
-      ) {
-        cursor[key] = [];
-      }
-      cursor = cursor[key];
-    }
-
-    const lastKey = segments[segments.length - 1]!;
-    cursor[lastKey] = value;
-
+  // Set data
+  setData: (
+    state: any,
+    variantId: string,
+    newData: ComponentData,
+  ): any => {
     return {
       contactFormSectionStates: {
         ...state.contactFormSectionStates,
@@ -294,24 +193,27 @@ export const contactFormSectionFunctions = {
     };
   },
 
-  // Update contact form section data
-  update: (
+  // Update title
+  updateTitle: (
     currentData: ComponentData,
-    updates: Partial<ComponentData>,
-  ): ComponentData => ({
-    ...currentData,
-    ...updates,
-  }),
-
-  // Add new social link
-  addSocialLink: (
-    currentData: ComponentData,
-    socialLink: any,
+    title: string,
   ): ComponentData => ({
     ...currentData,
     content: {
       ...currentData.content,
-      socialLinks: [...(currentData.content?.socialLinks || []), socialLink],
+      title,
+    },
+  }),
+
+  // Add social link
+  addSocialLink: (
+    currentData: ComponentData,
+    link: any,
+  ): ComponentData => ({
+    ...currentData,
+    content: {
+      ...currentData.content,
+      socialLinks: [...(currentData.content?.socialLinks || []), link],
     },
   }),
 
@@ -323,9 +225,7 @@ export const contactFormSectionFunctions = {
     ...currentData,
     content: {
       ...currentData.content,
-      socialLinks: (currentData.content?.socialLinks || []).filter(
-        (_, i) => i !== index,
-      ),
+      socialLinks: (currentData.content?.socialLinks || []).filter((_: any, i: number) => i !== index),
     },
   }),
 
@@ -338,7 +238,7 @@ export const contactFormSectionFunctions = {
     ...currentData,
     content: {
       ...currentData.content,
-      socialLinks: (currentData.content?.socialLinks || []).map((link, i) =>
+      socialLinks: (currentData.content?.socialLinks || []).map((link: any, i: number) =>
         i === index ? { ...link, ...updates } : link,
       ),
     },
@@ -347,19 +247,15 @@ export const contactFormSectionFunctions = {
   // Update form field
   updateFormField: (
     currentData: ComponentData,
-    fieldName: string,
+    fieldId: string,
     updates: any,
   ): ComponentData => ({
     ...currentData,
     form: {
       ...currentData.form,
-      fields: {
-        ...currentData.form?.fields,
-        [fieldName]: {
-          ...currentData.form?.fields?.[fieldName],
-          ...updates,
-        },
-      },
+      fields: (currentData.form?.fields || []).map((field: any) =>
+        field.id === fieldId ? { ...field, ...updates } : field,
+      ),
     },
   }),
 
@@ -378,107 +274,72 @@ export const contactFormSectionFunctions = {
     },
   }),
 
-  // Update title
-  updateTitle: (currentData: ComponentData, updates: any): ComponentData => ({
-    ...currentData,
-    content: {
-      ...currentData.content,
-      title: {
-        ...currentData.content?.title,
-        ...updates,
-      },
-    },
-  }),
-
-  // Update animations
-  updateAnimations: (
+  // Update layout
+  updateLayout: (
     currentData: ComponentData,
-    animations: any,
+    layout: any,
   ): ComponentData => ({
-    ...currentData,
-    animations: {
-      ...currentData.animations,
-      ...animations,
-    },
-  }),
-
-  // Update responsive settings
-  updateResponsive: (
-    currentData: ComponentData,
-    responsive: any,
-  ): ComponentData => ({
-    ...currentData,
-    responsive: {
-      ...currentData.responsive,
-      ...responsive,
-    },
-  }),
-
-  // Validate contact form data
-  validate: (data: ComponentData): { isValid: boolean; errors: string[] } => {
-    const errors: string[] = [];
-
-    if (!data.content?.title?.text) {
-      errors.push("Title is required");
-    }
-
-    if (!data.content?.socialLinks || data.content.socialLinks.length === 0) {
-      errors.push("At least one social link is required");
-    }
-
-    if (data.content?.socialLinks) {
-      data.content.socialLinks.forEach((link: any, index: number) => {
-        if (!link.href) {
-          errors.push(`Social link ${index + 1} is missing URL`);
-        }
-        if (!link.text) {
-          errors.push(`Social link ${index + 1} is missing display text`);
-        }
-        if (!link.alt) {
-          errors.push(`Social link ${index + 1} is missing platform type`);
-        }
-      });
-    }
-
-    if (!data.form?.submitButton?.text) {
-      errors.push("Submit button text is required");
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
-  },
-
-  // Get form field configuration
-  getFormFieldConfig: (data: ComponentData, fieldName: string) => {
-    return (
-      data.form?.fields?.[fieldName] || {
-        enabled: false,
-        placeholder: "",
-        required: false,
-        style: {
-          border: "border rounded-[6px]",
-          padding: "p-2",
-          outline: "outline-custom-secondarycolor",
-        },
-      }
-    );
-  },
-
-  // Get social link by platform
-  getSocialLinkByPlatform: (data: ComponentData, platform: string) => {
-    return data.content?.socialLinks?.find(
-      (link: any) => link.alt === platform,
-    );
-  },
-
-  // Update layout settings
-  updateLayout: (currentData: ComponentData, layout: any): ComponentData => ({
     ...currentData,
     layout: {
       ...currentData.layout,
       ...layout,
     },
   }),
+
+  // Update styling
+  updateStyling: (
+    currentData: ComponentData,
+    styling: any,
+  ): ComponentData => ({
+    ...currentData,
+    styling: {
+      ...currentData.styling,
+      ...styling,
+    },
+  }),
+
+  // Update data by path
+  updateByPath: (state: any, variantId: string, path: string, value: any) => {
+    const currentData = state.contactFormSectionStates?.[variantId] || getDefaultContactFormSectionData();
+    
+    // Create a deep copy and update the nested property
+    const newData = { ...currentData };
+    const pathParts = path.split('.');
+    let current = newData;
+    
+    for (let i = 0; i < pathParts.length - 1; i++) {
+      if (!current[pathParts[i]]) {
+        current[pathParts[i]] = {};
+      }
+      current = current[pathParts[i]];
+    }
+    
+    current[pathParts[pathParts.length - 1]] = value;
+
+    // Update pageComponentsByPage with the new data
+    const currentPage = state.currentPage || "homepage";
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+    
+    // Find and update the component in pageComponents
+    const updatedComponents = updatedPageComponents.map((comp: any) => {
+      if (comp.type === "contactFormSection" && comp.id === variantId) {
+        return {
+          ...comp,
+          data: newData,
+        };
+      }
+      return comp;
+    });
+
+    return {
+      contactFormSectionStates: {
+        ...state.contactFormSectionStates,
+        [variantId]: newData,
+      },
+      pageComponentsByPage: {
+        ...state.pageComponentsByPage,
+        [currentPage]: updatedComponents,
+      },
+    };
+  },
 };

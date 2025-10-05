@@ -209,6 +209,7 @@ export function EditorSidebar({
       // Use dynamic component initialization for all components
       // Use existing component data if available, otherwise use default data
       // For contactCards, check if cards exist in the data
+      // For contactFormSection, check if socialLinks exist in the data
       let dataToUse;
       if (selectedComponent.type === "contactCards") {
         // Check if cards exist in the data
@@ -220,6 +221,18 @@ export function EditorSidebar({
           dataToUse = selectedComponent.data;
         } else {
           // Use default data if no cards found
+          dataToUse = defaultData;
+        }
+      } else if (selectedComponent.type === "contactFormSection") {
+        // Check if socialLinks exist in the data
+        const hasSocialLinks = selectedComponent.data?.content?.socialLinks && 
+                               Array.isArray(selectedComponent.data.content.socialLinks) && 
+                               selectedComponent.data.content.socialLinks.length > 0;
+        
+        if (hasSocialLinks) {
+          dataToUse = selectedComponent.data;
+        } else {
+          // Use default data if no socialLinks found
           dataToUse = defaultData;
         }
       } else {
