@@ -397,7 +397,7 @@ export function ContentManagementPage() {
                 const IconComponent =
                   availableIcons[section.icon] || availableIcons["FileText"];
                 return (
-                  <Link href={section.path} key={section.id}>
+                  <Link href={`/dashboard${section.path}`} key={section.id}>
                     <Card
                       className={`h-full cursor-pointer transition-all hover:shadow-md ${
                         !section.status ? "opacity-70 border-dashed" : ""

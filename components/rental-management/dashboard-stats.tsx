@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { useRentalDashboardStore } from "@/context/store/rentalDashboard";
+import useAuthStore from "@/context/AuthContext";
 
 // مكون بطاقة الإحصائية
 interface StatCardProps {
@@ -1722,7 +1723,8 @@ export function RentalDashboardStats() {
       </div>
 
       {/* إحصائيات الصيانة */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* كود الصيانة مخفي ولكن موجود */}
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <StatCard
           title="طلبات الصيانة المفتوحة"
           value={counts.maintenance_open}
@@ -1742,7 +1744,7 @@ export function RentalDashboardStats() {
           onClick={openMaintenanceInProgressDialog}
           loading={loading}
         />
-      </div>
+      </div> */}
       {/* Dialogs */}
       <OngoingRentalsDialog />
       <ExpiringContractsDialog />
