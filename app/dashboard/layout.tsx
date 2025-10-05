@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
 import { GTMProvider } from "@/components/GTMProvider";
-import { GTMTest } from "@/components/GTMTest";
 
 /*
  * ========================================
@@ -90,8 +89,6 @@ export default function DashboardLayout({
     <GTMProvider containerId="GTM-KBL37C9T">
       <div dir="rtl" style={{ direction: "rtl" }}>
         {children}
-        {/* GTM Test Component - Remove in production */}
-        <GTMTest />
       </div>
     </GTMProvider>
   );
