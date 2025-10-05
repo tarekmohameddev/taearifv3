@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { ReCaptchaWrapper } from "@/components/ReCaptchaWrapper";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import Script from "next/script";
 
 export default async function RootLayout({
   children,
@@ -91,7 +92,9 @@ export default async function RootLayout({
       <head>
         {/* Google Tag Manager - فقط للصفحات المسموح بها وبدون subdomain */}
         {shouldLoadAnalytics && (
-          <script
+          <Script
+            id="gtm-script"
+            strategy="afterInteractive"
             dangerouslySetInnerHTML={{
               __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
               new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -105,8 +108,9 @@ export default async function RootLayout({
 
         {/* Microsoft Clarity - فقط للصفحات المسموح بها وبدون subdomain */}
         {shouldLoadAnalytics && (
-          <script
-            type="text/javascript"
+          <Script
+            id="clarity-script"
+            strategy="afterInteractive"
             dangerouslySetInnerHTML={{
               __html: `
                 (function(c,l,a,r,i,t,y){
@@ -122,12 +126,14 @@ export default async function RootLayout({
       <body>
         {/* Google Tag Manager (noscript) - فقط للصفحات المسموح بها وبدون subdomain */}
         {shouldLoadAnalytics && (
-          <noscript
-            dangerouslySetInnerHTML={{
-              __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KBL37C9T"
-              height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
-            }}
-          />
+          <noscript>
+            <iframe
+              src="https://www.googletagmanager.com/ns.html?id=GTM-KBL37C9T"
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
         )}
         {/* End Google Tag Manager (noscript) */}
 

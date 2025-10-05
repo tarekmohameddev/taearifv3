@@ -547,6 +547,7 @@ export function translateLabel(label: string, t: (key: string) => string): strin
     "Title Font": "components_structure.half_text_half_image_specific.title_font",
     "Description Font": "components_structure.half_text_half_image_specific.description_font",
     "Image": "components_structure.half_text_half_image_specific.image",
+    "Image Settings": "components_structure.half_text_half_image_specific.image_settings",
     "Image Source": "components_structure.half_text_half_image_specific.image_source",
     "Alt Text": "components_structure.half_text_half_image_specific.alt_text",
     "Image Style": "components_structure.half_text_half_image_specific.image_style",
