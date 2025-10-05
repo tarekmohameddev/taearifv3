@@ -26,6 +26,7 @@ const useStore = create((set, get) => {
     ...require("./store/sidebar")(set, get),
     ...require("./store/rentalManagement")(set, get),
     ...require("./store/purchaseManagement")(set, get),
+    ...require("./store/marketingDashboard")(set, get),
     ...require("./store/userAuth")(set),
   };
 });

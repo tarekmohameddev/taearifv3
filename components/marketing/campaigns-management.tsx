@@ -1,7 +1,6 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useMarketingDashboardStore } from "@/context/store/marketingDashboard";
+import { useState } from "react"
 import {
   Plus,
   BarChart3,
@@ -17,16 +16,10 @@ import {
   TrendingUp,
   Eye,
   Copy,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
   DialogContent,
@@ -34,76 +27,51 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Progress } from "@/components/ui/progress"
 
 interface Campaign {
-  id: string;
-  name: string;
-  description: string;
-  status: "draft" | "scheduled" | "running" | "paused" | "completed" | "failed";
-  type: "broadcast" | "drip" | "triggered";
+  id: string
+  name: string
+  description: string
+  status: "draft" | "scheduled" | "running" | "paused" | "completed" | "failed"
+  type: "broadcast" | "drip" | "triggered"
   audience: {
-    total: number;
-    segments: string[];
-  };
+    total: number
+    segments: string[]
+  }
   message: {
-    content: string;
-    mediaUrl?: string;
-    mediaType?: "image" | "video" | "document";
-  };
+    content: string
+    mediaUrl?: string
+    mediaType?: "image" | "video" | "document"
+  }
   schedule: {
-    startDate: string;
-    endDate?: string;
-    sendTime?: string;
-    timezone: string;
-  };
+    startDate: string
+    endDate?: string
+    sendTime?: string
+    timezone: string
+  }
   performance: {
-    sent: number;
-    delivered: number;
-    read: number;
-    replied: number;
-    failed: number;
-  };
-  createdAt: string;
-  createdBy: string;
-  phoneNumber: string;
-  estimatedCost: number;
+    sent: number
+    delivered: number
+    read: number
+    replied: number
+    failed: number
+  }
+  createdAt: string
+  createdBy: string
+  phoneNumber: string
+  estimatedCost: number
 }
 
 export function CampaignsManagement() {
-  // استخدام الـ store
-  const {
-    campaigns,
-    loading,
-    error,
-    createCampaign,
-    updateCampaign,
-    deleteCampaign,
-    isCreateCampaignDialogOpen,
-    isEditCampaignDialogOpen,
-    selectedCampaign,
-    openCreateCampaignDialog,
-    closeCreateCampaignDialog,
-    openEditCampaignDialog,
-    closeEditCampaignDialog,
-    setSelectedCampaign,
-  } = useMarketingDashboardStore();
-
-  // البيانات المحلية للحوارات (للحوارات فقط)
-  const [localCampaigns, setLocalCampaigns] = useState<Campaign[]>([
+  const [campaigns, setCampaigns] = useState<Campaign[]>([
     {
       id: "1",
       name: "حملة العروض الشتوية",
@@ -115,8 +83,7 @@ export function CampaignsManagement() {
         segments: ["عملاء مميزون", "مشتركون في النشرة"],
       },
       message: {
-        content:
-          "عروض شتوية مميزة! خصم يصل إلى 50% على جميع المنتجات. العرض محدود حتى نهاية الشهر.",
+        content: "عروض شتوية مميزة! خصم يصل إلى 50% على جميع المنتجات. العرض محدود حتى نهاية الشهر.",
         mediaUrl: "/winter-sale-banner.jpg",
         mediaType: "image",
       },
@@ -149,8 +116,7 @@ export function CampaignsManagement() {
         segments: ["عملاء لديهم مواعيد"],
       },
       message: {
-        content:
-          "تذكير: لديك موعد غداً في {appointment_time}. يرجى التأكيد أو إعادة الجدولة.",
+        content: "تذكير: لديك موعد غداً في {appointment_time}. يرجى التأكيد أو إعادة الجدولة.",
       },
       schedule: {
         startDate: "2024-01-01",
@@ -180,8 +146,7 @@ export function CampaignsManagement() {
         segments: ["عملاء جدد"],
       },
       message: {
-        content:
-          "مرحباً بك في عائلتنا! نحن سعداء لانضمامك إلينا. استمتع بخصم 20% على أول طلب.",
+        content: "مرحباً بك في عائلتنا! نحن سعداء لانضمامك إلينا. استمتع بخصم 20% على أول طلب.",
       },
       schedule: {
         startDate: "2024-01-25",
@@ -200,10 +165,11 @@ export function CampaignsManagement() {
       phoneNumber: "+966501234567",
       estimatedCost: 0,
     },
-  ]);
+  ])
 
-  // استخدام متغيرات الـ store بدلاً من المحلية
-  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null)
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
 
   const [newCampaign, setNewCampaign] = useState({
     name: "",
@@ -215,127 +181,137 @@ export function CampaignsManagement() {
     scheduleType: "now" as "now" | "scheduled",
     startDate: "",
     startTime: "",
-  });
+  })
 
   const getStatusColor = (status: Campaign["status"]) => {
     switch (status) {
       case "draft":
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-100 text-gray-800 border-gray-200"
       case "scheduled":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-blue-100 text-blue-800 border-blue-200"
       case "running":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-100 text-green-800 border-green-200"
       case "paused":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200"
       case "completed":
-        return "bg-purple-100 text-purple-800 border-purple-200";
+        return "bg-purple-100 text-purple-800 border-purple-200"
       case "failed":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-red-100 text-red-800 border-red-200"
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-100 text-gray-800 border-gray-200"
     }
-  };
+  }
 
   const getStatusText = (status: Campaign["status"]) => {
     switch (status) {
       case "draft":
-        return "مسودة";
+        return "مسودة"
       case "scheduled":
-        return "مجدولة";
+        return "مجدولة"
       case "running":
-        return "قيد التشغيل";
+        return "قيد التشغيل"
       case "paused":
-        return "متوقفة";
+        return "متوقفة"
       case "completed":
-        return "مكتملة";
+        return "مكتملة"
       case "failed":
-        return "فشلت";
+        return "فشلت"
       default:
-        return "غير معروف";
+        return "غير معروف"
     }
-  };
+  }
 
   const getTypeText = (type: Campaign["type"]) => {
     switch (type) {
       case "broadcast":
-        return "بث جماعي";
+        return "بث جماعي"
       case "drip":
-        return "حملة متدرجة";
+        return "حملة متدرجة"
       case "triggered":
-        return "حملة تلقائية";
+        return "حملة تلقائية"
       default:
-        return "غير معروف";
+        return "غير معروف"
     }
-  };
+  }
 
-  const handleCreateCampaign = async () => {
-    try {
-      const campaignData = {
-        name: newCampaign.name,
-        description: newCampaign.description,
-        channel_type: newCampaign.type === "broadcast" ? "whatsapp" : "sms",
-        target_audience: newCampaign.audience === "all" ? "جميع العملاء" : "عملاء مختارون",
-        message_content: newCampaign.message,
-        scheduled_at: newCampaign.scheduleType === "now" ? null : newCampaign.startDate,
-        status: newCampaign.scheduleType === "now" ? "active" : "scheduled",
-      };
-
-      await createCampaign(campaignData);
-      
-      // إعادة تعيين النموذج
-      setNewCampaign({
-        name: "",
-        description: "",
-        type: "broadcast",
-        audience: "all",
-        message: "",
-        phoneNumber: "",
-        scheduleType: "now",
-        startDate: "",
-        startTime: "",
-      });
-      
-      closeCreateCampaignDialog();
-    } catch (error) {
-      console.error("خطأ في إنشاء الحملة:", error);
+  const handleCreateCampaign = () => {
+    const campaign: Campaign = {
+      id: Date.now().toString(),
+      name: newCampaign.name,
+      description: newCampaign.description,
+      status: newCampaign.scheduleType === "now" ? "running" : "scheduled",
+      type: newCampaign.type,
+      audience: {
+        total: newCampaign.audience === "all" ? 1500 : 750,
+        segments: newCampaign.audience === "all" ? ["جميع العملاء"] : ["عملاء مختارون"],
+      },
+      message: {
+        content: newCampaign.message,
+      },
+      schedule: {
+        startDate: newCampaign.startDate || new Date().toISOString().split("T")[0],
+        sendTime: newCampaign.startTime || "10:00",
+        timezone: "Asia/Riyadh",
+      },
+      performance: {
+        sent: 0,
+        delivered: 0,
+        read: 0,
+        replied: 0,
+        failed: 0,
+      },
+      createdAt: new Date().toISOString().split("T")[0],
+      createdBy: "المستخدم الحالي",
+      phoneNumber: newCampaign.phoneNumber,
+      estimatedCost: (newCampaign.audience === "all" ? 1500 : 750) * 0.05,
     }
-  };
 
-  const handleCampaignAction = async (
-    campaignId: string,
-    action: "play" | "pause" | "stop" | "delete",
-  ) => {
-    try {
-      if (action === "delete") {
-        await deleteCampaign(campaignId);
-      } else {
-        // تحديث حالة الحملة
-        const statusMap = {
-          play: "active",
-          pause: "paused", 
-          stop: "completed"
-        };
-        
-        await updateCampaign(campaignId, {
-          status: statusMap[action]
-        });
-      }
-    } catch (error) {
-      console.error("خطأ في معالجة الحملة:", error);
+    setCampaigns([campaign, ...campaigns])
+    setNewCampaign({
+      name: "",
+      description: "",
+      type: "broadcast",
+      message: "",
+      audience: "all",
+      phoneNumber: "",
+      scheduleType: "now",
+      startDate: "",
+      startTime: "",
+    })
+    setIsCreateDialogOpen(false)
+  }
+
+  const handleCampaignAction = (campaignId: string, action: "play" | "pause" | "stop" | "delete") => {
+    setCampaigns(
+      campaigns.map((campaign) => {
+        if (campaign.id === campaignId) {
+          switch (action) {
+            case "play":
+              return { ...campaign, status: "running" as Campaign["status"] }
+            case "pause":
+              return { ...campaign, status: "paused" as Campaign["status"] }
+            case "stop":
+              return { ...campaign, status: "completed" as Campaign["status"] }
+            default:
+              return campaign
+          }
+        }
+        return campaign
+      }),
+    )
+
+    if (action === "delete") {
+      setCampaigns(campaigns.filter((campaign) => campaign.id !== campaignId))
     }
-  };
+  }
 
   const calculateDeliveryRate = (campaign: Campaign) => {
-    return campaign.performance.sent > 0
-      ? (campaign.performance.delivered / campaign.performance.sent) * 100
-      : 0;
-  };
+    return campaign.performance.sent > 0 ? (campaign.performance.delivered / campaign.performance.sent) * 100 : 0
+  }
 
   const calculateReadRate = (campaign: Campaign) => {
-    return campaign.performance.delivered > 0
-      ? (campaign.performance.read / campaign.performance.delivered) * 100
-      : 0;
-  };
+    return campaign.performance.delivered > 0 ? (campaign.performance.read / campaign.performance.delivered) * 100 : 0
+  }
 
   return (
     <div className="space-y-6">
@@ -346,12 +322,10 @@ export function CampaignsManagement() {
             <BarChart3 className="h-5 w-5 ml-2 text-primary" />
             إدارة الحملات
           </h2>
-          <p className="text-sm text-muted-foreground">
-            إنشاء وإدارة حملات التسويق عبر الواتساب
-          </p>
+          <p className="text-sm text-muted-foreground">إنشاء وإدارة حملات التسويق عبر الواتساب</p>
         </div>
 
-        <Dialog open={isCreateCampaignDialogOpen} onOpenChange={closeCreateCampaignDialog}>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
@@ -361,9 +335,7 @@ export function CampaignsManagement() {
           <DialogContent className="sm:max-w-lg" dir="rtl">
             <DialogHeader>
               <DialogTitle>إنشاء حملة تسويقية جديدة</DialogTitle>
-              <DialogDescription>
-                املأ البيانات التالية لإنشاء حملة تسويقية
-              </DialogDescription>
+              <DialogDescription>املأ البيانات التالية لإنشاء حملة تسويقية</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -371,9 +343,7 @@ export function CampaignsManagement() {
                 <Input
                   id="campaignName"
                   value={newCampaign.name}
-                  onChange={(e) =>
-                    setNewCampaign({ ...newCampaign, name: e.target.value })
-                  }
+                  onChange={(e) => setNewCampaign({ ...newCampaign, name: e.target.value })}
                   placeholder="مثل: حملة العروض الصيفية"
                 />
               </div>
@@ -383,12 +353,7 @@ export function CampaignsManagement() {
                 <Textarea
                   id="campaignDescription"
                   value={newCampaign.description}
-                  onChange={(e) =>
-                    setNewCampaign({
-                      ...newCampaign,
-                      description: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setNewCampaign({ ...newCampaign, description: e.target.value })}
                   placeholder="وصف مختصر للحملة وأهدافها"
                   rows={2}
                 />
@@ -399,9 +364,7 @@ export function CampaignsManagement() {
                   <Label htmlFor="campaignType">نوع الحملة</Label>
                   <Select
                     value={newCampaign.type}
-                    onValueChange={(value: Campaign["type"]) =>
-                      setNewCampaign({ ...newCampaign, type: value })
-                    }
+                    onValueChange={(value: Campaign["type"]) => setNewCampaign({ ...newCampaign, type: value })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -418,22 +381,16 @@ export function CampaignsManagement() {
                   <Label htmlFor="audience">الجمهور المستهدف</Label>
                   <Select
                     value={newCampaign.audience}
-                    onValueChange={(value) =>
-                      setNewCampaign({ ...newCampaign, audience: value })
-                    }
+                    onValueChange={(value) => setNewCampaign({ ...newCampaign, audience: value })}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">جميع العملاء (1,500)</SelectItem>
-                      <SelectItem value="vip">
-                        العملاء المميزون (750)
-                      </SelectItem>
+                      <SelectItem value="vip">العملاء المميزون (750)</SelectItem>
                       <SelectItem value="new">العملاء الجدد (300)</SelectItem>
-                      <SelectItem value="inactive">
-                        العملاء غير النشطين (450)
-                      </SelectItem>
+                      <SelectItem value="inactive">العملاء غير النشطين (450)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -443,20 +400,14 @@ export function CampaignsManagement() {
                 <Label htmlFor="phoneNumber">رقم الواتساب</Label>
                 <Select
                   value={newCampaign.phoneNumber}
-                  onValueChange={(value) =>
-                    setNewCampaign({ ...newCampaign, phoneNumber: value })
-                  }
+                  onValueChange={(value) => setNewCampaign({ ...newCampaign, phoneNumber: value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="اختر رقم الواتساب" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="+966501234567">
-                      +966501234567 - الرقم الرئيسي
-                    </SelectItem>
-                    <SelectItem value="+966559876543">
-                      +966559876543 - خدمة العملاء
-                    </SelectItem>
+                    <SelectItem value="+966501234567">+966501234567 - الرقم الرئيسي</SelectItem>
+                    <SelectItem value="+966559876543">+966559876543 - خدمة العملاء</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -466,15 +417,12 @@ export function CampaignsManagement() {
                 <Textarea
                   id="message"
                   value={newCampaign.message}
-                  onChange={(e) =>
-                    setNewCampaign({ ...newCampaign, message: e.target.value })
-                  }
+                  onChange={(e) => setNewCampaign({ ...newCampaign, message: e.target.value })}
                   placeholder="اكتب نص الرسالة هنا..."
                   rows={4}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  يمكنك استخدام متغيرات مثل {"{customer_name}"} و{" "}
-                  {"{company_name}"}
+                  يمكنك استخدام متغيرات مثل {"{customer_name}"} و {"{company_name}"}
                 </p>
               </div>
 
@@ -489,10 +437,7 @@ export function CampaignsManagement() {
                       value="now"
                       checked={newCampaign.scheduleType === "now"}
                       onChange={(e) =>
-                        setNewCampaign({
-                          ...newCampaign,
-                          scheduleType: e.target.value as "now" | "scheduled",
-                        })
+                        setNewCampaign({ ...newCampaign, scheduleType: e.target.value as "now" | "scheduled" })
                       }
                     />
                     <Label htmlFor="sendNow">إرسال فوري</Label>
@@ -505,10 +450,7 @@ export function CampaignsManagement() {
                       value="scheduled"
                       checked={newCampaign.scheduleType === "scheduled"}
                       onChange={(e) =>
-                        setNewCampaign({
-                          ...newCampaign,
-                          scheduleType: e.target.value as "now" | "scheduled",
-                        })
+                        setNewCampaign({ ...newCampaign, scheduleType: e.target.value as "now" | "scheduled" })
                       }
                     />
                     <Label htmlFor="sendScheduled">جدولة الإرسال</Label>
@@ -523,12 +465,7 @@ export function CampaignsManagement() {
                         id="startDate"
                         type="date"
                         value={newCampaign.startDate}
-                        onChange={(e) =>
-                          setNewCampaign({
-                            ...newCampaign,
-                            startDate: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setNewCampaign({ ...newCampaign, startDate: e.target.value })}
                       />
                     </div>
                     <div>
@@ -537,12 +474,7 @@ export function CampaignsManagement() {
                         id="startTime"
                         type="time"
                         value={newCampaign.startTime}
-                        onChange={(e) =>
-                          setNewCampaign({
-                            ...newCampaign,
-                            startTime: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setNewCampaign({ ...newCampaign, startTime: e.target.value })}
                       />
                     </div>
                   </div>
@@ -552,30 +484,19 @@ export function CampaignsManagement() {
               <Alert>
                 <Target className="h-4 w-4" />
                 <AlertDescription>
-                  التكلفة المتوقعة:{" "}
-                  {(
-                    (newCampaign.audience === "all" ? 1500 : 750) * 0.05
-                  ).toFixed(2)}{" "}
-                  ر.س
+                  التكلفة المتوقعة: {((newCampaign.audience === "all" ? 1500 : 750) * 0.05).toFixed(2)} ر.س
                 </AlertDescription>
               </Alert>
 
               <div className="flex gap-2 pt-4">
                 <Button
                   onClick={handleCreateCampaign}
-                  disabled={
-                    !newCampaign.name ||
-                    !newCampaign.message ||
-                    !newCampaign.phoneNumber
-                  }
+                  disabled={!newCampaign.name || !newCampaign.message || !newCampaign.phoneNumber}
                   className="flex-1"
                 >
                   إنشاء الحملة
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => closeCreateCampaignDialog()}
-                >
+                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                   إلغاء
                 </Button>
               </div>
@@ -604,7 +525,7 @@ export function CampaignsManagement() {
               <div>
                 <p className="text-sm text-muted-foreground">قيد التشغيل</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {campaigns.filter((c: any) => c.status === "running").length}
+                  {campaigns.filter((c) => c.status === "running").length}
                 </p>
               </div>
               <Play className="h-8 w-8 text-green-600" />
@@ -618,7 +539,7 @@ export function CampaignsManagement() {
               <div>
                 <p className="text-sm text-muted-foreground">مجدولة</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {campaigns.filter((c: any) => c.status === "scheduled").length}
+                  {campaigns.filter((c) => c.status === "scheduled").length}
                 </p>
               </div>
               <Clock className="h-8 w-8 text-blue-600" />
@@ -632,7 +553,7 @@ export function CampaignsManagement() {
               <div>
                 <p className="text-sm text-muted-foreground">مكتملة</p>
                 <p className="text-2xl font-bold text-purple-600">
-                  {campaigns.filter((c: any) => c.status === "completed").length}
+                  {campaigns.filter((c) => c.status === "completed").length}
                 </p>
               </div>
               <TrendingUp className="h-8 w-8 text-purple-600" />
@@ -643,40 +564,27 @@ export function CampaignsManagement() {
 
       {/* Campaigns List */}
       <div className="space-y-4">
-        {campaigns.map((campaign: any) => (
+        {campaigns.map((campaign) => (
           <Card key={campaign.id}>
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <CardTitle className="text-lg">{campaign.name}</CardTitle>
-                    <Badge className={getStatusColor(campaign.status)}>
-                      {getStatusText(campaign.status)}
-                    </Badge>
-                    <Badge variant="outline">
-                      {getTypeText(campaign.type)}
-                    </Badge>
+                    <Badge className={getStatusColor(campaign.status)}>{getStatusText(campaign.status)}</Badge>
+                    <Badge variant="outline">{getTypeText(campaign.type)}</Badge>
                   </div>
                   <CardDescription>{campaign.description}</CardDescription>
                 </div>
 
                 <div className="flex items-center gap-2">
                   {campaign.status === "running" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleCampaignAction(campaign.id, "pause")}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => handleCampaignAction(campaign.id, "pause")}>
                       <Pause className="h-3 w-3" />
                     </Button>
                   )}
-                  {(campaign.status === "paused" ||
-                    campaign.status === "scheduled") && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleCampaignAction(campaign.id, "play")}
-                    >
+                  {(campaign.status === "paused" || campaign.status === "scheduled") && (
+                    <Button variant="outline" size="sm" onClick={() => handleCampaignAction(campaign.id, "play")}>
                       <Play className="h-3 w-3" />
                     </Button>
                   )}
@@ -684,8 +592,8 @@ export function CampaignsManagement() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      setSelectedCampaign(campaign);
-                      setIsDetailsDialogOpen(true);
+                      setSelectedCampaign(campaign)
+                      setIsDetailsDialogOpen(true)
                     }}
                   >
                     <Eye className="h-3 w-3" />
@@ -710,49 +618,33 @@ export function CampaignsManagement() {
                 <div className="text-center p-3 bg-blue-50 rounded-lg">
                   <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
                     <Users className="h-4 w-4" />
-                    <span className="font-semibold">
-                      {campaign.audience.total.toLocaleString()}
-                    </span>
+                    <span className="font-semibold">{campaign.audience.total.toLocaleString()}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    جمهور مستهدف
-                  </span>
+                  <span className="text-xs text-muted-foreground">جمهور مستهدف</span>
                 </div>
 
                 <div className="text-center p-3 bg-green-50 rounded-lg">
                   <div className="flex items-center justify-center gap-1 text-green-600 mb-1">
                     <MessageSquare className="h-4 w-4" />
-                    <span className="font-semibold">
-                      {campaign.performance.sent.toLocaleString()}
-                    </span>
+                    <span className="font-semibold">{campaign.performance.sent.toLocaleString()}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    رسائل مُرسلة
-                  </span>
+                  <span className="text-xs text-muted-foreground">رسائل مُرسلة</span>
                 </div>
 
                 <div className="text-center p-3 bg-purple-50 rounded-lg">
                   <div className="flex items-center justify-center gap-1 text-purple-600 mb-1">
                     <TrendingUp className="h-4 w-4" />
-                    <span className="font-semibold">
-                      {calculateDeliveryRate(campaign).toFixed(1)}%
-                    </span>
+                    <span className="font-semibold">{calculateDeliveryRate(campaign).toFixed(1)}%</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    معدل التسليم
-                  </span>
+                  <span className="text-xs text-muted-foreground">معدل التسليم</span>
                 </div>
 
                 <div className="text-center p-3 bg-orange-50 rounded-lg">
                   <div className="flex items-center justify-center gap-1 text-orange-600 mb-1">
                     <Eye className="h-4 w-4" />
-                    <span className="font-semibold">
-                      {calculateReadRate(campaign).toFixed(1)}%
-                    </span>
+                    <span className="font-semibold">{calculateReadRate(campaign).toFixed(1)}%</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    معدل القراءة
-                  </span>
+                  <span className="text-xs text-muted-foreground">معدل القراءة</span>
                 </div>
               </div>
 
@@ -767,9 +659,7 @@ export function CampaignsManagement() {
                     {campaign.createdBy}
                   </span>
                 </div>
-                <span className="font-medium">
-                  التكلفة: {campaign.estimatedCost.toFixed(2)} ر.س
-                </span>
+                <span className="font-medium">التكلفة: {campaign.estimatedCost.toFixed(2)} ر.س</span>
               </div>
             </CardContent>
           </Card>
@@ -788,9 +678,7 @@ export function CampaignsManagement() {
                     {getStatusText(selectedCampaign.status)}
                   </Badge>
                 </DialogTitle>
-                <DialogDescription>
-                  {selectedCampaign.description}
-                </DialogDescription>
+                <DialogDescription>{selectedCampaign.description}</DialogDescription>
               </DialogHeader>
 
               <Tabs defaultValue="overview" className="space-y-4">
@@ -804,52 +692,34 @@ export function CampaignsManagement() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium">نوع الحملة</Label>
-                      <p className="text-sm text-muted-foreground">
-                        {getTypeText(selectedCampaign.type)}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{getTypeText(selectedCampaign.type)}</p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">
-                        رقم الواتساب
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedCampaign.phoneNumber}
-                      </p>
+                      <Label className="text-sm font-medium">رقم الواتساب</Label>
+                      <p className="text-sm text-muted-foreground">{selectedCampaign.phoneNumber}</p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">تاريخ البدء</Label>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedCampaign.schedule.startDate}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{selectedCampaign.schedule.startDate}</p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">وقت الإرسال</Label>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedCampaign.schedule.sendTime}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{selectedCampaign.schedule.sendTime}</p>
                     </div>
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium">
-                      الجمهور المستهدف
-                    </Label>
+                    <Label className="text-sm font-medium">الجمهور المستهدف</Label>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-sm text-muted-foreground">
                         {selectedCampaign.audience.total.toLocaleString()} شخص
                       </span>
                       <div className="flex gap-1">
-                        {selectedCampaign.audience.segments.map(
-                          (segment: any, index: number) => (
-                            <Badge
-                              key={index}
-                              variant="outline"
-                              className="text-xs"
-                            >
-                              {segment}
-                            </Badge>
-                          ),
-                        )}
+                        {selectedCampaign.audience.segments.map((segment, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {segment}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -863,16 +733,10 @@ export function CampaignsManagement() {
                           <div className="text-2xl font-bold text-green-600">
                             {selectedCampaign.performance.delivered}
                           </div>
-                          <p className="text-sm text-muted-foreground">
-                            رسائل مُسلمة
-                          </p>
-                          <Progress
-                            value={calculateDeliveryRate(selectedCampaign)}
-                            className="mt-2 h-2"
-                          />
+                          <p className="text-sm text-muted-foreground">رسائل مُسلمة</p>
+                          <Progress value={calculateDeliveryRate(selectedCampaign)} className="mt-2 h-2" />
                           <p className="text-xs text-muted-foreground mt-1">
-                            {calculateDeliveryRate(selectedCampaign).toFixed(1)}
-                            % معدل التسليم
+                            {calculateDeliveryRate(selectedCampaign).toFixed(1)}% معدل التسليم
                           </p>
                         </div>
                       </CardContent>
@@ -881,19 +745,11 @@ export function CampaignsManagement() {
                     <Card>
                       <CardContent className="p-4">
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-blue-600">
-                            {selectedCampaign.performance.read}
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            رسائل مقروءة
-                          </p>
-                          <Progress
-                            value={calculateReadRate(selectedCampaign)}
-                            className="mt-2 h-2"
-                          />
+                          <div className="text-2xl font-bold text-blue-600">{selectedCampaign.performance.read}</div>
+                          <p className="text-sm text-muted-foreground">رسائل مقروءة</p>
+                          <Progress value={calculateReadRate(selectedCampaign)} className="mt-2 h-2" />
                           <p className="text-xs text-muted-foreground mt-1">
-                            {calculateReadRate(selectedCampaign).toFixed(1)}%
-                            معدل القراءة
+                            {calculateReadRate(selectedCampaign).toFixed(1)}% معدل القراءة
                           </p>
                         </div>
                       </CardContent>
@@ -908,9 +764,7 @@ export function CampaignsManagement() {
                       <p className="text-xs text-muted-foreground">ردود</p>
                     </div>
                     <div className="p-3 bg-red-50 rounded-lg">
-                      <div className="text-lg font-semibold text-red-600">
-                        {selectedCampaign.performance.failed}
-                      </div>
+                      <div className="text-lg font-semibold text-red-600">{selectedCampaign.performance.failed}</div>
                       <p className="text-xs text-muted-foreground">فشل</p>
                     </div>
                     <div className="p-3 bg-green-50 rounded-lg">
@@ -926,15 +780,9 @@ export function CampaignsManagement() {
                   <div>
                     <Label className="text-sm font-medium">نص الرسالة</Label>
                     <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm whitespace-pre-wrap">
-                        {selectedCampaign.message.content}
-                      </p>
+                      <p className="text-sm whitespace-pre-wrap">{selectedCampaign.message.content}</p>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="mt-2 bg-transparent"
-                    >
+                    <Button variant="outline" size="sm" className="mt-2 bg-transparent">
                       <Copy className="h-3 w-3 ml-1" />
                       نسخ النص
                     </Button>
@@ -945,10 +793,7 @@ export function CampaignsManagement() {
                       <Label className="text-sm font-medium">المرفقات</Label>
                       <div className="mt-2 p-3 border rounded-lg">
                         <img
-                          src={
-                            selectedCampaign.message.mediaUrl ||
-                            "/placeholder.svg"
-                          }
+                          src={selectedCampaign.message.mediaUrl || "/placeholder.svg"}
                           alt="Campaign media"
                           className="max-w-full h-auto rounded"
                         />
@@ -967,13 +812,9 @@ export function CampaignsManagement() {
         <Card className="text-center py-12">
           <CardContent>
             <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              لا توجد حملات تسويقية
-            </h3>
-            <p className="text-muted-foreground mb-4">
-              ابدأ بإنشاء حملتك التسويقية الأولى
-            </p>
-            <Button onClick={() => openCreateCampaignDialog()}>
+            <h3 className="text-lg font-semibold mb-2">لا توجد حملات تسويقية</h3>
+            <p className="text-muted-foreground mb-4">ابدأ بإنشاء حملتك التسويقية الأولى</p>
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="h-4 w-4 ml-2" />
               إنشاء حملة جديدة
             </Button>
@@ -981,5 +822,5 @@ export function CampaignsManagement() {
         </Card>
       )}
     </div>
-  );
+  )
 }

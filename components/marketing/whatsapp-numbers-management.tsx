@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useMarketingDashboardStore } from "@/context/store/marketingDashboard";
+import { useState, useEffect } from "react"
+import useStore from "@/context/Store"
 import {
   Plus,
   Phone,
@@ -15,16 +15,10 @@ import {
   Users,
   Calendar,
   Activity,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
   DialogContent,
@@ -32,142 +26,145 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { WhatsappIcon } from "@/components/icons";
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { WhatsappIcon } from "@/components/icons"
 
 interface WhatsAppNumber {
-  id: number;
-  user_id: number;
-  name: string;
-  description: string;
-  type: string;
-  number: string;
-  business_id: string;
-  phone_id: string;
-  access_token: string;
-  is_verified: boolean;
-  is_connected: boolean;
-  sent_messages_count: number;
-  received_messages_count: number;
-  additional_settings: any[];
-  created_at: string;
-  updated_at: string;
+  id: number
+  user_id: number
+  name: string
+  description: string
+  type: string
+  number: string
+  business_id: string
+  phone_id: string
+  access_token: string
+  is_verified: boolean
+  is_connected: boolean
+  sent_messages_count: number
+  received_messages_count: number
+  additional_settings: {
+    webhook_url: string
+    template_namespace: string
+  }
+  crm_integration_enabled: boolean
+  appointment_system_integration_enabled: boolean
+  integration_settings: any
+  created_at: string
+  updated_at: string
 }
 
 export function WhatsAppNumbersManagement() {
-  // استخدام الـ store الجديد
-  const {
-    whatsappNumbers,
-    connectedNumbers,
-    verifiedNumbers,
-    loading,
-    error,
-    fetchWhatsAppNumbers,
-    addWhatsAppNumber,
-    deleteWhatsAppNumber,
-  } = useMarketingDashboardStore();
+  const { marketingChannels, fetchMarketingChannels, createMarketingChannel, deleteMarketingChannel } = useStore()
+  const [numbers, setNumbers] = useState<WhatsAppNumber[]>([])
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [newNumber, setNewNumber] = useState({
-    phoneNumber: "",
-    displayName: "",
+    name: "",
     description: "",
-  });
-  const [isConnecting, setIsConnecting] = useState(false);
+    number: "",
+    business_id: "",
+    phone_id: "",
+    access_token: "",
+    webhook_url: "",
+    template_namespace: "",
+  })
+  const [isConnecting, setIsConnecting] = useState(false)
 
+  // جلب البيانات عند تحميل المكون
   useEffect(() => {
-    fetchWhatsAppNumbers();
-  }, [fetchWhatsAppNumbers]);
+    fetchMarketingChannels()
+  }, []) // إزالة fetchMarketingChannels من dependency array
+
+  // تحديث الأرقام عند تغيير البيانات في الـ store
+  useEffect(() => {
+    setNumbers(marketingChannels.channels)
+  }, [marketingChannels.channels])
 
   const handleAddNumber = async () => {
+    setIsConnecting(true)
+
     try {
-      setIsConnecting(true);
+      const channelData = {
+        name: newNumber.name,
+        description: newNumber.description,
+        type: "whatsapp",
+        number: newNumber.number,
+        business_id: newNumber.business_id,
+        phone_id: newNumber.phone_id,
+        access_token: newNumber.access_token,
+        additional_settings: {
+          webhook_url: newNumber.webhook_url,
+          template_namespace: newNumber.template_namespace,
+        },
+      }
+
+      const result = await createMarketingChannel(channelData)
       
-      await addWhatsAppNumber({
-        phone_number: newNumber.phoneNumber,
-        display_name: newNumber.displayName,
-        business_name: newNumber.description,
-      });
-      
-      // إعادة تعيين النموذج
-      setNewNumber({
-        phoneNumber: "",
-        displayName: "",
-        description: "",
-      });
-      
-      setIsAddDialogOpen(false);
+      if (result.success) {
+        setNewNumber({
+          name: "",
+          description: "",
+          number: "",
+          business_id: "",
+          phone_id: "",
+          access_token: "",
+          webhook_url: "",
+          template_namespace: "",
+        })
+        setIsAddDialogOpen(false)
+      }
     } catch (error) {
-      console.error("خطأ في إضافة رقم WhatsApp:", error);
+      console.error("Error creating channel:", error)
     } finally {
-      setIsConnecting(false);
+      setIsConnecting(false)
     }
-  };
+  }
 
   const handleRemoveNumber = async (id: number) => {
     try {
-      await deleteWhatsAppNumber(id);
+      const result = await deleteMarketingChannel(id)
+      if (result.success) {
+        // القناة ستُحذف تلقائياً من القائمة في الـ store
+        console.log("تم حذف القناة بنجاح")
+      }
     } catch (error) {
-      console.error("خطأ في حذف رقم WhatsApp:", error);
+      console.error("Error deleting channel:", error)
     }
-  };
-
-  const getStatusColor = (number: WhatsAppNumber) => {
-    if (number.is_connected) {
-      return "bg-green-100 text-green-800 border-green-200";
-    } else {
-      return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getStatusIcon = (number: WhatsAppNumber) => {
-    if (number.is_connected) {
-      return <CheckCircle className="h-4 w-4" />;
-    } else {
-      return <XCircle className="h-4 w-4" />;
-    }
-  };
-
-  const getStatusText = (number: WhatsAppNumber) => {
-    if (number.is_connected) {
-      return "متصل";
-    } else {
-      return "غير متصل";
-    }
-  };
-
-  const getVerificationStatus = (number: WhatsAppNumber) => {
-    if (number.is_verified) {
-      return "verified";
-    } else {
-      return "pending";
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <span className="ml-2">جاري تحميل أرقام WhatsApp...</span>
-        </div>
-      </div>
-    );
   }
 
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </div>
-    );
+  const getStatusColor = (isConnected: boolean, isVerified: boolean) => {
+    if (isConnected && isVerified) {
+      return "bg-green-100 text-green-800 border-green-200"
+    } else if (isConnected && !isVerified) {
+      return "bg-yellow-100 text-yellow-800 border-yellow-200"
+    } else {
+      return "bg-red-100 text-red-800 border-red-200"
+    }
+  }
+
+  const getStatusIcon = (isConnected: boolean, isVerified: boolean) => {
+    if (isConnected && isVerified) {
+      return <CheckCircle className="h-4 w-4" />
+    } else if (isConnected && !isVerified) {
+      return <AlertCircle className="h-4 w-4" />
+    } else {
+      return <XCircle className="h-4 w-4" />
+    }
+  }
+
+  const getStatusText = (isConnected: boolean, isVerified: boolean) => {
+    if (isConnected && isVerified) {
+      return "متصل ومُحقق"
+    } else if (isConnected && !isVerified) {
+      return "متصل غير مُحقق"
+    } else {
+      return "غير متصل"
+    }
   }
 
   return (
@@ -179,9 +176,7 @@ export function WhatsAppNumbersManagement() {
             <WhatsappIcon className="h-5 w-5 ml-2 text-green-600" />
             أرقام الواتساب
           </h2>
-          <p className="text-sm text-muted-foreground">
-            إدارة أرقام الواتساب المتصلة مع Meta Cloud API
-          </p>
+          <p className="text-sm text-muted-foreground">إدارة أرقام الواتساب المتصلة مع Meta Cloud API</p>
         </div>
 
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -193,80 +188,107 @@ export function WhatsAppNumbersManagement() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-md" dir="rtl">
             <DialogHeader>
-              <DialogTitle>إضافة رقم واتساب جديد</DialogTitle>
-              <DialogDescription>
-                سيتم توجيهك إلى Meta Cloud API لربط رقم الواتساب
-              </DialogDescription>
+              <DialogTitle>إضافة قناة واتساب جديدة</DialogTitle>
+              <DialogDescription>أدخل تفاصيل قناة الواتساب الجديدة</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="phone">رقم الواتساب</Label>
+                <Label htmlFor="name">اسم القناة</Label>
                 <Input
-                  id="phone"
-                  placeholder="+966501234567"
-                  value={newNumber.phoneNumber}
-                  onChange={(e) =>
-                    setNewNumber({ ...newNumber, phoneNumber: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor="displayName">الاسم المعروض</Label>
-                <Input
-                  id="displayName"
+                  id="name"
                   placeholder="مثل: الرقم الرئيسي للشركة"
-                  value={newNumber.displayName}
-                  onChange={(e) =>
-                    setNewNumber({ ...newNumber, displayName: e.target.value })
-                  }
+                  value={newNumber.name}
+                  onChange={(e) => setNewNumber({ ...newNumber, name: e.target.value })}
                 />
               </div>
               <div>
-                <Label htmlFor="description">وصف (اختياري)</Label>
+                <Label htmlFor="description">وصف القناة</Label>
                 <Textarea
                   id="description"
-                  placeholder="وصف مختصر لاستخدام هذا الرقم"
+                  placeholder="وصف مختصر لاستخدام هذه القناة"
                   value={newNumber.description}
-                  onChange={(e) =>
-                    setNewNumber({ ...newNumber, description: e.target.value })
-                  }
+                  onChange={(e) => setNewNumber({ ...newNumber, description: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="number">رقم الواتساب</Label>
+                <Input
+                  id="number"
+                  placeholder="+966501234567"
+                  value={newNumber.number}
+                  onChange={(e) => setNewNumber({ ...newNumber, number: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="business_id">معرف الحساب التجاري</Label>
+                <Input
+                  id="business_id"
+                  placeholder="BA123456789"
+                  value={newNumber.business_id}
+                  onChange={(e) => setNewNumber({ ...newNumber, business_id: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone_id">معرف رقم الهاتف</Label>
+                <Input
+                  id="phone_id"
+                  placeholder="PN987654321"
+                  value={newNumber.phone_id}
+                  onChange={(e) => setNewNumber({ ...newNumber, phone_id: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="access_token">رمز الوصول</Label>
+                <Input
+                  id="access_token"
+                  placeholder="test_access_token_123"
+                  value={newNumber.access_token}
+                  onChange={(e) => setNewNumber({ ...newNumber, access_token: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="webhook_url">رابط الويب هوك</Label>
+                <Input
+                  id="webhook_url"
+                  placeholder="https://example.com/webhook"
+                  value={newNumber.webhook_url}
+                  onChange={(e) => setNewNumber({ ...newNumber, webhook_url: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="template_namespace">مساحة قوالب الرسائل</Label>
+                <Input
+                  id="template_namespace"
+                  placeholder="test_templates"
+                  value={newNumber.template_namespace}
+                  onChange={(e) => setNewNumber({ ...newNumber, template_namespace: e.target.value })}
                 />
               </div>
 
               <Alert>
-                <ExternalLink className="h-4 w-4" />
-                <AlertDescription>
-                  سيتم فتح نافذة Meta Cloud API لإكمال عملية الربط والتحقق من
-                  الرقم
-                </AlertDescription>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>تأكد من صحة جميع البيانات قبل إنشاء القناة. ستتم إضافة القناة الجديدة إلى قائمة قنوات الواتساب.</AlertDescription>
               </Alert>
 
               <div className="flex gap-2 pt-4">
                 <Button
                   onClick={handleAddNumber}
-                  disabled={
-                    !newNumber.phoneNumber ||
-                    !newNumber.displayName ||
-                    isConnecting
-                  }
+                  disabled={!newNumber.name || !newNumber.number || !newNumber.business_id || !newNumber.phone_id || !newNumber.access_token || isConnecting}
                   className="flex-1"
                 >
                   {isConnecting ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
-                      جاري الربط...
+                      جاري الإنشاء...
                     </>
                   ) : (
                     <>
-                      <ExternalLink className="h-4 w-4 ml-2" />
-                      ربط مع Meta API
+                      <Plus className="h-4 w-4 ml-2" />
+                      إنشاء قناة جديدة
                     </>
                   )}
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsAddDialogOpen(false)}
-                >
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                   إلغاء
                 </Button>
               </div>
@@ -275,9 +297,27 @@ export function WhatsAppNumbersManagement() {
         </Dialog>
       </div>
 
+      {/* Loading State */}
+      {marketingChannels.loading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+          <span className="mr-2">جاري تحميل البيانات...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {marketingChannels.error && (
+        <Alert className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>خطأ:</strong> {marketingChannels.error}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Numbers Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {whatsappNumbers.map((number: any) => (
+        {numbers.map((number) => (
           <Card key={number.id} className="relative">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
@@ -295,9 +335,9 @@ export function WhatsAppNumbersManagement() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Badge className={getStatusColor(number)}>
-                    {getStatusIcon(number)}
-                    <span className="mr-1">{getStatusText(number)}</span>
+                  <Badge className={getStatusColor(number.is_connected, number.is_verified)}>
+                    {getStatusIcon(number.is_connected, number.is_verified)}
+                    <span className="mr-1">{getStatusText(number.is_connected, number.is_verified)}</span>
                   </Badge>
                 </div>
               </div>
@@ -309,15 +349,13 @@ export function WhatsAppNumbersManagement() {
                 <div>
                   <span className="text-muted-foreground">حالة التحقق:</span>
                   <div className="flex items-center gap-1 mt-1">
-                    {getVerificationStatus(number) === "verified" ? (
+                    {number.is_verified ? (
                       <CheckCircle className="h-3 w-3 text-green-600" />
                     ) : (
-                      <AlertCircle className="h-3 w-3 text-yellow-600" />
+                      <XCircle className="h-3 w-3 text-red-600" />
                     )}
                     <span className="text-xs">
-                      {getVerificationStatus(number) === "verified"
-                        ? "مُحقق"
-                        : "في الانتظار"}
+                      {number.is_verified ? "مُحقق" : "غير مُحقق"}
                     </span>
                   </div>
                 </div>
@@ -326,9 +364,7 @@ export function WhatsAppNumbersManagement() {
                   <span className="text-muted-foreground">تاريخ الإضافة:</span>
                   <div className="flex items-center gap-1 mt-1">
                     <Calendar className="h-3 w-3" />
-                    <span className="text-xs">
-                      {new Date(number.created_at).toLocaleDateString()}
-                    </span>
+                    <span className="text-xs">{new Date(number.created_at).toLocaleDateString('ar-SA')}</span>
                   </div>
                 </div>
               </div>
@@ -338,25 +374,17 @@ export function WhatsAppNumbersManagement() {
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1 text-blue-600">
                     <MessageSquare className="h-4 w-4" />
-                    <span className="font-semibold">
-                      {number.sent_messages_count}
-                    </span>
+                    <span className="font-semibold">{number.sent_messages_count}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    رسائل مُرسلة
-                  </span>
+                  <span className="text-xs text-muted-foreground">رسائل مُرسلة</span>
                 </div>
 
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1 text-green-600">
                     <Users className="h-4 w-4" />
-                    <span className="font-semibold">
-                      {number.received_messages_count}
-                    </span>
+                    <span className="font-semibold">{number.received_messages_count}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    رسائل مُستقبلة
-                  </span>
+                  <span className="text-xs text-muted-foreground">رسائل مُستقبلة</span>
                 </div>
               </div>
 
@@ -364,27 +392,17 @@ export function WhatsAppNumbersManagement() {
               {number.business_id && (
                 <div className="text-xs text-muted-foreground space-y-1">
                   <div>Business Account ID: {number.business_id}</div>
-                  {number.phone_id && (
-                    <div>Phone Number ID: {number.phone_id}</div>
-                  )}
+                  {number.phone_id && <div>Phone Number ID: {number.phone_id}</div>}
                 </div>
               )}
 
               {/* Actions */}
               <div className="flex gap-2 pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 bg-transparent"
-                >
+                <Button variant="outline" size="sm" className="flex-1 bg-transparent">
                   <Edit className="h-3 w-3 ml-1" />
                   تعديل
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 bg-transparent"
-                >
+                <Button variant="outline" size="sm" className="flex-1 bg-transparent">
                   <Activity className="h-3 w-3 ml-1" />
                   الإحصائيات
                 </Button>
@@ -403,14 +421,12 @@ export function WhatsAppNumbersManagement() {
       </div>
 
       {/* Empty State */}
-      {whatsappNumbers.length === 0 && (
+      {!marketingChannels.loading && numbers.length === 0 && (
         <Card className="text-center py-12">
           <CardContent>
             <WhatsappIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">لا توجد أرقام واتساب</h3>
-            <p className="text-muted-foreground mb-4">
-              ابدأ بإضافة رقم واتساب الأول لبدء إرسال الرسائل
-            </p>
+            <p className="text-muted-foreground mb-4">ابدأ بإضافة رقم واتساب الأول لبدء إرسال الرسائل</p>
             <Button onClick={() => setIsAddDialogOpen(true)}>
               <Plus className="h-4 w-4 ml-2" />
               إضافة رقم واتساب
@@ -420,14 +436,13 @@ export function WhatsAppNumbersManagement() {
       )}
 
       {/* Info Alert */}
-      <Alert dir="rtl">
+      <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          <strong>ملاحظة:</strong> يتطلب ربط أرقام الواتساب حساب Meta Business
-          وموافقة على شروط استخدام WhatsApp Business API. تأكد من أن رقمك مُحقق
-          ومُعتمد من Meta قبل البدء في إرسال الرسائل.
+          <strong>ملاحظة:</strong> يتطلب ربط أرقام الواتساب حساب Meta Business وموافقة على شروط استخدام WhatsApp
+          Business API. تأكد من أن رقمك مُحقق ومُعتمد من Meta قبل البدء في إرسال الرسائل.
         </AlertDescription>
       </Alert>
     </div>
-  );
+  )
 }

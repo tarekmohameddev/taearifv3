@@ -7,6 +7,7 @@ const propertiesManagement = require("./propertiesManagement");
 const blogManagement = require("./blogManagement");
 const sidebar = require("./sidebar");
 const userAuth = require("./userAuth");
+const marketingDashboard = require("./marketingDashboard");
 
 const createStore = (set, get) => ({
   loading: false,
@@ -18,6 +19,7 @@ const createStore = (set, get) => ({
   ...blogManagement(set, get),
   ...sidebar(set, get),
   ...userAuth(set),
+  ...marketingDashboard(set, get),
 });
 
 module.exports = createStore;
