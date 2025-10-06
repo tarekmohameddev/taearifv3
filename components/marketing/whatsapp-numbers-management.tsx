@@ -56,6 +56,7 @@ interface WhatsAppNumber {
   crm_integration_enabled: boolean
   appointment_system_integration_enabled: boolean
   customers_page_integration_enabled: boolean
+  rental_page_integration_enabled: boolean
   integration_settings: any
   created_at: string
   updated_at: string
@@ -94,6 +95,7 @@ export function WhatsAppNumbersManagement() {
     crm_integration_enabled: false,
     appointment_system_integration_enabled: false,
     customers_page_integration_enabled: false,
+    rental_page_integration_enabled: false,
     integration_settings: {
       webhook_url: "",
       sync_frequency: "realtime",
@@ -239,6 +241,7 @@ export function WhatsAppNumbersManagement() {
       crm_integration_enabled: channel.crm_integration_enabled || false,
       appointment_system_integration_enabled: channel.appointment_system_integration_enabled || false,
       customers_page_integration_enabled: channel.customers_page_integration_enabled || false,
+      rental_page_integration_enabled: channel.rental_page_integration_enabled || false,
       integration_settings: {
         webhook_url: channel.integration_settings?.webhook_url || "",
         sync_frequency: channel.integration_settings?.sync_frequency || "realtime",
@@ -267,6 +270,7 @@ export function WhatsAppNumbersManagement() {
                   crm_integration_enabled: editFormData.crm_integration_enabled,
                   appointment_system_integration_enabled: editFormData.appointment_system_integration_enabled,
                   customers_page_integration_enabled: editFormData.customers_page_integration_enabled,
+                  rental_page_integration_enabled: editFormData.rental_page_integration_enabled,
                   integration_settings: editFormData.integration_settings
                 }
               : num
@@ -279,6 +283,7 @@ export function WhatsAppNumbersManagement() {
           crm_integration_enabled: false,
           appointment_system_integration_enabled: false,
           customers_page_integration_enabled: false,
+          rental_page_integration_enabled: false,
           integration_settings: {
             webhook_url: "",
             sync_frequency: "realtime",
@@ -303,6 +308,7 @@ export function WhatsAppNumbersManagement() {
       crm_integration_enabled: false,
       appointment_system_integration_enabled: false,
       customers_page_integration_enabled: false,
+      rental_page_integration_enabled: false,
       integration_settings: {
         webhook_url: "",
         sync_frequency: "realtime",
@@ -934,6 +940,25 @@ export function WhatsAppNumbersManagement() {
                     className="sr-only peer"
                     checked={editFormData.customers_page_integration_enabled}
                     onChange={(e) => setEditFormData(prev => ({ ...prev, customers_page_integration_enabled: e.target.checked }))}
+                  />
+                  <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                </label>
+              </div>
+            </div>
+
+            {/* Rental Page Integration */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h4 className="text-sm font-semibold text-gray-900">التكامل مع صفحة الإيجار</h4>
+                  <p className="text-xs text-gray-500">تفعيل تكامل نظام إدارة العقارات للإيجار</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={editFormData.rental_page_integration_enabled}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, rental_page_integration_enabled: e.target.checked }))}
                   />
                   <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
                 </label>
