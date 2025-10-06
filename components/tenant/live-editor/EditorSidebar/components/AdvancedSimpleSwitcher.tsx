@@ -334,7 +334,8 @@ export function AdvancedSimpleSwitcher({
       </div>
 
       {/* Component Info */}
-      <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
+              {/* مخفية فقط , ممكن استخدامها في المستقبل */}
+      {/* <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
         <div className="flex items-center space-x-2 text-sm">
           <span className="font-semibold text-green-800">{t("editor_sidebar.component")}:</span>
           <span className="font-mono bg-green-100 px-2 py-1 rounded text-green-700">
@@ -349,7 +350,7 @@ export function AdvancedSimpleSwitcher({
             {componentName}
           </span>
         </div>
-      </div>
+      </div> */}
 
       {/* Debug Info */}
       {process.env.NODE_ENV === "development" && (

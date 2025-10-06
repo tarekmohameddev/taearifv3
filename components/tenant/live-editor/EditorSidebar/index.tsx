@@ -740,7 +740,8 @@ export function EditorSidebar({
           {view === "edit-component" && selectedComponent && (
             <div className="space-y-8">
               {/* Theme Selector */}
-              <div className="group relative p-6 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 rounded-2xl border border-purple-200/50 shadow-lg hover:shadow-xl transition-all duration-300">
+              {/* مخفية فقط , ممكن استخدامها في المستقبل */}
+              {/* <div className="group relative p-6 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 rounded-2xl border border-purple-200/50 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative">
                   <div className="flex items-center justify-between mb-4">
@@ -786,7 +787,6 @@ export function EditorSidebar({
                       className="w-full"
                     />
 
-                    {/* Reset Button */}
                     <div className="pt-2 border-t border-purple-200/50">
                       <ResetConfirmDialog
                         componentType={selectedComponent.type}
@@ -801,7 +801,7 @@ export function EditorSidebar({
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               <div className="space-y-6">
                 <div className="flex items-center space-x-3">
