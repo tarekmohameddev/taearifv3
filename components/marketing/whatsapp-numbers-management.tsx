@@ -357,113 +357,148 @@ export function WhatsAppNumbersManagement() {
               إضافة رقم جديد
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md" dir="rtl">
-            <DialogHeader>
-              <DialogTitle>إضافة قناة واتساب جديدة</DialogTitle>
-              <DialogDescription>أدخل تفاصيل قناة الواتساب الجديدة</DialogDescription>
+          <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
+            <DialogHeader className="pb-4">
+              <DialogTitle className="text-lg sm:text-xl">إضافة قناة واتساب جديدة</DialogTitle>
+              <DialogDescription className="text-sm">أدخل تفاصيل قناة الواتساب الجديدة</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">اسم القناة</Label>
-                <Input
-                  id="name"
-                  placeholder="مثل: الرقم الرئيسي للشركة"
-                  value={newNumber.name}
-                  onChange={(e) => setNewNumber({ ...newNumber, name: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">وصف القناة</Label>
-                <Textarea
-                  id="description"
-                  placeholder="وصف مختصر لاستخدام هذه القناة"
-                  value={newNumber.description}
-                  onChange={(e) => setNewNumber({ ...newNumber, description: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="number">رقم الواتساب</Label>
-                <Input
-                  id="number"
-                  placeholder="+966501234567"
-                  value={newNumber.number}
-                  onChange={(e) => setNewNumber({ ...newNumber, number: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="business_id">معرف الحساب التجاري</Label>
-                <Input
-                  id="business_id"
-                  placeholder="BA123456789"
-                  value={newNumber.business_id}
-                  onChange={(e) => setNewNumber({ ...newNumber, business_id: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone_id">معرف رقم الهاتف</Label>
-                <Input
-                  id="phone_id"
-                  placeholder="PN987654321"
-                  value={newNumber.phone_id}
-                  onChange={(e) => setNewNumber({ ...newNumber, phone_id: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="access_token">رمز الوصول</Label>
-                <Input
-                  id="access_token"
-                  placeholder="test_access_token_123"
-                  value={newNumber.access_token}
-                  onChange={(e) => setNewNumber({ ...newNumber, access_token: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="webhook_url">رابط الويب هوك</Label>
-                <Input
-                  id="webhook_url"
-                  placeholder="https://example.com/webhook"
-                  value={newNumber.webhook_url}
-                  onChange={(e) => setNewNumber({ ...newNumber, webhook_url: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="template_namespace">مساحة قوالب الرسائل</Label>
-                <Input
-                  id="template_namespace"
-                  placeholder="test_templates"
-                  value={newNumber.template_namespace}
-                  onChange={(e) => setNewNumber({ ...newNumber, template_namespace: e.target.value })}
-                />
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+              {/* Basic Information Section */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name" className="text-sm font-medium">اسم القناة</Label>
+                    <Input
+                      id="name"
+                      placeholder="مثل: الرقم الرئيسي للشركة"
+                      value={newNumber.name}
+                      onChange={(e) => setNewNumber({ ...newNumber, name: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="number" className="text-sm font-medium">رقم الواتساب</Label>
+                    <Input
+                      id="number"
+                      placeholder="+966501234567"
+                      value={newNumber.number}
+                      onChange={(e) => setNewNumber({ ...newNumber, number: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="description" className="text-sm font-medium">وصف القناة</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="وصف مختصر لاستخدام هذه القناة"
+                    value={newNumber.description}
+                    onChange={(e) => setNewNumber({ ...newNumber, description: e.target.value })}
+                    className="mt-1 min-h-[80px]"
+                  />
+                </div>
               </div>
 
-              <Alert>
+              {/* Meta API Configuration Section */}
+              <div className="space-y-4 border-t pt-4">
+                <h4 className="text-sm font-semibold text-gray-700">إعدادات Meta API</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="business_id" className="text-sm font-medium">معرف الحساب التجاري</Label>
+                    <Input
+                      id="business_id"
+                      placeholder="BA123456789"
+                      value={newNumber.business_id}
+                      onChange={(e) => setNewNumber({ ...newNumber, business_id: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone_id" className="text-sm font-medium">معرف رقم الهاتف</Label>
+                    <Input
+                      id="phone_id"
+                      placeholder="PN987654321"
+                      value={newNumber.phone_id}
+                      onChange={(e) => setNewNumber({ ...newNumber, phone_id: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="access_token" className="text-sm font-medium">رمز الوصول</Label>
+                  <Input
+                    id="access_token"
+                    placeholder="test_access_token_123"
+                    value={newNumber.access_token}
+                    onChange={(e) => setNewNumber({ ...newNumber, access_token: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              {/* Advanced Settings Section */}
+              <div className="space-y-4 border-t pt-4">
+                <h4 className="text-sm font-semibold text-gray-700">الإعدادات المتقدمة</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="webhook_url" className="text-sm font-medium">رابط الويب هوك</Label>
+                    <Input
+                      id="webhook_url"
+                      placeholder="https://example.com/webhook"
+                      value={newNumber.webhook_url}
+                      onChange={(e) => setNewNumber({ ...newNumber, webhook_url: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="template_namespace" className="text-sm font-medium">مساحة قوالب الرسائل</Label>
+                    <Input
+                      id="template_namespace"
+                      placeholder="test_templates"
+                      value={newNumber.template_namespace}
+                      onChange={(e) => setNewNumber({ ...newNumber, template_namespace: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Alert className="mt-4">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>تأكد من صحة جميع البيانات قبل إنشاء القناة. ستتم إضافة القناة الجديدة إلى قائمة قنوات الواتساب.</AlertDescription>
+                <AlertDescription className="text-sm">
+                  تأكد من صحة جميع البيانات قبل إنشاء القناة. ستتم إضافة القناة الجديدة إلى قائمة قنوات الواتساب.
+                </AlertDescription>
               </Alert>
-
-              <div className="flex gap-2 pt-4">
-                <Button
-                  onClick={handleAddNumber}
-                  disabled={!newNumber.name || !newNumber.number || !newNumber.business_id || !newNumber.phone_id || !newNumber.access_token || isConnecting}
-                  className="flex-1"
-                >
-                  {isConnecting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
-                      جاري الإنشاء...
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="h-4 w-4 ml-2" />
-                      إنشاء قناة جديدة
-                    </>
-                  )}
-                </Button>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  إلغاء
-                </Button>
-              </div>
             </div>
+
+            <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-4 border-t">
+              <Button
+                onClick={handleAddNumber}
+                disabled={!newNumber.name || !newNumber.number || !newNumber.business_id || !newNumber.phone_id || !newNumber.access_token || isConnecting}
+                className="w-full sm:w-auto sm:flex-1 order-2 sm:order-1"
+              >
+                {isConnecting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                    جاري الإنشاء...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4 ml-2" />
+                    إنشاء قناة جديدة
+                  </>
+                )}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsAddDialogOpen(false)}
+                className="w-full sm:w-auto order-1 sm:order-2"
+              >
+                إلغاء
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
