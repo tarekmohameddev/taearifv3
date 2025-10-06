@@ -29,7 +29,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
+} from "@/components/ui/pagination2";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import useStore from "@/context/Store"; // استيراد الـ store

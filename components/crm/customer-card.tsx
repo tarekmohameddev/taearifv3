@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { Customer, PipelineStage, Reminder } from "@/types/crm";
 import useStore from "@/context/Store";
+import { WhatsAppSendDialog } from "@/components/marketing/whatsapp-send-dialog";
 
 interface CustomerCardProps {
   customer: Customer;
@@ -57,6 +58,10 @@ export default function CustomerCard({
   viewType,
 }: CustomerCardProps) {
   const [hasDragged, setHasDragged] = useState(false);
+  const [showWhatsAppDialog, setShowWhatsAppDialog] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [tabletMenuOpen, setTabletMenuOpen] = useState(false);
+  const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
   const { marketingChannels, fetchMarketingChannels } = useStore();
 
   // جلب قنوات التسويق عند تحميل المكون
@@ -80,10 +85,10 @@ export default function CustomerCard({
     }
   };
 
-  const handleDropdownClick = (e: React.MouseEvent) => {
-    // منع انتشار الحدث لمنع فتح dialog العميل
-    e.stopPropagation();
-  };
+
+  const handleCloseWhatsAppDialog = useCallback(() => {
+    setShowWhatsAppDialog(false);
+  }, []);
 
   const handleDragStart = (e: React.DragEvent) => {
     setHasDragged(true);
@@ -151,41 +156,60 @@ export default function CustomerCard({
               </div>
             </div>
           </div>
-          <DropdownMenu>
+          <DropdownMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-5 flex-shrink-0"
-                onClick={handleDropdownClick}
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={handleDropdownClick}>
-              <DropdownMenuItem onClick={() => onViewDetails(customer)}>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem 
+                onClick={() => onViewDetails(customer)}
+                onSelect={() => {}}
+              >
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onAddNote(customer)}>
+              <DropdownMenuItem 
+                onClick={() => onAddNote(customer)}
+                onSelect={() => {}}
+              >
                 <StickyNote className="ml-2 h-4 w-4" />
                 إضافة ملاحظة
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onAddReminder(customer)}>
+              <DropdownMenuItem 
+                onClick={() => onAddReminder(customer)}
+                onSelect={() => {}}
+              >
                 <Bell className="ml-2 h-4 w-4" />
                 إضافة تذكير
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onAddInteraction(customer)}>
+              <DropdownMenuItem 
+                onClick={() => onAddInteraction(customer)}
+                onSelect={() => {}}
+              >
                 <Activity className="ml-2 h-4 w-4" />
                 تسجيل تفاعل
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem 
+              >
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
               {hasValidCRMWhatsAppChannel() && (
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMobileMenuOpen(false);
+                    setTimeout(() => setShowWhatsAppDialog(true), 50);
+                  }}
+                >
                   <MessageSquare className="ml-2 h-4 w-4" />
                   واتساب
                 </DropdownMenuItem>
@@ -258,41 +282,60 @@ export default function CustomerCard({
               </div>
             </div>
           </div>
-          <DropdownMenu>
+          <DropdownMenu open={tabletMenuOpen} onOpenChange={setTabletMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6 flex-shrink-0"
-                onClick={handleDropdownClick}
               >
                 <MoreHorizontal className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={handleDropdownClick}>
-              <DropdownMenuItem onClick={() => onViewDetails(customer)}>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem 
+                onClick={() => onViewDetails(customer)}
+                onSelect={() => {}}
+              >
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onAddNote(customer)}>
+              <DropdownMenuItem 
+                onClick={() => onAddNote(customer)}
+                onSelect={() => {}}
+              >
                 <StickyNote className="ml-2 h-4 w-4" />
                 إضافة ملاحظة
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onAddReminder(customer)}>
+              <DropdownMenuItem 
+                onClick={() => onAddReminder(customer)}
+                onSelect={() => {}}
+              >
                 <Bell className="ml-2 h-4 w-4" />
                 إضافة تذكير
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onAddInteraction(customer)}>
+              <DropdownMenuItem 
+                onClick={() => onAddInteraction(customer)}
+                onSelect={() => {}}
+              >
                 <Activity className="ml-2 h-4 w-4" />
                 تسجيل تفاعل
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem 
+              >
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
               {hasValidCRMWhatsAppChannel() && (
-                <DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setDesktopMenuOpen(false);
+                    setTimeout(() => setShowWhatsAppDialog(true), 50);
+                  }}
+                >
                   <MessageSquare className="ml-2 h-4 w-4" />
                   واتساب
                 </DropdownMenuItem>
@@ -360,47 +403,73 @@ export default function CustomerCard({
               </div>
             </div>
           </div>
-          <DropdownMenu>
+          <DropdownMenu open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="ghost" 
                 size="icon" 
                 className="h-6 w-6"
-                onClick={handleDropdownClick}
               >
                 <MoreHorizontal className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={handleDropdownClick}>
-              <DropdownMenuItem onClick={() => onViewDetails(customer)}>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem 
+                onClick={() => onViewDetails(customer)}
+                onSelect={() => {}}
+              >
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onAddNote(customer)}>
+              <DropdownMenuItem 
+                onClick={() => onAddNote(customer)}
+                onSelect={() => {}}
+              >
                 <StickyNote className="ml-2 h-4 w-4" />
                 إضافة ملاحظة
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onAddReminder(customer)}>
+              <DropdownMenuItem 
+                onClick={() => onAddReminder(customer)}
+                onSelect={() => {}}
+              >
                 <Bell className="ml-2 h-4 w-4" />
                 إضافة تذكير
               </DropdownMenuItem>
               {hasValidCRMWhatsAppChannel() && (
-                <DropdownMenuItem onClick={() => onAddInteraction(customer)}>
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setDesktopMenuOpen(false);
+                    setTimeout(() => setShowWhatsAppDialog(true), 50);
+                  }}
+                >
                   <Activity className="ml-2 h-4 w-4" />
                   إرسال رسالة واتساب
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={() => onAddInteraction(customer)}>
+              <DropdownMenuItem 
+                onClick={() => onAddInteraction(customer)}
+                onSelect={() => {}}
+              >
                 <Activity className="ml-2 h-4 w-4" />
                 تسجيل تفاعل
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem 
+              >
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
               {hasValidCRMWhatsAppChannel() && (
-                <DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setDesktopMenuOpen(false);
+                    setTimeout(() => setShowWhatsAppDialog(true), 50);
+                  }}
+                >
                   <MessageSquare className="ml-2 h-4 w-4" />
                   واتساب
                 </DropdownMenuItem>
@@ -440,14 +509,29 @@ export default function CustomerCard({
     </Card>
   );
 
-  switch (viewType) {
-    case "mobile":
-      return renderMobileView();
-    case "tablet":
-      return renderTabletView();
-    case "desktop":
-      return renderDesktopView();
-    default:
-      return renderDesktopView();
-  }
+  return (
+    <>
+      {(() => {
+        switch (viewType) {
+          case "mobile":
+            return renderMobileView();
+          case "tablet":
+            return renderTabletView();
+          case "desktop":
+            return renderDesktopView();
+          default:
+            return renderDesktopView();
+        }
+      })()}
+      
+      {/* WhatsApp Send Dialog */}
+      <WhatsAppSendDialog
+        isOpen={showWhatsAppDialog}
+        onClose={handleCloseWhatsAppDialog}
+        customerPhone={customer.phone_number}
+        customerName={customer.name}
+        customerId={customer.id}
+      />
+    </>
+  );
 }
