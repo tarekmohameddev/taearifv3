@@ -1044,19 +1044,22 @@ export default function CrmPage() {
               onGlobalDragCancel={enhancedDragDrop.handleGlobalDragCancel}
             />
 
-            {/* Dialogs */}
-            <CustomerDetailDialog />
-            <AddNoteDialog />
-            <AddReminderDialog onReminderAdded={updateRemindersList} />
-            <EditReminderDialog onReminderUpdated={updateReminderInList} />
-            <AddAppointmentDialog onAppointmentAdded={updateAppointmentsList} />
-            <EditAppointmentDialog
-              onAppointmentUpdated={updateAppointmentInList}
-            />
-            <AddInteractionDialog />
-            <AddStageDialog onStageAdded={updateStagesList} />
-            <EditStageDialog onStageUpdated={updateStageInList} />
-            <CrmSettingsDialog onStageDeleted={removeStageFromList} />
+            {/* Dialogs - Conditional Rendering */}
+            {showCustomerDialog && <CustomerDetailDialog />}
+            {showAddNoteDialog && <AddNoteDialog />}
+            {showAddReminderDialog && <AddReminderDialog onReminderAdded={updateRemindersList} />}
+            {showEditReminderDialog && <EditReminderDialog onReminderUpdated={updateReminderInList} />}
+            {showAddAppointmentDialog && <AddAppointmentDialog onAppointmentAdded={updateAppointmentsList} />}
+            {showEditAppointmentDialog && (
+              <EditAppointmentDialog
+                onAppointmentUpdated={updateAppointmentInList}
+              />
+            )}
+            {showAddInteractionDialog && <AddInteractionDialog />}
+            {showAddStageDialog && <AddStageDialog onStageAdded={updateStagesList} />}
+            {showEditStageDialog && <EditStageDialog onStageUpdated={updateStageInList} />}
+            {showCrmSettingsDialog && <CrmSettingsDialog onStageDeleted={removeStageFromList} />}
+            {showAppointmentDetailDialog && <div>Appointment Detail Dialog</div>}
           </div>
         </main>
       </div>

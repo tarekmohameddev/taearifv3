@@ -46,6 +46,8 @@ import {
   X,
   ArrowRight,
 } from "lucide-react";
+import { useEffect } from "react";
+import useStore from "@/context/Store";
 
 export const CustomerTable = ({
   filteredAndSortedCustomers,
@@ -77,6 +79,21 @@ export const CustomerTable = ({
   onPageChange,
   loading,
 }: any) => {
+  const { marketingChannels, fetchMarketingChannels } = useStore();
+
+  // جلب قنوات التسويق عند تحميل المكون
+  useEffect(() => {
+    fetchMarketingChannels();
+  }, [fetchMarketingChannels]);
+
+  // التحقق من وجود قناة واتساب صالحة
+  const hasValidWhatsAppChannel = () => {
+    return marketingChannels.channels.some((channel: any) => 
+      channel.is_verified === true && 
+      channel.is_connected === true &&
+      channel.customers_page_integration_enabled === true
+    );
+  };
   return (
     <div className="space-y-4">
       {/* Bulk Actions */}
@@ -107,13 +124,15 @@ export const CustomerTable = ({
                   <Mail className="ml-2 h-4 w-4" />
                   إرسال بريد إلكتروني جماعي
                 </Button>
-                <Button
-                  className="w-full justify-start bg-transparent"
-                  variant="outline"
-                >
-                  <MessageSquare className="ml-2 h-4 w-4" />
-                  إرسال رسالة واتساب جماعية
-                </Button>
+                {hasValidWhatsAppChannel() && (
+                  <Button
+                    className="w-full justify-start bg-transparent"
+                    variant="outline"
+                  >
+                    <MessageSquare className="ml-2 h-4 w-4" />
+                    إرسال رسالة واتساب جماعية
+                  </Button>
+                )}
                 <Button
                   className="w-full justify-start bg-transparent"
                   variant="outline"
@@ -383,10 +402,12 @@ export const CustomerTable = ({
                           )}
 
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            <MessageSquare className="ml-2 h-4 w-4" />
-                            إرسال واتساب
-                          </DropdownMenuItem>
+                          {hasValidWhatsAppChannel() && (
+                            <DropdownMenuItem>
+                              <MessageSquare className="ml-2 h-4 w-4" />
+                              إرسال واتساب
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem>
                             <Phone className="ml-2 h-4 w-4" />
                             اتصال هاتفي

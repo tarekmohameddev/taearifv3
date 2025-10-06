@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { Customer, PipelineStage, Reminder } from "@/types/crm";
+import useStore from "@/context/Store";
 
 interface CustomerCardProps {
   customer: Customer;
@@ -56,12 +57,32 @@ export default function CustomerCard({
   viewType,
 }: CustomerCardProps) {
   const [hasDragged, setHasDragged] = useState(false);
+  const { marketingChannels, fetchMarketingChannels } = useStore();
+
+  // جلب قنوات التسويق عند تحميل المكون
+  useEffect(() => {
+    fetchMarketingChannels();
+  }, [fetchMarketingChannels]);
+
+  // التحقق من وجود قناة واتساب صالحة للـ CRM
+  const hasValidCRMWhatsAppChannel = () => {
+    return marketingChannels.channels.some((channel: any) => 
+      channel.is_verified === true && 
+      channel.is_connected === true &&
+      channel.crm_integration_enabled === true
+    );
+  };
 
   const handleClick = (e: React.MouseEvent) => {
     // إذا لم يتم السحب، افتح تفاصيل العميل
     if (!hasDragged) {
       onViewDetails(customer);
     }
+  };
+
+  const handleDropdownClick = (e: React.MouseEvent) => {
+    // منع انتشار الحدث لمنع فتح dialog العميل
+    e.stopPropagation();
   };
 
   const handleDragStart = (e: React.DragEvent) => {
@@ -135,12 +156,13 @@ export default function CustomerCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 flex-shrink-0"
+                className="h-8 w-5 flex-shrink-0"
+                onClick={handleDropdownClick}
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" onClick={handleDropdownClick}>
               <DropdownMenuItem onClick={() => onViewDetails(customer)}>
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
@@ -162,10 +184,12 @@ export default function CustomerCard({
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <MessageSquare className="ml-2 h-4 w-4" />
-                واتساب
-              </DropdownMenuItem>
+              {hasValidCRMWhatsAppChannel() && (
+                <DropdownMenuItem>
+                  <MessageSquare className="ml-2 h-4 w-4" />
+                  واتساب
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -240,11 +264,12 @@ export default function CustomerCard({
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6 flex-shrink-0"
+                onClick={handleDropdownClick}
               >
                 <MoreHorizontal className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" onClick={handleDropdownClick}>
               <DropdownMenuItem onClick={() => onViewDetails(customer)}>
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
@@ -266,10 +291,12 @@ export default function CustomerCard({
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <MessageSquare className="ml-2 h-4 w-4" />
-                واتساب
-              </DropdownMenuItem>
+              {hasValidCRMWhatsAppChannel() && (
+                <DropdownMenuItem>
+                  <MessageSquare className="ml-2 h-4 w-4" />
+                  واتساب
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -335,11 +362,16 @@ export default function CustomerCard({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6"
+                onClick={handleDropdownClick}
+              >
                 <MoreHorizontal className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" onClick={handleDropdownClick}>
               <DropdownMenuItem onClick={() => onViewDetails(customer)}>
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
@@ -352,6 +384,12 @@ export default function CustomerCard({
                 <Bell className="ml-2 h-4 w-4" />
                 إضافة تذكير
               </DropdownMenuItem>
+              {hasValidCRMWhatsAppChannel() && (
+                <DropdownMenuItem onClick={() => onAddInteraction(customer)}>
+                  <Activity className="ml-2 h-4 w-4" />
+                  إرسال رسالة واتساب
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => onAddInteraction(customer)}>
                 <Activity className="ml-2 h-4 w-4" />
                 تسجيل تفاعل
@@ -361,10 +399,12 @@ export default function CustomerCard({
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <MessageSquare className="ml-2 h-4 w-4" />
-                واتساب
-              </DropdownMenuItem>
+              {hasValidCRMWhatsAppChannel() && (
+                <DropdownMenuItem>
+                  <MessageSquare className="ml-2 h-4 w-4" />
+                  واتساب
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
