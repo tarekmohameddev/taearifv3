@@ -317,27 +317,35 @@ export function CreditSystemComponent() {
                 <h4 className="font-medium text-sm">اختر طريقة الدفع</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* My Fatoorah */}
-                  <div 
-                    className={`border-2 rounded-lg p-3 cursor-pointer transition-all ${
-                      selectedPaymentMethod === 'myfatoorah' 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => setSelectedPaymentMethod('myfatoorah')}
-                  >
-                    <div className="flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="w-24 h-24 rounded-lg flex items-center justify-center mb-2 mx-auto overflow-hidden">
-                          <img 
-                            src="/images/myfatoorah.png" 
-                            alt="My Fatoorah" 
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                        <span className="text-sm font-medium">ماي فاتورة</span>
-                      </div>
-                    </div>
-                  </div>
+                  <div className="relative">
+  <div 
+    className={`border-2 rounded-lg p-3 cursor-pointer transition-all ${
+      selectedPaymentMethod === 'myfatoorah' 
+        ? 'border-primary bg-primary/5' 
+        : 'border-gray-200 hover:border-gray-300'
+    }`}
+    onClick={() => setSelectedPaymentMethod('myfatoorah')}
+  >
+    <div className="flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-24 h-24 rounded-lg flex items-center justify-center mb-2 mx-auto overflow-hidden">
+          <img 
+            src="/images/myfatoorah.png" 
+            alt="My Fatoorah" 
+            className="w-full h-full object-contain"
+          />
+        </div>
+        <span className="text-sm font-medium">ماي فاتورة</span>
+      </div>
+    </div>
+  </div>
+
+  {/* Overlay */}
+  <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center rounded-lg">
+    <span className="text-gray-700 font-semibold text-sm">هذه الخدمة غير متاحة الآن</span>
+  </div>
+</div>
+
 
                   {/* Al Rajhi Bank */}
                   <div 
