@@ -503,11 +503,112 @@ export function WhatsAppNumbersManagement() {
         </Dialog>
       </div>
 
-      {/* Loading State */}
+      {/* Loading State - Skeleton */}
       {marketingChannels.loading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-          <span className="mr-2">جاري تحميل البيانات...</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Skeleton Card 1 */}
+          <Card className="relative animate-pulse">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gray-200 rounded-lg">
+                    <div className="h-5 w-5 bg-gray-300 rounded"></div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-5 w-32 bg-gray-200 rounded"></div>
+                    <div className="h-3 w-24 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+                <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                    <div className="h-3 w-32 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="h-8 w-24 bg-gray-200 rounded"></div>
+                </div>
+                <div className="space-y-1">
+                  <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                  <div className="h-3 w-16 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 p-3 bg-gray-100 rounded-lg">
+                <div className="text-center space-y-1">
+                  <div className="h-4 w-8 bg-gray-200 rounded mx-auto"></div>
+                  <div className="h-3 w-16 bg-gray-200 rounded mx-auto"></div>
+                </div>
+                <div className="text-center space-y-1">
+                  <div className="h-4 w-8 bg-gray-200 rounded mx-auto"></div>
+                  <div className="h-3 w-16 bg-gray-200 rounded mx-auto"></div>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="h-3 w-40 bg-gray-200 rounded"></div>
+                <div className="h-3 w-32 bg-gray-200 rounded"></div>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <div className="flex-1 h-8 bg-gray-200 rounded"></div>
+                <div className="flex-1 h-8 bg-gray-200 rounded"></div>
+                <div className="h-8 w-8 bg-gray-200 rounded"></div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Skeleton Card 2 */}
+          <Card className="relative animate-pulse">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gray-200 rounded-lg">
+                    <div className="h-5 w-5 bg-gray-300 rounded"></div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-5 w-28 bg-gray-200 rounded"></div>
+                    <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+                <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                    <div className="h-3 w-32 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="h-8 w-24 bg-gray-200 rounded"></div>
+                </div>
+                <div className="space-y-1">
+                  <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                  <div className="h-3 w-16 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 p-3 bg-gray-100 rounded-lg">
+                <div className="text-center space-y-1">
+                  <div className="h-4 w-8 bg-gray-200 rounded mx-auto"></div>
+                  <div className="h-3 w-16 bg-gray-200 rounded mx-auto"></div>
+                </div>
+                <div className="text-center space-y-1">
+                  <div className="h-4 w-8 bg-gray-200 rounded mx-auto"></div>
+                  <div className="h-3 w-16 bg-gray-200 rounded mx-auto"></div>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="h-3 w-40 bg-gray-200 rounded"></div>
+                <div className="h-3 w-32 bg-gray-200 rounded"></div>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <div className="flex-1 h-8 bg-gray-200 rounded"></div>
+                <div className="flex-1 h-8 bg-gray-200 rounded"></div>
+                <div className="h-8 w-8 bg-gray-200 rounded"></div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
@@ -612,12 +713,12 @@ export function WhatsAppNumbersManagement() {
                   onClick={() => openEditDialog(number)}
                 >
                   <Edit className="h-3 w-3 ml-1" />
-                  تعديل
+                  الاعدادات
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                {/* <Button variant="outline" size="sm" className="flex-1 bg-transparent">
                   <Activity className="h-3 w-3 ml-1" />
                   الإحصائيات
-                </Button>
+                </Button> */}
                 <Button
                   variant="outline"
                   size="sm"
@@ -814,104 +915,6 @@ export function WhatsAppNumbersManagement() {
               </div>
             </div>
 
-            {/* Integration Settings */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-gray-900">إعدادات التكامل</h4>
-              
-              {/* Webhook URL */}
-              <div className="space-y-2">
-                <Label htmlFor="webhook_url" className="text-sm font-medium text-gray-700">
-                  رابط Webhook
-                </Label>
-                <Input
-                  id="webhook_url"
-                  type="url"
-                  placeholder="https://example.com/webhook"
-                  value={editFormData.integration_settings.webhook_url}
-                  onChange={(e) => setEditFormData(prev => ({
-                    ...prev,
-                    integration_settings: {
-                      ...prev.integration_settings,
-                      webhook_url: e.target.value
-                    }
-                  }))}
-                  className="bg-white border-gray-300 focus:border-black focus:ring-black"
-                />
-              </div>
-
-              {/* Sync Frequency */}
-              <div className="space-y-2">
-                <Label htmlFor="sync_frequency" className="text-sm font-medium text-gray-700">
-                  تكرار المزامنة
-                </Label>
-                <select
-                  id="sync_frequency"
-                  value={editFormData.integration_settings.sync_frequency}
-                  onChange={(e) => setEditFormData(prev => ({
-                    ...prev,
-                    integration_settings: {
-                      ...prev.integration_settings,
-                      sync_frequency: e.target.value
-                    }
-                  }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-                >
-                  <option value="realtime">فوري</option>
-                  <option value="hourly">كل ساعة</option>
-                  <option value="daily">يومي</option>
-                  <option value="weekly">أسبوعي</option>
-                </select>
-              </div>
-
-              {/* Custom Fields */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="customer_id" className="text-sm font-medium text-gray-700">
-                    معرف العميل
-                  </Label>
-                  <Input
-                    id="customer_id"
-                    type="text"
-                    placeholder="crm_customer_id"
-                    value={editFormData.integration_settings.custom_fields.customer_id}
-                    onChange={(e) => setEditFormData(prev => ({
-                      ...prev,
-                      integration_settings: {
-                        ...prev.integration_settings,
-                        custom_fields: {
-                          ...prev.integration_settings.custom_fields,
-                          customer_id: e.target.value
-                        }
-                      }
-                    }))}
-                    className="bg-white border-gray-300 focus:border-black focus:ring-black"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="appointment_id" className="text-sm font-medium text-gray-700">
-                    معرف الموعد
-                  </Label>
-                  <Input
-                    id="appointment_id"
-                    type="text"
-                    placeholder="appointment_system_id"
-                    value={editFormData.integration_settings.custom_fields.appointment_id}
-                    onChange={(e) => setEditFormData(prev => ({
-                      ...prev,
-                      integration_settings: {
-                        ...prev.integration_settings,
-                        custom_fields: {
-                          ...prev.integration_settings.custom_fields,
-                          appointment_id: e.target.value
-                        }
-                      }
-                    }))}
-                    className="bg-white border-gray-300 focus:border-black focus:ring-black"
-                  />
-                </div>
-              </div>
-            </div>
           </div>
 
           <DialogFooter className="flex gap-3 pt-4">

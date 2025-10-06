@@ -226,11 +226,38 @@ export function CreditSystemComponent() {
               <DialogDescription>اختر الباقة المناسبة لاحتياجاتك</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 max-h-[calc(90vh-120px)] overflow-y-auto">
-              {/* Loading State */}
+              {/* Loading State - Skeleton */}
               {creditPackages.loading && (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  <span className="mr-2">جاري تحميل الباقات...</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                  {/* Skeleton Package Cards */}
+                  {[...Array(4)].map((_, index) => (
+                    <div key={index} className="relative animate-pulse">
+                      <Card className="border-0 shadow-none bg-transparent h-full">
+                        <CardContent className="p-4 h-full flex flex-col">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-4 h-4 bg-gray-200 rounded-full"></div>
+                              <div className="space-y-2">
+                                <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                                <div className="h-3 w-16 bg-gray-200 rounded"></div>
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="h-5 w-12 bg-gray-200 rounded"></div>
+                              <div className="h-3 w-8 bg-gray-200 rounded"></div>
+                            </div>
+                          </div>
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center justify-between">
+                              <div className="h-3 w-16 bg-gray-200 rounded"></div>
+                              <div className="h-3 w-12 bg-gray-200 rounded"></div>
+                            </div>
+                            <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -466,12 +493,64 @@ export function CreditSystemComponent() {
 
       {/* Credit Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Loading State */}
+        {/* Loading State - Skeleton */}
         {creditBalance.loading && (
-          <div className="col-span-full flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="mr-2">جاري تحميل بيانات الرصيد...</span>
-          </div>
+          <>
+            {/* Skeleton Card 1 - Current Balance */}
+            <Card className="animate-pulse">
+              <CardHeader className="pb-3">
+                <div className="h-4 w-24 bg-gray-200 rounded"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <div className="h-8 w-32 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="p-2 bg-gray-200 rounded-lg">
+                    <div className="h-5 w-5 bg-gray-300 rounded"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Skeleton Card 2 - Monthly Usage */}
+            <Card className="animate-pulse">
+              <CardHeader className="pb-3">
+                <div className="h-4 w-28 bg-gray-200 rounded"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="space-y-2">
+                    <div className="h-8 w-20 bg-gray-200 rounded"></div>
+                    <div className="h-3 w-24 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="p-2 bg-gray-200 rounded-lg">
+                    <div className="h-5 w-5 bg-gray-300 rounded"></div>
+                  </div>
+                </div>
+                <div className="h-2 w-full bg-gray-200 rounded mb-1"></div>
+                <div className="h-3 w-16 bg-gray-200 rounded"></div>
+              </CardContent>
+            </Card>
+
+            {/* Skeleton Card 3 - Average Cost */}
+            <Card className="animate-pulse">
+              <CardHeader className="pb-3">
+                <div className="h-4 w-24 bg-gray-200 rounded"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <div className="h-8 w-24 bg-gray-200 rounded"></div>
+                    <div className="h-3 w-16 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="p-2 bg-gray-200 rounded-lg">
+                    <div className="h-5 w-5 bg-gray-300 rounded"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </>
         )}
 
         {/* Error State */}
@@ -579,11 +658,29 @@ export function CreditSystemComponent() {
               <CardDescription>آخر العمليات على رصيدك</CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Loading State */}
+              {/* Loading State - Skeleton */}
               {creditTransactions.loading && (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  <span className="mr-2">جاري تحميل المعاملات...</span>
+                <div className="space-y-4">
+                  {/* Skeleton Transaction Items */}
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg animate-pulse">
+                      <div className="flex items-center gap-3">
+                        <div className="h-4 w-4 bg-gray-200 rounded"></div>
+                        <div className="space-y-2">
+                          <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                          <div className="flex items-center gap-2">
+                            <div className="h-3 w-3 bg-gray-200 rounded"></div>
+                            <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                            <div className="h-3 w-16 bg-gray-200 rounded"></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-left space-y-2">
+                        <div className="h-5 w-12 bg-gray-200 rounded"></div>
+                        <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -651,11 +748,44 @@ export function CreditSystemComponent() {
               <CardDescription>توزيع استخدام الرصيد على أرقام الواتساب</CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Loading State */}
+              {/* Loading State - Skeleton */}
               {channelUsage.loading && (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  <span className="mr-2">جاري تحميل بيانات الاستخدام...</span>
+                <div className="space-y-4">
+                  {/* Skeleton Usage Items */}
+                  {[...Array(2)].map((_, index) => (
+                    <div key={index} className="p-4 border rounded-lg animate-pulse">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="space-y-2">
+                          <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                          <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                        </div>
+                        <div className="text-left space-y-1">
+                          <div className="h-5 w-16 bg-gray-200 rounded"></div>
+                          <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm space-y-2">
+                        <div className="space-y-1">
+                          <div className="h-3 w-24 bg-gray-200 rounded"></div>
+                          <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="h-3 w-24 bg-gray-200 rounded"></div>
+                          <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm mt-2 space-y-2">
+                        <div className="space-y-1">
+                          <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                          <div className="h-4 w-12 bg-gray-200 rounded"></div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                          <div className="h-4 w-12 bg-gray-200 rounded"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -724,11 +854,27 @@ export function CreditSystemComponent() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
-          {/* Loading State */}
+          {/* Loading State - Skeleton */}
           {creditAnalytics.loading && (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <span className="mr-2">جاري تحميل التحليلات...</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Skeleton Analytics Cards */}
+              {[...Array(4)].map((_, index) => (
+                <Card key={index} className="animate-pulse">
+                  <CardHeader>
+                    <div className="h-6 w-32 bg-gray-200 rounded"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {[...Array(4)].map((_, itemIndex) => (
+                        <div key={itemIndex} className="flex justify-between items-center">
+                          <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                          <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           )}
 
