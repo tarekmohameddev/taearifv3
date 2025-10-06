@@ -739,6 +739,23 @@ export function PropertiesManagementPage() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
+              <Button
+                  className="gap-1"
+                  onClick={() => {
+                    const propertiesLength = pagination?.total || 0;
+                    const limit =
+                      useAuthStore.getState().userData?.package
+                        ?.real_estate_limit_number;
+                    if (propertiesLength >= limit) {
+                      setIsLimitReached(true);
+                    } else {
+                      router.push("/dashboard/buildings");
+                    }
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                  ادارة العمارات
+                </Button>
                 <Button
                   variant="outline"
                   size="icon"
@@ -891,6 +908,7 @@ export function PropertiesManagementPage() {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
+                
                 <Button
                   className="gap-1"
                   onClick={() => {
