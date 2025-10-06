@@ -198,6 +198,7 @@ export default function PropertyForm({ mode }) {
   const [categories, setCategories] = useState([]);
   const [projects, setProjects] = useState([]);
   const [facades, setFacades] = useState([]);
+  const [buildings, setBuildings] = useState([]);
   const [map, setMap] = useState(null);
   const [searchBox, setSearchBox] = useState(null);
   const thumbnailInputRef = useRef(null);
@@ -680,6 +681,25 @@ export default function PropertyForm({ mode }) {
       fetchProjects();
     }
   }, [userData?.token, mode]);
+
+  useEffect(() => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchBuildings");
+      return;
+    }
+
+    const fetchBuildings = async () => {
+      try {
+        const response = await axiosInstance.get("/buildings");
+        setBuildings(response.data.data.data);
+      } catch (error) {
+        console.error("Error fetching buildings:", error);
+        toast.error("حدث خطأ أثناء جلب العمارات.");
+      }
+    };
+    fetchBuildings();
+  }, [userData?.token]);
 
   // فحص الحد الأقصى للعقارات (للإضافة فقط)
   React.useEffect(() => {
@@ -1247,14 +1267,32 @@ export default function PropertyForm({ mode }) {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="building">العمارة</Label>
-                      <Input
-                        id="building"
+                      <Select
                         name="building"
-                        placeholder="Building A - Tower 1"
                         value={formData.building}
-                        onChange={handleInputChange}
-                        className={errors.building ? "border-red-500" : ""}
-                      />
+                        onValueChange={(value) =>
+                          handleInputChange({
+                            target: { name: "building", value },
+                          })
+                        }
+                      >
+                        <SelectTrigger
+                          id="building"
+                          className={errors.building ? "border-red-500" : ""}
+                        >
+                          <SelectValue placeholder="اختر العمارة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {buildings.map((building) => (
+                            <SelectItem
+                              key={building.id}
+                              value={building.name}
+                            >
+                              {building.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       {errors.building && (
                         <p className="text-sm text-red-500">{errors.building}</p>
                       )}
