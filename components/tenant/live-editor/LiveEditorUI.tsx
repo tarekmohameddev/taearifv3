@@ -72,11 +72,11 @@ interface LiveEditorUIProps {
 type DeviceType = "phone" | "tablet" | "laptop";
 
 // تعريف أبعاد الأجهزة
-const deviceDimensions = {
-  phone: { width: 375, height: 667, name: "Mobile" },
-  tablet: { width: 768, height: 1024, name: "Tablet" },
-  laptop: { width: "100%", height: "100%", name: "Desktop" },
-};
+const getDeviceDimensions = (t: any) => ({
+  phone: { width: 375, height: 667, name: t("live_editor.responsive.mobile") },
+  tablet: { width: 768, height: 1024, name: t("live_editor.responsive.tablet") },
+  laptop: { width: "100%", height: "100%", name: t("live_editor.responsive.desktop") },
+});
 
 // AutoFrame Component - مستوحى من Puck مع نسخ الـ styles
 const AutoFrame = ({
@@ -306,6 +306,7 @@ const AutoFrame = ({
 
 export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const t = useEditorT();
+  const deviceDimensions = getDeviceDimensions(t);
   const {
     user,
     pageComponents,
@@ -1362,12 +1363,13 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   </button>
                 )}
 
-                <button
+                {/* هذا الزر مخفي فقط , ممكن استخدامه في المستقبل */}
+                {/* <button
                   onClick={openMainSidebar}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   {t("live_editor.open_editor")}
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -1555,12 +1557,13 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                     </button>
                   )}
 
-                  <button
+                  {/* هذا الزر مخفي فقط , ممكن استخدامه في المستقبل */}
+                  {/* <button
                     onClick={openMainSidebar}
                     className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
                     {t("live_editor.open_editor")}
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>

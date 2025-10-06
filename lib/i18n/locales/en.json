@@ -353,7 +353,12 @@
     "understood": "Understood",
     "click_to_save": "Click to Save Changes",
     "coming_soon": "Coming Soon",
-    "components_disabled": "This feature will be available soon"
+    "components_disabled": "This feature will be available soon",
+    "responsive": {
+      "mobile": "Mobile",
+      "tablet": "Tablet",
+      "desktop": "Desktop"
+    }
   },
   "editor_sidebar": {
     "theme_settings": "Theme Settings",

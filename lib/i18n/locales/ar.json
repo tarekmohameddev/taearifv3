@@ -353,7 +353,12 @@
     "understood": "فهمت",
     "click_to_save": "اضغط لحفظ التعديلات",
     "coming_soon": "قريباً",
-    "components_disabled": "قريباً سيتم تشغيل هذه الخاصية"
+    "components_disabled": "قريباً سيتم تشغيل هذه الخاصية",
+    "responsive": {
+      "mobile": "الجوال",
+      "tablet": "التابلت",
+      "desktop": "سطح المكتب"
+    }
   },
   "editor_sidebar": {
     "theme_settings": "إعدادات الثيم",
