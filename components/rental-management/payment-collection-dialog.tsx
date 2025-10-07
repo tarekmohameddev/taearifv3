@@ -146,6 +146,7 @@ export function PaymentCollectionDialog() {
   const [notes, setNotes] = useState<string>("");
   const [bankName, setBankName] = useState<string>("");
   const [transferTo, setTransferTo] = useState<string>("منصة ناجز");
+  const [bankNameError, setBankNameError] = useState<string>("");
   const [receiptImagePath, setReceiptImagePath] = useState<string>("");
   const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
   const [selectedFees, setSelectedFees] = useState<
@@ -502,6 +503,11 @@ export function PaymentCollectionDialog() {
       return;
     }
 
+    // Validate bank name if payment method is bank transfer
+    if (!validateBankName()) {
+      return;
+    }
+
     // Open confirmation dialog instead of submitting directly
     setIsConfirmDialogOpen(true);
   };
@@ -684,6 +690,16 @@ export function PaymentCollectionDialog() {
     } finally {
       setIsUploadingImage(false);
     }
+  };
+
+  // Function to validate bank name
+  const validateBankName = (): boolean => {
+    if (paymentMethod === "bank_transfer" && !bankName.trim()) {
+      setBankNameError("يجب كتابة اسم البنك");
+      return false;
+    }
+    setBankNameError("");
+    return true;
   };
 
   const translateFeeName = (feeName: string) => {
@@ -1178,7 +1194,12 @@ export function PaymentCollectionDialog() {
                     <select
                       id="payment-method"
                       value={paymentMethod}
-                      onChange={(e) => setPaymentMethod(e.target.value as any)}
+                      onChange={(e) => {
+                        setPaymentMethod(e.target.value as any);
+                        if (bankNameError) {
+                          setBankNameError("");
+                        }
+                      }}
                       className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-gray-800 focus:ring-2 focus:ring-gray-200 text-right"
                       dir="rtl"
                     >
@@ -1254,7 +1275,12 @@ export function PaymentCollectionDialog() {
                           id="bank-name"
                           type="text"
                           value={bankName}
-                          onChange={(e) => setBankName(e.target.value)}
+                          onChange={(e) => {
+                            setBankName(e.target.value);
+                            if (bankNameError) {
+                              setBankNameError("");
+                            }
+                          }}
                           placeholder="مثال: البنك الأهلي السعودي"
                           className="text-right border-2 border-gray-300 focus:border-gray-800 focus:ring-2 focus:ring-gray-200"
                           dir="rtl"
@@ -1319,16 +1345,16 @@ export function PaymentCollectionDialog() {
                         </div>
                         <div className="mt-2">
                           <img 
-                            src={`https://taearif.com/storage/${receiptImagePath}`} 
+                            src={`https://taearif.com/${receiptImagePath}`} 
                             alt="صورة الإيصال" 
                             className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
                             onClick={() => {
-                              const fullImageUrl = `https://taearif.com/storage/${receiptImagePath}`;
+                              const fullImageUrl = `https://taearif.com/${receiptImagePath}`;
                               window.open(fullImageUrl, '_blank');
                             }}
                             onError={(e) => {
                               console.error("Error loading image:", receiptImagePath);
-                              console.error("Full image URL:", `https://taearif.com/storage/${receiptImagePath}`);
+                              console.error("Full image URL:", `https://taearif.com/${receiptImagePath}`);
                               // في حالة فشل تحميل الصورة، إعادة تعيين المسار
                               setReceiptImagePath("");
                             }}
@@ -2141,6 +2167,18 @@ export function PaymentCollectionDialog() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Bank Name Error Message */}
+            {bankNameError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-red-800 font-medium">{bankNameError}</span>
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
