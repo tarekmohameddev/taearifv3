@@ -195,6 +195,15 @@ export default function CustomerCard({
                 <Activity className="ml-2 h-4 w-4" />
                 تسجيل تفاعل
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const url = `/dashboard/activity-logs/customer/${customer.id}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <Activity className="mr-2 h-4 w-4" />
+                سجل النشاطات
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
               >
@@ -320,6 +329,15 @@ export default function CustomerCard({
               >
                 <Activity className="ml-2 h-4 w-4" />
                 تسجيل تفاعل
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const url = `/dashboard/activity-logs/customer/${customer.id}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <Activity className="mr-2 h-4 w-4" />
+                سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
@@ -454,6 +472,15 @@ export default function CustomerCard({
               >
                 <Activity className="ml-2 h-4 w-4" />
                 تسجيل تفاعل
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const url = `/dashboard/activity-logs/customer/${customer.id}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <Activity className="mr-2 h-4 w-4" />
+                سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
