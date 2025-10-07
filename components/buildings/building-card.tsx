@@ -456,7 +456,24 @@ export default function BuildingCard({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => router.push(`/property/${property.slug || property.id}`)}
+                    onClick={() => {
+                      const subdomain = building.user.username;
+                      const propertySlug = property.slug || property.id;
+                      
+                      // تحديد الدومين حسب البيئة
+                      const isDevelopment = process.env.NODE_ENV === "development";
+                      const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
+                      const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "mandhoor.com";
+                      
+                      const domain = isDevelopment 
+                        ? `${localDomain}:3000` 
+                        : productionDomain;
+                      
+                      const protocol = isDevelopment ? "http" : "https";
+                      const url = `${protocol}://${subdomain}.${domain}/property/${propertySlug}`;
+                      
+                      window.open(url, '_blank');
+                    }}
                     className="text-gray-400 hover:text-black"
                   >
                     <ExternalLink className="w-3 h-3" />
@@ -464,7 +481,7 @@ export default function BuildingCard({
                 </div>
               ))}
             </div>
-          </div>
+          </div> 
         )}
 
         {/* Owner Info */}
