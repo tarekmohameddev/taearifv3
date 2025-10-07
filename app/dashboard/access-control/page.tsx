@@ -220,6 +220,40 @@ export default function AccessControlPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [permissions, setPermissions] = useState<PermissionsResponse | null>(null);
   const [permissionsLoading, setPermissionsLoading] = useState(false);
+  
+  // Available permissions for translation
+  const [availablePermissions, setAvailablePermissions] = useState<any[]>([]);
+  
+  // Function to translate permission names
+  const translatePermission = (permissionName: string): string => {
+    console.log("🔍 Translating permission:", permissionName);
+    console.log("📋 Available permissions count:", availablePermissions?.length || 0);
+    
+    if (!availablePermissions || availablePermissions.length === 0) {
+      console.log("❌ No available permissions, returning original name");
+      return permissionName;
+    }
+    
+    const permission = availablePermissions.find(p => p.name === permissionName);
+    console.log("🔍 Found permission:", permission);
+    
+    if (permission) {
+      const translatedName = permission.name_ar || permission.name_en || permission.name;
+      console.log("✅ Translated to:", translatedName);
+      console.log("🔍 Translation details:", {
+        original: permissionName,
+        name_ar: permission.name_ar,
+        name_en: permission.name_en,
+        name: permission.name,
+        final: translatedName
+      });
+      return translatedName;
+    }
+    
+    console.log("❌ Permission not found, returning original name");
+    return permissionName;
+  };
+  
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState(false);
@@ -378,6 +412,46 @@ export default function AccessControlPage() {
       setError(err.response?.data?.message || "حدث خطأ في جلب تفاصيل الموظف");
     } finally {
       setDetailsLoading(false);
+    }
+  };
+
+  // Fetch available permissions for translation
+  const fetchAvailablePermissions = async () => {
+    try {
+      const response = await axiosInstance.get("/v1/employees/available-permissions");
+      console.log("🔍 Available Permissions Response:", response.data);
+      
+      if (response.data.status && response.data.data) {
+        // Check if data is array of objects with name_ar property
+        if (Array.isArray(response.data.data) && response.data.data.length > 0) {
+          const firstItem = response.data.data[0];
+          if (firstItem && typeof firstItem === 'object' && 'name_ar' in firstItem) {
+            // Data is already in the correct format
+            setAvailablePermissions(response.data.data);
+            console.log("✅ Available Permissions Set (objects):", response.data.data);
+            console.log("🔍 First permission example:", response.data.data[0]);
+            
+            // Test immediate translation
+            const testPermission = response.data.data.find((p: any) => p.name === "properties.view");
+            if (testPermission) {
+              console.log("🧪 Found properties.view permission:", testPermission);
+              console.log("🧪 Arabic name:", testPermission.name_ar);
+            } else {
+              console.log("❌ properties.view permission not found in data");
+            }
+          } else {
+            // Data is array of strings, we need to fetch the full permissions
+            console.log("⚠️ Data is array of strings, fetching full permissions...");
+            const fullResponse = await axiosInstance.get("/v1/permissions");
+            if (fullResponse.data.status && fullResponse.data.data) {
+              setAvailablePermissions(fullResponse.data.data);
+              console.log("✅ Full Permissions Set:", fullResponse.data.data);
+            }
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error("Error fetching available permissions:", err);
     }
   };
 
@@ -792,8 +866,94 @@ export default function AccessControlPage() {
       }, 2000);
       
     } catch (error: any) {
-      console.error("Error creating role:", error);
-      setCreateRoleError(error.response?.data?.message || "فشل في إنشاء الدور");
+      console.error("❌ Error creating role:", error);
+      console.error("❌ Error response:", error.response);
+      console.error("❌ Error data:", error.response?.data);
+      
+      // Handle different types of errors
+      let errorMessage = "فشل في إنشاء الدور";
+      
+      if (error.response?.data?.message) {
+        // Translate common English error messages to Arabic
+        const message = error.response.data.message;
+        if (message === "Validation failed") {
+          errorMessage = "فشل في التحقق من صحة البيانات";
+        } else if (message === "Unauthorized") {
+          errorMessage = "غير مصرح لك بالوصول";
+        } else if (message === "Forbidden") {
+          errorMessage = "ممنوع الوصول";
+        } else if (message === "Not Found") {
+          errorMessage = "غير موجود";
+        } else if (message === "Server Error") {
+          errorMessage = "خطأ في الخادم";
+        } else if (message === "Role already exists") {
+          errorMessage = "اسم الدور موجود بالفعل";
+        } else if (message === "Invalid permissions") {
+          errorMessage = "الصلاحيات المحددة غير صحيحة";
+        } else if (message === "Permission denied") {
+          errorMessage = "ليس لديك صلاحية للقيام بهذا الإجراء";
+        } else if (message === "Network error") {
+          errorMessage = "خطأ في الاتصال بالشبكة";
+        } else if (message === "Timeout") {
+          errorMessage = "انتهت مهلة الاتصال";
+        } else {
+          errorMessage = message;
+        }
+      } else if (error.response?.data?.errors) {
+        // Handle validation errors
+        const errors = error.response.data.errors;
+        if (errors.name) {
+          const nameError = errors.name[0];
+          if (nameError.includes("required")) {
+            errorMessage = "اسم الدور مطلوب";
+          } else if (nameError.includes("unique")) {
+            errorMessage = "اسم الدور موجود بالفعل";
+          } else if (nameError.includes("min")) {
+            errorMessage = "اسم الدور قصير جداً";
+          } else if (nameError.includes("max")) {
+            errorMessage = "اسم الدور طويل جداً";
+          } else {
+            errorMessage = `اسم الدور: ${nameError}`;
+          }
+        } else if (errors.permissions) {
+          const permissionError = errors.permissions[0];
+          if (permissionError.includes("required")) {
+            errorMessage = "يجب تحديد صلاحية واحدة على الأقل";
+          } else if (permissionError.includes("invalid")) {
+            errorMessage = "الصلاحيات المحددة غير صحيحة";
+          } else {
+            errorMessage = `الصلاحيات: ${permissionError}`;
+          }
+        } else {
+          // Translate common validation error messages
+          const allErrors = Object.values(errors).flat();
+          const translatedErrors = allErrors.map((error: string) => {
+            if (error.includes("required")) return "مطلوب";
+            if (error.includes("unique")) return "موجود بالفعل";
+            if (error.includes("min")) return "قصير جداً";
+            if (error.includes("max")) return "طويل جداً";
+            if (error.includes("invalid")) return "غير صحيح";
+            if (error.includes("email")) return "البريد الإلكتروني غير صحيح";
+            if (error.includes("password")) return "كلمة المرور غير صحيحة";
+            return error;
+          });
+          errorMessage = translatedErrors.join(', ');
+        }
+      } else if (error.response?.status === 422) {
+        errorMessage = "البيانات المرسلة غير صحيحة";
+      } else if (error.response?.status === 409) {
+        errorMessage = "اسم الدور موجود بالفعل";
+      } else if (error.response?.status === 403) {
+        errorMessage = "ليس لديك صلاحية لإنشاء أدوار";
+      } else if (error.response?.status === 500) {
+        errorMessage = "خطأ في الخادم، يرجى المحاولة لاحقاً";
+      } else if (error.code === 'NETWORK_ERROR') {
+        errorMessage = "خطأ في الاتصال بالخادم";
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = "انتهت مهلة الاتصال، يرجى المحاولة مرة أخرى";
+      }
+      
+      setCreateRoleError(errorMessage);
     } finally {
       setCreateRoleLoading(false);
     }
@@ -1017,7 +1177,21 @@ export default function AccessControlPage() {
 
   useEffect(() => {
     fetchEmployees();
+    fetchAvailablePermissions();
   }, []);
+
+  // Monitor availablePermissions changes
+  useEffect(() => {
+    console.log("🔄 Available permissions changed:", availablePermissions);
+    if (availablePermissions.length > 0) {
+      console.log("✅ Available permissions loaded:", availablePermissions.length, "permissions");
+      console.log("🔍 Sample permission:", availablePermissions[0]);
+      
+      // Test translation
+      const testTranslation = translatePermission("properties.view");
+      console.log("🧪 Test translation for 'properties.view':", testTranslation);
+    }
+  }, [availablePermissions]);
 
   useEffect(() => {
     console.log("🔄 Create dialog useEffect:", { showCreateDialog, permissions: !!permissions, rolesLength: roles.length });
@@ -1331,71 +1505,6 @@ export default function AccessControlPage() {
                                   
                                   <Separator className="my-8" />
                                   
-                                  {/* Permissions Section */}
-                                  <div className="space-y-6">
-                                    <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                                      <div className="p-2 bg-gray-100 rounded-lg">
-                                        <Lock className="h-5 w-5 text-gray-700" />
-                                      </div>
-                                      <h3 className="text-xl font-semibold text-black">الصلاحيات والأذونات</h3>
-                                    </div>
-                                    
-                                    {permissionsLoading ? (
-                                      <div className="flex items-center justify-center py-12">
-                                        <div className="flex flex-col items-center gap-3">
-                                          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                                          <span className="text-gray-600 font-medium">جاري تحميل الصلاحيات...</span>
-                                          <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
-                                            <div className="h-full bg-black animate-pulse rounded-full"></div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    ) : permissions ? (
-                                      <div className="space-y-6">
-                                        {Object.entries(permissions.grouped).map(([groupName, groupPermissions]) => (
-                                          <div key={groupName} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                                            <div className="flex items-center justify-between mb-4">
-                                              <div className="flex items-center gap-3">
-                                                <Checkbox
-                                                  id={`group-${groupName}`}
-                                                  checked={isGroupFullySelected(groupName)}
-                                                  onCheckedChange={(checked) => handleGroupPermissionChange(groupName, checked as boolean)}
-                                                  className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                                                />
-                                                <Label htmlFor={`group-${groupName}`} className="text-lg font-semibold text-black cursor-pointer">
-                                                  {groupName.charAt(0).toUpperCase() + groupName.slice(1)}
-                                                </Label>
-                                              </div>
-                                              <Badge variant="outline" className="text-gray-600">
-                                                {groupPermissions.length} صلاحية
-                                              </Badge>
-                                            </div>
-                                            
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pr-6">
-                                              {groupPermissions.map((permission) => (
-                                                <div key={permission.id} className="flex items-center gap-3 p-2 hover:bg-white rounded-lg transition-colors">
-                                                  <Checkbox
-                                                    id={`permission-${permission.id}`}
-                                                    checked={selectedPermissions[permission.name] || false}
-                                                    onCheckedChange={(checked) => handlePermissionChange(permission.name, checked as boolean)}
-                                                    className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                                                  />
-                                                  <Label htmlFor={`permission-${permission.id}`} className="text-sm text-gray-700 cursor-pointer flex-1">
-                                                    {permission.name}
-                                                  </Label>
-                                                </div>
-                                              ))}
-                                            </div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <div className="text-center py-8">
-                                        <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                        <p className="text-gray-600">لا توجد صلاحيات متاحة</p>
-                                      </div>
-                                    )}
-                                  </div>
                                 </div>
                               </ScrollArea>
                               
@@ -1625,7 +1734,7 @@ export default function AccessControlPage() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                               {employeeDetails.permissions.map((permission) => (
                                                 <div key={permission.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                                                  <span className="text-sm font-medium">{permission.name}</span>
+                                                  <span className="text-sm font-medium">{translatePermission(permission.name)}</span>
                                                   {permission.description && (
                                                     <span className="text-xs text-gray-500">{permission.description}</span>
                                                   )}
@@ -1831,71 +1940,6 @@ export default function AccessControlPage() {
                         
                         <Separator className="my-8" />
                         
-                        {/* Permissions Section */}
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                            <div className="p-2 bg-gray-100 rounded-lg">
-                              <Lock className="h-5 w-5 text-gray-700" />
-                            </div>
-                            <h3 className="text-xl font-semibold text-black">الصلاحيات والأذونات</h3>
-                          </div>
-                          
-                          {permissionsLoading ? (
-                            <div className="flex items-center justify-center py-12">
-                              <div className="flex flex-col items-center gap-3">
-                                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                                <span className="text-gray-600 font-medium">جاري تحميل الصلاحيات...</span>
-                                <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
-                                  <div className="h-full bg-black animate-pulse rounded-full"></div>
-                                </div>
-                              </div>
-                            </div>
-                          ) : permissions ? (
-                            <div className="space-y-6">
-                              {Object.entries(permissions.grouped).map(([groupName, groupPermissions]) => (
-                                <div key={groupName} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                                  <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-3">
-                                      <Checkbox
-                                        id={`edit-group-${groupName}`}
-                                        checked={isEditGroupFullySelected(groupName)}
-                                        onCheckedChange={(checked) => handleEditGroupPermissionChange(groupName, checked as boolean)}
-                                        className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                                      />
-                                      <Label htmlFor={`edit-group-${groupName}`} className="text-lg font-semibold text-black cursor-pointer">
-                                        {groupName.charAt(0).toUpperCase() + groupName.slice(1)}
-                                      </Label>
-                                    </div>
-                                    <Badge variant="outline" className="text-gray-600">
-                                      {groupPermissions.length} صلاحية
-                                    </Badge>
-                                  </div>
-                                  
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pr-6">
-                                    {groupPermissions.map((permission) => (
-                                      <div key={permission.id} className="flex items-center gap-3 p-2 hover:bg-white rounded-lg transition-colors">
-                                        <Checkbox
-                                          id={`edit-permission-${permission.id}`}
-                                          checked={editSelectedPermissions[permission.name] || false}
-                                          onCheckedChange={(checked) => handleEditPermissionChange(permission.name, checked as boolean)}
-                                          className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                                        />
-                                        <Label htmlFor={`edit-permission-${permission.id}`} className="text-sm text-gray-700 cursor-pointer flex-1">
-                                          {permission.name}
-                                        </Label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="text-center py-8">
-                              <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                              <p className="text-gray-600">لا توجد صلاحيات متاحة</p>
-                            </div>
-                          )}
-                        </div>
                       </div>
                     </ScrollArea>
                     
@@ -1944,7 +1988,11 @@ export default function AccessControlPage() {
                         </CardDescription>
                       </div>
                       <Button
-                        onClick={() => setShowCreateRoleDialog(true)}
+                        onClick={() => {
+                          setShowCreateRoleDialog(true);
+                          setCreateRoleError(null);
+                          setCreateRoleSuccess(false);
+                        }}
                         className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto"
                       >
                         <Plus className="h-4 w-4 ml-2" />
@@ -2097,7 +2145,7 @@ export default function AccessControlPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                           <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
-                                            {permission}
+                                            {translatePermission(permission)}
                                           </h4>
                                         </div>
                                       </div>
@@ -2256,7 +2304,7 @@ export default function AccessControlPage() {
                                         </div>
                                         <div className="flex-1">
                                           <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors">
-                                            {permission.name}
+                                            {translatePermission(permission.name)}
                                           </h4>
                                           {permission.description && (
                                             <p className="text-sm text-gray-600 mt-1">
@@ -2410,7 +2458,7 @@ export default function AccessControlPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <h5 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
-                              {permission}
+                              {translatePermission(permission)}
                             </h5>
                           </div>
                         </div>
@@ -2442,7 +2490,7 @@ export default function AccessControlPage() {
                               <Lock className="h-4 w-4 text-gray-600" />
                             </div>
                             <div className="min-w-0">
-                              <h5 className="font-medium text-gray-900 truncate">{permission.name}</h5>
+                              <h5 className="font-medium text-gray-900 truncate">{translatePermission(permission.name)}</h5>
                               <p className="text-sm text-gray-600">معرف الصلاحية: {permission.id}</p>
                             </div>
                           </div>
@@ -2499,7 +2547,12 @@ export default function AccessControlPage() {
                 id="roleName"
                 placeholder="أدخل اسم الدور"
                 value={roleFormData.name}
-                onChange={(e) => setRoleFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) => {
+                  setRoleFormData(prev => ({ ...prev, name: e.target.value }));
+                  if (createRoleError) {
+                    setCreateRoleError(null);
+                  }
+                }}
                 className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
@@ -2542,7 +2595,7 @@ export default function AccessControlPage() {
                                 htmlFor={`role-permission-${groupName}-${index}`}
                                 className="text-gray-700 cursor-pointer flex-1"
                               >
-                                {permission.name}
+                                {translatePermission(permission.name)}
                               </Label>
                             </div>
                           ))}
@@ -2675,7 +2728,7 @@ export default function AccessControlPage() {
                                 htmlFor={`edit-role-permission-${groupName}-${index}`}
                                 className="text-gray-700 cursor-pointer flex-1"
                               >
-                                {permission.name}
+                                {translatePermission(permission.name)}
                               </Label>
                             </div>
                           ))}
