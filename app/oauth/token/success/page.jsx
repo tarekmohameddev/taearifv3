@@ -9,7 +9,9 @@ export default async function OAuthSuccessPage() {
 
   // إذا كان هناك tenantId، فهذه صفحة tenant خاصة
   if (tenantId) {
-    return <TenantPageWrapper tenantId={tenantId} slug={"oauth/token/success"} />;
+    return (
+      <TenantPageWrapper tenantId={tenantId} slug={"oauth/token/success"} />
+    );
   }
 
   // إذا لم يكن هناك tenantId، اعرض صفحة OAuth العامة

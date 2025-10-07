@@ -12,8 +12,10 @@ export default async function Register() {
 
   // إذا كان هناك tenantId، فهذه صفحة tenant خاصة - لا نعرض صفحة التسجيل العامة
   if (tenantId) {
-    return <TenantPageWrapper tenantId={tenantId} slug={"oauth/social/extra-info"} />;
-    }
+    return (
+      <TenantPageWrapper tenantId={tenantId} slug={"oauth/social/extra-info"} />
+    );
+  }
 
   return <GoogleRegisterPage />;
 }

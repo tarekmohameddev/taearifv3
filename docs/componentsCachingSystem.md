@@ -9,6 +9,7 @@
 ### 1. **الـ Stores الرئيسية**
 
 #### **AuthContext.js** - إدارة المصادقة
+
 ```javascript
 // Zustand Store للـ authentication
 const useAuthStore = create((set, get) => ({
@@ -19,34 +20,51 @@ const useAuthStore = create((set, get) => ({
   liveEditorUser: null,
   liveEditorLoading: false,
   liveEditorError: null,
-  
+
   // دوال المصادقة
-  login: async (email, password) => { /* ... */ },
-  register: async (userData) => { /* ... */ },
-  logout: async () => { /* ... */ },
-  fetchUserData: async (username) => { /* ... */ },
-  
+  login: async (email, password) => {
+    /* ... */
+  },
+  register: async (userData) => {
+    /* ... */
+  },
+  logout: async () => {
+    /* ... */
+  },
+  fetchUserData: async (username) => {
+    /* ... */
+  },
+
   // دوال خاصة بالـ Live Editor
-  liveEditorLogin: async (email, password) => { /* ... */ },
-  liveEditorRegister: async (userData) => { /* ... */ },
-  liveEditorFetchUser: async (username) => { /* ... */ },
-  liveEditorLogout: async () => { /* ... */ },
+  liveEditorLogin: async (email, password) => {
+    /* ... */
+  },
+  liveEditorRegister: async (userData) => {
+    /* ... */
+  },
+  liveEditorFetchUser: async (username) => {
+    /* ... */
+  },
+  liveEditorLogout: async () => {
+    /* ... */
+  },
 }));
 ```
 
 #### **editorStore.ts** - إدارة الـ Live Editor
+
 ```typescript
 interface EditorStore {
   // حالة حفظ البيانات
   showDialog: boolean;
   openSaveDialogFn: OpenDialogFn;
-  
+
   // Current page for tracking
   currentPage: string;
-  
+
   // بيانات التعديل المؤقتة
   tempData: ComponentData;
-  
+
   // Global Components
   globalHeaderData: ComponentData;
   globalFooterData: ComponentData;
@@ -54,17 +72,18 @@ interface EditorStore {
     header: ComponentData;
     footer: ComponentData;
   };
-  
+
   // Dynamic component states
   componentStates: Record<string, Record<string, ComponentData>>;
   componentGetters: Record<string, (variantId: string) => ComponentData>;
-  
+
   // Page-wise components
   pageComponentsByPage: Record<string, ComponentInstanceWithPosition[]>;
 }
 ```
 
 #### **tenantStore.jsx** - إدارة بيانات الـ Tenant
+
 ```javascript
 const useTenantStore = create((set) => ({
   tenantData: null,
@@ -72,25 +91,40 @@ const useTenantStore = create((set) => ({
   error: null,
   tenant: null,
   tenantId: null,
-  
+
   // دوال التحديث
-  updateHeader: (headerData) => { /* ... */ },
-  updateHero: (heroData) => { /* ... */ },
-  updateFooter: (footerData) => { /* ... */ },
-  
+  updateHeader: (headerData) => {
+    /* ... */
+  },
+  updateHero: (heroData) => {
+    /* ... */
+  },
+  updateFooter: (footerData) => {
+    /* ... */
+  },
+
   // دوال الحفظ
-  saveHeaderChanges: async (tenantId, headerData, variant) => { /* ... */ },
-  saveHeroChanges: async (tenantId, heroData, variant) => { /* ... */ },
-  saveFooterChanges: async (tenantId, footerData, variant) => { /* ... */ },
-  
+  saveHeaderChanges: async (tenantId, headerData, variant) => {
+    /* ... */
+  },
+  saveHeroChanges: async (tenantId, heroData, variant) => {
+    /* ... */
+  },
+  saveFooterChanges: async (tenantId, footerData, variant) => {
+    /* ... */
+  },
+
   // تحميل البيانات
-  fetchTenantData: async (websiteName) => { /* ... */ },
+  fetchTenantData: async (websiteName) => {
+    /* ... */
+  },
 }));
 ```
 
 ## 🔄 **تدفق البيانات (Data Flow)**
 
 ### 1. **تحميل البيانات الأولي**
+
 ```
 المستخدم يدخل الموقع
   ↓
@@ -112,6 +146,7 @@ editorStore.loadFromDatabase()
 ```
 
 ### 2. **تعديل المكونات**
+
 ```
 المستخدم يعدل في Sidebar
   ↓
@@ -125,6 +160,7 @@ SidebarStateManager.updateComponentData()
 ```
 
 ### 3. **حفظ التغييرات**
+
 ```
 المستخدم يضغط حفظ
   ↓
@@ -144,49 +180,110 @@ API: /api/tenant/save-pages
 ### **editorStoreFunctions** - دوال متخصصة لكل مكون
 
 #### **مثال: contactCardsFunctions.ts**
+
 ```typescript
 export const contactCardsFunctions = {
   // دوال أساسية
-  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => { /* ... */ },
-  getData: (state: any, variantId: string): ComponentData => { /* ... */ },
-  setData: (state: any, variantId: string, data: ComponentData) => { /* ... */ },
-  updateByPath: (state: any, variantId: string, path: string, value: any) => { /* ... */ },
-  
+  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
+    /* ... */
+  },
+  getData: (state: any, variantId: string): ComponentData => {
+    /* ... */
+  },
+  setData: (state: any, variantId: string, data: ComponentData) => {
+    /* ... */
+  },
+  updateByPath: (state: any, variantId: string, path: string, value: any) => {
+    /* ... */
+  },
+
   // دوال متخصصة
-  addContactCard: (currentData: ComponentData, card: any): ComponentData => { /* ... */ },
-  removeContactCard: (currentData: ComponentData, index: number): ComponentData => { /* ... */ },
-  updateContactCard: (currentData: ComponentData, index: number, updates: any): ComponentData => { /* ... */ },
-  
+  addContactCard: (currentData: ComponentData, card: any): ComponentData => {
+    /* ... */
+  },
+  removeContactCard: (
+    currentData: ComponentData,
+    index: number,
+  ): ComponentData => {
+    /* ... */
+  },
+  updateContactCard: (
+    currentData: ComponentData,
+    index: number,
+    updates: any,
+  ): ComponentData => {
+    /* ... */
+  },
+
   // دوال التحقق
-  validate: (data: ComponentData): { isValid: boolean; errors: string[] } => { /* ... */ },
+  validate: (data: ComponentData): { isValid: boolean; errors: string[] } => {
+    /* ... */
+  },
 };
 ```
 
 #### **مثال: mapSectionFunctions.ts**
+
 ```typescript
 export const mapSectionFunctions = {
   // دوال أساسية
-  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => { /* ... */ },
-  getData: (state: any, variantId: string): ComponentData => { /* ... */ },
-  setData: (state: any, variantId: string, data: ComponentData) => { /* ... */ },
-  updateByPath: (state: any, variantId: string, path: string, value: any) => { /* ... */ },
-  
+  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
+    /* ... */
+  },
+  getData: (state: any, variantId: string): ComponentData => {
+    /* ... */
+  },
+  setData: (state: any, variantId: string, data: ComponentData) => {
+    /* ... */
+  },
+  updateByPath: (state: any, variantId: string, path: string, value: any) => {
+    /* ... */
+  },
+
   // دوال متخصصة للخرائط
-  addMarker: (currentData: ComponentData, marker: any): ComponentData => { /* ... */ },
-  removeMarker: (currentData: ComponentData, markerId: string): ComponentData => { /* ... */ },
-  updateMarker: (currentData: ComponentData, markerId: string, updates: any): ComponentData => { /* ... */ },
-  updateMapCenter: (currentData: ComponentData, lat: number, lng: number): ComponentData => { /* ... */ },
-  updateMapZoom: (currentData: ComponentData, zoom: number): ComponentData => { /* ... */ },
-  
+  addMarker: (currentData: ComponentData, marker: any): ComponentData => {
+    /* ... */
+  },
+  removeMarker: (
+    currentData: ComponentData,
+    markerId: string,
+  ): ComponentData => {
+    /* ... */
+  },
+  updateMarker: (
+    currentData: ComponentData,
+    markerId: string,
+    updates: any,
+  ): ComponentData => {
+    /* ... */
+  },
+  updateMapCenter: (
+    currentData: ComponentData,
+    lat: number,
+    lng: number,
+  ): ComponentData => {
+    /* ... */
+  },
+  updateMapZoom: (currentData: ComponentData, zoom: number): ComponentData => {
+    /* ... */
+  },
+
   // دوال مساعدة
-  getMapBounds: (data: ComponentData): { north: number; south: number; east: number; west: number } | null => { /* ... */ },
-  generateEmbedUrl: (data: ComponentData): string => { /* ... */ },
+  getMapBounds: (
+    data: ComponentData,
+  ): { north: number; south: number; east: number; west: number } | null => {
+    /* ... */
+  },
+  generateEmbedUrl: (data: ComponentData): string => {
+    /* ... */
+  },
 };
 ```
 
 ## 🔗 **ربط المكونات بالـ Stores**
 
 ### **مثال: ContactCards1.tsx**
+
 ```typescript
 const ContactCards1: React.FC<ContactCardsProps> = ({
   useStore = true,
@@ -197,7 +294,7 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   // Initialize variant id early so hooks can depend on it
   const variantId = variant || "contactCards1";
   const uniqueId = id || variantId;
-  
+
   // Add state to force re-renders when store updates
   const [forceUpdate, setForceUpdate] = useState(0);
 
@@ -228,7 +325,7 @@ useEffect(() => {
       setForceUpdate(prev => prev + 1);
     }
   });
-      
+
   return unsubscribe;
     }
 }, [props.useStore, uniqueId]);
@@ -284,11 +381,11 @@ const cards: ContactCardProps[] = (mergedData.cards || defaultData.cards).map((c
 }));
 
   return (
-    <div 
-      className={`${mergedData.layout?.container?.padding?.vertical || "py-[48px] md:py-[104px]"} ${mergedData.layout?.container?.padding?.horizontal || "px-4 sm:px-10"}`} 
+    <div
+      className={`${mergedData.layout?.container?.padding?.vertical || "py-[48px] md:py-[104px]"} ${mergedData.layout?.container?.padding?.horizontal || "px-4 sm:px-10"}`}
       dir="rtl"
     >
-      <div 
+      <div
         className={`grid ${mergedData.layout?.grid?.columns?.mobile || "grid-cols-1"} ${mergedData.layout?.grid?.columns?.desktop || "md:grid-cols-3"} ${mergedData.layout?.grid?.gap || "gap-[24px]"} ${mergedData.layout?.grid?.borderRadius || "rounded-[10px]"}`}
       >
         {cards.map((card, index) => (
@@ -311,6 +408,7 @@ const cards: ContactCardProps[] = (mergedData.cards || defaultData.cards).map((c
 ```
 
 ### **مثال: MapSection1.tsx**
+
 ```typescript
 const MapSection1: React.FC<MapSectionProps> = ({
   useStore = true,
@@ -321,7 +419,7 @@ const MapSection1: React.FC<MapSectionProps> = ({
   // Initialize variant id early so hooks can depend on it
   const variantId = variant || "mapSection1";
   const uniqueId = id || variantId;
-  
+
   // Add state to force re-renders when store updates
   const [forceUpdate, setForceUpdate] = useState(0);
 
@@ -352,7 +450,7 @@ const MapSection1: React.FC<MapSectionProps> = ({
           setForceUpdate(prev => prev + 1);
         }
       });
-      
+
       return unsubscribe;
     }
   }, [props.useStore, uniqueId]);
@@ -418,7 +516,7 @@ const MapSection1: React.FC<MapSectionProps> = ({
     <section className="container mx-auto px-4 py-8">
       {mergedData.content?.enabled && (
         <div className="text-center mb-8">
-          <h2 
+          <h2
             className="text-3xl font-bold mb-4"
             style={{
               fontFamily: mergedData.content?.font?.title?.family || defaultData.content.font.title.family,
@@ -430,7 +528,7 @@ const MapSection1: React.FC<MapSectionProps> = ({
           >
             {title}
           </h2>
-          <p 
+          <p
             className="text-lg text-gray-600 mb-4"
             style={{
               fontFamily: mergedData.content?.font?.subtitle?.family || defaultData.content.font.subtitle.family,
@@ -443,7 +541,7 @@ const MapSection1: React.FC<MapSectionProps> = ({
             {subtitle}
           </p>
           {description && (
-            <p 
+            <p
               className="text-base text-gray-500"
               style={{
                 fontFamily: mergedData.content?.font?.description?.family || defaultData.content.font.description.family,
@@ -458,7 +556,7 @@ const MapSection1: React.FC<MapSectionProps> = ({
           )}
         </div>
       )}
-      
+
       {mergedData.map?.enabled && (
         <div className="w-full max-w-[1600px] mx-auto">
           <iframe
@@ -480,21 +578,25 @@ const MapSection1: React.FC<MapSectionProps> = ({
 ## 🎯 **المميزات الرئيسية**
 
 ### 1. **نظام التحديث الديناميكي**
+
 - **تحديث عميق**: `updateDataByPath` للتنقل في البيانات المعقدة
 - **إنشاء تلقائي**: إنشاء الكائنات والمصفوفات المطلوبة
 - **تحقق من الأنواع**: التحقق من نوع البيانات قبل التحديث
 
 ### 2. **إدارة الحالة المتقدمة**
+
 - **فصل البيانات**: فصل بيانات المكونات عن بيانات الصفحات
 - **تزامن البيانات**: تزامن البيانات بين stores مختلفة
 - **إدارة الذاكرة**: إدارة فعالة للذاكرة مع Zustand
 
 ### 3. **نظام التحقق**
+
 - **تحقق من صحة البيانات**: `validate` functions لكل مكون
 - **معالجة الأخطاء**: معالجة شاملة للأخطاء
 - **رسائل واضحة**: رسائل خطأ واضحة للمطورين
 
 ### 4. **الأداء والتحسين**
+
 - **تحديث انتقائي**: تحديث المكونات المتأثرة فقط
 - **تخزين مؤقت**: تخزين البيانات في localStorage
 - **تحميل كسول**: تحميل البيانات عند الحاجة
@@ -502,9 +604,12 @@ const MapSection1: React.FC<MapSectionProps> = ({
 ## 🔧 **أفضل الممارسات**
 
 ### 1. **استخدام الـ Stores**
+
 ```typescript
 // ✅ صحيح
-const storeData = useEditorStore((s) => s.getComponentData("contactCards", uniqueId));
+const storeData = useEditorStore((s) =>
+  s.getComponentData("contactCards", uniqueId),
+);
 const tenantData = useTenantStore((s) => s.tenantData);
 
 // ❌ خطأ
@@ -512,16 +617,17 @@ const allStoreData = useEditorStore((s) => s); // يحمل كل البيانات
 ```
 
 ### 2. **إدارة التحديثات**
+
 ```typescript
 // ✅ صحيح
 useEffect(() => {
   if (props.useStore) {
     const unsubscribe = useEditorStore.subscribe((state) => {
       if (state.contactCardsStates[uniqueId]) {
-        setForceUpdate(prev => prev + 1);
+        setForceUpdate((prev) => prev + 1);
       }
     });
-    
+
     return unsubscribe;
   }
 }, [props.useStore, uniqueId]);
@@ -536,6 +642,7 @@ useEffect(() => {
 ```
 
 ### 3. **دمج البيانات**
+
 ```typescript
 // ✅ صحيح
 const mergedData = {
@@ -568,24 +675,34 @@ const mergedData = {
 ## 📊 **مراقبة الأداء**
 
 ### **Debug Logging**
+
 ```typescript
 // Debug: Log when data changes
 useEffect(() => {
   if (props.useStore) {
-    console.log('🔄 ContactCards Data Updated:', {
+    console.log("🔄 ContactCards Data Updated:", {
       uniqueId,
       storeData,
       currentStoreData,
       forceUpdate,
       contactCardsStates,
       allContactCardsStates: Object.keys(contactCardsStates),
-      getComponentDataResult: getComponentData("contactCards", uniqueId)
+      getComponentDataResult: getComponentData("contactCards", uniqueId),
     });
   }
-}, [storeData, currentStoreData, forceUpdate, props.useStore, uniqueId, contactCardsStates, getComponentData]);
+}, [
+  storeData,
+  currentStoreData,
+  forceUpdate,
+  props.useStore,
+  uniqueId,
+  contactCardsStates,
+  getComponentData,
+]);
 ```
 
 ### **Performance Monitoring**
+
 ```typescript
 // Track component render performance
 const startTime = performance.now();
@@ -597,6 +714,7 @@ console.log(`Component render time: ${endTime - startTime}ms`);
 ## 🔄 **نظام التحديث الديناميكي المتقدم**
 
 ### **1. Subscription Management**
+
 ```typescript
 // مثال: ContactFormSection1.tsx
 useEffect(() => {
@@ -604,25 +722,30 @@ useEffect(() => {
     // Force re-render when store data changes
     const unsubscribe = useEditorStore.subscribe((state) => {
       const newContactFormSectionStates = state.contactFormSectionStates;
-      console.log('🔄 ContactFormSection Store subscription triggered:', {
+      console.log("🔄 ContactFormSection Store subscription triggered:", {
         uniqueId,
         newContactFormSectionStates,
         hasData: !!newContactFormSectionStates[uniqueId],
-        allKeys: Object.keys(newContactFormSectionStates)
+        allKeys: Object.keys(newContactFormSectionStates),
       });
       if (newContactFormSectionStates[uniqueId]) {
-        console.log('🔄 ContactFormSection Store subscription triggered for:', uniqueId, newContactFormSectionStates[uniqueId]);
+        console.log(
+          "🔄 ContactFormSection Store subscription triggered for:",
+          uniqueId,
+          newContactFormSectionStates[uniqueId],
+        );
         // Force re-render by updating state
-        setForceUpdate(prev => prev + 1);
+        setForceUpdate((prev) => prev + 1);
       }
     });
-    
+
     return unsubscribe;
   }
 }, [props.useStore, uniqueId]);
 ```
 
 ### **2. Data Merging Strategy**
+
 ```typescript
 // Priority System: currentStoreData > storeData > tenantComponentData > props > default
 const mergedData = {
@@ -660,10 +783,11 @@ const mergedData = {
     ...(storeData?.styling || {}),
     ...(currentStoreData?.styling || {}),
   },
-  };
+};
 ```
 
 ### **3. Dynamic Form Rendering**
+
 ```typescript
 // Dynamic form fields rendering
 {formFields.map((field: any, index: number) => {
@@ -697,6 +821,7 @@ const mergedData = {
 ## 🎨 **نظام التصميم الديناميكي**
 
 ### **1. Responsive Layout System**
+
 ```typescript
 // Dynamic layout classes
 <div className={`flex ${layout?.grid?.columns?.mobile || "flex-col"} ${layout?.grid?.columns?.desktop || "md:flex-row"} w-full justify-between ${layout?.grid?.gap || "gap-[16px]"}`}>
@@ -710,9 +835,10 @@ const mergedData = {
 ```
 
 ### **2. Dynamic Styling**
+
 ```typescript
 // Dynamic title styling
-<h4 
+<h4
   className={`${styling?.title?.size || "text-[15px] md:text-[24px]"} ${styling?.title?.color || "text-custom-maincolor"} ${styling?.title?.weight || "font-normal"} xs:text-[20px] mb-[24px]`}
 >
   {title}
@@ -722,27 +848,37 @@ const mergedData = {
 ## 🔧 **أدوات التطوير والـ Debugging**
 
 ### **1. Comprehensive Logging**
+
 ```typescript
 // Debug: Log when data changes
 useEffect(() => {
   if (props.useStore) {
-    console.log('🔄 ContactFormSection Data Updated:', {
+    console.log("🔄 ContactFormSection Data Updated:", {
       uniqueId,
       storeData,
       currentStoreData,
       forceUpdate,
       contactFormSectionStates,
       allContactFormSectionStates: Object.keys(contactFormSectionStates),
-      getComponentDataResult: getComponentData("contactFormSection", uniqueId)
+      getComponentDataResult: getComponentData("contactFormSection", uniqueId),
     });
   }
-}, [storeData, currentStoreData, forceUpdate, props.useStore, uniqueId, contactFormSectionStates, getComponentData]);
+}, [
+  storeData,
+  currentStoreData,
+  forceUpdate,
+  props.useStore,
+  uniqueId,
+  contactFormSectionStates,
+  getComponentData,
+]);
 ```
 
 ### **2. Final Merge Logging**
+
 ```typescript
 // Debug: Log the final merged data
-console.log('🔍 ContactFormSection Final Merge:', {
+console.log("🔍 ContactFormSection Final Merge:", {
   uniqueId,
   currentStoreData,
   storeData,
@@ -751,13 +887,14 @@ console.log('🔍 ContactFormSection Final Merge:', {
   socialLinksCount: mergedData.content?.socialLinks?.length || 0,
   formFieldsCount: mergedData.form?.fields?.length || 0,
   contactFormSectionStatesKeys: Object.keys(contactFormSectionStates),
-  getComponentDataResult: getComponentData("contactFormSection", uniqueId)
+  getComponentDataResult: getComponentData("contactFormSection", uniqueId),
 });
 ```
 
 ## 📊 **مقاييس الأداء**
 
 ### **1. Component Performance**
+
 ```typescript
 // Track component render performance
 const startTime = performance.now();
@@ -767,6 +904,7 @@ console.log(`ContactFormSection render time: ${endTime - startTime}ms`);
 ```
 
 ### **2. Store Update Performance**
+
 ```typescript
 // Track store update frequency
 let updateCount = 0;
@@ -779,6 +917,7 @@ useEffect(() => {
 ## 🚀 **التحسينات المتقدمة**
 
 ### **1. Memoization**
+
 ```typescript
 // Memoize expensive calculations
 const memoizedData = useMemo(() => {
@@ -793,12 +932,14 @@ const memoizedData = useMemo(() => {
 ```
 
 ### **2. Lazy Loading**
+
 ```typescript
 // Lazy load heavy components
-const LazySocialLink = lazy(() => import('./SocialLink'));
+const LazySocialLink = lazy(() => import("./SocialLink"));
 ```
 
 ### **3. Error Boundaries**
+
 ```typescript
 // Error boundary for component errors
 class ContactFormSectionErrorBoundary extends React.Component {
@@ -828,6 +969,7 @@ class ContactFormSectionErrorBoundary extends React.Component {
 ## 🔄 **نظام التحديث التلقائي**
 
 ### **1. Real-time Updates**
+
 ```typescript
 // Real-time store synchronization
 useEffect(() => {
@@ -835,7 +977,7 @@ useEffect(() => {
     // Check for updates every 100ms
     const latestData = getComponentData("contactFormSection", uniqueId);
     if (JSON.stringify(latestData) !== JSON.stringify(currentStoreData)) {
-      setForceUpdate(prev => prev + 1);
+      setForceUpdate((prev) => prev + 1);
     }
   }, 100);
 
@@ -844,18 +986,19 @@ useEffect(() => {
 ```
 
 ### **2. Optimistic Updates**
+
 ```typescript
 // Optimistic UI updates
 const handleFormSubmit = async (formData) => {
   // Update UI immediately
-  setForceUpdate(prev => prev + 1);
-  
+  setForceUpdate((prev) => prev + 1);
+
   try {
     // Send to server
     await submitForm(formData);
   } catch (error) {
     // Revert on error
-    setForceUpdate(prev => prev + 1);
+    setForceUpdate((prev) => prev + 1);
   }
 };
 ```
@@ -863,35 +1006,37 @@ const handleFormSubmit = async (formData) => {
 ## 📱 **دعم الأجهزة المختلفة**
 
 ### **1. Responsive Design**
+
 ```typescript
 // Responsive layout system
-const getResponsiveClasses = (deviceType: 'mobile' | 'tablet' | 'desktop') => {
+const getResponsiveClasses = (deviceType: "mobile" | "tablet" | "desktop") => {
   const responsiveConfig = {
     mobile: {
       container: "px-4 py-8",
       grid: "flex-col",
       detailsWidth: "w-full",
-      formWidth: "w-full"
+      formWidth: "w-full",
     },
     tablet: {
       container: "px-6 py-12",
       grid: "md:flex-row",
       detailsWidth: "md:w-[35%]",
-      formWidth: "md:w-[50%]"
+      formWidth: "md:w-[50%]",
     },
     desktop: {
       container: "px-8 py-16",
       grid: "lg:flex-row",
       detailsWidth: "lg:w-[35%]",
-      formWidth: "lg:w-[50%]"
-    }
+      formWidth: "lg:w-[50%]",
+    },
   };
-  
+
   return responsiveConfig[deviceType];
 };
 ```
 
 ### **2. Device-specific Styling**
+
 ```typescript
 // Device-specific styling
 const getDeviceSpecificStyle = (deviceType: string) => {
@@ -899,20 +1044,20 @@ const getDeviceSpecificStyle = (deviceType: string) => {
     mobile: {
       titleSize: "text-[15px]",
       formGap: "gap-[12px]",
-      buttonSize: "text-[14px]"
+      buttonSize: "text-[14px]",
     },
     tablet: {
       titleSize: "text-[20px]",
       formGap: "gap-[18px]",
-      buttonSize: "text-[16px]"
+      buttonSize: "text-[16px]",
     },
     desktop: {
       titleSize: "text-[24px]",
       formGap: "gap-[24px]",
-      buttonSize: "text-[20px]"
-    }
+      buttonSize: "text-[20px]",
+    },
   };
-  
+
   return deviceStyles[deviceType] || deviceStyles.desktop;
 };
 ```
@@ -920,6 +1065,7 @@ const getDeviceSpecificStyle = (deviceType: string) => {
 ## 🎯 **أفضل الممارسات المتقدمة**
 
 ### **1. Type Safety**
+
 ```typescript
 // Strong typing for all data structures
 interface ContactFormSectionData {
@@ -947,13 +1093,14 @@ interface ContactFormSectionProps {
 ```
 
 ### **2. Performance Optimization**
+
 ```typescript
 // Debounced updates
 const debouncedUpdate = useCallback(
   debounce((data) => {
     updateComponentData(data);
   }, 300),
-  []
+  [],
 );
 
 // Memoized components
@@ -962,9 +1109,10 @@ const MemoizedFormField = React.memo(FormField);
 ```
 
 ### **3. Accessibility**
+
 ```typescript
 // ARIA attributes for accessibility
-<form 
+<form
   className="flex flex-col gap-[12px] md:gap-[24px]"
   role="form"
   aria-label="Contact Form"
@@ -990,12 +1138,14 @@ const MemoizedFormField = React.memo(FormField);
 ## 📈 **إحصائيات الأداء**
 
 ### **مقاييس الأداء الرئيسية:**
+
 - **Render Time**: < 50ms للمكونات البسيطة
 - **Store Update Time**: < 10ms للتحديثات
 - **Memory Usage**: < 5MB للبيانات المخزنة
 - **Bundle Size**: < 100KB للمكونات الإضافية
 
 ### **تحسينات الأداء:**
+
 - **Lazy Loading**: تحميل المكونات عند الحاجة
 - **Memoization**: تخزين النتائج المحسوبة
 - **Debouncing**: تقليل عدد التحديثات

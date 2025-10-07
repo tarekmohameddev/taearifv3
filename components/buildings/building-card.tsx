@@ -63,11 +63,11 @@ interface BuildingCardProps {
   isSelected?: boolean;
 }
 
-export default function BuildingCard({ 
-  building, 
-  viewMode, 
-  onSelect, 
-  isSelected = false 
+export default function BuildingCard({
+  building,
+  viewMode,
+  onSelect,
+  isSelected = false,
 }: BuildingCardProps) {
   const router = useRouter();
   const [showAllProperties, setShowAllProperties] = useState(false);
@@ -76,15 +76,15 @@ export default function BuildingCard({
   const handleDeleteBuilding = async () => {
     // تأكيد قبل الحذف
     const confirmed = window.confirm(
-      `هل أنت متأكد من حذف العمارة "${building.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`
+      `هل أنت متأكد من حذف العمارة "${building.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`,
     );
-    
+
     if (!confirmed) return;
 
     try {
       setIsDeleting(true);
       const response = await axiosInstance.delete(`/buildings/${building.id}`);
-      
+
       if (response.data.status === "success") {
         toast.success("تم حذف العمارة بنجاح");
         // إعادة تحميل الصفحة أو تحديث القائمة
@@ -148,7 +148,7 @@ export default function BuildingCard({
 
   const getPropertyPurposeText = (purpose: string) => {
     if (!purpose) return "غير محدد";
-    
+
     switch (purpose.toLowerCase()) {
       case "rent":
         return "إيجار";
@@ -163,26 +163,32 @@ export default function BuildingCard({
     }
   };
 
-  const displayedProperties = showAllProperties 
-    ? building.properties 
+  const displayedProperties = showAllProperties
+    ? building.properties
     : building.properties.slice(0, 3);
 
-  const availableProperties = building.properties.filter(p => p.property_status === "available").length;
-  const rentedProperties = building.properties.filter(p => p.property_status === "rented").length;
+  const availableProperties = building.properties.filter(
+    (p) => p.property_status === "available",
+  ).length;
+  const rentedProperties = building.properties.filter(
+    (p) => p.property_status === "rented",
+  ).length;
 
   if (viewMode === "list") {
     return (
-      <Card className={`border border-gray-200 hover:shadow-lg transition-all duration-200 ${
-        isSelected ? "ring-2 ring-black ring-opacity-50" : ""
-      }`}>
+      <Card
+        className={`border border-gray-200 hover:shadow-lg transition-all duration-200 ${
+          isSelected ? "ring-2 ring-black ring-opacity-50" : ""
+        }`}
+      >
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4 flex-1">
               <div className="flex-shrink-0">
                 <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                   {building.image_url ? (
-                    <img 
-                      src={building.image_url} 
+                    <img
+                      src={building.image_url}
                       alt={building.name}
                       className="w-full h-full object-cover"
                     />
@@ -191,7 +197,7 @@ export default function BuildingCard({
                   )}
                 </div>
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <div>
@@ -199,52 +205,64 @@ export default function BuildingCard({
                       {building.name}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      {building.properties.length} عقار • 
-                      {building.deed_number ? ` صك رقم ${building.deed_number}` : " بدون صك"}
+                      {building.properties.length} عقار •
+                      {building.deed_number
+                        ? ` صك رقم ${building.deed_number}`
+                        : " بدون صك"}
                     </p>
                   </div>
-                  
+
                   <div className="flex items-center space-x-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-black">{building.properties.length}</div>
+                      <div className="text-2xl font-bold text-black">
+                        {building.properties.length}
+                      </div>
                       <div className="text-xs text-gray-500">عقار</div>
                     </div>
-                    
+
                     <div className="text-center">
-                      <div className="text-lg font-semibold text-green-600">{availableProperties}</div>
+                      <div className="text-lg font-semibold text-green-600">
+                        {availableProperties}
+                      </div>
                       <div className="text-xs text-gray-500">متاح</div>
                     </div>
-                    
+
                     <div className="text-center">
-                      <div className="text-lg font-semibold text-blue-600">{rentedProperties}</div>
+                      <div className="text-lg font-semibold text-blue-600">
+                        {rentedProperties}
+                      </div>
                       <div className="text-xs text-gray-500">مؤجر</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push(`/dashboard/buildings/${building.id}`)}
+                onClick={() =>
+                  router.push(`/dashboard/buildings/${building.id}`)
+                }
                 className="border-gray-300 hover:bg-gray-50"
               >
                 <Eye className="w-4 h-4 mr-2" />
                 عرض
               </Button>
-              
+
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push(`/dashboard/buildings/${building.id}/edit`)}
+                onClick={() =>
+                  router.push(`/dashboard/buildings/${building.id}/edit`)
+                }
                 className="border-gray-300 hover:bg-gray-50"
               >
                 <Edit className="w-4 h-4 mr-2" />
                 تعديل
               </Button>
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm">
@@ -262,7 +280,7 @@ export default function BuildingCard({
                     <Edit className="w-4 h-4 mr-2" />
                     تعديل
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     className="text-red-600"
                     onClick={handleDeleteBuilding}
                     disabled={isDeleting}
@@ -280,9 +298,11 @@ export default function BuildingCard({
   }
 
   return (
-    <Card className={`border border-gray-200 hover:shadow-lg transition-all duration-200 ${
-      isSelected ? "ring-2 ring-black ring-opacity-50" : ""
-    }`}>
+    <Card
+      className={`border border-gray-200 hover:shadow-lg transition-all duration-200 ${
+        isSelected ? "ring-2 ring-black ring-opacity-50" : ""
+      }`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -310,7 +330,7 @@ export default function BuildingCard({
                 <Edit className="w-4 h-4 mr-2" />
                 تعديل
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="text-red-600"
                 onClick={handleDeleteBuilding}
                 disabled={isDeleting}
@@ -327,15 +347,21 @@ export default function BuildingCard({
         {/* Building Stats */}
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center p-3 bg-gray-50 rounded-lg">
-            <div className="text-lg font-bold text-black">{building.properties.length}</div>
+            <div className="text-lg font-bold text-black">
+              {building.properties.length}
+            </div>
             <div className="text-xs text-gray-500">إجمالي العقارات</div>
           </div>
           <div className="text-center p-3 bg-green-50 rounded-lg">
-            <div className="text-lg font-bold text-green-600">{availableProperties}</div>
+            <div className="text-lg font-bold text-green-600">
+              {availableProperties}
+            </div>
             <div className="text-xs text-gray-500">متاح</div>
           </div>
           <div className="text-center p-3 bg-blue-50 rounded-lg">
-            <div className="text-lg font-bold text-blue-600">{rentedProperties}</div>
+            <div className="text-lg font-bold text-blue-600">
+              {rentedProperties}
+            </div>
             <div className="text-xs text-gray-500">مؤجر</div>
           </div>
         </div>
@@ -348,7 +374,9 @@ export default function BuildingCard({
           </div>
           <div className="flex items-center text-sm text-gray-600">
             <BuildingIcon className="w-4 h-4 mr-2" />
-            <span>عداد المياه: {building.water_meter_number || "غير محدد"}</span>
+            <span>
+              عداد المياه: {building.water_meter_number || "غير محدد"}
+            </span>
           </div>
         </div>
 
@@ -378,7 +406,7 @@ export default function BuildingCard({
                 </Button>
               )}
             </div>
-            
+
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {displayedProperties.map((property) => (
                 <div
@@ -392,10 +420,12 @@ export default function BuildingCard({
                         {property.title || `عقار ${property.id}`}
                       </h5>
                       <p className="text-xs text-gray-600">
-                        {property.address || building.name || "العنوان غير محدد"}
+                        {property.address ||
+                          building.name ||
+                          "العنوان غير محدد"}
                       </p>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-sm font-semibold text-black">
                         {formatPrice(property.price)}
@@ -406,7 +436,7 @@ export default function BuildingCard({
                         {getPropertyStatusText(property.property_status)}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center gap-3 text-xs text-gray-600 mb-1">
                       <span className="flex items-center">
                         <Bed className="w-3 h-3 mr-1" />
@@ -421,7 +451,7 @@ export default function BuildingCard({
                         {property.area} م²
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 text-xs">
                       <Badge variant="outline" className="text-xs">
                         {getPropertyTypeText(property.type)}
@@ -430,18 +460,20 @@ export default function BuildingCard({
                         {getPropertyPurposeText(property.purpose)}
                       </Badge>
                     </div>
-                    
+
                     {/* Features */}
                     {property.features && (
                       <div className="mt-2">
-                        <div className="text-xs text-gray-500 mb-1">الميزات:</div>
+                        <div className="text-xs text-gray-500 mb-1">
+                          الميزات:
+                        </div>
                         <div className="flex flex-wrap gap-1">
                           {(() => {
                             let featuresArray = [];
-                            
+
                             if (Array.isArray(property.features)) {
                               featuresArray = property.features;
-                            } else if (typeof property.features === 'string') {
+                            } else if (typeof property.features === "string") {
                               try {
                                 // محاولة تحليل JSON
                                 const parsed = JSON.parse(property.features);
@@ -452,22 +484,31 @@ export default function BuildingCard({
                                 }
                               } catch {
                                 // إذا فشل التحليل، تعامل معه كـ string عادي
-                                featuresArray = property.features.split(',').map(f => f.trim()).filter(f => f);
+                                featuresArray = property.features
+                                  .split(",")
+                                  .map((f) => f.trim())
+                                  .filter((f) => f);
                               }
                             }
-                            
-                            return featuresArray.slice(0, 3).map((feature, index) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {feature}
-                              </Badge>
-                            ));
+
+                            return featuresArray
+                              .slice(0, 3)
+                              .map((feature, index) => (
+                                <Badge
+                                  key={index}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  {feature}
+                                </Badge>
+                              ));
                           })()}
                           {(() => {
                             let featuresArray = [];
-                            
+
                             if (Array.isArray(property.features)) {
                               featuresArray = property.features;
-                            } else if (typeof property.features === 'string') {
+                            } else if (typeof property.features === "string") {
                               try {
                                 const parsed = JSON.parse(property.features);
                                 if (Array.isArray(parsed)) {
@@ -476,41 +517,50 @@ export default function BuildingCard({
                                   featuresArray = [property.features];
                                 }
                               } catch {
-                                featuresArray = property.features.split(',').map(f => f.trim()).filter(f => f);
+                                featuresArray = property.features
+                                  .split(",")
+                                  .map((f) => f.trim())
+                                  .filter((f) => f);
                               }
                             }
-                            
-                            return featuresArray.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{featuresArray.length - 3} أخرى
-                              </Badge>
+
+                            return (
+                              featuresArray.length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{featuresArray.length - 3} أخرى
+                                </Badge>
+                              )
                             );
                           })()}
                         </div>
                       </div>
                     )}
                   </div>
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => {
                       const subdomain = building.user.username;
                       const propertySlug = property.slug || property.id;
-                      
+
                       // تحديد الدومين حسب البيئة
-                      const isDevelopment = process.env.NODE_ENV === "development";
-                      const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
-                      const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
-                      
-                      const domain = isDevelopment 
-                        ? `${localDomain}:3000` 
+                      const isDevelopment =
+                        process.env.NODE_ENV === "development";
+                      const localDomain =
+                        process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
+                      const productionDomain =
+                        process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN ||
+                        "taearif.com";
+
+                      const domain = isDevelopment
+                        ? `${localDomain}:3000`
                         : productionDomain;
-                      
+
                       const protocol = isDevelopment ? "http" : "https";
                       const url = `${protocol}://${subdomain}.${domain}/property/${propertySlug}`;
-                      
-                      window.open(url, '_blank');
+
+                      window.open(url, "_blank");
                     }}
                     className="text-gray-400 hover:text-black"
                   >
@@ -519,7 +569,7 @@ export default function BuildingCard({
                 </div>
               ))}
             </div>
-          </div> 
+          </div>
         )}
 
         {/* Owner Info */}
@@ -549,7 +599,9 @@ export default function BuildingCard({
             variant="outline"
             size="sm"
             className="flex-1 border-gray-300 hover:bg-gray-50"
-            onClick={() => router.push(`/dashboard/buildings/${building.id}/edit`)}
+            onClick={() =>
+              router.push(`/dashboard/buildings/${building.id}/edit`)
+            }
           >
             <Edit className="w-4 h-4 mr-2" />
             تعديل

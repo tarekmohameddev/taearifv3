@@ -15,7 +15,7 @@ export function useTenantId() {
         // في الـ client side، يمكننا الحصول على tenantId من الـ URL
         const hostname = window.location.hostname;
         const tenantFromSubdomain = extractTenantFromHostname(hostname);
-        
+
         if (tenantFromSubdomain) {
           setTenantId(tenantFromSubdomain);
           setIsLoading(false);
@@ -43,9 +43,19 @@ export function useTenantId() {
 function extractTenantFromHostname(hostname: string): string | null {
   const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
   const isDevelopment = process.env.NODE_ENV === "development";
-  
+
   // قائمة بالكلمات المحجوزة
-  const reservedWords = ["www", "api", "admin", "app", "mail", "ftp", "blog", "shop", "store"];
+  const reservedWords = [
+    "www",
+    "api",
+    "admin",
+    "app",
+    "mail",
+    "ftp",
+    "blog",
+    "shop",
+    "store",
+  ];
 
   // For localhost development: tenant1.localhost -> tenant1
   if (hostname.includes(localDomain)) {
@@ -59,7 +69,10 @@ function extractTenantFromHostname(hostname: string): string | null {
   }
 
   // For production: tenant1.mandhoor.com or tenant1.taearif.com -> tenant1
-  if (!isDevelopment && (hostname.includes("mandhoor.com") || hostname.includes("taearif.com"))) {
+  if (
+    !isDevelopment &&
+    (hostname.includes("mandhoor.com") || hostname.includes("taearif.com"))
+  ) {
     const parts = hostname.split(".");
     if (parts.length > 2) {
       const potentialTenantId = parts[0];

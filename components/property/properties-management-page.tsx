@@ -740,7 +740,7 @@ export function PropertiesManagementPage() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-              <Button
+                <Button
                   className="gap-1"
                   onClick={() => {
                     const propertiesLength = pagination?.total || 0;
@@ -909,7 +909,7 @@ export function PropertiesManagementPage() {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-                
+
                 <Button
                   className="gap-1"
                   onClick={() => {
@@ -1376,7 +1376,9 @@ function PropertyCard({
           variant="outline"
           size="sm"
           className="w-full gap-1"
-          onClick={() => router.push("/dashboard/properties/" + property.id + "/edit")}
+          onClick={() =>
+            router.push("/dashboard/properties/" + property.id + "/edit")
+          }
         >
           <Edit className="h-3.5 w-3.5" />
           تعديل

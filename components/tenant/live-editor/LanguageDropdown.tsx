@@ -31,7 +31,7 @@ export function LanguageDropdown() {
     (newLang: string) => {
       // إغلاق الـ dropdown فوراً
       setIsOpen(false);
-      
+
       // تحديث الحالة المحلية فوراً
       setSelectedLang(newLang);
       setIsChanging(true);

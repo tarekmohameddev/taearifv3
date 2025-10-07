@@ -277,14 +277,14 @@ export function LandingPage() {
         });
 
         toast.success("تم إنشاء حسابك بنجاح! سيتم تحويلك الآن.");
-        
+
         // Track successful registration
         trackFormSubmission("landing_page_register", "signup");
         trackEvent("signup_completed", {
           method: "landing_page",
           user_email: user.email,
         });
-        
+
         setTimeout(() => {
           router.push("/onboarding");
         }, 1500);
@@ -321,7 +321,7 @@ export function LandingPage() {
           ...prev,
           general: errorMsg,
         }));
-        
+
         // Track error
         trackEvent("registration_error", {
           error_type: "unexpected_error",

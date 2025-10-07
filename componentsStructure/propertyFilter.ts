@@ -226,7 +226,7 @@ export const propertyFilterStructure: ComponentStructure = {
               type: "select",
               options: [
                 { label: "Grid", value: "grid" },
-                { label: "Flex", value: "flex" }
+                { label: "Flex", value: "flex" },
               ],
             },
             {

@@ -351,7 +351,6 @@ const useTenantStore = create((set) => ({
         // Don't set anything - let the component use its default data
       }
 
-
       set({
         tenantData: data,
         loadingTenantData: false,

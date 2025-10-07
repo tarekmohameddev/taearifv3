@@ -112,11 +112,12 @@ export default function OAuthSuccessPageContent() {
       } catch (error) {
         console.error("OAuth success handling error:", error);
         setStatus("error");
-        const errorMsg = error instanceof Error
-          ? error.message
-          : "حدث خطأ أثناء معالجة تسجيل الدخول";
+        const errorMsg =
+          error instanceof Error
+            ? error.message
+            : "حدث خطأ أثناء معالجة تسجيل الدخول";
         setErrorMessage(errorMsg);
-        
+
         // Track error
         trackError(errorMsg, "oauth_error");
       }

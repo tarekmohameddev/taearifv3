@@ -31,13 +31,22 @@ const DefaultSkeleton = () => (
       </div>
       <div className="space-y-2">
         <div className="h-4 bg-gray-100 rounded animate-gentle-fade w-full relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer-ultra" style={{ animationDelay: '0.5s' }}></div>
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer-ultra"
+            style={{ animationDelay: "0.5s" }}
+          ></div>
         </div>
         <div className="h-4 bg-gray-100 rounded animate-gentle-fade w-5/6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer-slow" style={{ animationDelay: '1s' }}></div>
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer-slow"
+            style={{ animationDelay: "1s" }}
+          ></div>
         </div>
         <div className="h-4 bg-gray-100 rounded animate-gentle-fade w-4/6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer-ultra" style={{ animationDelay: '1.5s' }}></div>
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer-ultra"
+            style={{ animationDelay: "1.5s" }}
+          ></div>
         </div>
       </div>
     </div>
@@ -53,7 +62,6 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   componentName,
   fallback: Fallback = DefaultSkeleton,
 }) => {
-  
   // Direct component mapping - much more reliable than dynamic imports
   const renderSkeleton = () => {
     switch (componentName) {
@@ -91,7 +99,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
         return <CtaValuationSkeleton1 />;
       case "contactMapSection1":
         return <ContactMapSectionSkeleton1 />;
-      case "whyChooseUs1":  
+      case "whyChooseUs1":
         return <WhyChooseUsSkeleton1 />;
       case "contactCards1":
         return <ContactCardsSkeleton1 />;
@@ -99,7 +107,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
         return <DefaultSkeleton />;
     }
   };
-  
+
   return renderSkeleton();
 };
 

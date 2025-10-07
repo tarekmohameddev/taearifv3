@@ -4,11 +4,32 @@ import { useState, useEffect } from "react";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +37,27 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Eye, Users, Shield, Key, Mail, Phone, Calendar, MapPin, Plus, UserPlus, Lock, CheckCircle, XCircle, Loader2, Edit, Save, Search, BarChart3, Database } from "lucide-react";
+import {
+  Eye,
+  Users,
+  Shield,
+  Key,
+  Mail,
+  Phone,
+  Calendar,
+  MapPin,
+  Plus,
+  UserPlus,
+  Lock,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  Edit,
+  Save,
+  Search,
+  BarChart3,
+  Database,
+} from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 
 // Types
@@ -182,7 +223,6 @@ interface CreateEmployeeRequest {
   permissions: string[];
 }
 
-
 interface RolesResponse {
   status: string;
   data: Role[];
@@ -212,52 +252,62 @@ export default function AccessControlPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null,
+  );
   const [employeeDetails, setEmployeeDetails] = useState<Employee | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
-  
+
   // New employee creation states
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [permissions, setPermissions] = useState<PermissionsResponse | null>(null);
+  const [permissions, setPermissions] = useState<PermissionsResponse | null>(
+    null,
+  );
   const [permissionsLoading, setPermissionsLoading] = useState(false);
-  
+
   // Available permissions for translation
   const [availablePermissions, setAvailablePermissions] = useState<any[]>([]);
-  
+
   // Function to translate permission names
   const translatePermission = (permissionName: string): string => {
     console.log("🔍 Translating permission:", permissionName);
-    console.log("📋 Available permissions count:", availablePermissions?.length || 0);
-    
+    console.log(
+      "📋 Available permissions count:",
+      availablePermissions?.length || 0,
+    );
+
     if (!availablePermissions || availablePermissions.length === 0) {
       console.log("❌ No available permissions, returning original name");
       return permissionName;
     }
-    
-    const permission = availablePermissions.find(p => p.name === permissionName);
+
+    const permission = availablePermissions.find(
+      (p) => p.name === permissionName,
+    );
     console.log("🔍 Found permission:", permission);
-    
+
     if (permission) {
-      const translatedName = permission.name_ar || permission.name_en || permission.name;
+      const translatedName =
+        permission.name_ar || permission.name_en || permission.name;
       console.log("✅ Translated to:", translatedName);
       console.log("🔍 Translation details:", {
         original: permissionName,
         name_ar: permission.name_ar,
         name_en: permission.name_en,
         name: permission.name,
-        final: translatedName
+        final: translatedName,
       });
       return translatedName;
     }
-    
+
     console.log("❌ Permission not found, returning original name");
     return permissionName;
   };
-  
+
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState(false);
-  
+
   // Edit employee states
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -266,7 +316,7 @@ export default function AccessControlPage() {
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [editSuccess, setEditSuccess] = useState(false);
-  
+
   // Form states
   const [formData, setFormData] = useState<CreateEmployeeRequest>({
     first_name: "",
@@ -276,11 +326,15 @@ export default function AccessControlPage() {
     password: "",
     active: true,
     role_ids: [],
-    permissions: []
+    permissions: [],
   });
-  const [selectedPermissions, setSelectedPermissions] = useState<{[key: string]: boolean}>({});
-  const [selectedRoles, setSelectedRoles] = useState<{[key: number]: boolean}>({});
-  
+  const [selectedPermissions, setSelectedPermissions] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [selectedRoles, setSelectedRoles] = useState<{
+    [key: number]: boolean;
+  }>({});
+
   // Edit form states
   const [editFormData, setEditFormData] = useState<UpdateEmployeeRequest>({
     first_name: "",
@@ -290,30 +344,37 @@ export default function AccessControlPage() {
     password: "",
     active: true,
     role_ids: [],
-    permissions: []
+    permissions: [],
   });
-  const [editSelectedPermissions, setEditSelectedPermissions] = useState<{[key: string]: boolean}>({});
-  const [editSelectedRoles, setEditSelectedRoles] = useState<{[key: number]: boolean}>({});
-  
+  const [editSelectedPermissions, setEditSelectedPermissions] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [editSelectedRoles, setEditSelectedRoles] = useState<{
+    [key: number]: boolean;
+  }>({});
+
   // Permissions tab states
-  const [permissionsTabData, setPermissionsTabData] = useState<PermissionsResponse | null>(null);
+  const [permissionsTabData, setPermissionsTabData] =
+    useState<PermissionsResponse | null>(null);
   const [permissionsTabLoading, setPermissionsTabLoading] = useState(false);
-  const [permissionsTabError, setPermissionsTabError] = useState<string | null>(null);
+  const [permissionsTabError, setPermissionsTabError] = useState<string | null>(
+    null,
+  );
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Roles tab states
   const [rolesTabData, setRolesTabData] = useState<Role[]>([]);
   const [rolesTabLoading, setRolesTabLoading] = useState(false);
   const [rolesTabError, setRolesTabError] = useState<string | null>(null);
   const [rolesSearchQuery, setRolesSearchQuery] = useState("");
-  
+
   // Role details dialog state
   const [showRoleDetailsDialog, setShowRoleDetailsDialog] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [roleDetails, setRoleDetails] = useState<any>(null);
   const [roleDetailsLoading, setRoleDetailsLoading] = useState(false);
   const [roleDetailsError, setRoleDetailsError] = useState<string | null>(null);
-  
+
   // Create role dialog state
   const [showCreateRoleDialog, setShowCreateRoleDialog] = useState(false);
   const [createRoleLoading, setCreateRoleLoading] = useState(false);
@@ -321,12 +382,16 @@ export default function AccessControlPage() {
   const [createRoleSuccess, setCreateRoleSuccess] = useState(false);
   const [roleFormData, setRoleFormData] = useState({
     name: "",
-    permissions: [] as string[]
+    permissions: [] as string[],
   });
-  const [availablePermissionsForRole, setAvailablePermissionsForRole] = useState<any>(null);
-  const [permissionsForRoleLoading, setPermissionsForRoleLoading] = useState(false);
-  const [selectedRolePermissions, setSelectedRolePermissions] = useState<{[key: string]: boolean}>({});
-  
+  const [availablePermissionsForRole, setAvailablePermissionsForRole] =
+    useState<any>(null);
+  const [permissionsForRoleLoading, setPermissionsForRoleLoading] =
+    useState(false);
+  const [selectedRolePermissions, setSelectedRolePermissions] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   // Edit role dialog state
   const [showEditRoleDialog, setShowEditRoleDialog] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
@@ -335,63 +400,91 @@ export default function AccessControlPage() {
   const [editRoleSuccess, setEditRoleSuccess] = useState(false);
   const [editRoleFormData, setEditRoleFormData] = useState({
     name: "",
-    permissions: [] as string[]
+    permissions: [] as string[],
   });
-  const [editSelectedRolePermissions, setEditSelectedRolePermissions] = useState<{[key: string]: boolean}>({});
-  
+  const [editSelectedRolePermissions, setEditSelectedRolePermissions] =
+    useState<{ [key: string]: boolean }>({});
+
   // Delete role state
   const [showDeleteRoleDialog, setShowDeleteRoleDialog] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
   const [deleteRoleLoading, setDeleteRoleLoading] = useState(false);
   const [deleteRoleError, setDeleteRoleError] = useState<string | null>(null);
-  
+
   // Delete permission state
-  const [showDeletePermissionDialog, setShowDeletePermissionDialog] = useState(false);
+  const [showDeletePermissionDialog, setShowDeletePermissionDialog] =
+    useState(false);
   const [permissionToDelete, setPermissionToDelete] = useState<any>(null);
   const [deletePermissionLoading, setDeletePermissionLoading] = useState(false);
-  const [deletePermissionError, setDeletePermissionError] = useState<string | null>(null);
-  
+  const [deletePermissionError, setDeletePermissionError] = useState<
+    string | null
+  >(null);
+
   // Delete employee state
-  const [showDeleteEmployeeDialog, setShowDeleteEmployeeDialog] = useState(false);
-  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+  const [showDeleteEmployeeDialog, setShowDeleteEmployeeDialog] =
+    useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(
+    null,
+  );
   const [deleteEmployeeLoading, setDeleteEmployeeLoading] = useState(false);
-  const [deleteEmployeeError, setDeleteEmployeeError] = useState<string | null>(null);
+  const [deleteEmployeeError, setDeleteEmployeeError] = useState<string | null>(
+    null,
+  );
 
   // Filter permissions based on search query
-  const filteredPermissions = permissionsTabData ? 
-    Object.entries(permissionsTabData.grouped).reduce((acc, [groupName, groupPermissions]) => {
-      const filtered = groupPermissions.filter(permission => 
-        permission.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (permission.description && permission.description.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-      if (filtered.length > 0) {
-        acc[groupName] = filtered;
-      }
-      return acc;
-    }, {} as {[key: string]: Permission[]}) : {};
+  const filteredPermissions = permissionsTabData
+    ? Object.entries(permissionsTabData.grouped).reduce(
+        (acc, [groupName, groupPermissions]) => {
+          const filtered = groupPermissions.filter(
+            (permission) =>
+              permission.name
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+              (permission.description &&
+                permission.description
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase())),
+          );
+          if (filtered.length > 0) {
+            acc[groupName] = filtered;
+          }
+          return acc;
+        },
+        {} as { [key: string]: Permission[] },
+      )
+    : {};
 
   // Get total permissions count
-  const totalPermissions = permissionsTabData ? permissionsTabData.data.length : 0;
-  const totalGroups = permissionsTabData ? Object.keys(permissionsTabData.grouped).length : 0;
+  const totalPermissions = permissionsTabData
+    ? permissionsTabData.data.length
+    : 0;
+  const totalGroups = permissionsTabData
+    ? Object.keys(permissionsTabData.grouped).length
+    : 0;
 
   // Filter roles based on search query
-  const filteredRoles = rolesTabData.filter(role => 
-    role.name.toLowerCase().includes(rolesSearchQuery.toLowerCase()) ||
-    role.permissions_list?.some(permission => 
-      permission.toLowerCase().includes(rolesSearchQuery.toLowerCase())
-    )
+  const filteredRoles = rolesTabData.filter(
+    (role) =>
+      role.name.toLowerCase().includes(rolesSearchQuery.toLowerCase()) ||
+      role.permissions_list?.some((permission) =>
+        permission.toLowerCase().includes(rolesSearchQuery.toLowerCase()),
+      ),
   );
 
   // Get total roles count
   const totalRoles = rolesTabData.length;
-  const totalRolesPermissions = rolesTabData.reduce((total, role) => total + (role.permissions_list?.length || 0), 0);
+  const totalRolesPermissions = rolesTabData.reduce(
+    (total, role) => total + (role.permissions_list?.length || 0),
+    0,
+  );
 
   // Fetch employees data
   const fetchEmployees = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.get<EmployeesResponse>("/v1/employees");
+      const response =
+        await axiosInstance.get<EmployeesResponse>("/v1/employees");
       setEmployees(response.data.data);
     } catch (err: any) {
       console.error("Error fetching employees:", err);
@@ -405,7 +498,9 @@ export default function AccessControlPage() {
   const fetchEmployeeDetails = async (employeeId: number) => {
     setDetailsLoading(true);
     try {
-      const response = await axiosInstance.get<EmployeeDetailsResponse>(`/v1/employees/${employeeId}`);
+      const response = await axiosInstance.get<EmployeeDetailsResponse>(
+        `/v1/employees/${employeeId}`,
+      );
       setEmployeeDetails(response.data.data);
     } catch (err: any) {
       console.error("Error fetching employee details:", err);
@@ -418,30 +513,49 @@ export default function AccessControlPage() {
   // Fetch available permissions for translation
   const fetchAvailablePermissions = async () => {
     try {
-      const response = await axiosInstance.get("/v1/employees/available-permissions");
+      const response = await axiosInstance.get(
+        "/v1/employees/available-permissions",
+      );
       console.log("🔍 Available Permissions Response:", response.data);
-      
+
       if (response.data.status && response.data.data) {
         // Check if data is array of objects with name_ar property
-        if (Array.isArray(response.data.data) && response.data.data.length > 0) {
+        if (
+          Array.isArray(response.data.data) &&
+          response.data.data.length > 0
+        ) {
           const firstItem = response.data.data[0];
-          if (firstItem && typeof firstItem === 'object' && 'name_ar' in firstItem) {
+          if (
+            firstItem &&
+            typeof firstItem === "object" &&
+            "name_ar" in firstItem
+          ) {
             // Data is already in the correct format
             setAvailablePermissions(response.data.data);
-            console.log("✅ Available Permissions Set (objects):", response.data.data);
+            console.log(
+              "✅ Available Permissions Set (objects):",
+              response.data.data,
+            );
             console.log("🔍 First permission example:", response.data.data[0]);
-            
+
             // Test immediate translation
-            const testPermission = response.data.data.find((p: any) => p.name === "properties.view");
+            const testPermission = response.data.data.find(
+              (p: any) => p.name === "properties.view",
+            );
             if (testPermission) {
-              console.log("🧪 Found properties.view permission:", testPermission);
+              console.log(
+                "🧪 Found properties.view permission:",
+                testPermission,
+              );
               console.log("🧪 Arabic name:", testPermission.name_ar);
             } else {
               console.log("❌ properties.view permission not found in data");
             }
           } else {
             // Data is array of strings, we need to fetch the full permissions
-            console.log("⚠️ Data is array of strings, fetching full permissions...");
+            console.log(
+              "⚠️ Data is array of strings, fetching full permissions...",
+            );
             const fullResponse = await axiosInstance.get("/v1/permissions");
             if (fullResponse.data.status && fullResponse.data.data) {
               setAvailablePermissions(fullResponse.data.data);
@@ -459,8 +573,10 @@ export default function AccessControlPage() {
   const fetchPermissions = async () => {
     setPermissionsLoading(true);
     try {
-      const response = await axiosInstance.get<AvailablePermissionsResponse>("/v1/employees/available-permissions");
-      
+      const response = await axiosInstance.get<AvailablePermissionsResponse>(
+        "/v1/employees/available-permissions",
+      );
+
       // Convert the simple array to the expected format
       const permissionsData: PermissionsResponse = {
         status: response.data.status,
@@ -476,17 +592,17 @@ export default function AccessControlPage() {
             model_id: 0,
             permission_id: index + 1,
             model_type: "App\\Models\\User",
-            team_id: 0
-          }
+            team_id: 0,
+          },
         })),
         grouped: {},
-        templates: {}
+        templates: {},
       };
-      
+
       // Group permissions by category
-      const grouped: {[key: string]: Permission[]} = {};
+      const grouped: { [key: string]: Permission[] } = {};
       response.data.data.forEach((permissionName, index) => {
-        const category = permissionName.split('.')[0];
+        const category = permissionName.split(".")[0];
         if (!grouped[category]) {
           grouped[category] = [];
         }
@@ -502,11 +618,11 @@ export default function AccessControlPage() {
             model_id: 0,
             permission_id: index + 1,
             model_type: "App\\Models\\User",
-            team_id: 0
-          }
+            team_id: 0,
+          },
         });
       });
-      
+
       permissionsData.grouped = grouped;
       setPermissions(permissionsData);
     } catch (err: any) {
@@ -522,11 +638,13 @@ export default function AccessControlPage() {
     console.log("🔍 Fetching roles from /v1/employees/available-roles");
     setRolesLoading(true);
     try {
-      const response = await axiosInstance.get<AvailableRolesResponse>("/v1/employees/available-roles");
+      const response = await axiosInstance.get<AvailableRolesResponse>(
+        "/v1/employees/available-roles",
+      );
       console.log("✅ Roles response:", response.data);
-      
+
       // Convert the simple array to the expected format
-      const rolesData: Role[] = response.data.data.map(role => ({
+      const rolesData: Role[] = response.data.data.map((role) => ({
         id: role.id,
         name: role.name,
         created_at: new Date().toISOString(),
@@ -537,12 +655,12 @@ export default function AccessControlPage() {
           model_id: 0,
           role_id: role.id,
           model_type: "App\\Models\\User",
-          team_id: 0
+          team_id: 0,
         },
         permissions_list: [],
-        permissions: []
+        permissions: [],
       }));
-      
+
       setRoles(rolesData);
     } catch (err: any) {
       console.error("Error fetching roles:", err);
@@ -557,7 +675,8 @@ export default function AccessControlPage() {
     setPermissionsTabLoading(true);
     setPermissionsTabError(null);
     try {
-      const response = await axiosInstance.get<PermissionsResponse>("/v1/permissions");
+      const response =
+        await axiosInstance.get<PermissionsResponse>("/v1/permissions");
       setPermissionsTabData(response.data);
     } catch (err: any) {
       console.error("Error fetching permissions for tab:", err);
@@ -592,7 +711,9 @@ export default function AccessControlPage() {
       setRoleDetails(response.data.data);
     } catch (error: any) {
       console.error("Error fetching role details:", error);
-      setRoleDetailsError(error.response?.data?.message || "فشل في جلب تفاصيل الدور");
+      setRoleDetailsError(
+        error.response?.data?.message || "فشل في جلب تفاصيل الدور",
+      );
     } finally {
       setRoleDetailsLoading(false);
     }
@@ -603,7 +724,10 @@ export default function AccessControlPage() {
     setPermissionsForRoleLoading(true);
     try {
       const response = await axiosInstance.get("/v1/permissions");
-      console.log("📋 Available Permissions for Role API Response:", response.data);
+      console.log(
+        "📋 Available Permissions for Role API Response:",
+        response.data,
+      );
       setAvailablePermissionsForRole(response.data);
     } catch (error: any) {
       console.error("Error fetching available permissions for role:", error);
@@ -616,29 +740,29 @@ export default function AccessControlPage() {
   const createEmployee = async () => {
     setCreateLoading(true);
     setCreateError(null);
-    
+
     try {
       // Convert selected permissions to array
       const selectedPermissionsArray = Object.entries(selectedPermissions)
         .filter(([_, selected]) => selected)
         .map(([permissionName, _]) => permissionName);
-      
+
       // Convert selected roles to array
       const selectedRolesArray = Object.entries(selectedRoles)
         .filter(([_, selected]) => selected)
         .map(([roleId, _]) => parseInt(roleId));
-      
+
       const requestData = {
         ...formData,
         permissions: selectedPermissionsArray,
-        role_ids: selectedRolesArray
+        role_ids: selectedRolesArray,
       };
-      
+
       await axiosInstance.post("/v1/employees", requestData);
-      
+
       setCreateSuccess(true);
       setShowCreateDialog(false);
-      
+
       // Reset form
       setFormData({
         first_name: "",
@@ -648,17 +772,16 @@ export default function AccessControlPage() {
         password: "",
         active: true,
         role_ids: [],
-        permissions: []
+        permissions: [],
       });
       setSelectedPermissions({});
       setSelectedRoles({});
-      
+
       // Refresh employees list
       await fetchEmployees();
-      
+
       // Hide success message after 3 seconds
       setTimeout(() => setCreateSuccess(false), 3000);
-      
     } catch (err: any) {
       console.error("Error creating employee:", err);
       setCreateError(err.response?.data?.message || "حدث خطأ في إنشاء الموظف");
@@ -670,37 +793,40 @@ export default function AccessControlPage() {
   // Update employee
   const updateEmployee = async () => {
     if (!editingEmployee) return;
-    
+
     setEditLoading(true);
     setEditError(null);
-    
+
     try {
       // Convert selected permissions to array
       const selectedPermissionsArray = Object.entries(editSelectedPermissions)
         .filter(([_, selected]) => selected)
         .map(([permissionName, _]) => permissionName);
-      
+
       // Convert selected roles to array
       const selectedRolesArray = Object.entries(editSelectedRoles)
         .filter(([_, selected]) => selected)
         .map(([roleId, _]) => parseInt(roleId));
-      
+
       const requestData = {
         ...editFormData,
         permissions: selectedPermissionsArray,
-        role_ids: selectedRolesArray
+        role_ids: selectedRolesArray,
       };
-      
+
       // Remove password if empty
       if (!requestData.password) {
         delete requestData.password;
       }
-      
-      await axiosInstance.put(`/v1/employees/${editingEmployee.id}`, requestData);
-      
+
+      await axiosInstance.put(
+        `/v1/employees/${editingEmployee.id}`,
+        requestData,
+      );
+
       setEditSuccess(true);
       setShowEditDialog(false);
-      
+
       // Reset form
       setEditFormData({
         first_name: "",
@@ -710,18 +836,17 @@ export default function AccessControlPage() {
         password: "",
         active: true,
         role_ids: [],
-        permissions: []
+        permissions: [],
       });
       setEditSelectedPermissions({});
       setEditSelectedRoles({});
       setEditingEmployee(null);
-      
+
       // Refresh employees list
       await fetchEmployees();
-      
+
       // Hide success message after 3 seconds
       setTimeout(() => setEditSuccess(false), 3000);
-      
     } catch (err: any) {
       console.error("Error updating employee:", err);
       setEditError(err.response?.data?.message || "حدث خطأ في تحديث الموظف");
@@ -740,24 +865,24 @@ export default function AccessControlPage() {
       phone: employee.phone,
       password: "",
       active: employee.status === 1,
-      role_ids: employee.roles.map(role => role.id),
-      permissions: employee.permissions.map(perm => perm.name)
+      role_ids: employee.roles.map((role) => role.id),
+      permissions: employee.permissions.map((perm) => perm.name),
     });
-    
+
     // Set selected permissions
-    const permissionsMap: {[key: string]: boolean} = {};
-    employee.permissions.forEach(perm => {
+    const permissionsMap: { [key: string]: boolean } = {};
+    employee.permissions.forEach((perm) => {
       permissionsMap[perm.name] = true;
     });
     setEditSelectedPermissions(permissionsMap);
-    
+
     // Set selected roles
-    const rolesMap: {[key: number]: boolean} = {};
-    employee.roles.forEach(role => {
+    const rolesMap: { [key: number]: boolean } = {};
+    employee.roles.forEach((role) => {
       rolesMap[role.id] = true;
     });
     setEditSelectedRoles(rolesMap);
-    
+
     setShowEditDialog(true);
   };
 
@@ -773,23 +898,26 @@ export default function AccessControlPage() {
     setEditingRole(role);
     setEditRoleFormData({
       name: role.name,
-      permissions: []
+      permissions: [],
     });
-    
+
     // Fetch role details to get current permissions
     try {
       const response = await axiosInstance.get(`/v1/roles/${role.id}`);
       const roleData = response.data.data;
-      
+
       // Set selected permissions based on current role permissions
-      const permissionsMap: {[key: string]: boolean} = {};
-      if (roleData.permissions_list && Array.isArray(roleData.permissions_list)) {
+      const permissionsMap: { [key: string]: boolean } = {};
+      if (
+        roleData.permissions_list &&
+        Array.isArray(roleData.permissions_list)
+      ) {
         roleData.permissions_list.forEach((permission: string) => {
           permissionsMap[permission] = true;
         });
       }
       setEditSelectedRolePermissions(permissionsMap);
-      
+
       setShowEditRoleDialog(true);
     } catch (error: any) {
       console.error("Error fetching role details for edit:", error);
@@ -816,18 +944,24 @@ export default function AccessControlPage() {
   };
 
   // Handle role permission selection
-  const handleRolePermissionChange = (permissionName: string, checked: boolean) => {
-    setSelectedRolePermissions(prev => ({
+  const handleRolePermissionChange = (
+    permissionName: string,
+    checked: boolean,
+  ) => {
+    setSelectedRolePermissions((prev) => ({
       ...prev,
-      [permissionName]: checked
+      [permissionName]: checked,
     }));
   };
 
   // Handle edit role permission selection
-  const handleEditRolePermissionChange = (permissionName: string, checked: boolean) => {
-    setEditSelectedRolePermissions(prev => ({
+  const handleEditRolePermissionChange = (
+    permissionName: string,
+    checked: boolean,
+  ) => {
+    setEditSelectedRolePermissions((prev) => ({
       ...prev,
-      [permissionName]: checked
+      [permissionName]: checked,
     }));
   };
 
@@ -835,7 +969,7 @@ export default function AccessControlPage() {
   const createRole = async () => {
     setCreateRoleLoading(true);
     setCreateRoleError(null);
-    
+
     try {
       // Convert selected permissions to array
       const selectedPermissions = Object.entries(selectedRolePermissions)
@@ -844,35 +978,34 @@ export default function AccessControlPage() {
 
       const requestData = {
         name: roleFormData.name,
-        permissions: selectedPermissions
+        permissions: selectedPermissions,
       };
 
       console.log("📋 Creating role with data:", requestData);
-      
+
       const response = await axiosInstance.post("/v1/roles", requestData);
       console.log("📋 Create Role API Response:", response.data);
-      
+
       setCreateRoleSuccess(true);
       setRoleFormData({ name: "", permissions: [] });
       setSelectedRolePermissions({});
-      
+
       // Refresh roles list
       fetchRolesForTab();
-      
+
       // Close dialog after success
       setTimeout(() => {
         setShowCreateRoleDialog(false);
         setCreateRoleSuccess(false);
       }, 2000);
-      
     } catch (error: any) {
       console.error("❌ Error creating role:", error);
       console.error("❌ Error response:", error.response);
       console.error("❌ Error data:", error.response?.data);
-      
+
       // Handle different types of errors
       let errorMessage = "فشل في إنشاء الدور";
-      
+
       if (error.response?.data?.message) {
         // Translate common English error messages to Arabic
         const message = error.response.data.message;
@@ -937,7 +1070,7 @@ export default function AccessControlPage() {
             if (error.includes("password")) return "كلمة المرور غير صحيحة";
             return error;
           });
-          errorMessage = translatedErrors.join(', ');
+          errorMessage = translatedErrors.join(", ");
         }
       } else if (error.response?.status === 422) {
         errorMessage = "البيانات المرسلة غير صحيحة";
@@ -947,12 +1080,12 @@ export default function AccessControlPage() {
         errorMessage = "ليس لديك صلاحية لإنشاء أدوار";
       } else if (error.response?.status === 500) {
         errorMessage = "خطأ في الخادم، يرجى المحاولة لاحقاً";
-      } else if (error.code === 'NETWORK_ERROR') {
+      } else if (error.code === "NETWORK_ERROR") {
         errorMessage = "خطأ في الاتصال بالخادم";
-      } else if (error.code === 'ECONNABORTED') {
+      } else if (error.code === "ECONNABORTED") {
         errorMessage = "انتهت مهلة الاتصال، يرجى المحاولة مرة أخرى";
       }
-      
+
       setCreateRoleError(errorMessage);
     } finally {
       setCreateRoleLoading(false);
@@ -962,10 +1095,10 @@ export default function AccessControlPage() {
   // Update role
   const updateRole = async () => {
     if (!editingRole) return;
-    
+
     setEditRoleLoading(true);
     setEditRoleError(null);
-    
+
     try {
       // Convert selected permissions to array
       const selectedPermissions = Object.entries(editSelectedRolePermissions)
@@ -974,25 +1107,27 @@ export default function AccessControlPage() {
 
       const requestData = {
         name: editRoleFormData.name,
-        permissions: selectedPermissions
+        permissions: selectedPermissions,
       };
 
       console.log("📋 Updating role with data:", requestData);
-      
-      const response = await axiosInstance.put(`/v1/roles/${editingRole.id}`, requestData);
+
+      const response = await axiosInstance.put(
+        `/v1/roles/${editingRole.id}`,
+        requestData,
+      );
       console.log("📋 Update Role API Response:", response.data);
-      
+
       setEditRoleSuccess(true);
-      
+
       // Refresh roles list
       fetchRolesForTab();
-      
+
       // Close dialog after success
       setTimeout(() => {
         setShowEditRoleDialog(false);
         setEditRoleSuccess(false);
       }, 2000);
-      
     } catch (error: any) {
       console.error("Error updating role:", error);
       setEditRoleError(error.response?.data?.message || "فشل في تحديث الدور");
@@ -1004,23 +1139,24 @@ export default function AccessControlPage() {
   // Delete role
   const deleteRole = async () => {
     if (!roleToDelete) return;
-    
+
     setDeleteRoleLoading(true);
     setDeleteRoleError(null);
-    
+
     try {
       console.log("📋 Deleting role:", roleToDelete.id);
-      
-      const response = await axiosInstance.delete(`/v1/roles/${roleToDelete.id}`);
+
+      const response = await axiosInstance.delete(
+        `/v1/roles/${roleToDelete.id}`,
+      );
       console.log("📋 Delete Role API Response:", response.data);
-      
+
       // Refresh roles list
       fetchRolesForTab();
-      
+
       // Close dialog
       setShowDeleteRoleDialog(false);
       setRoleToDelete(null);
-      
     } catch (error: any) {
       console.error("Error deleting role:", error);
       setDeleteRoleError(error.response?.data?.message || "فشل في حذف الدور");
@@ -1032,26 +1168,29 @@ export default function AccessControlPage() {
   // Delete permission
   const deletePermission = async () => {
     if (!permissionToDelete) return;
-    
+
     setDeletePermissionLoading(true);
     setDeletePermissionError(null);
-    
+
     try {
       console.log("📋 Deleting permission:", permissionToDelete.id);
-      
-      const response = await axiosInstance.delete(`/v1/permissions/${permissionToDelete.id}`);
+
+      const response = await axiosInstance.delete(
+        `/v1/permissions/${permissionToDelete.id}`,
+      );
       console.log("📋 Delete Permission API Response:", response.data);
-      
+
       // Refresh permissions list
       fetchPermissionsForTab();
-      
+
       // Close dialog
       setShowDeletePermissionDialog(false);
       setPermissionToDelete(null);
-      
     } catch (error: any) {
       console.error("Error deleting permission:", error);
-      setDeletePermissionError(error.response?.data?.message || "فشل في حذف الصلاحية");
+      setDeletePermissionError(
+        error.response?.data?.message || "فشل في حذف الصلاحية",
+      );
     } finally {
       setDeletePermissionLoading(false);
     }
@@ -1060,26 +1199,29 @@ export default function AccessControlPage() {
   // Delete employee
   const deleteEmployee = async () => {
     if (!employeeToDelete) return;
-    
+
     setDeleteEmployeeLoading(true);
     setDeleteEmployeeError(null);
-    
+
     try {
       console.log("📋 Deleting employee:", employeeToDelete.id);
-      
-      const response = await axiosInstance.delete(`/v1/employees/${employeeToDelete.id}`);
+
+      const response = await axiosInstance.delete(
+        `/v1/employees/${employeeToDelete.id}`,
+      );
       console.log("📋 Delete Employee API Response:", response.data);
-      
+
       // Refresh employees list
       fetchEmployees();
-      
+
       // Close dialog
       setShowDeleteEmployeeDialog(false);
       setEmployeeToDelete(null);
-      
     } catch (error: any) {
       console.error("Error deleting employee:", error);
-      setDeleteEmployeeError(error.response?.data?.message || "فشل في حذف الموظف");
+      setDeleteEmployeeError(
+        error.response?.data?.message || "فشل في حذف الموظف",
+      );
     } finally {
       setDeleteEmployeeLoading(false);
     }
@@ -1087,23 +1229,23 @@ export default function AccessControlPage() {
 
   // Handle permission selection
   const handlePermissionChange = (permissionName: string, checked: boolean) => {
-    setSelectedPermissions(prev => ({
+    setSelectedPermissions((prev) => ({
       ...prev,
-      [permissionName]: checked
+      [permissionName]: checked,
     }));
   };
 
   // Handle group permission selection
   const handleGroupPermissionChange = (groupName: string, checked: boolean) => {
     if (!permissions) return;
-    
+
     const groupPermissions = permissions.grouped[groupName] || [];
     const newPermissions = { ...selectedPermissions };
-    
-    groupPermissions.forEach(permission => {
+
+    groupPermissions.forEach((permission) => {
       newPermissions[permission.name] = checked;
     });
-    
+
     setSelectedPermissions(newPermissions);
   };
 
@@ -1111,52 +1253,62 @@ export default function AccessControlPage() {
   const isGroupFullySelected = (groupName: string) => {
     if (!permissions) return false;
     const groupPermissions = permissions.grouped[groupName] || [];
-    return groupPermissions.every(permission => selectedPermissions[permission.name]);
+    return groupPermissions.every(
+      (permission) => selectedPermissions[permission.name],
+    );
   };
 
   // Check if some permissions in a group are selected
   const isGroupPartiallySelected = (groupName: string) => {
     if (!permissions) return false;
     const groupPermissions = permissions.grouped[groupName] || [];
-    const selectedCount = groupPermissions.filter(permission => selectedPermissions[permission.name]).length;
+    const selectedCount = groupPermissions.filter(
+      (permission) => selectedPermissions[permission.name],
+    ).length;
     return selectedCount > 0 && selectedCount < groupPermissions.length;
   };
 
   // Handle role selection for create
   const handleCreateRoleChange = (roleId: number, checked: boolean) => {
-    setSelectedRoles(prev => ({
+    setSelectedRoles((prev) => ({
       ...prev,
-      [roleId]: checked
+      [roleId]: checked,
     }));
   };
 
   // Handle role selection for edit
   const handleRoleChange = (roleId: number, checked: boolean) => {
-    setEditSelectedRoles(prev => ({
+    setEditSelectedRoles((prev) => ({
       ...prev,
-      [roleId]: checked
+      [roleId]: checked,
     }));
   };
 
   // Handle edit permission selection
-  const handleEditPermissionChange = (permissionName: string, checked: boolean) => {
-    setEditSelectedPermissions(prev => ({
+  const handleEditPermissionChange = (
+    permissionName: string,
+    checked: boolean,
+  ) => {
+    setEditSelectedPermissions((prev) => ({
       ...prev,
-      [permissionName]: checked
+      [permissionName]: checked,
     }));
   };
 
   // Handle edit group permission selection
-  const handleEditGroupPermissionChange = (groupName: string, checked: boolean) => {
+  const handleEditGroupPermissionChange = (
+    groupName: string,
+    checked: boolean,
+  ) => {
     if (!permissions) return;
-    
+
     const groupPermissions = permissions.grouped[groupName] || [];
     const newPermissions = { ...editSelectedPermissions };
-    
-    groupPermissions.forEach(permission => {
+
+    groupPermissions.forEach((permission) => {
       newPermissions[permission.name] = checked;
     });
-    
+
     setEditSelectedPermissions(newPermissions);
   };
 
@@ -1164,14 +1316,18 @@ export default function AccessControlPage() {
   const isEditGroupFullySelected = (groupName: string) => {
     if (!permissions) return false;
     const groupPermissions = permissions.grouped[groupName] || [];
-    return groupPermissions.every(permission => editSelectedPermissions[permission.name]);
+    return groupPermissions.every(
+      (permission) => editSelectedPermissions[permission.name],
+    );
   };
 
   // Check if some permissions in a group are selected for edit
   const isEditGroupPartiallySelected = (groupName: string) => {
     if (!permissions) return false;
     const groupPermissions = permissions.grouped[groupName] || [];
-    const selectedCount = groupPermissions.filter(permission => editSelectedPermissions[permission.name]).length;
+    const selectedCount = groupPermissions.filter(
+      (permission) => editSelectedPermissions[permission.name],
+    ).length;
     return selectedCount > 0 && selectedCount < groupPermissions.length;
   };
 
@@ -1184,17 +1340,28 @@ export default function AccessControlPage() {
   useEffect(() => {
     console.log("🔄 Available permissions changed:", availablePermissions);
     if (availablePermissions.length > 0) {
-      console.log("✅ Available permissions loaded:", availablePermissions.length, "permissions");
+      console.log(
+        "✅ Available permissions loaded:",
+        availablePermissions.length,
+        "permissions",
+      );
       console.log("🔍 Sample permission:", availablePermissions[0]);
-      
+
       // Test translation
       const testTranslation = translatePermission("properties.view");
-      console.log("🧪 Test translation for 'properties.view':", testTranslation);
+      console.log(
+        "🧪 Test translation for 'properties.view':",
+        testTranslation,
+      );
     }
   }, [availablePermissions]);
 
   useEffect(() => {
-    console.log("🔄 Create dialog useEffect:", { showCreateDialog, permissions: !!permissions, rolesLength: roles.length });
+    console.log("🔄 Create dialog useEffect:", {
+      showCreateDialog,
+      permissions: !!permissions,
+      rolesLength: roles.length,
+    });
     if (showCreateDialog && !permissions) {
       console.log("📋 Fetching permissions for create dialog");
       fetchPermissions();
@@ -1206,7 +1373,11 @@ export default function AccessControlPage() {
   }, [showCreateDialog]);
 
   useEffect(() => {
-    console.log("🔄 Edit dialog useEffect:", { showEditDialog, permissions: !!permissions, rolesLength: roles.length });
+    console.log("🔄 Edit dialog useEffect:", {
+      showEditDialog,
+      permissions: !!permissions,
+      rolesLength: roles.length,
+    });
     if (showEditDialog && roles.length === 0) {
       console.log("👥 Fetching roles for edit dialog");
       fetchRoles();
@@ -1267,17 +1438,28 @@ export default function AccessControlPage() {
       <DashboardHeader />
       <div className="flex flex-1 flex-col md:flex-row">
         <EnhancedSidebar activeTab="analytics" setActiveTab={() => {}} />
-        
+
         <div className="flex-1 overflow-auto p-6">
           <div className=" mx-auto">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">التحكم في الوصول</h1>
-              <p className="text-gray-600">إدارة الموظفين والأدوار والصلاحيات</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                التحكم في الوصول
+              </h1>
+              <p className="text-gray-600">
+                إدارة الموظفين والأدوار والصلاحيات
+              </p>
             </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="employees" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="employees"
+                  className="flex items-center gap-2"
+                >
                   <Users className="h-4 w-4" />
                   الموظفين
                 </TabsTrigger>
@@ -1321,7 +1503,10 @@ export default function AccessControlPage() {
                           <p className="text-sm text-gray-600">
                             إجمالي الموظفين: {employees.length}
                           </p>
-                          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                          <Dialog
+                            open={showCreateDialog}
+                            onOpenChange={setShowCreateDialog}
+                          >
                             <DialogTrigger asChild>
                               <Button className="bg-black hover:bg-gray-800 text-white">
                                 <UserPlus className="h-4 w-4 ml-2" />
@@ -1337,140 +1522,201 @@ export default function AccessControlPage() {
                                   إضافة موظف جديد
                                 </DialogTitle>
                                 <DialogDescription className="text-gray-600 text-base">
-                                  قم بإنشاء حساب جديد للموظف وتخصيص الصلاحيات المناسبة
+                                  قم بإنشاء حساب جديد للموظف وتخصيص الصلاحيات
+                                  المناسبة
                                 </DialogDescription>
                               </DialogHeader>
-                              
+
                               <ScrollArea className="max-h-[70vh] pr-4">
                                 <div className="space-y-8 py-6">
                                   {/* Success Message */}
                                   {createSuccess && (
                                     <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
                                       <CheckCircle className="h-5 w-5 text-green-600" />
-                                      <span className="text-green-800 font-medium">تم إنشاء الموظف بنجاح!</span>
+                                      <span className="text-green-800 font-medium">
+                                        تم إنشاء الموظف بنجاح!
+                                      </span>
                                     </div>
                                   )}
-                                  
+
                                   {/* Error Message */}
                                   {createError && (
                                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
                                       <XCircle className="h-5 w-5 text-red-600" />
-                                      <span className="text-red-800 font-medium">{createError}</span>
+                                      <span className="text-red-800 font-medium">
+                                        {createError}
+                                      </span>
                                     </div>
                                   )}
-                                  
+
                                   {/* Basic Information Section */}
                                   <div className="space-y-6">
                                     <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
                                       <div className="p-2 bg-gray-100 rounded-lg">
                                         <Users className="h-5 w-5 text-gray-700" />
                                       </div>
-                                      <h3 className="text-xl font-semibold text-black">المعلومات الأساسية</h3>
+                                      <h3 className="text-xl font-semibold text-black">
+                                        المعلومات الأساسية
+                                      </h3>
                                     </div>
-                                    
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                       <div className="space-y-2">
-                                        <Label htmlFor="first_name" className="text-sm font-medium text-gray-700">
+                                        <Label
+                                          htmlFor="first_name"
+                                          className="text-sm font-medium text-gray-700"
+                                        >
                                           الاسم الأول *
                                         </Label>
                                         <Input
                                           id="first_name"
                                           value={formData.first_name}
-                                          onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+                                          onChange={(e) =>
+                                            setFormData((prev) => ({
+                                              ...prev,
+                                              first_name: e.target.value,
+                                            }))
+                                          }
                                           placeholder="أدخل الاسم الأول"
                                           className="border-gray-300 focus:border-black focus:ring-black"
                                         />
                                       </div>
-                                      
+
                                       <div className="space-y-2">
-                                        <Label htmlFor="last_name" className="text-sm font-medium text-gray-700">
+                                        <Label
+                                          htmlFor="last_name"
+                                          className="text-sm font-medium text-gray-700"
+                                        >
                                           الاسم الأخير *
                                         </Label>
                                         <Input
                                           id="last_name"
                                           value={formData.last_name}
-                                          onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                                          onChange={(e) =>
+                                            setFormData((prev) => ({
+                                              ...prev,
+                                              last_name: e.target.value,
+                                            }))
+                                          }
                                           placeholder="أدخل الاسم الأخير"
                                           className="border-gray-300 focus:border-black focus:ring-black"
                                         />
                                       </div>
-                                      
+
                                       <div className="space-y-2">
-                                        <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                                        <Label
+                                          htmlFor="email"
+                                          className="text-sm font-medium text-gray-700"
+                                        >
                                           البريد الإلكتروني *
                                         </Label>
                                         <Input
                                           id="email"
                                           type="email"
                                           value={formData.email}
-                                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                                          onChange={(e) =>
+                                            setFormData((prev) => ({
+                                              ...prev,
+                                              email: e.target.value,
+                                            }))
+                                          }
                                           placeholder="example@company.com"
                                           className="border-gray-300 focus:border-black focus:ring-black"
                                         />
                                       </div>
-                                      
+
                                       <div className="space-y-2">
-                                        <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                                        <Label
+                                          htmlFor="phone"
+                                          className="text-sm font-medium text-gray-700"
+                                        >
                                           رقم الهاتف *
                                         </Label>
                                         <Input
                                           id="phone"
                                           value={formData.phone}
-                                          onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                                          onChange={(e) =>
+                                            setFormData((prev) => ({
+                                              ...prev,
+                                              phone: e.target.value,
+                                            }))
+                                          }
                                           placeholder="+966501234567"
                                           className="border-gray-300 focus:border-black focus:ring-black"
                                         />
                                       </div>
-                                      
+
                                       <div className="space-y-2">
-                                        <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                                        <Label
+                                          htmlFor="password"
+                                          className="text-sm font-medium text-gray-700"
+                                        >
                                           كلمة المرور *
                                         </Label>
                                         <Input
                                           id="password"
                                           type="password"
                                           value={formData.password}
-                                          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                                          onChange={(e) =>
+                                            setFormData((prev) => ({
+                                              ...prev,
+                                              password: e.target.value,
+                                            }))
+                                          }
                                           placeholder="كلمة مرور قوية"
                                           className="border-gray-300 focus:border-black focus:ring-black"
                                         />
                                       </div>
-                                      
+
                                       <div className="space-y-2">
-                                        <Label htmlFor="active" className="text-sm font-medium text-gray-700">
+                                        <Label
+                                          htmlFor="active"
+                                          className="text-sm font-medium text-gray-700"
+                                        >
                                           حالة الحساب
                                         </Label>
                                         <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg">
                                           <Switch
                                             id="active"
                                             checked={formData.active}
-                                            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, active: checked }))}
+                                            onCheckedChange={(checked) =>
+                                              setFormData((prev) => ({
+                                                ...prev,
+                                                active: checked,
+                                              }))
+                                            }
                                             className="data-[state=checked]:bg-black"
                                           />
                                           <span className="text-sm text-gray-600">
-                                            {formData.active ? "نشط" : "غير نشط"}
+                                            {formData.active
+                                              ? "نشط"
+                                              : "غير نشط"}
                                           </span>
                                         </div>
                                       </div>
                                     </div>
                                   </div>
-                                  
+
                                   <Separator className="my-8" />
-                                  
+
                                   {/* Roles Section */}
                                   <div className="space-y-6">
                                     <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
                                       <div className="p-2 bg-gray-100 rounded-lg">
                                         <Shield className="h-5 w-5 text-gray-700" />
                                       </div>
-                                      <h3 className="text-xl font-semibold text-black">الأدوار</h3>
+                                      <h3 className="text-xl font-semibold text-black">
+                                        الأدوار
+                                      </h3>
                                     </div>
-                                    
+
                                     {rolesLoading ? (
                                       <div className="flex items-center justify-center py-12">
                                         <div className="flex flex-col items-center gap-3">
                                           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                                          <span className="text-gray-600 font-medium">جاري تحميل الأدوار...</span>
+                                          <span className="text-gray-600 font-medium">
+                                            جاري تحميل الأدوار...
+                                          </span>
                                           <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
                                             <div className="h-full bg-black animate-pulse rounded-full"></div>
                                           </div>
@@ -1479,17 +1725,34 @@ export default function AccessControlPage() {
                                     ) : roles.length > 0 ? (
                                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {roles.map((role) => (
-                                          <div key={role.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                          <div
+                                            key={role.id}
+                                            className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                                          >
                                             <Checkbox
                                               id={`create-role-${role.id}`}
-                                              checked={selectedRoles[role.id] || false}
-                                              onCheckedChange={(checked) => handleCreateRoleChange(role.id, checked as boolean)}
+                                              checked={
+                                                selectedRoles[role.id] || false
+                                              }
+                                              onCheckedChange={(checked) =>
+                                                handleCreateRoleChange(
+                                                  role.id,
+                                                  checked as boolean,
+                                                )
+                                              }
                                               className="data-[state=checked]:bg-black data-[state=checked]:border-black"
                                             />
-                                            <Label htmlFor={`create-role-${role.id}`} className="text-sm text-gray-700 cursor-pointer flex-1">
-                                              <div className="font-medium">{role.name}</div>
+                                            <Label
+                                              htmlFor={`create-role-${role.id}`}
+                                              className="text-sm text-gray-700 cursor-pointer flex-1"
+                                            >
+                                              <div className="font-medium">
+                                                {role.name}
+                                              </div>
                                               <div className="text-xs text-gray-500">
-                                                {role.permissions_list?.length || 0} صلاحية
+                                                {role.permissions_list
+                                                  ?.length || 0}{" "}
+                                                صلاحية
                                               </div>
                                             </Label>
                                           </div>
@@ -1498,16 +1761,17 @@ export default function AccessControlPage() {
                                     ) : (
                                       <div className="text-center py-8">
                                         <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                        <p className="text-gray-600">لا توجد أدوار متاحة</p>
+                                        <p className="text-gray-600">
+                                          لا توجد أدوار متاحة
+                                        </p>
                                       </div>
                                     )}
                                   </div>
-                                  
+
                                   <Separator className="my-8" />
-                                  
                                 </div>
                               </ScrollArea>
-                              
+
                               <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                                 <Button
                                   variant="outline"
@@ -1518,7 +1782,14 @@ export default function AccessControlPage() {
                                 </Button>
                                 <Button
                                   onClick={createEmployee}
-                                  disabled={createLoading || !formData.first_name || !formData.last_name || !formData.email || !formData.phone || !formData.password}
+                                  disabled={
+                                    createLoading ||
+                                    !formData.first_name ||
+                                    !formData.last_name ||
+                                    !formData.email ||
+                                    !formData.phone ||
+                                    !formData.password
+                                  }
                                   className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400"
                                 >
                                   {createLoading ? (
@@ -1537,17 +1808,31 @@ export default function AccessControlPage() {
                             </DialogContent>
                           </Dialog>
                         </div>
-                        
+
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="text-right">الموظف</TableHead>
-                              <TableHead className="text-right">البريد الإلكتروني</TableHead>
-                              <TableHead className="text-right">الهاتف</TableHead>
-                              <TableHead className="text-right" >الأدوار</TableHead>
-                              <TableHead className="text-right">الحالة</TableHead>
-                              <TableHead className="text-right">تاريخ الإنشاء</TableHead>
-                              <TableHead className="text-right">الإجراءات</TableHead>
+                              <TableHead className="text-right">
+                                الموظف
+                              </TableHead>
+                              <TableHead className="text-right">
+                                البريد الإلكتروني
+                              </TableHead>
+                              <TableHead className="text-right">
+                                الهاتف
+                              </TableHead>
+                              <TableHead className="text-right">
+                                الأدوار
+                              </TableHead>
+                              <TableHead className="text-right">
+                                الحالة
+                              </TableHead>
+                              <TableHead className="text-right">
+                                تاريخ الإنشاء
+                              </TableHead>
+                              <TableHead className="text-right">
+                                الإجراءات
+                              </TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -1558,12 +1843,16 @@ export default function AccessControlPage() {
                                     <Avatar className="h-10 w-10">
                                       <AvatarImage src={employee.photo || ""} />
                                       <AvatarFallback>
-                                        {getInitials(employee.first_name, employee.last_name)}
+                                        {getInitials(
+                                          employee.first_name,
+                                          employee.last_name,
+                                        )}
                                       </AvatarFallback>
                                     </Avatar>
                                     <div>
                                       <p className="font-medium">
-                                        {employee.first_name} {employee.last_name}
+                                        {employee.first_name}{" "}
+                                        {employee.last_name}
                                       </p>
                                       <p className="text-sm text-gray-500">
                                         {employee.company_name || "بدون شركة"}
@@ -1606,7 +1895,9 @@ export default function AccessControlPage() {
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      onClick={() => handleEditEmployee(employee)}
+                                      onClick={() =>
+                                        handleEditEmployee(employee)
+                                      }
                                       className="flex items-center gap-2"
                                     >
                                       <Edit className="h-4 w-4" />
@@ -1615,7 +1906,9 @@ export default function AccessControlPage() {
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      onClick={() => handleDeleteEmployee(employee)}
+                                      onClick={() =>
+                                        handleDeleteEmployee(employee)
+                                      }
                                       className="flex items-center gap-2 text-red-600 hover:text-red-800 hover:border-red-800"
                                     >
                                       <XCircle className="h-4 w-4" />
@@ -1626,130 +1919,231 @@ export default function AccessControlPage() {
                                         <Button
                                           variant="outline"
                                           size="sm"
-                                          onClick={() => handleViewEmployee(employee)}
+                                          onClick={() =>
+                                            handleViewEmployee(employee)
+                                          }
                                           className="flex items-center gap-2"
                                         >
                                           <Eye className="h-4 w-4" />
                                           عرض التفاصيل
                                         </Button>
                                       </DialogTrigger>
-                                    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                                      <DialogHeader>
-                                        <DialogTitle className="flex items-center gap-2">
-                                          <Avatar className="h-8 w-8">
-                                            <AvatarImage src={employeeDetails?.photo || ""} />
-                                            <AvatarFallback>
-                                              {employeeDetails ? getInitials(employeeDetails.first_name, employeeDetails.last_name) : ""}
-                                            </AvatarFallback>
-                                          </Avatar>
-                                          تفاصيل الموظف
-                                        </DialogTitle>
-                                        <DialogDescription>
-                                          عرض جميع المعلومات والصلاحيات الخاصة بالموظف
-                                        </DialogDescription>
-                                      </DialogHeader>
-                                      
-                                      {detailsLoading ? (
-                                        <div className="flex items-center justify-center py-8">
-                                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                                        </div>
-                                      ) : employeeDetails ? (
-                                        <div className="space-y-6">
-                                          {/* Basic Information */}
-                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                              <h4 className="font-semibold text-gray-900">المعلومات الأساسية</h4>
-                                              <div className="space-y-2 text-sm">
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">الاسم الكامل:</span>
-                                                  <span className="font-medium">{employeeDetails.first_name} {employeeDetails.last_name}</span>
+                                      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                                        <DialogHeader>
+                                          <DialogTitle className="flex items-center gap-2">
+                                            <Avatar className="h-8 w-8">
+                                              <AvatarImage
+                                                src={
+                                                  employeeDetails?.photo || ""
+                                                }
+                                              />
+                                              <AvatarFallback>
+                                                {employeeDetails
+                                                  ? getInitials(
+                                                      employeeDetails.first_name,
+                                                      employeeDetails.last_name,
+                                                    )
+                                                  : ""}
+                                              </AvatarFallback>
+                                            </Avatar>
+                                            تفاصيل الموظف
+                                          </DialogTitle>
+                                          <DialogDescription>
+                                            عرض جميع المعلومات والصلاحيات الخاصة
+                                            بالموظف
+                                          </DialogDescription>
+                                        </DialogHeader>
+
+                                        {detailsLoading ? (
+                                          <div className="flex items-center justify-center py-8">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                          </div>
+                                        ) : employeeDetails ? (
+                                          <div className="space-y-6">
+                                            {/* Basic Information */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                              <div className="space-y-2">
+                                                <h4 className="font-semibold text-gray-900">
+                                                  المعلومات الأساسية
+                                                </h4>
+                                                <div className="space-y-2 text-sm">
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      الاسم الكامل:
+                                                    </span>
+                                                    <span className="font-medium">
+                                                      {
+                                                        employeeDetails.first_name
+                                                      }{" "}
+                                                      {
+                                                        employeeDetails.last_name
+                                                      }
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      البريد الإلكتروني:
+                                                    </span>
+                                                    <span className="font-medium">
+                                                      {employeeDetails.email}
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      الهاتف:
+                                                    </span>
+                                                    <span className="font-medium">
+                                                      {employeeDetails.phone}
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      الشركة:
+                                                    </span>
+                                                    <span className="font-medium">
+                                                      {employeeDetails.company_name ||
+                                                        "غير محدد"}
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      المدينة:
+                                                    </span>
+                                                    <span className="font-medium">
+                                                      {employeeDetails.city ||
+                                                        "غير محدد"}
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      الدولة:
+                                                    </span>
+                                                    <span className="font-medium">
+                                                      {employeeDetails.country ||
+                                                        "غير محدد"}
+                                                    </span>
+                                                  </div>
                                                 </div>
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">البريد الإلكتروني:</span>
-                                                  <span className="font-medium">{employeeDetails.email}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">الهاتف:</span>
-                                                  <span className="font-medium">{employeeDetails.phone}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">الشركة:</span>
-                                                  <span className="font-medium">{employeeDetails.company_name || "غير محدد"}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">المدينة:</span>
-                                                  <span className="font-medium">{employeeDetails.city || "غير محدد"}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">الدولة:</span>
-                                                  <span className="font-medium">{employeeDetails.country || "غير محدد"}</span>
+                                              </div>
+
+                                              <div className="space-y-2">
+                                                <h4 className="font-semibold text-gray-900">
+                                                  معلومات الحساب
+                                                </h4>
+                                                <div className="space-y-2 text-sm">
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      نوع الحساب:
+                                                    </span>
+                                                    <Badge variant="outline">
+                                                      {
+                                                        employeeDetails.account_type
+                                                      }
+                                                    </Badge>
+                                                  </div>
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      الحالة:
+                                                    </span>
+                                                    {getStatusBadge(
+                                                      employeeDetails.status,
+                                                    )}
+                                                  </div>
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      آخر تسجيل دخول:
+                                                    </span>
+                                                    <span className="font-medium">
+                                                      {employeeDetails.last_login_at
+                                                        ? formatDate(
+                                                            employeeDetails.last_login_at,
+                                                          )
+                                                        : "لم يسجل دخول"}
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      تاريخ الإنشاء:
+                                                    </span>
+                                                    <span className="font-medium">
+                                                      {formatDate(
+                                                        employeeDetails.created_at,
+                                                      )}
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex justify-between">
+                                                    <span className="text-gray-600">
+                                                      آخر تحديث:
+                                                    </span>
+                                                    <span className="font-medium">
+                                                      {formatDate(
+                                                        employeeDetails.updated_at,
+                                                      )}
+                                                    </span>
+                                                  </div>
                                                 </div>
                                               </div>
                                             </div>
-                                            
-                                            <div className="space-y-2">
-                                              <h4 className="font-semibold text-gray-900">معلومات الحساب</h4>
-                                              <div className="space-y-2 text-sm">
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">نوع الحساب:</span>
-                                                  <Badge variant="outline">{employeeDetails.account_type}</Badge>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">الحالة:</span>
-                                                  {getStatusBadge(employeeDetails.status)}
-                                                </div>
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">آخر تسجيل دخول:</span>
-                                                  <span className="font-medium">
-                                                    {employeeDetails.last_login_at ? formatDate(employeeDetails.last_login_at) : "لم يسجل دخول"}
-                                                  </span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">تاريخ الإنشاء:</span>
-                                                  <span className="font-medium">{formatDate(employeeDetails.created_at)}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                  <span className="text-gray-600">آخر تحديث:</span>
-                                                  <span className="font-medium">{formatDate(employeeDetails.updated_at)}</span>
-                                                </div>
+
+                                            {/* Roles */}
+                                            <div>
+                                              <h4 className="font-semibold text-gray-900 mb-3">
+                                                الأدوار
+                                              </h4>
+                                              <div className="flex flex-wrap gap-2">
+                                                {employeeDetails.roles.map(
+                                                  (role) => (
+                                                    <Badge
+                                                      key={role.id}
+                                                      variant="secondary"
+                                                      className="px-3 py-1"
+                                                    >
+                                                      {role.name}
+                                                    </Badge>
+                                                  ),
+                                                )}
+                                              </div>
+                                            </div>
+
+                                            {/* Permissions */}
+                                            <div>
+                                              <h4 className="font-semibold text-gray-900 mb-3">
+                                                الصلاحيات
+                                              </h4>
+                                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                {employeeDetails.permissions.map(
+                                                  (permission) => (
+                                                    <div
+                                                      key={permission.id}
+                                                      className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                                                    >
+                                                      <span className="text-sm font-medium">
+                                                        {translatePermission(
+                                                          permission.name,
+                                                        )}
+                                                      </span>
+                                                      {permission.description && (
+                                                        <span className="text-xs text-gray-500">
+                                                          {
+                                                            permission.description
+                                                          }
+                                                        </span>
+                                                      )}
+                                                    </div>
+                                                  ),
+                                                )}
                                               </div>
                                             </div>
                                           </div>
-
-                                          {/* Roles */}
-                                          <div>
-                                            <h4 className="font-semibold text-gray-900 mb-3">الأدوار</h4>
-                                            <div className="flex flex-wrap gap-2">
-                                              {employeeDetails.roles.map((role) => (
-                                                <Badge key={role.id} variant="secondary" className="px-3 py-1">
-                                                  {role.name}
-                                                </Badge>
-                                              ))}
-                                            </div>
+                                        ) : (
+                                          <div className="text-center py-8">
+                                            <p className="text-gray-500">
+                                              لا توجد تفاصيل متاحة
+                                            </p>
                                           </div>
-
-                                          {/* Permissions */}
-                                          <div>
-                                            <h4 className="font-semibold text-gray-900 mb-3">الصلاحيات</h4>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                              {employeeDetails.permissions.map((permission) => (
-                                                <div key={permission.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                                                  <span className="text-sm font-medium">{translatePermission(permission.name)}</span>
-                                                  {permission.description && (
-                                                    <span className="text-xs text-gray-500">{permission.description}</span>
-                                                  )}
-                                                </div>
-                                              ))}
-                                            </div>
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <div className="text-center py-8">
-                                          <p className="text-gray-500">لا توجد تفاصيل متاحة</p>
-                                        </div>
-                                      )}
-                                    </DialogContent>
-                                  </Dialog>
+                                        )}
+                                      </DialogContent>
+                                    </Dialog>
                                   </div>
                                 </TableCell>
                               </TableRow>
@@ -1760,7 +2154,7 @@ export default function AccessControlPage() {
                     )}
                   </CardContent>
                 </Card>
-                
+
                 {/* Edit Employee Dialog */}
                 <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
                   <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-white">
@@ -1775,111 +2169,165 @@ export default function AccessControlPage() {
                         قم بتعديل معلومات الموظف والصلاحيات المخصصة له
                       </DialogDescription>
                     </DialogHeader>
-                    
+
                     <ScrollArea className="max-h-[70vh] pr-4">
                       <div className="space-y-8 py-6">
                         {/* Success Message */}
                         {editSuccess && (
                           <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
                             <CheckCircle className="h-5 w-5 text-green-600" />
-                            <span className="text-green-800 font-medium">تم تحديث الموظف بنجاح!</span>
+                            <span className="text-green-800 font-medium">
+                              تم تحديث الموظف بنجاح!
+                            </span>
                           </div>
                         )}
-                        
+
                         {/* Error Message */}
                         {editError && (
                           <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
                             <XCircle className="h-5 w-5 text-red-600" />
-                            <span className="text-red-800 font-medium">{editError}</span>
+                            <span className="text-red-800 font-medium">
+                              {editError}
+                            </span>
                           </div>
                         )}
-                        
+
                         {/* Basic Information Section */}
                         <div className="space-y-6">
                           <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
                             <div className="p-2 bg-gray-100 rounded-lg">
                               <Users className="h-5 w-5 text-gray-700" />
                             </div>
-                            <h3 className="text-xl font-semibold text-black">المعلومات الأساسية</h3>
+                            <h3 className="text-xl font-semibold text-black">
+                              المعلومات الأساسية
+                            </h3>
                           </div>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                              <Label htmlFor="edit_first_name" className="text-sm font-medium text-gray-700">
+                              <Label
+                                htmlFor="edit_first_name"
+                                className="text-sm font-medium text-gray-700"
+                              >
                                 الاسم الأول *
                               </Label>
                               <Input
                                 id="edit_first_name"
                                 value={editFormData.first_name}
-                                onChange={(e) => setEditFormData(prev => ({ ...prev, first_name: e.target.value }))}
+                                onChange={(e) =>
+                                  setEditFormData((prev) => ({
+                                    ...prev,
+                                    first_name: e.target.value,
+                                  }))
+                                }
                                 placeholder="أدخل الاسم الأول"
                                 className="border-gray-300 focus:border-black focus:ring-black"
                               />
                             </div>
-                            
+
                             <div className="space-y-2">
-                              <Label htmlFor="edit_last_name" className="text-sm font-medium text-gray-700">
+                              <Label
+                                htmlFor="edit_last_name"
+                                className="text-sm font-medium text-gray-700"
+                              >
                                 الاسم الأخير *
                               </Label>
                               <Input
                                 id="edit_last_name"
                                 value={editFormData.last_name}
-                                onChange={(e) => setEditFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                                onChange={(e) =>
+                                  setEditFormData((prev) => ({
+                                    ...prev,
+                                    last_name: e.target.value,
+                                  }))
+                                }
                                 placeholder="أدخل الاسم الأخير"
                                 className="border-gray-300 focus:border-black focus:ring-black"
                               />
                             </div>
-                            
+
                             <div className="space-y-2">
-                              <Label htmlFor="edit_email" className="text-sm font-medium text-gray-700">
+                              <Label
+                                htmlFor="edit_email"
+                                className="text-sm font-medium text-gray-700"
+                              >
                                 البريد الإلكتروني *
                               </Label>
                               <Input
                                 id="edit_email"
                                 type="email"
                                 value={editFormData.email}
-                                onChange={(e) => setEditFormData(prev => ({ ...prev, email: e.target.value }))}
+                                onChange={(e) =>
+                                  setEditFormData((prev) => ({
+                                    ...prev,
+                                    email: e.target.value,
+                                  }))
+                                }
                                 placeholder="example@company.com"
                                 className="border-gray-300 focus:border-black focus:ring-black"
                               />
                             </div>
-                            
+
                             <div className="space-y-2">
-                              <Label htmlFor="edit_phone" className="text-sm font-medium text-gray-700">
+                              <Label
+                                htmlFor="edit_phone"
+                                className="text-sm font-medium text-gray-700"
+                              >
                                 رقم الهاتف *
                               </Label>
                               <Input
                                 id="edit_phone"
                                 value={editFormData.phone}
-                                onChange={(e) => setEditFormData(prev => ({ ...prev, phone: e.target.value }))}
+                                onChange={(e) =>
+                                  setEditFormData((prev) => ({
+                                    ...prev,
+                                    phone: e.target.value,
+                                  }))
+                                }
                                 placeholder="+966501234567"
                                 className="border-gray-300 focus:border-black focus:ring-black"
                               />
                             </div>
-                            
+
                             <div className="space-y-2">
-                              <Label htmlFor="edit_password" className="text-sm font-medium text-gray-700">
+                              <Label
+                                htmlFor="edit_password"
+                                className="text-sm font-medium text-gray-700"
+                              >
                                 كلمة المرور الجديدة (اختياري)
                               </Label>
                               <Input
                                 id="edit_password"
                                 type="password"
                                 value={editFormData.password}
-                                onChange={(e) => setEditFormData(prev => ({ ...prev, password: e.target.value }))}
+                                onChange={(e) =>
+                                  setEditFormData((prev) => ({
+                                    ...prev,
+                                    password: e.target.value,
+                                  }))
+                                }
                                 placeholder="اتركه فارغاً للحفاظ على كلمة المرور الحالية"
                                 className="border-gray-300 focus:border-black focus:ring-black"
                               />
                             </div>
-                            
+
                             <div className="space-y-2">
-                              <Label htmlFor="edit_active" className="text-sm font-medium text-gray-700">
+                              <Label
+                                htmlFor="edit_active"
+                                className="text-sm font-medium text-gray-700"
+                              >
                                 حالة الحساب
                               </Label>
                               <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg">
                                 <Switch
                                   id="edit_active"
                                   checked={editFormData.active}
-                                  onCheckedChange={(checked) => setEditFormData(prev => ({ ...prev, active: checked }))}
+                                  onCheckedChange={(checked) =>
+                                    setEditFormData((prev) => ({
+                                      ...prev,
+                                      active: checked,
+                                    }))
+                                  }
                                   className="data-[state=checked]:bg-black"
                                 />
                                 <span className="text-sm text-gray-600">
@@ -1889,23 +2337,27 @@ export default function AccessControlPage() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <Separator className="my-8" />
-                        
+
                         {/* Roles Section */}
                         <div className="space-y-6">
                           <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
                             <div className="p-2 bg-gray-100 rounded-lg">
                               <Shield className="h-5 w-5 text-gray-700" />
                             </div>
-                            <h3 className="text-xl font-semibold text-black">الأدوار</h3>
+                            <h3 className="text-xl font-semibold text-black">
+                              الأدوار
+                            </h3>
                           </div>
-                          
+
                           {rolesLoading ? (
                             <div className="flex items-center justify-center py-12">
                               <div className="flex flex-col items-center gap-3">
                                 <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                                <span className="text-gray-600 font-medium">جاري تحميل الأدوار...</span>
+                                <span className="text-gray-600 font-medium">
+                                  جاري تحميل الأدوار...
+                                </span>
                                 <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
                                   <div className="h-full bg-black animate-pulse rounded-full"></div>
                                 </div>
@@ -1914,17 +2366,33 @@ export default function AccessControlPage() {
                           ) : roles.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {roles.map((role) => (
-                                <div key={role.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                <div
+                                  key={role.id}
+                                  className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
                                   <Checkbox
                                     id={`edit-role-${role.id}`}
-                                    checked={editSelectedRoles[role.id] || false}
-                                    onCheckedChange={(checked) => handleRoleChange(role.id, checked as boolean)}
+                                    checked={
+                                      editSelectedRoles[role.id] || false
+                                    }
+                                    onCheckedChange={(checked) =>
+                                      handleRoleChange(
+                                        role.id,
+                                        checked as boolean,
+                                      )
+                                    }
                                     className="data-[state=checked]:bg-black data-[state=checked]:border-black"
                                   />
-                                  <Label htmlFor={`edit-role-${role.id}`} className="text-sm text-gray-700 cursor-pointer flex-1">
-                                    <div className="font-medium">{role.name}</div>
+                                  <Label
+                                    htmlFor={`edit-role-${role.id}`}
+                                    className="text-sm text-gray-700 cursor-pointer flex-1"
+                                  >
+                                    <div className="font-medium">
+                                      {role.name}
+                                    </div>
                                     <div className="text-xs text-gray-500">
-                                      {role.permissions_list?.length || 0} صلاحية
+                                      {role.permissions_list?.length || 0}{" "}
+                                      صلاحية
                                     </div>
                                   </Label>
                                 </div>
@@ -1933,16 +2401,17 @@ export default function AccessControlPage() {
                           ) : (
                             <div className="text-center py-8">
                               <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                              <p className="text-gray-600">لا توجد أدوار متاحة</p>
+                              <p className="text-gray-600">
+                                لا توجد أدوار متاحة
+                              </p>
                             </div>
                           )}
                         </div>
-                        
+
                         <Separator className="my-8" />
-                        
                       </div>
                     </ScrollArea>
-                    
+
                     <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                       <Button
                         variant="outline"
@@ -1953,7 +2422,13 @@ export default function AccessControlPage() {
                       </Button>
                       <Button
                         onClick={updateEmployee}
-                        disabled={editLoading || !editFormData.first_name || !editFormData.last_name || !editFormData.email || !editFormData.phone}
+                        disabled={
+                          editLoading ||
+                          !editFormData.first_name ||
+                          !editFormData.last_name ||
+                          !editFormData.email ||
+                          !editFormData.phone
+                        }
                         className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400"
                       >
                         {editLoading ? (
@@ -2005,7 +2480,9 @@ export default function AccessControlPage() {
                       <div className="flex items-center justify-center py-12">
                         <div className="flex flex-col items-center gap-3">
                           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                          <span className="text-gray-600 font-medium">جاري تحميل الأدوار...</span>
+                          <span className="text-gray-600 font-medium">
+                            جاري تحميل الأدوار...
+                          </span>
                           <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
                             <div className="h-full bg-black animate-pulse rounded-full"></div>
                           </div>
@@ -2029,33 +2506,47 @@ export default function AccessControlPage() {
                                 <Shield className="h-5 w-5 text-white" />
                               </div>
                               <div className="flex-1">
-                                <p className="text-sm text-blue-600 font-medium">إجمالي الأدوار</p>
-                                <p className="text-2xl font-bold text-blue-800">{totalRoles}</p>
+                                <p className="text-sm text-blue-600 font-medium">
+                                  إجمالي الأدوار
+                                </p>
+                                <p className="text-2xl font-bold text-blue-800">
+                                  {totalRoles}
+                                </p>
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-green-500 rounded-lg">
                                 <Key className="h-5 w-5 text-white" />
                               </div>
                               <div className="flex-1">
-                                <p className="text-sm text-green-600 font-medium">إجمالي الصلاحيات</p>
-                                <p className="text-2xl font-bold text-green-800">{totalRolesPermissions}</p>
+                                <p className="text-sm text-green-600 font-medium">
+                                  إجمالي الصلاحيات
+                                </p>
+                                <p className="text-2xl font-bold text-green-800">
+                                  {totalRolesPermissions}
+                                </p>
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-4 sm:col-span-2 lg:col-span-1">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-purple-500 rounded-lg">
                                 <BarChart3 className="h-5 w-5 text-white" />
                               </div>
                               <div className="flex-1">
-                                <p className="text-sm text-purple-600 font-medium">متوسط الصلاحيات</p>
+                                <p className="text-sm text-purple-600 font-medium">
+                                  متوسط الصلاحيات
+                                </p>
                                 <p className="text-2xl font-bold text-purple-800">
-                                  {totalRoles > 0 ? Math.round(totalRolesPermissions / totalRoles) : 0}
+                                  {totalRoles > 0
+                                    ? Math.round(
+                                        totalRolesPermissions / totalRoles,
+                                      )
+                                    : 0}
                                 </p>
                               </div>
                             </div>
@@ -2068,7 +2559,9 @@ export default function AccessControlPage() {
                           <Input
                             placeholder="البحث في الأدوار والصلاحيات..."
                             value={rolesSearchQuery}
-                            onChange={(e) => setRolesSearchQuery(e.target.value)}
+                            onChange={(e) =>
+                              setRolesSearchQuery(e.target.value)
+                            }
                             className="pr-10 border-gray-300 focus:border-black focus:ring-black"
                           />
                         </div>
@@ -2076,7 +2569,10 @@ export default function AccessControlPage() {
                         {/* Roles List */}
                         <div className="space-y-6">
                           {filteredRoles.map((role) => (
-                            <div key={role.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                            <div
+                              key={role.id}
+                              className="border border-gray-200 rounded-lg overflow-hidden"
+                            >
                               <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 px-4 sm:px-6 py-4">
                                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                                   <div className="flex items-center gap-3">
@@ -2088,17 +2584,25 @@ export default function AccessControlPage() {
                                         {role.name}
                                       </h3>
                                       <p className="text-sm text-gray-600">
-                                        {role.permissions_list?.length || 0} صلاحية
+                                        {role.permissions_list?.length || 0}{" "}
+                                        صلاحية
                                       </p>
                                     </div>
                                   </div>
                                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                      <Badge variant="outline" className="text-gray-600">
+                                      <Badge
+                                        variant="outline"
+                                        className="text-gray-600"
+                                      >
                                         ID: {role.id}
                                       </Badge>
-                                      <Badge variant="secondary" className="text-gray-600">
-                                        {role.permissions_list?.length || 0} صلاحية
+                                      <Badge
+                                        variant="secondary"
+                                        className="text-gray-600"
+                                      >
+                                        {role.permissions_list?.length || 0}{" "}
+                                        صلاحية
                                       </Badge>
                                     </div>
                                     <div className="flex items-center gap-2 flex-wrap">
@@ -2109,7 +2613,9 @@ export default function AccessControlPage() {
                                         className="text-gray-600 hover:text-black hover:border-black"
                                       >
                                         <Eye className="h-4 w-4 ml-2" />
-                                        <span className="hidden sm:inline">عرض التفاصيل</span>
+                                        <span className="hidden sm:inline">
+                                          عرض التفاصيل
+                                        </span>
                                         <span className="sm:hidden">عرض</span>
                                       </Button>
                                       <Button
@@ -2119,7 +2625,9 @@ export default function AccessControlPage() {
                                         className="text-gray-600 hover:text-black hover:border-black"
                                       >
                                         <Edit className="h-4 w-4 ml-2" />
-                                        <span className="hidden sm:inline">تعديل</span>
+                                        <span className="hidden sm:inline">
+                                          تعديل
+                                        </span>
                                       </Button>
                                       <Button
                                         variant="outline"
@@ -2128,35 +2636,45 @@ export default function AccessControlPage() {
                                         className="text-red-600 hover:text-red-800 hover:border-red-800"
                                       >
                                         <XCircle className="h-4 w-4 ml-2" />
-                                        <span className="hidden sm:inline">حذف</span>
+                                        <span className="hidden sm:inline">
+                                          حذف
+                                        </span>
                                       </Button>
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                              
+
                               <div className="p-4 sm:p-6">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                                  {role.permissions_list?.map((permission, index) => (
-                                    <div key={index} className="group border border-gray-200 rounded-lg p-3 hover:border-black hover:shadow-md transition-all duration-200">
-                                      <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-gray-100 group-hover:bg-black rounded-lg transition-colors flex-shrink-0">
-                                          <Lock className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                          <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
-                                            {translatePermission(permission)}
-                                          </h4>
+                                  {role.permissions_list?.map(
+                                    (permission, index) => (
+                                      <div
+                                        key={index}
+                                        className="group border border-gray-200 rounded-lg p-3 hover:border-black hover:shadow-md transition-all duration-200"
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          <div className="p-2 bg-gray-100 group-hover:bg-black rounded-lg transition-colors flex-shrink-0">
+                                            <Lock className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
+                                              {translatePermission(permission)}
+                                            </h4>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  ))}
+                                    ),
+                                  )}
                                 </div>
-                                
-                                {(!role.permissions_list || role.permissions_list.length === 0) && (
+
+                                {(!role.permissions_list ||
+                                  role.permissions_list.length === 0) && (
                                   <div className="text-center py-8">
                                     <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-600">لا توجد صلاحيات لهذا الدور</p>
+                                    <p className="text-gray-600">
+                                      لا توجد صلاحيات لهذا الدور
+                                    </p>
                                   </div>
                                 )}
                               </div>
@@ -2168,9 +2686,12 @@ export default function AccessControlPage() {
                         {filteredRoles.length === 0 && rolesSearchQuery && (
                           <div className="text-center py-12">
                             <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">لا توجد نتائج</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                              لا توجد نتائج
+                            </h3>
                             <p className="text-gray-600">
-                              لم يتم العثور على أدوار تطابق البحث: "{rolesSearchQuery}"
+                              لم يتم العثور على أدوار تطابق البحث: "
+                              {rolesSearchQuery}"
                             </p>
                           </div>
                         )}
@@ -2178,8 +2699,12 @@ export default function AccessControlPage() {
                     ) : (
                       <div className="text-center py-12">
                         <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">لا توجد أدوار</h3>
-                        <p className="text-gray-600">لا توجد أدوار متاحة في النظام</p>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          لا توجد أدوار
+                        </h3>
+                        <p className="text-gray-600">
+                          لا توجد أدوار متاحة في النظام
+                        </p>
                       </div>
                     )}
                   </CardContent>
@@ -2203,7 +2728,9 @@ export default function AccessControlPage() {
                       <div className="flex items-center justify-center py-12">
                         <div className="flex flex-col items-center gap-3">
                           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                          <span className="text-gray-600 font-medium">جاري تحميل الصلاحيات...</span>
+                          <span className="text-gray-600 font-medium">
+                            جاري تحميل الصلاحيات...
+                          </span>
                           <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
                             <div className="h-full bg-black animate-pulse rounded-full"></div>
                           </div>
@@ -2212,8 +2739,13 @@ export default function AccessControlPage() {
                     ) : permissionsTabError ? (
                       <div className="text-center py-8">
                         <XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-                        <p className="text-red-600 mb-4">{permissionsTabError}</p>
-                        <Button onClick={fetchPermissionsForTab} variant="outline">
+                        <p className="text-red-600 mb-4">
+                          {permissionsTabError}
+                        </p>
+                        <Button
+                          onClick={fetchPermissionsForTab}
+                          variant="outline"
+                        >
                           إعادة المحاولة
                         </Button>
                       </div>
@@ -2227,32 +2759,44 @@ export default function AccessControlPage() {
                                 <Database className="h-5 w-5 text-white" />
                               </div>
                               <div>
-                                <p className="text-sm text-blue-600 font-medium">إجمالي الصلاحيات</p>
-                                <p className="text-2xl font-bold text-blue-800">{totalPermissions}</p>
+                                <p className="text-sm text-blue-600 font-medium">
+                                  إجمالي الصلاحيات
+                                </p>
+                                <p className="text-2xl font-bold text-blue-800">
+                                  {totalPermissions}
+                                </p>
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-green-500 rounded-lg">
                                 <BarChart3 className="h-5 w-5 text-white" />
                               </div>
                               <div>
-                                <p className="text-sm text-green-600 font-medium">فئات الصلاحيات</p>
-                                <p className="text-2xl font-bold text-green-800">{totalGroups}</p>
+                                <p className="text-sm text-green-600 font-medium">
+                                  فئات الصلاحيات
+                                </p>
+                                <p className="text-2xl font-bold text-green-800">
+                                  {totalGroups}
+                                </p>
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-4">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-purple-500 rounded-lg">
                                 <Key className="h-5 w-5 text-white" />
                               </div>
                               <div>
-                                <p className="text-sm text-purple-600 font-medium">الصلاحيات النشطة</p>
-                                <p className="text-2xl font-bold text-purple-800">{totalPermissions}</p>
+                                <p className="text-sm text-purple-600 font-medium">
+                                  الصلاحيات النشطة
+                                </p>
+                                <p className="text-2xl font-bold text-purple-800">
+                                  {totalPermissions}
+                                </p>
                               </div>
                             </div>
                           </div>
@@ -2271,91 +2815,120 @@ export default function AccessControlPage() {
 
                         {/* Permissions Groups */}
                         <div className="space-y-6">
-                          {Object.entries(filteredPermissions).map(([groupName, groupPermissions]) => (
-                            <div key={groupName} className="border border-gray-200 rounded-lg overflow-hidden">
-                              <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 px-6 py-4">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-black rounded-lg">
-                                      <Key className="h-5 w-5 text-white" />
-                                    </div>
-                                    <div>
-                                      <h3 className="text-lg font-semibold text-black capitalize">
-                                        {groupName}
-                                      </h3>
-                                      <p className="text-sm text-gray-600">
-                                        {groupPermissions.length} صلاحية
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <Badge variant="outline" className="text-gray-600">
-                                    {groupPermissions.length}
-                                  </Badge>
-                                </div>
-                              </div>
-                              
-                              <div className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                  {groupPermissions.map((permission) => (
-                                    <div key={permission.id} className="group border border-gray-200 rounded-lg p-4 hover:border-black hover:shadow-md transition-all duration-200">
-                                      <div className="flex items-start gap-3">
-                                        <div className="p-2 bg-gray-100 group-hover:bg-black rounded-lg transition-colors">
-                                          <Lock className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
-                                        </div>
-                                        <div className="flex-1">
-                                          <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors">
-                                            {translatePermission(permission.name)}
-                                          </h4>
-                                          {permission.description && (
-                                            <p className="text-sm text-gray-600 mt-1">
-                                              {permission.description}
-                                            </p>
-                                          )}
-                                          <div className="flex items-center gap-2 mt-2">
-                                            <Badge variant="outline" className="text-xs">
-                                              ID: {permission.id}
-                                            </Badge>
-                                            {permission.team_id && (
-                                              <Badge variant="secondary" className="text-xs">
-                                                Team: {permission.team_id}
-                                              </Badge>
-                                            )}
-                                          </div>
-                                        </div>
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          onClick={() => handleDeletePermission(permission)}
-                                          className="text-red-600 hover:text-red-800 hover:border-red-800 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                          <XCircle className="h-4 w-4 ml-2" />
-                                          حذف
-                                        </Button>
+                          {Object.entries(filteredPermissions).map(
+                            ([groupName, groupPermissions]) => (
+                              <div
+                                key={groupName}
+                                className="border border-gray-200 rounded-lg overflow-hidden"
+                              >
+                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 px-6 py-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <div className="p-2 bg-black rounded-lg">
+                                        <Key className="h-5 w-5 text-white" />
+                                      </div>
+                                      <div>
+                                        <h3 className="text-lg font-semibold text-black capitalize">
+                                          {groupName}
+                                        </h3>
+                                        <p className="text-sm text-gray-600">
+                                          {groupPermissions.length} صلاحية
+                                        </p>
                                       </div>
                                     </div>
-                                  ))}
+                                    <Badge
+                                      variant="outline"
+                                      className="text-gray-600"
+                                    >
+                                      {groupPermissions.length}
+                                    </Badge>
+                                  </div>
+                                </div>
+
+                                <div className="p-6">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {groupPermissions.map((permission) => (
+                                      <div
+                                        key={permission.id}
+                                        className="group border border-gray-200 rounded-lg p-4 hover:border-black hover:shadow-md transition-all duration-200"
+                                      >
+                                        <div className="flex items-start gap-3">
+                                          <div className="p-2 bg-gray-100 group-hover:bg-black rounded-lg transition-colors">
+                                            <Lock className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
+                                          </div>
+                                          <div className="flex-1">
+                                            <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors">
+                                              {translatePermission(
+                                                permission.name,
+                                              )}
+                                            </h4>
+                                            {permission.description && (
+                                              <p className="text-sm text-gray-600 mt-1">
+                                                {permission.description}
+                                              </p>
+                                            )}
+                                            <div className="flex items-center gap-2 mt-2">
+                                              <Badge
+                                                variant="outline"
+                                                className="text-xs"
+                                              >
+                                                ID: {permission.id}
+                                              </Badge>
+                                              {permission.team_id && (
+                                                <Badge
+                                                  variant="secondary"
+                                                  className="text-xs"
+                                                >
+                                                  Team: {permission.team_id}
+                                                </Badge>
+                                              )}
+                                            </div>
+                                          </div>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                              handleDeletePermission(permission)
+                                            }
+                                            className="text-red-600 hover:text-red-800 hover:border-red-800 opacity-0 group-hover:opacity-100 transition-opacity"
+                                          >
+                                            <XCircle className="h-4 w-4 ml-2" />
+                                            حذف
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ),
+                          )}
                         </div>
 
                         {/* No Results */}
-                        {Object.keys(filteredPermissions).length === 0 && searchQuery && (
-                          <div className="text-center py-12">
-                            <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">لا توجد نتائج</h3>
-                            <p className="text-gray-600">
-                              لم يتم العثور على صلاحيات تطابق البحث: "{searchQuery}"
-                            </p>
-                          </div>
-                        )}
+                        {Object.keys(filteredPermissions).length === 0 &&
+                          searchQuery && (
+                            <div className="text-center py-12">
+                              <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                لا توجد نتائج
+                              </h3>
+                              <p className="text-gray-600">
+                                لم يتم العثور على صلاحيات تطابق البحث: "
+                                {searchQuery}"
+                              </p>
+                            </div>
+                          )}
                       </div>
                     ) : (
                       <div className="text-center py-12">
                         <Key className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">لا توجد صلاحيات</h3>
-                        <p className="text-gray-600">لا توجد صلاحيات متاحة في النظام</p>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          لا توجد صلاحيات
+                        </h3>
+                        <p className="text-gray-600">
+                          لا توجد صلاحيات متاحة في النظام
+                        </p>
                       </div>
                     )}
                   </CardContent>
@@ -2367,23 +2940,26 @@ export default function AccessControlPage() {
       </div>
 
       {/* Role Details Dialog */}
-      <Dialog open={showRoleDetailsDialog} onOpenChange={setShowRoleDetailsDialog}>
+      <Dialog
+        open={showRoleDetailsDialog}
+        onOpenChange={setShowRoleDetailsDialog}
+      >
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-black">
               <Shield className="h-5 w-5" />
               تفاصيل الدور
             </DialogTitle>
-            <DialogDescription>
-              عرض تفاصيل الدور وصلاحياته
-            </DialogDescription>
+            <DialogDescription>عرض تفاصيل الدور وصلاحياته</DialogDescription>
           </DialogHeader>
-          
+
           {roleDetailsLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="flex flex-col items-center gap-3">
                 <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                <span className="text-gray-600 font-medium">جاري تحميل تفاصيل الدور...</span>
+                <span className="text-gray-600 font-medium">
+                  جاري تحميل تفاصيل الدور...
+                </span>
                 <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
                   <div className="h-full bg-black animate-pulse rounded-full"></div>
                 </div>
@@ -2393,7 +2969,12 @@ export default function AccessControlPage() {
             <div className="text-center py-8">
               <XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
               <p className="text-red-600 mb-4">{roleDetailsError}</p>
-              <Button onClick={() => selectedRole && fetchRoleDetails(selectedRole.id)} variant="outline">
+              <Button
+                onClick={() =>
+                  selectedRole && fetchRoleDetails(selectedRole.id)
+                }
+                variant="outline"
+              >
                 إعادة المحاولة
               </Button>
             </div>
@@ -2409,10 +2990,12 @@ export default function AccessControlPage() {
                     <h3 className="text-2xl font-bold text-black capitalize">
                       {roleDetails.name}
                     </h3>
-                    <p className="text-gray-600">معرف الدور: {roleDetails.id}</p>
+                    <p className="text-gray-600">
+                      معرف الدور: {roleDetails.id}
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
@@ -2421,20 +3004,26 @@ export default function AccessControlPage() {
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span className="text-gray-600">اسم الحارس:</span>
-                      <span className="font-medium">{roleDetails.guard_name}</span>
+                      <span className="font-medium">
+                        {roleDetails.guard_name}
+                      </span>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span className="text-gray-600">تاريخ الإنشاء:</span>
                       <span className="font-medium">
-                        {new Date(roleDetails.created_at).toLocaleDateString("ar-US")}
+                        {new Date(roleDetails.created_at).toLocaleDateString(
+                          "ar-US",
+                        )}
                       </span>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span className="text-gray-600">آخر تحديث:</span>
                       <span className="font-medium">
-                        {new Date(roleDetails.updated_at).toLocaleDateString("ar-US")}
+                        {new Date(roleDetails.updated_at).toLocaleDateString(
+                          "ar-US",
+                        )}
                       </span>
                     </div>
                   </div>
@@ -2445,25 +3034,33 @@ export default function AccessControlPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Key className="h-5 w-5 text-gray-600" />
-                  <h4 className="text-lg font-semibold text-black">الصلاحيات ({roleDetails.permissions_list?.length || 0})</h4>
+                  <h4 className="text-lg font-semibold text-black">
+                    الصلاحيات ({roleDetails.permissions_list?.length || 0})
+                  </h4>
                 </div>
-                
-                {roleDetails.permissions_list && roleDetails.permissions_list.length > 0 ? (
+
+                {roleDetails.permissions_list &&
+                roleDetails.permissions_list.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                    {roleDetails.permissions_list.map((permission: string, index: number) => (
-                      <div key={index} className="group border border-gray-200 rounded-lg p-4 hover:border-black hover:shadow-md transition-all duration-200">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-gray-100 group-hover:bg-black rounded-lg transition-colors flex-shrink-0">
-                            <Lock className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h5 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
-                              {translatePermission(permission)}
-                            </h5>
+                    {roleDetails.permissions_list.map(
+                      (permission: string, index: number) => (
+                        <div
+                          key={index}
+                          className="group border border-gray-200 rounded-lg p-4 hover:border-black hover:shadow-md transition-all duration-200"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-gray-100 group-hover:bg-black rounded-lg transition-colors flex-shrink-0">
+                              <Lock className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h5 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
+                                {translatePermission(permission)}
+                              </h5>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-8">
@@ -2474,36 +3071,53 @@ export default function AccessControlPage() {
               </div>
 
               {/* Detailed Permissions */}
-              {roleDetails.permissions && roleDetails.permissions.length > 0 && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-gray-600" />
-                    <h4 className="text-lg font-semibold text-black">تفاصيل الصلاحيات</h4>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {roleDetails.permissions.map((permission: any, index: number) => (
-                      <div key={index} className="border border-gray-200 rounded-lg p-4 hover:border-black transition-colors">
-                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-gray-100 rounded-lg flex-shrink-0">
-                              <Lock className="h-4 w-4 text-gray-600" />
-                            </div>
-                            <div className="min-w-0">
-                              <h5 className="font-medium text-gray-900 truncate">{translatePermission(permission.name)}</h5>
-                              <p className="text-sm text-gray-600">معرف الصلاحية: {permission.id}</p>
+              {roleDetails.permissions &&
+                roleDetails.permissions.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5 text-gray-600" />
+                      <h4 className="text-lg font-semibold text-black">
+                        تفاصيل الصلاحيات
+                      </h4>
+                    </div>
+
+                    <div className="space-y-3">
+                      {roleDetails.permissions.map(
+                        (permission: any, index: number) => (
+                          <div
+                            key={index}
+                            className="border border-gray-200 rounded-lg p-4 hover:border-black transition-colors"
+                          >
+                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gray-100 rounded-lg flex-shrink-0">
+                                  <Lock className="h-4 w-4 text-gray-600" />
+                                </div>
+                                <div className="min-w-0">
+                                  <h5 className="font-medium text-gray-900 truncate">
+                                    {translatePermission(permission.name)}
+                                  </h5>
+                                  <p className="text-sm text-gray-600">
+                                    معرف الصلاحية: {permission.id}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right lg:text-left">
+                                <p className="text-sm text-gray-600">
+                                  معرف الدور: {permission.pivot.role_id}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  معرف الصلاحية:{" "}
+                                  {permission.pivot.permission_id}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                          <div className="text-right lg:text-left">
-                            <p className="text-sm text-gray-600">معرف الدور: {permission.pivot.role_id}</p>
-                            <p className="text-sm text-gray-600">معرف الصلاحية: {permission.pivot.permission_id}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                        ),
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           ) : (
             <div className="text-center py-8">
@@ -2511,9 +3125,9 @@ export default function AccessControlPage() {
               <p className="text-gray-600">لا توجد بيانات للعرض</p>
             </div>
           )}
-          
+
           <DialogFooter>
-            <Button 
+            <Button
               onClick={() => setShowRoleDetailsDialog(false)}
               variant="outline"
               className="text-gray-600 hover:text-black hover:border-black"
@@ -2525,7 +3139,10 @@ export default function AccessControlPage() {
       </Dialog>
 
       {/* Create Role Dialog */}
-      <Dialog open={showCreateRoleDialog} onOpenChange={setShowCreateRoleDialog}>
+      <Dialog
+        open={showCreateRoleDialog}
+        onOpenChange={setShowCreateRoleDialog}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-black">
@@ -2536,7 +3153,7 @@ export default function AccessControlPage() {
               إنشاء دور جديد مع تحديد الصلاحيات المطلوبة
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-6">
             {/* Role Name */}
             <div className="space-y-2">
@@ -2548,7 +3165,10 @@ export default function AccessControlPage() {
                 placeholder="أدخل اسم الدور"
                 value={roleFormData.name}
                 onChange={(e) => {
-                  setRoleFormData(prev => ({ ...prev, name: e.target.value }));
+                  setRoleFormData((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }));
                   if (createRoleError) {
                     setCreateRoleError(null);
                   }
@@ -2563,45 +3183,67 @@ export default function AccessControlPage() {
                 <Key className="h-5 w-5 text-gray-600" />
                 <Label className="text-black font-medium">الصلاحيات</Label>
               </div>
-              
+
               {permissionsForRoleLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="flex flex-col items-center gap-3">
                     <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                    <span className="text-gray-600 font-medium">جاري تحميل الصلاحيات...</span>
+                    <span className="text-gray-600 font-medium">
+                      جاري تحميل الصلاحيات...
+                    </span>
                   </div>
                 </div>
-              ) : availablePermissionsForRole && availablePermissionsForRole.grouped ? (
+              ) : availablePermissionsForRole &&
+                availablePermissionsForRole.grouped ? (
                 <ScrollArea className="h-64 border border-gray-200 rounded-lg p-4">
                   <div className="space-y-4">
-                    {Object.entries(availablePermissionsForRole.grouped).map(([groupName, groupPermissions]) => (
-                      <div key={groupName} className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <div className="p-1 bg-gray-100 rounded">
-                            <Key className="h-4 w-4 text-gray-600" />
-                          </div>
-                          <h4 className="font-medium text-gray-900 capitalize">{groupName}</h4>
-                        </div>
-                        <div className="space-y-2 pr-4">
-                          {Array.isArray(groupPermissions) && groupPermissions.map((permission: any, index: number) => (
-                            <div key={index} className="flex items-center space-x-2 space-x-reverse">
-                              <Checkbox
-                                id={`role-permission-${groupName}-${index}`}
-                                checked={selectedRolePermissions[permission.name] || false}
-                                onCheckedChange={(checked) => handleRolePermissionChange(permission.name, checked as boolean)}
-                                className="border-gray-300 data-[state=checked]:bg-black data-[state=checked]:border-black"
-                              />
-                              <Label 
-                                htmlFor={`role-permission-${groupName}-${index}`}
-                                className="text-gray-700 cursor-pointer flex-1"
-                              >
-                                {translatePermission(permission.name)}
-                              </Label>
+                    {Object.entries(availablePermissionsForRole.grouped).map(
+                      ([groupName, groupPermissions]) => (
+                        <div key={groupName} className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className="p-1 bg-gray-100 rounded">
+                              <Key className="h-4 w-4 text-gray-600" />
                             </div>
-                          ))}
+                            <h4 className="font-medium text-gray-900 capitalize">
+                              {groupName}
+                            </h4>
+                          </div>
+                          <div className="space-y-2 pr-4">
+                            {Array.isArray(groupPermissions) &&
+                              groupPermissions.map(
+                                (permission: any, index: number) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center space-x-2 space-x-reverse"
+                                  >
+                                    <Checkbox
+                                      id={`role-permission-${groupName}-${index}`}
+                                      checked={
+                                        selectedRolePermissions[
+                                          permission.name
+                                        ] || false
+                                      }
+                                      onCheckedChange={(checked) =>
+                                        handleRolePermissionChange(
+                                          permission.name,
+                                          checked as boolean,
+                                        )
+                                      }
+                                      className="border-gray-300 data-[state=checked]:bg-black data-[state=checked]:border-black"
+                                    />
+                                    <Label
+                                      htmlFor={`role-permission-${groupName}-${index}`}
+                                      className="text-gray-700 cursor-pointer flex-1"
+                                    >
+                                      {translatePermission(permission.name)}
+                                    </Label>
+                                  </div>
+                                ),
+                              )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </ScrollArea>
               ) : (
@@ -2617,7 +3259,9 @@ export default function AccessControlPage() {
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span className="text-green-800 font-medium">تم إنشاء الدور بنجاح!</span>
+                  <span className="text-green-800 font-medium">
+                    تم إنشاء الدور بنجاح!
+                  </span>
                 </div>
               </div>
             )}
@@ -2627,21 +3271,23 @@ export default function AccessControlPage() {
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex items-center gap-2">
                   <XCircle className="h-5 w-5 text-red-600" />
-                  <span className="text-red-800 font-medium">{createRoleError}</span>
+                  <span className="text-red-800 font-medium">
+                    {createRoleError}
+                  </span>
                 </div>
               </div>
             )}
           </div>
-          
+
           <DialogFooter>
-            <Button 
+            <Button
               onClick={() => setShowCreateRoleDialog(false)}
               variant="outline"
               className="text-gray-600 hover:text-black hover:border-black"
             >
               إلغاء
             </Button>
-            <Button 
+            <Button
               onClick={createRole}
               disabled={createRoleLoading || !roleFormData.name.trim()}
               className="bg-black hover:bg-gray-800 text-white disabled:opacity-50"
@@ -2670,11 +3316,9 @@ export default function AccessControlPage() {
               <Edit className="h-5 w-5" />
               تعديل الدور
             </DialogTitle>
-            <DialogDescription>
-              تعديل بيانات الدور وصلاحياته
-            </DialogDescription>
+            <DialogDescription>تعديل بيانات الدور وصلاحياته</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-6">
             {/* Role Name */}
             <div className="space-y-2">
@@ -2685,7 +3329,12 @@ export default function AccessControlPage() {
                 id="editRoleName"
                 placeholder="أدخل اسم الدور"
                 value={editRoleFormData.name}
-                onChange={(e) => setEditRoleFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setEditRoleFormData((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
                 className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
@@ -2696,45 +3345,67 @@ export default function AccessControlPage() {
                 <Key className="h-5 w-5 text-gray-600" />
                 <Label className="text-black font-medium">الصلاحيات</Label>
               </div>
-              
+
               {permissionsForRoleLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="flex flex-col items-center gap-3">
                     <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                    <span className="text-gray-600 font-medium">جاري تحميل الصلاحيات...</span>
+                    <span className="text-gray-600 font-medium">
+                      جاري تحميل الصلاحيات...
+                    </span>
                   </div>
                 </div>
-              ) : availablePermissionsForRole && availablePermissionsForRole.grouped ? (
+              ) : availablePermissionsForRole &&
+                availablePermissionsForRole.grouped ? (
                 <ScrollArea className="h-64 border border-gray-200 rounded-lg p-4">
                   <div className="space-y-4">
-                    {Object.entries(availablePermissionsForRole.grouped).map(([groupName, groupPermissions]) => (
-                      <div key={groupName} className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <div className="p-1 bg-gray-100 rounded">
-                            <Key className="h-4 w-4 text-gray-600" />
-                          </div>
-                          <h4 className="font-medium text-gray-900 capitalize">{groupName}</h4>
-                        </div>
-                        <div className="space-y-2 pr-4">
-                          {Array.isArray(groupPermissions) && groupPermissions.map((permission: any, index: number) => (
-                            <div key={index} className="flex items-center space-x-2 space-x-reverse">
-                              <Checkbox
-                                id={`edit-role-permission-${groupName}-${index}`}
-                                checked={editSelectedRolePermissions[permission.name] || false}
-                                onCheckedChange={(checked) => handleEditRolePermissionChange(permission.name, checked as boolean)}
-                                className="border-gray-300 data-[state=checked]:bg-black data-[state=checked]:border-black"
-                              />
-                              <Label 
-                                htmlFor={`edit-role-permission-${groupName}-${index}`}
-                                className="text-gray-700 cursor-pointer flex-1"
-                              >
-                                {translatePermission(permission.name)}
-                              </Label>
+                    {Object.entries(availablePermissionsForRole.grouped).map(
+                      ([groupName, groupPermissions]) => (
+                        <div key={groupName} className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className="p-1 bg-gray-100 rounded">
+                              <Key className="h-4 w-4 text-gray-600" />
                             </div>
-                          ))}
+                            <h4 className="font-medium text-gray-900 capitalize">
+                              {groupName}
+                            </h4>
+                          </div>
+                          <div className="space-y-2 pr-4">
+                            {Array.isArray(groupPermissions) &&
+                              groupPermissions.map(
+                                (permission: any, index: number) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center space-x-2 space-x-reverse"
+                                  >
+                                    <Checkbox
+                                      id={`edit-role-permission-${groupName}-${index}`}
+                                      checked={
+                                        editSelectedRolePermissions[
+                                          permission.name
+                                        ] || false
+                                      }
+                                      onCheckedChange={(checked) =>
+                                        handleEditRolePermissionChange(
+                                          permission.name,
+                                          checked as boolean,
+                                        )
+                                      }
+                                      className="border-gray-300 data-[state=checked]:bg-black data-[state=checked]:border-black"
+                                    />
+                                    <Label
+                                      htmlFor={`edit-role-permission-${groupName}-${index}`}
+                                      className="text-gray-700 cursor-pointer flex-1"
+                                    >
+                                      {translatePermission(permission.name)}
+                                    </Label>
+                                  </div>
+                                ),
+                              )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </ScrollArea>
               ) : (
@@ -2750,7 +3421,9 @@ export default function AccessControlPage() {
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span className="text-green-800 font-medium">تم تحديث الدور بنجاح!</span>
+                  <span className="text-green-800 font-medium">
+                    تم تحديث الدور بنجاح!
+                  </span>
                 </div>
               </div>
             )}
@@ -2760,21 +3433,23 @@ export default function AccessControlPage() {
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex items-center gap-2">
                   <XCircle className="h-5 w-5 text-red-600" />
-                  <span className="text-red-800 font-medium">{editRoleError}</span>
+                  <span className="text-red-800 font-medium">
+                    {editRoleError}
+                  </span>
                 </div>
               </div>
             )}
           </div>
-          
+
           <DialogFooter>
-            <Button 
+            <Button
               onClick={() => setShowEditRoleDialog(false)}
               variant="outline"
               className="text-gray-600 hover:text-black hover:border-black"
             >
               إلغاء
             </Button>
-            <Button 
+            <Button
               onClick={updateRole}
               disabled={editRoleLoading || !editRoleFormData.name.trim()}
               className="bg-black hover:bg-gray-800 text-white disabled:opacity-50"
@@ -2796,7 +3471,10 @@ export default function AccessControlPage() {
       </Dialog>
 
       {/* Delete Role Dialog */}
-      <Dialog open={showDeleteRoleDialog} onOpenChange={setShowDeleteRoleDialog}>
+      <Dialog
+        open={showDeleteRoleDialog}
+        onOpenChange={setShowDeleteRoleDialog}
+      >
         <DialogContent className="max-w-md bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
@@ -2807,7 +3485,7 @@ export default function AccessControlPage() {
               هل أنت متأكد من حذف هذا الدور؟ لا يمكن التراجع عن هذا الإجراء.
             </DialogDescription>
           </DialogHeader>
-          
+
           {roleToDelete && (
             <div className="py-4">
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -2816,8 +3494,12 @@ export default function AccessControlPage() {
                     <Shield className="h-5 w-5 text-red-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-red-800">{roleToDelete.name}</h4>
-                    <p className="text-sm text-red-600">معرف الدور: {roleToDelete.id}</p>
+                    <h4 className="font-medium text-red-800">
+                      {roleToDelete.name}
+                    </h4>
+                    <p className="text-sm text-red-600">
+                      معرف الدور: {roleToDelete.id}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -2828,20 +3510,22 @@ export default function AccessControlPage() {
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center gap-2">
                 <XCircle className="h-5 w-5 text-red-600" />
-                <span className="text-red-800 font-medium">{deleteRoleError}</span>
+                <span className="text-red-800 font-medium">
+                  {deleteRoleError}
+                </span>
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
-            <Button 
+            <Button
               onClick={() => setShowDeleteRoleDialog(false)}
               variant="outline"
               className="text-gray-600 hover:text-black hover:border-black"
             >
               إلغاء
             </Button>
-            <Button 
+            <Button
               onClick={deleteRole}
               disabled={deleteRoleLoading}
               className="bg-red-600 hover:bg-red-700 text-white"
@@ -2863,7 +3547,10 @@ export default function AccessControlPage() {
       </Dialog>
 
       {/* Delete Permission Dialog */}
-      <Dialog open={showDeletePermissionDialog} onOpenChange={setShowDeletePermissionDialog}>
+      <Dialog
+        open={showDeletePermissionDialog}
+        onOpenChange={setShowDeletePermissionDialog}
+      >
         <DialogContent className="max-w-md bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
@@ -2874,7 +3561,7 @@ export default function AccessControlPage() {
               هل أنت متأكد من حذف هذه الصلاحية؟ لا يمكن التراجع عن هذا الإجراء.
             </DialogDescription>
           </DialogHeader>
-          
+
           {permissionToDelete && (
             <div className="py-4">
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -2883,10 +3570,16 @@ export default function AccessControlPage() {
                     <Lock className="h-5 w-5 text-red-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-red-800">{permissionToDelete.name}</h4>
-                    <p className="text-sm text-red-600">معرف الصلاحية: {permissionToDelete.id}</p>
+                    <h4 className="font-medium text-red-800">
+                      {permissionToDelete.name}
+                    </h4>
+                    <p className="text-sm text-red-600">
+                      معرف الصلاحية: {permissionToDelete.id}
+                    </p>
                     {permissionToDelete.description && (
-                      <p className="text-sm text-red-600 mt-1">{permissionToDelete.description}</p>
+                      <p className="text-sm text-red-600 mt-1">
+                        {permissionToDelete.description}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -2898,20 +3591,22 @@ export default function AccessControlPage() {
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center gap-2">
                 <XCircle className="h-5 w-5 text-red-600" />
-                <span className="text-red-800 font-medium">{deletePermissionError}</span>
+                <span className="text-red-800 font-medium">
+                  {deletePermissionError}
+                </span>
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
-            <Button 
+            <Button
               onClick={() => setShowDeletePermissionDialog(false)}
               variant="outline"
               className="text-gray-600 hover:text-black hover:border-black"
             >
               إلغاء
             </Button>
-            <Button 
+            <Button
               onClick={deletePermission}
               disabled={deletePermissionLoading}
               className="bg-red-600 hover:bg-red-700 text-white"
@@ -2933,7 +3628,10 @@ export default function AccessControlPage() {
       </Dialog>
 
       {/* Delete Employee Dialog */}
-      <Dialog open={showDeleteEmployeeDialog} onOpenChange={setShowDeleteEmployeeDialog}>
+      <Dialog
+        open={showDeleteEmployeeDialog}
+        onOpenChange={setShowDeleteEmployeeDialog}
+      >
         <DialogContent className="max-w-md bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
@@ -2944,7 +3642,7 @@ export default function AccessControlPage() {
               هل أنت متأكد من حذف هذا الموظف؟ لا يمكن التراجع عن هذا الإجراء.
             </DialogDescription>
           </DialogHeader>
-          
+
           {employeeToDelete && (
             <div className="py-4">
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -2952,15 +3650,22 @@ export default function AccessControlPage() {
                   <Avatar className="h-12 w-12">
                     <AvatarImage src={employeeToDelete.photo || ""} />
                     <AvatarFallback>
-                      {getInitials(employeeToDelete.first_name, employeeToDelete.last_name)}
+                      {getInitials(
+                        employeeToDelete.first_name,
+                        employeeToDelete.last_name,
+                      )}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <h4 className="font-medium text-red-800">
                       {employeeToDelete.first_name} {employeeToDelete.last_name}
                     </h4>
-                    <p className="text-sm text-red-600">{employeeToDelete.email}</p>
-                    <p className="text-sm text-red-600">معرف الموظف: {employeeToDelete.id}</p>
+                    <p className="text-sm text-red-600">
+                      {employeeToDelete.email}
+                    </p>
+                    <p className="text-sm text-red-600">
+                      معرف الموظف: {employeeToDelete.id}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -2971,20 +3676,22 @@ export default function AccessControlPage() {
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center gap-2">
                 <XCircle className="h-5 w-5 text-red-600" />
-                <span className="text-red-800 font-medium">{deleteEmployeeError}</span>
+                <span className="text-red-800 font-medium">
+                  {deleteEmployeeError}
+                </span>
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
-            <Button 
+            <Button
               onClick={() => setShowDeleteEmployeeDialog(false)}
               variant="outline"
               className="text-gray-600 hover:text-black hover:border-black"
             >
               إلغاء
             </Button>
-            <Button 
+            <Button
               onClick={deleteEmployee}
               disabled={deleteEmployeeLoading}
               className="bg-red-600 hover:bg-red-700 text-white"

@@ -105,6 +105,8 @@ export function UpdatedAddRentalForm({
     rental_period_type: "",
     rental_period_multiplier: 1,
     rental_period_value: 0,
+    rental_type: "monthly",
+    rental_duration: 12,
     paying_plan: "monthly",
     base_rent_amount: "",
     currency: "SAR",
@@ -124,9 +126,67 @@ export function UpdatedAddRentalForm({
   const [openAvailableProperty, setOpenAvailableProperty] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<string>("");
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>("");
-  const [selectedProject, setSelectedProject] = useState<string>("");
 
+  // Function to calculate payment amounts based on contract type, duration, and payment frequency
+  const calculatePaymentAmount = () => {
+    if (!formData.base_rent_amount || !formData.rental_duration || !formData.rental_type || !formData.paying_plan) {
+      return null;
+    }
+
+    const totalAmount = parseFloat(formData.base_rent_amount);
+    const duration = formData.rental_duration;
+    const contractType = formData.rental_type; // "monthly" or "yearly"
+    const paymentFrequency = formData.paying_plan; // "monthly", "quarterly", "semi_annual", "annual"
+
+    // Convert duration to months
+    const totalMonths = contractType === "yearly" ? duration * 12 : duration;
+
+    // Calculate how many payment periods based on frequency
+    let paymentPeriods = 0;
+    let periodName = "";
+
+    switch (paymentFrequency) {
+      case "monthly":
+        paymentPeriods = totalMonths;
+        periodName = "شهري";
+        break;
+      case "quarterly":
+        paymentPeriods = Math.ceil(totalMonths / 3);
+        periodName = "ربع سنوي";
+        break;
+      case "semi_annual":
+        paymentPeriods = Math.ceil(totalMonths / 6);
+        periodName = "نصف سنوي";
+        break;
+      case "annual":
+        paymentPeriods = Math.ceil(totalMonths / 12);
+        periodName = "سنوي";
+        break;
+      default:
+        paymentPeriods = totalMonths;
+        periodName = "شهري";
+    }
+
+    const paymentAmount = Math.round(totalAmount / paymentPeriods);
+
+    return {
+      paymentAmount,
+      paymentPeriods,
+      periodName,
+      totalMonths,
+      totalAmount
+    };
+  };
+  const [selectedProject, setSelectedProject] = useState<string>("");
+  const [isRed, setIsRed] = useState(true);
   // جلب البيانات عند فتح النموذج
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsRed(false);
+    }, 30000); // 30 ثانية
+
+    return () => clearTimeout(timer);
+  }, []);
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
@@ -141,11 +201,12 @@ export function UpdatedAddRentalForm({
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [projectsRes, propertiesRes, availablePropertiesRes] = await Promise.all([
-          axiosInstance.get("/projects"),
-          axiosInstance.get("/properties"),
-          axiosInstance.get("/properties/available-units"),
-        ]);
+        const [projectsRes, propertiesRes, availablePropertiesRes] =
+          await Promise.all([
+            axiosInstance.get("/projects"),
+            axiosInstance.get("/properties"),
+            axiosInstance.get("/properties/available-units"),
+          ]);
 
         // معالجة بيانات المشاريع
         if (
@@ -229,6 +290,12 @@ export function UpdatedAddRentalForm({
     ) {
       newErrors.base_rent_amount = "مبلغ الإيجار مطلوب ولا يقل عن 100 ريال";
     }
+    if (!formData.rental_type.trim()) {
+      newErrors.rental_type = "نوع الإيجار مطلوب";
+    }
+    if (!formData.rental_duration || formData.rental_duration <= 0) {
+      newErrors.rental_duration = "مدة الإيجار مطلوبة ولا تقل عن 1";
+    }
 
     // التحقق من صحة رقم الهاتف
     if (
@@ -306,8 +373,8 @@ export function UpdatedAddRentalForm({
       project_id: formData.project_id ? parseInt(formData.project_id) : null,
       building_id: selectedBuildingId,
       move_in_date: formData.move_in_date,
-      rental_type: formData.rental_period_type || "monthly",
-      rental_duration: Number(formData.rental_period) || 12,
+      rental_type: formData.rental_type,
+      rental_duration: Number(formData.rental_duration),
       paying_plan: formData.paying_plan,
       total_rental_amount: formData.base_rent_amount
         ? parseFloat(formData.base_rent_amount)
@@ -318,11 +385,13 @@ export function UpdatedAddRentalForm({
       cost_items: [
         {
           name: "Security Deposit",
-          cost: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
+          cost: formData.deposit_amount
+            ? parseFloat(formData.deposit_amount)
+            : 0,
           type: "fixed",
           payer: "tenant",
           payment_frequency: "one_time",
-          description: "Refundable security deposit"
+          description: "Refundable security deposit",
         },
         {
           name: "Maintenance Fee",
@@ -330,9 +399,9 @@ export function UpdatedAddRentalForm({
           type: "fixed",
           payer: "tenant",
           payment_frequency: "per_installment",
-          description: "Monthly maintenance fee"
-        }
-      ]
+          description: "Monthly maintenance fee",
+        },
+      ],
     };
 
     console.log("Processed form data for API:", processedFormData);
@@ -574,7 +643,10 @@ export function UpdatedAddRentalForm({
               <Label className="text-sm font-medium text-gray-700">
                 العقار <span className="text-red-500">*</span>
               </Label>
-              <Popover open={openAvailableProperty && !loading} onOpenChange={setOpenAvailableProperty}>
+              <Popover
+                open={openAvailableProperty && !loading}
+                onOpenChange={setOpenAvailableProperty}
+              >
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -596,19 +668,24 @@ export function UpdatedAddRentalForm({
                     ) : (
                       "اختر عقار..."
                     )}
-                    {!loading && <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                    {!loading && (
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent 
-                  className="w-full p-0 z-50" 
-                  side="bottom" 
+                <PopoverContent
+                  className="w-full p-0 z-50"
+                  side="bottom"
                   align="start"
                   onOpenAutoFocus={(e) => e.preventDefault()}
                   onInteractOutside={(e) => e.preventDefault()}
                   onEscapeKeyDown={(e) => e.preventDefault()}
                 >
                   <Command>
-                    <CommandInput placeholder="ابحث عن عقار..." disabled={loading} />
+                    <CommandInput
+                      placeholder="ابحث عن عقار..."
+                      disabled={loading}
+                    />
                     <CommandList>
                       {loading ? (
                         <div className="flex items-center justify-center p-4">
@@ -617,79 +694,110 @@ export function UpdatedAddRentalForm({
                         </div>
                       ) : (
                         <>
-                          <CommandEmpty>لا يوجد عقارات متاحة للإيجار</CommandEmpty>
+                          <CommandEmpty>
+                            لا يوجد عقارات متاحة للإيجار
+                          </CommandEmpty>
                           <CommandGroup>
-                        {Array.isArray(availableProperties) &&
-                          availableProperties.map((property) => (
-                            <CommandItem
-                              key={property.id}
-                              value={property.id.toString()}
-                              className="cursor-pointer"
-                              onSelect={() => {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  property_id: property.id.toString(),
-                                  project_id: property.project?.id?.toString() || "",
-                                }));
-                                // تحديث العمارة والمشروع عند اختيار العقار
-                                setSelectedBuilding(property.building?.name || "");
-                                setSelectedBuildingId(property.building?.id?.toString() || "");
-                                setSelectedProject(property.project?.name || "");
-                                setOpenAvailableProperty(false);
-                              }}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  property_id: property.id.toString(),
-                                  project_id: property.project?.id?.toString() || "",
-                                }));
-                                // تحديث العمارة والمشروع عند اختيار العقار
-                                setSelectedBuilding(property.building?.name || "");
-                                setSelectedBuildingId(property.building?.id?.toString() || "");
-                                setSelectedProject(property.project?.name || "");
-                                setOpenAvailableProperty(false);
-                              }}
-                              onPointerDown={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  property_id: property.id.toString(),
-                                  project_id: property.project?.id?.toString() || "",
-                                }));
-                                // تحديث العمارة والمشروع عند اختيار العقار
-                                setSelectedBuilding(property.building?.name || "");
-                                setSelectedBuildingId(property.building?.id?.toString() || "");
-                                setSelectedProject(property.project?.name || "");
-                                setOpenAvailableProperty(false);
-                              }}
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  property_id: property.id.toString(),
-                                  project_id: property.project?.id?.toString() || "",
-                                }));
-                                // تحديث العمارة والمشروع عند اختيار العقار
-                                setSelectedBuilding(property.building?.name || "");
-                                setSelectedBuildingId(property.building?.id?.toString() || "");
-                                setSelectedProject(property.project?.name || "");
-                                setOpenAvailableProperty(false);
-                              }}
-                            >
-                              <Check
-                                className={`mr-2 h-4 w-4 ${
-                                  formData.property_id === property.id.toString()
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                }`}
-                              />
-                              {property.title || `عقار ${property.id}`}
-                            </CommandItem>
-                          ))}
+                            {Array.isArray(availableProperties) &&
+                              availableProperties.map((property) => (
+                                <CommandItem
+                                  key={property.id}
+                                  value={property.id.toString()}
+                                  className="cursor-pointer"
+                                  onSelect={() => {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      property_id: property.id.toString(),
+                                      project_id:
+                                        property.project?.id?.toString() || "",
+                                    }));
+                                    // تحديث العمارة والمشروع عند اختيار العقار
+                                    setSelectedBuilding(
+                                      property.building?.name || "",
+                                    );
+                                    setSelectedBuildingId(
+                                      property.building?.id?.toString() || "",
+                                    );
+                                    setSelectedProject(
+                                      property.project?.name || "",
+                                    );
+                                    setOpenAvailableProperty(false);
+                                  }}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      property_id: property.id.toString(),
+                                      project_id:
+                                        property.project?.id?.toString() || "",
+                                    }));
+                                    // تحديث العمارة والمشروع عند اختيار العقار
+                                    setSelectedBuilding(
+                                      property.building?.name || "",
+                                    );
+                                    setSelectedBuildingId(
+                                      property.building?.id?.toString() || "",
+                                    );
+                                    setSelectedProject(
+                                      property.project?.name || "",
+                                    );
+                                    setOpenAvailableProperty(false);
+                                  }}
+                                  onPointerDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      property_id: property.id.toString(),
+                                      project_id:
+                                        property.project?.id?.toString() || "",
+                                    }));
+                                    // تحديث العمارة والمشروع عند اختيار العقار
+                                    setSelectedBuilding(
+                                      property.building?.name || "",
+                                    );
+                                    setSelectedBuildingId(
+                                      property.building?.id?.toString() || "",
+                                    );
+                                    setSelectedProject(
+                                      property.project?.name || "",
+                                    );
+                                    setOpenAvailableProperty(false);
+                                  }}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      property_id: property.id.toString(),
+                                      project_id:
+                                        property.project?.id?.toString() || "",
+                                    }));
+                                    // تحديث العمارة والمشروع عند اختيار العقار
+                                    setSelectedBuilding(
+                                      property.building?.name || "",
+                                    );
+                                    setSelectedBuildingId(
+                                      property.building?.id?.toString() || "",
+                                    );
+                                    setSelectedProject(
+                                      property.project?.name || "",
+                                    );
+                                    setOpenAvailableProperty(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={`mr-2 h-4 w-4 ${
+                                      formData.property_id ===
+                                      property.id.toString()
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    }`}
+                                  />
+                                  {property.title || `عقار ${property.id}`}
+                                </CommandItem>
+                              ))}
                           </CommandGroup>
                         </>
                       )}
@@ -729,8 +837,6 @@ export function UpdatedAddRentalForm({
               />
             </div>
 
-
-
             <div className="space-y-2">
               <Label
                 htmlFor="move_in_date"
@@ -761,13 +867,13 @@ export function UpdatedAddRentalForm({
               )}
             </div>
 
-            {/* خطة الدفع - في الأعلى */}
+            {/* اسلوب الدفع - في الأعلى */}
             <div className="space-y-2">
               <Label
                 htmlFor="paying_plan"
                 className="text-sm font-medium text-gray-700"
               >
-                خطة الدفع
+                اسلوب الدفع
               </Label>
               <Select
                 value={formData.paying_plan}
@@ -787,109 +893,12 @@ export function UpdatedAddRentalForm({
               </Select>
             </div>
 
-            {/* مدة الإيجار - تحت خطة الدفع */}
-            <div className="space-y-3">
-              <Label
-                htmlFor="rental_period"
-                className="text-sm font-medium text-gray-700"
-              >
-                مدة الإيجار (
-                {formData.paying_plan === "monthly"
-                  ? "بالشهور"
-                  : formData.paying_plan === "quarterly"
-                    ? "بالأرباع"
-                    : formData.paying_plan === "semi_annual"
-                      ? "بالنصف سنوي"
-                      : formData.paying_plan === "annual"
-                        ? "بالسنوات"
-                        : "بالشهور"}
-                ) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="rental_period"
-                type="number"
-                value={formData.rental_period}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value) || 0;
-                  setFormData((prev) => ({ ...prev, rental_period: value }));
-
-                  // التحقق الفوري من القيمة
-                  if (value <= 0) {
-                    setErrors((prev) => ({
-                      ...prev,
-                      rental_period: "مدة الإيجار مطلوبة ولا تقل عن شهر واحد",
-                    }));
-                  } else {
-                    setErrors((prev) => ({ ...prev, rental_period: "" }));
-                  }
-                }}
-                min="1"
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.rental_period ? "border-red-500" : ""}`}
-              />
-              {errors.rental_period && (
-                <p className="text-sm text-red-600 flex items-center">
-                  <AlertCircle className="h-3 w-3 ml-1" />
-                  {errors.rental_period}
-                </p>
-              )}
-              {formData.rental_period &&
-                !isNaN(formData.rental_period) &&
-                formData.rental_period > 0 && (
-                  <div className="text-sm bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 rounded-lg border border-gray-200 shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="font-semibold text-gray-800">
-                          {formData.rental_period}{" "}
-                          {formData.paying_plan === "monthly"
-                            ? "شهر"
-                            : formData.paying_plan === "quarterly"
-                              ? "ربع"
-                              : formData.paying_plan === "semi_annual"
-                                ? "نصف سنوي"
-                                : formData.paying_plan === "annual"
-                                  ? "سنة"
-                                  : "شهر"}
-                        </span>
-                        <span className="text-gray-500 text-xs">
-                          (
-                          {formData.paying_plan === "monthly"
-                            ? "شهري"
-                            : formData.paying_plan === "quarterly"
-                              ? "ربع سنوي"
-                              : formData.paying_plan === "semi_annual"
-                                ? "نصف سنوي"
-                                : formData.paying_plan === "annual"
-                                  ? "سنوي"
-                                  : "شهري"}
-                          )
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-600 bg-white px-2 py-1 rounded-md border">
-                        <span className="font-medium">
-                          {formData.paying_plan === "monthly"
-                            ? formData.rental_period
-                            : formData.paying_plan === "quarterly"
-                              ? formData.rental_period * 3
-                              : formData.paying_plan === "semi_annual"
-                                ? formData.rental_period * 6
-                                : formData.paying_plan === "annual"
-                                  ? formData.rental_period * 12
-                                  : formData.rental_period}{" "}
-                          شهر إجمالي
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-            </div>
-
             <div className="space-y-2">
               <Label
                 htmlFor="base_rent_amount"
                 className="text-sm font-medium text-gray-700"
               >
-                مبلغ الإيجار <span className="text-red-500">*</span>
+                مبلغ الإيجار الاجمالي<span className="text-red-500">*</span>
               </Label>
               <Input
                 id="base_rent_amount"
@@ -908,34 +917,152 @@ export function UpdatedAddRentalForm({
                 min="100"
                 className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.base_rent_amount ? "border-red-500" : ""}`}
               />
+              <Label
+                htmlFor="base_rent_amount"
+                className={`text-xs font-medium transition-colors duration-500 ${
+                  isRed ? "text-red-700" : "text-gray-700"
+                }`}
+              >
+                اكتب إجمالي قيمة الإيجار عن كامل المدة، لا عن كل دفعة.
+              </Label>
               {errors.base_rent_amount && (
                 <p className="text-sm text-red-600 flex items-center">
                   <AlertCircle className="h-3 w-3 ml-1" />
                   {errors.base_rent_amount}
                 </p>
               )}
+
+              {/* حساب تقسيم مبلغ الإيجار على المدة */}
+              {(() => {
+                const calculation = calculatePaymentAmount();
+                if (!calculation) return null;
+
+                return (
+                  <div className="text-sm bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-3 rounded-lg border border-blue-200 shadow-sm">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="font-semibold text-blue-800">
+                        المبلغ {calculation.periodName}: {calculation.paymentAmount.toLocaleString()} ريال
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-2 text-xs">
+                      <div className="bg-white px-3 py-2 rounded-md border border-blue-200">
+                        <div className="grid grid-cols-2 gap-2 text-center">
+                          <div>
+                            <span className="text-gray-600">المدة الإجمالية:</span>
+                            <span className="font-medium text-blue-800 block">
+                              {calculation.totalMonths} شهر
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">عدد الدفعات:</span>
+                            <span className="font-medium text-blue-800 block">
+                              {calculation.paymentPeriods} دفعة
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center text-blue-600 bg-white px-2 py-1 rounded-md border">
+                        <span className="font-medium">
+                          {calculation.totalAmount.toLocaleString()} ÷ {calculation.paymentPeriods} = {calculation.paymentAmount.toLocaleString()} ريال
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
+            {/* خيار الإيجار */}
             <div className="space-y-2">
               <Label
-                htmlFor="deposit_amount"
+                htmlFor="rental_type"
                 className="text-sm font-medium text-gray-700"
               >
-                مبلغ الضمان
+                خيار الإيجار (نوع العقد) <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="deposit_amount"
-                type="number"
-                value={formData.deposit_amount}
-                onChange={(e) =>
+              <Select
+                value={formData.rental_type}
+                onValueChange={(value) => {
                   setFormData((prev) => ({
                     ...prev,
-                    deposit_amount: e.target.value,
-                  }))
-                }
-                placeholder="10000"
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                    rental_type: value,
+                  }));
+                  if (errors.rental_type) {
+                    setErrors((prev) => ({ ...prev, rental_type: "" }));
+                  }
+                }}
+              >
+                <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
+                  <SelectValue placeholder="اختر نوع الإيجار" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="monthly">شهري</SelectItem>
+                  <SelectItem value="yearly">سنوي</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.rental_type && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.rental_type}
+                </p>
+              )}
+            </div>
+
+            {/* عدد الشهور أو السنوات */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="rental_duration"
+                className="text-sm font-medium text-gray-700"
+              >
+                {formData.rental_type === "yearly"
+                  ? "عدد السنوات"
+                  : "عدد الشهور"}{" "}
+                (مدة العقد) <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="rental_duration"
+                type="number"
+                value={formData.rental_duration}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  setFormData((prev) => ({
+                    ...prev,
+                    rental_duration: value,
+                  }));
+                  if (errors.rental_duration) {
+                    setErrors((prev) => ({ ...prev, rental_duration: "" }));
+                  }
+                }}
+                placeholder={formData.rental_type === "yearly" ? "1" : "12"}
+                min="1"
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.rental_duration ? "border-red-500" : ""}`}
               />
+              {errors.rental_duration && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.rental_duration}
+                </p>
+              )}
+              {formData.rental_duration && formData.rental_duration > 0 && (
+                <div className="text-sm bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-blue-800 font-medium">
+                      المدة الإجمالية: {formData.rental_duration}{" "}
+                      {formData.rental_type === "yearly" ? "سنة" : "شهر"}
+                      {formData.rental_type === "yearly" && (
+                        <span className="text-gray-600">
+                          {" "}
+                          ({formData.rental_duration * 12} شهر)
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

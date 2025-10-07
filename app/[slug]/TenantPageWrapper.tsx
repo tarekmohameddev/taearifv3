@@ -13,16 +13,20 @@ import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/LanguageDropdown";
 import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
 import { SkeletonLoader } from "@/components/skeleton";
-import { 
-  StaticHeaderSkeleton1, 
-  HeroSkeleton1, 
-  HeroSkeleton2, 
-  FilterButtonsSkeleton1, 
-  GridSkeleton1, 
-  HalfTextHalfImageSkeleton1, 
-  ContactCardsSkeleton1 
+import {
+  StaticHeaderSkeleton1,
+  HeroSkeleton1,
+  HeroSkeleton2,
+  FilterButtonsSkeleton1,
+  GridSkeleton1,
+  HalfTextHalfImageSkeleton1,
+  ContactCardsSkeleton1,
 } from "@/components/skeleton";
-import { shouldCenterComponent, getCenterWrapperClasses, getCenterWrapperStyles } from "@/lib/ComponentsInCenter";
+import {
+  shouldCenterComponent,
+  getCenterWrapperClasses,
+  getCenterWrapperStyles,
+} from "@/lib/ComponentsInCenter";
 
 const loadComponent = (section: string, componentName: string) => {
   if (!componentName) return null;
@@ -214,7 +218,7 @@ export default function TenantPageWrapper({
         <div className="min-h-screen flex flex-col" dir="rtl">
           {/* Header Skeleton */}
           <StaticHeaderSkeleton1 />
-          
+
           {/* Page-specific Skeleton Content */}
           {renderSkeletonContent()}
         </div>
@@ -286,13 +290,19 @@ export default function TenantPageWrapper({
               }
 
               // التحقق من ما إذا كان المكون يحتاج للتوسيط
-              const centerWrapperClasses = getCenterWrapperClasses(comp.componentName);
-              const centerWrapperStyles = getCenterWrapperStyles(comp.componentName);
-              
+              const centerWrapperClasses = getCenterWrapperClasses(
+                comp.componentName,
+              );
+              const centerWrapperStyles = getCenterWrapperStyles(
+                comp.componentName,
+              );
+
               const componentElement = (
-                <Suspense 
-                  key={comp.id} 
-                  fallback={<SkeletonLoader componentName={comp.componentName} />}
+                <Suspense
+                  key={comp.id}
+                  fallback={
+                    <SkeletonLoader componentName={comp.componentName} />
+                  }
                 >
                   <Cmp {...(comp.data as any)} useStore variant={comp.id} />
                 </Suspense>
@@ -301,7 +311,11 @@ export default function TenantPageWrapper({
               // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات والستايل المناسب
               if (shouldCenterComponent(comp.componentName)) {
                 return (
-                  <div key={comp.id} className={centerWrapperClasses} style={centerWrapperStyles}>
+                  <div
+                    key={comp.id}
+                    className={centerWrapperClasses}
+                    style={centerWrapperStyles}
+                  >
                     {componentElement}
                   </div>
                 );

@@ -78,7 +78,7 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
   // Initialize variant id early so hooks can depend on it
   const variantId = variant || "contactFormSection1";
   const uniqueId = id || variantId;
-  
+
   // Add state to force re-renders when store updates
   const [forceUpdate, setForceUpdate] = useState(0);
 
@@ -87,7 +87,9 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
     (s) => s.ensureComponentVariant,
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
-  const contactFormSectionStates = useEditorStore((s) => s.contactFormSectionStates);
+  const contactFormSectionStates = useEditorStore(
+    (s) => s.contactFormSectionStates,
+  );
 
   useEffect(() => {
     if (props.useStore) {
@@ -107,10 +109,10 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
         const newContactFormSectionStates = state.contactFormSectionStates;
         if (newContactFormSectionStates[uniqueId]) {
           // Force re-render by updating state
-          setForceUpdate(prev => prev + 1);
+          setForceUpdate((prev) => prev + 1);
         }
       });
-      
+
       return unsubscribe;
     }
   }, [props.useStore, uniqueId]);
@@ -133,7 +135,6 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
   const currentStoreData = props.useStore
     ? contactFormSectionStates[uniqueId] || {}
     : {};
-
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
@@ -170,8 +171,11 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
   const tenantComponentData = getTenantComponentData();
 
   // Check if we have any data from API/stores first
-  const hasApiData = tenantComponentData && Object.keys(tenantComponentData).length > 0;
-  const hasStoreData = (storeData && Object.keys(storeData).length > 0) || (currentStoreData && Object.keys(currentStoreData).length > 0);
+  const hasApiData =
+    tenantComponentData && Object.keys(tenantComponentData).length > 0;
+  const hasStoreData =
+    (storeData && Object.keys(storeData).length > 0) ||
+    (currentStoreData && Object.keys(currentStoreData).length > 0);
   const hasPropsData = props.content || props.form;
 
   // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
@@ -220,9 +224,11 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
 
   // Use merged data with proper fallbacks
   const title = mergedData.content?.title || defaultData.content.title;
-  const socialLinks = mergedData.content?.socialLinks || defaultData.content.socialLinks;
+  const socialLinks =
+    mergedData.content?.socialLinks || defaultData.content.socialLinks;
   const formFields = mergedData.form?.fields || defaultData.form.fields;
-  const submitButton = mergedData.form?.submitButton || defaultData.form.submitButton;
+  const submitButton =
+    mergedData.form?.submitButton || defaultData.form.submitButton;
   const layout = mergedData.layout || defaultData.layout;
   const styling = mergedData.styling || defaultData.styling;
 
@@ -231,10 +237,14 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
       className={`container mx-auto ${layout?.container?.padding?.horizontal || "px-4"} ${layout?.container?.padding?.vertical || "py-8"} lg:w-full sm:max-w-[${layout?.container?.maxWidth || "1600px"}]`}
       dir="rtl"
     >
-      <div className={`flex ${layout?.grid?.columns?.mobile || "flex-col"} ${layout?.grid?.columns?.desktop || "md:flex-row"} w-full justify-between ${layout?.grid?.gap || "gap-[16px]"}`}>
-        <div className={`details ${styling?.layout?.detailsWidth || "w-full md:w-[35%]"} flex flex-col items-start justify-center ${styling?.layout?.gap || "gap-[16px] md:gap-[10px]"}`}>
+      <div
+        className={`flex ${layout?.grid?.columns?.mobile || "flex-col"} ${layout?.grid?.columns?.desktop || "md:flex-row"} w-full justify-between ${layout?.grid?.gap || "gap-[16px]"}`}
+      >
+        <div
+          className={`details ${styling?.layout?.detailsWidth || "w-full md:w-[35%]"} flex flex-col items-start justify-center ${styling?.layout?.gap || "gap-[16px] md:gap-[10px]"}`}
+        >
           <div className="flex flex-col gap-[2px]">
-            <h4 
+            <h4
               className={`${styling?.title?.size || "text-[15px] md:text-[24px]"} ${styling?.title?.color || "text-custom-maincolor"} ${styling?.title?.weight || "font-normal"} xs:text-[20px] mb-[24px]`}
             >
               {title}
@@ -259,25 +269,34 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
                     rows={field.rows || 2}
                     placeholder={field.placeholder}
                     required={field.required}
-                    className={field.style?.className || "border rounded p-2 mb-[12px] outline-custom-secondarycolor"}
+                    className={
+                      field.style?.className ||
+                      "border rounded p-2 mb-[12px] outline-custom-secondarycolor"
+                    }
                   />
                 );
               }
               return (
-            <input
+                <input
                   key={field.id || index}
                   id={field.id}
                   name={field.id}
                   type={field.type}
                   placeholder={field.placeholder}
                   required={field.required}
-                  className={field.style?.className || "border rounded-[6px] p-2 outline-custom-secondarycolor"}
+                  className={
+                    field.style?.className ||
+                    "border rounded-[6px] p-2 outline-custom-secondarycolor"
+                  }
                 />
               );
             })}
             <button
               type="submit"
-              className={submitButton.style?.className || "bg-custom-secondarycolor text-white rounded-[6px] w-full text-[14px] md:text-[20px] bg-emerald-700 hover:scale-105 transition duration-300 py-2 md:py-1"}
+              className={
+                submitButton.style?.className ||
+                "bg-custom-secondarycolor text-white rounded-[6px] w-full text-[14px] md:text-[20px] bg-emerald-700 hover:scale-105 transition duration-300 py-2 md:py-1"
+              }
             >
               {submitButton.text || "إرسال"}
             </button>

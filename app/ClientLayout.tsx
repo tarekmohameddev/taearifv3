@@ -68,7 +68,7 @@ export default function ClientLayout({
   const isAllowedPageForPopup = (pathname: string) => {
     const allowedPages = [
       "/dashboard/affiliate",
-      "/dashboard/analytics", 
+      "/dashboard/analytics",
       "/dashboard/apps",
       "/dashboard/blog",
       "/dashboard/blogs",
@@ -180,7 +180,6 @@ export default function ClientLayout({
             if (completed == undefined) {
               router.push("/onboarding");
             } else {
-
               router.push("/dashboard");
             }
           } catch (error) {
@@ -228,13 +227,15 @@ export default function ClientLayout({
     <AuthProvider>
       {children}
 
-      {showPopup && userData?.message && isAllowedPageForPopup(pathname || "") && (
-        <InfoPopup
-          message={userData.message}
-          isVisible={showPopup}
-          onClose={handleClosePopup}
-        />
-      )}
+      {showPopup &&
+        userData?.message &&
+        isAllowedPageForPopup(pathname || "") && (
+          <InfoPopup
+            message={userData.message}
+            isVisible={showPopup}
+            onClose={handleClosePopup}
+          />
+        )}
     </AuthProvider>
   );
 }

@@ -2,9 +2,9 @@
 
 export default function HalfTextHalfImageSkeleton1() {
   console.log("🎨 HalfTextHalfImageSkeleton1: Component is rendering!");
-  
+
   return (
-    <section 
+    <section
       className="mx-auto max-w-[1600px] px-4"
       style={{
         paddingTop: "48px", // 12 * 4px = 48px
@@ -13,32 +13,51 @@ export default function HalfTextHalfImageSkeleton1() {
       dir="rtl"
     >
       <div className="flex flex-col md:flex-row w-full gap-x-16 md:min-h-[369px]">
-        
         {/* Text Section: 52.8% على الديسكتوب */}
         <div className="md:py-12 relative w-full flex flex-col items-start order-2 md:order-1 md:w-[52.8%]">
           <div className="flex flex-col w-full">
-            
             {/* Eyebrow Text Skeleton */}
             <div className="mb-2">
               <div className="h-4 md:h-5 xl:h-6 bg-gray-100 rounded animate-pulse w-24 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer"></div>
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer" style={{ animationDelay: '1s' }}></div>
+                <div
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer"
+                  style={{ animationDelay: "1s" }}
+                ></div>
               </div>
             </div>
 
             {/* Title Skeleton */}
             <div className="mb-3 md:mb-6 space-y-2">
               <div className="h-8 md:h-10 lg:h-12 xl:h-14 bg-gray-200 rounded animate-pulse w-full relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer" style={{ animationDelay: '0.2s' }}></div>
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer" style={{ animationDelay: '1.2s' }}></div>
+                <div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
+                <div
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
+                  style={{ animationDelay: "1.2s" }}
+                ></div>
               </div>
               <div className="h-8 md:h-10 lg:h-12 xl:h-14 bg-gray-200 rounded animate-pulse w-5/6 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer" style={{ animationDelay: '0.3s' }}></div>
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer" style={{ animationDelay: '1.3s' }}></div>
+                <div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
+                  style={{ animationDelay: "0.3s" }}
+                ></div>
+                <div
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
+                  style={{ animationDelay: "1.3s" }}
+                ></div>
               </div>
               <div className="h-8 md:h-10 lg:h-12 xl:h-14 bg-gray-200 rounded animate-pulse w-4/5 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer" style={{ animationDelay: '0.4s' }}></div>
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer" style={{ animationDelay: '1.4s' }}></div>
+                <div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
+                  style={{ animationDelay: "0.4s" }}
+                ></div>
+                <div
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
+                  style={{ animationDelay: "1.4s" }}
+                ></div>
               </div>
             </div>
           </div>
@@ -46,29 +65,59 @@ export default function HalfTextHalfImageSkeleton1() {
           {/* Description Skeleton */}
           <div className="mb-4 md:mb-10 md:flex-grow w-full space-y-2">
             <div className="h-4 md:h-5 xl:h-6 bg-gray-100 rounded animate-pulse w-full relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer" style={{ animationDelay: '0.5s' }}></div>
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer" style={{ animationDelay: '1.5s' }}></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer"
+                style={{ animationDelay: "0.5s" }}
+              ></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer"
+                style={{ animationDelay: "1.5s" }}
+              ></div>
             </div>
             <div className="h-4 md:h-5 xl:h-6 bg-gray-100 rounded animate-pulse w-11/12 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer" style={{ animationDelay: '0.6s' }}></div>
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer" style={{ animationDelay: '1.6s' }}></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer"
+                style={{ animationDelay: "0.6s" }}
+              ></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer"
+                style={{ animationDelay: "1.6s" }}
+              ></div>
             </div>
             <div className="h-4 md:h-5 xl:h-6 bg-gray-100 rounded animate-pulse w-full relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer" style={{ animationDelay: '0.7s' }}></div>
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer" style={{ animationDelay: '1.7s' }}></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer"
+                style={{ animationDelay: "0.7s" }}
+              ></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer"
+                style={{ animationDelay: "1.7s" }}
+              ></div>
             </div>
             <div className="h-4 md:h-5 xl:h-6 bg-gray-100 rounded animate-pulse w-4/5 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer" style={{ animationDelay: '0.8s' }}></div>
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer" style={{ animationDelay: '1.8s' }}></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer"
+                style={{ animationDelay: "0.8s" }}
+              ></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer"
+                style={{ animationDelay: "1.8s" }}
+              ></div>
             </div>
             <div className="h-4 md:h-5 xl:h-6 bg-gray-100 rounded animate-pulse w-3/4 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer" style={{ animationDelay: '0.9s' }}></div>
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer" style={{ animationDelay: '1.9s' }}></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent animate-shimmer"
+                style={{ animationDelay: "0.9s" }}
+              ></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer"
+                style={{ animationDelay: "1.9s" }}
+              ></div>
             </div>
           </div>
 
           {/* Button Skeleton */}
-          <div 
+          <div
             className="bg-emerald-200 rounded-lg animate-pulse flex items-center justify-center relative overflow-hidden"
             style={{
               width: "119px",
@@ -76,18 +125,29 @@ export default function HalfTextHalfImageSkeleton1() {
               borderRadius: "10px",
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent animate-shimmer" style={{ animationDelay: '1.0s' }}></div>
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-200/40 to-transparent animate-shimmer" style={{ animationDelay: '2.0s' }}></div>
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent animate-shimmer"
+              style={{ animationDelay: "1.0s" }}
+            ></div>
+            <div
+              className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-200/40 to-transparent animate-shimmer"
+              style={{ animationDelay: "2.0s" }}
+            ></div>
           </div>
         </div>
 
         {/* Image Section: 47.2% على الديسكتوب */}
         <div className="relative mb-10 md:mb-0 order-1 md:order-2 md:w-[47.2%]">
-          
           {/* Background Shape Skeleton (if enabled) */}
           <div className="absolute top-0 left-0 h-full rounded-[5px] overflow-hidden z-0 w-full bg-gray-100 animate-pulse">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/40 to-transparent animate-shimmer" style={{ animationDelay: '1.1s' }}></div>
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer" style={{ animationDelay: '2.1s' }}></div>
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/40 to-transparent animate-shimmer"
+              style={{ animationDelay: "1.1s" }}
+            ></div>
+            <div
+              className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/30 to-transparent animate-shimmer"
+              style={{ animationDelay: "2.1s" }}
+            ></div>
           </div>
 
           {/* Main Image Skeleton */}
@@ -95,15 +155,27 @@ export default function HalfTextHalfImageSkeleton1() {
             <div className="w-full h-full bg-gray-200 rounded animate-pulse relative overflow-hidden">
               {/* Background Shimmer */}
               <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/50 to-transparent animate-shimmer" style={{ animationDelay: '1.2s' }}></div>
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/30 to-transparent animate-shimmer" style={{ animationDelay: '2.2s' }}></div>
+                <div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/50 to-transparent animate-shimmer"
+                  style={{ animationDelay: "1.2s" }}
+                ></div>
+                <div
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/30 to-transparent animate-shimmer"
+                  style={{ animationDelay: "2.2s" }}
+                ></div>
               </div>
 
               {/* Image Placeholder Icon */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-16 h-16 md:w-20 md:h-20 bg-gray-300 rounded-full animate-pulse relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-400/50 to-transparent animate-shimmer" style={{ animationDelay: '1.3s' }}></div>
-                  <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-300/30 to-transparent animate-shimmer" style={{ animationDelay: '2.3s' }}></div>
+                  <div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-400/50 to-transparent animate-shimmer"
+                    style={{ animationDelay: "1.3s" }}
+                  ></div>
+                  <div
+                    className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-300/30 to-transparent animate-shimmer"
+                    style={{ animationDelay: "2.3s" }}
+                  ></div>
                 </div>
               </div>
 

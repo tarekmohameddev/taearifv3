@@ -3,7 +3,7 @@ import SolutionsPage from "@/components/solutions/SolutionsPage";
 import { notFound } from "next/navigation";
 
 // إبقاء الصفحة dynamic لتتمكن من التحقق من tenantId
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function Solutions() {
   const headersList = await headers();

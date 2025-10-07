@@ -213,10 +213,11 @@ export function EditorSidebar({
       let dataToUse;
       if (selectedComponent.type === "contactCards") {
         // Check if cards exist in the data
-        const hasCards = selectedComponent.data?.cards && 
-                        Array.isArray(selectedComponent.data.cards) && 
-                        selectedComponent.data.cards.length > 0;
-        
+        const hasCards =
+          selectedComponent.data?.cards &&
+          Array.isArray(selectedComponent.data.cards) &&
+          selectedComponent.data.cards.length > 0;
+
         if (hasCards) {
           dataToUse = selectedComponent.data;
         } else {
@@ -225,10 +226,11 @@ export function EditorSidebar({
         }
       } else if (selectedComponent.type === "contactFormSection") {
         // Check if socialLinks exist in the data
-        const hasSocialLinks = selectedComponent.data?.content?.socialLinks && 
-                               Array.isArray(selectedComponent.data.content.socialLinks) && 
-                               selectedComponent.data.content.socialLinks.length > 0;
-        
+        const hasSocialLinks =
+          selectedComponent.data?.content?.socialLinks &&
+          Array.isArray(selectedComponent.data.content.socialLinks) &&
+          selectedComponent.data.content.socialLinks.length > 0;
+
         if (hasSocialLinks) {
           dataToUse = selectedComponent.data;
         } else {
@@ -238,7 +240,8 @@ export function EditorSidebar({
       } else {
         // For other components, use existing logic
         dataToUse =
-          selectedComponent.data && Object.keys(selectedComponent.data).length > 0
+          selectedComponent.data &&
+          Object.keys(selectedComponent.data).length > 0
             ? selectedComponent.data
             : defaultData;
       }
@@ -251,21 +254,22 @@ export function EditorSidebar({
         selectedDataKeys: selectedComponent.data
           ? Object.keys(selectedComponent.data)
           : [],
-        hasCards: selectedComponent.data?.cards && 
-                 Array.isArray(selectedComponent.data.cards) && 
-                 selectedComponent.data.cards.length > 0,
+        hasCards:
+          selectedComponent.data?.cards &&
+          Array.isArray(selectedComponent.data.cards) &&
+          selectedComponent.data.cards.length > 0,
         cardsCount: selectedComponent.data?.cards?.length || 0,
         reason:
           selectedComponent.type === "contactCards"
-            ? (selectedComponent.data?.cards && 
-               Array.isArray(selectedComponent.data.cards) && 
-               selectedComponent.data.cards.length > 0
-                ? "Using existing component data with cards"
-                : "Using default data - no cards found in API data")
-            : (selectedComponent.data &&
-               Object.keys(selectedComponent.data).length > 0
-                ? "Using existing component data"
-                : "Using default data for new component"),
+            ? selectedComponent.data?.cards &&
+              Array.isArray(selectedComponent.data.cards) &&
+              selectedComponent.data.cards.length > 0
+              ? "Using existing component data with cards"
+              : "Using default data - no cards found in API data"
+            : selectedComponent.data &&
+                Object.keys(selectedComponent.data).length > 0
+              ? "Using existing component data"
+              : "Using default data for new component",
       });
 
       // Log before calling ensureComponentVariant
@@ -381,7 +385,7 @@ export function EditorSidebar({
       // Set hasChangesMade to true when save is triggered
       console.log("🚀 Setting hasChangesMade to true in EditorSidebar");
       setHasChangesMade(true);
-      
+
       // Get store state before saving
       const store = useEditorStore.getState();
       const currentPage = store.currentPage || "homepage";
@@ -393,7 +397,10 @@ export function EditorSidebar({
         currentPage,
         pageComponentsBefore: pageComponentsBefore.length,
         tempData,
-        storeData: store.getComponentData(selectedComponent.type, selectedComponent.id)
+        storeData: store.getComponentData(
+          selectedComponent.type,
+          selectedComponent.id,
+        ),
       });
 
       // Get the latest tempData from store for global components
@@ -476,14 +483,17 @@ export function EditorSidebar({
       // Merge tempData with store data to preserve all changes
       // Priority: tempData (latest changes) > storeData (previous changes) > existingComponent.data (old changes)
       const mergedData = existingComponent?.data
-        ? deepMerge(deepMerge(existingComponent.data, storeData), latestTempData)
+        ? deepMerge(
+            deepMerge(existingComponent.data, storeData),
+            latestTempData,
+          )
         : deepMerge(storeData, latestTempData);
 
       console.log("🔧 Merge Process Debug:", {
         existingComponentData: existingComponent?.data,
         storeData,
         latestTempData,
-        mergedData
+        mergedData,
       });
 
       // Update the component data in the store using the merged data
@@ -525,8 +535,8 @@ export function EditorSidebar({
         pageComponentsAfter: pageComponentsAfter.length,
         storeAfter: {
           contactCardsStates: storeAfter.contactCardsStates,
-          pageComponentsByPage: storeAfter.pageComponentsByPage[currentPage]
-        }
+          pageComponentsByPage: storeAfter.pageComponentsByPage[currentPage],
+        },
       });
 
       onClose();
@@ -725,13 +735,20 @@ export function EditorSidebar({
                   </button>
                 ))}
               </div>
-              
+
               {/* Coming Soon Overlay - Disabled add-section functionality */}
-              <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 -top-[30px] flex items-start justify-center pointer-events-auto" style={{ paddingTop: "250px" }}>
+              <div
+                className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 -top-[30px] flex items-start justify-center pointer-events-auto"
+                style={{ paddingTop: "250px" }}
+              >
                 <div className="text-center">
                   <div className="text-6xl mb-4">🚧</div>
-                  <h2 className="text-2xl font-bold text-red-600 mb-2">{t("live_editor.coming_soon")}</h2>
-                  <p className="text-red-500 font-medium">{t("live_editor.components_disabled")}</p>
+                  <h2 className="text-2xl font-bold text-red-600 mb-2">
+                    {t("live_editor.coming_soon")}
+                  </h2>
+                  <p className="text-red-500 font-medium">
+                    {t("live_editor.components_disabled")}
+                  </p>
                 </div>
               </div>
             </div>

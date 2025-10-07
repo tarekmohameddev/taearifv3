@@ -66,7 +66,9 @@ export interface SectionType {
 }
 
 // دالة للحصول على الأقسام مع الترجمة
-export const getSections = (t: (key: string) => string): Record<string, SectionType> => ({
+export const getSections = (
+  t: (key: string) => string,
+): Record<string, SectionType> => ({
   homepage: {
     id: "homepage",
     name: "homepage",
@@ -128,7 +130,9 @@ export const SECTIONS: Record<string, SectionType> = {
 };
 
 // دالة للحصول على المكونات مع الترجمة
-export const getComponents = (t: (key: string) => string): Record<string, any> => ({
+export const getComponents = (
+  t: (key: string) => string,
+): Record<string, any> => ({
   hero: {
     id: "hero",
     name: "hero",
@@ -549,37 +553,53 @@ export const getAllComponents = (): ComponentType[] => {
 
 // دوال جديدة تدعم الترجمة
 // استخدام: const component = getComponentByIdTranslated('hero', t);
-export const getComponentByIdTranslated = (id: string, t: (key: string) => string): ComponentType | undefined => {
+export const getComponentByIdTranslated = (
+  id: string,
+  t: (key: string) => string,
+): ComponentType | undefined => {
   const components = getComponents(t);
   return components[id];
 };
 
 // استخدام: const components = getComponentsBySectionTranslated('homepage', t);
-export const getComponentsBySectionTranslated = (sectionId: string, t: (key: string) => string): ComponentType[] => {
+export const getComponentsBySectionTranslated = (
+  sectionId: string,
+  t: (key: string) => string,
+): ComponentType[] => {
   const components = getComponents(t);
   return Object.values(components).filter((comp) => comp.section === sectionId);
 };
 
 // استخدام: const components = getComponentsByCategoryTranslated('content', t);
-export const getComponentsByCategoryTranslated = (category: string, t: (key: string) => string): ComponentType[] => {
+export const getComponentsByCategoryTranslated = (
+  category: string,
+  t: (key: string) => string,
+): ComponentType[] => {
   const components = getComponents(t);
   return Object.values(components).filter((comp) => comp.category === category);
 };
 
 // استخدام: const section = getSectionByIdTranslated('homepage', t);
-export const getSectionByIdTranslated = (id: string, t: (key: string) => string): SectionType | undefined => {
+export const getSectionByIdTranslated = (
+  id: string,
+  t: (key: string) => string,
+): SectionType | undefined => {
   const sections = getSections(t);
   return sections[id];
 };
 
 // استخدام: const sections = getAllSectionsTranslated(t);
-export const getAllSectionsTranslated = (t: (key: string) => string): SectionType[] => {
+export const getAllSectionsTranslated = (
+  t: (key: string) => string,
+): SectionType[] => {
   const sections = getSections(t);
   return Object.values(sections);
 };
 
 // استخدام: const components = getAllComponentsTranslated(t);
-export const getAllComponentsTranslated = (t: (key: string) => string): ComponentType[] => {
+export const getAllComponentsTranslated = (
+  t: (key: string) => string,
+): ComponentType[] => {
   const components = getComponents(t);
   return Object.values(components);
 };
@@ -626,7 +646,10 @@ export const getSectionPath = (section: string): string => {
 
 // دوال إضافية تدعم الترجمة
 // استخدام: const components = getComponentsByHasStoreTranslated(true, t);
-export const getComponentsByHasStoreTranslated = (hasStore: boolean, t: (key: string) => string): ComponentType[] => {
+export const getComponentsByHasStoreTranslated = (
+  hasStore: boolean,
+  t: (key: string) => string,
+): ComponentType[] => {
   const components = getComponents(t);
   return Object.values(components).filter((comp) => comp.hasStore === hasStore);
 };
@@ -643,28 +666,40 @@ export const getComponentsByHasStructureTranslated = (
 };
 
 // استخدام: const displayName = getComponentDisplayNameTranslated('hero', t);
-export const getComponentDisplayNameTranslated = (type: string, t: (key: string) => string): string => {
+export const getComponentDisplayNameTranslated = (
+  type: string,
+  t: (key: string) => string,
+): string => {
   const components = getComponents(t);
   const component = components[type];
   return component ? component.displayName : type;
 };
 
 // استخدام: const theme = getComponentDefaultThemeTranslated('hero', t);
-export const getComponentDefaultThemeTranslated = (type: string, t: (key: string) => string): string => {
+export const getComponentDefaultThemeTranslated = (
+  type: string,
+  t: (key: string) => string,
+): string => {
   const components = getComponents(t);
   const component = components[type];
   return component ? component.defaultTheme || `${type}1` : `${type}1`;
 };
 
 // استخدام: const subPath = getComponentSubPathTranslated('hero', t);
-export const getComponentSubPathTranslated = (baseName: string, t: (key: string) => string): string | undefined => {
+export const getComponentSubPathTranslated = (
+  baseName: string,
+  t: (key: string) => string,
+): string | undefined => {
   const components = getComponents(t);
   const component = components[baseName];
   return component?.subPath;
 };
 
 // استخدام: const path = getSectionPathTranslated('homepage', t);
-export const getSectionPathTranslated = (section: string, t: (key: string) => string): string => {
+export const getSectionPathTranslated = (
+  section: string,
+  t: (key: string) => string,
+): string => {
   const sections = getSections(t);
   const sectionObj = sections[section];
   return sectionObj ? sectionObj.path : section;

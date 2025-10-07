@@ -70,7 +70,7 @@ module.exports = (set, get) => ({
 
       console.log("API Response received:", response.data);
       console.log("Projects count:", response.data.data.projects?.length);
-      
+
       // تحديث الـ store مع البيانات الجديدة
       set((state) => {
         const newState = {
@@ -85,7 +85,7 @@ module.exports = (set, get) => ({
         console.log("New state being set:", newState);
         return newState;
       });
-      
+
       console.log("Store updated with projects");
     } catch (error) {
       const errorInfo = logError(error, "fetchProjects");

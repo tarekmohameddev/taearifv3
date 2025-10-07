@@ -836,7 +836,10 @@ const Hero1 = (props: HeroProps = {}) => {
       {/* Content */}
       <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col items-center px-4 text-center text-white">
         {/* Desktop/Tablet Layout */}
-        <div className="hidden md:block" style={{ paddingTop: mergedData.content?.paddingTop || "200px" }}>
+        <div
+          className="hidden md:block"
+          style={{ paddingTop: mergedData.content?.paddingTop || "200px" }}
+        >
           <h1
             className={cn(
               "mx-auto text-balance",
@@ -870,7 +873,8 @@ const Hero1 = (props: HeroProps = {}) => {
               )}
               style={titleStyles}
             >
-              {mergedData.content?.title || "اكتشف عقارك المثالي في أفضل المواقع"}
+              {mergedData.content?.title ||
+                "اكتشف عقارك المثالي في أفضل المواقع"}
             </h1>
             <p
               className={cn(
@@ -883,7 +887,7 @@ const Hero1 = (props: HeroProps = {}) => {
                 "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية"}
             </p>
           </div>
-          
+
           {/* Search Form for Mobile */}
           {mergedData.searchForm?.enabled && (
             <div className="w-full max-w-md px-4 pb-8">

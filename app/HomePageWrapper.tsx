@@ -18,20 +18,24 @@ import {
   getComponentSubPath,
 } from "@/lib-liveeditor/ComponentsList";
 import { SkeletonLoader } from "@/components/skeleton";
-import { 
-  StaticHeaderSkeleton1, 
-  HeroSkeleton1, 
-  HeroSkeleton2, 
-  FilterButtonsSkeleton1, 
-  GridSkeleton1, 
-  HalfTextHalfImageSkeleton1, 
-  ContactCardsSkeleton1 
+import {
+  StaticHeaderSkeleton1,
+  HeroSkeleton1,
+  HeroSkeleton2,
+  FilterButtonsSkeleton1,
+  GridSkeleton1,
+  HalfTextHalfImageSkeleton1,
+  ContactCardsSkeleton1,
 } from "@/components/skeleton";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageSwitcher } from "@/components/tenant/LanguageSwitcher";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
-import { shouldCenterComponent, getCenterWrapperClasses, getCenterWrapperStyles } from "@/lib/ComponentsInCenter";
+import {
+  shouldCenterComponent,
+  getCenterWrapperClasses,
+  getCenterWrapperStyles,
+} from "@/lib/ComponentsInCenter";
 import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
 
 // دالة لتحميل المكونات ديناميكيًا بناءً على الاسم والرقم الأخير
@@ -143,24 +147,30 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
     ) {
       console.warn("🏠 HomePageWrapper - Fetching tenant data for:", tenantId);
       hasFetchedRef.current = true;
-      
+
       // محاولة تحميل البيانات من cache أولاً
       const loadData = async () => {
         try {
           const cachedData = await preloadTenantData(tenantId);
           if (cachedData) {
             // إذا كانت البيانات موجودة في cache، استخدمها مباشرة
-            console.log("🏠 HomePageWrapper - Using cached data for:", tenantId);
+            console.log(
+              "🏠 HomePageWrapper - Using cached data for:",
+              tenantId,
+            );
             return;
           }
         } catch (error) {
-          console.warn("🏠 HomePageWrapper - Cache failed, fetching from API:", error);
+          console.warn(
+            "🏠 HomePageWrapper - Cache failed, fetching from API:",
+            error,
+          );
         }
-        
+
         // إذا لم تكن البيانات في cache، جلبها من API
         fetchTenantData(tenantId);
       };
-      
+
       loadData();
     }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
@@ -283,7 +293,7 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
         <div className="min-h-screen flex flex-col" dir="rtl">
           {/* Header Skeleton */}
           <StaticHeaderSkeleton1 />
-          
+
           {/* Page-specific Skeleton Content */}
           {renderSkeletonContent()}
         </div>
@@ -332,13 +342,19 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
               }
 
               // التحقق من ما إذا كان المكون يحتاج للتوسيط
-              const centerWrapperClasses = getCenterWrapperClasses(comp.componentName);
-              const centerWrapperStyles = getCenterWrapperStyles(comp.componentName);
-              
+              const centerWrapperClasses = getCenterWrapperClasses(
+                comp.componentName,
+              );
+              const centerWrapperStyles = getCenterWrapperStyles(
+                comp.componentName,
+              );
+
               const componentElement = (
-                <Suspense 
-                  key={comp.id} 
-                  fallback={<SkeletonLoader componentName={comp.componentName} />}
+                <Suspense
+                  key={comp.id}
+                  fallback={
+                    <SkeletonLoader componentName={comp.componentName} />
+                  }
                 >
                   <Cmp {...(comp.data as any)} useStore variant={comp.id} />
                 </Suspense>
@@ -347,7 +363,11 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
               // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات والستايل المناسب
               if (shouldCenterComponent(comp.componentName)) {
                 return (
-                  <div key={comp.id} className={centerWrapperClasses} style={centerWrapperStyles as React.CSSProperties}>
+                  <div
+                    key={comp.id}
+                    className={centerWrapperClasses}
+                    style={centerWrapperStyles as React.CSSProperties}
+                  >
                     {componentElement}
                   </div>
                 );

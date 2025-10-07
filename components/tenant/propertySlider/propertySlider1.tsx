@@ -90,7 +90,8 @@ const getDefaultPropertySliderData = () => ({
     color: "transparent",
   },
   dataSource: {
-    apiUrl: "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
+    apiUrl:
+      "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
     enabled: true,
   },
 });
@@ -127,8 +128,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
 
   // State for API data
-  const [apiProperties, setApiProperties] =
-    useState<Property[]>([]);
+  const [apiProperties, setApiProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Subscribe to editor store updates for this component variant
@@ -148,12 +148,12 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
       }
 
       // Convert legacy API URLs to new format and replace tenantId
-      const defaultUrl = "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10";
+      const defaultUrl =
+        "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10";
       const url = convertLegacyApiUrl(apiUrl || defaultUrl, currentTenantId);
-      
-      
+
       const response = await axiosInstance.get(url);
-      
+
       // Handle new API response format
       if (response.data && response.data.properties) {
         setApiProperties(response.data.properties);
@@ -240,13 +240,18 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   // Fetch properties on component mount and when API URL changes
   useEffect(() => {
     const apiUrl =
-      mergedData.dataSource?.apiUrl || "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10";
+      mergedData.dataSource?.apiUrl ||
+      "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10";
     const useApiData = mergedData.dataSource?.enabled !== false;
 
     if (useApiData && currentTenantId) {
       fetchProperties(apiUrl);
     }
-  }, [mergedData.dataSource?.apiUrl, mergedData.dataSource?.enabled, currentTenantId]);
+  }, [
+    mergedData.dataSource?.apiUrl,
+    mergedData.dataSource?.enabled,
+    currentTenantId,
+  ]);
 
   // Use API data if enabled, otherwise use static data
   const useApiData = mergedData.dataSource?.enabled !== false;
@@ -299,7 +304,9 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-            <p className="text-lg text-gray-600 mt-4">جاري تحميل بيانات الموقع...</p>
+            <p className="text-lg text-gray-600 mt-4">
+              جاري تحميل بيانات الموقع...
+            </p>
           </div>
         </div>
       </section>
@@ -313,12 +320,26 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              <svg
+                className="w-8 h-8 text-yellow-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
               </svg>
             </div>
-            <p className="text-lg text-yellow-600 font-medium">لم يتم العثور على معرف الموقع</p>
-            <p className="text-sm text-gray-500 mt-2">تأكد من أنك تصل إلى الموقع من الرابط الصحيح</p>
+            <p className="text-lg text-yellow-600 font-medium">
+              لم يتم العثور على معرف الموقع
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              تأكد من أنك تصل إلى الموقع من الرابط الصحيح
+            </p>
           </div>
         </div>
       </section>
@@ -472,12 +493,26 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
                 <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  <svg
+                    className="w-8 h-8 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
                   </svg>
                 </div>
-                <p className="text-gray-600 text-lg font-medium">لا توجد عقارات متاحة حالياً</p>
-                <p className="text-gray-500 text-sm mt-2">يرجى المحاولة مرة أخرى لاحقاً</p>
+                <p className="text-gray-600 text-lg font-medium">
+                  لا توجد عقارات متاحة حالياً
+                </p>
+                <p className="text-gray-500 text-sm mt-2">
+                  يرجى المحاولة مرة أخرى لاحقاً
+                </p>
               </div>
             </div>
           )}

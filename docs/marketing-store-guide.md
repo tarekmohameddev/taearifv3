@@ -7,14 +7,18 @@
 ## الملفات المُنشأة
 
 ### 1. `context/store/marketingDashboard.js`
+
 الـ store الرئيسي الذي يحتوي على:
+
 - إدارة حالة البيانات
 - دوال API calls
 - إدارة الحوارات (Dialogs)
 - معالجة الأخطاء
 
 ### 2. `lib/marketingApi.js`
+
 ملف API functions منفصل يحتوي على:
+
 - دوال API منظمة حسب النوع
 - معالجة الأخطاء
 - Utility functions
@@ -25,13 +29,13 @@
 ### 1. استيراد الـ Store
 
 ```javascript
-import { useMarketingDashboardStore } from '@/context/store/marketingDashboard';
+import { useMarketingDashboardStore } from "@/context/store/marketingDashboard";
 ```
 
 ### 2. استخدام الـ Store في المكونات
 
 ```javascript
-import { useMarketingDashboardStore } from '@/context/store/marketingDashboard';
+import { useMarketingDashboardStore } from "@/context/store/marketingDashboard";
 
 function MarketingComponent() {
   const {
@@ -42,7 +46,7 @@ function MarketingComponent() {
     marketingSettings,
     loading,
     error,
-    
+
     // الدوال
     createCampaign,
     fetchCreditPackages,
@@ -64,6 +68,7 @@ function MarketingComponent() {
 ## البيانات المتاحة
 
 ### 1. الإحصائيات
+
 ```javascript
 const { statistics } = useMarketingDashboardStore();
 // statistics.total_campaigns
@@ -75,11 +80,14 @@ const { statistics } = useMarketingDashboardStore();
 ```
 
 ### 2. الحملات
+
 ```javascript
-const { campaigns, activeCampaigns, completedCampaigns } = useMarketingDashboardStore();
+const { campaigns, activeCampaigns, completedCampaigns } =
+  useMarketingDashboardStore();
 ```
 
 ### 3. النظام الائتماني
+
 ```javascript
 const { creditSystem } = useMarketingDashboardStore();
 // creditSystem.available_credits
@@ -90,11 +98,14 @@ const { creditSystem } = useMarketingDashboardStore();
 ```
 
 ### 4. أرقام WhatsApp
+
 ```javascript
-const { whatsappNumbers, connectedNumbers, verifiedNumbers } = useMarketingDashboardStore();
+const { whatsappNumbers, connectedNumbers, verifiedNumbers } =
+  useMarketingDashboardStore();
 ```
 
 ### 5. إعدادات التسويق
+
 ```javascript
 const { marketingSettings } = useMarketingDashboardStore();
 // marketingSettings.channels
@@ -105,20 +116,18 @@ const { marketingSettings } = useMarketingDashboardStore();
 ## الدوال المتاحة
 
 ### 1. إدارة الحملات
+
 ```javascript
-const {
-  createCampaign,
-  updateCampaign,
-  deleteCampaign,
-} = useMarketingDashboardStore();
+const { createCampaign, updateCampaign, deleteCampaign } =
+  useMarketingDashboardStore();
 
 // إنشاء حملة جديدة
 await createCampaign({
-  name: 'حملة جديدة',
-  description: 'وصف الحملة',
-  channel_type: 'whatsapp',
-  target_audience: 'جميع العملاء',
-  message_content: 'محتوى الرسالة',
+  name: "حملة جديدة",
+  description: "وصف الحملة",
+  channel_type: "whatsapp",
+  target_audience: "جميع العملاء",
+  message_content: "محتوى الرسالة",
 });
 
 // تحديث حملة
@@ -129,11 +138,9 @@ await deleteCampaign(campaignId);
 ```
 
 ### 2. النظام الائتماني
+
 ```javascript
-const {
-  fetchCreditPackages,
-  purchaseCredits,
-} = useMarketingDashboardStore();
+const { fetchCreditPackages, purchaseCredits } = useMarketingDashboardStore();
 
 // جلب باقات الائتمان
 await fetchCreditPackages();
@@ -143,24 +150,24 @@ await purchaseCredits(packageId);
 ```
 
 ### 3. إدارة أرقام WhatsApp
+
 ```javascript
-const {
-  fetchWhatsAppNumbers,
-  addWhatsAppNumber,
-} = useMarketingDashboardStore();
+const { fetchWhatsAppNumbers, addWhatsAppNumber } =
+  useMarketingDashboardStore();
 
 // جلب أرقام WhatsApp
 await fetchWhatsAppNumbers();
 
 // إضافة رقم جديد
 await addWhatsAppNumber({
-  phone_number: '+966501234567',
-  display_name: 'رقم العمل',
-  business_name: 'اسم الشركة',
+  phone_number: "+966501234567",
+  display_name: "رقم العمل",
+  business_name: "اسم الشركة",
 });
 ```
 
 ### 4. إعدادات التسويق
+
 ```javascript
 const {
   fetchMarketingSettings,
@@ -182,13 +189,14 @@ await updateSystemIntegrations(channelId, {
   crm_integration_enabled: true,
   appointment_system_integration_enabled: true,
   integration_settings: {
-    crm_api_url: 'https://crm.example.com/api',
-    crm_api_key: 'your_api_key',
+    crm_api_url: "https://crm.example.com/api",
+    crm_api_key: "your_api_key",
   },
 });
 ```
 
 ### 5. جلب جميع البيانات
+
 ```javascript
 const { fetchAllMarketingData } = useMarketingDashboardStore();
 
@@ -224,7 +232,7 @@ const handleCloseDialog = () => {
 const { error, loading } = useMarketingDashboardStore();
 
 if (error) {
-  console.error('خطأ:', error);
+  console.error("خطأ:", error);
   // عرض رسالة الخطأ للمستخدم
 }
 ```
@@ -232,8 +240,9 @@ if (error) {
 ## أمثلة عملية
 
 ### 1. صفحة إدارة الحملات
+
 ```javascript
-import { useMarketingDashboardStore } from '@/context/store/marketingDashboard';
+import { useMarketingDashboardStore } from "@/context/store/marketingDashboard";
 
 function CampaignsManagement() {
   const {
@@ -257,16 +266,12 @@ function CampaignsManagement() {
 
   return (
     <div>
-      <button onClick={openCreateCampaignDialog}>
-        إنشاء حملة جديدة
-      </button>
-      
-      {campaigns.map(campaign => (
+      <button onClick={openCreateCampaignDialog}>إنشاء حملة جديدة</button>
+
+      {campaigns.map((campaign) => (
         <div key={campaign.id}>
           {campaign.name}
-          <button onClick={() => deleteCampaign(campaign.id)}>
-            حذف
-          </button>
+          <button onClick={() => deleteCampaign(campaign.id)}>حذف</button>
         </div>
       ))}
     </div>
@@ -275,16 +280,13 @@ function CampaignsManagement() {
 ```
 
 ### 2. صفحة النظام الائتماني
+
 ```javascript
-import { useMarketingDashboardStore } from '@/context/store/marketingDashboard';
+import { useMarketingDashboardStore } from "@/context/store/marketingDashboard";
 
 function CreditSystem() {
-  const {
-    creditSystem,
-    fetchCreditPackages,
-    purchaseCredits,
-    loading,
-  } = useMarketingDashboardStore();
+  const { creditSystem, fetchCreditPackages, purchaseCredits, loading } =
+    useMarketingDashboardStore();
 
   useEffect(() => {
     fetchCreditPackages();
@@ -302,15 +304,15 @@ function CreditSystem() {
   return (
     <div>
       <h2>الائتمانات المتاحة: {creditSystem.available_credits}</h2>
-      
-      {creditSystem.packages.map(pkg => (
+
+      {creditSystem.packages.map((pkg) => (
         <div key={pkg.id}>
           <h3>{pkg.name}</h3>
           <p>الائتمانات: {pkg.credits}</p>
-          <p>السعر: {pkg.price} {pkg.currency}</p>
-          <button onClick={() => handlePurchaseCredits(pkg.id)}>
-            شراء
-          </button>
+          <p>
+            السعر: {pkg.price} {pkg.currency}
+          </p>
+          <button onClick={() => handlePurchaseCredits(pkg.id)}>شراء</button>
         </div>
       ))}
     </div>
@@ -329,12 +331,14 @@ function CreditSystem() {
 ## استكشاف الأخطاء
 
 ### مشاكل شائعة:
+
 1. **خطأ 401**: تأكد من وجود token صحيح
 2. **خطأ 403**: تأكد من الصلاحيات
 3. **خطأ 404**: تأكد من صحة API endpoints
 4. **خطأ 422**: تأكد من صحة البيانات المرسلة
 
 ### حل المشاكل:
+
 ```javascript
 // فحص حالة الـ store
 const { loading, error, isInitialized } = useMarketingDashboardStore();
@@ -345,6 +349,6 @@ if (!isInitialized) {
 }
 
 if (error) {
-  console.error('خطأ في الـ store:', error);
+  console.error("خطأ في الـ store:", error);
 }
 ```

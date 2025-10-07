@@ -90,7 +90,9 @@ export function ThemeSelector({
           className={`inline-flex items-center gap-2 bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 hover:from-purple-100 hover:to-blue-100 hover:border-purple-300 transition-all duration-200 ${className}`}
         >
           <Palette className="w-4 h-4 text-purple-600" />
-          <span className="text-purple-700 font-medium">{t("theme_selector.change_theme")}</span>
+          <span className="text-purple-700 font-medium">
+            {t("theme_selector.change_theme")}
+          </span>
           <Sparkles className="w-3 h-3 text-purple-500" />
         </Button>
       </DialogTrigger>
@@ -110,7 +112,9 @@ export function ThemeSelector({
           {/* Current Theme Display */}
           {currentThemeData && (
             <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-              <h3 className="font-medium text-blue-900 mb-2">{t("theme_selector.current_theme")}</h3>
+              <h3 className="font-medium text-blue-900 mb-2">
+                {t("theme_selector.current_theme")}
+              </h3>
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <img
@@ -136,7 +140,9 @@ export function ThemeSelector({
 
           {/* Theme Grid */}
           <div>
-            <h3 className="font-medium text-gray-900 mb-4">{t("theme_selector.available_themes")}</h3>
+            <h3 className="font-medium text-gray-900 mb-4">
+              {t("theme_selector.available_themes")}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {currentThemes.map((theme) => (
                 <div

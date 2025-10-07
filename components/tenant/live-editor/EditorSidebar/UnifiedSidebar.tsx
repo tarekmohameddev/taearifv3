@@ -141,9 +141,15 @@ export function UnifiedSidebar({
         {/* Component Info */}
         <div className="p-4 border-b border-slate-200/60">
           <div className="text-sm text-slate-600">
-            <div className="font-medium">{t("editor_sidebar.type")}: {selectedComponent.type}</div>
-            <div className="font-medium">{t("editor_sidebar.id")}: {selectedComponent.id}</div>
-            <div className="font-medium">{t("editor_sidebar.page")}: {currentPage}</div>
+            <div className="font-medium">
+              {t("editor_sidebar.type")}: {selectedComponent.type}
+            </div>
+            <div className="font-medium">
+              {t("editor_sidebar.id")}: {selectedComponent.id}
+            </div>
+            <div className="font-medium">
+              {t("editor_sidebar.page")}: {currentPage}
+            </div>
           </div>
         </div>
 
@@ -161,7 +167,8 @@ export function UnifiedSidebar({
             />
           ) : (
             <div className="text-center text-slate-500 py-8">
-              {t("editor_sidebar.component_type_not_supported")}: {selectedComponent.type}
+              {t("editor_sidebar.component_type_not_supported")}:{" "}
+              {selectedComponent.type}
             </div>
           )}
         </div>

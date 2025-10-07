@@ -43,9 +43,9 @@ module.exports = (set, get) => ({
       );
 
       // تصفية القنوات لعرض فقط قنوات الواتساب
-      const whatsappChannels = response.data.data?.filter(
-        (channel) => channel.type === "whatsapp"
-      ) || [];
+      const whatsappChannels =
+        response.data.data?.filter((channel) => channel.type === "whatsapp") ||
+        [];
 
       set((state) => ({
         marketingChannels: {
@@ -89,7 +89,7 @@ module.exports = (set, get) => ({
     try {
       const response = await axiosInstance.post(
         `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels`,
-        channelData
+        channelData,
       );
 
       // إضافة القناة الجديدة إلى القائمة
@@ -106,7 +106,10 @@ module.exports = (set, get) => ({
       toast.error(error.message || "حدث خطأ أثناء إنشاء القناة", {
         id: loadingToast,
       });
-      return { success: false, error: error.message || "حدث خطأ أثناء إنشاء القناة" };
+      return {
+        success: false,
+        error: error.message || "حدث خطأ أثناء إنشاء القناة",
+      };
     }
   },
 
@@ -121,7 +124,7 @@ module.exports = (set, get) => ({
 
     try {
       await axiosInstance.delete(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels/${channelId}`
+        `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels/${channelId}`,
       );
 
       // إزالة القناة من القائمة
@@ -129,7 +132,7 @@ module.exports = (set, get) => ({
         marketingChannels: {
           ...state.marketingChannels,
           channels: state.marketingChannels.channels.filter(
-            (channel) => channel.id !== channelId
+            (channel) => channel.id !== channelId,
           ),
         },
       }));
@@ -140,7 +143,10 @@ module.exports = (set, get) => ({
       toast.error(error.message || "حدث خطأ أثناء حذف القناة", {
         id: loadingToast,
       });
-      return { success: false, error: error.message || "حدث خطأ أثناء حذف القناة" };
+      return {
+        success: false,
+        error: error.message || "حدث خطأ أثناء حذف القناة",
+      };
     }
   },
 
@@ -156,18 +162,20 @@ module.exports = (set, get) => ({
     try {
       // الحصول على الحالة الحالية للقناة
       const currentState = get();
-      const currentChannel = currentState.marketingChannels.channels.find(channel => channel.id === channelId);
-      
+      const currentChannel = currentState.marketingChannels.channels.find(
+        (channel) => channel.id === channelId,
+      );
+
       // إرسال كلا الحقلين معاً
       const requestData = {
         is_connected: currentChannel?.is_connected || false,
         is_verified: currentChannel?.is_verified || false,
-        ...statusData
+        ...statusData,
       };
 
       const response = await axiosInstance.patch(
         `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels/${channelId}/status`,
-        requestData
+        requestData,
       );
 
       // تحديث القناة في القائمة
@@ -175,9 +183,7 @@ module.exports = (set, get) => ({
         marketingChannels: {
           ...state.marketingChannels,
           channels: state.marketingChannels.channels.map((channel) =>
-            channel.id === channelId
-              ? { ...channel, ...requestData }
-              : channel
+            channel.id === channelId ? { ...channel, ...requestData } : channel,
           ),
         },
       }));
@@ -188,7 +194,10 @@ module.exports = (set, get) => ({
       toast.error(error.message || "حدث خطأ أثناء تحديث حالة القناة", {
         id: loadingToast,
       });
-      return { success: false, error: error.message || "حدث خطأ أثناء تحديث حالة القناة" };
+      return {
+        success: false,
+        error: error.message || "حدث خطأ أثناء تحديث حالة القناة",
+      };
     }
   },
 
@@ -203,7 +212,7 @@ module.exports = (set, get) => ({
     if (creditPackages.packages.length > 0 && !creditPackages.loading) {
       return;
     }
-    
+
     set((state) => ({
       creditPackages: {
         ...state.creditPackages,
@@ -263,8 +272,8 @@ module.exports = (set, get) => ({
         `${process.env.NEXT_PUBLIC_Backend_URL}/v1/credits/purchase`,
         {
           package_id: packageId,
-          payment_method: paymentMethod
-        }
+          payment_method: paymentMethod,
+        },
       );
 
       toast.success("تم إنشاء طلب الدفع بنجاح", { id: loadingToast });
@@ -273,7 +282,10 @@ module.exports = (set, get) => ({
       toast.error(error.message || "حدث خطأ أثناء معالجة طلب الشراء", {
         id: loadingToast,
       });
-      return { success: false, error: error.message || "حدث خطأ أثناء معالجة طلب الشراء" };
+      return {
+        success: false,
+        error: error.message || "حدث خطأ أثناء معالجة طلب الشراء",
+      };
     }
   },
 
@@ -293,7 +305,10 @@ module.exports = (set, get) => ({
     }
 
     const { creditTransactions } = get();
-    if (creditTransactions.transactions.length > 0 && !creditTransactions.loading) {
+    if (
+      creditTransactions.transactions.length > 0 &&
+      !creditTransactions.loading
+    ) {
       return;
     }
 
@@ -365,7 +380,7 @@ module.exports = (set, get) => ({
     set((state) => ({
       creditAnalytics: {
         ...state.creditAnalytics,
-    loading: true,
+        loading: true,
         error: null,
       },
     }));
@@ -483,7 +498,7 @@ module.exports = (set, get) => ({
     try {
       const response = await axiosInstance.patch(
         `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels/${channelId}/system-integrations`,
-        integrationData
+        integrationData,
       );
 
       // تحديث القناة في القائمة
@@ -492,13 +507,15 @@ module.exports = (set, get) => ({
           ...state.marketingChannels,
           channels: state.marketingChannels.channels.map((channel) =>
             channel.id === channelId
-              ? { 
-                  ...channel, 
-                  crm_integration_enabled: integrationData.crm_integration_enabled,
-                  appointment_system_integration_enabled: integrationData.appointment_system_integration_enabled,
-                  integration_settings: integrationData.integration_settings
+              ? {
+                  ...channel,
+                  crm_integration_enabled:
+                    integrationData.crm_integration_enabled,
+                  appointment_system_integration_enabled:
+                    integrationData.appointment_system_integration_enabled,
+                  integration_settings: integrationData.integration_settings,
                 }
-              : channel
+              : channel,
           ),
         },
       }));
@@ -509,7 +526,10 @@ module.exports = (set, get) => ({
       toast.error(error.message || "حدث خطأ أثناء تحديث إعدادات التكامل", {
         id: loadingToast,
       });
-      return { success: false, error: error.message || "حدث خطأ أثناء تحديث إعدادات التكامل" };
+      return {
+        success: false,
+        error: error.message || "حدث خطأ أثناء تحديث إعدادات التكامل",
+      };
     }
   },
 
@@ -533,7 +553,7 @@ module.exports = (set, get) => ({
 
     try {
       const response = await axiosInstance.get(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels/usage`
+        `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels/usage`,
       );
 
       set((state) => ({

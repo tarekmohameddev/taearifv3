@@ -109,7 +109,10 @@ export function AdvancedSimpleSwitcher({
       }
 
       // ترجمة الـ structure
-      const translatedStructure = translateComponentStructure(loadedStructure, t);
+      const translatedStructure = translateComponentStructure(
+        loadedStructure,
+        t,
+      );
 
       // البحث عن الـ variant المناسب
       const targetVariant =
@@ -151,7 +154,9 @@ export function AdvancedSimpleSwitcher({
             <span className="text-white text-sm">⏳</span>
           </div>
           <div>
-            <h4 className="font-bold text-blue-800">{t("editor_sidebar.loading_structure")}</h4>
+            <h4 className="font-bold text-blue-800">
+              {t("editor_sidebar.loading_structure")}
+            </h4>
             <p className="text-sm text-blue-600">
               {t("editor_sidebar.loading_component_structure")} {type}...
             </p>
@@ -170,7 +175,9 @@ export function AdvancedSimpleSwitcher({
             <span className="text-white text-sm">❌</span>
           </div>
           <div>
-            <h4 className="font-bold text-red-800">{t("editor_sidebar.structure_loading_error")}</h4>
+            <h4 className="font-bold text-red-800">
+              {t("editor_sidebar.structure_loading_error")}
+            </h4>
             <p className="text-sm text-red-600">
               {error || t("editor_sidebar.failed_to_load_structure")}
             </p>
@@ -260,7 +267,9 @@ export function AdvancedSimpleSwitcher({
             <span className="text-white text-sm">⚠️</span>
           </div>
           <div>
-            <h4 className="font-bold text-red-800">{t("editor_sidebar.no_variants_available")}</h4>
+            <h4 className="font-bold text-red-800">
+              {t("editor_sidebar.no_variants_available")}
+            </h4>
             <p className="text-sm text-red-600">
               {t("editor_sidebar.no_variants_found")}
             </p>
@@ -334,7 +343,7 @@ export function AdvancedSimpleSwitcher({
       </div>
 
       {/* Component Info */}
-              {/* مخفية فقط , ممكن استخدامها في المستقبل */}
+      {/* مخفية فقط , ممكن استخدامها في المستقبل */}
       {/* <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
         <div className="flex items-center space-x-2 text-sm">
           <span className="font-semibold text-green-800">{t("editor_sidebar.component")}:</span>
@@ -358,11 +367,21 @@ export function AdvancedSimpleSwitcher({
           <p>
             <strong>{t("editor_sidebar.debug_info")}:</strong>
           </p>
-          <p>{t("editor_sidebar.type")}: {type}</p>
-          <p>{t("editor_sidebar.component")} Name: {componentName}</p>
-          <p>Active {t("editor_sidebar.variant")}: {activeVariant?.id}</p>
-          <p>{t("editor_sidebar.fields_count")}: {fields?.length || 0}</p>
-          <p>{t("editor_sidebar.mode")}: {mode}</p>
+          <p>
+            {t("editor_sidebar.type")}: {type}
+          </p>
+          <p>
+            {t("editor_sidebar.component")} Name: {componentName}
+          </p>
+          <p>
+            Active {t("editor_sidebar.variant")}: {activeVariant?.id}
+          </p>
+          <p>
+            {t("editor_sidebar.fields_count")}: {fields?.length || 0}
+          </p>
+          <p>
+            {t("editor_sidebar.mode")}: {mode}
+          </p>
         </div>
       )}
       <DynamicFieldsRenderer

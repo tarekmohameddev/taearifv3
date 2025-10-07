@@ -32,7 +32,7 @@ export function StatusChangeDialog({
   onClose,
   rental,
   onStatusChange,
-  isLoading
+  isLoading,
 }: StatusChangeDialogProps) {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
 
@@ -42,12 +42,12 @@ export function StatusChangeDialog({
       case "draft":
         return [
           { value: "active", label: "نشط" },
-          { value: "cancelled", label: "ملغي" }
+          { value: "cancelled", label: "ملغي" },
         ];
       case "active":
         return [
           { value: "ended", label: "منتهي" },
-          { value: "cancelled", label: "ملغي" }
+          { value: "cancelled", label: "ملغي" },
         ];
       case "ended":
         return []; // Cannot change from final state
@@ -73,16 +73,14 @@ export function StatusChangeDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>تغيير حالة العقد</DialogTitle>
-          <DialogDescription>
-            اختر الحالة الجديدة للعقد
-          </DialogDescription>
+          <DialogDescription>اختر الحالة الجديدة للعقد</DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div>
             <Label>الحالة الحالية: {rental?.status || "غير محدد"}</Label>
           </div>
-          
+
           {availableOptions.length > 0 ? (
             <div className="space-y-2">
               <Label htmlFor="status-select">الحالة الجديدة</Label>
@@ -111,8 +109,8 @@ export function StatusChangeDialog({
             إلغاء
           </Button>
           {availableOptions.length > 0 && (
-            <Button 
-              onClick={handleSave} 
+            <Button
+              onClick={handleSave}
               disabled={!selectedStatus || isLoading}
             >
               {isLoading ? "جاري الحفظ..." : "حفظ"}
@@ -123,4 +121,3 @@ export function StatusChangeDialog({
     </Dialog>
   );
 }
-

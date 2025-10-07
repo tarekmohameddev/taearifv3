@@ -3,7 +3,7 @@ import HomePageWrapper from "./HomePageWrapper";
 import TaearifLandingPageSimple from "../components/TaearifLandingPageSimple";
 
 // إبقاء الصفحة dynamic لتتمكن من التحقق من tenantId
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const headersList = await headers();

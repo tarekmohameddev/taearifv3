@@ -245,7 +245,6 @@ export default function StaticFooter({
       ...(overrideData || {}), // overrideData overrides everything (for iframe)
     };
 
-
     return result;
   }, [defaultData, globalComponentsData, tenantGlobalFooterData, overrideData]);
 

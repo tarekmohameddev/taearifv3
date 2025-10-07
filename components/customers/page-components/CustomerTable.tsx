@@ -83,7 +83,8 @@ export const CustomerTable = ({
 }: any) => {
   const { marketingChannels, fetchMarketingChannels } = useStore();
   const [showWhatsAppDialog, setShowWhatsAppDialog] = useState(false);
-  const [selectedCustomerForWhatsApp, setSelectedCustomerForWhatsApp] = useState<any>(null);
+  const [selectedCustomerForWhatsApp, setSelectedCustomerForWhatsApp] =
+    useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // جلب قنوات التسويق عند تحميل المكون
@@ -93,10 +94,11 @@ export const CustomerTable = ({
 
   // التحقق من وجود قناة واتساب صالحة
   const hasValidWhatsAppChannel = () => {
-    return marketingChannels.channels.some((channel: any) => 
-      channel.is_verified === true && 
-      channel.is_connected === true &&
-      channel.customers_page_integration_enabled === true
+    return marketingChannels.channels.some(
+      (channel: any) =>
+        channel.is_verified === true &&
+        channel.is_connected === true &&
+        channel.customers_page_integration_enabled === true,
     );
   };
   return (
@@ -335,7 +337,10 @@ export const CustomerTable = ({
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                      <DropdownMenu
+                        open={dropdownOpen}
+                        onOpenChange={setDropdownOpen}
+                      >
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
                             <MoreHorizontal className="h-4 w-4" />
@@ -362,14 +367,14 @@ export const CustomerTable = ({
                             تعيين المرحلة
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                onClick={() => {
-                  const url = `/dashboard/activity-logs/customer/${customer.id}`;
-                  window.open(url, "_blank");
-                }}
-              >
-                <Activity className="mr-2 h-4 w-4" />
-                سجل النشاطات
-              </DropdownMenuItem>
+                            onClick={() => {
+                              const url = `/dashboard/activity-logs/customer/${customer.id}`;
+                              window.open(url, "_blank");
+                            }}
+                          >
+                            <Activity className="mr-2 h-4 w-4" />
+                            سجل النشاطات
+                          </DropdownMenuItem>
                           {formData && (
                             <Dialog open={open} onOpenChange={setOpen}>
                               <DialogContent>
@@ -416,16 +421,21 @@ export const CustomerTable = ({
 
                           <DropdownMenuSeparator />
                           {hasValidWhatsAppChannel() && (
-                          <DropdownMenuItem onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setDropdownOpen(false);
-                            setSelectedCustomerForWhatsApp(customer);
-                            setTimeout(() => setShowWhatsAppDialog(true), 50);
-                          }}>
-                            <MessageSquare className="ml-2 h-4 w-4" />
-                            إرسال واتساب
-                          </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setDropdownOpen(false);
+                                setSelectedCustomerForWhatsApp(customer);
+                                setTimeout(
+                                  () => setShowWhatsAppDialog(true),
+                                  50,
+                                );
+                              }}
+                            >
+                              <MessageSquare className="ml-2 h-4 w-4" />
+                              إرسال واتساب
+                            </DropdownMenuItem>
                           )}
                           <DropdownMenuItem>
                             <Phone className="ml-2 h-4 w-4" />
@@ -475,7 +485,7 @@ export const CustomerTable = ({
         customer={selectedCustomerForStage}
         onStageUpdated={onStageUpdated}
       />
-      
+
       {/* WhatsApp Send Dialog */}
       <WhatsAppSendDialog
         isOpen={showWhatsAppDialog}

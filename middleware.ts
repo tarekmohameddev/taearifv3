@@ -35,7 +35,17 @@ function getTenantIdFromHost(host: string): string | null {
   const isDevelopment = process.env.NODE_ENV === "development";
 
   // قائمة بالكلمات المحجوزة التي لا يجب أن تكون tenantId
-  const reservedWords = ["www", "api", "admin", "app", "mail", "ftp", "blog", "shop", "store"];
+  const reservedWords = [
+    "www",
+    "api",
+    "admin",
+    "app",
+    "mail",
+    "ftp",
+    "blog",
+    "shop",
+    "store",
+  ];
 
   // For localhost development: tenant1.localhost:3000 -> tenant1
   if (host.includes(localDomain)) {
@@ -51,7 +61,10 @@ function getTenantIdFromHost(host: string): string | null {
 
   // For production: tenant1.mandhoor.com -> tenant1
   // تحقق من أن الـ host يحتوي على mandhoor.com أو taearif.com
-  if (!isDevelopment && (host.includes("mandhoor.com") || host.includes("taearif.com"))) {
+  if (
+    !isDevelopment &&
+    (host.includes("mandhoor.com") || host.includes("taearif.com"))
+  ) {
     const parts = host.split(".");
     if (parts.length > 2) {
       const potentialTenantId = parts[0];
@@ -86,67 +99,71 @@ export function middleware(request: NextRequest) {
 
   // تحسين الأداء للمكونات الثابتة - إضافة cache headers
   let response = NextResponse.next();
-  
+
   // إضافة cache headers للمكونات الثابتة (عندما لا يوجد tenantId)
-  if (!tenantId && (
-    pathname === "/" ||
-    pathname === "/solutions" ||
-    pathname === "/updates" ||
-    pathname === "/landing" ||
-    pathname === "/about-us"
-  )) {
+  if (
+    !tenantId &&
+    (pathname === "/" ||
+      pathname === "/solutions" ||
+      pathname === "/updates" ||
+      pathname === "/landing" ||
+      pathname === "/about-us")
+  ) {
     // تحسين cache للمكونات Taearif
-    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-    response.headers.set('X-Component-Type', 'taearif-static');
+    response.headers.set(
+      "Cache-Control",
+      "public, max-age=31536000, immutable",
+    );
+    response.headers.set("X-Component-Type", "taearif-static");
   }
 
   /*
    * ========================================
    * AUTO-REDIRECT TO ARABIC LOCALE (EXCEPT LIVE-EDITOR)
    * ========================================
-   * 
+   *
    * This section handles automatic redirection of all pages to Arabic locale,
    * except for the live-editor page.
-   * 
+   *
    * PURPOSE:
    * - Force all pages to use Arabic locale (ar) regardless of the original URL
    * - Ensures consistent RTL experience across all sections
    * - Prevents users from accessing pages in English locale
    * - Excludes live-editor page from this redirection
-   * 
+   *
    * HOW IT WORKS:
    * 1. Detects if the current path is an English page (starts with /en)
    * 2. Checks if the page is NOT live-editor
    * 3. If both conditions are true, redirects to the same path with Arabic locale
-   * 
+   *
    * AFFECTED PAGES:
    * - /en/* -> /ar/* (except /en/live-editor)
    * - All pages except live-editor
-   * 
+   *
    * LIVE-EDITOR HANDLING:
    * - /en/live-editor -> stays in English (no redirect)
    * - /live-editor (no locale) -> redirects to: /ar/live-editor
    * - Arabic is the default locale for live-editor when no locale is specified
-   * 
+   *
    * MODIFICATION NOTES:
    * - To disable this feature: Comment out the entire redirect section
    * - To change target locale: Replace "ar" with desired locale code
    * - To modify live-editor default: Change liveEditorDefaultLocale variable
-   * 
+   *
    * EXAMPLE:
    * User visits: /en/dashboard/analytics -> redirects to: /ar/dashboard/analytics
    * User visits: /en/live-editor -> stays: /en/live-editor
    * User visits: /live-editor -> redirects to: /ar/live-editor
    */
-  
+
   // Check if this is an English page and NOT live-editor
   const isEnglishPage = pathname.startsWith("/en/");
   const isLiveEditor = pathname.startsWith("/en/live-editor");
-  
+
   if (isEnglishPage && !isLiveEditor) {
     // Extract the path without locale
     const pathWithoutLocale = pathname.replace("/en", "");
-    
+
     // Redirect to Arabic version of the page
     const newUrl = new URL(`/ar${pathWithoutLocale}`, request.url);
     return NextResponse.redirect(newUrl);
@@ -162,7 +179,9 @@ export function middleware(request: NextRequest) {
   // If no locale in pathname, redirect to appropriate default locale
   if (!pathnameHasLocale) {
     // Use Arabic as default for live-editor, English for other pages
-    const locale = pathname.startsWith("/live-editor") ? liveEditorDefaultLocale : defaultLocale;
+    const locale = pathname.startsWith("/live-editor")
+      ? liveEditorDefaultLocale
+      : defaultLocale;
     const newUrl = new URL(`/${locale}${pathname}`, request.url);
     return NextResponse.redirect(newUrl);
   }

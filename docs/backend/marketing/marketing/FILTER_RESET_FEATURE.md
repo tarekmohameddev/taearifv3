@@ -12,6 +12,7 @@ Added **"Reset" buttons** to clear all search and filter criteria for both Packa
 ## 🎯 Features Added
 
 ### 1. Package Filters Reset Button
+
 - **Location**: Left panel (Credit Packages)
 - **Button**: "Reset" with refresh icon
 - **Clears**:
@@ -20,6 +21,7 @@ Added **"Reset" buttons** to clear all search and filter criteria for both Packa
   - Package Search text
 
 ### 2. Channel Filters Reset Button
+
 - **Location**: Right panel (Channel Pricing)
 - **Button**: "Reset" with refresh icon
 - **Clears**:
@@ -31,31 +33,28 @@ Added **"Reset" buttons** to clear all search and filter criteria for both Packa
 ## 🎨 UI Changes
 
 ### Package Filters Section (Before)
+
 ```html
-Col-4: Status Filter
-Col-4: Marketing Filter  
-Col-4: Search Box
+Col-4: Status Filter Col-4: Marketing Filter Col-4: Search Box
 ```
 
 ### Package Filters Section (After)
+
 ```html
-Col-3: Status Filter
-Col-3: Marketing Filter
-Col-4: Search Box
-Col-2: Reset Button ⟲
+Col-3: Status Filter Col-3: Marketing Filter Col-4: Search Box Col-2: Reset
+Button ⟲
 ```
 
 ### Channel Filters Section (Before)
+
 ```html
-Col-6: Status Filter
-Col-6: Search Box
+Col-6: Status Filter Col-6: Search Box
 ```
 
 ### Channel Filters Section (After)
+
 ```html
-Col-4: Status Filter
-Col-5: Search Box
-Col-3: Reset Button ⟲
+Col-4: Status Filter Col-5: Search Box Col-3: Reset Button ⟲
 ```
 
 ---
@@ -63,6 +62,7 @@ Col-3: Reset Button ⟲
 ## 💻 How It Works
 
 ### User Flow:
+
 1. User applies filters (selects status, types search, etc.)
 2. Results are filtered
 3. User clicks **"Reset"** button
@@ -70,20 +70,21 @@ Col-3: Reset Button ⟲
 5. Page automatically reloads with default view (all items)
 
 ### Technical Implementation:
+
 ```javascript
 // Package Reset
-resetPackageFilters.addEventListener('click', function() {
-    document.getElementById('packageStatusFilter').value = '';
-    document.getElementById('marketingSupportFilter').value = '';
-    document.getElementById('packageSearch').value = '';
-    applyFilters(); // Triggers page reload
+resetPackageFilters.addEventListener("click", function () {
+  document.getElementById("packageStatusFilter").value = "";
+  document.getElementById("marketingSupportFilter").value = "";
+  document.getElementById("packageSearch").value = "";
+  applyFilters(); // Triggers page reload
 });
 
 // Channel Reset
-resetChannelFilters.addEventListener('click', function() {
-    document.getElementById('channelStatusFilter').value = '';
-    document.getElementById('channelSearch').value = '';
-    applyFilters(); // Triggers page reload
+resetChannelFilters.addEventListener("click", function () {
+  document.getElementById("channelStatusFilter").value = "";
+  document.getElementById("channelSearch").value = "";
+  applyFilters(); // Triggers page reload
 });
 ```
 
@@ -92,9 +93,11 @@ resetChannelFilters.addEventListener('click', function() {
 ## 🎯 Usage Examples
 
 ### Example 1: Reset Package Filters
+
 **Scenario**: Admin filtered to show only "Active Marketing Packages"
 
 **Steps**:
+
 1. Admin selected:
    - Status: "Active"
    - Marketing: "Marketing Support"
@@ -105,9 +108,11 @@ resetChannelFilters.addEventListener('click', function() {
 5. ✅ Page shows all packages again (e.g., 6 packages)
 
 ### Example 2: Reset Channel Filters
+
 **Scenario**: Admin searched for "whatsapp" channels
 
 **Steps**:
+
 1. Admin typed "whatsapp" in search box
 2. Sees only WhatsApp channels
 3. Clicks **"Reset"** button
@@ -119,6 +124,7 @@ resetChannelFilters.addEventListener('click', function() {
 ## 🎨 Button Design
 
 ### Visual Appearance:
+
 ```css
 Button Style: btn-outline-secondary btn-sm w-100
 Icon: fas fa-redo (refresh icon)
@@ -128,6 +134,7 @@ Color: Gray outline (secondary)
 ```
 
 ### On Hover:
+
 - Background changes to gray
 - Border becomes more prominent
 - Cursor changes to pointer
@@ -162,55 +169,63 @@ Color: Gray outline (secondary)
 ## 🔧 Technical Details
 
 ### Files Modified:
+
 - `resources/views/admin/credit_management/dashboard.blade.php`
 
 ### Changes Made:
 
 #### 1. HTML Structure (Packages)
+
 ```html
 <!-- Added col-md-2 for reset button -->
 <div class="col-md-2">
-    <button class="btn btn-outline-secondary btn-sm w-100" 
-            id="resetPackageFilters" 
-            title="Reset all filters">
-        <i class="fas fa-redo me-1"></i> Reset
-    </button>
+  <button
+    class="btn btn-outline-secondary btn-sm w-100"
+    id="resetPackageFilters"
+    title="Reset all filters"
+  >
+    <i class="fas fa-redo me-1"></i> Reset
+  </button>
 </div>
 ```
 
 #### 2. HTML Structure (Channels)
+
 ```html
 <!-- Added col-md-3 for reset button -->
 <div class="col-md-3">
-    <button class="btn btn-outline-secondary btn-sm w-100" 
-            id="resetChannelFilters" 
-            title="Reset all filters">
-        <i class="fas fa-redo me-1"></i> Reset
-    </button>
+  <button
+    class="btn btn-outline-secondary btn-sm w-100"
+    id="resetChannelFilters"
+    title="Reset all filters"
+  >
+    <i class="fas fa-redo me-1"></i> Reset
+  </button>
 </div>
 ```
 
 #### 3. JavaScript Event Listeners
+
 ```javascript
 // Package reset functionality
-const resetPackageFilters = document.getElementById('resetPackageFilters');
+const resetPackageFilters = document.getElementById("resetPackageFilters");
 if (resetPackageFilters) {
-    resetPackageFilters.addEventListener('click', function() {
-        document.getElementById('packageStatusFilter').value = '';
-        document.getElementById('marketingSupportFilter').value = '';
-        document.getElementById('packageSearch').value = '';
-        applyFilters();
-    });
+  resetPackageFilters.addEventListener("click", function () {
+    document.getElementById("packageStatusFilter").value = "";
+    document.getElementById("marketingSupportFilter").value = "";
+    document.getElementById("packageSearch").value = "";
+    applyFilters();
+  });
 }
 
 // Channel reset functionality
-const resetChannelFilters = document.getElementById('resetChannelFilters');
+const resetChannelFilters = document.getElementById("resetChannelFilters");
 if (resetChannelFilters) {
-    resetChannelFilters.addEventListener('click', function() {
-        document.getElementById('channelStatusFilter').value = '';
-        document.getElementById('channelSearch').value = '';
-        applyFilters();
-    });
+  resetChannelFilters.addEventListener("click", function () {
+    document.getElementById("channelStatusFilter").value = "";
+    document.getElementById("channelSearch").value = "";
+    applyFilters();
+  });
 }
 ```
 
@@ -219,11 +234,13 @@ if (resetChannelFilters) {
 ## 📱 Responsive Design
 
 ### Desktop (≥768px):
+
 - Package filters in 4 columns: 3-3-4-2
 - Channel filters in 3 columns: 4-5-3
 - Reset buttons fully visible
 
 ### Tablet/Mobile (<768px):
+
 - All columns stack vertically
 - Reset button takes full width
 - Easy to tap on mobile devices
@@ -235,12 +252,14 @@ if (resetChannelFilters) {
 ### For Admins:
 
 **To Reset Package Filters:**
+
 1. Go to `/admin/credit-management`
 2. Look at the left panel (Credit Packages)
 3. Find the "Reset" button (right side of filters)
 4. Click it to clear all package filters
 
 **To Reset Channel Filters:**
+
 1. Go to `/admin/credit-management`
 2. Look at the right panel (Channel Pricing)
 3. Find the "Reset" button (right side of filters)
@@ -265,15 +284,14 @@ Possible improvements for later:
 
 ## 📞 Related Documentation
 
-| Document | Description |
-|----------|-------------|
-| `QUICK_REFERENCE.md` | Main dashboard guide |
+| Document                        | Description          |
+| ------------------------------- | -------------------- |
+| `QUICK_REFERENCE.md`            | Main dashboard guide |
 | `CUSTOM_CHANNEL_TYPES_GUIDE.md` | Custom channel types |
-| `SYNC_PRICING_EXPLAINED.md` | Pricing sync feature |
+| `SYNC_PRICING_EXPLAINED.md`     | Pricing sync feature |
 
 ---
 
 **Last Updated**: 2025-10-01  
 **Version**: 1.0.0  
 **Status**: ✅ Production Ready
-

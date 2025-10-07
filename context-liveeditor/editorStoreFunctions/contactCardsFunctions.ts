@@ -324,7 +324,7 @@ export const contactCardsFunctions = {
     // Update pageComponentsByPage with the new data
     const currentPage = state.currentPage || "homepage";
     const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
-    
+
     // Find and update the component in pageComponents
     const updatedComponents = updatedPageComponents.map((comp: any) => {
       if (comp.type === "contactCards" && comp.id === variantId) {

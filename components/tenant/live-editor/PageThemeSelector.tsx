@@ -139,7 +139,9 @@ export function PageThemeSelector({
             className={`inline-flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200 hover:from-indigo-100 hover:to-purple-100 hover:border-indigo-300 transition-all duration-200 ${className}`}
           >
             <Globe className="w-4 h-4 text-indigo-600" />
-            <span className="text-indigo-700 font-medium">{t("page_theme.page_theme")}</span>
+            <span className="text-indigo-700 font-medium">
+              {t("page_theme.page_theme")}
+            </span>
             <Sparkles className="w-3 h-3 text-indigo-500" />
           </Button>
         </DialogTrigger>
@@ -189,9 +191,9 @@ export function PageThemeSelector({
                           {theme.name}
                         </h4>
                         {selectedTheme === theme.id && (
-                        <Badge className="bg-indigo-600 text-white text-xs">
-                          {t("theme_selector.selected")}
-                        </Badge>
+                          <Badge className="bg-indigo-600 text-white text-xs">
+                            {t("theme_selector.selected")}
+                          </Badge>
                         )}
                       </div>
                       <p className="text-sm text-gray-600 mb-3">

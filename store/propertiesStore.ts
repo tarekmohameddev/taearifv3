@@ -201,7 +201,9 @@ export const usePropertiesStore = create<PropertiesStore>()(
         try {
           // الحصول على tenantId من الـ store
           if (!state.tenantId) {
-            console.log("Store: No tenant ID available, skipping fetchProperties");
+            console.log(
+              "Store: No tenant ID available, skipping fetchProperties",
+            );
             set({ loading: false });
             return;
           }
@@ -210,22 +212,22 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
           // بناء URL مع pagination والفلاتر
           const params = new URLSearchParams();
-          params.append('page', page.toString());
-          
+          params.append("page", page.toString());
+
           if (state.transactionType) {
-            params.append('purpose', state.transactionType);
+            params.append("purpose", state.transactionType);
           }
-          if (state.activeFilter && state.activeFilter !== 'all') {
-            params.append('status', state.activeFilter);
+          if (state.activeFilter && state.activeFilter !== "all") {
+            params.append("status", state.activeFilter);
           }
           if (state.propertyType) {
-            params.append('type', state.propertyType);
+            params.append("type", state.propertyType);
           }
           if (state.search) {
-            params.append('search', state.search);
+            params.append("search", state.search);
           }
           if (state.price) {
-            params.append('max_price', state.price);
+            params.append("max_price", state.price);
           }
 
           const url = `/v1/tenant-website/${tenantId}/properties?${params.toString()}`;
@@ -281,7 +283,9 @@ export const usePropertiesStore = create<PropertiesStore>()(
         try {
           // الحصول على tenantId من الـ store
           if (!state.tenantId) {
-            console.log("Store: No tenant ID available, skipping fetchAllProperties");
+            console.log(
+              "Store: No tenant ID available, skipping fetchAllProperties",
+            );
             set({ loading: false });
             return;
           }
@@ -356,12 +360,19 @@ export const usePropertiesStore = create<PropertiesStore>()(
         if (state.transactionType) {
           filtered = filtered.filter((property) => {
             // تحويل القيم للتطابق مع البيانات الجديدة
-            const normalizedTransactionType = state.transactionType === "sale" ? "sale" : "rent";
-            const propertyTransactionType = property.transactionType.toLowerCase();
-            
-            return propertyTransactionType === normalizedTransactionType || 
-                   (normalizedTransactionType === "sale" && propertyTransactionType === "sold") ||
-                   (normalizedTransactionType === "rent" && (propertyTransactionType === "rent" || propertyTransactionType === "rented"));
+            const normalizedTransactionType =
+              state.transactionType === "sale" ? "sale" : "rent";
+            const propertyTransactionType =
+              property.transactionType.toLowerCase();
+
+            return (
+              propertyTransactionType === normalizedTransactionType ||
+              (normalizedTransactionType === "sale" &&
+                propertyTransactionType === "sold") ||
+              (normalizedTransactionType === "rent" &&
+                (propertyTransactionType === "rent" ||
+                  propertyTransactionType === "rented"))
+            );
           });
         }
 

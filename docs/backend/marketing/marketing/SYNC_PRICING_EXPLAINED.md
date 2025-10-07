@@ -9,16 +9,19 @@ The **Sync Pricing** feature automatically updates all marketing channel prices 
 ## 🔄 **How It Works - Step by Step**
 
 ### **Step 1: Get Active Marketing Packages**
+
 ```php
 $packages = CreditPackage::forMarketingChannels()
     ->active()
     ->get();
 ```
+
 - Gets all **active** credit packages
 - Only packages that **support marketing channels**
 - Example: Starter Pack, Business Pack, etc.
 
 ### **Step 2: Calculate Average Price Per Credit**
+
 ```php
 foreach ($packages as $package) {
     if ($package->credits > 0) {
@@ -31,20 +34,21 @@ $avgPricePerCredit = $totalPricePerCredit / $count;
 
 **Example Calculation:**
 
-| Package | Credits | Price | Price per Credit |
-|---------|---------|-------|------------------|
-| Starter Pack | 100 | 25 SAR | 0.2500 SAR |
-| Business Pack | 500 | 100 SAR | 0.2000 SAR |
-| Basic Package | 1,000 | 50 SAR | 0.0500 SAR |
-| Medium Package | 2,500 | 100 SAR | 0.0400 SAR |
-| Advanced Package | 5,000 | 180 SAR | 0.0360 SAR |
-| Professional Package | 10,000 | 300 SAR | 0.0300 SAR |
+| Package              | Credits | Price   | Price per Credit |
+| -------------------- | ------- | ------- | ---------------- |
+| Starter Pack         | 100     | 25 SAR  | 0.2500 SAR       |
+| Business Pack        | 500     | 100 SAR | 0.2000 SAR       |
+| Basic Package        | 1,000   | 50 SAR  | 0.0500 SAR       |
+| Medium Package       | 2,500   | 100 SAR | 0.0400 SAR       |
+| Advanced Package     | 5,000   | 180 SAR | 0.0360 SAR       |
+| Professional Package | 10,000  | 300 SAR | 0.0300 SAR       |
 
 **Total:** 0.2500 + 0.2000 + 0.0500 + 0.0400 + 0.0360 + 0.0300 = **0.6060 SAR**
 
 **Average:** 0.6060 ÷ 6 packages = **0.1010 SAR per credit**
 
 ### **Step 3: Update All Active Channel Pricing**
+
 ```php
 MarketingChannelPricing::active()->get()->each(function ($pricing) use ($avgPricePerCredit) {
     $pricing->price_per_credit = round($avgPricePerCredit, 4);
@@ -53,6 +57,7 @@ MarketingChannelPricing::active()->get()->each(function ($pricing) use ($avgPric
 ```
 
 Updates all channels:
+
 - **WhatsApp:** price_per_credit = 0.1010 SAR
 - **Facebook:** price_per_credit = 0.1010 SAR
 - **Telegram:** price_per_credit = 0.1010 SAR
@@ -60,12 +65,14 @@ Updates all channels:
 - **SMS:** price_per_credit = 0.1010 SAR
 
 ### **Step 4: Recalculate Effective Prices**
+
 ```php
 $pricing->updateEffectivePrice();
 // effective_price_per_message = credits_per_message × price_per_credit
 ```
 
 **Example:**
+
 - **WhatsApp:** 1 credit/msg × 0.1010 = **0.1010 SAR/message**
 - **Facebook:** 2 credits/msg × 0.1010 = **0.2020 SAR/message**
 - **Telegram:** 1 credit/msg × 0.1010 = **0.1010 SAR/message**
@@ -116,21 +123,25 @@ $pricing->updateEffectivePrice();
 ## 🎯 **Why Use Sync Pricing?**
 
 ### **1. Consistency**
+
 - Ensures all marketing channels use the same credit price
 - Based on your actual credit package pricing
 - Prevents pricing conflicts
 
 ### **2. Automatic Updates**
+
 - When you change package prices, just click "Sync Pricing"
 - All channels update automatically
 - No need to manually update each channel
 
 ### **3. Fair Pricing**
+
 - Average of all packages = fair market price
 - Balances between cheap and expensive packages
 - Reflects your overall pricing strategy
 
 ### **4. Time Saving**
+
 - One click updates all 5 channels
 - Instead of editing each channel individually
 - Instant synchronization
@@ -140,6 +151,7 @@ $pricing->updateEffectivePrice();
 ## ⚠️ **Important Notes**
 
 ### **What Gets Updated:**
+
 - ✅ **price_per_credit** for each channel
 - ✅ **effective_price_per_message** (automatically recalculated)
 - ✅ Only **active** channels are updated
@@ -147,6 +159,7 @@ $pricing->updateEffectivePrice();
 - ❌ **Inactive** channels are NOT updated
 
 ### **What Packages Are Used:**
+
 - ✅ Only **active** packages
 - ✅ Only packages with **"supports_marketing_channels" = true**
 - ❌ Inactive packages are ignored
@@ -155,21 +168,27 @@ $pricing->updateEffectivePrice();
 ### **What Happens If:**
 
 **No active packages found:**
+
 ```
 Error: "No active credit packages found for marketing channels!"
 ```
+
 Action: Activate at least one package with marketing support
 
 **No valid packages (0 credits):**
+
 ```
 Error: "No valid credit packages found for syncing!"
 ```
+
 Action: Ensure packages have credits > 0
 
 **Success:**
+
 ```
 Success: "All channel pricing synced from credit packages! Average: 0.1010 SAR/credit"
 ```
+
 Shows the average price that was applied
 
 ---
@@ -177,11 +196,13 @@ Shows the average price that was applied
 ## 🧪 **How to Use Sync Pricing**
 
 ### **Step 1: Prepare**
+
 1. Make sure you have active credit packages
 2. Ensure packages have "Support Marketing Channels" enabled
 3. Check package prices are correct
 
 ### **Step 2: Sync**
+
 1. Go to `/admin/credit-management`
 2. Click **"Sync Pricing"** button (top right)
 3. Modal opens with warning
@@ -189,6 +210,7 @@ Shows the average price that was applied
 5. Confirm when asked
 
 ### **Step 3: Verify**
+
 1. Page reloads with success message
 2. Check the average price shown
 3. Look at channel pricing in the right panel
@@ -199,19 +221,25 @@ Shows the average price that was applied
 ## 💡 **Use Cases**
 
 ### **Use Case 1: New Pricing Structure**
+
 You changed all your package prices and want channels to reflect the new average:
+
 1. Update package prices
 2. Click "Sync Pricing"
 3. All channels updated ✅
 
 ### **Use Case 2: Adding New Packages**
+
 You added new premium packages and want to adjust channel pricing:
+
 1. Add new packages
 2. Click "Sync Pricing"
 3. Average includes new packages ✅
 
 ### **Use Case 3: Standardizing Pricing**
+
 Your channels have different prices and you want them consistent:
+
 1. Click "Sync Pricing"
 2. All channels use same price per credit ✅
 3. Only difference is credits per message
@@ -221,6 +249,7 @@ Your channels have different prices and you want them consistent:
 ## 📊 **Real Example from Your System**
 
 **Your Current Packages:**
+
 1. Starter Pack: 100 credits @ 25 SAR = 0.2500/credit
 2. Business Pack: 500 credits @ 100 SAR = 0.2000/credit
 3. Basic Package: 1,000 credits @ 50 SAR = 0.0500/credit
@@ -229,9 +258,11 @@ Your channels have different prices and you want them consistent:
 6. Professional Package: 10,000 credits @ 300 SAR = 0.0300/credit
 
 **After Sync, all channels will have:**
+
 - Price per Credit: **0.1010 SAR** (average of above 6 packages)
 
 **Your Current Channels:**
+
 1. WhatsApp: 1 credit/msg → 0.1010 SAR/msg
 2. Facebook: 2 credits/msg → 0.2020 SAR/msg
 3. Telegram: 1 credit/msg → 0.1010 SAR/msg
@@ -250,6 +281,7 @@ Your channels have different prices and you want them consistent:
 4. One click, all channels updated!
 
 **Formula:**
+
 ```
 Average Price/Credit = Sum of (Package Price ÷ Package Credits) ÷ Number of Packages
 

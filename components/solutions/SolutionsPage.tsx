@@ -14,7 +14,7 @@ export default function SolutionsPage() {
   useEffect(() => {
     // Track page view
     trackPageView("/solutions", "Solutions Page");
-    
+
     // Animation Observer
     const observer = new IntersectionObserver(
       (entries) => {
@@ -37,7 +37,9 @@ export default function SolutionsPage() {
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
       anchor.addEventListener("click", (e: Event) => {
         e.preventDefault();
-        const target = document.querySelector((anchor as HTMLAnchorElement).getAttribute("href") || "");
+        const target = document.querySelector(
+          (anchor as HTMLAnchorElement).getAttribute("href") || "",
+        );
         if (target) {
           target.scrollIntoView({
             behavior: "smooth",

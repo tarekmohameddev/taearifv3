@@ -885,14 +885,24 @@ export default function PropertyForm({ mode }) {
     formData.append("deed_image", file);
 
     try {
-      const response = await axiosInstance.post("/properties/upload-deed-image", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axiosInstance.post(
+        "/properties/upload-deed-image",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
 
-      if (response.data && response.data.status === "success" && response.data.data) {
+      if (
+        response.data &&
+        response.data.status === "success" &&
+        response.data.data
+      ) {
         return response.data.data;
       } else {
-        throw new Error("Unexpected response structure from deed image upload API");
+        throw new Error(
+          "Unexpected response structure from deed image upload API",
+        );
       }
     } catch (error) {
       console.error("Deed image upload error:", error);
@@ -1001,7 +1011,9 @@ export default function PropertyForm({ mode }) {
             deedImagePath = uploadedDeedImage.path || uploadedDeedImage.url;
           } catch (error) {
             console.error("Failed to upload deed image:", error);
-            toast.error("فشل في رفع صورة السند العقاري. يرجى المحاولة مرة أخرى.");
+            toast.error(
+              "فشل في رفع صورة السند العقاري. يرجى المحاولة مرة أخرى.",
+            );
             throw error;
           }
         }
@@ -1282,19 +1294,21 @@ export default function PropertyForm({ mode }) {
                         >
                           <SelectValue placeholder="اختر العمارة" />
                         </SelectTrigger>
-                          <SelectContent>
-                            {buildings.map((building) => (
-                              <SelectItem
-                                key={building.id}
-                                value={building.id.toString()}
-                              >
-                                {building.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
+                        <SelectContent>
+                          {buildings.map((building) => (
+                            <SelectItem
+                              key={building.id}
+                              value={building.id.toString()}
+                            >
+                              {building.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
                       </Select>
                       {errors.building_id && (
-                        <p className="text-sm text-red-500">{errors.building_id}</p>
+                        <p className="text-sm text-red-500">
+                          {errors.building_id}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -1940,38 +1954,51 @@ export default function PropertyForm({ mode }) {
                     {/* أرقام العدادات */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="water_meter_number">رقم عداد المياه</Label>
+                        <Label htmlFor="water_meter_number">
+                          رقم عداد المياه
+                        </Label>
                         <Input
                           id="water_meter_number"
                           name="water_meter_number"
                           placeholder="123456789"
                           value={formData.water_meter_number}
                           onChange={handleInputChange}
-                          className={errors.water_meter_number ? "border-red-500" : ""}
+                          className={
+                            errors.water_meter_number ? "border-red-500" : ""
+                          }
                           dir="rtl"
                         />
                         {errors.water_meter_number && (
-                          <p className="text-sm text-red-500">{errors.water_meter_number}</p>
+                          <p className="text-sm text-red-500">
+                            {errors.water_meter_number}
+                          </p>
                         )}
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="electricity_meter_number">رقم عداد الكهرباء</Label>
+                        <Label htmlFor="electricity_meter_number">
+                          رقم عداد الكهرباء
+                        </Label>
                         <Input
                           id="electricity_meter_number"
                           name="electricity_meter_number"
                           placeholder="987654321"
                           value={formData.electricity_meter_number}
                           onChange={handleInputChange}
-                          className={errors.electricity_meter_number ? "border-red-500" : ""}
+                          className={
+                            errors.electricity_meter_number
+                              ? "border-red-500"
+                              : ""
+                          }
                           dir="rtl"
                         />
                         {errors.electricity_meter_number && (
-                          <p className="text-sm text-red-500">{errors.electricity_meter_number}</p>
+                          <p className="text-sm text-red-500">
+                            {errors.electricity_meter_number}
+                          </p>
                         )}
                       </div>
                     </div>
-
                   </div>
                   {/* مرافق العقار - Property Features */}
                   <div className="space-y-4 whitespace-nowraps">
@@ -2105,69 +2132,71 @@ export default function PropertyForm({ mode }) {
                       />
                     </div>
                   </div>
-                  
-                    {/* صورة السند العقاري */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-right">صورة السند العقاري (الصك)</h3>
-                      <div className="flex flex-col md:flex-row items-center gap-6">
-                        <div className="border rounded-md p-2 flex-1 w-full">
-                          <div className="flex items-center justify-center h-48 bg-muted rounded-md relative">
-                            {previews.deedImage ? (
-                              <>
-                                <img
-                                  src={previews.deedImage}
-                                  alt="Deed image"
-                                  className="h-full w-full object-cover rounded-md"
-                                />
-                                <Button
-                                  variant="destructive"
-                                  size="icon"
-                                  className="absolute top-2 right-2 h-8 w-8"
-                                  onClick={() => removeImage("deedImage")}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </>
-                            ) : (
-                              <ImageIcon className="h-12 w-12 text-muted-foreground" />
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-4 w-full md:w-1/3">
-                          <input
-                            ref={deedImageInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => handleFileChange(e, "deedImage")}
-                          />
-                          <Button
-                            variant="outline"
-                            className="h-12 w-full"
-                            onClick={() => triggerFileInput("deedImage")}
-                            disabled={uploading}
-                          >
-                            <div className="flex items-center gap-2">
-                              {uploading ? (
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                              ) : (
-                                <Upload className="h-5 w-5" />
-                              )}
-                              <span>رفع صورة السند</span>
-                            </div>
-                          </Button>
-                          <p className="text-sm text-muted-foreground">
-                            يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف
-                            هو 5 ميجابايت.
-                          </p>
-                          {errors.deedImage && (
-                            <p className="text-xs text-red-500">
-                              {errors.deedImage}
-                            </p>
+
+                  {/* صورة السند العقاري */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-right">
+                      صورة السند العقاري (الصك)
+                    </h3>
+                    <div className="flex flex-col md:flex-row items-center gap-6">
+                      <div className="border rounded-md p-2 flex-1 w-full">
+                        <div className="flex items-center justify-center h-48 bg-muted rounded-md relative">
+                          {previews.deedImage ? (
+                            <>
+                              <img
+                                src={previews.deedImage}
+                                alt="Deed image"
+                                className="h-full w-full object-cover rounded-md"
+                              />
+                              <Button
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-2 right-2 h-8 w-8"
+                                onClick={() => removeImage("deedImage")}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <ImageIcon className="h-12 w-12 text-muted-foreground" />
                           )}
                         </div>
                       </div>
+                      <div className="flex flex-col gap-4 w-full md:w-1/3">
+                        <input
+                          ref={deedImageInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleFileChange(e, "deedImage")}
+                        />
+                        <Button
+                          variant="outline"
+                          className="h-12 w-full"
+                          onClick={() => triggerFileInput("deedImage")}
+                          disabled={uploading}
+                        >
+                          <div className="flex items-center gap-2">
+                            {uploading ? (
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : (
+                              <Upload className="h-5 w-5" />
+                            )}
+                            <span>رفع صورة السند</span>
+                          </div>
+                        </Button>
+                        <p className="text-sm text-muted-foreground">
+                          يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم
+                          الملف هو 5 ميجابايت.
+                        </p>
+                        {errors.deedImage && (
+                          <p className="text-xs text-red-500">
+                            {errors.deedImage}
+                          </p>
+                        )}
+                      </div>
                     </div>
+                  </div>
                 </CardContent>
               </Card>
 

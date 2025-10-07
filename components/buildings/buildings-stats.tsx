@@ -31,61 +31,84 @@ interface BuildingsStatsProps {
   loading?: boolean;
 }
 
-export default function BuildingsStats({ buildings, loading = false }: BuildingsStatsProps) {
+export default function BuildingsStats({
+  buildings,
+  loading = false,
+}: BuildingsStatsProps) {
   // Calculate statistics
   const totalBuildings = buildings.length;
-  const totalProperties = buildings.reduce((acc, building) => acc + building.properties.length, 0);
-  
+  const totalProperties = buildings.reduce(
+    (acc, building) => acc + building.properties.length,
+    0,
+  );
+
   const availableProperties = buildings.reduce(
-    (acc, building) => 
-      acc + building.properties.filter(p => p.property_status === "available").length,
-    0
+    (acc, building) =>
+      acc +
+      building.properties.filter((p) => p.property_status === "available")
+        .length,
+    0,
   );
-  
+
   const rentedProperties = buildings.reduce(
-    (acc, building) => 
-      acc + building.properties.filter(p => p.property_status === "rented").length,
-    0
+    (acc, building) =>
+      acc +
+      building.properties.filter((p) => p.property_status === "rented").length,
+    0,
   );
-  
+
   const soldProperties = buildings.reduce(
-    (acc, building) => 
-      acc + building.properties.filter(p => p.property_status === "sold").length,
-    0
+    (acc, building) =>
+      acc +
+      building.properties.filter((p) => p.property_status === "sold").length,
+    0,
   );
 
   const residentialProperties = buildings.reduce(
-    (acc, building) => 
-      acc + building.properties.filter(p => p.type === "residential").length,
-    0
+    (acc, building) =>
+      acc + building.properties.filter((p) => p.type === "residential").length,
+    0,
   );
-  
+
   const commercialProperties = buildings.reduce(
-    (acc, building) => 
-      acc + building.properties.filter(p => p.type === "commercial").length,
-    0
+    (acc, building) =>
+      acc + building.properties.filter((p) => p.type === "commercial").length,
+    0,
   );
 
   const rentProperties = buildings.reduce(
-    (acc, building) => 
-      acc + building.properties.filter(p => p.purpose && p.purpose.toLowerCase() === "rent").length,
-    0
+    (acc, building) =>
+      acc +
+      building.properties.filter(
+        (p) => p.purpose && p.purpose.toLowerCase() === "rent",
+      ).length,
+    0,
   );
-  
+
   const saleProperties = buildings.reduce(
-    (acc, building) => 
-      acc + building.properties.filter(p => p.purpose && p.purpose.toLowerCase() === "sale").length,
-    0
+    (acc, building) =>
+      acc +
+      building.properties.filter(
+        (p) => p.purpose && p.purpose.toLowerCase() === "sale",
+      ).length,
+    0,
   );
 
   // Calculate average properties per building
-  const avgPropertiesPerBuilding = totalBuildings > 0 ? (totalProperties / totalBuildings).toFixed(1) : 0;
-  
+  const avgPropertiesPerBuilding =
+    totalBuildings > 0 ? (totalProperties / totalBuildings).toFixed(1) : 0;
+
   // Calculate occupancy rate
-  const occupancyRate = totalProperties > 0 ? ((rentedProperties / totalProperties) * 100).toFixed(1) : 0;
-  
+  const occupancyRate =
+    totalProperties > 0
+      ? ((rentedProperties / totalProperties) * 100).toFixed(1)
+      : 0;
+
   // Calculate availability rate
-  const availabilityRate = totalProperties > 0 ? ((availableProperties / totalProperties) * 100).toFixed(1) : 0;
+  const availabilityRate =
+    totalProperties > 0
+      ? ((availableProperties / totalProperties) * 100).toFixed(1)
+      : 0;
 
   const stats = [
     {
@@ -157,14 +180,20 @@ export default function BuildingsStats({ buildings, loading = false }: Buildings
     {
       title: "العقارات السكنية",
       value: residentialProperties,
-      percentage: totalProperties > 0 ? ((residentialProperties / totalProperties) * 100).toFixed(1) : 0,
+      percentage:
+        totalProperties > 0
+          ? ((residentialProperties / totalProperties) * 100).toFixed(1)
+          : 0,
       color: "text-green-600",
       bgColor: "bg-green-50",
     },
     {
       title: "العقارات التجارية",
       value: commercialProperties,
-      percentage: totalProperties > 0 ? ((commercialProperties / totalProperties) * 100).toFixed(1) : 0,
+      percentage:
+        totalProperties > 0
+          ? ((commercialProperties / totalProperties) * 100).toFixed(1)
+          : 0,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
     },
@@ -174,14 +203,20 @@ export default function BuildingsStats({ buildings, loading = false }: Buildings
     {
       title: "عقارات للإيجار",
       value: rentProperties,
-      percentage: totalProperties > 0 ? ((rentProperties / totalProperties) * 100).toFixed(1) : 0,
+      percentage:
+        totalProperties > 0
+          ? ((rentProperties / totalProperties) * 100).toFixed(1)
+          : 0,
       color: "text-orange-600",
       bgColor: "bg-orange-50",
     },
     {
       title: "عقارات للبيع",
       value: saleProperties,
-      percentage: totalProperties > 0 ? ((saleProperties / totalProperties) * 100).toFixed(1) : 0,
+      percentage:
+        totalProperties > 0
+          ? ((saleProperties / totalProperties) * 100).toFixed(1)
+          : 0,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
     },
@@ -210,7 +245,10 @@ export default function BuildingsStats({ buildings, loading = false }: Buildings
       {/* Main Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
-          <Card key={index} className="border border-gray-200 hover:shadow-lg transition-shadow">
+          <Card
+            key={index}
+            className="border border-gray-200 hover:shadow-lg transition-shadow"
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
                 {stat.title}
@@ -230,7 +268,10 @@ export default function BuildingsStats({ buildings, loading = false }: Buildings
       {/* Detailed Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {detailedStats.map((stat, index) => (
-          <Card key={index} className="border border-gray-200 hover:shadow-lg transition-shadow">
+          <Card
+            key={index}
+            className="border border-gray-200 hover:shadow-lg transition-shadow"
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
                 {stat.title}
@@ -249,13 +290,18 @@ export default function BuildingsStats({ buildings, loading = false }: Buildings
       {/* Property Type Distribution */}
       <Card className="border border-gray-200">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-black">توزيع العقارات حسب النوع</CardTitle>
+          <CardTitle className="text-lg font-semibold text-black">
+            توزيع العقارات حسب النوع
+          </CardTitle>
           <CardDescription>نسبة العقارات السكنية والتجارية</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {propertyTypeStats.map((stat, index) => (
-              <div key={index} className="flex items-center justify-between p-4 rounded-lg border border-gray-200">
+              <div
+                key={index}
+                className="flex items-center justify-between p-4 rounded-lg border border-gray-200"
+              >
                 <div className="flex items-center space-x-3">
                   <div className={`p-2 rounded-lg ${stat.bgColor}`}>
                     <Home className={`h-4 w-4 ${stat.color}`} />
@@ -266,10 +312,12 @@ export default function BuildingsStats({ buildings, loading = false }: Buildings
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-black">{stat.percentage}%</div>
+                  <div className="text-lg font-bold text-black">
+                    {stat.percentage}%
+                  </div>
                   <div className="w-20 bg-gray-200 rounded-full h-2 mt-1">
-                    <div 
-                      className={`h-2 rounded-full ${stat.bgColor.replace('bg-', 'bg-').replace('-50', '-500')}`}
+                    <div
+                      className={`h-2 rounded-full ${stat.bgColor.replace("bg-", "bg-").replace("-50", "-500")}`}
                       style={{ width: `${stat.percentage}%` }}
                     />
                   </div>
@@ -283,13 +331,18 @@ export default function BuildingsStats({ buildings, loading = false }: Buildings
       {/* Property Purpose Distribution */}
       <Card className="border border-gray-200">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-black">توزيع العقارات حسب الغرض</CardTitle>
+          <CardTitle className="text-lg font-semibold text-black">
+            توزيع العقارات حسب الغرض
+          </CardTitle>
           <CardDescription>نسبة العقارات للإيجار والبيع</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {propertyPurposeStats.map((stat, index) => (
-              <div key={index} className="flex items-center justify-between p-4 rounded-lg border border-gray-200">
+              <div
+                key={index}
+                className="flex items-center justify-between p-4 rounded-lg border border-gray-200"
+              >
                 <div className="flex items-center space-x-3">
                   <div className={`p-2 rounded-lg ${stat.bgColor}`}>
                     <DollarSign className={`h-4 w-4 ${stat.color}`} />
@@ -300,10 +353,12 @@ export default function BuildingsStats({ buildings, loading = false }: Buildings
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-black">{stat.percentage}%</div>
+                  <div className="text-lg font-bold text-black">
+                    {stat.percentage}%
+                  </div>
                   <div className="w-20 bg-gray-200 rounded-full h-2 mt-1">
-                    <div 
-                      className={`h-2 rounded-full ${stat.bgColor.replace('bg-', 'bg-').replace('-50', '-500')}`}
+                    <div
+                      className={`h-2 rounded-full ${stat.bgColor.replace("bg-", "bg-").replace("-50", "-500")}`}
                       style={{ width: `${stat.percentage}%` }}
                     />
                   </div>

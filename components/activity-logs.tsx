@@ -4,26 +4,39 @@ import { useState, useEffect } from "react";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Activity, 
-  Search, 
-  Filter, 
-  Download, 
-  Calendar, 
-  User, 
-  Clock, 
+import {
+  Activity,
+  Search,
+  Filter,
+  Download,
+  Calendar,
+  User,
+  Clock,
   Eye,
   Loader2,
   XCircle,
   CheckCircle,
   AlertCircle,
-  Info
+  Info,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 
@@ -74,15 +87,18 @@ export function ActivityLogsPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.get<ActivityLogsResponse>("/v1/logs", {
-        params: {
-          page: currentPage,
-          search: searchQuery,
-          action: statusFilter !== "all" ? statusFilter : undefined,
-          date: dateFilter !== "all" ? dateFilter : undefined,
-        }
-      });
-      
+      const response = await axiosInstance.get<ActivityLogsResponse>(
+        "/v1/logs",
+        {
+          params: {
+            page: currentPage,
+            search: searchQuery,
+            action: statusFilter !== "all" ? statusFilter : undefined,
+            date: dateFilter !== "all" ? dateFilter : undefined,
+          },
+        },
+      );
+
       setActivityLogs(response.data.data.logs);
       setTotalPages(response.data.data.pagination.last_page);
       setTotalLogs(response.data.data.pagination.total);
@@ -102,23 +118,23 @@ export function ActivityLogsPage() {
   // Format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("ar-US", {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   // Get status icon based on action type
   const getStatusIcon = (action: string) => {
-    if (action.includes('created')) {
+    if (action.includes("created")) {
       return <CheckCircle className="h-4 w-4 text-green-600" />;
-    } else if (action.includes('updated')) {
+    } else if (action.includes("updated")) {
       return <AlertCircle className="h-4 w-4 text-yellow-600" />;
-    } else if (action.includes('deleted')) {
+    } else if (action.includes("deleted")) {
       return <XCircle className="h-4 w-4 text-red-600" />;
-    } else if (action.includes('assigned')) {
+    } else if (action.includes("assigned")) {
       return <Info className="h-4 w-4 text-blue-600" />;
     } else {
       return <Activity className="h-4 w-4 text-gray-600" />;
@@ -127,36 +143,46 @@ export function ActivityLogsPage() {
 
   // Get status badge variant based on action type
   const getStatusBadgeVariant = (action: string) => {
-    if (action.includes('created')) {
-      return 'default';
-    } else if (action.includes('updated')) {
-      return 'secondary';
-    } else if (action.includes('deleted')) {
-      return 'destructive';
-    } else if (action.includes('assigned')) {
-      return 'outline';
+    if (action.includes("created")) {
+      return "default";
+    } else if (action.includes("updated")) {
+      return "secondary";
+    } else if (action.includes("deleted")) {
+      return "destructive";
+    } else if (action.includes("assigned")) {
+      return "outline";
     } else {
-      return 'secondary';
+      return "secondary";
     }
   };
 
   // Filter logs based on search and filters
-  const filteredLogs = activityLogs.filter(log => {
-    const matchesSearch = searchQuery === "" || 
+  const filteredLogs = activityLogs.filter((log) => {
+    const matchesSearch =
+      searchQuery === "" ||
       log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
       log.target_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
       log.actor_type.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || log.action.includes(statusFilter);
-    
+
+    const matchesStatus =
+      statusFilter === "all" || log.action.includes(statusFilter);
+
     return matchesSearch && matchesStatus;
   });
 
   // Calculate statistics
-  const createdCount = activityLogs.filter(log => log.action.includes('created')).length;
-  const updatedCount = activityLogs.filter(log => log.action.includes('updated')).length;
-  const deletedCount = activityLogs.filter(log => log.action.includes('deleted')).length;
-  const assignedCount = activityLogs.filter(log => log.action.includes('assigned')).length;
+  const createdCount = activityLogs.filter((log) =>
+    log.action.includes("created"),
+  ).length;
+  const updatedCount = activityLogs.filter((log) =>
+    log.action.includes("updated"),
+  ).length;
+  const deletedCount = activityLogs.filter((log) =>
+    log.action.includes("deleted"),
+  ).length;
+  const assignedCount = activityLogs.filter((log) =>
+    log.action.includes("assigned"),
+  ).length;
 
   // Effects
   useEffect(() => {
@@ -171,8 +197,12 @@ export function ActivityLogsPage() {
         <div className="flex-1 overflow-auto p-6">
           <div className="mx-auto ">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">سجلات النشاط</h1>
-              <p className="text-gray-600">مراقبة وتتبع جميع الأنشطة في النظام</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                سجلات النشاط
+              </h1>
+              <p className="text-gray-600">
+                مراقبة وتتبع جميع الأنشطة في النظام
+              </p>
             </div>
 
             {/* Statistics Cards */}
@@ -185,7 +215,9 @@ export function ActivityLogsPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">تم الإنشاء</p>
-                      <p className="text-2xl font-bold text-green-600">{createdCount}</p>
+                      <p className="text-2xl font-bold text-green-600">
+                        {createdCount}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -199,7 +231,9 @@ export function ActivityLogsPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">تم التحديث</p>
-                      <p className="text-2xl font-bold text-yellow-600">{updatedCount}</p>
+                      <p className="text-2xl font-bold text-yellow-600">
+                        {updatedCount}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -213,7 +247,9 @@ export function ActivityLogsPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">تم الحذف</p>
-                      <p className="text-2xl font-bold text-red-600">{deletedCount}</p>
+                      <p className="text-2xl font-bold text-red-600">
+                        {deletedCount}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -227,7 +263,9 @@ export function ActivityLogsPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">تم التعيين</p>
-                      <p className="text-2xl font-bold text-blue-600">{assignedCount}</p>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {assignedCount}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -296,7 +334,9 @@ export function ActivityLogsPage() {
                   <div className="flex items-center justify-center py-12">
                     <div className="flex flex-col items-center gap-3">
                       <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                      <span className="text-gray-600 font-medium">جاري تحميل سجلات النشاط...</span>
+                      <span className="text-gray-600 font-medium">
+                        جاري تحميل سجلات النشاط...
+                      </span>
                     </div>
                   </div>
                 ) : error ? (
@@ -310,25 +350,34 @@ export function ActivityLogsPage() {
                 ) : filteredLogs.length > 0 ? (
                   <div className="space-y-4">
                     {filteredLogs.map((log) => (
-                      <div key={log.id} className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                      <div
+                        key={log.id}
+                        className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
+                      >
                         <div className="flex items-start gap-4">
                           <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
                             <Activity className="h-5 w-5 text-gray-600" />
                           </div>
-                          
+
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
-                              <h4 className="font-medium text-gray-900">{log.action}</h4>
-                              <Badge variant={getStatusBadgeVariant(log.action)} className="text-xs">
+                              <h4 className="font-medium text-gray-900">
+                                {log.action}
+                              </h4>
+                              <Badge
+                                variant={getStatusBadgeVariant(log.action)}
+                                className="text-xs"
+                              >
                                 {getStatusIcon(log.action)}
                                 <span className="mr-1">{log.action}</span>
                               </Badge>
                             </div>
-                            
+
                             <p className="text-sm text-gray-600 mb-2">
-                              {log.actor_type}: {log.actor_id} → {log.target_type}: {log.target_id}
+                              {log.actor_type}: {log.actor_id} →{" "}
+                              {log.target_type}: {log.target_id}
                             </p>
-                            
+
                             <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
                               <div className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
@@ -344,7 +393,7 @@ export function ActivityLogsPage() {
                               </div>
                             </div>
                           </div>
-                          
+
                           <Button variant="outline" size="sm">
                             <Eye className="h-4 w-4 ml-2" />
                             تفاصيل
@@ -356,8 +405,12 @@ export function ActivityLogsPage() {
                 ) : (
                   <div className="text-center py-12">
                     <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">لا توجد سجلات نشاط</h3>
-                    <p className="text-gray-600">لم يتم العثور على سجلات نشاط تطابق المعايير المحددة</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      لا توجد سجلات نشاط
+                    </h3>
+                    <p className="text-gray-600">
+                      لم يتم العثور على سجلات نشاط تطابق المعايير المحددة
+                    </p>
                   </div>
                 )}
               </CardContent>

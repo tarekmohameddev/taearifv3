@@ -12,11 +12,13 @@ You can now create **custom channel types** in addition to the default ones (Wha
 ## 🎯 What Changed?
 
 ### Before
+
 - Channel types were hardcoded as ENUM: `whatsapp`, `facebook`, `telegram`, `instagram`, `sms`
 - Could only select from these 5 predefined types
 - No way to add new channel types without database migration
 
 ### After
+
 - Channel types are now VARCHAR(50) - fully flexible
 - Can enter **any custom channel type** (e.g., `twitter`, `email`, `linkedin`, `tiktok`, `viber`)
 - Still shows suggestions from existing types
@@ -35,6 +37,7 @@ php artisan migrate
 ```
 
 This migration does the following:
+
 - Changes `marketing_channels.type` from ENUM to VARCHAR(50)
 - Changes `marketing_channel_pricing.channel_type` from ENUM to VARCHAR(50)
 - Preserves all existing data
@@ -43,6 +46,7 @@ This migration does the following:
 ### Step 2: Access the Admin Dashboard
 
 Navigate to:
+
 ```
 /admin/credit-management
 ```
@@ -58,6 +62,7 @@ Navigate to:
 3. Click **"Create Pricing"**
 
 **Input Examples:**
+
 - `twitter` ✅
 - `email` ✅
 - `linkedin` ✅
@@ -70,44 +75,52 @@ Navigate to:
 ## 📝 Input Rules & Auto-Formatting
 
 ### Validation Rules
+
 - **Max Length**: 50 characters
 - **Allowed Characters**: Letters, numbers, hyphens, underscores
 - **Required**: Yes
 - **Unique**: Each channel type can only exist once
 
 ### Auto-Sanitization
+
 The system automatically:
+
 1. **Converts to lowercase**: `Twitter` → `twitter`
 2. **Trims whitespace**: `  email  ` → `email`
 3. **Replaces spaces with underscores**: `Google Ads` → `google_ads`
 
 ### Examples
-| You Type | System Saves |
-|----------|--------------|
-| `Twitter` | `twitter` |
+
+| You Type          | System Saves      |
+| ----------------- | ----------------- |
+| `Twitter`         | `twitter`         |
 | `Email Marketing` | `email_marketing` |
-| `Google Ads` | `google_ads` |
-| `LinkedIn` | `linkedin` |
-| `TikTok` | `tiktok` |
-| `We Chat` | `we_chat` |
+| `Google Ads`      | `google_ads`      |
+| `LinkedIn`        | `linkedin`        |
+| `TikTok`          | `tiktok`          |
+| `We Chat`         | `we_chat`         |
 
 ---
 
 ## 🎨 Channel Icons & Colors
 
 ### Default Icons
+
 Custom channels will use default styling:
+
 - **Icon**: Generic comment icon (📱)
 - **Color**: Light gray (#95a5a6)
 
 ### Add Custom Icons (Optional)
 
 To add custom icons for your new channel types, edit:
+
 ```php
 resources/views/admin/credit_management/dashboard.blade.php
 ```
 
 Find this section (around line 267):
+
 ```php
 $channelConfig = [
     'whatsapp' => ['icon' => 'fab fa-whatsapp', 'color' => '#25D366'],
@@ -120,6 +133,7 @@ $channelConfig = [
 ```
 
 Add your custom channel:
+
 ```php
 'twitter' => ['icon' => 'fab fa-twitter', 'color' => '#1DA1F2'],
 'linkedin' => ['icon' => 'fab fa-linkedin', 'color' => '#0077B5'],
@@ -132,6 +146,7 @@ Add your custom channel:
 ## 📊 Example Use Cases
 
 ### Use Case 1: Email Marketing
+
 ```json
 {
   "channel_type": "email",
@@ -142,6 +157,7 @@ Add your custom channel:
 ```
 
 ### Use Case 2: Twitter Marketing
+
 ```json
 {
   "channel_type": "twitter",
@@ -152,6 +168,7 @@ Add your custom channel:
 ```
 
 ### Use Case 3: LinkedIn Ads
+
 ```json
 {
   "channel_type": "linkedin",
@@ -162,6 +179,7 @@ Add your custom channel:
 ```
 
 ### Use Case 4: TikTok Marketing
+
 ```json
 {
   "channel_type": "tiktok",
@@ -177,21 +195,23 @@ Add your custom channel:
 
 ### Files Modified
 
-| File | Changes |
-|------|---------|
-| `database/migrations/2025_10_01_035118_change_channel_type_to_varchar_for_flexibility.php` | New migration to change ENUM to VARCHAR |
-| `app/Http/Controllers/Api/markting/MarketingChannelController.php` | Updated validation from `in:whatsapp,facebook,...` to `max:50\|alpha_dash` |
-| `app/Http/Controllers/Admin/CreditManagementController.php` | Updated validation for channel_type to accept custom values |
-| `resources/views/admin/credit_management/dashboard.blade.php` | Changed dropdown to text input with datalist suggestions + auto-sanitization |
+| File                                                                                       | Changes                                                                      |
+| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `database/migrations/2025_10_01_035118_change_channel_type_to_varchar_for_flexibility.php` | New migration to change ENUM to VARCHAR                                      |
+| `app/Http/Controllers/Api/markting/MarketingChannelController.php`                         | Updated validation from `in:whatsapp,facebook,...` to `max:50\|alpha_dash`   |
+| `app/Http/Controllers/Admin/CreditManagementController.php`                                | Updated validation for channel_type to accept custom values                  |
+| `resources/views/admin/credit_management/dashboard.blade.php`                              | Changed dropdown to text input with datalist suggestions + auto-sanitization |
 
 ### Database Changes
 
 **Before:**
+
 ```sql
 type ENUM('whatsapp', 'facebook', 'telegram', 'instagram', 'sms')
 ```
 
 **After:**
+
 ```sql
 type VARCHAR(50)
 ```
@@ -201,16 +221,18 @@ type VARCHAR(50)
 **API Endpoint**: `POST /api/marketing/channels`
 
 **Before:**
+
 ```json
 {
-  "type": "whatsapp"  // Must be one of: whatsapp, facebook, telegram, instagram, sms
+  "type": "whatsapp" // Must be one of: whatsapp, facebook, telegram, instagram, sms
 }
 ```
 
 **After:**
+
 ```json
 {
-  "type": "twitter"  // Can be any string (max 50 chars, letters/numbers/hyphens/underscores)
+  "type": "twitter" // Can be any string (max 50 chars, letters/numbers/hyphens/underscores)
 }
 ```
 
@@ -219,11 +241,13 @@ type VARCHAR(50)
 ## ✅ Testing Checklist
 
 ### Before Migration
+
 - [ ] Backup your database
 - [ ] Note existing channel types and their data
 - [ ] Verify all existing channels work
 
 ### After Migration
+
 - [ ] Run `php artisan migrate`
 - [ ] Verify existing channels still work
 - [ ] Test creating a new custom channel (e.g., `twitter`)
@@ -235,6 +259,7 @@ type VARCHAR(50)
 - [ ] Test deleting new channel types
 
 ### API Testing
+
 - [ ] Test API endpoint with custom channel type
 - [ ] Verify validation accepts custom types
 - [ ] Test creating marketing channel with custom type
@@ -245,21 +270,25 @@ type VARCHAR(50)
 ## 🚨 Important Notes
 
 ### 1. Migration Safety
+
 - The migration preserves all existing data
 - It only changes the column type, not the values
 - The down() method can revert if needed (before adding custom types)
 
 ### 2. Backwards Compatibility
+
 - All existing channels (whatsapp, facebook, etc.) continue to work
 - No changes needed to existing code using these channels
 - The datalist still shows original 5 types as suggestions
 
 ### 3. Validation
+
 - `alpha_dash` rule allows: letters, numbers, hyphens, underscores
 - No special characters or emojis allowed
 - Prevents SQL injection and XSS attacks
 
 ### 4. Best Practices
+
 - Use lowercase for consistency
 - Use underscores instead of spaces
 - Keep names short and descriptive
@@ -272,6 +301,7 @@ type VARCHAR(50)
 ### Creating Twitter Channel Pricing (Admin)
 
 **Steps:**
+
 1. Go to `/admin/credit-management`
 2. Click "Add Channel"
 3. Type: `twitter`
@@ -281,6 +311,7 @@ type VARCHAR(50)
 7. Click "Create Pricing"
 
 **Result:**
+
 ```
 ✅ Channel pricing created successfully!
 - Channel Type: twitter
@@ -290,6 +321,7 @@ type VARCHAR(50)
 ### Creating Email Marketing Channel (User via API)
 
 **Request:**
+
 ```bash
 POST /api/marketing/channels
 Authorization: Bearer {token}
@@ -307,6 +339,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -340,6 +373,7 @@ php artisan migrate:rollback --step=1
 ## 📞 Support
 
 For questions or issues:
+
 1. Check this guide first
 2. Review the test results in the dashboard
 3. Check browser console for JavaScript errors
@@ -349,12 +383,12 @@ For questions or issues:
 
 ## 🎓 Related Documentation
 
-| Document | Purpose |
-|----------|---------|
-| `QUICK_REFERENCE.md` | Quick reference for credit management |
-| `SYNC_PRICING_EXPLAINED.md` | How pricing sync works |
-| `CREDIT_MANAGEMENT_API_GUIDE.md` | API documentation |
-| `MARKETING_SETTINGS_API_GUIDE.md` | Marketing settings API |
+| Document                          | Purpose                               |
+| --------------------------------- | ------------------------------------- |
+| `QUICK_REFERENCE.md`              | Quick reference for credit management |
+| `SYNC_PRICING_EXPLAINED.md`       | How pricing sync works                |
+| `CREDIT_MANAGEMENT_API_GUIDE.md`  | API documentation                     |
+| `MARKETING_SETTINGS_API_GUIDE.md` | Marketing settings API                |
 
 ---
 
@@ -362,4 +396,3 @@ For questions or issues:
 **Version**: 2.0.0  
 **Author**: AI Assistant  
 **Status**: ✅ Production Ready
-

@@ -81,17 +81,13 @@ export function ResetConfirmDialog({
                   <li>{t("reset_dialog.color_styling")}</li>
                   <li>{t("reset_dialog.layout_settings")}</li>
                   <li>{t("reset_dialog.theme_selections")}</li>
-                  <li>
-                    {t("reset_dialog.other_configurations")}
-                  </li>
+                  <li>{t("reset_dialog.other_configurations")}</li>
                 </ul>
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <div className="text-sm text-blue-800">
-                  <strong>
-                    {t("reset_dialog.restore_default")}
-                  </strong>
+                  <strong>{t("reset_dialog.restore_default")}</strong>
                 </div>
               </div>
 

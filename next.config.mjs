@@ -26,7 +26,7 @@ const nextConfig = {
   },
   // تحسينات للأداء
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: process.env.NODE_ENV === "production",
   },
   // تحسين cache
   onDemandEntries: {
@@ -34,7 +34,7 @@ const nextConfig = {
     pagesBufferLength: 2,
   },
   // تحسين البناء للصفحات الثابتة
-  output: 'standalone',
+  output: "standalone",
 };
 
 mergeConfig(nextConfig, userConfig);

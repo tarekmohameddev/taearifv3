@@ -34,12 +34,15 @@ type Property = {
 export function PropertyCard({ p }: { p: Property }) {
   const router = useRouter();
   const { tenantId } = useTenantId();
-  const isUnavailable = p.status?.toLowerCase() === "rented" || p.status?.toLowerCase() === "sold";
+  const isUnavailable =
+    p.status?.toLowerCase() === "rented" || p.status?.toLowerCase() === "sold";
 
   const handleClick = () => {
     if (!isUnavailable && tenantId) {
       const propertySlug = p.slug || p.id; // Use slug if available, fallback to id
-      console.log(`PropertyCard: Navigating to property ${propertySlug} with tenantId: ${tenantId}`);
+      console.log(
+        `PropertyCard: Navigating to property ${propertySlug} with tenantId: ${tenantId}`,
+      );
       router.push(`/property/${propertySlug}`);
     } else if (!tenantId) {
       console.log("PropertyCard: No tenantId available, cannot navigate");

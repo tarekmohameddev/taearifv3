@@ -18,27 +18,31 @@ export default async function RootLayout({
   const locale = headersList.get("x-locale") || "";
 
   // إعادة التوجيه من الإنجليزية إلى العربية (استثناء live-editor)
-  if (locale === "en" && pathname !== "/live-editor" && !pathname.startsWith("/live-editor/")) {
+  if (
+    locale === "en" &&
+    pathname !== "/live-editor" &&
+    !pathname.startsWith("/live-editor/")
+  ) {
     redirect(`/ar${pathname}`);
   }
 
   // تحديد الصفحات المسموح بها لـ GTM و Clarity
   const allowedPages = [
     "/dashboard",
-    "/live-editor", 
+    "/live-editor",
     "/login",
     "/register",
     "/", // الصفحة الرئيسية للشركة
     "/about-us",
     "/solutions",
     "/updates",
-    "/landing"
+    "/landing",
   ];
 
   // تحديد الصفحات التي يجب أن تظهر فيها ReCaptcha
   const recaptchaPages = [
     "/dashboard/affiliate",
-    "/dashboard/analytics", 
+    "/dashboard/analytics",
     "/dashboard/apps",
     "/dashboard/blog",
     "/dashboard/blogs",
@@ -63,16 +67,18 @@ export default async function RootLayout({
     "/live-editor",
     "/oauth/token/success",
     "/oauth/social/extra-info",
-    "/onboarding"
+    "/onboarding",
   ];
 
   // التحقق من أن الصفحة مسموح بها وليس هناك subdomain
-  const shouldLoadAnalytics = !tenantId && allowedPages.some(page => 
-    pathname === page || pathname.startsWith(page + "/")
-  );
+  const shouldLoadAnalytics =
+    !tenantId &&
+    allowedPages.some(
+      (page) => pathname === page || pathname.startsWith(page + "/"),
+    );
 
   // التحقق من أن الصفحة تحتاج ReCaptcha (مع مراعاة locale)
-  const shouldLoadReCaptcha = recaptchaPages.some(page => {
+  const shouldLoadReCaptcha = recaptchaPages.some((page) => {
     // التحقق من المسار المباشر
     if (pathname === page || pathname.startsWith(page + "/")) {
       return true;
@@ -82,7 +88,9 @@ export default async function RootLayout({
     const match = pathname.match(localePattern);
     if (match) {
       const [, , pathWithoutLocale] = match;
-      return pathWithoutLocale === page || pathWithoutLocale.startsWith(page + "/");
+      return (
+        pathWithoutLocale === page || pathWithoutLocale.startsWith(page + "/")
+      );
     }
     return false;
   });

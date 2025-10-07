@@ -117,7 +117,7 @@ export default function TaearifLandingPageSimple() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-slide-up">
               <button
-                onClick={() => router.push('/register')}
+                onClick={() => router.push("/register")}
                 className="inline-flex items-center bg-black text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl hover:bg-gray-800 transition-all text-lg"
               >
                 <Rocket className="ml-2 h-5 w-5" />
@@ -483,7 +483,7 @@ export default function TaearifLandingPageSimple() {
               <ul className="space-y-2">
                 <li>
                   <button
-                    onClick={() => router.push('/')}
+                    onClick={() => router.push("/")}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     الرئيسية
@@ -491,7 +491,7 @@ export default function TaearifLandingPageSimple() {
                 </li>
                 <li>
                   <button
-                    onClick={() => router.push('/solutions')}
+                    onClick={() => router.push("/solutions")}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     الحلول
@@ -499,7 +499,7 @@ export default function TaearifLandingPageSimple() {
                 </li>
                 <li>
                   <button
-                    onClick={() => router.push('/about-us')}
+                    onClick={() => router.push("/about-us")}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     من نحن
@@ -507,7 +507,7 @@ export default function TaearifLandingPageSimple() {
                 </li>
                 <li>
                   <button
-                    onClick={() => router.push('/updates')}
+                    onClick={() => router.push("/updates")}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     التحديثات
@@ -515,7 +515,7 @@ export default function TaearifLandingPageSimple() {
                 </li>
                 <li>
                   <button
-                    onClick={() => router.push('/privacy')}
+                    onClick={() => router.push("/privacy")}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     سياسة الخصوصية

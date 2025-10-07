@@ -5,6 +5,7 @@
 **YES!** The credit system is fully integrated with marketing channels. Here's how it works:
 
 ### **How Credits Work with Marketing Channels:**
+
 1. **Users purchase credits** using the credit system
 2. **Credits are automatically deducted** when sending messages through marketing channels
 3. **Different message types cost different amounts** of credits
@@ -16,11 +17,13 @@
 ## 🔄 Credit Flow with Marketing Channels
 
 ### **1. Credit Purchase Flow**
+
 ```
 User → Purchase Credits → Payment Gateway → Credits Added → Ready to Use
 ```
 
 ### **2. Message Sending Flow**
+
 ```
 User → Send Message → Check Credits → Deduct Credits → Send Message → Update Balance
 ```
@@ -30,17 +33,19 @@ User → Send Message → Check Credits → Deduct Credits → Send Message → 
 ## 💰 Credit Costs for Marketing Channels
 
 ### **Current Pricing Structure:**
+
 ```javascript
 const messageTypeCosts = {
-  'whatsapp': 1,      // 1 credit per WhatsApp message
-  'sms': 1,           // 1 credit per SMS
-  'facebook': 1,      // 1 credit per Facebook message
-  'telegram': 1,      // 1 credit per Telegram message
-  'instagram': 1,     // 1 credit per Instagram message
+  whatsapp: 1, // 1 credit per WhatsApp message
+  sms: 1, // 1 credit per SMS
+  facebook: 1, // 1 credit per Facebook message
+  telegram: 1, // 1 credit per Telegram message
+  instagram: 1, // 1 credit per Instagram message
 };
 ```
 
 ### **Cost Calculation:**
+
 - **Text Messages**: 1 credit each
 - **Media Messages**: 1 credit each (same as text)
 - **Template Messages**: 1 credit each
@@ -56,32 +61,35 @@ const messageTypeCosts = {
 // Frontend: Send message through marketing channel
 const sendMessage = async (channelId, messageData) => {
   try {
-    const response = await fetch(`/api/marketing-channels/${channelId}/send-message`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `/api/marketing-channels/${channelId}/send-message`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: "+966501234567",
+          message: "Hello from our marketing channel!",
+          message_type: "text",
+        }),
       },
-      body: JSON.stringify({
-        to: '+966501234567',
-        message: 'Hello from our marketing channel!',
-        message_type: 'text'
-      })
-    });
+    );
 
     const result = await response.json();
-    
-    if (result.status === 'success') {
-      console.log('Message sent successfully!');
-      console.log('Credits used:', result.credits_used);
-      console.log('Remaining credits:', result.remaining_credits);
-    } else if (result.error === 'Insufficient credits') {
-      console.log('Not enough credits!');
-      console.log('Available:', result.credits_available);
-      console.log('Required:', result.credits_required);
+
+    if (result.status === "success") {
+      console.log("Message sent successfully!");
+      console.log("Credits used:", result.credits_used);
+      console.log("Remaining credits:", result.remaining_credits);
+    } else if (result.error === "Insufficient credits") {
+      console.log("Not enough credits!");
+      console.log("Available:", result.credits_available);
+      console.log("Required:", result.credits_required);
     }
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error("Error sending message:", error);
   }
 };
 ```
@@ -93,36 +101,36 @@ const sendMessage = async (channelId, messageData) => {
 const checkCreditsBeforeSending = async (messageType, recipientCount = 1) => {
   try {
     // Get current balance
-    const balanceResponse = await fetch('/api/v1/credits/balance', {
+    const balanceResponse = await fetch("/api/v1/credits/balance", {
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
-    
+
     const balance = await balanceResponse.json();
     const availableCredits = balance.user_credits.available_credits;
-    
+
     // Calculate required credits
     const creditsPerMessage = 1; // Based on message type
     const requiredCredits = creditsPerMessage * recipientCount;
-    
+
     if (availableCredits >= requiredCredits) {
       return {
         canSend: true,
         availableCredits,
         requiredCredits,
-        remainingAfterSend: availableCredits - requiredCredits
+        remainingAfterSend: availableCredits - requiredCredits,
       };
     } else {
       return {
         canSend: false,
         availableCredits,
         requiredCredits,
-        shortfall: requiredCredits - availableCredits
+        shortfall: requiredCredits - availableCredits,
       };
     }
   } catch (error) {
-    console.error('Error checking credits:', error);
+    console.error("Error checking credits:", error);
     return { canSend: false, error: error.message };
   }
 };
@@ -134,41 +142,49 @@ const checkCreditsBeforeSending = async (messageType, recipientCount = 1) => {
 // Frontend: Send bulk messages with credit validation
 const sendBulkMessages = async (channelId, recipients, message) => {
   // Check credits first
-  const creditCheck = await checkCreditsBeforeSending('text', recipients.length);
-  
+  const creditCheck = await checkCreditsBeforeSending(
+    "text",
+    recipients.length,
+  );
+
   if (!creditCheck.canSend) {
-    alert(`Insufficient credits! You need ${creditCheck.shortfall} more credits.`);
+    alert(
+      `Insufficient credits! You need ${creditCheck.shortfall} more credits.`,
+    );
     return;
   }
-  
+
   // Confirm with user
   const confirmed = confirm(
     `Send ${recipients.length} messages?\n` +
-    `Credits required: ${creditCheck.requiredCredits}\n` +
-    `Remaining after send: ${creditCheck.remainingAfterSend}`
+      `Credits required: ${creditCheck.requiredCredits}\n` +
+      `Remaining after send: ${creditCheck.remainingAfterSend}`,
   );
-  
+
   if (!confirmed) return;
-  
+
   // Send messages
   for (const recipient of recipients) {
     try {
-      const response = await fetch(`/api/marketing-channels/${channelId}/send-message`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await fetch(
+        `/api/marketing-channels/${channelId}/send-message`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: recipient,
+            message: message,
+            message_type: "text",
+          }),
         },
-        body: JSON.stringify({
-          to: recipient,
-          message: message,
-          message_type: 'text'
-        })
-      });
-      
+      );
+
       const result = await response.json();
-      
-      if (result.status === 'success') {
+
+      if (result.status === "success") {
         console.log(`Message sent to ${recipient}`);
       } else {
         console.error(`Failed to send to ${recipient}:`, result.error);
@@ -191,10 +207,10 @@ const sendBulkMessages = async (channelId, recipients, message) => {
 public function sendMessage(Request $request, $id): JsonResponse
 {
     // ... validation and channel checks ...
-    
+
     // Calculate credits needed
     $creditsNeeded = UserCredit::getCostForMessageType($channel->type);
-    
+
     // Check and deduct credits
     $creditResult = CreditController::useCredits(
         Auth::id(),
@@ -207,17 +223,17 @@ public function sendMessage(Request $request, $id): JsonResponse
             'message_type' => $request->get('message_type', 'text'),
         ]
     );
-    
+
     if (!$creditResult['success']) {
         return $this->fail($creditResult['error'], 400, [
             'credits_available' => $creditResult['available_credits'] ?? 0,
             'credits_required' => $creditsNeeded,
         ]);
     }
-    
+
     // Send message through external API
     // ... message sending logic ...
-    
+
     return $this->ok([
         'message_sent' => true,
         'credits_used' => $creditsNeeded,
@@ -233,7 +249,7 @@ public function sendMessage(Request $request, $id): JsonResponse
 ### **1. Credit Balance Display in Marketing Channel**
 
 ```jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const MarketingChannelCard = ({ channel, token }) => {
   const [balance, setBalance] = useState(null);
@@ -245,42 +261,45 @@ const MarketingChannelCard = ({ channel, token }) => {
 
   const fetchBalance = async () => {
     try {
-      const response = await fetch('/api/v1/credits/balance', {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const response = await fetch("/api/v1/credits/balance", {
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
       setBalance(data.user_credits);
     } catch (error) {
-      console.error('Error fetching balance:', error);
+      console.error("Error fetching balance:", error);
     }
   };
 
   const sendMessage = async (recipient, message) => {
     setSending(true);
     try {
-      const response = await fetch(`/api/marketing-channels/${channel.id}/send-message`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await fetch(
+        `/api/marketing-channels/${channel.id}/send-message`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: recipient,
+            message: message,
+            message_type: "text",
+          }),
         },
-        body: JSON.stringify({
-          to: recipient,
-          message: message,
-          message_type: 'text'
-        })
-      });
+      );
 
       const result = await response.json();
-      
-      if (result.status === 'success') {
-        alert('Message sent successfully!');
+
+      if (result.status === "success") {
+        alert("Message sent successfully!");
         fetchBalance(); // Refresh balance
       } else {
         alert(`Error: ${result.error}`);
       }
     } catch (error) {
-      alert('Failed to send message');
+      alert("Failed to send message");
     } finally {
       setSending(false);
     }
@@ -292,7 +311,7 @@ const MarketingChannelCard = ({ channel, token }) => {
         <h3>{channel.name}</h3>
         <span className="channel-type">{channel.type}</span>
       </div>
-      
+
       <div className="credit-info">
         <div className="balance">
           <span className="credits">{balance?.available_credits || 0}</span>
@@ -304,30 +323,28 @@ const MarketingChannelCard = ({ channel, token }) => {
       </div>
 
       <div className="message-form">
-        <input 
-          type="text" 
+        <input
+          type="text"
           placeholder="Recipient number"
           className="recipient-input"
         />
-        <textarea 
+        <textarea
           placeholder="Type your message..."
           className="message-input"
         />
-        <button 
-          onClick={() => sendMessage('+966501234567', 'Test message')}
+        <button
+          onClick={() => sendMessage("+966501234567", "Test message")}
           disabled={sending || (balance?.available_credits || 0) < 1}
           className="send-btn"
         >
-          {sending ? 'Sending...' : 'Send Message (1 Credit)'}
+          {sending ? "Sending..." : "Send Message (1 Credit)"}
         </button>
       </div>
 
       {(balance?.available_credits || 0) < 1 && (
         <div className="insufficient-credits">
           <p>⚠️ Insufficient credits to send messages</p>
-          <button className="purchase-credits-btn">
-            Purchase Credits
-          </button>
+          <button className="purchase-credits-btn">Purchase Credits</button>
         </div>
       )}
     </div>
@@ -339,23 +356,26 @@ const MarketingChannelCard = ({ channel, token }) => {
 
 ```jsx
 const CreditUsageIndicator = ({ balance }) => {
-  const usagePercentage = balance ? 
-    (balance.used_credits / balance.monthly_limit) * 100 : 0;
+  const usagePercentage = balance
+    ? (balance.used_credits / balance.monthly_limit) * 100
+    : 0;
 
   return (
     <div className="credit-usage-indicator">
       <div className="usage-header">
         <span>Monthly Usage</span>
-        <span>{balance?.used_credits || 0} / {balance?.monthly_limit || 0}</span>
+        <span>
+          {balance?.used_credits || 0} / {balance?.monthly_limit || 0}
+        </span>
       </div>
-      
+
       <div className="usage-bar">
-        <div 
+        <div
           className="usage-fill"
           style={{ width: `${Math.min(usagePercentage, 100)}%` }}
         />
       </div>
-      
+
       <div className="usage-warning">
         {usagePercentage > 80 && (
           <span className="warning">⚠️ Approaching monthly limit</span>
@@ -430,21 +450,24 @@ CreditPackage::create([
 // Get credit usage analytics for marketing channels
 const getCreditAnalytics = async (startDate, endDate) => {
   try {
-    const response = await fetch(`/api/v1/credits/analytics?start_date=${startDate}&end_date=${endDate}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
+    const response = await fetch(
+      `/api/v1/credits/analytics?start_date=${startDate}&end_date=${endDate}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
     const analytics = await response.json();
-    
+
     return {
       totalCreditsUsed: analytics.total_credits_used,
       creditsByChannel: analytics.credits_by_channel,
       creditsByMessageType: analytics.credits_by_message_type,
       monthlyUsage: analytics.monthly_usage,
-      costBreakdown: analytics.cost_breakdown
+      costBreakdown: analytics.cost_breakdown,
     };
   } catch (error) {
-    console.error('Error fetching analytics:', error);
+    console.error("Error fetching analytics:", error);
   }
 };
 ```
@@ -455,21 +478,24 @@ const getCreditAnalytics = async (startDate, endDate) => {
 // Get channel performance including credit costs
 const getChannelPerformance = async (channelId) => {
   try {
-    const response = await fetch(`/api/marketing-channels/${channelId}/performance`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
+    const response = await fetch(
+      `/api/marketing-channels/${channelId}/performance`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
     const performance = await response.json();
-    
+
     return {
       messagesSent: performance.messages_sent,
       creditsUsed: performance.credits_used,
       costPerMessage: performance.cost_per_message,
       successRate: performance.success_rate,
-      totalCost: performance.total_cost
+      totalCost: performance.total_cost,
     };
   } catch (error) {
-    console.error('Error fetching performance:', error);
+    console.error("Error fetching performance:", error);
   }
 };
 ```
@@ -483,22 +509,22 @@ const getChannelPerformance = async (channelId) => {
 ```javascript
 // Handle insufficient credits error
 const handleInsufficientCredits = (error) => {
-  if (error.error === 'Insufficient credits') {
+  if (error.error === "Insufficient credits") {
     return {
       showPurchaseModal: true,
       message: `You need ${error.required_credits} credits but only have ${error.available_credits}`,
-      shortfall: error.required_credits - error.available_credits
+      shortfall: error.required_credits - error.available_credits,
     };
   }
-  
-  if (error.error === 'Monthly credit limit exceeded') {
+
+  if (error.error === "Monthly credit limit exceeded") {
     return {
       showLimitModal: true,
       message: `You've reached your monthly limit of ${error.monthly_limit} credits`,
-      usedCredits: error.used_credits
+      usedCredits: error.used_credits,
     };
   }
-  
+
   return { showError: true, message: error.error };
 };
 ```
@@ -508,29 +534,31 @@ const handleInsufficientCredits = (error) => {
 ## 🎯 Best Practices
 
 ### **1. Always Check Credits Before Sending**
+
 ```javascript
 // Good practice: Check credits first
 const sendMessageSafely = async (channelId, messageData) => {
-  const creditCheck = await checkCreditsBeforeSending('text', 1);
-  
+  const creditCheck = await checkCreditsBeforeSending("text", 1);
+
   if (!creditCheck.canSend) {
     // Show purchase modal or redirect to credit purchase
     showCreditPurchaseModal(creditCheck.shortfall);
     return;
   }
-  
+
   // Proceed with sending
   await sendMessage(channelId, messageData);
 };
 ```
 
 ### **2. Show Real-time Balance Updates**
+
 ```javascript
 // Update balance after each message
 const sendMessageWithBalanceUpdate = async (channelId, messageData) => {
   const result = await sendMessage(channelId, messageData);
-  
-  if (result.status === 'success') {
+
+  if (result.status === "success") {
     // Update UI with new balance
     updateBalanceDisplay(result.remaining_credits);
   }
@@ -538,19 +566,22 @@ const sendMessageWithBalanceUpdate = async (channelId, messageData) => {
 ```
 
 ### **3. Provide Clear Cost Information**
+
 ```javascript
 // Always show cost before sending
 const MessageComposer = ({ channel }) => {
   const [recipientCount, setRecipientCount] = useState(1);
-  const [messageType, setMessageType] = useState('text');
-  
+  const [messageType, setMessageType] = useState("text");
+
   const costPerMessage = 1; // Based on message type
   const totalCost = costPerMessage * recipientCount;
-  
+
   return (
     <div className="message-composer">
       <div className="cost-display">
-        <span>Cost: {totalCost} credits for {recipientCount} message(s)</span>
+        <span>
+          Cost: {totalCost} credits for {recipientCount} message(s)
+        </span>
       </div>
       {/* Message form */}
     </div>
@@ -570,6 +601,6 @@ const MessageComposer = ({ channel }) => {
 ✅ **Cost Transparency** - Clear pricing for different message types  
 ✅ **Error Handling** - Graceful handling of insufficient credits  
 ✅ **Analytics** - Track credit usage across all channels  
-✅ **Flexible Pricing** - Easy to customize costs per message type  
+✅ **Flexible Pricing** - Easy to customize costs per message type
 
 The system is production-ready and provides a seamless experience for users managing their marketing campaigns! 🚀

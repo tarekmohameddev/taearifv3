@@ -63,7 +63,10 @@ const Pagination: React.FC<PaginationProps> = ({
   }, [currentPage, totalPages]);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200" dir="rtl">
+    <div
+      className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200"
+      dir="rtl"
+    >
       {/* Pagination Info */}
       <div className="text-sm text-gray-600 text-center sm:text-right">
         عرض {showingFrom} إلى {showingTo} من أصل {totalItems} عقار

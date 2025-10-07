@@ -145,7 +145,9 @@ export function CardThemeSelector({
           className={`w-full inline-flex items-center gap-2 bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200 hover:from-pink-100 hover:to-purple-100 hover:border-pink-300 transition-all duration-200 ${className}`}
         >
           <Palette className="w-4 h-4 text-pink-600" />
-          <span className="text-pink-700 font-medium">{t("card_theme.card_theme")}</span>
+          <span className="text-pink-700 font-medium">
+            {t("card_theme.card_theme")}
+          </span>
           <Sparkles className="w-3 h-3 text-pink-500" />
         </Button>
       </DialogTrigger>
@@ -157,7 +159,9 @@ export function CardThemeSelector({
             {t("card_theme.choose_card_theme")}
           </DialogTitle>
           <DialogDescription className="text-gray-600">
-            {t("card_theme.card_theme_description")} {t("card_theme.current_theme")}: {currentThemeData?.name || "Default"}
+            {t("card_theme.card_theme_description")}{" "}
+            {t("card_theme.current_theme")}:{" "}
+            {currentThemeData?.name || "Default"}
           </DialogDescription>
         </DialogHeader>
 

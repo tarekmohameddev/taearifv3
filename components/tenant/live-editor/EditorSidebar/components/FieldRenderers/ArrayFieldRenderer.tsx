@@ -84,37 +84,37 @@ export function ArrayFieldRenderer({
       for (const f of arrDef.of) {
         // Generate smart defaults based on field type
         switch (f.type) {
-        case "text":
-          newItem[f.key] = f.defaultValue || "";
-          break;
-        case "number":
-          newItem[f.key] = f.defaultValue || 0;
-          break;
-        case "boolean":
-          newItem[f.key] = f.defaultValue || false;
-          break;
-        case "color":
-          newItem[f.key] = f.defaultValue || "#000000";
-          break;
-        case "image":
-          newItem[f.key] = f.defaultValue || "";
-          break;
-        case "select":
-          newItem[f.key] = f.defaultValue || f.options?.[0]?.value || "";
-          break;
-        case "object":
-          newItem[f.key] = f.defaultValue || {};
-          break;
-        case "array":
-          newItem[f.key] = f.defaultValue || [];
-          break;
-        default:
-          newItem[f.key] = f.defaultValue || "";
+          case "text":
+            newItem[f.key] = f.defaultValue || "";
+            break;
+          case "number":
+            newItem[f.key] = f.defaultValue || 0;
+            break;
+          case "boolean":
+            newItem[f.key] = f.defaultValue || false;
+            break;
+          case "color":
+            newItem[f.key] = f.defaultValue || "#000000";
+            break;
+          case "image":
+            newItem[f.key] = f.defaultValue || "";
+            break;
+          case "select":
+            newItem[f.key] = f.defaultValue || f.options?.[0]?.value || "";
+            break;
+          case "object":
+            newItem[f.key] = f.defaultValue || {};
+            break;
+          case "array":
+            newItem[f.key] = f.defaultValue || [];
+            break;
+          default:
+            newItem[f.key] = f.defaultValue || "";
+        }
       }
+      return newItem;
     }
-    return newItem;
   };
-  }
   const addItem = () => {
     const newItem = generateDefaultItem();
     updateValue(normalizedPath, [...items, newItem]);
@@ -605,14 +605,20 @@ export function ArrayFieldRenderer({
               </div>
               {isOpen && (
                 <div className="p-4 space-y-4 bg-gradient-to-b from-white to-slate-50">
-                  {arrDef.of && Array.isArray(arrDef.of) && arrDef.of.map((f: any) => (
-                    <div key={f.key}>
-                      {/* Render nested arrays specially */}
-                      {f.type === "array"
-                        ? renderNestedArray(f, `${normalizedPath}.${idx}`, item)
-                        : renderField(f, `${normalizedPath}.${idx}`)}
-                    </div>
-                  ))}
+                  {arrDef.of &&
+                    Array.isArray(arrDef.of) &&
+                    arrDef.of.map((f: any) => (
+                      <div key={f.key}>
+                        {/* Render nested arrays specially */}
+                        {f.type === "array"
+                          ? renderNestedArray(
+                              f,
+                              `${normalizedPath}.${idx}`,
+                              item,
+                            )
+                          : renderField(f, `${normalizedPath}.${idx}`)}
+                      </div>
+                    ))}
                 </div>
               )}
             </div>
@@ -650,20 +656,22 @@ export function ArrayFieldRenderer({
               >
                 Add {arrDef.itemLabel || "Item"}
               </button>
-              {arrDef.of && Array.isArray(arrDef.of) && arrDef.of.length > 0 && (
-                <button
-                  onClick={() => {
-                    // Add multiple items at once
-                    const multipleItems = Array.from({ length: 3 }, () =>
-                      generateDefaultItem(),
-                    );
-                    updateValue(normalizedPath, multipleItems);
-                  }}
-                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
-                >
-                  Add 3 {arrDef.itemLabel || "Items"}
-                </button>
-              )}
+              {arrDef.of &&
+                Array.isArray(arrDef.of) &&
+                arrDef.of.length > 0 && (
+                  <button
+                    onClick={() => {
+                      // Add multiple items at once
+                      const multipleItems = Array.from({ length: 3 }, () =>
+                        generateDefaultItem(),
+                      );
+                      updateValue(normalizedPath, multipleItems);
+                    }}
+                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
+                  >
+                    Add 3 {arrDef.itemLabel || "Items"}
+                  </button>
+                )}
             </div>
           </div>
         )}

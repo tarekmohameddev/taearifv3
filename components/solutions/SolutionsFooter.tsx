@@ -77,7 +77,7 @@ export default function SolutionsFooter() {
             <ul className="space-y-2">
               <li>
                 <button
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push("/")}
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   الرئيسية
@@ -85,7 +85,7 @@ export default function SolutionsFooter() {
               </li>
               <li>
                 <button
-                  onClick={() => router.push('/solutions')}
+                  onClick={() => router.push("/solutions")}
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   الحلول
@@ -93,7 +93,7 @@ export default function SolutionsFooter() {
               </li>
               <li>
                 <button
-                  onClick={() => router.push('/about-us')}
+                  onClick={() => router.push("/about-us")}
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   من نحن
@@ -101,7 +101,7 @@ export default function SolutionsFooter() {
               </li>
               <li>
                 <button
-                  onClick={() => router.push('/updates')}
+                  onClick={() => router.push("/updates")}
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   التحديثات
@@ -109,7 +109,7 @@ export default function SolutionsFooter() {
               </li>
               <li>
                 <button
-                  onClick={() => router.push('/privacy')}
+                  onClick={() => router.push("/privacy")}
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   سياسة الخصوصية

@@ -1047,19 +1047,35 @@ export default function CrmPage() {
             {/* Dialogs - Conditional Rendering */}
             {showCustomerDialog && <CustomerDetailDialog />}
             {showAddNoteDialog && <AddNoteDialog />}
-            {showAddReminderDialog && <AddReminderDialog onReminderAdded={updateRemindersList} />}
-            {showEditReminderDialog && <EditReminderDialog onReminderUpdated={updateReminderInList} />}
-            {showAddAppointmentDialog && <AddAppointmentDialog onAppointmentAdded={updateAppointmentsList} />}
+            {showAddReminderDialog && (
+              <AddReminderDialog onReminderAdded={updateRemindersList} />
+            )}
+            {showEditReminderDialog && (
+              <EditReminderDialog onReminderUpdated={updateReminderInList} />
+            )}
+            {showAddAppointmentDialog && (
+              <AddAppointmentDialog
+                onAppointmentAdded={updateAppointmentsList}
+              />
+            )}
             {showEditAppointmentDialog && (
               <EditAppointmentDialog
                 onAppointmentUpdated={updateAppointmentInList}
               />
             )}
             {showAddInteractionDialog && <AddInteractionDialog />}
-            {showAddStageDialog && <AddStageDialog onStageAdded={updateStagesList} />}
-            {showEditStageDialog && <EditStageDialog onStageUpdated={updateStageInList} />}
-            {showCrmSettingsDialog && <CrmSettingsDialog onStageDeleted={removeStageFromList} />}
-            {showAppointmentDetailDialog && <div>Appointment Detail Dialog</div>}
+            {showAddStageDialog && (
+              <AddStageDialog onStageAdded={updateStagesList} />
+            )}
+            {showEditStageDialog && (
+              <EditStageDialog onStageUpdated={updateStageInList} />
+            )}
+            {showCrmSettingsDialog && (
+              <CrmSettingsDialog onStageDeleted={removeStageFromList} />
+            )}
+            {showAppointmentDetailDialog && (
+              <div>Appointment Detail Dialog</div>
+            )}
           </div>
         </main>
       </div>

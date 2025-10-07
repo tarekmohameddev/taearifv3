@@ -72,8 +72,8 @@ export default function DetailedSolutions() {
                   <span className="text-gray-700">خرائط تفاعلية</span>
                 </div>
               </div>
-              <button 
-                onClick={() => router.push('/register')} 
+              <button
+                onClick={() => router.push("/register")}
                 className="btn btn-success"
               >
                 <Rocket className="ml-2 h-5 w-5" />
@@ -176,8 +176,8 @@ export default function DetailedSolutions() {
                   </span>
                 </div>
               </div>
-              <button 
-                onClick={() => router.push('/register')} 
+              <button
+                onClick={() => router.push("/register")}
                 className="btn btn-primary"
               >
                 <Users className="ml-2 h-5 w-5" />

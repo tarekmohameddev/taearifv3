@@ -1,9 +1,11 @@
 # تحسين Static Generation لصفحات Taearif
 
 ## الهدف
+
 تحويل صفحات Taearif إلى **Static Generation** لتجنب ظهور loading عند التنقل بينها.
 
 ## الصفحات المُحسنة
+
 - `app/page.tsx` (الصفحة الرئيسية)
 - `app/solutions` (صفحة الحلول)
 - `app/updates` (صفحة التحديثات)
@@ -13,12 +15,14 @@
 ## التحسينات المطبقة
 
 ### 1. Static Generation Configuration
+
 ```typescript
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = false;
 ```
 
 ### 2. تحسين Next.js Configuration
+
 ```javascript
 // next.config.mjs
 output: 'standalone',
@@ -27,20 +31,23 @@ staticPageGenerationTimeout: 1000,
 ```
 
 ### 3. تحسين Middleware
+
 ```typescript
 // إضافة cache headers للصفحات الثابتة
-if (!tenantId && (
-  pathname === "/" ||
-  pathname === "/solutions" ||
-  pathname === "/updates" ||
-  pathname === "/landing" ||
-  pathname === "/about-us"
-)) {
-  response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+if (
+  !tenantId &&
+  (pathname === "/" ||
+    pathname === "/solutions" ||
+    pathname === "/updates" ||
+    pathname === "/landing" ||
+    pathname === "/about-us")
+) {
+  response.headers.set("Cache-Control", "public, max-age=31536000, immutable");
 }
 ```
 
 ### 4. ملفات التكوين الجديدة
+
 - `lib/staticParams.ts` - معاملات ثابتة للصفحات
 - `build-config.js` - تكوين البناء
 - `docs/static-generation-optimization.md` - هذا الملف
@@ -48,12 +55,14 @@ if (!tenantId && (
 ## النتائج المتوقعة
 
 ### ✅ **مزايا Static Generation:**
+
 1. **لا loading عند التنقل** - الصفحات مُعدة مسبقاً
 2. **أداء أسرع** - لا حاجة لجلب البيانات من الـ server
 3. **تحسين SEO** - محركات البحث تحب الصفحات الثابتة
 4. **تقليل استهلاك الخادم** - الصفحات تُخدم من CDN
 
 ### 🚀 **التحسينات:**
+
 - **وقت التحميل**: 0ms (فوري)
 - **حجم البناء**: محسن للصفحات الثابتة
 - **Cache**: 1 سنة للصفحات الثابتة
@@ -62,16 +71,19 @@ if (!tenantId && (
 ## كيفية العمل
 
 ### 1. عند البناء (Build Time):
+
 - Next.js يُعد جميع الصفحات الثابتة مسبقاً
 - يتم إنشاء HTML files للصفحات
 - يتم تحسين CSS و JavaScript
 
 ### 2. عند التنقل (Runtime):
+
 - الصفحات تُخدم فورياً من cache
 - لا حاجة لجلب البيانات من API
 - لا loading screens
 
 ### 3. للصفحات مع tenantId:
+
 - تبقى dynamic كما هي
 - تستخدم HomePageWrapper أو TenantPageWrapper
 - تحميل البيانات من API عند الحاجة
@@ -99,12 +111,14 @@ npm start
 ## استكشاف الأخطاء
 
 ### إذا ظهر loading:
+
 1. تأكد من أن `dynamic = 'force-static'`
 2. تأكد من أن `revalidate = false`
 3. تأكد من أن الصفحة لا تحتوي على `tenantId`
 4. تأكد من أن البناء تم بنجاح
 
 ### إذا لم تعمل الصفحات:
+
 1. تأكد من أن middleware يعمل بشكل صحيح
 2. تأكد من أن headers صحيحة
 3. تأكد من أن البناء تم بدون أخطاء

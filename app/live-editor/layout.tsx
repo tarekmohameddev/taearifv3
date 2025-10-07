@@ -186,7 +186,7 @@ function AddPageDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen} style={{ position: 'relative' }}>
+    <Dialog open={open} onOpenChange={setOpen} style={{ position: "relative" }}>
       <DialogTrigger asChild>
         <Button
           variant="outline"
@@ -209,7 +209,10 @@ function AddPageDialog({
           {t("editor.add_page")}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto relative" dir="ltr">
+      <DialogContent
+        className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto relative"
+        dir="ltr"
+      >
         <DialogHeader className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center">
@@ -609,32 +612,35 @@ function AddPageDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
-      
+
       {/* Coming Soon Overlay - Disabled add page functionality */}
-      <div 
+      <div
         className="fixed inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center pointer-events-auto"
-        style={{ 
+        style={{
           zIndex: 9999,
-          position: 'fixed',
+          position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <div className="text-center">
           <div className="text-6xl mb-4">🚧</div>
-          <h2 className="text-2xl font-bold text-red-600 mb-2">{t("live_editor.coming_soon")}</h2>
-          <p className="text-red-500 font-medium">{t("live_editor.components_disabled")}</p>
+          <h2 className="text-2xl font-bold text-red-600 mb-2">
+            {t("live_editor.coming_soon")}
+          </h2>
+          <p className="text-red-500 font-medium">
+            {t("live_editor.components_disabled")}
+          </p>
         </div>
       </div>
-
     </Dialog>
   );
 }
@@ -669,21 +675,21 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
     const handleClickOutside = (event: MouseEvent) => {
       if (isDropdownOpen) {
         const target = event.target as HTMLElement;
-        if (!target.closest('.dropdown-container')) {
+        if (!target.closest(".dropdown-container")) {
           setIsDropdownOpen(false);
         }
       }
       if (isPagesDropdownOpen) {
         const target = event.target as HTMLElement;
-        if (!target.closest('.pages-dropdown-container')) {
+        if (!target.closest(".pages-dropdown-container")) {
           setIsPagesDropdownOpen(false);
         }
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDropdownOpen, isPagesDropdownOpen]);
 
@@ -958,13 +964,18 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
   // }
 
   return (
-    <nav className="bg-white border-b-[1.5px] border-red-300 sticky top-0 z-[9999]" dir="ltr">
+    <nav
+      className="bg-white border-b-[1.5px] border-red-300 sticky top-0 z-[9999]"
+      dir="ltr"
+    >
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-1">
         {/* Desktop Layout - Single Row */}
         <div className="hidden md:flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">{t("editor.title")}</h1>
+              <h1 className="text-xl font-bold text-gray-900">
+                {t("editor.title")}
+              </h1>
               <span className="ml-2 text-sm text-gray-500">({tenantId})</span>
             </div>
             {/* Desktop Pages Navigation - Hidden on screens < 1100px */}
@@ -1079,16 +1090,16 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               </div>
             </div>
           </div>
-          
+
           {/* Desktop Actions - Hidden on screens <= 1400px */}
           <div className="hidden xl:flex items-center space-x-4">
             {/* Save Button - Always visible */}
             <div className="relative">
-              <button 
+              <button
                 onClick={requestSave}
                 className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-2000 focus:ring-blue-500 ${
-                  showArrowTooltip 
-                    ? "bg-red-500 hover:bg-red-900 animate-pulse shadow-lg shadow-red-500/50" 
+                  showArrowTooltip
+                    ? "bg-red-500 hover:bg-red-900 animate-pulse shadow-lg shadow-red-500/50"
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
@@ -1107,7 +1118,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                 </svg>
                 {t("editor.save_changes")}
               </button>
-              
             </div>
 
             {/* Add Page Button for Desktop */}
@@ -1185,8 +1195,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               <button
                 onClick={requestSave}
                 className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-2000 focus:ring-blue-500 ${
-                  showArrowTooltip 
-                    ? "bg-red-500 hover:bg-red-900 animate-pulse shadow-lg shadow-red-500/50" 
+                  showArrowTooltip
+                    ? "bg-red-500 hover:bg-red-900 animate-pulse shadow-lg shadow-red-500/50"
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
@@ -1205,11 +1215,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                 </svg>
                 {t("editor.save_changes")}
               </button>
-              
             </div>
 
             <LanguageDropdown />
-            
+
             {/* Modern Dropdown Menu */}
             <div className="relative dropdown-container">
               <button
@@ -1321,7 +1330,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
           {/* First Row - Title */}
           <div className="flex items-center justify-center py-3">
             <div className="flex-shrink-0 flex items-center pb-2 relative">
-              <h1 className="text-lg font-bold text-gray-900">{t("editor.title")}</h1>
+              <h1 className="text-lg font-bold text-gray-900">
+                {t("editor.title")}
+              </h1>
               <span className="ml-2 text-sm text-gray-500">({tenantId})</span>
               {/* Custom border width - يمكن تعديل العرض هنا */}
               <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[400px] h-px bg-gray-200"></div>
@@ -1432,8 +1443,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                 <button
                   onClick={requestSave}
                   className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-1000 focus:ring-blue-500 ${
-                    showArrowTooltip 
-                      ? "bg-red-700 hover:bg-red-700 animate-pulse shadow-lg shadow-red-500/50" 
+                    showArrowTooltip
+                      ? "bg-red-700 hover:bg-red-700 animate-pulse shadow-lg shadow-red-500/50"
                       : "bg-blue-600 hover:bg-blue-700"
                   }`}
                 >
@@ -1452,11 +1463,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                   </svg>
                   <span className="inline">{t("editor.save_changes")}</span>
                 </button>
-                
               </div>
 
               <LanguageDropdown />
-              
+
               {/* Actions Dropdown */}
               <div className="relative dropdown-container">
                 <button
@@ -1564,10 +1574,13 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
           </div>
         </div>
       </div>
-      
+
       {/* Add Page Dialog */}
       <Dialog open={isAddPageDialogOpen} onOpenChange={setIsAddPageDialogOpen}>
-        <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto" dir="ltr">
+        <DialogContent
+          className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto"
+          dir="ltr"
+        >
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center">
@@ -1626,7 +1639,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                   <Input
                     id="pageName"
                     value={formData.pageName}
-                    onChange={(e) => setFormData({ ...formData, pageName: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, pageName: e.target.value })
+                    }
                     placeholder={t("editor.page_name_placeholder")}
                     className={errors.pageName ? "border-red-500" : ""}
                   />
@@ -1642,7 +1657,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                   <Input
                     id="slug"
                     value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, slug: e.target.value })
+                    }
                     placeholder={t("editor.slug_placeholder")}
                     className={errors.slug ? "border-red-500" : ""}
                   />
@@ -1658,7 +1675,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             {/* معلومات SEO */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="bg-green-50 text-green-700">
+                <Badge
+                  variant="secondary"
+                  className="bg-green-50 text-green-700"
+                >
                   <svg
                     className="w-3 h-3 mr-1"
                     fill="none"
@@ -1684,7 +1704,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                   <Input
                     id="metaTitle"
                     value={formData.metaTitle}
-                    onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, metaTitle: e.target.value })
+                    }
                     placeholder={t("editor.meta_title_placeholder")}
                     className={errors.metaTitle ? "border-red-500" : ""}
                   />
@@ -1694,13 +1716,21 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="metaDescription" className="text-sm font-medium">
+                  <Label
+                    htmlFor="metaDescription"
+                    className="text-sm font-medium"
+                  >
                     {t("editor.meta_description")}
                   </Label>
                   <Textarea
                     id="metaDescription"
                     value={formData.metaDescription}
-                    onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        metaDescription: e.target.value,
+                      })
+                    }
                     placeholder={t("editor.meta_description_placeholder")}
                     rows={3}
                   />
@@ -1713,7 +1743,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                   <Input
                     id="metaKeywords"
                     value={formData.metaKeywords}
-                    onChange={(e) => setFormData({ ...formData, metaKeywords: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, metaKeywords: e.target.value })
+                    }
                     placeholder={t("editor.meta_keywords_placeholder")}
                   />
                 </div>
@@ -1771,16 +1803,23 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               )}
             </Button>
           </DialogFooter>
-                {/* Coming Soon Overlay - Disabled add page functionality */}
-                <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto" style={{ paddingTop: "250px" }}>
-          <div className="text-center">
-            <div className="text-6xl mb-4">🚧</div>
-            <h2 className="text-2xl font-bold text-red-600 mb-2">{t("live_editor.coming_soon")}</h2>
-            <p className="text-red-500 font-medium">{t("live_editor.components_disabled")}</p>
+          {/* Coming Soon Overlay - Disabled add page functionality */}
+          <div
+            className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto"
+            style={{ paddingTop: "250px" }}
+          >
+            <div className="text-center">
+              <div className="text-6xl mb-4">🚧</div>
+              <h2 className="text-2xl font-bold text-red-600 mb-2">
+                {t("live_editor.coming_soon")}
+              </h2>
+              <p className="text-red-500 font-medium">
+                {t("live_editor.components_disabled")}
+              </p>
+            </div>
           </div>
-        </div>
         </DialogContent>
-      </Dialog> 
+      </Dialog>
     </nav>
   );
 }
@@ -1793,7 +1832,7 @@ export default function LiveEditorLayout({
   const { setLocale } = useEditorLocale();
   const t = useEditorT();
   const pathname = usePathname();
-  
+
   // State for arrow tooltip
   const [showArrowTooltip, setShowArrowTooltip] = useState(false);
   const [previousHasChangesMade, setPreviousHasChangesMade] = useState(false);
@@ -1821,7 +1860,6 @@ export default function LiveEditorLayout({
     }
     setPreviousHasChangesMade(hasChangesMade);
   }, [hasChangesMade, previousHasChangesMade]);
-
 
   // Show loading while validating token
   if (tokenValidation.loading) {
@@ -1851,7 +1889,9 @@ export default function LiveEditorLayout({
 
             <EditorNavBar showArrowTooltip={showArrowTooltip} />
 
-            <main className="flex-1" dir="ltr">{children}</main>
+            <main className="flex-1" dir="ltr">
+              {children}
+            </main>
           </div>
         </EditorProvider>
       </AuthProvider>

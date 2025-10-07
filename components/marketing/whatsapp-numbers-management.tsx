@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import useStore from "@/context/Store"
+import { useState, useEffect } from "react";
+import useStore from "@/context/Store";
 import {
   Plus,
   Phone,
@@ -16,10 +16,16 @@ import {
   Calendar,
   Activity,
   Settings,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -28,45 +34,52 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { WhatsappIcon } from "@/components/icons"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { WhatsappIcon } from "@/components/icons";
 
 interface WhatsAppNumber {
-  id: number
-  user_id: number
-  name: string
-  description: string
-  type: string
-  number: string
-  business_id: string
-  phone_id: string
-  access_token: string
-  is_verified: boolean
-  is_connected: boolean
-  sent_messages_count: number
-  received_messages_count: number
+  id: number;
+  user_id: number;
+  name: string;
+  description: string;
+  type: string;
+  number: string;
+  business_id: string;
+  phone_id: string;
+  access_token: string;
+  is_verified: boolean;
+  is_connected: boolean;
+  sent_messages_count: number;
+  received_messages_count: number;
   additional_settings: {
-    webhook_url: string
-    template_namespace: string
-  }
-  crm_integration_enabled: boolean
-  appointment_system_integration_enabled: boolean
-  customers_page_integration_enabled: boolean
-  rental_page_integration_enabled: boolean
-  integration_settings: any
-  created_at: string
-  updated_at: string
+    webhook_url: string;
+    template_namespace: string;
+  };
+  crm_integration_enabled: boolean;
+  appointment_system_integration_enabled: boolean;
+  customers_page_integration_enabled: boolean;
+  rental_page_integration_enabled: boolean;
+  integration_settings: any;
+  created_at: string;
+  updated_at: string;
 }
 
 export function WhatsAppNumbersManagement() {
-  const { marketingChannels, fetchMarketingChannels, createMarketingChannel, deleteMarketingChannel, updateChannelStatus, updateChannelSystemIntegrations } = useStore()
-  const [numbers, setNumbers] = useState<WhatsAppNumber[]>([])
+  const {
+    marketingChannels,
+    fetchMarketingChannels,
+    createMarketingChannel,
+    deleteMarketingChannel,
+    updateChannelStatus,
+    updateChannelSystemIntegrations,
+  } = useStore();
+  const [numbers, setNumbers] = useState<WhatsAppNumber[]>([]);
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newNumber, setNewNumber] = useState({
     name: "",
     description: "",
@@ -76,21 +89,25 @@ export function WhatsAppNumbersManagement() {
     access_token: "",
     webhook_url: "",
     template_namespace: "",
-  })
-  const [isConnecting, setIsConnecting] = useState(false)
-  
+  });
+  const [isConnecting, setIsConnecting] = useState(false);
+
   // Status Dialog States
-  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false)
-  const [selectedChannel, setSelectedChannel] = useState<WhatsAppNumber | null>(null)
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState<WhatsAppNumber | null>(
+    null,
+  );
   const [tempStatus, setTempStatus] = useState({
     is_connected: false,
-    is_verified: false
-  })
-  const [isSavingStatus, setIsSavingStatus] = useState(false)
-  
+    is_verified: false,
+  });
+  const [isSavingStatus, setIsSavingStatus] = useState(false);
+
   // Edit Dialog States
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [editingChannel, setEditingChannel] = useState<WhatsAppNumber | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingChannel, setEditingChannel] = useState<WhatsAppNumber | null>(
+    null,
+  );
   const [editFormData, setEditFormData] = useState({
     crm_integration_enabled: false,
     appointment_system_integration_enabled: false,
@@ -101,24 +118,24 @@ export function WhatsAppNumbersManagement() {
       sync_frequency: "realtime",
       custom_fields: {
         customer_id: "",
-        appointment_id: ""
-      }
-    }
-  })
-  const [isSavingEdit, setIsSavingEdit] = useState(false)
+        appointment_id: "",
+      },
+    },
+  });
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // جلب البيانات عند تحميل المكون
   useEffect(() => {
-    fetchMarketingChannels()
-  }, []) // إزالة fetchMarketingChannels من dependency array
+    fetchMarketingChannels();
+  }, []); // إزالة fetchMarketingChannels من dependency array
 
   // تحديث الأرقام عند تغيير البيانات في الـ store
   useEffect(() => {
-    setNumbers(marketingChannels.channels)
-  }, [marketingChannels.channels])
+    setNumbers(marketingChannels.channels);
+  }, [marketingChannels.channels]);
 
   const handleAddNumber = async () => {
-    setIsConnecting(true)
+    setIsConnecting(true);
 
     try {
       const channelData = {
@@ -133,10 +150,10 @@ export function WhatsAppNumbersManagement() {
           webhook_url: newNumber.webhook_url,
           template_namespace: newNumber.template_namespace,
         },
-      }
+      };
 
-      const result = await createMarketingChannel(channelData)
-      
+      const result = await createMarketingChannel(channelData);
+
       if (result.success) {
         setNewNumber({
           name: "",
@@ -147,138 +164,150 @@ export function WhatsAppNumbersManagement() {
           access_token: "",
           webhook_url: "",
           template_namespace: "",
-        })
-        setIsAddDialogOpen(false)
+        });
+        setIsAddDialogOpen(false);
       }
     } catch (error) {
-      console.error("Error creating channel:", error)
+      console.error("Error creating channel:", error);
     } finally {
-      setIsConnecting(false)
+      setIsConnecting(false);
     }
-  }
+  };
 
   const handleRemoveNumber = async (id: number) => {
     try {
-      const result = await deleteMarketingChannel(id)
+      const result = await deleteMarketingChannel(id);
       if (result.success) {
         // القناة ستُحذف تلقائياً من القائمة في الـ store
-        console.log("تم حذف القناة بنجاح")
+        console.log("تم حذف القناة بنجاح");
       }
     } catch (error) {
-      console.error("Error deleting channel:", error)
+      console.error("Error deleting channel:", error);
     }
-  }
+  };
 
-  const handleStatusChange = async (channelId: number, field: 'is_connected' | 'is_verified', value: boolean) => {
+  const handleStatusChange = async (
+    channelId: number,
+    field: "is_connected" | "is_verified",
+    value: boolean,
+  ) => {
     try {
-      const result = await updateChannelStatus(channelId, { [field]: value })
+      const result = await updateChannelStatus(channelId, { [field]: value });
       if (result.success) {
         // تحديث الحالة المحلية
-        setNumbers(prevNumbers => 
-          prevNumbers.map(num => 
-            num.id === channelId 
-              ? { ...num, [field]: value }
-              : num
-          )
-        )
+        setNumbers((prevNumbers) =>
+          prevNumbers.map((num) =>
+            num.id === channelId ? { ...num, [field]: value } : num,
+          ),
+        );
       }
     } catch (error) {
-      console.error('Error updating channel status:', error)
+      console.error("Error updating channel status:", error);
     }
-  }
+  };
 
   const openStatusDialog = (channel: WhatsAppNumber) => {
-    setSelectedChannel(channel)
+    setSelectedChannel(channel);
     setTempStatus({
       is_connected: channel.is_connected,
-      is_verified: channel.is_verified
-    })
-    setIsStatusDialogOpen(true)
-  }
+      is_verified: channel.is_verified,
+    });
+    setIsStatusDialogOpen(true);
+  };
 
   const handleSaveStatus = async () => {
-    if (!selectedChannel || isSavingStatus) return
+    if (!selectedChannel || isSavingStatus) return;
 
-    setIsSavingStatus(true)
+    setIsSavingStatus(true);
     try {
-      const result = await updateChannelStatus(selectedChannel.id, tempStatus)
+      const result = await updateChannelStatus(selectedChannel.id, tempStatus);
       if (result.success) {
         // تحديث الحالة المحلية
-        setNumbers(prevNumbers => 
-          prevNumbers.map(num => 
-            num.id === selectedChannel.id 
-              ? { ...num, ...tempStatus }
-              : num
-          )
-        )
+        setNumbers((prevNumbers) =>
+          prevNumbers.map((num) =>
+            num.id === selectedChannel.id ? { ...num, ...tempStatus } : num,
+          ),
+        );
         // إغلاق الـ popup
-        setIsStatusDialogOpen(false)
-        setSelectedChannel(null)
+        setIsStatusDialogOpen(false);
+        setSelectedChannel(null);
         setTempStatus({
           is_connected: false,
-          is_verified: false
-        })
+          is_verified: false,
+        });
       }
     } catch (error) {
-      console.error('Error updating channel status:', error)
+      console.error("Error updating channel status:", error);
     } finally {
-      setIsSavingStatus(false)
+      setIsSavingStatus(false);
     }
-  }
+  };
 
   const handleCancelStatus = () => {
-    setIsStatusDialogOpen(false)
-    setSelectedChannel(null)
+    setIsStatusDialogOpen(false);
+    setSelectedChannel(null);
     setTempStatus({
       is_connected: false,
-      is_verified: false
-    })
-  }
+      is_verified: false,
+    });
+  };
 
   const openEditDialog = (channel: WhatsAppNumber) => {
-    setEditingChannel(channel)
+    setEditingChannel(channel);
     setEditFormData({
       crm_integration_enabled: channel.crm_integration_enabled || false,
-      appointment_system_integration_enabled: channel.appointment_system_integration_enabled || false,
-      customers_page_integration_enabled: channel.customers_page_integration_enabled || false,
-      rental_page_integration_enabled: channel.rental_page_integration_enabled || false,
+      appointment_system_integration_enabled:
+        channel.appointment_system_integration_enabled || false,
+      customers_page_integration_enabled:
+        channel.customers_page_integration_enabled || false,
+      rental_page_integration_enabled:
+        channel.rental_page_integration_enabled || false,
       integration_settings: {
         webhook_url: channel.integration_settings?.webhook_url || "",
-        sync_frequency: channel.integration_settings?.sync_frequency || "realtime",
+        sync_frequency:
+          channel.integration_settings?.sync_frequency || "realtime",
         custom_fields: {
-          customer_id: channel.integration_settings?.custom_fields?.customer_id || "",
-          appointment_id: channel.integration_settings?.custom_fields?.appointment_id || ""
-        }
-      }
-    })
-    setIsEditDialogOpen(true)
-  }
+          customer_id:
+            channel.integration_settings?.custom_fields?.customer_id || "",
+          appointment_id:
+            channel.integration_settings?.custom_fields?.appointment_id || "",
+        },
+      },
+    });
+    setIsEditDialogOpen(true);
+  };
 
   const handleSaveEdit = async () => {
-    if (!editingChannel || isSavingEdit) return
+    if (!editingChannel || isSavingEdit) return;
 
-    setIsSavingEdit(true)
+    setIsSavingEdit(true);
     try {
-      const result = await updateChannelSystemIntegrations(editingChannel.id, editFormData)
+      const result = await updateChannelSystemIntegrations(
+        editingChannel.id,
+        editFormData,
+      );
       if (result.success) {
         // تحديث الحالة المحلية
-        setNumbers(prevNumbers => 
-          prevNumbers.map(num => 
-            num.id === editingChannel.id 
-              ? { 
-                  ...num, 
+        setNumbers((prevNumbers) =>
+          prevNumbers.map((num) =>
+            num.id === editingChannel.id
+              ? {
+                  ...num,
                   crm_integration_enabled: editFormData.crm_integration_enabled,
-                  appointment_system_integration_enabled: editFormData.appointment_system_integration_enabled,
-                  customers_page_integration_enabled: editFormData.customers_page_integration_enabled,
-                  rental_page_integration_enabled: editFormData.rental_page_integration_enabled,
-                  integration_settings: editFormData.integration_settings
+                  appointment_system_integration_enabled:
+                    editFormData.appointment_system_integration_enabled,
+                  customers_page_integration_enabled:
+                    editFormData.customers_page_integration_enabled,
+                  rental_page_integration_enabled:
+                    editFormData.rental_page_integration_enabled,
+                  integration_settings: editFormData.integration_settings,
                 }
-              : num
-          )
-        )
+              : num,
+          ),
+        );
         // إغلاق الـ dialog
-        setIsEditDialogOpen(false)
-        setEditingChannel(null)
+        setIsEditDialogOpen(false);
+        setEditingChannel(null);
         setEditFormData({
           crm_integration_enabled: false,
           appointment_system_integration_enabled: false,
@@ -289,21 +318,21 @@ export function WhatsAppNumbersManagement() {
             sync_frequency: "realtime",
             custom_fields: {
               customer_id: "",
-              appointment_id: ""
-            }
-          }
-        })
+              appointment_id: "",
+            },
+          },
+        });
       }
     } catch (error) {
-      console.error('Error updating channel integrations:', error)
+      console.error("Error updating channel integrations:", error);
     } finally {
-      setIsSavingEdit(false)
+      setIsSavingEdit(false);
     }
-  }
+  };
 
   const handleCancelEdit = () => {
-    setIsEditDialogOpen(false)
-    setEditingChannel(null)
+    setIsEditDialogOpen(false);
+    setEditingChannel(null);
     setEditFormData({
       crm_integration_enabled: false,
       appointment_system_integration_enabled: false,
@@ -314,41 +343,41 @@ export function WhatsAppNumbersManagement() {
         sync_frequency: "realtime",
         custom_fields: {
           customer_id: "",
-          appointment_id: ""
-        }
-      }
-    })
-  }
+          appointment_id: "",
+        },
+      },
+    });
+  };
 
   const getStatusColor = (isConnected: boolean, isVerified: boolean) => {
     if (isConnected && isVerified) {
-      return "bg-green-100 text-green-800 border-green-200"
+      return "bg-green-100 text-green-800 border-green-200";
     } else if (isConnected && !isVerified) {
-      return "bg-yellow-100 text-yellow-800 border-yellow-200"
+      return "bg-yellow-100 text-yellow-800 border-yellow-200";
     } else {
-      return "bg-red-100 text-red-800 border-red-200"
+      return "bg-red-100 text-red-800 border-red-200";
     }
-  }
+  };
 
   const getStatusIcon = (isConnected: boolean, isVerified: boolean) => {
     if (isConnected && isVerified) {
-      return <CheckCircle className="h-4 w-4" />
+      return <CheckCircle className="h-4 w-4" />;
     } else if (isConnected && !isVerified) {
-      return <AlertCircle className="h-4 w-4" />
+      return <AlertCircle className="h-4 w-4" />;
     } else {
-      return <XCircle className="h-4 w-4" />
+      return <XCircle className="h-4 w-4" />;
     }
-  }
+  };
 
   const getStatusText = (isConnected: boolean, isVerified: boolean) => {
     if (isConnected && isVerified) {
-      return "متصل ومُحقق"
+      return "متصل ومُحقق";
     } else if (isConnected && !isVerified) {
-      return "متصل غير مُحقق"
+      return "متصل غير مُحقق";
     } else {
-      return "غير متصل"
+      return "غير متصل";
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -359,7 +388,9 @@ export function WhatsAppNumbersManagement() {
             <WhatsappIcon className="h-5 w-5 ml-2 text-green-600" />
             أرقام الواتساب
           </h2>
-          <p className="text-sm text-muted-foreground">إدارة أرقام الواتساب المتصلة مع Meta Cloud API</p>
+          <p className="text-sm text-muted-foreground">
+            إدارة أرقام الواتساب المتصلة مع Meta Cloud API
+          </p>
         </div>
 
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -369,44 +400,66 @@ export function WhatsAppNumbersManagement() {
               إضافة رقم جديد
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
+          <DialogContent
+            className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto"
+            dir="rtl"
+          >
             <DialogHeader className="pb-4">
-              <DialogTitle className="text-lg sm:text-xl">إضافة قناة واتساب جديدة</DialogTitle>
-              <DialogDescription className="text-sm">أدخل تفاصيل قناة الواتساب الجديدة</DialogDescription>
+              <DialogTitle className="text-lg sm:text-xl">
+                إضافة قناة واتساب جديدة
+              </DialogTitle>
+              <DialogDescription className="text-sm">
+                أدخل تفاصيل قناة الواتساب الجديدة
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
               {/* Basic Information Section */}
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name" className="text-sm font-medium">اسم القناة</Label>
+                    <Label htmlFor="name" className="text-sm font-medium">
+                      اسم القناة
+                    </Label>
                     <Input
                       id="name"
                       placeholder="مثل: الرقم الرئيسي للشركة"
                       value={newNumber.name}
-                      onChange={(e) => setNewNumber({ ...newNumber, name: e.target.value })}
+                      onChange={(e) =>
+                        setNewNumber({ ...newNumber, name: e.target.value })
+                      }
                       className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="number" className="text-sm font-medium">رقم الواتساب</Label>
+                    <Label htmlFor="number" className="text-sm font-medium">
+                      رقم الواتساب
+                    </Label>
                     <Input
                       id="number"
                       placeholder="+966501234567"
                       value={newNumber.number}
-                      onChange={(e) => setNewNumber({ ...newNumber, number: e.target.value })}
+                      onChange={(e) =>
+                        setNewNumber({ ...newNumber, number: e.target.value })
+                      }
                       className="mt-1"
                     />
                   </div>
                 </div>
-                
+
                 <div>
-                  <Label htmlFor="description" className="text-sm font-medium">وصف القناة</Label>
+                  <Label htmlFor="description" className="text-sm font-medium">
+                    وصف القناة
+                  </Label>
                   <Textarea
                     id="description"
                     placeholder="وصف مختصر لاستخدام هذه القناة"
                     value={newNumber.description}
-                    onChange={(e) => setNewNumber({ ...newNumber, description: e.target.value })}
+                    onChange={(e) =>
+                      setNewNumber({
+                        ...newNumber,
+                        description: e.target.value,
+                      })
+                    }
                     className="mt-1 min-h-[80px]"
                   />
                 </div>
@@ -414,37 +467,60 @@ export function WhatsAppNumbersManagement() {
 
               {/* Meta API Configuration Section */}
               <div className="space-y-4 border-t pt-4">
-                <h4 className="text-sm font-semibold text-gray-700">إعدادات Meta API</h4>
+                <h4 className="text-sm font-semibold text-gray-700">
+                  إعدادات Meta API
+                </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="business_id" className="text-sm font-medium">معرف الحساب التجاري</Label>
+                    <Label
+                      htmlFor="business_id"
+                      className="text-sm font-medium"
+                    >
+                      معرف الحساب التجاري
+                    </Label>
                     <Input
                       id="business_id"
                       placeholder="BA123456789"
                       value={newNumber.business_id}
-                      onChange={(e) => setNewNumber({ ...newNumber, business_id: e.target.value })}
+                      onChange={(e) =>
+                        setNewNumber({
+                          ...newNumber,
+                          business_id: e.target.value,
+                        })
+                      }
                       className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone_id" className="text-sm font-medium">معرف رقم الهاتف</Label>
+                    <Label htmlFor="phone_id" className="text-sm font-medium">
+                      معرف رقم الهاتف
+                    </Label>
                     <Input
                       id="phone_id"
                       placeholder="PN987654321"
                       value={newNumber.phone_id}
-                      onChange={(e) => setNewNumber({ ...newNumber, phone_id: e.target.value })}
+                      onChange={(e) =>
+                        setNewNumber({ ...newNumber, phone_id: e.target.value })
+                      }
                       className="mt-1"
                     />
                   </div>
                 </div>
-                
+
                 <div>
-                  <Label htmlFor="access_token" className="text-sm font-medium">رمز الوصول</Label>
+                  <Label htmlFor="access_token" className="text-sm font-medium">
+                    رمز الوصول
+                  </Label>
                   <Input
                     id="access_token"
                     placeholder="test_access_token_123"
                     value={newNumber.access_token}
-                    onChange={(e) => setNewNumber({ ...newNumber, access_token: e.target.value })}
+                    onChange={(e) =>
+                      setNewNumber({
+                        ...newNumber,
+                        access_token: e.target.value,
+                      })
+                    }
                     className="mt-1"
                   />
                 </div>
@@ -452,25 +528,47 @@ export function WhatsAppNumbersManagement() {
 
               {/* Advanced Settings Section */}
               <div className="space-y-4 border-t pt-4">
-                <h4 className="text-sm font-semibold text-gray-700">الإعدادات المتقدمة</h4>
+                <h4 className="text-sm font-semibold text-gray-700">
+                  الإعدادات المتقدمة
+                </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="webhook_url" className="text-sm font-medium">رابط الويب هوك</Label>
+                    <Label
+                      htmlFor="webhook_url"
+                      className="text-sm font-medium"
+                    >
+                      رابط الويب هوك
+                    </Label>
                     <Input
                       id="webhook_url"
                       placeholder="https://example.com/webhook"
                       value={newNumber.webhook_url}
-                      onChange={(e) => setNewNumber({ ...newNumber, webhook_url: e.target.value })}
+                      onChange={(e) =>
+                        setNewNumber({
+                          ...newNumber,
+                          webhook_url: e.target.value,
+                        })
+                      }
                       className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="template_namespace" className="text-sm font-medium">مساحة قوالب الرسائل</Label>
+                    <Label
+                      htmlFor="template_namespace"
+                      className="text-sm font-medium"
+                    >
+                      مساحة قوالب الرسائل
+                    </Label>
                     <Input
                       id="template_namespace"
                       placeholder="test_templates"
                       value={newNumber.template_namespace}
-                      onChange={(e) => setNewNumber({ ...newNumber, template_namespace: e.target.value })}
+                      onChange={(e) =>
+                        setNewNumber({
+                          ...newNumber,
+                          template_namespace: e.target.value,
+                        })
+                      }
                       className="mt-1"
                     />
                   </div>
@@ -480,7 +578,8 @@ export function WhatsAppNumbersManagement() {
               <Alert className="mt-4">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="text-sm">
-                  تأكد من صحة جميع البيانات قبل إنشاء القناة. ستتم إضافة القناة الجديدة إلى قائمة قنوات الواتساب.
+                  تأكد من صحة جميع البيانات قبل إنشاء القناة. ستتم إضافة القناة
+                  الجديدة إلى قائمة قنوات الواتساب.
                 </AlertDescription>
               </Alert>
             </div>
@@ -488,7 +587,14 @@ export function WhatsAppNumbersManagement() {
             <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-4 border-t">
               <Button
                 onClick={handleAddNumber}
-                disabled={!newNumber.name || !newNumber.number || !newNumber.business_id || !newNumber.phone_id || !newNumber.access_token || isConnecting}
+                disabled={
+                  !newNumber.name ||
+                  !newNumber.number ||
+                  !newNumber.business_id ||
+                  !newNumber.phone_id ||
+                  !newNumber.access_token ||
+                  isConnecting
+                }
                 className="w-full sm:w-auto sm:flex-1 order-2 sm:order-1"
               >
                 {isConnecting ? (
@@ -503,8 +609,8 @@ export function WhatsAppNumbersManagement() {
                   </>
                 )}
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setIsAddDialogOpen(false)}
                 className="w-full sm:w-auto order-1 sm:order-2"
               >
@@ -654,9 +760,16 @@ export function WhatsAppNumbersManagement() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Badge className={getStatusColor(number.is_connected, number.is_verified)}>
+                  <Badge
+                    className={getStatusColor(
+                      number.is_connected,
+                      number.is_verified,
+                    )}
+                  >
                     {getStatusIcon(number.is_connected, number.is_verified)}
-                    <span className="mr-1">{getStatusText(number.is_connected, number.is_verified)}</span>
+                    <span className="mr-1">
+                      {getStatusText(number.is_connected, number.is_verified)}
+                    </span>
                   </Badge>
                 </div>
               </div>
@@ -668,8 +781,12 @@ export function WhatsAppNumbersManagement() {
                 {/* Status Management */}
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-900">إدارة الحالة</p>
-                    <p className="text-xs text-gray-500">تغيير حالة الاتصال والتحقق</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      إدارة الحالة
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      تغيير حالة الاتصال والتحقق
+                    </p>
                   </div>
                   <Button
                     onClick={() => openStatusDialog(number)}
@@ -687,7 +804,9 @@ export function WhatsAppNumbersManagement() {
                   <span className="text-muted-foreground">تاريخ الإضافة:</span>
                   <div className="flex items-center gap-1 mt-1">
                     <Calendar className="h-3 w-3" />
-                    <span className="text-xs">{new Date(number.created_at).toLocaleDateString('ar-US')}</span>
+                    <span className="text-xs">
+                      {new Date(number.created_at).toLocaleDateString("ar-US")}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -697,17 +816,25 @@ export function WhatsAppNumbersManagement() {
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1 text-blue-600">
                     <MessageSquare className="h-4 w-4" />
-                    <span className="font-semibold">{number.sent_messages_count}</span>
+                    <span className="font-semibold">
+                      {number.sent_messages_count}
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground">رسائل مُرسلة</span>
+                  <span className="text-xs text-muted-foreground">
+                    رسائل مُرسلة
+                  </span>
                 </div>
 
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1 text-green-600">
                     <Users className="h-4 w-4" />
-                    <span className="font-semibold">{number.received_messages_count}</span>
+                    <span className="font-semibold">
+                      {number.received_messages_count}
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground">رسائل مُستقبلة</span>
+                  <span className="text-xs text-muted-foreground">
+                    رسائل مُستقبلة
+                  </span>
                 </div>
               </div>
 
@@ -715,13 +842,18 @@ export function WhatsAppNumbersManagement() {
               {number.business_id && (
                 <div className="text-xs text-muted-foreground space-y-1">
                   <div>Business Account ID: {number.business_id}</div>
-                  {number.phone_id && <div>Phone Number ID: {number.phone_id}</div>}
+                  {number.phone_id && (
+                    <div>Phone Number ID: {number.phone_id}</div>
+                  )}
                 </div>
               )}
 
               {/* Actions */}
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" size="sm" className="flex-1 bg-transparent"
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 bg-transparent"
                   onClick={() => openEditDialog(number)}
                 >
                   <Edit className="h-3 w-3 ml-1" />
@@ -751,7 +883,9 @@ export function WhatsAppNumbersManagement() {
           <CardContent>
             <WhatsappIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">لا توجد أرقام واتساب</h3>
-            <p className="text-muted-foreground mb-4">ابدأ بإضافة رقم واتساب الأول لبدء إرسال الرسائل</p>
+            <p className="text-muted-foreground mb-4">
+              ابدأ بإضافة رقم واتساب الأول لبدء إرسال الرسائل
+            </p>
             <Button onClick={() => setIsAddDialogOpen(true)}>
               <Plus className="h-4 w-4 ml-2" />
               إضافة رقم واتساب
@@ -764,14 +898,18 @@ export function WhatsAppNumbersManagement() {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          <strong>ملاحظة:</strong> يتطلب ربط أرقام الواتساب حساب Meta Business وموافقة على شروط استخدام WhatsApp
-          Business API. تأكد من أن رقمك مُحقق ومُعتمد من Meta قبل البدء في إرسال الرسائل.
+          <strong>ملاحظة:</strong> يتطلب ربط أرقام الواتساب حساب Meta Business
+          وموافقة على شروط استخدام WhatsApp Business API. تأكد من أن رقمك مُحقق
+          ومُعتمد من Meta قبل البدء في إرسال الرسائل.
         </AlertDescription>
       </Alert>
 
       {/* Status Change Dialog */}
       <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
-        <DialogContent className="max-w-md bg-white border-0 shadow-2xl" dir="rtl">
+        <DialogContent
+          className="max-w-md bg-white border-0 shadow-2xl"
+          dir="rtl"
+        >
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-xl font-bold text-gray-900 text-center">
               تغيير حالة الرقم
@@ -786,15 +924,24 @@ export function WhatsAppNumbersManagement() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h4 className="text-sm font-semibold text-gray-900">حالة الاتصال</h4>
-                  <p className="text-xs text-gray-500">تحديد ما إذا كان الرقم متصل أم لا</p>
+                  <h4 className="text-sm font-semibold text-gray-900">
+                    حالة الاتصال
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    تحديد ما إذا كان الرقم متصل أم لا
+                  </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     className="sr-only peer"
                     checked={tempStatus.is_connected}
-                    onChange={(e) => setTempStatus(prev => ({ ...prev, is_connected: e.target.checked }))}
+                    onChange={(e) =>
+                      setTempStatus((prev) => ({
+                        ...prev,
+                        is_connected: e.target.checked,
+                      }))
+                    }
                   />
                   <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
                 </label>
@@ -821,15 +968,24 @@ export function WhatsAppNumbersManagement() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h4 className="text-sm font-semibold text-gray-900">حالة التحقق</h4>
-                  <p className="text-xs text-gray-500">تحديد ما إذا كان الرقم مُحقق أم لا</p>
+                  <h4 className="text-sm font-semibold text-gray-900">
+                    حالة التحقق
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    تحديد ما إذا كان الرقم مُحقق أم لا
+                  </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     className="sr-only peer"
                     checked={tempStatus.is_verified}
-                    onChange={(e) => setTempStatus(prev => ({ ...prev, is_verified: e.target.checked }))}
+                    onChange={(e) =>
+                      setTempStatus((prev) => ({
+                        ...prev,
+                        is_verified: e.target.checked,
+                      }))
+                    }
                   />
                   <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
                 </label>
@@ -878,7 +1034,10 @@ export function WhatsAppNumbersManagement() {
 
       {/* Edit Integration Settings Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white border-0 shadow-2xl" dir="rtl">
+        <DialogContent
+          className="max-w-2xl bg-white border-0 shadow-2xl"
+          dir="rtl"
+        >
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-xl font-bold text-gray-900 text-center">
               تعديل إعدادات التكامل
@@ -893,15 +1052,24 @@ export function WhatsAppNumbersManagement() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h4 className="text-sm font-semibold text-gray-900">تكامل CRM</h4>
-                  <p className="text-xs text-gray-500">تفعيل تكامل نظام إدارة العملاء</p>
+                  <h4 className="text-sm font-semibold text-gray-900">
+                    تكامل CRM
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    تفعيل تكامل نظام إدارة العملاء
+                  </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     className="sr-only peer"
                     checked={editFormData.crm_integration_enabled}
-                    onChange={(e) => setEditFormData(prev => ({ ...prev, crm_integration_enabled: e.target.checked }))}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        crm_integration_enabled: e.target.checked,
+                      }))
+                    }
                   />
                   <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
                 </label>
@@ -912,15 +1080,27 @@ export function WhatsAppNumbersManagement() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h4 className="text-sm font-semibold text-gray-900">تكامل نظام المواعيد</h4>
-                  <p className="text-xs text-gray-500">تفعيل تكامل نظام إدارة المواعيد</p>
+                  <h4 className="text-sm font-semibold text-gray-900">
+                    تكامل نظام المواعيد
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    تفعيل تكامل نظام إدارة المواعيد
+                  </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     className="sr-only peer"
-                    checked={editFormData.appointment_system_integration_enabled}
-                    onChange={(e) => setEditFormData(prev => ({ ...prev, appointment_system_integration_enabled: e.target.checked }))}
+                    checked={
+                      editFormData.appointment_system_integration_enabled
+                    }
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        appointment_system_integration_enabled:
+                          e.target.checked,
+                      }))
+                    }
                   />
                   <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
                 </label>
@@ -931,15 +1111,24 @@ export function WhatsAppNumbersManagement() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h4 className="text-sm font-semibold text-gray-900">التكامل مع إدارة العملاء</h4>
-                  <p className="text-xs text-gray-500">تفعيل تكامل نظام إدارة العملاء والخدمات</p>
+                  <h4 className="text-sm font-semibold text-gray-900">
+                    التكامل مع إدارة العملاء
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    تفعيل تكامل نظام إدارة العملاء والخدمات
+                  </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     className="sr-only peer"
                     checked={editFormData.customers_page_integration_enabled}
-                    onChange={(e) => setEditFormData(prev => ({ ...prev, customers_page_integration_enabled: e.target.checked }))}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        customers_page_integration_enabled: e.target.checked,
+                      }))
+                    }
                   />
                   <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
                 </label>
@@ -950,21 +1139,29 @@ export function WhatsAppNumbersManagement() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h4 className="text-sm font-semibold text-gray-900">التكامل مع صفحة الإيجار</h4>
-                  <p className="text-xs text-gray-500">تفعيل تكامل نظام إدارة العقارات للإيجار</p>
+                  <h4 className="text-sm font-semibold text-gray-900">
+                    التكامل مع صفحة الإيجار
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    تفعيل تكامل نظام إدارة العقارات للإيجار
+                  </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     className="sr-only peer"
                     checked={editFormData.rental_page_integration_enabled}
-                    onChange={(e) => setEditFormData(prev => ({ ...prev, rental_page_integration_enabled: e.target.checked }))}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        rental_page_integration_enabled: e.target.checked,
+                      }))
+                    }
                   />
                   <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
                 </label>
               </div>
             </div>
-
           </div>
 
           <DialogFooter className="flex gap-3 pt-4">
@@ -993,5 +1190,5 @@ export function WhatsAppNumbersManagement() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

@@ -159,13 +159,15 @@ export function RentalApplicationsService({
     marketingChannels,
     fetchMarketingChannels,
   } = useStore();
-  
+
   // Status change dialog state
-  const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] = useState(false);
-  const [selectedRentalForStatusChange, setSelectedRentalForStatusChange] = useState<any>(null);
+  const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] =
+    useState(false);
+  const [selectedRentalForStatusChange, setSelectedRentalForStatusChange] =
+    useState<any>(null);
   const [newStatus, setNewStatus] = useState<string>("");
   const [statusChangeLoading, setStatusChangeLoading] = useState(false);
-  
+
   // Function to open status change dialog
   const openStatusChangeDialog = (rental: any) => {
     setSelectedRentalForStatusChange(rental);
@@ -186,12 +188,12 @@ export function RentalApplicationsService({
       case "draft":
         return [
           { value: "active", label: "نشط" },
-          { value: "cancelled", label: "ملغي" }
+          { value: "cancelled", label: "ملغي" },
         ];
       case "active":
         return [
           { value: "ended", label: "منتهي" },
-          { value: "cancelled", label: "ملغي" }
+          { value: "cancelled", label: "ملغي" },
         ];
       case "ended":
       case "cancelled":
@@ -204,8 +206,11 @@ export function RentalApplicationsService({
   // Function to handle status change
   const handleStatusChange = async (status: string) => {
     console.log("🔄 handleStatusChange called with status:", status);
-    console.log("🔄 selectedRentalForStatusChange:", selectedRentalForStatusChange);
-    
+    console.log(
+      "🔄 selectedRentalForStatusChange:",
+      selectedRentalForStatusChange,
+    );
+
     if (!selectedRentalForStatusChange || !status) {
       console.log("❌ Missing rental or status");
       return;
@@ -216,22 +221,25 @@ export function RentalApplicationsService({
       const response = await axiosInstance.patch(
         `/v1/rms/rentals/${selectedRentalForStatusChange.id}/status`,
         {
-          status: status
-        }
+          status: status,
+        },
       );
 
       if (response.data.status) {
         // Update the rental status in the local state
-        const updatedRentals = rentals.map((rental: any) => 
-          rental.id === selectedRentalForStatusChange.id 
+        const updatedRentals = rentals.map((rental: any) =>
+          rental.id === selectedRentalForStatusChange.id
             ? { ...rental, status: status }
-            : rental
+            : rental,
         );
-        setRentalApplications({ ...rentalApplications, rentals: updatedRentals });
-        
+        setRentalApplications({
+          ...rentalApplications,
+          rentals: updatedRentals,
+        });
+
         // Close dialog
         closeStatusChangeDialog();
-        
+
         // Show success message (you can add toast notification here)
         console.log("Status changed successfully");
       } else {
@@ -267,10 +275,11 @@ export function RentalApplicationsService({
 
   // التحقق من وجود قناة واتساب صالحة
   const hasValidCRMWhatsAppChannel = () => {
-    return marketingChannels.channels.some((channel: any) => 
-      channel.is_verified === true && 
-      channel.is_connected === true &&
-      channel.rental_page_integration_enabled === true
+    return marketingChannels.channels.some(
+      (channel: any) =>
+        channel.is_verified === true &&
+        channel.is_connected === true &&
+        channel.rental_page_integration_enabled === true,
     );
   };
 
@@ -820,10 +829,12 @@ export function RentalApplicationsService({
                   key={rental.id}
                   onClick={(e) => {
                     // منع فتح dialog إذا تم الضغط على dropdown menu أو أزرار
-                    if ((e.target as any).closest?.('[data-dropdown]') || 
-                        (e.target as any).closest?.('button') || 
-                        (e.target as any).closest?.('[role="menuitem"]') ||
-                        (e.target as any).closest?.('.cursor-pointer')) {
+                    if (
+                      (e.target as any).closest?.("[data-dropdown]") ||
+                      (e.target as any).closest?.("button") ||
+                      (e.target as any).closest?.('[role="menuitem"]') ||
+                      (e.target as any).closest?.(".cursor-pointer")
+                    ) {
                       return;
                     }
                     openRentalDetailsDialog(rental.id);
@@ -992,13 +1003,16 @@ export function RentalApplicationsService({
                             تغيير حالة العقد
                           </DropdownMenuItem>
                           {hasValidCRMWhatsAppChannel() && (
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  console.log("Setting rental for WhatsApp:", rental);
-                                  openRentalWhatsAppDialog(rental);
-                                }}
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log(
+                                  "Setting rental for WhatsApp:",
+                                  rental,
+                                );
+                                openRentalWhatsAppDialog(rental);
+                              }}
                               className="cursor-pointer hover:bg-gray-100"
                             >
                               <Activity className="h-4 w-4 ml-2 text-gray-600" />
@@ -1190,7 +1204,7 @@ export function RentalApplicationsService({
                     <div className="space-y-3">
                       <div>
                         <Label className="text-sm font-medium text-gray-700">
-                        العمارة
+                          العمارة
                         </Label>
                         <p className="text-sm text-gray-900">
                           {selectedRental.property?.id}
@@ -1584,7 +1598,7 @@ export function RentalApplicationsService({
           </div>
         </div>
       )}
-      
+
       {/* Rental WhatsApp Dialog */}
       <RentalWhatsAppDialog
         isOpen={rentalApplications.isRentalWhatsAppDialogOpen || false}
@@ -2767,7 +2781,6 @@ function EditRentalForm({
                 </PopoverContent>
               </Popover>
             </div>
-
 
             <div className="space-y-2">
               <Label htmlFor="edit_move_in_date">تاريخ الانتقال *</Label>

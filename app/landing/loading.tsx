@@ -1,10 +1,10 @@
 "use client";
 
 import { memo } from "react";
-import { 
+import {
   StaticHeaderSkeleton1,
   HeroSkeleton1,
-  FilterButtonsSkeleton1
+  FilterButtonsSkeleton1,
 } from "@/components/skeleton";
 
 // تحسين الأداء باستخدام memo

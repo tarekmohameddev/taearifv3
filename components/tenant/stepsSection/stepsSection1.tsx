@@ -17,18 +17,20 @@ const getStepIconUrl = (type: string): string => {
     step5: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/5.svg",
     step6: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/6.svg",
   };
-  
+
   return iconMap[type] || iconMap.step1;
 };
 
 type Step = {
   title: string;
   desc: string;
-  image: string | {
-    type: string;
-    size?: string;
-    className?: string;
-  };
+  image:
+    | string
+    | {
+        type: string;
+        size?: string;
+        className?: string;
+      };
   titleStyle?: {
     color?: string;
     size?: { mobile?: string; desktop?: string };
@@ -417,11 +419,27 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
             <div key={i} className="flex items-start gap-4">
               <div className="mt-1 shrink-0">
                 <Image
-                  src={typeof step.image === 'string' ? step.image : getStepIconUrl(step.image.type)}
+                  src={
+                    typeof step.image === "string"
+                      ? step.image
+                      : getStepIconUrl(step.image.type)
+                  }
                   alt={step.title}
-                  width={typeof step.image === 'string' ? 24 : parseInt(step.image.size || '80')}
-                  height={typeof step.image === 'string' ? 24 : parseInt(step.image.size || '80')}
-                  className={typeof step.image === 'string' ? "size-10 sm:size-15" : (step.image.className || "w-20 h-20")}
+                  width={
+                    typeof step.image === "string"
+                      ? 24
+                      : parseInt(step.image.size || "80")
+                  }
+                  height={
+                    typeof step.image === "string"
+                      ? 24
+                      : parseInt(step.image.size || "80")
+                  }
+                  className={
+                    typeof step.image === "string"
+                      ? "size-10 sm:size-15"
+                      : step.image.className || "w-20 h-20"
+                  }
                 />
               </div>
               <div>

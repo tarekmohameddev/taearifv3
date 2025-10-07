@@ -1,6 +1,7 @@
 # Credit Packages System Documentation
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Purpose](#purpose)
 3. [System Architecture](#system-architecture)
@@ -20,6 +21,7 @@ The Credit Packages System is a comprehensive solution for managing credit bundl
 ## Purpose
 
 ### Primary Objectives
+
 - **Credit Bundle Management**: Create and manage different credit packages for users
 - **Flexible Pricing**: Set custom prices, discounts, and promotional offers
 - **Marketing Integration**: Enable packages to support marketing channel usage
@@ -27,6 +29,7 @@ The Credit Packages System is a comprehensive solution for managing credit bundl
 - **Revenue Optimization**: Create attractive packages to maximize sales
 
 ### Business Value
+
 - **Revenue Generation**: Primary source of income through credit sales
 - **User Acquisition**: Attractive packages to attract new users
 - **Retention**: Popular packages and discounts to retain existing users
@@ -36,6 +39,7 @@ The Credit Packages System is a comprehensive solution for managing credit bundl
 ## System Architecture
 
 ### Components
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Admin Interface                          │
@@ -87,28 +91,29 @@ The Credit Packages System is a comprehensive solution for managing credit bundl
 
 #### Database Table: `credit_packages`
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| `id` | bigint | Primary key | Auto increment |
-| `name` | varchar(255) | Package name | Required |
-| `name_ar` | varchar(255) | Arabic package name | Optional |
-| `description` | text | Package description | Optional |
-| `description_ar` | text | Arabic description | Optional |
-| `credits` | integer | Number of credits in package | Required, Min: 1 |
-| `price` | decimal(10,2) | Package price | Required, Min: 0 |
-| `currency` | varchar(3) | Currency code | Required, Max: 3 chars |
-| `discount_percentage` | decimal(5,2) | Discount percentage | Optional, Max: 100 |
-| `is_popular` | boolean | Popular package flag | Default: false |
-| `is_active` | boolean | Active status | Default: true |
-| `sort_order` | integer | Display order | Default: 0 |
-| `supports_marketing_channels` | boolean | Marketing support flag | Default: false |
-| `marketing_priority` | integer | Marketing priority | Default: 0 |
-| `features` | json | General features list | Optional |
-| `marketing_features` | json | Marketing-specific features | Optional |
-| `created_at` | timestamp | Creation timestamp | Auto |
-| `updated_at` | timestamp | Last update timestamp | Auto |
+| Field                         | Type          | Description                  | Constraints            |
+| ----------------------------- | ------------- | ---------------------------- | ---------------------- |
+| `id`                          | bigint        | Primary key                  | Auto increment         |
+| `name`                        | varchar(255)  | Package name                 | Required               |
+| `name_ar`                     | varchar(255)  | Arabic package name          | Optional               |
+| `description`                 | text          | Package description          | Optional               |
+| `description_ar`              | text          | Arabic description           | Optional               |
+| `credits`                     | integer       | Number of credits in package | Required, Min: 1       |
+| `price`                       | decimal(10,2) | Package price                | Required, Min: 0       |
+| `currency`                    | varchar(3)    | Currency code                | Required, Max: 3 chars |
+| `discount_percentage`         | decimal(5,2)  | Discount percentage          | Optional, Max: 100     |
+| `is_popular`                  | boolean       | Popular package flag         | Default: false         |
+| `is_active`                   | boolean       | Active status                | Default: true          |
+| `sort_order`                  | integer       | Display order                | Default: 0             |
+| `supports_marketing_channels` | boolean       | Marketing support flag       | Default: false         |
+| `marketing_priority`          | integer       | Marketing priority           | Default: 0             |
+| `features`                    | json          | General features list        | Optional               |
+| `marketing_features`          | json          | Marketing-specific features  | Optional               |
+| `created_at`                  | timestamp     | Creation timestamp           | Auto                   |
+| `updated_at`                  | timestamp     | Last update timestamp        | Auto                   |
 
 #### Model Methods
+
 - `getPricePerCreditAttribute()`: Calculate cost per credit
 - `getDiscountedPriceAttribute()`: Calculate discounted price
 - `getSavingsAmountAttribute()`: Calculate savings amount
@@ -119,6 +124,7 @@ The Credit Packages System is a comprehensive solution for managing credit bundl
 - `getEstimatedMessagesPerChannel()`: Calculate message estimates
 
 #### Computed Attributes
+
 ```php
 // Price per credit calculation
 public function getPricePerCreditAttribute()
@@ -143,6 +149,7 @@ public function getDiscountedPriceAttribute()
 ## Admin Interface
 
 ### Routes (admin.php lines 517-523)
+
 ```php
 Route::resource('credit-packages', 'Admin\AdminCreditPackageController');
 Route::patch('/credit-packages/{id}/toggle-status', 'Admin\AdminCreditPackageController@toggleStatus');
@@ -152,6 +159,7 @@ Route::post('/credit-packages/bulk-update-marketing-support', 'Admin\AdminCredit
 ```
 
 ### Views Structure
+
 ```
 resources/views/admin/credit_packages/
 ├── index.blade.php      # List all packages with filters
@@ -161,6 +169,7 @@ resources/views/admin/credit_packages/
 ```
 
 ### Key Features
+
 1. **Package Management**: Create, edit, delete credit packages
 2. **Advanced Filtering**: Filter by status, marketing support, search
 3. **Status Control**: Activate/deactivate packages
@@ -173,27 +182,30 @@ resources/views/admin/credit_packages/
 ## API Endpoints
 
 ### RESTful Routes
-| Method | Endpoint | Action | Description |
-|--------|----------|--------|-------------|
-| GET | `/admin/credit-packages` | index | List all packages with filters |
-| GET | `/admin/credit-packages/create` | create | Show create form |
-| POST | `/admin/credit-packages` | store | Create new package |
-| GET | `/admin/credit-packages/{id}` | show | View package details |
-| GET | `/admin/credit-packages/{id}/edit` | edit | Show edit form |
-| PUT/PATCH | `/admin/credit-packages/{id}` | update | Update package |
-| DELETE | `/admin/credit-packages/{id}` | destroy | Delete package |
+
+| Method    | Endpoint                           | Action  | Description                    |
+| --------- | ---------------------------------- | ------- | ------------------------------ |
+| GET       | `/admin/credit-packages`           | index   | List all packages with filters |
+| GET       | `/admin/credit-packages/create`    | create  | Show create form               |
+| POST      | `/admin/credit-packages`           | store   | Create new package             |
+| GET       | `/admin/credit-packages/{id}`      | show    | View package details           |
+| GET       | `/admin/credit-packages/{id}/edit` | edit    | Show edit form                 |
+| PUT/PATCH | `/admin/credit-packages/{id}`      | update  | Update package                 |
+| DELETE    | `/admin/credit-packages/{id}`      | destroy | Delete package                 |
 
 ### Additional Endpoints
-| Method | Endpoint | Action | Description |
-|--------|----------|--------|-------------|
-| PATCH | `/admin/credit-packages/{id}/toggle-status` | toggleStatus | Toggle active status |
-| PATCH | `/admin/credit-packages/{id}/toggle-marketing-support` | toggleMarketingSupport | Toggle marketing support |
-| GET | `/admin/credit-packages/marketing/list` | getMarketingPackages | Get marketing packages (AJAX) |
-| POST | `/admin/credit-packages/bulk-update-marketing-support` | bulkUpdateMarketingSupport | Bulk update marketing support |
+
+| Method | Endpoint                                               | Action                     | Description                   |
+| ------ | ------------------------------------------------------ | -------------------------- | ----------------------------- |
+| PATCH  | `/admin/credit-packages/{id}/toggle-status`            | toggleStatus               | Toggle active status          |
+| PATCH  | `/admin/credit-packages/{id}/toggle-marketing-support` | toggleMarketingSupport     | Toggle marketing support      |
+| GET    | `/admin/credit-packages/marketing/list`                | getMarketingPackages       | Get marketing packages (AJAX) |
+| POST   | `/admin/credit-packages/bulk-update-marketing-support` | bulkUpdateMarketingSupport | Bulk update marketing support |
 
 ## Postman Collection
 
 ### Collection Structure
+
 ```json
 {
   "info": {
@@ -232,23 +244,29 @@ resources/views/admin/credit_packages/
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                {"key": "name", "value": "Starter Pack"},
-                {"key": "name_ar", "value": "باقة المبتدئين"},
-                {"key": "description", "value": "Perfect for getting started"},
-                {"key": "description_ar", "value": "مثالية للبدء"},
-                {"key": "credits", "value": "500"},
-                {"key": "price", "value": "25.00"},
-                {"key": "currency", "value": "SAR"},
-                {"key": "discount_percentage", "value": "10"},
-                {"key": "is_popular", "value": "1"},
-                {"key": "is_active", "value": "1"},
-                {"key": "sort_order", "value": "1"},
-                {"key": "supports_marketing_channels", "value": "1"},
-                {"key": "marketing_priority", "value": "1"},
-                {"key": "features[]", "value": "Email Support"},
-                {"key": "features[]", "value": "Basic Analytics"},
-                {"key": "marketing_features[]", "value": "WhatsApp Messaging"},
-                {"key": "marketing_features[]", "value": "SMS Campaigns"}
+                { "key": "name", "value": "Starter Pack" },
+                { "key": "name_ar", "value": "باقة المبتدئين" },
+                {
+                  "key": "description",
+                  "value": "Perfect for getting started"
+                },
+                { "key": "description_ar", "value": "مثالية للبدء" },
+                { "key": "credits", "value": "500" },
+                { "key": "price", "value": "25.00" },
+                { "key": "currency", "value": "SAR" },
+                { "key": "discount_percentage", "value": "10" },
+                { "key": "is_popular", "value": "1" },
+                { "key": "is_active", "value": "1" },
+                { "key": "sort_order", "value": "1" },
+                { "key": "supports_marketing_channels", "value": "1" },
+                { "key": "marketing_priority", "value": "1" },
+                { "key": "features[]", "value": "Email Support" },
+                { "key": "features[]", "value": "Basic Analytics" },
+                {
+                  "key": "marketing_features[]",
+                  "value": "WhatsApp Messaging"
+                },
+                { "key": "marketing_features[]", "value": "SMS Campaigns" }
               ]
             }
           }
@@ -274,14 +292,14 @@ resources/views/admin/credit_packages/
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                {"key": "_method", "value": "PUT"},
-                {"key": "name", "value": "Premium Starter Pack"},
-                {"key": "credits", "value": "750"},
-                {"key": "price", "value": "35.00"},
-                {"key": "discount_percentage", "value": "15"},
-                {"key": "is_popular", "value": "1"},
-                {"key": "is_active", "value": "1"},
-                {"key": "supports_marketing_channels", "value": "1"}
+                { "key": "_method", "value": "PUT" },
+                { "key": "name", "value": "Premium Starter Pack" },
+                { "key": "credits", "value": "750" },
+                { "key": "price", "value": "35.00" },
+                { "key": "discount_percentage", "value": "15" },
+                { "key": "is_popular", "value": "1" },
+                { "key": "is_active", "value": "1" },
+                { "key": "supports_marketing_channels", "value": "1" }
               ]
             }
           }
@@ -387,6 +405,7 @@ resources/views/admin/credit_packages/
 ```
 
 ### Environment Variables
+
 ```json
 {
   "base_url": "http://localhost:8000",
@@ -399,6 +418,7 @@ resources/views/admin/credit_packages/
 ## Usage Examples
 
 ### 1. Creating a Starter Package
+
 ```php
 // Admin creates a starter package
 $package = CreditPackage::create([
@@ -422,6 +442,7 @@ $package = CreditPackage::create([
 ```
 
 ### 2. User Purchase Flow
+
 ```php
 // User selects a package
 $package = CreditPackage::find(1);
@@ -446,6 +467,7 @@ $user->save();
 ```
 
 ### 3. Marketing Channel Integration
+
 ```php
 // Get packages that support marketing channels
 $marketingPackages = CreditPackage::forMarketingChannels()
@@ -456,7 +478,7 @@ $marketingPackages = CreditPackage::forMarketingChannels()
 // Calculate message estimates for each package
 foreach ($marketingPackages as $package) {
     $estimates = $package->getEstimatedMessagesPerChannel();
-    
+
     // Example output:
     // [
     //     'whatsapp' => ['estimated_messages' => 250, 'credits_per_message' => 2],
@@ -468,6 +490,7 @@ foreach ($marketingPackages as $package) {
 ## Integration with Marketing Channels
 
 ### Relationship
+
 Credit Packages integrate with Marketing Channel Pricing to provide a complete credit ecosystem:
 
 1. **Credit Packages**: Define what users can buy
@@ -477,6 +500,7 @@ Credit Packages integrate with Marketing Channel Pricing to provide a complete c
 ### Integration Methods
 
 #### 1. Message Estimates
+
 ```php
 // Calculate how many messages each package can send
 public function getEstimatedMessagesPerChannel()
@@ -499,6 +523,7 @@ public function getEstimatedMessagesPerChannel()
 ```
 
 #### 2. Marketing Support Toggle
+
 ```php
 // Enable/disable marketing channel support
 public function toggleMarketingSupport($id)
@@ -513,6 +538,7 @@ public function toggleMarketingSupport($id)
 ```
 
 #### 3. Bulk Marketing Support Updates
+
 ```php
 // Update multiple packages at once
 public function bulkUpdateMarketingSupport(Request $request)
@@ -531,6 +557,7 @@ public function bulkUpdateMarketingSupport(Request $request)
 ## Business Logic
 
 ### 1. Pricing Calculations
+
 ```php
 // Cost per credit calculation
 public function getPricePerCreditAttribute()
@@ -562,6 +589,7 @@ public function getSavingsAmountAttribute()
 ```
 
 ### 2. Package Status Management
+
 ```php
 // Toggle package availability
 public function toggleStatus($id)
@@ -576,6 +604,7 @@ public function toggleStatus($id)
 ```
 
 ### 3. Advanced Filtering
+
 ```php
 // Filter packages with multiple criteria
 public function index(Request $request)
@@ -610,6 +639,7 @@ public function index(Request $request)
 ## Pricing Calculations
 
 ### 1. Basic Pricing
+
 ```php
 // Example: 1000 credits for 50 SAR
 $package = new CreditPackage([
@@ -622,6 +652,7 @@ $pricePerCredit = $package->price_per_credit; // 0.05 SAR
 ```
 
 ### 2. Discounted Pricing
+
 ```php
 // Example: 20% discount on 1000 credits package
 $package = new CreditPackage([
@@ -638,6 +669,7 @@ $pricePerCredit = $package->price_per_credit; // 0.04 SAR (after discount)
 ```
 
 ### 3. Marketing Channel Value
+
 ```php
 // Calculate value for marketing channels
 $package = CreditPackage::find(1);
@@ -663,6 +695,7 @@ $estimates = $package->getEstimatedMessagesPerChannel();
 ## Security & Validation
 
 ### Input Validation
+
 ```php
 $validator = Validator::make($request->all(), [
     'name' => 'required|string|max:255',
@@ -684,6 +717,7 @@ $validator = Validator::make($request->all(), [
 ```
 
 ### Access Control
+
 - Admin authentication required
 - Permission-based access control
 - CSRF protection on all forms
@@ -692,12 +726,14 @@ $validator = Validator::make($request->all(), [
 ## Performance Considerations
 
 ### Database Optimization
+
 - Indexed fields: `is_active`, `supports_marketing_channels`, `sort_order`
 - Efficient queries with proper scopes
 - Pagination for large datasets
 - Eager loading for relationships
 
 ### Caching Strategy
+
 - Cache active packages
 - Cache popular packages
 - Cache marketing packages
@@ -706,6 +742,7 @@ $validator = Validator::make($request->all(), [
 ## Monitoring & Analytics
 
 ### Key Metrics
+
 - Package sales statistics
 - Popular package analysis
 - Revenue per package
@@ -713,6 +750,7 @@ $validator = Validator::make($request->all(), [
 - User conversion rates
 
 ### Logging
+
 - Package changes logged
 - Transaction tracking
 - Error handling and logging
@@ -721,6 +759,7 @@ $validator = Validator::make($request->all(), [
 ## Future Enhancements
 
 ### Planned Features
+
 1. **Dynamic Pricing**: Time-based pricing adjustments
 2. **Package Bundles**: Multiple package combinations
 3. **Subscription Packages**: Recurring credit packages
@@ -731,6 +770,7 @@ $validator = Validator::make($request->all(), [
 8. **Package Recommendations**: AI-powered suggestions
 
 ### Integration Opportunities
+
 1. **Payment Gateways**: Direct payment integration
 2. **CRM Systems**: Customer relationship management
 3. **Analytics Platforms**: Business intelligence

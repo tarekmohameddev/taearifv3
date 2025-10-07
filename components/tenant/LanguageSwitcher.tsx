@@ -9,11 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useClientLocale } from "@/context-liveeditor/clientI18nStore";
-import {
-  locales,
-  localeNames,
-  localeFlags,
-} from "@/lib/i18n/config";
+import { locales, localeNames, localeFlags } from "@/lib/i18n/config";
 import { Globe } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import {

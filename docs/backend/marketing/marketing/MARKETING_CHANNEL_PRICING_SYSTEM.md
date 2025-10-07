@@ -1,6 +1,7 @@
 # Marketing Channel Pricing System Documentation
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Purpose](#purpose)
 3. [System Architecture](#system-architecture)
@@ -19,6 +20,7 @@ The Marketing Channel Pricing System is a comprehensive solution for managing cr
 ## Purpose
 
 ### Primary Objectives
+
 - **Credit Consumption Management**: Define how many credits each message type costs per channel
 - **Multi-Channel Support**: Manage pricing for different marketing platforms
 - **Cost Control**: Provide granular control over message pricing
@@ -26,6 +28,7 @@ The Marketing Channel Pricing System is a comprehensive solution for managing cr
 - **Automated Calculations**: Calculate effective message costs automatically
 
 ### Business Value
+
 - **Revenue Optimization**: Set competitive pricing for different channels
 - **Cost Management**: Control operational costs per message type
 - **User Experience**: Provide transparent pricing to users
@@ -34,6 +37,7 @@ The Marketing Channel Pricing System is a comprehensive solution for managing cr
 ## System Architecture
 
 ### Components
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Admin Interface                          │
@@ -82,22 +86,23 @@ The Marketing Channel Pricing System is a comprehensive solution for managing cr
 
 #### Database Table: `marketing_channel_pricing`
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| `id` | bigint | Primary key | Auto increment |
-| `channel_type` | varchar | Channel identifier | Required, Unique |
-| `credits_per_message` | integer | Credits consumed per message | Required, Min: 1 |
-| `price_per_credit` | decimal(8,4) | Cost per credit | Required, Min: 0 |
-| `effective_price_per_message` | decimal(8,4) | Calculated total cost | Auto-calculated |
-| `currency` | varchar(3) | Currency code | Required, Max: 3 chars |
-| `is_active` | boolean | Active status | Default: true |
-| `description` | text | Channel description | Optional |
-| `description_ar` | text | Arabic description | Optional |
-| `channel_specific_settings` | json | Channel-specific config | Optional |
-| `created_at` | timestamp | Creation timestamp | Auto |
-| `updated_at` | timestamp | Last update timestamp | Auto |
+| Field                         | Type         | Description                  | Constraints            |
+| ----------------------------- | ------------ | ---------------------------- | ---------------------- |
+| `id`                          | bigint       | Primary key                  | Auto increment         |
+| `channel_type`                | varchar      | Channel identifier           | Required, Unique       |
+| `credits_per_message`         | integer      | Credits consumed per message | Required, Min: 1       |
+| `price_per_credit`            | decimal(8,4) | Cost per credit              | Required, Min: 0       |
+| `effective_price_per_message` | decimal(8,4) | Calculated total cost        | Auto-calculated        |
+| `currency`                    | varchar(3)   | Currency code                | Required, Max: 3 chars |
+| `is_active`                   | boolean      | Active status                | Default: true          |
+| `description`                 | text         | Channel description          | Optional               |
+| `description_ar`              | text         | Arabic description           | Optional               |
+| `channel_specific_settings`   | json         | Channel-specific config      | Optional               |
+| `created_at`                  | timestamp    | Creation timestamp           | Auto                   |
+| `updated_at`                  | timestamp    | Last update timestamp        | Auto                   |
 
 #### Supported Channel Types
+
 ```php
 const CHANNEL_WHATSAPP = 'whatsapp';
 const CHANNEL_FACEBOOK = 'facebook';
@@ -107,6 +112,7 @@ const CHANNEL_SMS = 'sms';
 ```
 
 #### Model Methods
+
 - `calculateEffectivePrice()`: Calculate total cost per message
 - `updateEffectivePrice()`: Update and save effective price
 - `getChannelTypes()`: Get available channel types
@@ -116,6 +122,7 @@ const CHANNEL_SMS = 'sms';
 ## Admin Interface
 
 ### Routes (admin.php lines 511-516)
+
 ```php
 Route::resource('marketing-channel-pricing', 'Admin\AdminMarketingChannelPricingController');
 Route::patch('/marketing-channel-pricing/{id}/toggle-status', 'Admin\AdminMarketingChannelPricingController@toggleStatus');
@@ -125,6 +132,7 @@ Route::post('/marketing-channel-pricing/bulk-update', 'Admin\AdminMarketingChann
 ```
 
 ### Views Structure
+
 ```
 resources/views/admin/marketing_channel_pricing/
 ├── index.blade.php      # List all channel pricing
@@ -135,6 +143,7 @@ resources/views/admin/marketing_channel_pricing/
 ```
 
 ### Key Features
+
 1. **Channel Management**: Create, edit, delete channel pricing
 2. **Status Control**: Activate/deactivate channels
 3. **Bulk Operations**: Update multiple channels simultaneously
@@ -145,27 +154,30 @@ resources/views/admin/marketing_channel_pricing/
 ## API Endpoints
 
 ### RESTful Routes
-| Method | Endpoint | Action | Description |
-|--------|----------|--------|-------------|
-| GET | `/admin/marketing-channel-pricing` | index | List all channel pricing |
-| GET | `/admin/marketing-channel-pricing/create` | create | Show create form |
-| POST | `/admin/marketing-channel-pricing` | store | Create new pricing |
-| GET | `/admin/marketing-channel-pricing/{id}` | show | View pricing details |
-| GET | `/admin/marketing-channel-pricing/{id}/edit` | edit | Show edit form |
-| PUT/PATCH | `/admin/marketing-channel-pricing/{id}` | update | Update pricing |
-| DELETE | `/admin/marketing-channel-pricing/{id}` | destroy | Delete pricing |
+
+| Method    | Endpoint                                     | Action  | Description              |
+| --------- | -------------------------------------------- | ------- | ------------------------ |
+| GET       | `/admin/marketing-channel-pricing`           | index   | List all channel pricing |
+| GET       | `/admin/marketing-channel-pricing/create`    | create  | Show create form         |
+| POST      | `/admin/marketing-channel-pricing`           | store   | Create new pricing       |
+| GET       | `/admin/marketing-channel-pricing/{id}`      | show    | View pricing details     |
+| GET       | `/admin/marketing-channel-pricing/{id}/edit` | edit    | Show edit form           |
+| PUT/PATCH | `/admin/marketing-channel-pricing/{id}`      | update  | Update pricing           |
+| DELETE    | `/admin/marketing-channel-pricing/{id}`      | destroy | Delete pricing           |
 
 ### Additional Endpoints
-| Method | Endpoint | Action | Description |
-|--------|----------|--------|-------------|
-| PATCH | `/admin/marketing-channel-pricing/{id}/toggle-status` | toggleStatus | Toggle active status |
-| POST | `/admin/marketing-channel-pricing/update-from-credit-packages` | updatePricingFromCreditPackages | Sync with credit packages |
-| GET | `/admin/marketing-channel-pricing/comparison` | pricingComparison | View pricing comparison |
-| POST | `/admin/marketing-channel-pricing/bulk-update` | bulkUpdateCredits | Bulk update credits |
+
+| Method | Endpoint                                                       | Action                          | Description               |
+| ------ | -------------------------------------------------------------- | ------------------------------- | ------------------------- |
+| PATCH  | `/admin/marketing-channel-pricing/{id}/toggle-status`          | toggleStatus                    | Toggle active status      |
+| POST   | `/admin/marketing-channel-pricing/update-from-credit-packages` | updatePricingFromCreditPackages | Sync with credit packages |
+| GET    | `/admin/marketing-channel-pricing/comparison`                  | pricingComparison               | View pricing comparison   |
+| POST   | `/admin/marketing-channel-pricing/bulk-update`                 | bulkUpdateCredits               | Bulk update credits       |
 
 ## Postman Collection
 
 ### Collection Structure
+
 ```json
 {
   "info": {
@@ -192,12 +204,12 @@ resources/views/admin/marketing_channel_pricing/
             "body": {
               "mode": "formdata",
               "formdata": [
-                {"key": "channel_type", "value": "whatsapp"},
-                {"key": "credits_per_message", "value": "2"},
-                {"key": "price_per_credit", "value": "0.05"},
-                {"key": "currency", "value": "SAR"},
-                {"key": "description", "value": "WhatsApp messaging pricing"},
-                {"key": "is_active", "value": "1"}
+                { "key": "channel_type", "value": "whatsapp" },
+                { "key": "credits_per_message", "value": "2" },
+                { "key": "price_per_credit", "value": "0.05" },
+                { "key": "currency", "value": "SAR" },
+                { "key": "description", "value": "WhatsApp messaging pricing" },
+                { "key": "is_active", "value": "1" }
               ]
             }
           }
@@ -217,13 +229,13 @@ resources/views/admin/marketing_channel_pricing/
             "body": {
               "mode": "formdata",
               "formdata": [
-                {"key": "_method", "value": "PUT"},
-                {"key": "channel_type", "value": "whatsapp"},
-                {"key": "credits_per_message", "value": "3"},
-                {"key": "price_per_credit", "value": "0.04"},
-                {"key": "currency", "value": "SAR"},
-                {"key": "description", "value": "Updated WhatsApp pricing"},
-                {"key": "is_active", "value": "1"}
+                { "key": "_method", "value": "PUT" },
+                { "key": "channel_type", "value": "whatsapp" },
+                { "key": "credits_per_message", "value": "3" },
+                { "key": "price_per_credit", "value": "0.04" },
+                { "key": "currency", "value": "SAR" },
+                { "key": "description", "value": "Updated WhatsApp pricing" },
+                { "key": "is_active", "value": "1" }
               ]
             }
           }
@@ -284,6 +296,7 @@ resources/views/admin/marketing_channel_pricing/
 ```
 
 ### Environment Variables
+
 ```json
 {
   "base_url": "http://localhost:8000",
@@ -296,6 +309,7 @@ resources/views/admin/marketing_channel_pricing/
 ## Usage Examples
 
 ### 1. Creating WhatsApp Channel Pricing
+
 ```php
 // Admin creates WhatsApp pricing
 $pricing = MarketingChannelPricing::create([
@@ -312,6 +326,7 @@ $pricing = MarketingChannelPricing::create([
 ```
 
 ### 2. User Sending Messages
+
 ```php
 // User has 1000 credits
 $userCredits = 1000;
@@ -325,6 +340,7 @@ $remainingCredits = $userCredits - $creditsUsed; // 998 credits
 ```
 
 ### 3. Pricing Comparison
+
 ```php
 // Get pricing comparison across all channels
 $comparison = MarketingChannelPricing::getPricingComparison();
@@ -340,6 +356,7 @@ $comparison = MarketingChannelPricing::getPricingComparison();
 ## Integration with Credit Packages
 
 ### Relationship
+
 The Marketing Channel Pricing system integrates with Credit Packages to provide a complete credit management solution:
 
 1. **Credit Packages**: Define what users can buy (e.g., "1000 credits for 50 SAR")
@@ -348,6 +365,7 @@ The Marketing Channel Pricing system integrates with Credit Packages to provide 
 ### Integration Methods
 
 #### 1. Price Synchronization
+
 ```php
 // Update channel pricing from credit package average
 public function updatePricingFromCreditPackages()
@@ -364,6 +382,7 @@ public function updatePricingFromCreditPackages()
 ```
 
 #### 2. Message Estimates
+
 ```php
 // Calculate how many messages a package can send
 public function getEstimatedMessagesPerChannel()
@@ -388,12 +407,14 @@ public function getEstimatedMessagesPerChannel()
 ## Business Logic
 
 ### 1. Effective Price Calculation
+
 ```php
 // Automatic calculation when pricing is created/updated
 $effectivePrice = $creditsPerMessage * $pricePerCredit;
 ```
 
 ### 2. Credit Consumption
+
 ```php
 // When user sends message
 $creditsToDeduct = $channelPricing->credits_per_message;
@@ -401,6 +422,7 @@ $userCredits -= $creditsToDeduct;
 ```
 
 ### 3. Channel Status Management
+
 ```php
 // Toggle channel availability
 public function toggleStatus($id)
@@ -412,6 +434,7 @@ public function toggleStatus($id)
 ```
 
 ### 4. Bulk Operations
+
 ```php
 // Update multiple channels at once
 public function bulkUpdateCredits(Request $request)
@@ -429,6 +452,7 @@ public function bulkUpdateCredits(Request $request)
 ## Security & Validation
 
 ### Input Validation
+
 ```php
 $validator = Validator::make($request->all(), [
     'channel_type' => 'required|in:whatsapp,facebook,telegram,instagram,sms|unique:marketing_channel_pricing,channel_type',
@@ -442,6 +466,7 @@ $validator = Validator::make($request->all(), [
 ```
 
 ### Access Control
+
 - Admin authentication required
 - Permission-based access control
 - CSRF protection on all forms
@@ -450,11 +475,13 @@ $validator = Validator::make($request->all(), [
 ## Performance Considerations
 
 ### Database Optimization
+
 - Indexed fields: `channel_type`, `is_active`
 - Efficient queries with proper scopes
 - Pagination for large datasets
 
 ### Caching Strategy
+
 - Cache active channel pricing
 - Cache pricing comparisons
 - Invalidate cache on updates
@@ -462,12 +489,14 @@ $validator = Validator::make($request->all(), [
 ## Monitoring & Analytics
 
 ### Key Metrics
+
 - Channel usage statistics
 - Credit consumption patterns
 - Pricing effectiveness
 - Revenue per channel
 
 ### Logging
+
 - Pricing changes logged
 - Error handling and logging
 - Performance monitoring
@@ -475,6 +504,7 @@ $validator = Validator::make($request->all(), [
 ## Future Enhancements
 
 ### Planned Features
+
 1. **Dynamic Pricing**: Time-based pricing adjustments
 2. **Volume Discounts**: Bulk message pricing tiers
 3. **Regional Pricing**: Location-based pricing
@@ -483,6 +513,7 @@ $validator = Validator::make($request->all(), [
 6. **API Rate Limiting**: Channel-specific limits
 
 ### Integration Opportunities
+
 1. **Payment Gateways**: Direct billing integration
 2. **CRM Systems**: Customer relationship management
 3. **Analytics Platforms**: Business intelligence

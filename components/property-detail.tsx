@@ -94,18 +94,16 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
     try {
       setLoadingProperty(true);
       setPropertyError(null);
-      
+
       if (!tenantId) {
         setLoadingProperty(false);
         return;
       }
 
-
       const response = await axiosInstance.get(
-        `/v1/tenant-website/${tenantId}/properties/${propertySlug}`
+        `/v1/tenant-website/${tenantId}/properties/${propertySlug}`,
       );
 
-      
       // Handle new API response format
       if (response.data && response.data.property) {
         setProperty(response.data.property);
@@ -127,23 +125,26 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
   const fetchSimilarProperties = async () => {
     try {
       setLoadingSimilar(true);
-      
+
       if (!tenantId) {
         setLoadingSimilar(false);
         return;
       }
 
       const response = await axiosInstance.get(
-        `/v1/tenant-website/${tenantId}/properties?purpose=rent&latest=1&limit=10`
+        `/v1/tenant-website/${tenantId}/properties?purpose=rent&latest=1&limit=10`,
       );
 
-      
       // Handle new API response format
       if (response.data && response.data.properties) {
         setSimilarProperties(response.data.properties);
-        console.log(`PropertyDetail: ✅ Similar properties loaded: ${response.data.properties.length} items`);
+        console.log(
+          `PropertyDetail: ✅ Similar properties loaded: ${response.data.properties.length} items`,
+        );
       } else {
-        console.log("PropertyDetail: ⚠️ No similar properties found in response");
+        console.log(
+          "PropertyDetail: ⚠️ No similar properties found in response",
+        );
         setSimilarProperties([]);
       }
     } catch (error) {
@@ -163,7 +164,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
   };
 
   const handleImageClick = (imageSrc: string, index?: number) => {
-    if (imageSrc && imageSrc.trim() !== '') {
+    if (imageSrc && imageSrc.trim() !== "") {
       setSelectedImage(imageSrc);
       setSelectedImageIndex(index || 0);
       setIsDialogOpen(true);
@@ -177,14 +178,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
   const handlePreviousImage = () => {
     if (propertyImages.length === 0) return;
-    
+
     const prevIndex =
       selectedImageIndex > 0
         ? selectedImageIndex - 1
         : propertyImages.length - 1;
-    
+
     const prevImage = propertyImages[prevIndex];
-    if (prevImage && prevImage.trim() !== '') {
+    if (prevImage && prevImage.trim() !== "") {
       setSelectedImageIndex(prevIndex);
       setSelectedImage(prevImage);
     }
@@ -192,14 +193,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
   const handleNextImage = () => {
     if (propertyImages.length === 0) return;
-    
+
     const nextIndex =
       selectedImageIndex < propertyImages.length - 1
         ? selectedImageIndex + 1
         : 0;
-    
+
     const nextImage = propertyImages[nextIndex];
-    if (nextImage && nextImage.trim() !== '') {
+    if (nextImage && nextImage.trim() !== "") {
       setSelectedImageIndex(nextIndex);
       setSelectedImage(nextImage);
     }
@@ -245,10 +246,13 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
   }, [property]);
 
   // صور العقار - computed value
-  const propertyImages = property && property.image ? [
-    property.image,
-    ...(property.images || []), // Add additional images if available
-  ].filter(img => img && img.trim() !== '') : []; // Filter out empty images
+  const propertyImages =
+    property && property.image
+      ? [
+          property.image,
+          ...(property.images || []), // Add additional images if available
+        ].filter((img) => img && img.trim() !== "")
+      : []; // Filter out empty images
 
   // Show skeleton loading while tenant or property is loading
   if (tenantLoading || loadingProperty) {
@@ -280,7 +284,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 {/* تفاصيل العقار في شبكة - Skeleton */}
                 <div className="grid grid-cols-2 gap-y-6 lg:gap-y-10">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                    <div key={i} className="flex flex-row gap-x-2 md:gap-x-6 items-center">
+                    <div
+                      key={i}
+                      className="flex flex-row gap-x-2 md:gap-x-6 items-center"
+                    >
                       <div className="flex flex-row gap-x-2 items-center">
                         <div className="w-4 h-4 bg-emerald-200 rounded animate-pulse"></div>
                         <div className="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
@@ -305,7 +312,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 {/* Carousel للصور المصغرة - Skeleton */}
                 <div className="flex gap-4 overflow-hidden">
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="relative h-24 w-24 bg-gray-200 rounded-lg animate-pulse flex-shrink-0">
+                    <div
+                      key={i}
+                      className="relative h-24 w-24 bg-gray-200 rounded-lg animate-pulse flex-shrink-0"
+                    >
                       <div className="absolute bottom-1 right-1 opacity-50">
                         <div className="w-6 h-6 bg-gray-300 rounded animate-pulse"></div>
                       </div>
@@ -423,12 +433,26 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center py-20">
             <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              <svg
+                className="w-8 h-8 text-yellow-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
               </svg>
             </div>
-            <p className="text-lg text-yellow-600 font-medium">لم يتم العثور على معرف الموقع</p>
-            <p className="text-sm text-gray-500 mt-2">تأكد من أنك تصل إلى الموقع من الرابط الصحيح</p>
+            <p className="text-lg text-yellow-600 font-medium">
+              لم يتم العثور على معرف الموقع
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              تأكد من أنك تصل إلى الموقع من الرابط الصحيح
+            </p>
           </div>
         </div>
       </section>
@@ -442,14 +466,26 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center py-20">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-8 h-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <p className="text-lg text-red-600 font-medium">
               {propertyError || "العقار غير موجود"}
             </p>
-            <p className="text-sm text-gray-500 mt-2">تأكد من صحة رابط العقار</p>
+            <p className="text-sm text-gray-500 mt-2">
+              تأكد من صحة رابط العقار
+            </p>
             <button
               onClick={() => fetchProperty()}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -463,7 +499,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
   }
 
   return (
-    <section className="py-12" >
+    <section className="py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-12 md:mb-20 flex flex-col md:flex-row gap-x-6 gap-y-8">
           {/* المحتوى الرئيسي */}
@@ -628,8 +664,18 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 ) : (
                   <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
                     <div className="text-gray-500 text-center">
-                      <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <svg
+                        className="w-16 h-16 mx-auto mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
                       </svg>
                       <p className="text-sm">لا توجد صورة متاحة</p>
                     </div>
@@ -655,25 +701,27 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {propertyImages.length > 0 && property && (
                 <SwiperCarousel
                   items={propertyImages
-                    .filter(imageSrc => imageSrc && imageSrc.trim() !== '') // Filter out empty images
+                    .filter((imageSrc) => imageSrc && imageSrc.trim() !== "") // Filter out empty images
                     .map((imageSrc, index) => (
-                    <div key={index} className="relative h-[10rem] md:h-24">
-                      <Image
-                        src={imageSrc}
-                        alt={`${property.title || "العقار"} - صورة ${index + 1}`}
-                        fill
-                        className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
-                          mainImage === imageSrc ? "border-emerald-500" : "border-transparent"
-                        }`}
-                        onClick={() => handleThumbnailClick(imageSrc, index)}
-                      />
-                      <div className="absolute bottom-1 right-1 opacity-50">
-                        <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
-                          <span className="text-white text-xs">دليل</span>
+                      <div key={index} className="relative h-[10rem] md:h-24">
+                        <Image
+                          src={imageSrc}
+                          alt={`${property.title || "العقار"} - صورة ${index + 1}`}
+                          fill
+                          className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
+                            mainImage === imageSrc
+                              ? "border-emerald-500"
+                              : "border-transparent"
+                          }`}
+                          onClick={() => handleThumbnailClick(imageSrc, index)}
+                        />
+                        <div className="absolute bottom-1 right-1 opacity-50">
+                          <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
+                            <span className="text-white text-xs">دليل</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                   space={16}
                   autoplay={false}
                   desktopCount={4}
@@ -990,7 +1038,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-5xl max-h-[90vh] p-0">
           <DialogTitle className="sr-only">عرض صورة العقار</DialogTitle>
-          {selectedImage && selectedImage.trim() !== '' && property && (
+          {selectedImage && selectedImage.trim() !== "" && property && (
             <div
               className="relative w-full h-[80vh] group"
               onTouchStart={handleTouchStart}

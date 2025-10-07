@@ -291,7 +291,7 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   // Initialize variant id early so hooks can depend on it
   const variantId = variant || "contactCards1";
   const uniqueId = id || variantId;
-  
+
   // Add state to force re-renders when store updates
   const [forceUpdate, setForceUpdate] = useState(0);
 
@@ -318,19 +318,23 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
       // Force re-render when store data changes
       const unsubscribe = useEditorStore.subscribe((state) => {
         const newContactCardsStates = state.contactCardsStates;
-        console.log('🔄 Store subscription triggered:', {
+        console.log("🔄 Store subscription triggered:", {
           uniqueId,
           newContactCardsStates,
           hasData: !!newContactCardsStates[uniqueId],
-          allKeys: Object.keys(newContactCardsStates)
+          allKeys: Object.keys(newContactCardsStates),
         });
         if (newContactCardsStates[uniqueId]) {
-          console.log('🔄 Store subscription triggered for:', uniqueId, newContactCardsStates[uniqueId]);
+          console.log(
+            "🔄 Store subscription triggered for:",
+            uniqueId,
+            newContactCardsStates[uniqueId],
+          );
           // Force re-render by updating state
-          setForceUpdate(prev => prev + 1);
+          setForceUpdate((prev) => prev + 1);
         }
       });
-      
+
       return unsubscribe;
     }
   }, [props.useStore, uniqueId]);
@@ -357,18 +361,25 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   // Debug: Log when data changes
   useEffect(() => {
     if (props.useStore) {
-      console.log('🔄 ContactCards Data Updated:', {
+      console.log("🔄 ContactCards Data Updated:", {
         uniqueId,
         storeData,
         currentStoreData,
         forceUpdate,
         contactCardsStates,
         allContactCardsStates: Object.keys(contactCardsStates),
-        getComponentDataResult: getComponentData("contactCards", uniqueId)
+        getComponentDataResult: getComponentData("contactCards", uniqueId),
       });
     }
-  }, [storeData, currentStoreData, forceUpdate, props.useStore, uniqueId, contactCardsStates, getComponentData]);
-
+  }, [
+    storeData,
+    currentStoreData,
+    forceUpdate,
+    props.useStore,
+    uniqueId,
+    contactCardsStates,
+    getComponentData,
+  ]);
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
@@ -404,12 +415,13 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
 
   const tenantComponentData = getTenantComponentData();
 
-
   // Check if we have any data from API/stores first
-  const hasApiData = tenantComponentData && Object.keys(tenantComponentData).length > 0;
-  const hasStoreData = (storeData && Object.keys(storeData).length > 0) || (currentStoreData && Object.keys(currentStoreData).length > 0);
+  const hasApiData =
+    tenantComponentData && Object.keys(tenantComponentData).length > 0;
+  const hasStoreData =
+    (storeData && Object.keys(storeData).length > 0) ||
+    (currentStoreData && Object.keys(currentStoreData).length > 0);
   const hasPropsData = props.cards && props.cards.length > 0;
-  
 
   // Use default data instead of empty cards
   const createEmptyCards = () => getDefaultContactCardsData().cards;
@@ -430,18 +442,25 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
       ...(storeData?.layout || {}),
       ...(currentStoreData?.layout || {}),
     },
-    cards: (currentStoreData?.cards || storeData?.cards || tenantComponentData?.cards || props.cards || (hasApiData || hasStoreData || hasPropsData ? defaultData.cards : createEmptyCards())),
+    cards:
+      currentStoreData?.cards ||
+      storeData?.cards ||
+      tenantComponentData?.cards ||
+      props.cards ||
+      (hasApiData || hasStoreData || hasPropsData
+        ? defaultData.cards
+        : createEmptyCards()),
   };
 
   // Debug: Log the final merged data
-  console.log('🔍 ContactCards Final Merge:', {
+  console.log("🔍 ContactCards Final Merge:", {
     uniqueId,
     currentStoreData,
     storeData,
     mergedData,
     cards: mergedData.cards?.length || 0,
     contactCardsStatesKeys: Object.keys(contactCardsStates),
-    getComponentDataResult: getComponentData("contactCards", uniqueId)
+    getComponentDataResult: getComponentData("contactCards", uniqueId),
   });
 
   // Don't render if not visible
@@ -450,25 +469,28 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   }
 
   // Use merged data for cards with proper fallbacks
-  const cards: ContactCardProps[] = (mergedData.cards || defaultData.cards).map((card: ContactCardProps) => ({
-    ...card,
-    icon: {
-      ...card.icon,
-      src: card.icon.src || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCA0NUw0NSA0MEw0MCAzNUwzMCA0MFYyMEw0MCAyNVY0MEwzMCA0NVoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+"
-    },
-    cardStyle: {
-      ...defaultData.cards[0]?.cardStyle,
-      ...card.cardStyle
-    }
-  }));
-  
+  const cards: ContactCardProps[] = (mergedData.cards || defaultData.cards).map(
+    (card: ContactCardProps) => ({
+      ...card,
+      icon: {
+        ...card.icon,
+        src:
+          card.icon.src ||
+          "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCA0NUw0NSA0MEw0MCAzNUwzMCA0MFYyMEw0MCAyNVY0MEwzMCA0NVoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+",
+      },
+      cardStyle: {
+        ...defaultData.cards[0]?.cardStyle,
+        ...card.cardStyle,
+      },
+    }),
+  );
 
   return (
-    <div 
-      className={`${mergedData.layout?.container?.padding?.vertical || "py-[48px] md:py-[104px]"} ${mergedData.layout?.container?.padding?.horizontal || "px-4 sm:px-10"}`} 
+    <div
+      className={`${mergedData.layout?.container?.padding?.vertical || "py-[48px] md:py-[104px]"} ${mergedData.layout?.container?.padding?.horizontal || "px-4 sm:px-10"}`}
       dir="rtl"
     >
-      <div 
+      <div
         className={`grid ${mergedData.layout?.grid?.columns?.mobile || "grid-cols-1"} ${mergedData.layout?.grid?.columns?.desktop || "md:grid-cols-3"} ${mergedData.layout?.grid?.gap || "gap-[24px]"} ${mergedData.layout?.grid?.borderRadius || "rounded-[10px]"}`}
       >
         {cards.map((card, index) => (
@@ -482,13 +504,13 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
             }
           >
             {card.icon.src && card.icon.src.trim() !== "" && (
-            <Image
+              <Image
                 className={`${card.icon.size?.mobile || "w-[40px] h-[40px]"} ${card.icon.size?.desktop || "md:w-[60px] md:h-[60px]"}`}
-              src={card.icon.src}
+                src={card.icon.src}
                 alt={card.icon.alt || "Contact card icon"}
-              width={60}
-              height={60}
-            />
+                width={60}
+                height={60}
+              />
             )}
             <div
               className={`flex flex-col ${card.cardStyle?.alignment?.horizontal || "items-center"} ${card.cardStyle?.alignment?.vertical || "justify-center"} ${card.cardStyle?.gap?.content?.mobile || "gap-y-[8px]"} ${card.cardStyle?.gap?.content?.desktop || "md:gap-y-[16px]"}`}

@@ -12,7 +12,6 @@ export const createInitialComponents = (
 
   if (pageDefinition) {
     const components = pageDefinition.map((definition, index) => {
-
       // استخدام componentName من البيانات الافتراضية بدلاً من إنشاء اسم افتراضي
       return {
         id: uuidv4(),

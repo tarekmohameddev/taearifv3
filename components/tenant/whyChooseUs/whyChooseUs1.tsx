@@ -16,7 +16,7 @@ const getWhyChooseUsIconUrl = (type: string): string => {
     icon5: "https://dalel-lovat.vercel.app/images/why-choose-us/5.svg",
     icon6: "https://dalel-lovat.vercel.app/images/why-choose-us/6.svg",
   };
-  
+
   return iconMap[type] || iconMap.icon1;
 };
 
@@ -387,34 +387,43 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
     // First, check if data comes directly from API response (new structure)
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "whyChooseUs" && component.componentName === variantId) {
+        if (
+          component.type === "whyChooseUs" &&
+          component.componentName === variantId
+        ) {
           const componentData = component.data;
-          
+
           // Transform the API data structure to match component expectations
           return {
             visible: componentData.visible,
             header: {
               title: componentData.texts?.title || componentData.header?.title,
-              description: componentData.texts?.subtitle || componentData.header?.description,
+              description:
+                componentData.texts?.subtitle ||
+                componentData.header?.description,
               typography: {
                 title: {
-                  className: componentData.texts?.title ? "section-title text-right" : undefined
+                  className: componentData.texts?.title
+                    ? "section-title text-right"
+                    : undefined,
                 },
                 description: {
-                  className: componentData.texts?.subtitle ? "section-subtitle-xl" : undefined
-                }
-              }
+                  className: componentData.texts?.subtitle
+                    ? "section-subtitle-xl"
+                    : undefined,
+                },
+              },
             },
             colors: {
               background: componentData.colors?.background,
               textColor: componentData.colors?.textColor,
               titleColor: componentData.colors?.titleColor,
-              descriptionColor: componentData.colors?.descriptionColor
+              descriptionColor: componentData.colors?.descriptionColor,
             },
             layout: {
               direction: componentData.layout?.direction || "rtl",
-              maxWidth: componentData.layout?.maxWidth || "1600px"
-            }
+              maxWidth: componentData.layout?.maxWidth || "1600px",
+            },
           };
         }
       }
@@ -446,7 +455,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
         }
       }
     }
-    
+
     return {};
   };
 
@@ -525,7 +534,6 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
       ...(currentStoreData.layout || {}),
     },
   };
-
 
   // Don't render if not visible
   if (!mergedData.visible) {
@@ -614,7 +622,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                   "mx-auto flex size-20 items-center justify-center"
                 }
               >
-                {typeof f.icon === 'string' ? (
+                {typeof f.icon === "string" ? (
                   <img
                     src={f.icon}
                     alt={f.title}
@@ -625,11 +633,11 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                   />
                 ) : (
                   <Image
-                    src={getWhyChooseUsIconUrl(f.icon?.type || 'icon1')}
+                    src={getWhyChooseUsIconUrl(f.icon?.type || "icon1")}
                     alt={f.title}
-                    width={parseInt(f.icon?.size || '80')}
-                    height={parseInt(f.icon?.size || '80')}
-                    className={f.icon?.className || 'w-20 h-20'}
+                    width={parseInt(f.icon?.size || "80")}
+                    height={parseInt(f.icon?.size || "80")}
+                    className={f.icon?.className || "w-20 h-20"}
                   />
                 )}
               </div>

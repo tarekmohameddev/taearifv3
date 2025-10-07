@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   MessageSquare,
   Phone,
@@ -32,29 +32,29 @@ import {
   X,
   User,
   Building2,
-} from "lucide-react"
-import useStore from "@/context/Store"
-import axiosInstance from "@/lib/axiosInstance"
+} from "lucide-react";
+import useStore from "@/context/Store";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface RentalWhatsAppDialogProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
   rental?: {
-    id: number
-    tenant_full_name: string
-    tenant_phone: string
-    tenant_email: string
-    property_name: string
-    base_rent_amount: number
-  }
+    id: number;
+    tenant_full_name: string;
+    tenant_phone: string;
+    tenant_email: string;
+    property_name: string;
+    base_rent_amount: number;
+  };
 }
 
 interface WhatsAppChannel {
-  id: number
-  name: string
-  number: string
-  is_verified: boolean
-  is_connected: boolean
+  id: number;
+  name: string;
+  number: string;
+  is_verified: boolean;
+  is_connected: boolean;
 }
 
 export function RentalWhatsAppDialog({
@@ -62,76 +62,81 @@ export function RentalWhatsAppDialog({
   onClose,
   rental,
 }: RentalWhatsAppDialogProps) {
-  const { marketingChannels, fetchMarketingChannels } = useStore()
-  const [selectedChannel, setSelectedChannel] = useState<string>("")
-  const [message, setMessage] = useState("")
-  const [isSending, setIsSending] = useState(false)
-  const [sendStatus, setSendStatus] = useState<"idle" | "success" | "error">("idle")
-  const [errorMessage, setErrorMessage] = useState("")
+  const { marketingChannels, fetchMarketingChannels } = useStore();
+  const [selectedChannel, setSelectedChannel] = useState<string>("");
+  const [message, setMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [sendStatus, setSendStatus] = useState<"idle" | "success" | "error">(
+    "idle",
+  );
+  const [errorMessage, setErrorMessage] = useState("");
 
   // جلب قنوات التسويق عند فتح الـ dialog
   useEffect(() => {
     if (isOpen) {
-      fetchMarketingChannels()
+      fetchMarketingChannels();
     }
-  }, [isOpen, fetchMarketingChannels])
+  }, [isOpen, fetchMarketingChannels]);
 
   // تصفية قنوات الواتساب الصالحة فقط
   const validWhatsAppChannels = marketingChannels.channels.filter(
-    (channel: any) => 
-      channel.type === "whatsapp" && 
-      channel.is_verified === true && 
-      channel.is_connected === true
-  )
+    (channel: any) =>
+      channel.type === "whatsapp" &&
+      channel.is_verified === true &&
+      channel.is_connected === true,
+  );
 
   const handleSend = async () => {
     if (!selectedChannel || !message.trim()) {
-      setErrorMessage("يرجى اختيار قناة واتساب وكتابة محتوى الرسالة")
-      setSendStatus("error")
-      return
+      setErrorMessage("يرجى اختيار قناة واتساب وكتابة محتوى الرسالة");
+      setSendStatus("error");
+      return;
     }
 
-    setIsSending(true)
-    setSendStatus("idle")
-    setErrorMessage("")
+    setIsSending(true);
+    setSendStatus("idle");
+    setErrorMessage("");
 
     try {
       // إرسال API request باستخدام axiosInstance
-      const response = await axiosInstance.post('/v1/marketing/channels/send-whatsapp-to-customer', {
-        customer_id: null, // لا يوجد customer_id في rental management
-        message: message.trim(),
-        channel_id: parseInt(selectedChannel),
-        rental_id: rental?.id || null
-      })
-      
-      setSendStatus("success")
+      const response = await axiosInstance.post(
+        "/v1/marketing/channels/send-whatsapp-to-customer",
+        {
+          customer_id: null, // لا يوجد customer_id في rental management
+          message: message.trim(),
+          channel_id: parseInt(selectedChannel),
+          rental_id: rental?.id || null,
+        },
+      );
+
+      setSendStatus("success");
       setTimeout(() => {
-        handleClose()
-      }, 2000)
+        handleClose();
+      }, 2000);
     } catch (error) {
-      console.error('Error sending WhatsApp message:', error)
-      setSendStatus("error")
-      setErrorMessage("حدث خطأ أثناء إرسال الرسالة")
+      console.error("Error sending WhatsApp message:", error);
+      setSendStatus("error");
+      setErrorMessage("حدث خطأ أثناء إرسال الرسالة");
     } finally {
-      setIsSending(false)
+      setIsSending(false);
     }
-  }
+  };
 
   const handleClose = useCallback(() => {
-    console.log("handleClose called")
-    setSelectedChannel("")
-    setMessage("")
-    setSendStatus("idle")
-    setErrorMessage("")
-    onClose()
-  }, [onClose])
+    console.log("handleClose called");
+    setSelectedChannel("");
+    setMessage("");
+    setSendStatus("idle");
+    setErrorMessage("");
+    onClose();
+  }, [onClose]);
 
-  const isFormValid = selectedChannel && message.trim()
+  const isFormValid = selectedChannel && message.trim();
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent 
-        className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto bg-white border-0 shadow-2xl" 
+      <DialogContent
+        className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto bg-white border-0 shadow-2xl"
         dir="rtl"
       >
         <DialogHeader className="space-y-3 pb-6 border-b border-gray-100">
@@ -178,7 +183,10 @@ export function RentalWhatsAppDialog({
                       رقم الهاتف: {rental?.tenant_phone || "غير محدد"}
                     </div>
                   </div>
-                  <Badge variant="outline" className="bg-white text-gray-700 border-gray-300">
+                  <Badge
+                    variant="outline"
+                    className="bg-white text-gray-700 border-gray-300"
+                  >
                     المستأجر
                   </Badge>
                 </div>
@@ -193,10 +201,16 @@ export function RentalWhatsAppDialog({
                       {rental?.property_name || "العقار"}
                     </div>
                     <div className="text-xs text-gray-500">
-                      المبلغ: {rental?.base_rent_amount ? `${rental.base_rent_amount} ريال` : "غير محدد"}
+                      المبلغ:{" "}
+                      {rental?.base_rent_amount
+                        ? `${rental.base_rent_amount} ريال`
+                        : "غير محدد"}
                     </div>
                   </div>
-                  <Badge variant="outline" className="bg-white text-gray-700 border-gray-300">
+                  <Badge
+                    variant="outline"
+                    className="bg-white text-gray-700 border-gray-300"
+                  >
                     العقار
                   </Badge>
                 </div>
@@ -206,7 +220,10 @@ export function RentalWhatsAppDialog({
 
           {/* Channel Selection */}
           <div className="space-y-3">
-            <Label htmlFor="channel" className="text-sm font-semibold text-gray-900">
+            <Label
+              htmlFor="channel"
+              className="text-sm font-semibold text-gray-900"
+            >
               اختيار قناة الواتساب *
             </Label>
             <Select value={selectedChannel} onValueChange={setSelectedChannel}>
@@ -220,7 +237,9 @@ export function RentalWhatsAppDialog({
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         <span className="font-medium">{channel.name}</span>
-                        <span className="text-gray-500 text-xs">({channel.number})</span>
+                        <span className="text-gray-500 text-xs">
+                          ({channel.number})
+                        </span>
                       </div>
                     </SelectItem>
                   ))
@@ -243,7 +262,10 @@ export function RentalWhatsAppDialog({
 
           {/* Message Content */}
           <div className="space-y-3">
-            <Label htmlFor="message" className="text-sm font-semibold text-gray-900">
+            <Label
+              htmlFor="message"
+              className="text-sm font-semibold text-gray-900"
+            >
               محتوى الرسالة *
             </Label>
             <Textarea
@@ -292,7 +314,9 @@ export function RentalWhatsAppDialog({
           </Button>
           <Button
             onClick={handleSend}
-            disabled={!isFormValid || isSending || validWhatsAppChannels.length === 0}
+            disabled={
+              !isFormValid || isSending || validWhatsAppChannels.length === 0
+            }
             className="flex-1 bg-gray-900 text-white hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {isSending ? (
@@ -310,5 +334,5 @@ export function RentalWhatsAppDialog({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

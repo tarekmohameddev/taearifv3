@@ -158,7 +158,10 @@ export const stepsSectionStructure: ComponentStructure = {
                   options: [
                     { value: "step1", label: "Step 1 - Property Inspection" },
                     { value: "step2", label: "Step 2 - Property Description" },
-                    { value: "step3", label: "Step 3 - Professional Photography" },
+                    {
+                      value: "step3",
+                      label: "Step 3 - Professional Photography",
+                    },
                     { value: "step4", label: "Step 4 - Marketing Strategy" },
                     { value: "step5", label: "Step 5 - Online Listing" },
                     { value: "step6", label: "Step 6 - Client Communication" },

@@ -9,11 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useEditorLocale } from "@/context-liveeditor/editorI18nStore";
-import {
-  locales,
-  localeNames,
-  localeFlags,
-} from "@/lib/i18n/config";
+import { locales, localeNames, localeFlags } from "@/lib/i18n/config";
 import { Globe } from "lucide-react";
 
 export function LanguageSwitcher() {

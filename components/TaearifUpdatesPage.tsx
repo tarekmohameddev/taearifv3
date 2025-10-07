@@ -27,7 +27,7 @@ export default function TaearifUpdatesPage() {
   useEffect(() => {
     // Track page view
     trackPageView("/updates", "Updates Page");
-    
+
     // Initialize animations
     const observer = new IntersectionObserver(
       (entries) => {
@@ -75,14 +75,18 @@ export default function TaearifUpdatesPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => document.getElementById('latest-updates')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() =>
+                  document
+                    .getElementById("latest-updates")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
                 className="inline-flex items-center bg-black text-white px-8 py-4 rounded-lg hover:bg-gray-800 transition-all text-lg"
               >
                 <ArrowDown className="h-5 w-5 ml-2" />
                 شاهد التحديثات
               </button>
               <button
-                onClick={() => router.push('/register')}
+                onClick={() => router.push("/register")}
                 className="inline-flex items-center bg-black text-white px-8 py-4 rounded-lg hover:bg-gray-800 transition-all text-lg"
               >
                 <Rocket className="h-5 w-5 ml-2" />
@@ -463,7 +467,7 @@ export default function TaearifUpdatesPage() {
               <ul className="space-y-2">
                 <li>
                   <button
-                    onClick={() => router.push('/')}
+                    onClick={() => router.push("/")}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     الرئيسية
@@ -471,7 +475,7 @@ export default function TaearifUpdatesPage() {
                 </li>
                 <li>
                   <button
-                    onClick={() => router.push('/solutions')}
+                    onClick={() => router.push("/solutions")}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     الحلول
@@ -479,7 +483,7 @@ export default function TaearifUpdatesPage() {
                 </li>
                 <li>
                   <button
-                    onClick={() => router.push('/about-us')}
+                    onClick={() => router.push("/about-us")}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     من نحن
@@ -487,7 +491,7 @@ export default function TaearifUpdatesPage() {
                 </li>
                 <li>
                   <button
-                    onClick={() => router.push('/updates')}
+                    onClick={() => router.push("/updates")}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     التحديثات
@@ -495,7 +499,7 @@ export default function TaearifUpdatesPage() {
                 </li>
                 <li>
                   <button
-                    onClick={() => router.push('/privacy')}
+                    onClick={() => router.push("/privacy")}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     سياسة الخصوصية

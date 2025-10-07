@@ -18,7 +18,9 @@ export const AVAILABLE_SECTIONS: AvailableSection[] = getComponentsBySection(
 }));
 
 // دالة للحصول على الأقسام المتاحة مع الترجمة
-export const getAvailableSectionsTranslated = (t: (key: string) => string): AvailableSection[] => {
+export const getAvailableSectionsTranslated = (
+  t: (key: string) => string,
+): AvailableSection[] => {
   return getComponentsBySectionTranslated("homepage", t).map((component) => ({
     type: component.id,
     name: component.displayName,
@@ -34,7 +36,9 @@ export const SECTION_ICONS: Record<string, string> = Object.fromEntries(
 );
 
 // دالة للحصول على أيقونات الأقسام مع الترجمة
-export const getSectionIconsTranslated = (t: (key: string) => string): Record<string, string> => {
+export const getSectionIconsTranslated = (
+  t: (key: string) => string,
+): Record<string, string> => {
   const components = getComponents(t);
   return Object.fromEntries(
     Object.entries(components).map(([key, component]) => [key, component.icon]),
@@ -47,7 +51,10 @@ export const getSectionIcon = (type: string): string => {
 };
 
 // دالة للحصول على أيقونة القسم مع الترجمة
-export const getSectionIconTranslated = (type: string, t: (key: string) => string): string => {
+export const getSectionIconTranslated = (
+  type: string,
+  t: (key: string) => string,
+): string => {
   const icons = getSectionIconsTranslated(t);
   return icons[type] || "🎯";
 };

@@ -1,16 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Megaphone, MessageSquare, Settings, BarChart3, Plus } from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react";
+import {
+  Megaphone,
+  MessageSquare,
+  Settings,
+  BarChart3,
+  Plus,
+} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { WhatsAppNumbersManagement } from "@/components/marketing/whatsapp-numbers-management"
-import { CreditSystemComponent } from "@/components/marketing/credit-system"
-import { MarketingSettingsComponent } from "@/components/marketing/marketing-settings"
+import { WhatsAppNumbersManagement } from "@/components/marketing/whatsapp-numbers-management";
+import { CreditSystemComponent } from "@/components/marketing/credit-system";
+import { MarketingSettingsComponent } from "@/components/marketing/marketing-settings";
 
 export function MarketingPage() {
-  const [activeTab, setActiveTab] = useState("marketing")
+  const [activeTab, setActiveTab] = useState("marketing");
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
@@ -24,16 +30,24 @@ export function MarketingPage() {
                 <Megaphone className="h-6 w-6 ml-2 text-primary" />
                 التسويق
               </h1>
-              <p className="text-muted-foreground">إدارة حملات التسويق والواتساب والإعدادات المتعلقة بالرسائل</p>
+              <p className="text-muted-foreground">
+                إدارة حملات التسويق والواتساب والإعدادات المتعلقة بالرسائل
+              </p>
             </div>
 
             <Tabs defaultValue="whatsapp" className="space-y-6">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="whatsapp" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="whatsapp"
+                  className="flex items-center gap-2"
+                >
                   <MessageSquare className="h-4 w-4" />
                   <span className="hidden sm:inline">واتساب</span>
                 </TabsTrigger>
-                <TabsTrigger value="credits" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="credits"
+                  className="flex items-center gap-2"
+                >
                   <Plus className="h-4 w-4" />
                   <span className="hidden sm:inline">الرصيد</span>
                 </TabsTrigger>
@@ -46,11 +60,10 @@ export function MarketingPage() {
               <TabsContent value="credits">
                 <CreditSystemComponent />
               </TabsContent>
-
             </Tabs>
           </div>
         </main>
       </div>
     </div>
-  )
+  );
 }

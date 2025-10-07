@@ -675,12 +675,15 @@ export function PaymentCollectionDialog() {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (response.data.status) {
         setReceiptImagePath(response.data.data.image_path);
-        console.log("Image uploaded successfully:", response.data.data.image_path);
+        console.log(
+          "Image uploaded successfully:",
+          response.data.data.image_path,
+        );
       } else {
         throw new Error("Failed to upload image");
       }
@@ -823,7 +826,6 @@ export function PaymentCollectionDialog() {
 
         {data && !loading && (
           <div className="space-y-6 text-right">
-
             {/* Payment Summary */}
             <Card className="border-2 border-gray-200 shadow-lg">
               <CardHeader className="bg-gradient-to-r from-gray-50 to-white p-4 sm:p-6">
@@ -920,7 +922,10 @@ export function PaymentCollectionDialog() {
                         dir="rtl"
                       >
                         {/* Header with sequence number and status */}
-                        <div className="sm:flex hidden items-center justify-between" dir="rtl">
+                        <div
+                          className="sm:flex hidden items-center justify-between"
+                          dir="rtl"
+                        >
                           <div
                             className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm ${
                               isPaid
@@ -1008,7 +1013,7 @@ export function PaymentCollectionDialog() {
                             {isPaid ? "تم الدفع في: " : "مستحق في: "}
                             {formatDate(payment.due_date)}
                           </p>
-                          
+
                           {isPaid ? (
                             <p className="text-xs text-center text-green-600">
                               مدفوع بالكامل:{" "}
@@ -1030,9 +1035,7 @@ export function PaymentCollectionDialog() {
                               {payment.remaining_amount > 0 && (
                                 <p
                                   className={`text-xs text-center ${
-                                    isSelected
-                                      ? "text-red-200"
-                                      : "text-red-600"
+                                    isSelected ? "text-red-200" : "text-red-600"
                                   }`}
                                 >
                                   متبقي:{" "}
@@ -1313,48 +1316,80 @@ export function PaymentCollectionDialog() {
                     <Label className="text-right block text-sm font-medium text-gray-700">
                       رفع صورة الإيصال (اختياري)
                     </Label>
-                    
+
                     {receiptImagePath && receiptImagePath.trim() !== "" ? (
                       // حالة ما بعد الرفع - عرض الصورة مع إمكانية الحذف فقط
                       <div className="relative">
                         <div className="flex items-center gap-3 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
-                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          <svg
+                            className="w-5 h-5 text-green-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
                           </svg>
                           <div className="flex-1">
-                            <p className="text-sm text-green-700 font-medium">تم رفع صورة الإيصال بنجاح</p>
-                            <p className="text-xs text-green-600">يمكنك الضغط على الصورة لمشاهدتها</p>
+                            <p className="text-sm text-green-700 font-medium">
+                              تم رفع صورة الإيصال بنجاح
+                            </p>
+                            <p className="text-xs text-green-600">
+                              يمكنك الضغط على الصورة لمشاهدتها
+                            </p>
                           </div>
                           <button
                             type="button"
                             onClick={() => {
                               setReceiptImagePath("");
                               // إعادة تعيين input file
-                              const fileInput = document.getElementById('receipt-upload') as HTMLInputElement;
+                              const fileInput = document.getElementById(
+                                "receipt-upload",
+                              ) as HTMLInputElement;
                               if (fileInput) {
-                                fileInput.value = '';
+                                fileInput.value = "";
                               }
                             }}
                             className="text-red-500 hover:text-red-700 transition-colors"
                             title="حذف الصورة"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         </div>
                         <div className="mt-2">
-                          <img 
-                            src={`https://taearif.com/${receiptImagePath}`} 
-                            alt="صورة الإيصال" 
+                          <img
+                            src={`https://taearif.com/${receiptImagePath}`}
+                            alt="صورة الإيصال"
                             className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
                             onClick={() => {
                               const fullImageUrl = `https://taearif.com/${receiptImagePath}`;
-                              window.open(fullImageUrl, '_blank');
+                              window.open(fullImageUrl, "_blank");
                             }}
                             onError={(e) => {
-                              console.error("Error loading image:", receiptImagePath);
-                              console.error("Full image URL:", `https://taearif.com/${receiptImagePath}`);
+                              console.error(
+                                "Error loading image:",
+                                receiptImagePath,
+                              );
+                              console.error(
+                                "Full image URL:",
+                                `https://taearif.com/${receiptImagePath}`,
+                              );
                               // في حالة فشل تحميل الصورة، إعادة تعيين المسار
                               setReceiptImagePath("");
                             }}
@@ -1366,7 +1401,9 @@ export function PaymentCollectionDialog() {
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50">
                         <div className="flex flex-col items-center gap-3">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                          <p className="text-sm text-gray-600">جاري رفع الصورة...</p>
+                          <p className="text-sm text-gray-600">
+                            جاري رفع الصورة...
+                          </p>
                         </div>
                       </div>
                     ) : (
@@ -1386,7 +1423,7 @@ export function PaymentCollectionDialog() {
                         onDragEnter={(e) => e.preventDefault()}
                         onClick={() => {
                           if (!isUploadingImage && !receiptImagePath) {
-                            document.getElementById('receipt-upload')?.click();
+                            document.getElementById("receipt-upload")?.click();
                           }
                         }}
                       >
@@ -1403,11 +1440,21 @@ export function PaymentCollectionDialog() {
                           id="receipt-upload"
                           disabled={!!receiptImagePath}
                         />
-                        
+
                         <div className="flex flex-col items-center gap-3">
                           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            <svg
+                              className="w-6 h-6 text-gray-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                              />
                             </svg>
                           </div>
                           <div>
@@ -2172,10 +2219,22 @@ export function PaymentCollectionDialog() {
             {bankNameError && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                 <div className="flex items-center gap-2">
-                  <svg className="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="h-5 w-5 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
-                  <span className="text-red-800 font-medium">{bankNameError}</span>
+                  <span className="text-red-800 font-medium">
+                    {bankNameError}
+                  </span>
                 </div>
               </div>
             )}

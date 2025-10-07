@@ -71,10 +71,11 @@ export default function CustomerCard({
 
   // التحقق من وجود قناة واتساب صالحة للـ CRM
   const hasValidCRMWhatsAppChannel = () => {
-    return marketingChannels.channels.some((channel: any) => 
-      channel.is_verified === true && 
-      channel.is_connected === true &&
-      channel.crm_integration_enabled === true
+    return marketingChannels.channels.some(
+      (channel: any) =>
+        channel.is_verified === true &&
+        channel.is_connected === true &&
+        channel.crm_integration_enabled === true,
     );
   };
 
@@ -84,7 +85,6 @@ export default function CustomerCard({
       onViewDetails(customer);
     }
   };
-
 
   const handleCloseWhatsAppDialog = useCallback(() => {
     setShowWhatsAppDialog(false);
@@ -167,28 +167,28 @@ export default function CustomerCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onViewDetails(customer)}
                 onSelect={() => {}}
               >
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onAddNote(customer)}
                 onSelect={() => {}}
               >
                 <StickyNote className="ml-2 h-4 w-4" />
                 إضافة ملاحظة
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onAddReminder(customer)}
                 onSelect={() => {}}
               >
                 <Bell className="ml-2 h-4 w-4" />
                 إضافة تذكير
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onAddInteraction(customer)}
                 onSelect={() => {}}
               >
@@ -205,8 +205,7 @@ export default function CustomerCard({
                 سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-              >
+              <DropdownMenuItem>
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
@@ -302,28 +301,28 @@ export default function CustomerCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onViewDetails(customer)}
                 onSelect={() => {}}
               >
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onAddNote(customer)}
                 onSelect={() => {}}
               >
                 <StickyNote className="ml-2 h-4 w-4" />
                 إضافة ملاحظة
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onAddReminder(customer)}
                 onSelect={() => {}}
               >
                 <Bell className="ml-2 h-4 w-4" />
                 إضافة تذكير
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onAddInteraction(customer)}
                 onSelect={() => {}}
               >
@@ -340,13 +339,12 @@ export default function CustomerCard({
                 سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-              >
+              <DropdownMenuItem>
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
               {hasValidCRMWhatsAppChannel() && (
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -421,32 +419,31 @@ export default function CustomerCard({
               </div>
             </div>
           </div>
-          <DropdownMenu open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
+          <DropdownMenu
+            open={desktopMenuOpen}
+            onOpenChange={setDesktopMenuOpen}
+          >
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-6 w-6"
-              >
+              <Button variant="ghost" size="icon" className="h-6 w-6">
                 <MoreHorizontal className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onViewDetails(customer)}
                 onSelect={() => {}}
               >
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onAddNote(customer)}
                 onSelect={() => {}}
               >
                 <StickyNote className="ml-2 h-4 w-4" />
                 إضافة ملاحظة
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onAddReminder(customer)}
                 onSelect={() => {}}
               >
@@ -454,7 +451,7 @@ export default function CustomerCard({
                 إضافة تذكير
               </DropdownMenuItem>
               {hasValidCRMWhatsAppChannel() && (
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -466,7 +463,7 @@ export default function CustomerCard({
                   إرسال رسالة واتساب
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onAddInteraction(customer)}
                 onSelect={() => {}}
               >
@@ -483,13 +480,12 @@ export default function CustomerCard({
                 سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-              >
+              <DropdownMenuItem>
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
               {hasValidCRMWhatsAppChannel() && (
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -550,7 +546,7 @@ export default function CustomerCard({
             return renderDesktopView();
         }
       })()}
-      
+
       {/* WhatsApp Send Dialog */}
       <WhatsAppSendDialog
         isOpen={showWhatsAppDialog}

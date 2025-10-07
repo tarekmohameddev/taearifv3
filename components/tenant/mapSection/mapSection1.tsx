@@ -21,7 +21,7 @@ const MapSection1: React.FC<MapSectionProps> = ({
   // Initialize variant id early so hooks can depend on it
   const variantId = variant || "mapSection1";
   const uniqueId = id || variantId;
-  
+
   // Add state to force re-renders when store updates
   const [forceUpdate, setForceUpdate] = useState(0);
 
@@ -48,19 +48,23 @@ const MapSection1: React.FC<MapSectionProps> = ({
       // Force re-render when store data changes
       const unsubscribe = useEditorStore.subscribe((state) => {
         const newMapSectionStates = state.mapSectionStates;
-        console.log('🔄 MapSection Store subscription triggered:', {
+        console.log("🔄 MapSection Store subscription triggered:", {
           uniqueId,
           newMapSectionStates,
           hasData: !!newMapSectionStates[uniqueId],
-          allKeys: Object.keys(newMapSectionStates)
+          allKeys: Object.keys(newMapSectionStates),
         });
         if (newMapSectionStates[uniqueId]) {
-          console.log('🔄 MapSection Store subscription triggered for:', uniqueId, newMapSectionStates[uniqueId]);
+          console.log(
+            "🔄 MapSection Store subscription triggered for:",
+            uniqueId,
+            newMapSectionStates[uniqueId],
+          );
           // Force re-render by updating state
-          setForceUpdate(prev => prev + 1);
+          setForceUpdate((prev) => prev + 1);
         }
       });
-      
+
       return unsubscribe;
     }
   }, [props.useStore, uniqueId]);
@@ -87,17 +91,25 @@ const MapSection1: React.FC<MapSectionProps> = ({
   // Debug: Log when data changes
   useEffect(() => {
     if (props.useStore) {
-      console.log('🔄 MapSection Data Updated:', {
+      console.log("🔄 MapSection Data Updated:", {
         uniqueId,
         storeData,
         currentStoreData,
         forceUpdate,
         mapSectionStates,
         allMapSectionStates: Object.keys(mapSectionStates),
-        getComponentDataResult: getComponentData("mapSection", uniqueId)
+        getComponentDataResult: getComponentData("mapSection", uniqueId),
       });
     }
-  }, [storeData, currentStoreData, forceUpdate, props.useStore, uniqueId, mapSectionStates, getComponentData]);
+  }, [
+    storeData,
+    currentStoreData,
+    forceUpdate,
+    props.useStore,
+    uniqueId,
+    mapSectionStates,
+    getComponentData,
+  ]);
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
@@ -134,8 +146,11 @@ const MapSection1: React.FC<MapSectionProps> = ({
   const tenantComponentData = getTenantComponentData();
 
   // Check if we have any data from API/stores first
-  const hasApiData = tenantComponentData && Object.keys(tenantComponentData).length > 0;
-  const hasStoreData = (storeData && Object.keys(storeData).length > 0) || (currentStoreData && Object.keys(currentStoreData).length > 0);
+  const hasApiData =
+    tenantComponentData && Object.keys(tenantComponentData).length > 0;
+  const hasStoreData =
+    (storeData && Object.keys(storeData).length > 0) ||
+    (currentStoreData && Object.keys(currentStoreData).length > 0);
   const hasPropsData = props.map || props.content;
 
   // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
@@ -171,7 +186,7 @@ const MapSection1: React.FC<MapSectionProps> = ({
   };
 
   // Debug: Log the final merged data
-  console.log('🔍 MapSection Final Merge:', {
+  console.log("🔍 MapSection Final Merge:", {
     uniqueId,
     currentStoreData,
     storeData,
@@ -179,7 +194,7 @@ const MapSection1: React.FC<MapSectionProps> = ({
     mapEnabled: mergedData.map?.enabled,
     contentEnabled: mergedData.content?.enabled,
     mapSectionStatesKeys: Object.keys(mapSectionStates),
-    getComponentDataResult: getComponentData("mapSection", uniqueId)
+    getComponentDataResult: getComponentData("mapSection", uniqueId),
   });
 
   // Don't render if not visible
@@ -190,7 +205,8 @@ const MapSection1: React.FC<MapSectionProps> = ({
   // Use merged data with proper fallbacks
   const title = mergedData.content?.title || defaultData.content.title;
   const subtitle = mergedData.content?.subtitle || defaultData.content.subtitle;
-  const description = mergedData.content?.description || defaultData.content.description;
+  const description =
+    mergedData.content?.description || defaultData.content.description;
   const mapSrc = mergedData.map?.embedUrl || defaultData.map.embedUrl;
   const mapHeight = mergedData.height?.desktop || defaultData.height.desktop;
 
@@ -198,27 +214,47 @@ const MapSection1: React.FC<MapSectionProps> = ({
     <section className="container mx-auto px-4 py-8">
       {mergedData.content?.enabled && (
         <div className="text-center mb-8">
-          <h2 
+          <h2
             className="text-3xl font-bold mb-4"
             style={{
-              fontFamily: mergedData.content?.font?.title?.family || defaultData.content.font.title.family,
-              fontSize: mergedData.content?.font?.title?.size || defaultData.content.font.title.size,
-              fontWeight: mergedData.content?.font?.title?.weight || defaultData.content.font.title.weight,
-              color: mergedData.content?.font?.title?.color || defaultData.content.font.title.color,
-              lineHeight: mergedData.content?.font?.title?.lineHeight || defaultData.content.font.title.lineHeight,
+              fontFamily:
+                mergedData.content?.font?.title?.family ||
+                defaultData.content.font.title.family,
+              fontSize:
+                mergedData.content?.font?.title?.size ||
+                defaultData.content.font.title.size,
+              fontWeight:
+                mergedData.content?.font?.title?.weight ||
+                defaultData.content.font.title.weight,
+              color:
+                mergedData.content?.font?.title?.color ||
+                defaultData.content.font.title.color,
+              lineHeight:
+                mergedData.content?.font?.title?.lineHeight ||
+                defaultData.content.font.title.lineHeight,
             }}
           >
             {title}
           </h2>
           {description && (
-            <p 
+            <p
               className="text-base text-gray-500"
               style={{
-                fontFamily: mergedData.content?.font?.description?.family || defaultData.content.font.description.family,
-                fontSize: mergedData.content?.font?.description?.size || defaultData.content.font.description.size,
-                fontWeight: mergedData.content?.font?.description?.weight || defaultData.content.font.description.weight,
-                color: mergedData.content?.font?.description?.color || defaultData.content.font.description.color,
-                lineHeight: mergedData.content?.font?.description?.lineHeight || defaultData.content.font.description.lineHeight,
+                fontFamily:
+                  mergedData.content?.font?.description?.family ||
+                  defaultData.content.font.description.family,
+                fontSize:
+                  mergedData.content?.font?.description?.size ||
+                  defaultData.content.font.description.size,
+                fontWeight:
+                  mergedData.content?.font?.description?.weight ||
+                  defaultData.content.font.description.weight,
+                color:
+                  mergedData.content?.font?.description?.color ||
+                  defaultData.content.font.description.color,
+                lineHeight:
+                  mergedData.content?.font?.description?.lineHeight ||
+                  defaultData.content.font.description.lineHeight,
               }}
             >
               {description}
@@ -226,19 +262,19 @@ const MapSection1: React.FC<MapSectionProps> = ({
           )}
         </div>
       )}
-      
+
       {mergedData.map?.enabled && (
-      <div className="w-full max-w-[1600px] mx-auto">
-        <iframe
-          src={mapSrc}
-          width="100%"
+        <div className="w-full max-w-[1600px] mx-auto">
+          <iframe
+            src={mapSrc}
+            width="100%"
             height={mapHeight}
-          style={{ border: 0 }}
-          allowFullScreen={true}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        ></iframe>
-      </div>
+            style={{ border: 0 }}
+            allowFullScreen={true}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
       )}
     </section>
   );

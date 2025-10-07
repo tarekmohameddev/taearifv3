@@ -70,8 +70,7 @@ const useAuthStore = create((set, get) => ({
       // تحديث localStorage للتوافق مع AuthProvider
       try {
         localStorage.setItem("user", JSON.stringify(userData));
-      } catch (error) {
-      }
+      } catch (error) {}
       if (get().userData.is_free_plan == null) {
         const ress = await axiosInstance.get("/user");
         const subscriptionDATA = ress.data.data;
@@ -196,8 +195,7 @@ const useAuthStore = create((set, get) => ({
       // تحديث localStorage للتوافق مع AuthProvider
       try {
         localStorage.setItem("user", JSON.stringify(safeUserData));
-      } catch (error) {
-      }
+      } catch (error) {}
 
       unlockAxios(); // ✅ إعادة تفعيل axios
 
@@ -304,8 +302,7 @@ const useAuthStore = create((set, get) => ({
       // تحديث localStorage للتوافق مع AuthProvider
       try {
         localStorage.setItem("user", JSON.stringify(userData));
-      } catch (error) {
-      }
+      } catch (error) {}
 
       unlockAxios(); // ✅ إعادة تفعيل axios
 

@@ -470,7 +470,9 @@ export function DynamicFieldsRenderer({
                     : "border-slate-200"
                 }`}
                 rows={4}
-                placeholder={def.placeholder || t("editor_sidebar.enter_your_text")}
+                placeholder={
+                  def.placeholder || t("editor_sidebar.enter_your_text")
+                }
               />
               {value && value.length > 0 && (
                 <div className="absolute right-3 top-3">
@@ -626,9 +628,19 @@ export function DynamicFieldsRenderer({
             {/* Debug info for select fields */}
             {process.env.NODE_ENV === "development" && (
               <div className="mt-2 text-xs text-gray-500">
-                <div>{t("editor_sidebar.current_value_debug", { value: value || "undefined" })}</div>
-                <div>{t("editor_sidebar.options_debug", { options: JSON.stringify(def.options || []) })}</div>
-                <div>{t("editor_sidebar.path_debug", { path: normalizedPath })}</div>
+                <div>
+                  {t("editor_sidebar.current_value_debug", {
+                    value: value || "undefined",
+                  })}
+                </div>
+                <div>
+                  {t("editor_sidebar.options_debug", {
+                    options: JSON.stringify(def.options || []),
+                  })}
+                </div>
+                <div>
+                  {t("editor_sidebar.path_debug", { path: normalizedPath })}
+                </div>
               </div>
             )}
           </div>

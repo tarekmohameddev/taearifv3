@@ -247,11 +247,11 @@ export function GoogleRegisterPage() {
             },
           });
           setFormSubmitted(true);
-          
+
           // Track successful signup
           trackSignup("google");
           trackFormSubmission("google_register", "signup");
-          
+
           setTimeout(() => {
             router.push("/onboarding");
           }, 1500);
@@ -284,7 +284,7 @@ export function GoogleRegisterPage() {
             ...prevErrors,
             general: errorMsg,
           }));
-          
+
           // Track error
           trackError(errorMsg, "google_register_error");
         }

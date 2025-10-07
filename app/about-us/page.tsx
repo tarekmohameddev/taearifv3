@@ -4,7 +4,7 @@ import TenantAboutUsPage from "../../components/TenantAboutUsPage";
 import TenantPageWrapper from "../TenantPageWrapper";
 
 // إبقاء الصفحة dynamic لتتمكن من التحقق من tenantId
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function AboutUs({
   params,

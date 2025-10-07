@@ -74,8 +74,16 @@ type DeviceType = "phone" | "tablet" | "laptop";
 // تعريف أبعاد الأجهزة
 const getDeviceDimensions = (t: any) => ({
   phone: { width: 375, height: 667, name: t("live_editor.responsive.mobile") },
-  tablet: { width: 768, height: 1024, name: t("live_editor.responsive.tablet") },
-  laptop: { width: "100%", height: "100%", name: t("live_editor.responsive.desktop") },
+  tablet: {
+    width: 768,
+    height: 1024,
+    name: t("live_editor.responsive.tablet"),
+  },
+  laptop: {
+    width: "100%",
+    height: "100%",
+    name: t("live_editor.responsive.desktop"),
+  },
 });
 
 // AutoFrame Component - مستوحى من Puck مع نسخ الـ styles
@@ -388,8 +396,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     // تعيين العرض الأولي
     handleResize();
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // التحكم في فتح الـ sidebar بناءً على عرض الشاشة
@@ -452,18 +460,20 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   // دالة تغيير الجهاز مع إعادة تصيير المكونات المحددة
   const handleDeviceChange = (device: DeviceType) => {
     setSelectedDevice(device);
-    
+
     // إعادة تصيير المكونات المحددة عند تغيير الجهاز
     setTimeout(() => {
-      const { componentsToRefresh } = require("@/lib-liveeditor/refreshComponents.js");
-      
+      const {
+        componentsToRefresh,
+      } = require("@/lib-liveeditor/refreshComponents.js");
+
       // إعادة تصيير المكونات المحددة
       componentsToRefresh.forEach((componentName: string) => {
         // البحث عن المكونات في pageComponents وإعادة تصييرها
-        const componentsToUpdate = pageComponents.filter((comp: any) => 
-          comp.componentName === componentName
+        const componentsToUpdate = pageComponents.filter(
+          (comp: any) => comp.componentName === componentName,
         );
-        
+
         if (componentsToUpdate.length > 0) {
           // إضافة forceUpdate للمكونات المحددة
           const updatedComponents = pageComponents.map((comp: any) => {
@@ -476,10 +486,10 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             }
             return comp;
           });
-          
+
           // تحديث الحالة
           state.setPageComponents(updatedComponents);
-          
+
           // تحديث pageComponentsByPage في الـ store
           setTimeout(() => {
             const store = useEditorStore.getState();
@@ -988,7 +998,9 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-900">{t("live_editor.components")}</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              {t("live_editor.components")}
+            </h2>
             <motion.button
               onClick={() => setIsExpanded((v) => !v)}
               className="p-1 rounded-md hover:bg-gray-100"
@@ -1070,85 +1082,91 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   animate="show"
                   className="space-y-2"
                 >
-                {filteredSections.length > 0 ? (
-                  filteredSections.map((section) => (
-                    <motion.div
-                      key={section.type}
-                      variants={listItem}
-                      className="group relative"
-                    >
-                      <DraggableDrawerItem
-                        componentType={section.component}
-                        section={section.section}
-                        data={{
-                          label: section.name,
-                          description: section.description,
-                          icon: section.type,
-                        }}
+                  {filteredSections.length > 0 ? (
+                    filteredSections.map((section) => (
+                      <motion.div
+                        key={section.type}
+                        variants={listItem}
+                        className="group relative"
                       >
-                        <div className="p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
-                          <div className="flex items-center space-x-3">
-                            <div className="text-2xl">
-                              {getSectionIconTranslated(section.type, t)}
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="font-medium text-gray-900">
-                                {section.name}
-                              </h3>
-                              <p className="text-sm text-gray-500 mt-1">
-                                {section.description}
-                              </p>
-                            </div>
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                              <svg
-                                className="w-4 h-4 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M4 8h16M4 16h16"
-                                />
-                              </svg>
+                        <DraggableDrawerItem
+                          componentType={section.component}
+                          section={section.section}
+                          data={{
+                            label: section.name,
+                            description: section.description,
+                            icon: section.type,
+                          }}
+                        >
+                          <div className="p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
+                            <div className="flex items-center space-x-3">
+                              <div className="text-2xl">
+                                {getSectionIconTranslated(section.type, t)}
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-medium text-gray-900">
+                                  {section.name}
+                                </h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                  {section.description}
+                                </p>
+                              </div>
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                <svg
+                                  className="w-4 h-4 text-gray-400"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 8h16M4 16h16"
+                                  />
+                                </svg>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </DraggableDrawerItem>
-                    </motion.div>
-                  ))
-                ) : (
-                  <motion.div
-                    variants={listItem}
-                    className="text-center py-8 text-gray-500"
-                  >
-                    <svg
-                      className="w-12 h-12 mx-auto mb-3 text-gray-300"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                        </DraggableDrawerItem>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <motion.div
+                      variants={listItem}
+                      className="text-center py-8 text-gray-500"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                    <p>{t("live_editor.no_components_found")}</p>
-                  </motion.div>
-                )}
+                      <svg
+                        className="w-12 h-12 mx-auto mb-3 text-gray-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                      <p>{t("live_editor.no_components_found")}</p>
+                    </motion.div>
+                  )}
                 </motion.div>
-                
+
                 {/* Coming Soon Overlay - Disabled all components */}
-                <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto" style={{ paddingTop: "250px" }}
+                <div
+                  className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto"
+                  style={{ paddingTop: "250px" }}
                 >
                   <div className="text-center">
                     <div className="text-6xl mb-4">🚧</div>
-                    <h2 className="text-2xl font-bold text-red-600 mb-2">{t("live_editor.coming_soon")}</h2>
-                    <p className="text-red-500 font-medium">{t("live_editor.components_disabled")}</p>
+                    <h2 className="text-2xl font-bold text-red-600 mb-2">
+                      {t("live_editor.coming_soon")}
+                    </h2>
+                    <p className="text-red-500 font-medium">
+                      {t("live_editor.components_disabled")}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1190,42 +1208,42 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
               <div className="flex items-center space-x-4">
                 {/* Components Sidebar Toggle - Only show on screens < 1300px */}
                 {/* {screenWidth < 1300 && ( */}
-                  <button
-                    onClick={() => {
-                      const newState = !isComponentsSidebarOpen;
-                      setIsComponentsSidebarOpen(newState);
-                      // إذا تم إغلاق Components Sidebar يدوياً، ضع علامة على ذلك
-                      if (!newState) {
-                        setWasComponentsSidebarManuallyClosed(true);
-                      } else {
-                        setWasComponentsSidebarManuallyClosed(false);
-                      }
-                    }}
-                    className="p-2 rounded-md hover:bg-gray-100 transition-colors"
-                    title={
-                      isComponentsSidebarOpen
-                        ? t("live_editor.hide_components")
-                        : t("live_editor.show_components")
+                <button
+                  onClick={() => {
+                    const newState = !isComponentsSidebarOpen;
+                    setIsComponentsSidebarOpen(newState);
+                    // إذا تم إغلاق Components Sidebar يدوياً، ضع علامة على ذلك
+                    if (!newState) {
+                      setWasComponentsSidebarManuallyClosed(true);
+                    } else {
+                      setWasComponentsSidebarManuallyClosed(false);
                     }
+                  }}
+                  className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+                  title={
+                    isComponentsSidebarOpen
+                      ? t("live_editor.hide_components")
+                      : t("live_editor.show_components")
+                  }
+                >
+                  <svg
+                    className="w-6 h-6 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <svg
-                      className="w-6 h-6 text-gray-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d={
-                          isComponentsSidebarOpen
-                            ? "M11 19l-7-7 7-7m8 14l-7-7 7-7"
-                            : "M13 5l7 7-7 7M5 5l7 7-7 7"
-                        }
-                      />
-                    </svg>
-                  </button>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d={
+                        isComponentsSidebarOpen
+                          ? "M11 19l-7-7 7-7m8 14l-7-7 7-7"
+                          : "M13 5l7 7-7 7M5 5l7 7-7 7"
+                      }
+                    />
+                  </svg>
+                </button>
                 {/* )} */}
                 <h1 className="text-2xl font-bold text-gray-900">
                   {pageTitle} {t("live_editor.editor")}
@@ -1419,7 +1437,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                     {pageTitle} {t("live_editor.editor")}
                   </h1>
                 </div>
-                
+
                 {/* Device Preview Controls */}
                 <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
                   <button
@@ -1476,15 +1494,13 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                     </svg>
                   </button>
                   <div className="text-sm text-gray-500 font-medium pr-2">
-                  {deviceDimensions[selectedDevice].name}
-                </div>
+                    {deviceDimensions[selectedDevice].name}
+                  </div>
                 </div>
               </div>
 
               {/* Second Row - Action Buttons */}
               <div className="flex items-center justify-between">
-
-                
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => {
@@ -1528,7 +1544,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                     </svg>
                     {t("live_editor.delete_page")}
                   </button>
-                  
+
                   {/* Debug Toggle Button - Development Only */}
                   {process.env.NODE_ENV === "development" && (
                     <button
@@ -1683,7 +1699,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
           open={deletePageDialogOpen}
           onOpenChange={setDeletePageDialogOpen}
         >
-          <AlertDialogContent 
+          <AlertDialogContent
             className="max-w-lg"
             onClick={() => setDeletePageDialogOpen(false)}
           >
@@ -1733,15 +1749,9 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                       ⚠️ {t("live_editor.critical_warning")}
                     </h4>
                     <ul className="text-red-700 space-y-1 text-sm">
-                      <li>
-                        • {t("live_editor.page_will_be_deleted")}
-                      </li>
-                      <li>
-                        • {t("live_editor.all_components_lost")}
-                      </li>
-                      <li>
-                        • {t("live_editor.affect_live_website")}
-                      </li>
+                      <li>• {t("live_editor.page_will_be_deleted")}</li>
+                      <li>• {t("live_editor.all_components_lost")}</li>
+                      <li>• {t("live_editor.affect_live_website")}</li>
                       <li>• {t("live_editor.no_backup")}</li>
                     </ul>
                   </div>
@@ -1783,19 +1793,29 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                 {t("live_editor.yes_im_sure")}
               </AlertDialogAction>
             </AlertDialogFooter>
-                    {/* Coming Soon Overlay - Disabled add page functionality */}
-        <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto" style={{ paddingTop: "200px" }}>
-          <div className="text-center">
-            <div className="text-6xl mb-4">🚧</div>
-            <h2 className="text-2xl font-bold text-red-600 mb-2">{t("live_editor.coming_soon")}</h2>
-            <p className="text-red-500 font-medium">{t("live_editor.components_disabled")}</p>
-          </div>
-        </div>
+            {/* Coming Soon Overlay - Disabled add page functionality */}
+            <div
+              className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto"
+              style={{ paddingTop: "200px" }}
+            >
+              <div className="text-center">
+                <div className="text-6xl mb-4">🚧</div>
+                <h2 className="text-2xl font-bold text-red-600 mb-2">
+                  {t("live_editor.coming_soon")}
+                </h2>
+                <p className="text-red-500 font-medium">
+                  {t("live_editor.components_disabled")}
+                </p>
+              </div>
+            </div>
           </AlertDialogContent>
         </AlertDialog>
 
         {/* Changes Made Dialog - Modern Popup */}
-        <AlertDialog open={showChangesDialog} onOpenChange={setShowChangesDialog}>
+        <AlertDialog
+          open={showChangesDialog}
+          onOpenChange={setShowChangesDialog}
+        >
           <AlertDialogContent className="max-w-md border-0 shadow-2xl bg-white">
             <AlertDialogHeader>
               <AlertDialogTitle className="sr-only">
@@ -1892,7 +1912,9 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                     className={`text-xs font-medium mb-2 ${positionValidation.isValid ? "text-green-600" : "text-red-600"}`}
                   >
                     {t("live_editor.position_validation")}:{" "}
-                    {positionValidation.isValid ? `✅ ${t("live_editor.valid")}` : `❌ ${t("live_editor.invalid")}`}
+                    {positionValidation.isValid
+                      ? `✅ ${t("live_editor.valid")}`
+                      : `❌ ${t("live_editor.invalid")}`}
                   </div>
                   {!positionValidation.isValid && (
                     <div className="space-y-1">
@@ -1924,20 +1946,19 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                 <div className="text-xs font-medium text-gray-700 mb-2">
                   {t("live_editor.changes_status")}
                 </div>
-                <div className={`text-xs p-2 rounded border ${
-                  hasChangesMade 
-                    ? "bg-green-50 border-green-200 text-green-800" 
-                    : "bg-gray-50 border-gray-200 text-gray-600"
-                }`}>
+                <div
+                  className={`text-xs p-2 rounded border ${
+                    hasChangesMade
+                      ? "bg-green-50 border-green-200 text-green-800"
+                      : "bg-gray-50 border-gray-200 text-gray-600"
+                  }`}
+                >
                   <div className="flex items-center">
-                    <span className="mr-2">
-                      {hasChangesMade ? "✅" : "⭕"}
-                    </span>
+                    <span className="mr-2">{hasChangesMade ? "✅" : "⭕"}</span>
                     <span className="font-mono">
-                      {hasChangesMade 
-                        ? t("live_editor.changes_detected") 
-                        : t("live_editor.no_changes")
-                      }
+                      {hasChangesMade
+                        ? t("live_editor.changes_detected")
+                        : t("live_editor.no_changes")}
                     </span>
                   </div>
                 </div>
@@ -1946,7 +1967,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
               {/* Current Components */}
               <div className="mb-4">
                 <div className="text-xs font-medium text-gray-700 mb-2">
-                  {t("live_editor.current_components")} ({pageComponents.length})
+                  {t("live_editor.current_components")} ({pageComponents.length}
+                  )
                 </div>
                 <div className="space-y-1">
                   {pageComponents.map((comp: any, index: number) => (
@@ -1982,15 +2004,19 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                       {debugInfo.operation.componentName}
                     </div>
                     <div>
-                      <strong>{t("live_editor.from")}:</strong> {debugInfo.operation.sourceIndex} →{" "}
-                      <strong>{t("live_editor.to")}:</strong> {debugInfo.calculatedIndex}
+                      <strong>{t("live_editor.from")}:</strong>{" "}
+                      {debugInfo.operation.sourceIndex} →{" "}
+                      <strong>{t("live_editor.to")}:</strong>{" "}
+                      {debugInfo.calculatedIndex}
                     </div>
                     <div>
-                      <strong>{t("live_editor.final")}:</strong> {debugInfo.finalIndex}
+                      <strong>{t("live_editor.final")}:</strong>{" "}
+                      {debugInfo.finalIndex}
                     </div>
                     {debugInfo.adjustmentReason && (
                       <div>
-                        <strong>{t("live_editor.reason")}:</strong> {debugInfo.adjustmentReason}
+                        <strong>{t("live_editor.reason")}:</strong>{" "}
+                        {debugInfo.adjustmentReason}
                       </div>
                     )}
                     <div>

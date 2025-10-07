@@ -1,19 +1,23 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { 
+import {
   StaticHeaderSkeleton1,
   HeroSkeleton1,
   HeroSkeleton2,
   FilterButtonsSkeleton1,
   GridSkeleton1,
   HalfTextHalfImageSkeleton1,
-  ContactCardsSkeleton1
+  ContactCardsSkeleton1,
 } from "@/components/skeleton";
 import { memo, useEffect, useState } from "react";
 
 // تحسين الأداء باستخدام memo
-const LoadingContent = memo(function LoadingContent({ slug }: { slug: string }) {
+const LoadingContent = memo(function LoadingContent({
+  slug,
+}: {
+  slug: string;
+}) {
   const renderSkeletonContent = () => {
     switch (slug) {
       case "for-rent":
@@ -61,46 +65,55 @@ const LoadingContent = memo(function LoadingContent({ slug }: { slug: string }) 
 export default function Loading() {
   const pathname = usePathname();
   const [hasTenantId, setHasTenantId] = useState<boolean | null>(null);
-  
+
   // التحقق من وجود tenantId
   useEffect(() => {
     const checkTenantId = () => {
       // التحقق من subdomain في hostname
       const hostname = window.location.hostname;
-      const isLocalhost = hostname.includes('localhost');
-      const hasSubdomain = hostname.split('.').length > 2 || 
-                          (isLocalhost && hostname.split('.').length > 1);
-      
+      const isLocalhost = hostname.includes("localhost");
+      const hasSubdomain =
+        hostname.split(".").length > 2 ||
+        (isLocalhost && hostname.split(".").length > 1);
+
       // التحقق من localStorage أو cookies
-      const hasStoredTenantId = localStorage.getItem('tenantId') || 
-                                document.cookie.includes('tenantId');
-      
+      const hasStoredTenantId =
+        localStorage.getItem("tenantId") ||
+        document.cookie.includes("tenantId");
+
       setHasTenantId(hasSubdomain || !!hasStoredTenantId);
     };
-    
+
     checkTenantId();
   }, []);
-  
+
   // استخراج الـ slug من المسار
   const getSlugFromPathname = (pathname: string): string => {
     if (!pathname) return "";
-    
+
     // إزالة الـ / من البداية والنهاية
     const cleanPath = pathname.replace(/^\/+|\/+$/g, "");
-    
+
     // إذا كان المسار فارغ، فهو الصفحة الرئيسية
     if (!cleanPath) return "/";
-    
+
     // إذا كان المسار يحتوي على أكثر من جزء، نأخذ الجزء الأول
     const parts = cleanPath.split("/");
     return parts[0];
   };
 
   const slug = getSlugFromPathname(pathname || "");
-  
+
   // تقليل console.log في production
-  if (process.env.NODE_ENV === 'development') {
-    console.log("🔄 Loading component - pathname:", pathname, "slug:", slug, "hasTenantId:", hasTenantId);
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      "🔄 Loading component - pathname:",
+      pathname,
+      "slug:",
+      slug,
+      "hasTenantId:",
+      hasTenantId,
+    );
   }
 
   // إذا لم يوجد tenantId، اعرض صفحة بيضاء فارغة

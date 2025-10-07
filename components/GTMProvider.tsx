@@ -24,18 +24,22 @@ export function GTMProvider({ children, containerId }: GTMProviderProps) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.dataLayer = window.dataLayer || [];
-      window.gtag = window.gtag || function() {
-        window.dataLayer.push(arguments);
-      };
+      window.gtag =
+        window.gtag ||
+        function () {
+          window.dataLayer.push(arguments);
+        };
     }
   }, []);
 
   // Track page views on route changes
   useEffect(() => {
     if (typeof window !== "undefined" && window.gtag) {
-      const url = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
-      
-      window.gtag('config', containerId, {
+      const url =
+        pathname +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "");
+
+      window.gtag("config", containerId, {
         page_path: url,
         page_title: document.title,
       });
@@ -64,4 +68,3 @@ export function GTMProvider({ children, containerId }: GTMProviderProps) {
     </>
   );
 }
-

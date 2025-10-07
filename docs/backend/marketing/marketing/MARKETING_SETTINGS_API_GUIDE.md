@@ -5,6 +5,7 @@ This guide explains how to use the new Marketing Settings API endpoints to manag
 ## Overview
 
 The Marketing Settings API allows you to:
+
 - Enable/disable CRM system integration
 - Enable/disable Appointment System (نظام المواعيد) integration
 - Manage integration-specific settings
@@ -30,12 +31,14 @@ integration_settings JSON NULL
 **Description:** Retrieve all marketing settings for the authenticated user's channels.
 
 **Headers:**
+
 ```
 Authorization: Bearer {token}
 Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -69,9 +72,11 @@ Content-Type: application/json
 **Description:** Retrieve marketing settings for a specific channel.
 
 **Parameters:**
+
 - `id` (integer, required): Channel ID
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -101,9 +106,11 @@ Content-Type: application/json
 **Description:** Update marketing settings for a specific channel.
 
 **Parameters:**
+
 - `id` (integer, required): Channel ID
 
 **Request Body:**
+
 ```json
 {
   "crm_integration_enabled": true,
@@ -122,6 +129,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -154,9 +162,11 @@ Content-Type: application/json
 **Description:** Update only the system integration settings for a specific channel.
 
 **Parameters:**
+
 - `id` (integer, required): Channel ID
 
 **Request Body:**
+
 ```json
 {
   "crm_integration_enabled": true,
@@ -171,6 +181,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -201,6 +212,7 @@ Content-Type: application/json
 The `MarketingChannel` model now includes several helper methods:
 
 #### `getSystemIntegrationSettings()`
+
 Returns the current system integration settings.
 
 ```php
@@ -209,6 +221,7 @@ $settings = $channel->getSystemIntegrationSettings();
 ```
 
 #### `updateSystemIntegrationSettings($settings)`
+
 Updates the system integration settings.
 
 ```php
@@ -220,6 +233,7 @@ $channel->updateSystemIntegrationSettings([
 ```
 
 #### `isCrmIntegrationEnabled()`
+
 Checks if CRM integration is enabled.
 
 ```php
@@ -229,6 +243,7 @@ if ($channel->isCrmIntegrationEnabled()) {
 ```
 
 #### `isAppointmentSystemIntegrationEnabled()`
+
 Checks if Appointment System integration is enabled.
 
 ```php
@@ -246,44 +261,47 @@ Based on the image you provided, here's how you can integrate the API with your 
 ```javascript
 // Get all marketing settings
 async function getMarketingSettings() {
-    const response = await fetch('/api/marketing/settings', {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    return await response.json();
+  const response = await fetch("/api/marketing/settings", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return await response.json();
 }
 
 // Update system integration settings
 async function updateSystemIntegrations(channelId, settings) {
-    const response = await fetch(`/api/marketing/channels/${channelId}/system-integrations`, {
-        method: 'PATCH',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            crm_integration_enabled: settings.crmEnabled,
-            appointment_system_integration_enabled: settings.appointmentEnabled,
-            integration_settings: settings.integrationSettings
-        })
-    });
-    return await response.json();
+  const response = await fetch(
+    `/api/marketing/channels/${channelId}/system-integrations`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        crm_integration_enabled: settings.crmEnabled,
+        appointment_system_integration_enabled: settings.appointmentEnabled,
+        integration_settings: settings.integrationSettings,
+      }),
+    },
+  );
+  return await response.json();
 }
 
 // Example usage
 const settings = await getMarketingSettings();
-console.log('Marketing Settings:', settings.data);
+console.log("Marketing Settings:", settings.data);
 
 // Update CRM integration
 await updateSystemIntegrations(1, {
-    crmEnabled: true,
-    appointmentEnabled: false,
-    integrationSettings: {
-        crm_api_url: 'https://crm.example.com/api',
-        crm_api_key: 'your_api_key'
-    }
+  crmEnabled: true,
+  appointmentEnabled: false,
+  integrationSettings: {
+    crm_api_url: "https://crm.example.com/api",
+    crm_api_key: "your_api_key",
+  },
 });
 ```
 
@@ -294,20 +312,20 @@ For the toggle switches shown in your image:
 ```javascript
 // Handle CRM integration toggle
 function handleCrmToggle(channelId, enabled) {
-    updateSystemIntegrations(channelId, {
-        crmEnabled: enabled,
-        appointmentEnabled: getCurrentAppointmentStatus(),
-        integrationSettings: getCurrentIntegrationSettings()
-    });
+  updateSystemIntegrations(channelId, {
+    crmEnabled: enabled,
+    appointmentEnabled: getCurrentAppointmentStatus(),
+    integrationSettings: getCurrentIntegrationSettings(),
+  });
 }
 
 // Handle Appointment System integration toggle
 function handleAppointmentToggle(channelId, enabled) {
-    updateSystemIntegrations(channelId, {
-        crmEnabled: getCurrentCrmStatus(),
-        appointmentEnabled: enabled,
-        integrationSettings: getCurrentIntegrationSettings()
-    });
+  updateSystemIntegrations(channelId, {
+    crmEnabled: getCurrentCrmStatus(),
+    appointmentEnabled: enabled,
+    integrationSettings: getCurrentIntegrationSettings(),
+  });
 }
 ```
 
@@ -326,6 +344,7 @@ All endpoints return consistent error responses:
 ```
 
 Common HTTP status codes:
+
 - `200` - Success
 - `400` - Bad Request
 - `401` - Unauthorized
@@ -342,6 +361,7 @@ php test-scripts/test_marketing_settings_api.php
 ```
 
 This script will:
+
 1. Create a test marketing channel
 2. Test all the new model methods
 3. Simulate API responses
@@ -368,6 +388,7 @@ This will add the new fields to the `marketing_channels` table.
 ## Future Enhancements
 
 Potential future enhancements could include:
+
 - Webhook notifications when integration settings change
 - Integration health checks
 - Automatic sync with external systems

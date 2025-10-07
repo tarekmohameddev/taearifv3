@@ -27,9 +27,9 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
         href: "https://facebook.com",
         alt: "facebook",
         text: "مكتب دليل الجواء التلقائي",
-        icon: { 
-          size: "24", 
-          color: "#1f2937" 
+        icon: {
+          size: "24",
+          color: "#1f2937",
         },
         textStyle: {
           size: "text-[14px] md:text-[16px]",
@@ -41,9 +41,9 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
         href: "https://x.com",
         alt: "x",
         text: "مكتب دليل الجواء التلقائي",
-        icon: { 
-          size: "24", 
-          color: "#1f2937" 
+        icon: {
+          size: "24",
+          color: "#1f2937",
         },
         textStyle: {
           size: "text-[14px] md:text-[16px]",
@@ -55,9 +55,9 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
         href: "https://www.instagram.com/guide__aljiwa?igsh=MWY1amdsaGlhZm1xOA==",
         alt: "instagram",
         text: "مكتب دليل الجواء التلقائي",
-        icon: { 
-          size: "24", 
-          color: "#1f2937" 
+        icon: {
+          size: "24",
+          color: "#1f2937",
         },
         textStyle: {
           size: "text-[14px] md:text-[16px]",
@@ -69,9 +69,9 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
         href: "https://linkedin.com",
         alt: "linkedin",
         text: "مكتب دليل الجواء التلقائي",
-        icon: { 
-          size: "24", 
-          color: "#1f2937" 
+        icon: {
+          size: "24",
+          color: "#1f2937",
         },
         textStyle: {
           size: "text-[14px] md:text-[16px]",
@@ -83,9 +83,9 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
         href: "https://wa.me/966537120774",
         alt: "whatsapp",
         text: "مكتب دليل الجواء التلقائي",
-        icon: { 
-          size: "24", 
-          color: "#1f2937" 
+        icon: {
+          size: "24",
+          color: "#1f2937",
         },
         textStyle: {
           size: "text-[14px] md:text-[16px]",
@@ -122,14 +122,16 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
         rows: 2,
         required: true,
         style: {
-          className: "border rounded p-2 mb-[12px] outline-custom-secondarycolor",
+          className:
+            "border rounded p-2 mb-[12px] outline-custom-secondarycolor",
         },
       },
     ],
     submitButton: {
       text: "إرسال",
       style: {
-        className: "bg-custom-secondarycolor text-white rounded-[6px] w-full text-[14px] md:text-[20px] bg-emerald-700 hover:scale-105 transition duration-300 py-2 md:py-1",
+        className:
+          "bg-custom-secondarycolor text-white rounded-[6px] w-full text-[14px] md:text-[20px] bg-emerald-700 hover:scale-105 transition duration-300 py-2 md:py-1",
       },
     },
   },
@@ -172,19 +174,15 @@ export const contactFormSectionFunctions = {
   },
 
   // Get data
-  getData: (
-    state: any,
-    variantId: string,
-  ): ComponentData => {
-    return state.contactFormSectionStates?.[variantId] || getDefaultContactFormSectionData();
+  getData: (state: any, variantId: string): ComponentData => {
+    return (
+      state.contactFormSectionStates?.[variantId] ||
+      getDefaultContactFormSectionData()
+    );
   },
 
   // Set data
-  setData: (
-    state: any,
-    variantId: string,
-    newData: ComponentData,
-  ): any => {
+  setData: (state: any, variantId: string, newData: ComponentData): any => {
     return {
       contactFormSectionStates: {
         ...state.contactFormSectionStates,
@@ -194,10 +192,7 @@ export const contactFormSectionFunctions = {
   },
 
   // Update title
-  updateTitle: (
-    currentData: ComponentData,
-    title: string,
-  ): ComponentData => ({
+  updateTitle: (currentData: ComponentData, title: string): ComponentData => ({
     ...currentData,
     content: {
       ...currentData.content,
@@ -206,10 +201,7 @@ export const contactFormSectionFunctions = {
   }),
 
   // Add social link
-  addSocialLink: (
-    currentData: ComponentData,
-    link: any,
-  ): ComponentData => ({
+  addSocialLink: (currentData: ComponentData, link: any): ComponentData => ({
     ...currentData,
     content: {
       ...currentData.content,
@@ -225,7 +217,9 @@ export const contactFormSectionFunctions = {
     ...currentData,
     content: {
       ...currentData.content,
-      socialLinks: (currentData.content?.socialLinks || []).filter((_: any, i: number) => i !== index),
+      socialLinks: (currentData.content?.socialLinks || []).filter(
+        (_: any, i: number) => i !== index,
+      ),
     },
   }),
 
@@ -238,8 +232,9 @@ export const contactFormSectionFunctions = {
     ...currentData,
     content: {
       ...currentData.content,
-      socialLinks: (currentData.content?.socialLinks || []).map((link: any, i: number) =>
-        i === index ? { ...link, ...updates } : link,
+      socialLinks: (currentData.content?.socialLinks || []).map(
+        (link: any, i: number) =>
+          i === index ? { ...link, ...updates } : link,
       ),
     },
   }),
@@ -275,10 +270,7 @@ export const contactFormSectionFunctions = {
   }),
 
   // Update layout
-  updateLayout: (
-    currentData: ComponentData,
-    layout: any,
-  ): ComponentData => ({
+  updateLayout: (currentData: ComponentData, layout: any): ComponentData => ({
     ...currentData,
     layout: {
       ...currentData.layout,
@@ -287,10 +279,7 @@ export const contactFormSectionFunctions = {
   }),
 
   // Update styling
-  updateStyling: (
-    currentData: ComponentData,
-    styling: any,
-  ): ComponentData => ({
+  updateStyling: (currentData: ComponentData, styling: any): ComponentData => ({
     ...currentData,
     styling: {
       ...currentData.styling,
@@ -300,26 +289,28 @@ export const contactFormSectionFunctions = {
 
   // Update data by path
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const currentData = state.contactFormSectionStates?.[variantId] || getDefaultContactFormSectionData();
-    
+    const currentData =
+      state.contactFormSectionStates?.[variantId] ||
+      getDefaultContactFormSectionData();
+
     // Create a deep copy and update the nested property
     const newData = { ...currentData };
-    const pathParts = path.split('.');
+    const pathParts = path.split(".");
     let current = newData;
-    
+
     for (let i = 0; i < pathParts.length - 1; i++) {
       if (!current[pathParts[i]]) {
         current[pathParts[i]] = {};
       }
       current = current[pathParts[i]];
     }
-    
+
     current[pathParts[pathParts.length - 1]] = value;
 
     // Update pageComponentsByPage with the new data
     const currentPage = state.currentPage || "homepage";
     const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
-    
+
     // Find and update the component in pageComponents
     const updatedComponents = updatedPageComponents.map((comp: any) => {
       if (comp.type === "contactFormSection" && comp.id === variantId) {
