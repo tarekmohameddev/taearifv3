@@ -128,7 +128,7 @@ export default function PropertyForm({ mode }) {
     title: "",
     description: "",
     address: "",
-    building: "",
+    building_id: "",
     water_meter_number: "",
     electricity_meter_number: "",
     deed_number: "",
@@ -497,7 +497,7 @@ export default function PropertyForm({ mode }) {
             category: property.category_id?.toString() || "",
             description: property.description || "",
             address: property.address || "",
-            building: property.building || "",
+            building_id: property.building_id || "",
             water_meter_number: property.water_meter_number || "",
             electricity_meter_number: property.electricity_meter_number || "",
             deed_number: property.deed_number || "",
@@ -1009,7 +1009,7 @@ export default function PropertyForm({ mode }) {
         const propertyData = {
           title: formData.title,
           address: formData.address,
-          building: formData.building,
+          building_id: formData.building_id,
           water_meter_number: formData.water_meter_number,
           electricity_meter_number: formData.electricity_meter_number,
           deed_number: deedImagePath,
@@ -1266,35 +1266,35 @@ export default function PropertyForm({ mode }) {
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="building">العمارة</Label>
+                      <Label htmlFor="building_id">العمارة</Label>
                       <Select
-                        name="building"
-                        value={formData.building}
+                        name="building_id"
+                        value={formData.building_id}
                         onValueChange={(value) =>
                           handleInputChange({
-                            target: { name: "building", value },
+                            target: { name: "building_id", value },
                           })
                         }
                       >
                         <SelectTrigger
-                          id="building"
-                          className={errors.building ? "border-red-500" : ""}
+                          id="building_id"
+                          className={errors.building_id ? "border-red-500" : ""}
                         >
                           <SelectValue placeholder="اختر العمارة" />
                         </SelectTrigger>
-                        <SelectContent>
-                          {buildings.map((building) => (
-                            <SelectItem
-                              key={building.id}
-                              value={building.name}
-                            >
-                              {building.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
+                          <SelectContent>
+                            {buildings.map((building) => (
+                              <SelectItem
+                                key={building.id}
+                                value={building.id.toString()}
+                              >
+                                {building.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
                       </Select>
-                      {errors.building && (
-                        <p className="text-sm text-red-500">{errors.building}</p>
+                      {errors.building_id && (
+                        <p className="text-sm text-red-500">{errors.building_id}</p>
                       )}
                     </div>
                   </div>

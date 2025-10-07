@@ -117,6 +117,8 @@ export default function BuildingCard({
   };
 
   const getPropertyPurposeText = (purpose: string) => {
+    if (!purpose) return "غير محدد";
+    
     switch (purpose.toLowerCase()) {
       case "rent":
         return "إيجار";
@@ -386,23 +388,56 @@ export default function BuildingCard({
                       <div className="mt-2">
                         <div className="text-xs text-gray-500 mb-1">الميزات:</div>
                         <div className="flex flex-wrap gap-1">
-                          {Array.isArray(property.features) 
-                            ? property.features.slice(0, 3).map((feature, index) => (
-                                <Badge key={index} variant="secondary" className="text-xs">
-                                  {feature}
-                                </Badge>
-                              ))
-                            : typeof property.features === 'string' && property.features !== 'ميزة4' && (
-                                <Badge variant="secondary" className="text-xs">
-                                  {property.features}
-                                </Badge>
-                              )
-                          }
-                          {Array.isArray(property.features) && property.features.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{property.features.length - 3} أخرى
-                            </Badge>
-                          )}
+                          {(() => {
+                            let featuresArray = [];
+                            
+                            if (Array.isArray(property.features)) {
+                              featuresArray = property.features;
+                            } else if (typeof property.features === 'string') {
+                              try {
+                                // محاولة تحليل JSON
+                                const parsed = JSON.parse(property.features);
+                                if (Array.isArray(parsed)) {
+                                  featuresArray = parsed;
+                                } else {
+                                  featuresArray = [property.features];
+                                }
+                              } catch {
+                                // إذا فشل التحليل، تعامل معه كـ string عادي
+                                featuresArray = property.features.split(',').map(f => f.trim()).filter(f => f);
+                              }
+                            }
+                            
+                            return featuresArray.slice(0, 3).map((feature, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {feature}
+                              </Badge>
+                            ));
+                          })()}
+                          {(() => {
+                            let featuresArray = [];
+                            
+                            if (Array.isArray(property.features)) {
+                              featuresArray = property.features;
+                            } else if (typeof property.features === 'string') {
+                              try {
+                                const parsed = JSON.parse(property.features);
+                                if (Array.isArray(parsed)) {
+                                  featuresArray = parsed;
+                                } else {
+                                  featuresArray = [property.features];
+                                }
+                              } catch {
+                                featuresArray = property.features.split(',').map(f => f.trim()).filter(f => f);
+                              }
+                            }
+                            
+                            return featuresArray.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{featuresArray.length - 3} أخرى
+                              </Badge>
+                            );
+                          })()}
                         </div>
                       </div>
                     )}
@@ -445,15 +480,6 @@ export default function BuildingCard({
 
       <CardFooter className="pt-3">
         <div className="flex gap-2 w-full">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 border-gray-300 hover:bg-gray-50"
-            onClick={() => router.push(`/dashboard/buildings/${building.id}`)}
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            عرض
-          </Button>
           <Button
             variant="outline"
             size="sm"

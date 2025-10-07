@@ -1,6 +1,6 @@
 "use client";
 import {
-  Building,
+  Building as BuildingIcon,
   Building2,
   Home,
   TrendingUp,
@@ -68,13 +68,13 @@ export default function BuildingsStats({ buildings, loading = false }: Buildings
 
   const rentProperties = buildings.reduce(
     (acc, building) => 
-      acc + building.properties.filter(p => p.purpose.toLowerCase() === "rent").length,
+      acc + building.properties.filter(p => p.purpose && p.purpose.toLowerCase() === "rent").length,
     0
   );
   
   const saleProperties = buildings.reduce(
     (acc, building) => 
-      acc + building.properties.filter(p => p.purpose.toLowerCase() === "sale").length,
+      acc + building.properties.filter(p => p.purpose && p.purpose.toLowerCase() === "sale").length,
     0
   );
 
