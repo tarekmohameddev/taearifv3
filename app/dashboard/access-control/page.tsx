@@ -304,6 +304,24 @@ export default function AccessControlPage() {
     permissions: [] as string[]
   });
   const [editSelectedRolePermissions, setEditSelectedRolePermissions] = useState<{[key: string]: boolean}>({});
+  
+  // Delete role state
+  const [showDeleteRoleDialog, setShowDeleteRoleDialog] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
+  const [deleteRoleLoading, setDeleteRoleLoading] = useState(false);
+  const [deleteRoleError, setDeleteRoleError] = useState<string | null>(null);
+  
+  // Delete permission state
+  const [showDeletePermissionDialog, setShowDeletePermissionDialog] = useState(false);
+  const [permissionToDelete, setPermissionToDelete] = useState<any>(null);
+  const [deletePermissionLoading, setDeletePermissionLoading] = useState(false);
+  const [deletePermissionError, setDeletePermissionError] = useState<string | null>(null);
+  
+  // Delete employee state
+  const [showDeleteEmployeeDialog, setShowDeleteEmployeeDialog] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+  const [deleteEmployeeLoading, setDeleteEmployeeLoading] = useState(false);
+  const [deleteEmployeeError, setDeleteEmployeeError] = useState<string | null>(null);
 
   // Filter permissions based on search query
   const filteredPermissions = permissionsTabData ? 
@@ -705,6 +723,24 @@ export default function AccessControlPage() {
     }
   };
 
+  // Handle delete role
+  const handleDeleteRole = (role: Role) => {
+    setRoleToDelete(role);
+    setShowDeleteRoleDialog(true);
+  };
+
+  // Handle delete permission
+  const handleDeletePermission = (permission: any) => {
+    setPermissionToDelete(permission);
+    setShowDeletePermissionDialog(true);
+  };
+
+  // Handle delete employee
+  const handleDeleteEmployee = (employee: Employee) => {
+    setEmployeeToDelete(employee);
+    setShowDeleteEmployeeDialog(true);
+  };
+
   // Handle role permission selection
   const handleRolePermissionChange = (permissionName: string, checked: boolean) => {
     setSelectedRolePermissions(prev => ({
@@ -802,6 +838,90 @@ export default function AccessControlPage() {
       setEditRoleError(error.response?.data?.message || "فشل في تحديث الدور");
     } finally {
       setEditRoleLoading(false);
+    }
+  };
+
+  // Delete role
+  const deleteRole = async () => {
+    if (!roleToDelete) return;
+    
+    setDeleteRoleLoading(true);
+    setDeleteRoleError(null);
+    
+    try {
+      console.log("📋 Deleting role:", roleToDelete.id);
+      
+      const response = await axiosInstance.delete(`/v1/roles/${roleToDelete.id}`);
+      console.log("📋 Delete Role API Response:", response.data);
+      
+      // Refresh roles list
+      fetchRolesForTab();
+      
+      // Close dialog
+      setShowDeleteRoleDialog(false);
+      setRoleToDelete(null);
+      
+    } catch (error: any) {
+      console.error("Error deleting role:", error);
+      setDeleteRoleError(error.response?.data?.message || "فشل في حذف الدور");
+    } finally {
+      setDeleteRoleLoading(false);
+    }
+  };
+
+  // Delete permission
+  const deletePermission = async () => {
+    if (!permissionToDelete) return;
+    
+    setDeletePermissionLoading(true);
+    setDeletePermissionError(null);
+    
+    try {
+      console.log("📋 Deleting permission:", permissionToDelete.id);
+      
+      const response = await axiosInstance.delete(`/v1/permissions/${permissionToDelete.id}`);
+      console.log("📋 Delete Permission API Response:", response.data);
+      
+      // Refresh permissions list
+      fetchPermissionsForTab();
+      
+      // Close dialog
+      setShowDeletePermissionDialog(false);
+      setPermissionToDelete(null);
+      
+    } catch (error: any) {
+      console.error("Error deleting permission:", error);
+      setDeletePermissionError(error.response?.data?.message || "فشل في حذف الصلاحية");
+    } finally {
+      setDeletePermissionLoading(false);
+    }
+  };
+
+  // Delete employee
+  const deleteEmployee = async () => {
+    if (!employeeToDelete) return;
+    
+    setDeleteEmployeeLoading(true);
+    setDeleteEmployeeError(null);
+    
+    try {
+      console.log("📋 Deleting employee:", employeeToDelete.id);
+      
+      const response = await axiosInstance.delete(`/v1/employees/${employeeToDelete.id}`);
+      console.log("📋 Delete Employee API Response:", response.data);
+      
+      // Refresh employees list
+      fetchEmployees();
+      
+      // Close dialog
+      setShowDeleteEmployeeDialog(false);
+      setEmployeeToDelete(null);
+      
+    } catch (error: any) {
+      console.error("Error deleting employee:", error);
+      setDeleteEmployeeError(error.response?.data?.message || "فشل في حذف الموظف");
+    } finally {
+      setDeleteEmployeeLoading(false);
     }
   };
 
@@ -1383,6 +1503,15 @@ export default function AccessControlPage() {
                                       <Edit className="h-4 w-4" />
                                       تعديل
                                     </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleDeleteEmployee(employee)}
+                                      className="flex items-center gap-2 text-red-600 hover:text-red-800 hover:border-red-800"
+                                    >
+                                      <XCircle className="h-4 w-4" />
+                                      حذف
+                                    </Button>
                                     <Dialog>
                                       <DialogTrigger asChild>
                                         <Button
@@ -1941,6 +2070,15 @@ export default function AccessControlPage() {
                                         <Edit className="h-4 w-4 ml-2" />
                                         تعديل
                                       </Button>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleDeleteRole(role)}
+                                        className="text-red-600 hover:text-red-800 hover:border-red-800"
+                                      >
+                                        <XCircle className="h-4 w-4 ml-2" />
+                                        حذف
+                                      </Button>
                                     </div>
                                   </div>
                                 </div>
@@ -2133,6 +2271,15 @@ export default function AccessControlPage() {
                                             )}
                                           </div>
                                         </div>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => handleDeletePermission(permission)}
+                                          className="text-red-600 hover:text-red-800 hover:border-red-800 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                          <XCircle className="h-4 w-4 ml-2" />
+                                          حذف
+                                        </Button>
                                       </div>
                                     </div>
                                   ))}
@@ -2585,6 +2732,216 @@ export default function AccessControlPage() {
                 <>
                   <Save className="h-4 w-4 ml-2" />
                   تحديث الدور
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Role Dialog */}
+      <Dialog open={showDeleteRoleDialog} onOpenChange={setShowDeleteRoleDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <XCircle className="h-5 w-5" />
+              حذف الدور
+            </DialogTitle>
+            <DialogDescription>
+              هل أنت متأكد من حذف هذا الدور؟ لا يمكن التراجع عن هذا الإجراء.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {roleToDelete && (
+            <div className="py-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    <Shield className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-red-800">{roleToDelete.name}</h4>
+                    <p className="text-sm text-red-600">معرف الدور: {roleToDelete.id}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {deleteRoleError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-center gap-2">
+                <XCircle className="h-5 w-5 text-red-600" />
+                <span className="text-red-800 font-medium">{deleteRoleError}</span>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button 
+              onClick={() => setShowDeleteRoleDialog(false)}
+              variant="outline"
+              className="text-gray-600 hover:text-black hover:border-black"
+            >
+              إلغاء
+            </Button>
+            <Button 
+              onClick={deleteRole}
+              disabled={deleteRoleLoading}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deleteRoleLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                  جاري الحذف...
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 ml-2" />
+                  حذف الدور
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Permission Dialog */}
+      <Dialog open={showDeletePermissionDialog} onOpenChange={setShowDeletePermissionDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <XCircle className="h-5 w-5" />
+              حذف الصلاحية
+            </DialogTitle>
+            <DialogDescription>
+              هل أنت متأكد من حذف هذه الصلاحية؟ لا يمكن التراجع عن هذا الإجراء.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {permissionToDelete && (
+            <div className="py-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    <Lock className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-red-800">{permissionToDelete.name}</h4>
+                    <p className="text-sm text-red-600">معرف الصلاحية: {permissionToDelete.id}</p>
+                    {permissionToDelete.description && (
+                      <p className="text-sm text-red-600 mt-1">{permissionToDelete.description}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {deletePermissionError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-center gap-2">
+                <XCircle className="h-5 w-5 text-red-600" />
+                <span className="text-red-800 font-medium">{deletePermissionError}</span>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button 
+              onClick={() => setShowDeletePermissionDialog(false)}
+              variant="outline"
+              className="text-gray-600 hover:text-black hover:border-black"
+            >
+              إلغاء
+            </Button>
+            <Button 
+              onClick={deletePermission}
+              disabled={deletePermissionLoading}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deletePermissionLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                  جاري الحذف...
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 ml-2" />
+                  حذف الصلاحية
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Employee Dialog */}
+      <Dialog open={showDeleteEmployeeDialog} onOpenChange={setShowDeleteEmployeeDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <XCircle className="h-5 w-5" />
+              حذف الموظف
+            </DialogTitle>
+            <DialogDescription>
+              هل أنت متأكد من حذف هذا الموظف؟ لا يمكن التراجع عن هذا الإجراء.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {employeeToDelete && (
+            <div className="py-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={employeeToDelete.photo || ""} />
+                    <AvatarFallback>
+                      {getInitials(employeeToDelete.first_name, employeeToDelete.last_name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h4 className="font-medium text-red-800">
+                      {employeeToDelete.first_name} {employeeToDelete.last_name}
+                    </h4>
+                    <p className="text-sm text-red-600">{employeeToDelete.email}</p>
+                    <p className="text-sm text-red-600">معرف الموظف: {employeeToDelete.id}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {deleteEmployeeError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-center gap-2">
+                <XCircle className="h-5 w-5 text-red-600" />
+                <span className="text-red-800 font-medium">{deleteEmployeeError}</span>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button 
+              onClick={() => setShowDeleteEmployeeDialog(false)}
+              variant="outline"
+              className="text-gray-600 hover:text-black hover:border-black"
+            >
+              إلغاء
+            </Button>
+            <Button 
+              onClick={deleteEmployee}
+              disabled={deleteEmployeeLoading}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deleteEmployeeLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                  جاري الحذف...
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 ml-2" />
+                  حذف الموظف
                 </>
               )}
             </Button>
