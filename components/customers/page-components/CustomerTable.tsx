@@ -42,6 +42,7 @@ import {
   Clock,
   SortAsc,
   SortDesc,
+  Activity,
   CheckSquare,
   X,
   ArrowRight,
@@ -360,7 +361,15 @@ export const CustomerTable = ({
                             <ArrowRight className="ml-2 h-4 w-4" />
                             تعيين المرحلة
                           </DropdownMenuItem>
-
+                          <DropdownMenuItem
+                onClick={() => {
+                  const url = `/dashboard/activity-logs/customer/${customer.id}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <Activity className="mr-2 h-4 w-4" />
+                سجل النشاطات
+              </DropdownMenuItem>
                           {formData && (
                             <Dialog open={open} onOpenChange={setOpen}>
                               <DialogContent>

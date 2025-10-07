@@ -1,4 +1,4 @@
-import PropertyActivityPage from "@/components/activityLogs/property-activity-page";
+import CustomerActivityPage from "@/components/activityLogs/customer-activity-page";
 
 export const metadata = {
   title: "سجلات النشاط",
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <PropertyActivityPage />;
+  return <CustomerActivityPage />;
 }
