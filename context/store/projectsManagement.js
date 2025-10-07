@@ -1,7 +1,12 @@
-import axiosInstance from "@/lib/axiosInstance";
-import useAuthStore from "@/context/AuthContext";
+const axiosInstance = require("@/lib/axiosInstance");
+const useAuthStore = require("@/context/AuthContext");
+const {
+  retryWithBackoff,
+  logError,
+  formatErrorMessage,
+} = require("@/utils/errorHandler");
 
-module.exports = (set) => ({
+module.exports = (set, get) => ({
   projectsManagement: {
     viewMode: "grid",
     projects: [],
@@ -45,10 +50,6 @@ module.exports = (set) => ({
 
   fetchProjects: async () => {
     // التحقق من وجود التوكن قبل إجراء الطلب
-    const token = useAuthStore.getState().userData?.token;
-    if (!token) {
-      return;
-    }
 
     set((state) => ({
       projectsManagement: {
@@ -59,28 +60,47 @@ module.exports = (set) => ({
     }));
 
     try {
-      const response = await axiosInstance.get(
-        `/projects`,
+      const response = await retryWithBackoff(
+        async () => {
+          return await axiosInstance.get("/projects");
+        },
+        3,
+        1000,
       );
+
+      console.log("API Response received:", response.data);
+      console.log("Projects count:", response.data.data.projects?.length);
       
-      set((state) => ({
-        projectsManagement: {
-          ...state.projectsManagement,
-          projects: response.data.data.projects || [],
-          pagination: response.data.data.pagination || null,
-          loadingProjects: false,
-          isInitialized: true,
-        },
-      }));
+      // تحديث الـ store مع البيانات الجديدة
+      set((state) => {
+        const newState = {
+          projectsManagement: {
+            ...state.projectsManagement,
+            projects: response.data.data.projects || [],
+            pagination: response.data.data.pagination || null,
+            loadingProjects: false,
+            isInitialized: true,
+          },
+        };
+        console.log("New state being set:", newState);
+        return newState;
+      });
+      
+      console.log("Store updated with projects");
     } catch (error) {
+      const errorInfo = logError(error, "fetchProjects");
+      console.error("Error fetching projects:", error);
+
       set((state) => ({
         projectsManagement: {
           ...state.projectsManagement,
-          error: error.message || "حدث خطأ أثناء جلب بيانات المشاريع",
+          error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات المشاريع"),
           loadingProjects: false,
           isInitialized: true,
         },
       }));
+
+      throw error;
     }
   },
 });

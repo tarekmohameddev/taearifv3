@@ -342,56 +342,6 @@ module.exports = (set, get) => ({
     }
   },
 
-  // Fetch projects
-  fetchProjects: async () => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    const token = useAuthStore.getState().userData?.token;
-    if (!token) {
-      return;
-    }
-
-    set((state) => ({
-      purchaseManagement: {
-        ...state.purchaseManagement,
-        loadingProjects: true,
-        error: null,
-      },
-    }));
-
-    try {
-      const response = await retryWithBackoff(
-        async () => {
-          return await axiosInstance.get("/projects");
-        },
-        3,
-        1000,
-      );
-
-      const projectsList = response.data.data.projects || [];
-
-      set((state) => ({
-        purchaseManagement: {
-          ...state.purchaseManagement,
-          projects: projectsList,
-          loadingProjects: false,
-        },
-      }));
-
-      return projectsList;
-    } catch (error) {
-      const errorInfo = logError(error, "fetchProjects");
-
-      set((state) => ({
-        purchaseManagement: {
-          ...state.purchaseManagement,
-          error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات العقارات"),
-          loadingProjects: false,
-        },
-      }));
-
-      throw error;
-    }
-  },
 
   // Create Purchase Request
   createPurchaseRequest: async (requestData) => {

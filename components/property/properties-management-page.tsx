@@ -8,6 +8,7 @@ import {
 } from "@/utils/errorHandler";
 import toast from "react-hot-toast";
 import {
+  Activity,
   Bath,
   Bed,
   Building,
@@ -1261,6 +1262,15 @@ function PropertyCard({
               >
                 <ExternalLink className="mr-2 h-4 w-4" />
                 معاينة
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const url = `/dashboard/activity-logs/property/${property.id}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <Activity className="mr-2 h-4 w-4" />
+                سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onDuplicate(property)}>
                 <Copy className="mr-2 h-4 w-4" />

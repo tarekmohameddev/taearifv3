@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
 import {
+  Activity,
   Building2,
   Calendar,
   Copy,
@@ -142,6 +143,14 @@ export function ProjectsManagementPage() {
     fetchProjects,
   } = useStore();
 
+  // Debug logging for state
+  console.log("=== COMPONENT STATE DEBUGGING ===");
+  console.log("projects from store:", projects);
+  console.log("projects length:", projects?.length);
+  console.log("loadingProjects:", loadingProjects);
+  console.log("isInitialized:", isInitialized);
+
+
   // تحديث وضع العرض
   const setViewMode = (mode: "grid" | "list") => {
     setProjectsManagement({ viewMode: mode });
@@ -150,7 +159,6 @@ export function ProjectsManagementPage() {
   const handleDelete = async (id: number) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
-      console.log("No token available, skipping handleDelete");
       alert("Authentication required. Please login.");
       return;
     }
@@ -163,18 +171,17 @@ export function ProjectsManagementPage() {
   };
 
   useEffect(() => {
-    console.log("loadingProjects", loadingProjects);
-  }, [loadingProjects]);
-  
-  
-  useEffect(() => {
+    console.log("useEffect triggered - isInitialized:", isInitialized, "loadingProjects:", loadingProjects);
+    
     // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
       console.log("No token available, skipping fetchProjects");
       return;
     }
 
+    // Always fetch projects when component mounts if not initialized
     if (!isInitialized) {
+      console.log("Calling fetchProjects...");
       fetchProjects();
     }
   }, [fetchProjects, isInitialized, userData?.token]);
@@ -187,8 +194,11 @@ export function ProjectsManagementPage() {
     </div>
   );
 
-  const renderProjectCards = (projectsToRender: IProject[]) =>
-    viewMode === "grid" ? (
+  const renderProjectCards = (projectsToRender: IProject[]) => {
+    console.log("renderProjectCards called with:", projectsToRender);
+    console.log("projectsToRender length:", projectsToRender?.length);
+    
+    return viewMode === "grid" ? (
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {projectsToRender.map((project) => (
           <ProjectCard key={project.id} project={project} />
@@ -201,6 +211,7 @@ export function ProjectsManagementPage() {
         ))}
       </div>
     );
+  };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
@@ -332,14 +343,25 @@ export function ProjectsManagementPage() {
                   <TabsTrigger value="featured">مميز</TabsTrigger> */}
                 {/* </TabsList> */}
                 <TabsContent value="all" className="mt-4">
-                  {projects && projects.length === 0 ? (
-                    <EmptyState type="مشاريع" />
-                  ) : (
-                    renderProjectCards(projects)
-                  )}
+                  {(() => {
+                    console.log("TabsContent all - projects:", projects);
+                    console.log("TabsContent all - projects length:", projects?.length);
+                    console.log("TabsContent all - isArray:", Array.isArray(projects));
+                    
+                    if (projects && Array.isArray(projects) && projects.length > 0) {
+                      console.log("Rendering project cards");
+                      return renderProjectCards(projects);
+                    } else {
+                      console.log("Rendering empty state");
+                      return <EmptyState type="مشاريع" />;
+                    }
+                  })()}
                 </TabsContent>
                 <TabsContent value="1" className="mt-4">
                   {(() => {
+                    if (!projects || !Array.isArray(projects) || projects.length === 0) {
+                      return <EmptyState type="مشاريع" />;
+                    }
                     const publishedProjects = projects.filter((project: IProject) => {
                       if (typeof project.published === "boolean") {
                         return project.published === true;
@@ -356,6 +378,9 @@ export function ProjectsManagementPage() {
                 </TabsContent>
                 <TabsContent value="0" className="mt-4">
                   {(() => {
+                    if (!projects || !Array.isArray(projects) || projects.length === 0) {
+                      return <EmptyState type="مشاريع" />;
+                    }
                     const draftProjects = projects.filter((project: IProject) => {
                       if (typeof project.published === "boolean") {
                         return project.published === false;
@@ -372,6 +397,9 @@ export function ProjectsManagementPage() {
                 </TabsContent>
                 <TabsContent value="featured" className="mt-4">
                   {(() => {
+                    if (!projects || !Array.isArray(projects) || projects.length === 0) {
+                      return <EmptyState type="مشاريع" />;
+                    }
                     const featuredProjects = projects.filter((project: IProject) => {
                       if (typeof project.featured === "boolean") {
                         return project.featured === true;
@@ -513,6 +541,15 @@ function ProjectCard({ project }: { project: IProject }) {
               <DropdownMenuItem>
                 <Copy className="mr-2 h-4 w-4" />
                 نسخ
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const url = `/dashboard/activity-logs/project/${project.id}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <Activity className="mr-2 h-4 w-4" />
+                سجل النشاطات
               </DropdownMenuItem>
               {project.published === false ? (
                 <DropdownMenuItem>
@@ -706,6 +743,15 @@ function ProjectListItem({ project }: { project: IProject }) {
                     <Copy className="mr-2 h-4 w-4" />
                     نسخ
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                onClick={() => {
+                  const url = `/dashboard/activity-logs/project/${project.id}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <Activity className="mr-2 h-4 w-4" />
+                سجل النشاطات
+              </DropdownMenuItem>
                   {project.published === false ? (
                     <DropdownMenuItem>
                       <ExternalLink className="mr-2 h-4 w-4" />
