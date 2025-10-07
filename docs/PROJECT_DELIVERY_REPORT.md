@@ -5,8 +5,8 @@
 | البند             | التفاصيل                                  |
 | ----------------- | ----------------------------------------- |
 | **اسم المشروع**   | تكامل Live Editor مع الداشبورد            |
-| **تاريخ البداية** | ${new Date().toLocaleDateString('ar-SA')} |
-| **تاريخ التسليم** | ${new Date().toLocaleDateString('ar-SA')} |
+| **تاريخ البداية** | ${new Date().toLocaleDateString('ar-US')} |
+| **تاريخ التسليم** | ${new Date().toLocaleDateString('ar-US')} |
 | **مدة المشروع**   | 10 خطوات متتالية                          |
 | **الحالة**        | ✅ مكتمل 100%                             |
 | **المطور**        | فريق التطوير                              |
@@ -400,7 +400,7 @@ website-builder-dashboard/
 
 ---
 
-**تاريخ التسليم:** ${new Date().toLocaleDateString('ar-SA')}
+**تاريخ التسليم:** ${new Date().toLocaleDateString('ar-US')}
 **المطور:** فريق التطوير
 **الإصدار:** 1.0.0
 **الحالة:** مكتمل 100% ✅

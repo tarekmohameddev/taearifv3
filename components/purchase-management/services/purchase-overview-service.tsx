@@ -119,7 +119,7 @@ export function PurchaseOverviewService() {
             descriptionAr: `طلب شراء ${request.request_number} - ${request.client_name}`,
             date: request.created_at.split("T")[0],
             dateHijri: new Date(request.created_at).toLocaleDateString(
-              "ar-SA-u-ca-islamic",
+              "ar-US-u-ca-islamic",
             ),
             status: request.overall_status,
             statusAr:

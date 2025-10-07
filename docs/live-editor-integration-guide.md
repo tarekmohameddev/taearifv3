@@ -177,6 +177,6 @@ NEXTAUTH_URL=your_app_url
 
 ---
 
-**تاريخ الإنشاء:** ${new Date().toLocaleDateString('ar-SA')}
+**تاريخ الإنشاء:** ${new Date().toLocaleDateString('ar-US')}
 **الإصدار:** 1.0.0
 **المطور:** فريق التطوير

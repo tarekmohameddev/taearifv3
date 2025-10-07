@@ -71,7 +71,7 @@ export default function BuildingCard({
   const [showAllProperties, setShowAllProperties] = useState(false);
 
   const formatPrice = (price: string) => {
-    return new Intl.NumberFormat("ar-SA", {
+    return new Intl.NumberFormat("ar-US", {
       style: "currency",
       currency: "SAR",
     }).format(parseFloat(price));
@@ -472,7 +472,7 @@ export default function BuildingCard({
               </span>
             </div>
             <span className="text-xs text-gray-500">
-              {new Date(building.created_at).toLocaleDateString("ar-SA")}
+              {new Date(building.created_at).toLocaleDateString("ar-US")}
             </span>
           </div>
         </div>

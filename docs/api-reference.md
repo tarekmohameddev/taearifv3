@@ -372,5 +372,5 @@ curl -X POST http://localhost:3000/api/tenant/getTenant \
 
 ---
 
-**تاريخ التحديث:** ${new Date().toLocaleDateString('ar-SA')}
+**تاريخ التحديث:** ${new Date().toLocaleDateString('ar-US')}
 **الإصدار:** 1.0.0

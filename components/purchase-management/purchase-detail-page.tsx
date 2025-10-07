@@ -606,7 +606,7 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
                 </h1>
                 <p className="text-gray-600">
                   تم الإنشاء في{" "}
-                  {new Date(request.createdAt).toLocaleDateString("ar-SA")}
+                  {new Date(request.createdAt).toLocaleDateString("ar-US")}
                 </p>
               </div>
             </div>
@@ -757,7 +757,7 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
                     السعر
                   </Label>
                   <p className="text-2xl font-bold text-green-600">
-                    {request.property.price.toLocaleString("ar-SA")} ريال
+                    {request.property.price.toLocaleString("ar-US")} ريال
                   </p>
                 </div>
                 <div>
@@ -800,7 +800,7 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
                           request.stages[
                             stage.key as keyof typeof request.stages
                           ].completedAt!,
-                        ).toLocaleDateString("ar-SA")}
+                        ).toLocaleDateString("ar-US")}
                       </span>
                     </div>
                   )}

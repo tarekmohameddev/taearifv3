@@ -291,7 +291,7 @@ website-builder-dashboard/
 
 ---
 
-**تاريخ الإكمال:** ${new Date().toLocaleDateString('ar-SA')}
+**تاريخ الإكمال:** ${new Date().toLocaleDateString('ar-US')}
 **المطور:** فريق التطوير
 **الإصدار:** 1.0.0
 **الحالة:** مكتمل 100% ✅

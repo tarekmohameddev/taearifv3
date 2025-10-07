@@ -459,5 +459,5 @@ const filteredComponents = components.filter(
 
 ---
 
-**تاريخ التحديث:** ${new Date().toLocaleDateString('ar-SA')}
+**تاريخ التحديث:** ${new Date().toLocaleDateString('ar-US')}
 **الإصدار:** 1.0.0
