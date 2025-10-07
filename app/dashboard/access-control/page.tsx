@@ -1102,7 +1102,7 @@ export default function AccessControlPage() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="employees" className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   الموظفين
@@ -1111,10 +1111,10 @@ export default function AccessControlPage() {
                   <Shield className="h-4 w-4" />
                   الأدوار
                 </TabsTrigger>
-                <TabsTrigger value="permissions" className="flex items-center gap-2">
+                {/* <TabsTrigger value="permissions" className="flex items-center gap-2">
                   <Key className="h-4 w-4" />
                   الصلاحيات
-                </TabsTrigger>
+                </TabsTrigger> */}
               </TabsList>
 
               {/* Employees Tab */}
