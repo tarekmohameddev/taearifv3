@@ -67,6 +67,9 @@ module.exports = (set, get) => ({
     selectedRentalId: null,
     isPaymentCollectionDialogOpen: false,
     selectedPaymentRentalId: null,
+    showWhatsAppDialog: false,
+    isRentalWhatsAppDialogOpen: false,
+    selectedRentalForWhatsApp: null,
   },
   setRentalApplications: (newState) =>
     set((state) => ({
@@ -113,6 +116,56 @@ module.exports = (set, get) => ({
         ...state.rentalApplications,
         isPaymentCollectionDialogOpen: false,
         selectedPaymentRentalId: null,
+      },
+    })),
+
+  openWhatsAppDialog: (rental) => {
+    console.log("openWhatsAppDialog called with rental:", rental);
+    set((state) => ({
+      rentalApplications: {
+        ...state.rentalApplications,
+        showWhatsAppDialog: true,
+        selectedRental: rental,
+        // Close rental details dialog when opening WhatsApp dialog
+        isRentalDetailsDialogOpen: false,
+        selectedRentalId: null,
+      },
+    }));
+  },
+
+  closeWhatsAppDialog: () =>
+    set((state) => ({
+      rentalApplications: {
+        ...state.rentalApplications,
+        showWhatsAppDialog: false,
+        selectedRental: null,
+        selectedRentalId: null,
+      },
+    })),
+
+  // Rental WhatsApp Dialog functions
+  openRentalWhatsAppDialog: (rental) => {
+    console.log("openRentalWhatsAppDialog called with rental:", rental);
+    set((state) => ({
+      rentalApplications: {
+        ...state.rentalApplications,
+        isRentalWhatsAppDialogOpen: true,
+        selectedRentalForWhatsApp: rental,
+        // Close other dialogs when opening rental WhatsApp dialog
+        isRentalDetailsDialogOpen: false,
+        selectedRentalId: null,
+        showWhatsAppDialog: false,
+        selectedRental: null,
+      },
+    }));
+  },
+
+  closeRentalWhatsAppDialog: () =>
+    set((state) => ({
+      rentalApplications: {
+        ...state.rentalApplications,
+        isRentalWhatsAppDialogOpen: false,
+        selectedRentalForWhatsApp: null,
       },
     })),
 

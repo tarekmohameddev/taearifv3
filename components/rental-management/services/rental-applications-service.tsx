@@ -84,7 +84,9 @@ import useStore from "@/context/Store";
 import { RentalDetailsDialog } from "../rental-details-dialog";
 import { UpdatedAddRentalForm } from "./updated-rental-form";
 import { PaymentCollectionDialog } from "../payment-collection-dialog";
+import { RentalWhatsAppDialog } from "../rental-whatsapp-dialog";
 import useAuthStore from "@/context/AuthContext";
+import { MessageSquare, Activity } from "lucide-react";
 
 interface Property {
   id: number;
@@ -151,6 +153,10 @@ export function RentalApplicationsService({
     setRentalApplications,
     openRentalDetailsDialog,
     openPaymentCollectionDialog,
+    openRentalWhatsAppDialog,
+    closeRentalWhatsAppDialog,
+    marketingChannels,
+    fetchMarketingChannels,
   } = useStore();
   const {
     rentals,
@@ -171,6 +177,25 @@ export function RentalApplicationsService({
     lastProcessedOpenAddDialogCounter,
   } = rentalApplications;
   const { userData } = useAuthStore();
+
+  // التحقق من وجود قناة واتساب صالحة
+  const hasValidCRMWhatsAppChannel = () => {
+    return marketingChannels.channels.some((channel: any) => 
+      channel.is_verified === true && 
+      channel.is_connected === true &&
+      channel.rental_page_integration_enabled === true
+    );
+  };
+
+  // Debug: Log selectedRental changes
+  useEffect(() => {
+    console.log("selectedRental changed:", selectedRental);
+  }, [selectedRental]);
+
+  // جلب قنوات التسويق عند تحميل المكون
+  useEffect(() => {
+    fetchMarketingChannels();
+  }, [fetchMarketingChannels]);
 
   // Dialog states are now managed by Zustand store
 
@@ -706,7 +731,16 @@ export function RentalApplicationsService({
               {filteredRentals.map((rental: RentalData, index: number) => (
                 <tr
                   key={rental.id}
-                  onClick={() => openRentalDetailsDialog(rental.id)}
+                  onClick={(e) => {
+                    // منع فتح dialog إذا تم الضغط على dropdown menu أو أزرار
+                    if ((e.target as any).closest?.('[data-dropdown]') || 
+                        (e.target as any).closest?.('button') || 
+                        (e.target as any).closest?.('[role="menuitem"]') ||
+                        (e.target as any).closest?.('.cursor-pointer')) {
+                      return;
+                    }
+                    openRentalDetailsDialog(rental.id);
+                  }}
                   className={`hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-300 hover:shadow-sm cursor-pointer ${
                     index % 2 === 0 ? "bg-white" : "bg-gray-25"
                   }`}
@@ -828,7 +862,7 @@ export function RentalApplicationsService({
                   {/* الإجراءات */}
                   <td className="px-6 py-5 z-[9999]">
                     <div className="flex items-center justify-center z-[9999]">
-                      <DropdownMenu>
+                      <DropdownMenu data-dropdown>
                         <DropdownMenuTrigger asChild>
                           <Button
                             size="sm"
@@ -860,6 +894,20 @@ export function RentalApplicationsService({
                             <CreditCard className="h-4 w-4 ml-2 text-gray-600" />
                             تحصيل المدفوعات
                           </DropdownMenuItem>
+                          {hasValidCRMWhatsAppChannel() && (
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  console.log("Setting rental for WhatsApp:", rental);
+                                  openRentalWhatsAppDialog(rental);
+                                }}
+                              className="cursor-pointer hover:bg-gray-100"
+                            >
+                              <Activity className="h-4 w-4 ml-2 text-gray-600" />
+                              ارسال رسالة واتساب
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1430,6 +1478,13 @@ export function RentalApplicationsService({
           </div>
         </div>
       )}
+      
+      {/* Rental WhatsApp Dialog */}
+      <RentalWhatsAppDialog
+        isOpen={rentalApplications.isRentalWhatsAppDialogOpen || false}
+        onClose={closeRentalWhatsAppDialog}
+        rental={rentalApplications.selectedRentalForWhatsApp}
+      />
     </div>
   );
 }
