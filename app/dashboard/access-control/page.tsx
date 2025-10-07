@@ -1432,13 +1432,13 @@ export default function AccessControlPage() {
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>الموظف</TableHead>
-                              <TableHead>البريد الإلكتروني</TableHead>
-                              <TableHead>الهاتف</TableHead>
-                              <TableHead>الأدوار</TableHead>
-                              <TableHead>الحالة</TableHead>
-                              <TableHead>تاريخ الإنشاء</TableHead>
-                              <TableHead>الإجراءات</TableHead>
+                              <TableHead className="text-right">الموظف</TableHead>
+                              <TableHead className="text-right">البريد الإلكتروني</TableHead>
+                              <TableHead className="text-right">الهاتف</TableHead>
+                              <TableHead className="text-right" >الأدوار</TableHead>
+                              <TableHead className="text-right">الحالة</TableHead>
+                              <TableHead className="text-right">تاريخ الإنشاء</TableHead>
+                              <TableHead className="text-right">الإجراءات</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -1933,7 +1933,7 @@ export default function AccessControlPage() {
               <TabsContent value="roles" className="mt-6">
                 <Card>
                   <CardHeader>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
                         <CardTitle className="flex items-center gap-2">
                           <Shield className="h-5 w-5" />
@@ -1945,7 +1945,7 @@ export default function AccessControlPage() {
                       </div>
                       <Button
                         onClick={() => setShowCreateRoleDialog(true)}
-                        className="bg-black hover:bg-gray-800 text-white"
+                        className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto"
                       >
                         <Plus className="h-4 w-4 ml-2" />
                         إنشاء دور
@@ -1974,13 +1974,13 @@ export default function AccessControlPage() {
                     ) : rolesTabData.length > 0 ? (
                       <div className="space-y-6">
                         {/* Statistics Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                           <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-blue-500 rounded-lg">
                                 <Shield className="h-5 w-5 text-white" />
                               </div>
-                              <div>
+                              <div className="flex-1">
                                 <p className="text-sm text-blue-600 font-medium">إجمالي الأدوار</p>
                                 <p className="text-2xl font-bold text-blue-800">{totalRoles}</p>
                               </div>
@@ -1992,19 +1992,19 @@ export default function AccessControlPage() {
                               <div className="p-2 bg-green-500 rounded-lg">
                                 <Key className="h-5 w-5 text-white" />
                               </div>
-                              <div>
+                              <div className="flex-1">
                                 <p className="text-sm text-green-600 font-medium">إجمالي الصلاحيات</p>
                                 <p className="text-2xl font-bold text-green-800">{totalRolesPermissions}</p>
                               </div>
                             </div>
                           </div>
                           
-                          <div className="bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-4">
+                          <div className="bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-4 sm:col-span-2 lg:col-span-1">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-purple-500 rounded-lg">
                                 <BarChart3 className="h-5 w-5 text-white" />
                               </div>
-                              <div>
+                              <div className="flex-1">
                                 <p className="text-sm text-purple-600 font-medium">متوسط الصلاحيات</p>
                                 <p className="text-2xl font-bold text-purple-800">
                                   {totalRoles > 0 ? Math.round(totalRolesPermissions / totalRoles) : 0}
@@ -2029,8 +2029,8 @@ export default function AccessControlPage() {
                         <div className="space-y-6">
                           {filteredRoles.map((role) => (
                             <div key={role.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                              <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 px-6 py-4">
-                                <div className="flex items-center justify-between">
+                              <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 px-4 sm:px-6 py-4">
+                                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                                   <div className="flex items-center gap-3">
                                     <div className="p-2 bg-black rounded-lg">
                                       <Shield className="h-5 w-5 text-white" />
@@ -2044,14 +2044,16 @@ export default function AccessControlPage() {
                                       </p>
                                     </div>
                                   </div>
-                                  <div className="flex items-center gap-2">
-                                    <Badge variant="outline" className="text-gray-600">
-                                      ID: {role.id}
-                                    </Badge>
-                                    <Badge variant="secondary" className="text-gray-600">
-                                      {role.permissions_list?.length || 0} صلاحية
-                                    </Badge>
-                                    <div className="flex items-center gap-2">
+                                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <Badge variant="outline" className="text-gray-600">
+                                        ID: {role.id}
+                                      </Badge>
+                                      <Badge variant="secondary" className="text-gray-600">
+                                        {role.permissions_list?.length || 0} صلاحية
+                                      </Badge>
+                                    </div>
+                                    <div className="flex items-center gap-2 flex-wrap">
                                       <Button
                                         variant="outline"
                                         size="sm"
@@ -2059,7 +2061,8 @@ export default function AccessControlPage() {
                                         className="text-gray-600 hover:text-black hover:border-black"
                                       >
                                         <Eye className="h-4 w-4 ml-2" />
-                                        عرض التفاصيل
+                                        <span className="hidden sm:inline">عرض التفاصيل</span>
+                                        <span className="sm:hidden">عرض</span>
                                       </Button>
                                       <Button
                                         variant="outline"
@@ -2068,7 +2071,7 @@ export default function AccessControlPage() {
                                         className="text-gray-600 hover:text-black hover:border-black"
                                       >
                                         <Edit className="h-4 w-4 ml-2" />
-                                        تعديل
+                                        <span className="hidden sm:inline">تعديل</span>
                                       </Button>
                                       <Button
                                         variant="outline"
@@ -2077,23 +2080,23 @@ export default function AccessControlPage() {
                                         className="text-red-600 hover:text-red-800 hover:border-red-800"
                                       >
                                         <XCircle className="h-4 w-4 ml-2" />
-                                        حذف
+                                        <span className="hidden sm:inline">حذف</span>
                                       </Button>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                               
-                              <div className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                              <div className="p-4 sm:p-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                                   {role.permissions_list?.map((permission, index) => (
                                     <div key={index} className="group border border-gray-200 rounded-lg p-3 hover:border-black hover:shadow-md transition-all duration-200">
                                       <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-gray-100 group-hover:bg-black rounded-lg transition-colors">
+                                        <div className="p-2 bg-gray-100 group-hover:bg-black rounded-lg transition-colors flex-shrink-0">
                                           <Lock className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
                                         </div>
-                                        <div className="flex-1">
-                                          <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors">
+                                        <div className="flex-1 min-w-0">
+                                          <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
                                             {permission}
                                           </h4>
                                         </div>
@@ -2317,7 +2320,7 @@ export default function AccessControlPage() {
 
       {/* Role Details Dialog */}
       <Dialog open={showRoleDetailsDialog} onOpenChange={setShowRoleDetailsDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-black">
               <Shield className="h-5 w-5" />
@@ -2362,25 +2365,25 @@ export default function AccessControlPage() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <div className="flex justify-between">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span className="text-gray-600">معرف الفريق:</span>
                       <span className="font-medium">{roleDetails.team_id}</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span className="text-gray-600">اسم الحارس:</span>
                       <span className="font-medium">{roleDetails.guard_name}</span>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex justify-between">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span className="text-gray-600">تاريخ الإنشاء:</span>
                       <span className="font-medium">
                         {new Date(roleDetails.created_at).toLocaleDateString("ar-US")}
                       </span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span className="text-gray-600">آخر تحديث:</span>
                       <span className="font-medium">
                         {new Date(roleDetails.updated_at).toLocaleDateString("ar-US")}
@@ -2398,15 +2401,15 @@ export default function AccessControlPage() {
                 </div>
                 
                 {roleDetails.permissions_list && roleDetails.permissions_list.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     {roleDetails.permissions_list.map((permission: string, index: number) => (
                       <div key={index} className="group border border-gray-200 rounded-lg p-4 hover:border-black hover:shadow-md transition-all duration-200">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-gray-100 group-hover:bg-black rounded-lg transition-colors">
+                          <div className="p-2 bg-gray-100 group-hover:bg-black rounded-lg transition-colors flex-shrink-0">
                             <Lock className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
                           </div>
-                          <div className="flex-1">
-                            <h5 className="font-medium text-gray-900 group-hover:text-black transition-colors">
+                          <div className="flex-1 min-w-0">
+                            <h5 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
                               {permission}
                             </h5>
                           </div>
@@ -2433,17 +2436,17 @@ export default function AccessControlPage() {
                   <div className="space-y-3">
                     {roleDetails.permissions.map((permission: any, index: number) => (
                       <div key={index} className="border border-gray-200 rounded-lg p-4 hover:border-black transition-colors">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                           <div className="flex items-center gap-3">
-                            <div className="p-2 bg-gray-100 rounded-lg">
+                            <div className="p-2 bg-gray-100 rounded-lg flex-shrink-0">
                               <Lock className="h-4 w-4 text-gray-600" />
                             </div>
-                            <div>
-                              <h5 className="font-medium text-gray-900">{permission.name}</h5>
+                            <div className="min-w-0">
+                              <h5 className="font-medium text-gray-900 truncate">{permission.name}</h5>
                               <p className="text-sm text-gray-600">معرف الصلاحية: {permission.id}</p>
                             </div>
                           </div>
-                          <div className="text-right">
+                          <div className="text-right lg:text-left">
                             <p className="text-sm text-gray-600">معرف الدور: {permission.pivot.role_id}</p>
                             <p className="text-sm text-gray-600">معرف الصلاحية: {permission.pivot.permission_id}</p>
                           </div>
@@ -2475,7 +2478,7 @@ export default function AccessControlPage() {
 
       {/* Create Role Dialog */}
       <Dialog open={showCreateRoleDialog} onOpenChange={setShowCreateRoleDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-black">
               <Shield className="h-5 w-5" />
@@ -2608,7 +2611,7 @@ export default function AccessControlPage() {
 
       {/* Edit Role Dialog */}
       <Dialog open={showEditRoleDialog} onOpenChange={setShowEditRoleDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-black">
               <Edit className="h-5 w-5" />
@@ -2741,7 +2744,7 @@ export default function AccessControlPage() {
 
       {/* Delete Role Dialog */}
       <Dialog open={showDeleteRoleDialog} onOpenChange={setShowDeleteRoleDialog}>
-        <DialogContent className="max-w-md bg-white">
+        <DialogContent className="max-w-md bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
               <XCircle className="h-5 w-5" />
@@ -2808,7 +2811,7 @@ export default function AccessControlPage() {
 
       {/* Delete Permission Dialog */}
       <Dialog open={showDeletePermissionDialog} onOpenChange={setShowDeletePermissionDialog}>
-        <DialogContent className="max-w-md bg-white">
+        <DialogContent className="max-w-md bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
               <XCircle className="h-5 w-5" />
@@ -2878,7 +2881,7 @@ export default function AccessControlPage() {
 
       {/* Delete Employee Dialog */}
       <Dialog open={showDeleteEmployeeDialog} onOpenChange={setShowDeleteEmployeeDialog}>
-        <DialogContent className="max-w-md bg-white">
+        <DialogContent className="max-w-md bg-white mx-4 sm:mx-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
               <XCircle className="h-5 w-5" />
