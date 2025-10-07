@@ -348,6 +348,16 @@ export default function BuildingCard({
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <div className="flex-1">
+                    {/* Property Name and Address */}
+                    <div className="mb-2">
+                      <h5 className="text-sm font-semibold text-black mb-1">
+                        {property.title || `عقار ${property.id}`}
+                      </h5>
+                      <p className="text-xs text-gray-600">
+                        {property.address || building.name || "العنوان غير محدد"}
+                      </p>
+                    </div>
+                    
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-sm font-semibold text-black">
                         {formatPrice(property.price)}
@@ -446,7 +456,7 @@ export default function BuildingCard({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => router.push(`/dashboard/properties/${property.id}`)}
+                    onClick={() => router.push(`/property/${property.slug || property.id}`)}
                     className="text-gray-400 hover:text-black"
                   >
                     <ExternalLink className="w-3 h-3" />

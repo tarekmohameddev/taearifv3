@@ -41,6 +41,9 @@ export interface Property {
   reorder: number;
   reorder_featured: number;
   featured_image_url: string;
+  title?: string;
+  address?: string;
+  slug?: string;
 }
 
 export interface User {
