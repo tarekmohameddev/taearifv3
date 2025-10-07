@@ -463,7 +463,7 @@ export default function BuildingCard({
                       // تحديد الدومين حسب البيئة
                       const isDevelopment = process.env.NODE_ENV === "development";
                       const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
-                      const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "mandhoor.com";
+                      const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
                       
                       const domain = isDevelopment 
                         ? `${localDomain}:3000` 
