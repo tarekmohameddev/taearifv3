@@ -617,7 +617,7 @@ export function UpdatedAddRentalForm({
                         </div>
                       ) : (
                         <>
-                          <CommandEmpty>لم يتم العثور على عقار.</CommandEmpty>
+                          <CommandEmpty>لا يوجد عقارات متاحة للإيجار</CommandEmpty>
                           <CommandGroup>
                         {Array.isArray(availableProperties) &&
                           availableProperties.map((property) => (

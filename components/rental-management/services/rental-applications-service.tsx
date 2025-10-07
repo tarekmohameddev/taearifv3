@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { StatusChangeDialog } from "./status-change-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -158,6 +159,92 @@ export function RentalApplicationsService({
     marketingChannels,
     fetchMarketingChannels,
   } = useStore();
+  
+  // Status change dialog state
+  const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] = useState(false);
+  const [selectedRentalForStatusChange, setSelectedRentalForStatusChange] = useState<any>(null);
+  const [newStatus, setNewStatus] = useState<string>("");
+  const [statusChangeLoading, setStatusChangeLoading] = useState(false);
+  
+  // Function to open status change dialog
+  const openStatusChangeDialog = (rental: any) => {
+    setSelectedRentalForStatusChange(rental);
+    setNewStatus("");
+    setIsStatusChangeDialogOpen(true);
+  };
+
+  // Function to close status change dialog
+  const closeStatusChangeDialog = () => {
+    setIsStatusChangeDialogOpen(false);
+    setSelectedRentalForStatusChange(null);
+    setNewStatus("");
+  };
+
+  // Function to get available status options based on current status
+  const getAvailableStatusOptions = (currentStatus: string) => {
+    switch (currentStatus) {
+      case "draft":
+        return [
+          { value: "active", label: "نشط" },
+          { value: "cancelled", label: "ملغي" }
+        ];
+      case "active":
+        return [
+          { value: "ended", label: "منتهي" },
+          { value: "cancelled", label: "ملغي" }
+        ];
+      case "ended":
+      case "cancelled":
+        return []; // Cannot change from final states
+      default:
+        return [];
+    }
+  };
+
+  // Function to handle status change
+  const handleStatusChange = async (status: string) => {
+    console.log("🔄 handleStatusChange called with status:", status);
+    console.log("🔄 selectedRentalForStatusChange:", selectedRentalForStatusChange);
+    
+    if (!selectedRentalForStatusChange || !status) {
+      console.log("❌ Missing rental or status");
+      return;
+    }
+
+    setStatusChangeLoading(true);
+    try {
+      const response = await axiosInstance.patch(
+        `/v1/rms/rentals/${selectedRentalForStatusChange.id}/status`,
+        {
+          status: status
+        }
+      );
+
+      if (response.data.status) {
+        // Update the rental status in the local state
+        const updatedRentals = rentals.map((rental: any) => 
+          rental.id === selectedRentalForStatusChange.id 
+            ? { ...rental, status: status }
+            : rental
+        );
+        setRentalApplications({ ...rentalApplications, rentals: updatedRentals });
+        
+        // Close dialog
+        closeStatusChangeDialog();
+        
+        // Show success message (you can add toast notification here)
+        console.log("Status changed successfully");
+      } else {
+        throw new Error("Failed to change status");
+      }
+    } catch (error: any) {
+      console.error("Error changing status:", error);
+      // Handle error (you can add error notification here)
+    } finally {
+      setStatusChangeLoading(false);
+    }
+  };
+
   const {
     rentals,
     pagination,
@@ -894,6 +981,16 @@ export function RentalApplicationsService({
                             <CreditCard className="h-4 w-4 ml-2 text-gray-600" />
                             تحصيل المدفوعات
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openStatusChangeDialog(rental);
+                            }}
+                            className="cursor-pointer hover:bg-gray-100"
+                          >
+                            <CreditCard className="h-4 w-4 ml-2 text-gray-600" />
+                            تغيير حالة العقد
+                          </DropdownMenuItem>
                           {hasValidCRMWhatsAppChannel() && (
                               <DropdownMenuItem
                                 onClick={(e) => {
@@ -1378,6 +1475,15 @@ export function RentalApplicationsService({
 
       {/* Payment Collection Dialog */}
       <PaymentCollectionDialog />
+
+      {/* Status Change Dialog */}
+      <StatusChangeDialog
+        isOpen={isStatusChangeDialogOpen}
+        onClose={closeStatusChangeDialog}
+        rental={selectedRentalForStatusChange}
+        onStatusChange={handleStatusChange}
+        isLoading={statusChangeLoading}
+      />
 
       {/* Pagination */}
       {pagination && pagination.last_page > 1 && (
@@ -1954,7 +2060,7 @@ function AddRentalForm({
                   <Command>
                     <CommandInput placeholder="ابحث عن عقار..." />
                     <CommandList>
-                      <CommandEmpty>لم يتم العثور على عقار.</CommandEmpty>
+                      <CommandEmpty>لا يوجد عقارات متاحة</CommandEmpty>
                       <CommandGroup>
                         {Array.isArray(properties) &&
                           properties.map((property) => (
@@ -2629,7 +2735,7 @@ function EditRentalForm({
                   <Command>
                     <CommandInput placeholder="ابحث عن عقار..." />
                     <CommandList>
-                      <CommandEmpty>لم يتم العثور على عقار.</CommandEmpty>
+                      <CommandEmpty>لا يوجد عقارات متاحة</CommandEmpty>
                       <CommandGroup>
                         {Array.isArray(properties) &&
                           properties.map((property) => (
