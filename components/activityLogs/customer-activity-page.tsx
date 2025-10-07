@@ -44,9 +44,18 @@ interface CustomerLog {
   created_at: string;
 }
 
+interface CustomerInfo {
+  id: number;
+  name: string;
+  email: string;
+}
+
 interface CustomerLogsResponse {
   status: string;
   data: {
+    id: number;
+    name: string;
+    email: string;
     logs: CustomerLog[];
     pagination: {
       total: number;
@@ -65,6 +74,7 @@ export default function CustomerActivityLogPage() {
 
   // State
   const [customerLogs, setCustomerLogs] = useState<CustomerLog[]>([]);
+  const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -87,6 +97,11 @@ export default function CustomerActivityLogPage() {
       });
       
       setCustomerLogs(response.data.data.logs);
+      setCustomerInfo({
+        id: response.data.data.id,
+        name: response.data.data.name,
+        email: response.data.data.email
+      });
       setTotalPages(response.data.data.pagination.last_page);
       setTotalLogs(response.data.data.pagination.total);
     } catch (err: any) {
@@ -188,6 +203,24 @@ export default function CustomerActivityLogPage() {
                 </div>
               </div>
               <p className="text-gray-600">مراقبة وتتبع جميع الأنشطة المتعلقة بهذا العميل</p>
+              
+              {/* Customer Information */}
+              {customerInfo && (
+                <Card className="mt-4">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <User className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900">{customerInfo.name}</h3>
+                        <p className="text-gray-600">{customerInfo.email}</p>
+                        <p className="text-sm text-gray-500">ID: {customerInfo.id}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Statistics Cards */}
