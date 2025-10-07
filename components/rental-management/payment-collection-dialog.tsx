@@ -883,7 +883,7 @@ export function PaymentCollectionDialog() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 sm:p-6">
-                <div className="grid grid-cols-6 gap-3">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
                   {data.payment_details.items.map((payment) => {
                     const isPaid = payment.status === "paid";
                     const isSelected = selectedPayments.some(
@@ -904,7 +904,7 @@ export function PaymentCollectionDialog() {
                         dir="rtl"
                       >
                         {/* Header with sequence number and status */}
-                        <div className="flex items-center justify-between" dir="rtl">
+                        <div className="sm:flex hidden items-center justify-between" dir="rtl">
                           <div
                             className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm ${
                               isPaid
