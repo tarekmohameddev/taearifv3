@@ -116,10 +116,15 @@ export function UpdatedAddRentalForm({
 
   const [projects, setProjects] = useState<any[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
+  const [availableProperties, setAvailableProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [openProject, setOpenProject] = useState(false);
   const [openProperty, setOpenProperty] = useState(false);
+  const [openAvailableProperty, setOpenAvailableProperty] = useState(false);
+  const [selectedBuilding, setSelectedBuilding] = useState<string>("");
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string>("");
+  const [selectedProject, setSelectedProject] = useState<string>("");
 
   // جلب البيانات عند فتح النموذج
   useEffect(() => {
@@ -136,9 +141,10 @@ export function UpdatedAddRentalForm({
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [projectsRes, propertiesRes] = await Promise.all([
+        const [projectsRes, propertiesRes, availablePropertiesRes] = await Promise.all([
           axiosInstance.get("/projects"),
           axiosInstance.get("/properties"),
+          axiosInstance.get("/properties/available-units"),
         ]);
 
         // معالجة بيانات المشاريع
@@ -170,10 +176,22 @@ export function UpdatedAddRentalForm({
         } else {
           setProperties([]);
         }
+
+        // معالجة بيانات العقارات المتاحة
+        if (
+          availablePropertiesRes.data?.data &&
+          Array.isArray(availablePropertiesRes.data.data)
+        ) {
+          setAvailableProperties(availablePropertiesRes.data.data);
+        } else {
+          console.log("No available properties data found");
+          setAvailableProperties([]);
+        }
       } catch (error) {
         setErrors({ general: "حدث خطأ في جلب البيانات" });
         setProjects([]);
         setProperties([]);
+        setAvailableProperties([]);
       } finally {
         setLoading(false);
       }
@@ -196,8 +214,8 @@ export function UpdatedAddRentalForm({
     if (!formData.tenant_phone.trim()) {
       newErrors.tenant_phone = "رقم الهاتف مطلوب";
     }
-    if (!formData.property_number.trim()) {
-      newErrors.property_number = "رقم العقار مطلوب";
+    if (!formData.property_id.trim()) {
+      newErrors.property_number = "العقار مطلوب";
     }
     if (!formData.move_in_date.trim()) {
       newErrors.move_in_date = "تاريخ الانتقال مطلوب";
@@ -276,27 +294,48 @@ export function UpdatedAddRentalForm({
       return;
     }
 
-    // تحويل البيانات إلى الأنواع الصحيحة
+    // تحويل البيانات إلى الأنواع الصحيحة لتطابق الـ API المطلوب
     const processedFormData: any = {
-      ...formData,
-      property_id: formData.property_id ? parseInt(formData.property_id) : null,
+      tenant_full_name: formData.tenant_full_name,
+      tenant_phone: formData.tenant_phone,
+      tenant_email: formData.tenant_email,
+      tenant_job_title: formData.tenant_job_title,
+      tenant_social_status: formData.tenant_social_status,
+      tenant_national_id: formData.tenant_national_id,
+      unit_id: formData.property_id ? parseInt(formData.property_id) : null,
       project_id: formData.project_id ? parseInt(formData.project_id) : null,
-      rental_period: Number(formData.rental_period) || 12,
-      base_rent_amount: formData.base_rent_amount
+      building_id: selectedBuildingId,
+      move_in_date: formData.move_in_date,
+      rental_type: formData.rental_period_type || "monthly",
+      rental_duration: Number(formData.rental_period) || 12,
+      paying_plan: formData.paying_plan,
+      total_rental_amount: formData.base_rent_amount
         ? parseFloat(formData.base_rent_amount)
         : 0,
-      deposit_amount: formData.deposit_amount
-        ? parseFloat(formData.deposit_amount)
-        : 0,
-      office_commission_value: formData.office_commission_value
-        ? parseFloat(formData.office_commission_value)
-        : 0,
-      platform_fee: formData.platform_fee
-        ? parseFloat(formData.platform_fee)
-        : 0,
-      water_fee: formData.water_fee ? parseFloat(formData.water_fee) : 0,
+      currency: formData.currency,
+      contract_number: formData.contract_number,
+      notes: formData.notes,
+      cost_items: [
+        {
+          name: "Security Deposit",
+          cost: formData.deposit_amount ? parseFloat(formData.deposit_amount) : 0,
+          type: "fixed",
+          payer: "tenant",
+          payment_frequency: "one_time",
+          description: "Refundable security deposit"
+        },
+        {
+          name: "Maintenance Fee",
+          cost: formData.platform_fee ? parseFloat(formData.platform_fee) : 0,
+          type: "fixed",
+          payer: "tenant",
+          payment_frequency: "per_installment",
+          description: "Monthly maintenance fee"
+        }
+      ]
     };
 
+    console.log("Processed form data for API:", processedFormData);
     onSubmit(processedFormData);
   };
 
@@ -532,27 +571,132 @@ export function UpdatedAddRentalForm({
             </h4>
 
             <div className="space-y-2">
-              <Label
-                htmlFor="property_number"
-                className="text-sm font-medium text-gray-700"
-              >
-                رقم العقار <span className="text-red-500">*</span>
+              <Label className="text-sm font-medium text-gray-700">
+                العقار <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="property_number"
-                value={formData.property_number}
-                onChange={(e) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    property_number: e.target.value,
-                  }));
-                  if (errors.property_number) {
-                    setErrors((prev) => ({ ...prev, property_number: "" }));
-                  }
-                }}
-                placeholder="12"
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.property_number ? "border-red-500" : ""}`}
-              />
+              <Popover open={openAvailableProperty && !loading} onOpenChange={setOpenAvailableProperty}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openAvailableProperty}
+                    disabled={loading}
+                    className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        جاري التحميل...
+                      </>
+                    ) : formData.property_id ? (
+                      availableProperties.find(
+                        (property) =>
+                          property.id.toString() === formData.property_id,
+                      )?.title || `عقار ${formData.property_id}`
+                    ) : (
+                      "اختر عقار..."
+                    )}
+                    {!loading && <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="w-full p-0 z-50" 
+                  side="bottom" 
+                  align="start"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                  onInteractOutside={(e) => e.preventDefault()}
+                  onEscapeKeyDown={(e) => e.preventDefault()}
+                >
+                  <Command>
+                    <CommandInput placeholder="ابحث عن عقار..." disabled={loading} />
+                    <CommandList>
+                      {loading ? (
+                        <div className="flex items-center justify-center p-4">
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <span>جاري تحميل العقارات...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <CommandEmpty>لم يتم العثور على عقار.</CommandEmpty>
+                          <CommandGroup>
+                        {Array.isArray(availableProperties) &&
+                          availableProperties.map((property) => (
+                            <CommandItem
+                              key={property.id}
+                              value={property.id.toString()}
+                              className="cursor-pointer"
+                              onSelect={() => {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  property_id: property.id.toString(),
+                                  project_id: property.project?.id?.toString() || "",
+                                }));
+                                // تحديث العمارة والمشروع عند اختيار العقار
+                                setSelectedBuilding(property.building?.name || "");
+                                setSelectedBuildingId(property.building?.id?.toString() || "");
+                                setSelectedProject(property.project?.name || "");
+                                setOpenAvailableProperty(false);
+                              }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  property_id: property.id.toString(),
+                                  project_id: property.project?.id?.toString() || "",
+                                }));
+                                // تحديث العمارة والمشروع عند اختيار العقار
+                                setSelectedBuilding(property.building?.name || "");
+                                setSelectedBuildingId(property.building?.id?.toString() || "");
+                                setSelectedProject(property.project?.name || "");
+                                setOpenAvailableProperty(false);
+                              }}
+                              onPointerDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  property_id: property.id.toString(),
+                                  project_id: property.project?.id?.toString() || "",
+                                }));
+                                // تحديث العمارة والمشروع عند اختيار العقار
+                                setSelectedBuilding(property.building?.name || "");
+                                setSelectedBuildingId(property.building?.id?.toString() || "");
+                                setSelectedProject(property.project?.name || "");
+                                setOpenAvailableProperty(false);
+                              }}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  property_id: property.id.toString(),
+                                  project_id: property.project?.id?.toString() || "",
+                                }));
+                                // تحديث العمارة والمشروع عند اختيار العقار
+                                setSelectedBuilding(property.building?.name || "");
+                                setSelectedBuildingId(property.building?.id?.toString() || "");
+                                setSelectedProject(property.project?.name || "");
+                                setOpenAvailableProperty(false);
+                              }}
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  formData.property_id === property.id.toString()
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                }`}
+                              />
+                              {property.title || `عقار ${property.id}`}
+                            </CommandItem>
+                          ))}
+                          </CommandGroup>
+                        </>
+                      )}
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               {errors.property_number && (
                 <p className="text-sm text-red-600 flex items-center">
                   <AlertCircle className="h-3 w-3 ml-1" />
@@ -565,121 +709,26 @@ export function UpdatedAddRentalForm({
               <Label className="text-sm font-medium text-gray-700">
                 المشروع
               </Label>
-              <Popover open={openProject} onOpenChange={setOpenProject}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={openProject}
-                    className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
-                  >
-                    {formData.project_id
-                      ? projects.find(
-                          (project) =>
-                            project.id.toString() === formData.project_id,
-                        )?.contents?.[0]?.title ||
-                        `مشروع ${formData.project_id}`
-                      : "اختر مشروع..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="ابحث عن مشروع..." />
-                    <CommandList>
-                      <CommandEmpty>لم يتم العثور على مشروع.</CommandEmpty>
-                      <CommandGroup>
-                        {Array.isArray(projects) &&
-                          projects.map((project) => (
-                            <CommandItem
-                              key={project.id}
-                              value={
-                                project.contents?.[0]?.title ||
-                                `مشروع ${project.id}`
-                              }
-                              onSelect={() => {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  project_id: project.id.toString(),
-                                }));
-                                setOpenProject(false);
-                              }}
-                            >
-                              <Check
-                                className={`mr-2 h-4 w-4 ${
-                                  formData.project_id === project.id.toString()
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                }`}
-                              />
-                              {project.contents?.[0]?.title ||
-                                `مشروع ${project.id}`}
-                            </CommandItem>
-                          ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <Input
+                value={selectedProject}
+                disabled
+                placeholder="سيتم ملء هذا الحقل تلقائياً عند اختيار العقار"
+                className="border-gray-300 bg-gray-50 text-gray-600"
+              />
             </div>
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700">
-                العقار
+                العمارة
               </Label>
-              <Popover open={openProperty} onOpenChange={setOpenProperty}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={openProperty}
-                    className="w-full justify-between border-gray-300 focus:border-gray-900 focus:ring-gray-900"
-                  >
-                    {formData.property_id
-                      ? properties.find(
-                          (property) =>
-                            property.id.toString() === formData.property_id,
-                        )?.title || `عقار ${formData.property_id}`
-                      : "اختر عقار..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="ابحث عن عقار..." />
-                    <CommandList>
-                      <CommandEmpty>لم يتم العثور على عقار.</CommandEmpty>
-                      <CommandGroup>
-                        {Array.isArray(properties) &&
-                          properties.map((property) => (
-                            <CommandItem
-                              key={property.id}
-                              value={property.title || `عقار ${property.id}`}
-                              onSelect={() => {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  property_id: property.id.toString(),
-                                }));
-                                setOpenProperty(false);
-                              }}
-                            >
-                              <Check
-                                className={`mr-2 h-4 w-4 ${
-                                  formData.property_id ===
-                                  property.id.toString()
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                }`}
-                              />
-                              {property.title || `عقار ${property.id}`}
-                            </CommandItem>
-                          ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <Input
+                value={selectedBuilding}
+                disabled
+                placeholder="سيتم ملء هذا الحقل تلقائياً عند اختيار العقار"
+                className="border-gray-300 bg-gray-50 text-gray-600"
+              />
             </div>
+
 
 
             <div className="space-y-2">
