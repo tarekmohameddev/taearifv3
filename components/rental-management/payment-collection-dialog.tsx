@@ -144,6 +144,10 @@ export function PaymentCollectionDialog() {
   );
   const [reference, setReference] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
+  const [bankName, setBankName] = useState<string>("");
+  const [transferTo, setTransferTo] = useState<string>("منصة ناجز");
+  const [receiptImagePath, setReceiptImagePath] = useState<string>("");
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
   const [selectedFees, setSelectedFees] = useState<
     Array<{
       type: string;
@@ -599,6 +603,14 @@ export function PaymentCollectionDialog() {
         payment_method: paymentMethod,
         payment_date: paymentDate,
         reference: reference || `PAY-${Date.now()}`,
+        notes: notes,
+        ...(paymentMethod === "bank_transfer" && {
+          bank_name: bankName,
+          transfer_to: transferTo,
+        }),
+        ...(receiptImagePath && {
+          receipt_image_path: receiptImagePath,
+        }),
       };
 
       const response = await axiosInstance.post(
@@ -615,6 +627,9 @@ export function PaymentCollectionDialog() {
         setFullPaymentItems([]);
         setReference("");
         setNotes("");
+        setBankName("");
+        setTransferTo("منصة ناجز");
+        setReceiptImagePath("");
         // Show success message or handle success
       }
     } catch (err: any) {
@@ -639,6 +654,36 @@ export function PaymentCollectionDialog() {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setIsUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("receipt_image", file);
+
+      const response = await axiosInstance.post(
+        "/v1/rms/rentals/upload-receipt-image",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.status) {
+        setReceiptImagePath(response.data.data.image_path);
+        console.log("Image uploaded successfully:", response.data.data.image_path);
+      } else {
+        throw new Error("Failed to upload image");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      // You might want to show a toast notification here
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const translateFeeName = (feeName: string) => {
@@ -762,107 +807,6 @@ export function PaymentCollectionDialog() {
 
         {data && !loading && (
           <div className="space-y-6 text-right">
-            {/* Rental Info Card */}
-            <Card className="border-2 border-gray-200 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-gray-50 to-white p-4 sm:p-6">
-                <CardTitle
-                  className="flex items-center gap-3 text-right text-lg sm:text-xl"
-                  dir="rtl"
-                >
-                  <div className="h-10 w-10 bg-gradient-to-br from-gray-800 to-gray-600 rounded-full flex items-center justify-center">
-                    <User className="h-5 w-5 text-white" />
-                  </div>
-                  معلومات المستأجر والعقار
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6 space-y-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Tenant Info */}
-                  <div className="space-y-4">
-                    <h3
-                      className="text-lg font-bold text-gray-900 flex items-center gap-2"
-                      dir="rtl"
-                    >
-                      <User className="h-5 w-5" />
-                      بيانات المستأجر
-                    </h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3" dir="rtl">
-                        <div className="text-right">
-                          <p className="text-sm text-gray-500">الاسم</p>
-                          <p className="font-semibold text-gray-900">
-                            {data.rental_info?.tenant_name || "غير محدد"}
-                          </p>
-                        </div>
-                        <User className="h-4 w-4 text-gray-500" />
-                      </div>
-                      <div className="flex items-center gap-3" dir="rtl">
-                        <div className="text-right">
-                          <p className="text-sm text-gray-500">الهاتف</p>
-                          <p className="font-semibold text-gray-900">
-                            {data.rental_info?.tenant_phone || "غير محدد"}
-                          </p>
-                        </div>
-                        <Phone className="h-4 w-4 text-gray-500" />
-                      </div>
-                      <div className="flex items-center gap-3" dir="rtl">
-                        <div className="text-right">
-                          <p className="text-sm text-gray-500">
-                            البريد الإلكتروني
-                          </p>
-                          <p className="font-semibold text-gray-900 break-all">
-                            {data.rental_info?.tenant_email || "غير محدد"}
-                          </p>
-                        </div>
-                        <Mail className="h-4 w-4 text-gray-500" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Property Info */}
-                  <div className="space-y-4">
-                    <h3
-                      className="text-lg font-bold text-gray-900 flex items-center gap-2"
-                      dir="rtl"
-                    >
-                      <Building2 className="h-5 w-5" />
-                      بيانات العقار
-                    </h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3" dir="rtl">
-                        <div className="text-right">
-                          <p className="text-sm text-gray-500">رقم العقار</p>
-                          <p className="font-semibold text-gray-900">
-                            {data.rental_info?.property_number || "غير محدد"}
-                          </p>
-                        </div>
-                        <Hash className="h-4 w-4 text-gray-500" />
-                      </div>
-                      <div className="flex items-center gap-3" dir="rtl">
-                        <div className="text-right">
-                          <p className="text-sm text-gray-500">الوحدة</p>
-                          <p className="font-semibold text-gray-900">
-                            {data.rental_info?.unit_label || "غير محدد"}
-                          </p>
-                        </div>
-                        <Building2 className="h-4 w-4 text-gray-500" />
-                      </div>
-                      {data.rental_info?.contract_number && (
-                        <div className="flex items-center gap-3" dir="rtl">
-                          <div className="text-right">
-                            <p className="text-sm text-gray-500">رقم العقد</p>
-                            <p className="font-semibold text-gray-900">
-                              {data.rental_info?.contract_number}
-                            </p>
-                          </div>
-                          <Hash className="h-4 w-4 text-gray-500" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Payment Summary */}
             <Card className="border-2 border-gray-200 shadow-lg">
@@ -922,120 +866,6 @@ export function PaymentCollectionDialog() {
                     </p>
                   </div>
                 </div>
-
-                {/* Fees Breakdown */}
-                <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-4">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
-                    تفاصيل الرسوم
-                  </h3>
-                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-500 mb-1">
-                        إجمالي الإيجار
-                      </p>
-                      <p className="text-base font-bold text-gray-900">
-                        {formatCurrency(
-                          data.payment_details?.summary?.total_rent_due || 0,
-                        )}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-500 mb-1">
-                        إجمالي الرسوم
-                      </p>
-                      <p className="text-base font-bold text-gray-900">
-                        {formatCurrency(
-                          data.payment_details?.summary?.total_fees_due || 0,
-                        )}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-500 mb-1">رسوم المنصة</p>
-                      <p className="text-base font-bold text-gray-900">
-                        {formatCurrency(data.fees_breakdown?.platform_fee || 0)}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-500 mb-1">رسوم المياه</p>
-                      <p className="text-base font-bold text-gray-900">
-                        {formatCurrency(data.fees_breakdown?.water_fee || 0)}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-500 mb-1">رسوم المكتب</p>
-                      <p className="text-base font-bold text-gray-900">
-                        {formatCurrency(data.fees_breakdown?.office_fee || 0)}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Individual Fee Selection */}
-                  <div className="mt-6 pt-4 border-t border-gray-300">
-                    <h4 className="text-md font-bold text-gray-900 mb-3 text-center">
-                      اختر الرسوم المطلوب دفعها
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      {data.available_fees?.map((fee) => {
-                        const isPaid = fee.remaining_amount === 0;
-                        const isSelected = selectedFees.some(
-                          (f) => f.type === fee.fee_type,
-                        );
-
-                        return (
-                          <button
-                            key={fee.fee_type}
-                            onClick={() =>
-                              !isPaid &&
-                              handleFeeSelect(
-                                fee.fee_type,
-                                fee.remaining_amount,
-                                translateFeeName(fee.fee_name),
-                              )
-                            }
-                            className={`p-3 rounded-lg border-2 transition-all duration-300 ${
-                              isPaid
-                                ? "bg-green-50 border-2 border-green-200 cursor-not-allowed opacity-75"
-                                : isSelected
-                                  ? "bg-gradient-to-r from-gray-800 to-gray-600 text-white border-gray-800 shadow-lg cursor-pointer"
-                                  : "bg-white text-gray-700 border-gray-300 hover:border-gray-500 hover:shadow-md cursor-pointer"
-                            }`}
-                          >
-                            <div className="text-center">
-                              <p
-                                className={`font-semibold ${
-                                  isPaid
-                                    ? "text-green-800"
-                                    : isSelected
-                                      ? "text-white"
-                                      : "text-gray-700"
-                                }`}
-                              >
-                                {translateFeeName(fee.fee_name)}
-                                {isPaid && " (مدفوعة)"}
-                              </p>
-                              <p
-                                className={`text-sm ${
-                                  isPaid
-                                    ? "text-green-600"
-                                    : isSelected
-                                      ? "text-white"
-                                      : "text-gray-700"
-                                }`}
-                              >
-                                {isPaid
-                                  ? "مدفوع بالكامل"
-                                  : formatCurrency(fee.remaining_amount)}
-                              </p>
-                              {!isPaid && (
-                                <p className="text-xs text-gray-500">متبقي</p>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
@@ -1053,7 +883,7 @@ export function PaymentCollectionDialog() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 sm:p-6">
-                <div className="space-y-3">
+                <div className="grid grid-cols-6 gap-3">
                   {data.payment_details.items.map((payment) => {
                     const isPaid = payment.status === "paid";
                     const isSelected = selectedPayments.some(
@@ -1064,7 +894,7 @@ export function PaymentCollectionDialog() {
                       <div
                         key={payment.id}
                         onClick={() => !isPaid && handlePaymentSelect(payment)}
-                        className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg transition-all duration-300 gap-3 sm:gap-4 ${
+                        className={`flex flex-col p-3 rounded-lg transition-all duration-300 gap-2 min-h-[120px] ${
                           isPaid
                             ? "bg-green-50 border-2 border-green-200 cursor-not-allowed opacity-75"
                             : isSelected
@@ -1073,9 +903,10 @@ export function PaymentCollectionDialog() {
                         }`}
                         dir="rtl"
                       >
-                        <div className="flex items-center gap-4" dir="rtl">
+                        {/* Header with sequence number and status */}
+                        <div className="flex items-center justify-between" dir="rtl">
                           <div
-                            className={`h-10 w-10 rounded-full flex items-center justify-center font-bold ${
+                            className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm ${
                               isPaid
                                 ? "bg-green-500 text-white"
                                 : isSelected
@@ -1084,79 +915,6 @@ export function PaymentCollectionDialog() {
                             }`}
                           >
                             {isPaid ? "✓" : payment.sequence_no}
-                          </div>
-                          <div className="text-right" dir="rtl">
-                            <p
-                              className={`text-base font-semibold text-right ${
-                                isPaid
-                                  ? "text-green-800"
-                                  : isSelected
-                                    ? "text-white"
-                                    : "text-gray-900"
-                              }`}
-                            >
-                              الدفعة رقم {payment.sequence_no}
-                              {isPaid && " (مدفوعة)"}
-                            </p>
-                            <p
-                              className={`text-sm text-right ${
-                                isPaid
-                                  ? "text-green-600"
-                                  : isSelected
-                                    ? "text-gray-200"
-                                    : "text-gray-500"
-                              }`}
-                            >
-                              {isPaid ? "تم الدفع في: " : "مستحق في: "}
-                              {formatDate(payment.due_date)}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4" dir="rtl">
-                          <div className="text-right" dir="rtl">
-                            <p
-                              className={`text-base font-bold text-right ${
-                                isPaid
-                                  ? "text-green-800"
-                                  : isSelected
-                                    ? "text-white"
-                                    : "text-gray-900"
-                              }`}
-                            >
-                              {formatCurrency(payment.rent_amount)}
-                            </p>
-                            {isPaid ? (
-                              <p className="text-sm text-right text-green-600">
-                                مدفوع بالكامل:{" "}
-                                {formatCurrency(payment.paid_amount)}
-                              </p>
-                            ) : (
-                              <>
-                                {payment.paid_amount > 0 && (
-                                  <p
-                                    className={`text-sm text-right ${
-                                      isSelected
-                                        ? "text-green-200"
-                                        : "text-green-600"
-                                    }`}
-                                  >
-                                    مدفوع: {formatCurrency(payment.paid_amount)}
-                                  </p>
-                                )}
-                                {payment.remaining_amount > 0 && (
-                                  <p
-                                    className={`text-sm text-right ${
-                                      isSelected
-                                        ? "text-red-200"
-                                        : "text-red-600"
-                                    }`}
-                                  >
-                                    متبقي:{" "}
-                                    {formatCurrency(payment.remaining_amount)}
-                                  </p>
-                                )}
-                              </>
-                            )}
                           </div>
                           <Badge
                             className={`${
@@ -1188,15 +946,166 @@ export function PaymentCollectionDialog() {
                             </span>
                           </Badge>
                         </div>
+
+                        {/* Payment title */}
+                        <div className="text-center">
+                          <p
+                            className={`text-sm font-bold ${
+                              isPaid
+                                ? "text-green-800"
+                                : isSelected
+                                  ? "text-white"
+                                  : "text-gray-900"
+                            }`}
+                          >
+                            الدفعة رقم {payment.sequence_no}
+                            {isPaid && " (مدفوعة)"}
+                          </p>
+                        </div>
+
+                        {/* Amount section */}
+                        <div className="text-center">
+                          <p
+                            className={`text-lg font-bold ${
+                              isPaid
+                                ? "text-green-800"
+                                : isSelected
+                                  ? "text-white"
+                                  : "text-gray-900"
+                            }`}
+                          >
+                            {formatCurrency(payment.rent_amount)}
+                          </p>
+                        </div>
+
+                        {/* Date and payment details */}
+                        <div className="space-y-1">
+                          <p
+                            className={`text-xs text-center ${
+                              isPaid
+                                ? "text-green-600"
+                                : isSelected
+                                  ? "text-gray-200"
+                                  : "text-gray-500"
+                            }`}
+                          >
+                            {isPaid ? "تم الدفع في: " : "مستحق في: "}
+                            {formatDate(payment.due_date)}
+                          </p>
+                          
+                          {isPaid ? (
+                            <p className="text-xs text-center text-green-600">
+                              مدفوع بالكامل:{" "}
+                              {formatCurrency(payment.paid_amount)}
+                            </p>
+                          ) : (
+                            <div className="space-y-1">
+                              {payment.paid_amount > 0 && (
+                                <p
+                                  className={`text-xs text-center ${
+                                    isSelected
+                                      ? "text-green-200"
+                                      : "text-green-600"
+                                  }`}
+                                >
+                                  مدفوع: {formatCurrency(payment.paid_amount)}
+                                </p>
+                              )}
+                              {payment.remaining_amount > 0 && (
+                                <p
+                                  className={`text-xs text-center ${
+                                    isSelected
+                                      ? "text-red-200"
+                                      : "text-red-600"
+                                  }`}
+                                >
+                                  متبقي:{" "}
+                                  {formatCurrency(payment.remaining_amount)}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Fees Breakdown */}
+                <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-3 mt-4">
+                  {/* Individual Fee Selection */}
+                  <div className="mt-3">
+                    <h4 className="text-sm font-bold text-gray-900 mb-2 text-center">
+                      اختر الرسوم المطلوب دفعها
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {data.available_fees?.map((fee) => {
+                        const isPaid = fee.remaining_amount === 0;
+                        const isSelected = selectedFees.some(
+                          (f) => f.type === fee.fee_type,
+                        );
+
+                        return (
+                          <button
+                            key={fee.fee_type}
+                            onClick={() =>
+                              !isPaid &&
+                              handleFeeSelect(
+                                fee.fee_type,
+                                fee.remaining_amount,
+                                translateFeeName(fee.fee_name),
+                              )
+                            }
+                            className={`p-2 rounded-lg border-2 transition-all duration-300 ${
+                              isPaid
+                                ? "bg-green-50 border-2 border-green-200 cursor-not-allowed opacity-75"
+                                : isSelected
+                                  ? "bg-gradient-to-r from-gray-800 to-gray-600 text-white border-gray-800 shadow-lg cursor-pointer"
+                                  : "bg-white text-gray-700 border-gray-300 hover:border-gray-500 hover:shadow-md cursor-pointer"
+                            }`}
+                          >
+                            <div className="text-center">
+                              <p
+                                className={`text-sm font-semibold ${
+                                  isPaid
+                                    ? "text-green-800"
+                                    : isSelected
+                                      ? "text-white"
+                                      : "text-gray-700"
+                                }`}
+                              >
+                                {translateFeeName(fee.fee_name)}
+                                {isPaid && " (مدفوعة)"}
+                              </p>
+                              <p
+                                className={`text-xs ${
+                                  isPaid
+                                    ? "text-green-600"
+                                    : isSelected
+                                      ? "text-white"
+                                      : "text-gray-700"
+                                }`}
+                              >
+                                {isPaid
+                                  ? "مدفوع بالكامل"
+                                  : formatCurrency(fee.remaining_amount)}
+                              </p>
+                              {!isPaid && (
+                                <p className="text-xs text-gray-500">متبقي</p>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Payment Type Selection */}
-            <Card className="border-2 border-gray-200 shadow-lg">
+            {/* مختفي فقط ولا اريد ازالته */}
+            {/* <Card className="border-2 border-gray-200 shadow-lg">
               <CardHeader className="bg-gradient-to-r from-gray-50 to-white p-4 sm:p-6">
                 <CardTitle
                   className="flex items-center gap-3 text-right text-lg sm:text-xl"
@@ -1242,7 +1151,7 @@ export function PaymentCollectionDialog() {
                   </button>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Payment Details Section */}
             <Card className="border-2 border-gray-200 shadow-lg">
@@ -1330,6 +1239,162 @@ export function PaymentCollectionDialog() {
                       className="text-right border-2 border-gray-300 focus:border-gray-800 focus:ring-2 focus:ring-gray-200"
                       dir="rtl"
                     />
+                  </div>
+
+                  {paymentMethod === "bank_transfer" && (
+                    <>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="bank-name"
+                          className="text-right block text-sm font-medium text-gray-700"
+                        >
+                          اسم البنك
+                        </Label>
+                        <Input
+                          id="bank-name"
+                          type="text"
+                          value={bankName}
+                          onChange={(e) => setBankName(e.target.value)}
+                          placeholder="مثال: البنك الأهلي السعودي"
+                          className="text-right border-2 border-gray-300 focus:border-gray-800 focus:ring-2 focus:ring-gray-200"
+                          dir="rtl"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="transfer-to"
+                          className="text-right block text-sm font-medium text-gray-700"
+                        >
+                          التحويل إلى
+                        </Label>
+                        <select
+                          id="transfer-to"
+                          value={transferTo}
+                          onChange={(e) => setTransferTo(e.target.value)}
+                          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-gray-800 focus:ring-2 focus:ring-gray-200 text-right"
+                          dir="rtl"
+                        >
+                          <option value="منصة ناجز">منصة ناجز</option>
+                          <option value="المكتب">المكتب</option>
+                          <option value="المالك">المالك</option>
+                        </select>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label className="text-right block text-sm font-medium text-gray-700">
+                      رفع صورة الإيصال (اختياري)
+                    </Label>
+                    
+                    {receiptImagePath && receiptImagePath.trim() !== "" ? (
+                      // حالة ما بعد الرفع - عرض الصورة مع إمكانية الحذف فقط
+                      <div className="relative">
+                        <div className="flex items-center gap-3 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <div className="flex-1">
+                            <p className="text-sm text-green-700 font-medium">تم رفع صورة الإيصال بنجاح</p>
+                            <p className="text-xs text-green-600">يمكنك الضغط على الصورة لمشاهدتها</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReceiptImagePath("");
+                              // إعادة تعيين input file
+                              const fileInput = document.getElementById('receipt-upload') as HTMLInputElement;
+                              if (fileInput) {
+                                fileInput.value = '';
+                              }
+                            }}
+                            className="text-red-500 hover:text-red-700 transition-colors"
+                            title="حذف الصورة"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div className="mt-2">
+                          <img 
+                            src={`https://taearif.com/storage/${receiptImagePath}`} 
+                            alt="صورة الإيصال" 
+                            className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => {
+                              const fullImageUrl = `https://taearif.com/storage/${receiptImagePath}`;
+                              window.open(fullImageUrl, '_blank');
+                            }}
+                            onError={(e) => {
+                              console.error("Error loading image:", receiptImagePath);
+                              console.error("Full image URL:", `https://taearif.com/storage/${receiptImagePath}`);
+                              // في حالة فشل تحميل الصورة، إعادة تعيين المسار
+                              setReceiptImagePath("");
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ) : isUploadingImage ? (
+                      // حالة الرفع - عرض مؤشر التحميل فقط
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50">
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                          <p className="text-sm text-gray-600">جاري رفع الصورة...</p>
+                        </div>
+                      </div>
+                    ) : (
+                      // حالة ما قبل الرفع - منطقة السحب والإفلات
+                      <div
+                        className="border-2 border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50 rounded-lg p-6 text-center cursor-pointer transition-all duration-200"
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          if (!isUploadingImage && !receiptImagePath) {
+                            const files = e.dataTransfer.files;
+                            if (files.length > 0) {
+                              handleImageUpload(files[0]);
+                            }
+                          }
+                        }}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDragEnter={(e) => e.preventDefault()}
+                        onClick={() => {
+                          if (!isUploadingImage && !receiptImagePath) {
+                            document.getElementById('receipt-upload')?.click();
+                          }
+                        }}
+                      >
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file && !receiptImagePath) {
+                              handleImageUpload(file);
+                            }
+                          }}
+                          className="hidden"
+                          id="receipt-upload"
+                          disabled={!!receiptImagePath}
+                        />
+                        
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-700">
+                              اسحب الصورة هنا أو اضغط للرفع
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              PNG, JPG, GIF حتى 10MB
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
