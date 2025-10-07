@@ -51,6 +51,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
+import axiosInstance from "@/lib/axiosInstance";
+import { toast } from "sonner";
 
 import { Building } from "./types";
 
@@ -69,6 +71,34 @@ export default function BuildingCard({
 }: BuildingCardProps) {
   const router = useRouter();
   const [showAllProperties, setShowAllProperties] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteBuilding = async () => {
+    // تأكيد قبل الحذف
+    const confirmed = window.confirm(
+      `هل أنت متأكد من حذف العمارة "${building.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`
+    );
+    
+    if (!confirmed) return;
+
+    try {
+      setIsDeleting(true);
+      const response = await axiosInstance.delete(`/buildings/${building.id}`);
+      
+      if (response.data.status === "success") {
+        toast.success("تم حذف العمارة بنجاح");
+        // إعادة تحميل الصفحة أو تحديث القائمة
+        window.location.reload();
+      } else {
+        toast.error("فشل في حذف العمارة");
+      }
+    } catch (error) {
+      console.error("Error deleting building:", error);
+      toast.error("حدث خطأ أثناء حذف العمارة");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const formatPrice = (price: string) => {
     return new Intl.NumberFormat("ar-US", {
@@ -232,9 +262,13 @@ export default function BuildingCard({
                     <Edit className="w-4 h-4 mr-2" />
                     تعديل
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-600">
+                  <DropdownMenuItem 
+                    className="text-red-600"
+                    onClick={handleDeleteBuilding}
+                    disabled={isDeleting}
+                  >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    حذف
+                    {isDeleting ? "جاري الحذف..." : "حذف"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -276,9 +310,13 @@ export default function BuildingCard({
                 <Edit className="w-4 h-4 mr-2" />
                 تعديل
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem 
+                className="text-red-600"
+                onClick={handleDeleteBuilding}
+                disabled={isDeleting}
+              >
                 <Trash2 className="w-4 h-4 mr-2" />
-                حذف
+                {isDeleting ? "جاري الحذف..." : "حذف"}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
