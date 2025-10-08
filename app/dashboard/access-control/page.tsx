@@ -233,6 +233,15 @@ interface AvailableRolesResponse {
   data: Array<{
     id: number;
     name: string;
+    permissions_list?: string[];
+    permissions?: Array<{
+      id: number;
+      name: string;
+      pivot: {
+        role_id: number;
+        permission_id: number;
+      };
+    }>;
   }>;
 }
 
@@ -580,7 +589,7 @@ export default function AccessControlPage() {
       );
       console.log("✅ Roles response:", response.data);
 
-      // Convert the simple array to the expected format
+      // Use the data directly from backend with all permissions
       const rolesData: Role[] = response.data.data.map((role) => ({
         id: role.id,
         name: role.name,
@@ -594,8 +603,8 @@ export default function AccessControlPage() {
           model_type: "App\\Models\\User",
           team_id: 0,
         },
-        permissions_list: [],
-        permissions: [],
+        permissions_list: role.permissions_list || [],
+        permissions: role.permissions || [],
       }));
 
       setRoles(rolesData);
