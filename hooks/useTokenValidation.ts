@@ -53,6 +53,31 @@ export const useTokenValidation = () => {
         const newUser = userData.data || userData;
         setNewUserData(newUser);
 
+        // Store user data with permissions in AuthContext
+        if (newUser) {
+          setUserData({
+            email: newUser.email,
+            token: token,
+            username: newUser.username,
+            domain: newUser.domain,
+            first_name: newUser.first_name,
+            last_name: newUser.last_name,
+            is_free_plan: newUser.is_free_plan,
+            days_remaining: newUser.membership?.days_remaining,
+            package_title: newUser.membership?.package?.title,
+            package_features: newUser.membership?.package?.features || [],
+            project_limit_number: newUser.membership?.package?.project_limit_number,
+            real_estate_limit_number: newUser.membership?.package?.real_estate_limit_number,
+            message: newUser.message,
+            company_name: newUser.company_name,
+            permissions: newUser.permissions || [],
+            account_type: newUser.account_type,
+            tenant_id: newUser.tenant_id,
+          });
+          setUserIsLogged(true);
+          setAuthenticated(true);
+        }
+
         // التحقق من تطابق الحساب
         const currentUser = userData;
         const isSame = currentUser && currentUser.email === newUser.email;
@@ -131,6 +156,9 @@ export const useTokenValidation = () => {
       real_estate_limit_number: null,
       message: null,
       company_name: null,
+      permissions: [],
+      account_type: null,
+      tenant_id: null,
     });
     setUserIsLogged(false);
     setAuthenticated(false);

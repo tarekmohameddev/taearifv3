@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
 import { GTMProvider } from "@/components/GTMProvider";
+import PermissionWrapper from "@/components/PermissionWrapper";
 
 /*
  * ========================================
@@ -56,7 +57,6 @@ export default function DashboardLayout({
     `;
     document.head.appendChild(style);
 
-    console.log("🔄 Dashboard Layout: Applied RTL styling");
 
     // تنظيف عند الخروج من المجلد
     return () => {
@@ -66,7 +66,6 @@ export default function DashboardLayout({
         styleElement.remove();
       }
 
-      console.log("🔄 Dashboard Layout: Removed RTL styling");
     };
   }, []);
 
@@ -88,7 +87,9 @@ export default function DashboardLayout({
   return (
     <GTMProvider containerId="GTM-KBL37C9T">
       <div dir="rtl" style={{ direction: "rtl" }}>
-        {children}
+        <PermissionWrapper>
+          {children}
+        </PermissionWrapper>
       </div>
     </GTMProvider>
   );

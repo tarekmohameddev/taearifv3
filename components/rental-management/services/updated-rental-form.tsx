@@ -127,6 +127,17 @@ export function UpdatedAddRentalForm({
   const [selectedBuilding, setSelectedBuilding] = useState<string>("");
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>("");
 
+  // Dynamic Cost Center State
+  const [costCenterItems, setCostCenterItems] = useState<Array<{
+    id: string;
+    name: string;
+    cost: string;
+    type: 'percentage' | 'amount';
+    payer: 'tenant' | 'landlord';
+    payment_frequency: 'one_time' | 'per_installment';
+    description: string;
+  }>>([]);
+
   // Function to calculate payment amounts based on contract type, duration, and payment frequency
   const calculatePaymentAmount = () => {
     if (!formData.base_rent_amount || !formData.rental_duration || !formData.rental_type || !formData.paying_plan) {
@@ -177,6 +188,33 @@ export function UpdatedAddRentalForm({
       totalAmount
     };
   };
+
+  // Cost Center Management Functions
+  const addCostCenterItem = () => {
+    const newItem = {
+      id: Date.now().toString(),
+      name: '',
+      cost: '',
+      type: 'amount' as const,
+      payer: 'tenant' as const,
+      payment_frequency: 'per_installment' as const,
+      description: ''
+    };
+    setCostCenterItems(prev => [...prev, newItem]);
+  };
+
+  const updateCostCenterItem = (id: string, field: string, value: string) => {
+    setCostCenterItems(prev => 
+      prev.map(item => 
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  const removeCostCenterItem = (id: string) => {
+    setCostCenterItems(prev => prev.filter(item => item.id !== id));
+  };
+
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [isRed, setIsRed] = useState(true);
   // جلب البيانات عند فتح النموذج
@@ -382,26 +420,14 @@ export function UpdatedAddRentalForm({
       currency: formData.currency,
       contract_number: formData.contract_number,
       notes: formData.notes,
-      cost_items: [
-        {
-          name: "Security Deposit",
-          cost: formData.deposit_amount
-            ? parseFloat(formData.deposit_amount)
-            : 0,
-          type: "fixed",
-          payer: "tenant",
-          payment_frequency: "one_time",
-          description: "Refundable security deposit",
-        },
-        {
-          name: "Maintenance Fee",
-          cost: formData.platform_fee ? parseFloat(formData.platform_fee) : 0,
-          type: "fixed",
-          payer: "tenant",
-          payment_frequency: "per_installment",
-          description: "Monthly maintenance fee",
-        },
-      ],
+      cost_items: costCenterItems.map(item => ({
+        name: item.name,
+        cost: item.cost ? parseFloat(item.cost) : 0,
+        type: item.type === 'amount' ? 'fixed' : 'percentage',
+        payer: item.payer === 'landlord' ? 'owner' : item.payer,
+        payment_frequency: item.payment_frequency,
+        description: item.description,
+      })),
     };
 
     console.log("Processed form data for API:", processedFormData);
@@ -1067,129 +1093,158 @@ export function UpdatedAddRentalForm({
           </div>
         </div>
 
-        {/* قسم العمولة والرسوم */}
+        {/* مركز التكلفة */}
         <div className="space-y-4 border-t border-gray-200 pt-6">
-          <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">
-            العمولة والرسوم
-          </h4>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label
-                htmlFor="office_commission_type"
-                className="text-sm font-medium text-gray-700"
-              >
-                نوع عمولة المكتب
-              </Label>
-              <Select
-                value={formData.office_commission_type}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    office_commission_type: value,
-                  }))
-                }
-              >
-                <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="percentage">نسبة مئوية</SelectItem>
-                  <SelectItem value="amount">مبلغ ثابت</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label
-                htmlFor="office_commission_value"
-                className="text-sm font-medium text-gray-700"
-              >
-                قيمة عمولة المكتب{" "}
-                {formData.office_commission_type === "percentage"
-                  ? "(%)"
-                  : "(ريال)"}
-              </Label>
-              <Input
-                id="office_commission_value"
-                type="number"
-                step={
-                  formData.office_commission_type === "percentage" ? "0.1" : "1"
-                }
-                value={formData.office_commission_value}
-                onChange={(e) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    office_commission_value: e.target.value,
-                  }));
-                  if (errors.office_commission_value) {
-                    setErrors((prev) => ({
-                      ...prev,
-                      office_commission_value: "",
-                    }));
-                  }
-                }}
-                placeholder={
-                  formData.office_commission_type === "percentage"
-                    ? "5.0"
-                    : "500"
-                }
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.office_commission_value ? "border-red-500" : ""}`}
-              />
-              {errors.office_commission_value && (
-                <p className="text-sm text-red-600 flex items-center">
-                  <AlertCircle className="h-3 w-3 ml-1" />
-                  {errors.office_commission_value}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label
-                htmlFor="platform_fee"
-                className="text-sm font-medium text-gray-700"
-              >
-                رسوم المنصة (ريال)
-              </Label>
-              <Input
-                id="platform_fee"
-                type="number"
-                step="0.01"
-                value={formData.platform_fee}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    platform_fee: e.target.value,
-                  }))
-                }
-                placeholder="150.00"
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label
-                htmlFor="water_fee"
-                className="text-sm font-medium text-gray-700"
-              >
-                رسوم المياه (ريال)
-              </Label>
-              <Input
-                id="water_fee"
-                type="number"
-                step="0.01"
-                value={formData.water_fee}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    water_fee: e.target.value,
-                  }))
-                }
-                placeholder="200.00"
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
-              />
-            </div>
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">
+              مركز التكلفة
+            </h4>
+            <Button
+              type="button"
+              onClick={addCostCenterItem}
+              className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              إضافة تكلفة
+            </Button>
           </div>
+
+          {costCenterItems.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 011.414.586l5.414 5.414a1 1 0 01.586 1.414V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <p>لا توجد تكاليف مضافة بعد</p>
+              <p className="text-sm">اضغط على "إضافة تكلفة" لإضافة تكلفة جديدة</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {costCenterItems.map((item, index) => (
+                <div key={item.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h5 className="font-medium text-gray-900">
+                      تكلفة #{index + 1}
+                    </h5>
+                    <Button
+                      type="button"
+                      onClick={() => removeCostCenterItem(item.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2"
+                      variant="ghost"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* اسم التكلفة */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        اسم التكلفة *
+                      </Label>
+                      <Input
+                        value={item.name}
+                        onChange={(e) => updateCostCenterItem(item.id, 'name', e.target.value)}
+                        placeholder="مثال: رسوم الصيانة"
+                        className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                      />
+                    </div>
+
+                    {/* التكلفة */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        التكلفة *
+                      </Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={item.cost}
+                        onChange={(e) => updateCostCenterItem(item.id, 'cost', e.target.value)}
+                        placeholder="100.00"
+                        className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                      />
+                    </div>
+
+                    {/* نوع التكلفة */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        نوع التكلفة
+                      </Label>
+                      <Select
+                        value={item.type}
+                        onValueChange={(value) => updateCostCenterItem(item.id, 'type', value)}
+                      >
+                        <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="amount">مبلغ ثابت</SelectItem>
+                          <SelectItem value="percentage">نسبة مئوية</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* من يدفع */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        من يدفع
+                      </Label>
+                      <Select
+                        value={item.payer}
+                        onValueChange={(value) => updateCostCenterItem(item.id, 'payer', value)}
+                      >
+                        <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="tenant">المستأجر</SelectItem>
+                          <SelectItem value="landlord">المالك</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* تكرار الدفع */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        تكرار الدفع
+                      </Label>
+                      <Select
+                        value={item.payment_frequency}
+                        onValueChange={(value) => updateCostCenterItem(item.id, 'payment_frequency', value)}
+                      >
+                        <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="one_time">مرة واحدة</SelectItem>
+                          <SelectItem value="per_installment">لكل قسط</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* الوصف */}
+                    <div className="space-y-2 md:col-span-2 lg:col-span-1">
+                      <Label className="text-sm font-medium text-gray-700">
+                        الوصف
+                      </Label>
+                      <Textarea
+                        value={item.description}
+                        onChange={(e) => updateCostCenterItem(item.id, 'description', e.target.value)}
+                        placeholder="وصف التكلفة..."
+                        rows={2}
+                        className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">

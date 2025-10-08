@@ -569,69 +569,6 @@ export default function AccessControlPage() {
     }
   };
 
-  // Fetch permissions data
-  const fetchPermissions = async () => {
-    setPermissionsLoading(true);
-    try {
-      const response = await axiosInstance.get<AvailablePermissionsResponse>(
-        "/v1/employees/available-permissions",
-      );
-
-      // Convert the simple array to the expected format
-      const permissionsData: PermissionsResponse = {
-        status: response.data.status,
-        data: response.data.data.map((permissionName, index) => ({
-          id: index + 1,
-          name: permissionName,
-          description: null,
-          team_id: null,
-          guard_name: "sanctum",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          pivot: {
-            model_id: 0,
-            permission_id: index + 1,
-            model_type: "App\\Models\\User",
-            team_id: 0,
-          },
-        })),
-        grouped: {},
-        templates: {},
-      };
-
-      // Group permissions by category
-      const grouped: { [key: string]: Permission[] } = {};
-      response.data.data.forEach((permissionName, index) => {
-        const category = permissionName.split(".")[0];
-        if (!grouped[category]) {
-          grouped[category] = [];
-        }
-        grouped[category].push({
-          id: index + 1,
-          name: permissionName,
-          description: null,
-          team_id: null,
-          guard_name: "sanctum",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          pivot: {
-            model_id: 0,
-            permission_id: index + 1,
-            model_type: "App\\Models\\User",
-            team_id: 0,
-          },
-        });
-      });
-
-      permissionsData.grouped = grouped;
-      setPermissions(permissionsData);
-    } catch (err: any) {
-      console.error("Error fetching permissions:", err);
-      setCreateError("حدث خطأ في جلب الصلاحيات");
-    } finally {
-      setPermissionsLoading(false);
-    }
-  };
 
   // Fetch roles data
   const fetchRoles = async () => {
@@ -1362,10 +1299,6 @@ export default function AccessControlPage() {
       permissions: !!permissions,
       rolesLength: roles.length,
     });
-    if (showCreateDialog && !permissions) {
-      console.log("📋 Fetching permissions for create dialog");
-      fetchPermissions();
-    }
     if (showCreateDialog && roles.length === 0) {
       console.log("👥 Fetching roles for create dialog");
       fetchRoles();
@@ -1381,10 +1314,6 @@ export default function AccessControlPage() {
     if (showEditDialog && roles.length === 0) {
       console.log("👥 Fetching roles for edit dialog");
       fetchRoles();
-    }
-    if (showEditDialog && !permissions) {
-      console.log("📋 Fetching permissions for edit dialog");
-      fetchPermissions();
     }
   }, [showEditDialog]);
 
