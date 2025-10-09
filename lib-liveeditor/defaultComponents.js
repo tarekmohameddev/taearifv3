@@ -31,7 +31,7 @@ export const PAGE_DEFINITIONS = {
           subtitle: "نحن هنا لتوفير أفضل الحلول العقارية لك",
           font: {
             title: {
-              family: "Inter",
+              family: "Tajawal",
               size: {
                 desktop: "5xl",
                 tablet: "4xl",
@@ -42,7 +42,7 @@ export const PAGE_DEFINITIONS = {
               lineHeight: "1.25",
             },
             subtitle: {
-              family: "Inter",
+              family: "Tajawal",
               size: {
                 desktop: "2xl",
                 tablet: "2xl",
@@ -367,7 +367,7 @@ export const PAGE_DEFINITIONS = {
         },
         typography: {
           title: {
-            fontFamily: "Inter",
+            fontFamily: "Tajawal",
             fontSize: {
               desktop: "2xl",
               tablet: "xl",
@@ -377,7 +377,7 @@ export const PAGE_DEFINITIONS = {
             color: "#1f2937",
           },
           subtitle: {
-            fontFamily: "Inter",
+            fontFamily: "Tajawal",
             fontSize: {
               desktop: "lg",
               tablet: "base",
@@ -1069,7 +1069,7 @@ export const PAGE_DEFINITIONS = {
           image: "https://dalel-lovat.vercel.app/images/logo.svg",
           text: "مكتب دليل الجواء",
           font: {
-            family: "Inter",
+            family: "Tajawal",
             size: 24,
             weight: "600",
           },
@@ -1406,7 +1406,7 @@ export const PAGE_DEFINITIONS = {
           image: "https://dalel-lovat.vercel.app/images/logo.svg",
           text: "مكتب دليل الجواء",
           font: {
-            family: "Inter",
+            family: "Tajawal",
             size: 24,
             weight: "600",
           },
@@ -1733,7 +1733,7 @@ export const PAGE_DEFINITIONS = {
           subtitle: "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
           font: {
             title: {
-              family: "Inter",
+              family: "Tajawal",
               size: {
                 desktop: "5xl",
                 tablet: "4xl",
@@ -1744,7 +1744,7 @@ export const PAGE_DEFINITIONS = {
               lineHeight: "1.25",
             },
             subtitle: {
-              family: "Inter",
+              family: "Tajawal",
               size: {
                 desktop: "2xl",
                 tablet: "2xl",
@@ -2111,7 +2111,7 @@ export const PAGE_DEFINITIONS = {
           image: "https://dalel-lovat.vercel.app/images/logo.svg",
           text: "مكتب دليل الجواء",
           font: {
-            family: "Inter",
+            family: "Tajawal",
             size: 24,
             weight: "600",
           },
@@ -2420,7 +2420,7 @@ export const PAGE_DEFINITIONS = {
           subtitle: "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
           font: {
             title: {
-              family: "Inter",
+              family: "Tajawal",
               size: {
                 desktop: "5xl",
                 tablet: "4xl",
@@ -2431,7 +2431,7 @@ export const PAGE_DEFINITIONS = {
               lineHeight: "1.25",
             },
             subtitle: {
-              family: "Inter",
+              family: "Tajawal",
               size: {
                 desktop: "2xl",
                 tablet: "2xl",
@@ -2607,7 +2607,7 @@ export const PAGE_DEFINITIONS = {
           image: "https://dalel-lovat.vercel.app/images/logo.svg",
           text: "",
           font: {
-            family: "Inter",
+            family: "Tajawal",
             size: 24,
             weight: "600",
           },

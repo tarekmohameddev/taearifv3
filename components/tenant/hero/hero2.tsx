@@ -120,14 +120,14 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
       maxWidth: "5xl",
       font: {
         title: {
-          family: "Inter",
+          family: "Tajawal",
           size: { desktop: "36px", tablet: "36px", mobile: "36px" },
           weight: "bold",
           color: "#ffffff",
           lineHeight: "1.25",
         },
         description: {
-          family: "Inter",
+          family: "Tajawal",
           size: { desktop: "15px", tablet: "15px", mobile: "15px" },
           weight: "normal",
           color: "#ffffff",
@@ -179,14 +179,14 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
       maxWidth: "5xl",
       font: {
         title: {
-          family: "Inter",
+          family: "Tajawal",
           size: { desktop: "36px", tablet: "36px", mobile: "36px" },
           weight: "bold",
           color: "#ffffff",
           lineHeight: "1.25",
         },
         description: {
-          family: "Inter",
+          family: "Tajawal",
           size: { desktop: "15px", tablet: "15px", mobile: "15px" },
           weight: "normal",
           color: "#ffffff",

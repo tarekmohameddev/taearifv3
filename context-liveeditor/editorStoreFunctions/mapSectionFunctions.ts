@@ -85,21 +85,21 @@ export const getDefaultMapSectionData = (): ComponentData => ({
     },
     font: {
       title: {
-        family: "Inter",
+        family: "Tajawal",
         size: "24px",
         weight: "600",
         color: "#1f2937",
         lineHeight: "1.2",
       },
       subtitle: {
-        family: "Inter",
+        family: "Tajawal",
         size: "18px",
         weight: "400",
         color: "#6b7280",
         lineHeight: "1.5",
       },
       description: {
-        family: "Inter",
+        family: "Tajawal",
         size: "16px",
         weight: "400",
         color: "#6b7280",

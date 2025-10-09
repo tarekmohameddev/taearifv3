@@ -39,7 +39,7 @@ export const getDefaultHeaderData = (): ComponentData => {
       image: "https://dalel-lovat.vercel.app/images/logo.svg",
       text: "مكتب دليل الجواء",
       font: {
-        family: "Inter",
+        family: "Tajawal",
         size: 24,
         weight: "600",
       },

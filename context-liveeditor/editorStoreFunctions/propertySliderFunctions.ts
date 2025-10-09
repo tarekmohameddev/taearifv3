@@ -23,7 +23,7 @@ export const getDefaultPropertySliderData = (): ComponentData => ({
   },
   typography: {
     title: {
-      fontFamily: "Inter",
+      fontFamily: "Tajawal",
       fontSize: {
         desktop: "2xl",
         tablet: "xl",
@@ -33,7 +33,7 @@ export const getDefaultPropertySliderData = (): ComponentData => ({
       color: "#1f2937",
     },
     subtitle: {
-      fontFamily: "Inter",
+      fontFamily: "Tajawal",
       fontSize: {
         desktop: "lg",
         tablet: "base",

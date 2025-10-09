@@ -59,14 +59,14 @@ export const createDefaultData = (
           subtitle: "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
           font: {
             title: {
-              family: "Inter",
+              family: "Tajawal",
               size: { desktop: "5xl", tablet: "4xl", mobile: "2xl" },
               weight: "extrabold",
               color: "#ffffff",
               lineHeight: "1.25",
             },
             subtitle: {
-              family: "Inter",
+              family: "Tajawal",
               size: { desktop: "2xl", tablet: "2xl", mobile: "2xl" },
               weight: "normal",
               color: "rgba(255, 255, 255, 0.85)",
@@ -189,7 +189,7 @@ export const createDefaultData = (
           image: "https://dalel-lovat.vercel.app/images/logo.svg",
           text: "مكتب دليل الجواء",
           font: {
-            family: "Inter",
+            family: "Tajawal",
             size: 24,
             weight: "600",
           },
@@ -351,7 +351,7 @@ export const createDefaultData = (
         },
         typography: {
           title: {
-            fontFamily: "Inter",
+            fontFamily: "Tajawal",
             fontSize: {
               desktop: "2xl",
               tablet: "xl",
@@ -361,7 +361,7 @@ export const createDefaultData = (
             color: "#1f2937",
           },
           subtitle: {
-            fontFamily: "Inter",
+            fontFamily: "Tajawal",
             fontSize: {
               desktop: "lg",
               tablet: "base",

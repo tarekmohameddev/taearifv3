@@ -323,7 +323,7 @@ export const mapSectionStructure: ComponentStructure = {
                       key: "family",
                       label: "Family",
                       type: "text",
-                      placeholder: "Inter",
+                      placeholder: "Tajawal",
                     },
                     {
                       key: "size",
@@ -355,7 +355,7 @@ export const mapSectionStructure: ComponentStructure = {
                       key: "family",
                       label: "Family",
                       type: "text",
-                      placeholder: "Inter",
+                      placeholder: "Tajawal",
                     },
                     {
                       key: "size",

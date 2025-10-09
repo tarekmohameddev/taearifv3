@@ -28,14 +28,14 @@ export const getDefaultHeroData = (): ComponentData => ({
     subtitle: "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
     font: {
       title: {
-        family: "Inter",
+        family: "Tajawal",
         size: { desktop: "5xl", tablet: "4xl", mobile: "2xl" },
         weight: "extrabold",
         color: "#ffffff",
         lineHeight: "1.25",
       },
       subtitle: {
-        family: "Inter",
+        family: "Tajawal",
         size: { desktop: "2xl", tablet: "2xl", mobile: "2xl" },
         weight: "normal",
         color: "rgba(255, 255, 255, 0.85)",
@@ -154,14 +154,14 @@ export const getDefaultHero2Data = (): ComponentData => ({
     maxWidth: "5xl",
     font: {
       title: {
-        family: "Inter",
+        family: "Tajawal",
         size: { desktop: "36px", tablet: "36px", mobile: "36px" },
         weight: "bold",
         color: "#ffffff",
         lineHeight: "1.25",
       },
       description: {
-        family: "Inter",
+        family: "Tajawal",
         size: { desktop: "15px", tablet: "15px", mobile: "15px" },
         weight: "normal",
         color: "#ffffff",

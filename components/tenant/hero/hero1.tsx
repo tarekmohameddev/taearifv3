@@ -52,14 +52,14 @@ const getDefaultHeroData = () => ({
     subtitle: "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
     font: {
       title: {
-        family: "Inter",
+        family: "Tajawal",
         size: { desktop: "5xl", tablet: "4xl", mobile: "2xl" },
         weight: "extrabold",
         color: "#ffffff",
         lineHeight: "1.25",
       },
       subtitle: {
-        family: "Inter",
+        family: "Tajawal",
         size: { desktop: "2xl", tablet: "2xl", mobile: "2xl" },
         weight: "normal",
         color: "rgba(255, 255, 255, 0.85)",
@@ -786,14 +786,14 @@ const Hero1 = (props: HeroProps = {}) => {
   };
 
   const titleStyles = {
-    fontFamily: mergedData.content?.font?.title?.family || "Inter",
+    fontFamily: mergedData.content?.font?.title?.family || "Tajawal",
     fontWeight: mergedData.content?.font?.title?.weight || "extrabold",
     color: mergedData.content?.font?.title?.color || "#ffffff",
     lineHeight: mergedData.content?.font?.title?.lineHeight || "1.25",
   };
 
   const subtitleStyles = {
-    fontFamily: mergedData.content?.font?.subtitle?.family || "Inter",
+    fontFamily: mergedData.content?.font?.subtitle?.family || "Tajawal",
     fontWeight: mergedData.content?.font?.subtitle?.weight || "normal",
     color:
       mergedData.content?.font?.subtitle?.color || "rgba(255, 255, 255, 0.85)",

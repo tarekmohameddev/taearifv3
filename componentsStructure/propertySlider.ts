@@ -156,7 +156,7 @@ export const propertySliderStructure: ComponentStructure = {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  defaultValue: "Inter",
+                  defaultValue: "Tajawal",
                   description: "Font family for title",
                 },
                 {
@@ -212,7 +212,7 @@ export const propertySliderStructure: ComponentStructure = {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  defaultValue: "Inter",
+                  defaultValue: "Tajawal",
                   description: "Font family for subtitle",
                 },
                 {

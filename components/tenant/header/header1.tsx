@@ -52,7 +52,7 @@ const getDefaultHeaderData = () => ({
     image: "https://dalel-lovat.vercel.app/images/logo.svg",
     text: "مكتب دليل الجواء",
     font: {
-      family: "Inter",
+      family: "Tajawal",
       size: 24,
       weight: "600",
     },
@@ -425,7 +425,7 @@ const Header1 = (props: HeaderProps = {}) => {
 
   const logoStyles = useMemo(
     () => ({
-      fontFamily: mergedData.logo?.font?.family || "Inter",
+      fontFamily: mergedData.logo?.font?.family || "Tajawal",
       fontWeight: mergedData.logo?.font?.weight || "600",
       fontSize: `${mergedData.logo?.font?.size || 24}px`,
       color:

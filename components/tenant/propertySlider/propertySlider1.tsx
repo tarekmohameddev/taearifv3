@@ -57,7 +57,7 @@ const getDefaultPropertySliderData = () => ({
   },
   typography: {
     title: {
-      fontFamily: "Inter",
+      fontFamily: "Tajawal",
       fontSize: {
         desktop: "2xl",
         tablet: "xl",
@@ -67,7 +67,7 @@ const getDefaultPropertySliderData = () => ({
       color: "#1f2937",
     },
     subtitle: {
-      fontFamily: "Inter",
+      fontFamily: "Tajawal",
       fontSize: {
         desktop: "lg",
         tablet: "base",
@@ -261,14 +261,14 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
 
   // Generate dynamic styles
   const titleStyles = {
-    fontFamily: mergedData.typography?.title?.fontFamily || "Inter",
+    fontFamily: mergedData.typography?.title?.fontFamily || "Tajawal",
     fontSize: mergedData.typography?.title?.fontSize?.desktop || "2xl",
     fontWeight: mergedData.typography?.title?.fontWeight || "extrabold",
     color: mergedData.typography?.title?.color || "#1f2937",
   };
 
   const subtitleStyles = {
-    fontFamily: mergedData.typography?.subtitle?.fontFamily || "Inter",
+    fontFamily: mergedData.typography?.subtitle?.fontFamily || "Tajawal",
     fontSize: mergedData.typography?.subtitle?.fontSize?.desktop || "lg",
     fontWeight: mergedData.typography?.subtitle?.fontWeight || "normal",
     color: mergedData.typography?.subtitle?.color || "#6b7280",
@@ -381,7 +381,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
             <h2
               className="section-title font-extrabold"
               style={{
-                fontFamily: mergedData.typography?.title?.fontFamily || "Inter",
+                fontFamily: mergedData.typography?.title?.fontFamily || "Tajawal",
                 fontSize:
                   mergedData.typography?.title?.fontSize?.desktop || "2xl",
                 fontWeight:
@@ -418,7 +418,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
                 className="section-title font-extrabold"
                 style={{
                   fontFamily:
-                    mergedData.typography?.title?.fontFamily || "Inter",
+                    mergedData.typography?.title?.fontFamily || "Tajawal",
                   fontSize:
                     mergedData.typography?.title?.fontSize?.desktop || "2xl",
                   fontWeight:
@@ -436,7 +436,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
                 className="section-subtitle"
                 style={{
                   fontFamily:
-                    mergedData.typography?.subtitle?.fontFamily || "Inter",
+                    mergedData.typography?.subtitle?.fontFamily || "Tajawal",
                   fontSize:
                     mergedData.typography?.subtitle?.fontSize?.desktop || "lg",
                   fontWeight:
