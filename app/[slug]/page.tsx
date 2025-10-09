@@ -4,10 +4,11 @@ import TenantPageWrapper from "./TenantPageWrapper";
 export default async function TenantPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
+  const { slug } = await params;
 
-  return <TenantPageWrapper tenantId={tenantId} slug={params.slug} />;
+  return <TenantPageWrapper tenantId={tenantId} slug={slug} />;
 }
