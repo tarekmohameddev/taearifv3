@@ -25,7 +25,7 @@ const LoadingContent = memo(function LoadingContent({
         return (
           <main className="flex-1">
             <FilterButtonsSkeleton1 />
-            <GridSkeleton1 />
+            <GridSkeleton1 /> 
           </main>
         );
       case "about-us":
