@@ -164,6 +164,10 @@
     "propertiesPage": {
       "display_name": "صفحة العقارات",
       "description": "صفحة قائمة العقارات الكاملة مع مرشح وبحث ومكونات الشبكة"
+    },
+    "inputs": {
+      "display_name": "نظام الإدخال المتقدم",
+      "description": "نظام نماذج ديناميكي مع بطاقات قابلة للتخصيص وحقول وتحقق من الصحة"
     }
   },
   "components_old": {
@@ -1035,6 +1039,7 @@
       "api_url": "رابط API",
       "latest_rentals": "أحدث الإيجارات",
       "latest_sales": "أحدث المبيعات",
+      "latest_projects": "أحدث المشاريع",
       "use_api_data": "استخدام بيانات API",
       "typography": "الطباعة",
       "title_typography": "طباعة العنوان",
@@ -2531,6 +2536,7 @@
       "api_url": "رابط API",
       "latest_rentals": "أحدث الإيجارات",
       "latest_sales": "أحدث المبيعات",
+      "latest_projects": "أحدث المشاريع",
       "use_api_data": "استخدام بيانات API",
       "typography": "الطباعة",
       "title_typography": "طباعة العنوان",

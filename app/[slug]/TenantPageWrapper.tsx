@@ -96,35 +96,70 @@ export default function TenantPageWrapper({
   // Set tenantId in store when component mounts
   useEffect(() => {
     if (tenantId) {
+      console.log("✅ Setting tenantId in store:", tenantId);
       setTenantId(tenantId);
+    } else {
+      console.log("❌ No tenantId provided");
     }
   }, [tenantId, setTenantId]);
 
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
+    console.log("🔍 useEffect triggered:", {
+      tenantId,
+      hasTenantData: !!tenantData,
+      loadingTenantData,
+      shouldFetch: tenantId && !tenantData && !loadingTenantData,
+    });
+
     if (tenantId && !tenantData && !loadingTenantData) {
+      console.log("🔄 Fetching tenant data for:", tenantId);
       fetchTenantData(tenantId);
+    } else {
+      console.log("⏭️ Skipping fetchTenantData:", {
+        reason: !tenantId
+          ? "No tenantId"
+          : tenantData
+            ? "Data already exists"
+            : loadingTenantData
+              ? "Already loading"
+              : "Unknown",
+      });
     }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
+
+  // إضافة useEffect منفصل لمراقبة حالة التحميل
+  useEffect(() => {
+    console.log("🔍 Loading state changed:", {
+      loadingTenantData,
+      hasTenantData: !!tenantData,
+      error,
+      tenantId,
+    });
+  }, [loadingTenantData, tenantData, error, tenantId]);
 
   // التحقق من وجود الـ slug في componentSettings أو البيانات الافتراضية
   const slugExists = useMemo(() => {
     if (!slug) {
+      console.log("❌ No slug provided");
       return false;
     }
 
     // التحقق من وجود الـ slug في componentSettings
     if (tenantData?.componentSettings && slug in tenantData.componentSettings) {
+      console.log("✅ Slug found in componentSettings:", slug);
       return true;
     }
 
-    // التحقق من وجود الـ slug في البيانات الافتراضية
-    if ((PAGE_DEFINITIONS as any)[slug]) {
+    // التحقق من وجود الـ slug في البيانات الافتراضية (فقط إذا لم يتم جلب البيانات من الـ backend)
+    if (!tenantData && (PAGE_DEFINITIONS as any)[slug]) {
+      console.log("✅ Slug found in PAGE_DEFINITIONS (fallback):", slug);
       return true;
     }
 
+    console.log("❌ Slug not found:", slug);
     return false;
-  }, [tenantData?.componentSettings, slug]);
+  }, [tenantData?.componentSettings, slug, tenantData]);
 
   // Get components from componentSettings or default components
   const componentsList = useMemo(() => {
@@ -137,6 +172,7 @@ export default function TenantPageWrapper({
       tenantData.componentSettings[slug] &&
       Object.keys(tenantData.componentSettings[slug]).length > 0
     ) {
+      console.log("✅ Using componentSettings for:", slug);
       const pageSettings = tenantData.componentSettings[slug];
 
       // تحويل componentSettings إلى قائمة مكونات
@@ -151,12 +187,13 @@ export default function TenantPageWrapper({
         })
         .sort((a, b) => (a.position || 0) - (b.position || 0));
 
+      console.log("✅ Components from componentSettings:", components);
       return components;
     }
 
-    // استخدام البيانات الافتراضية من PAGE_DEFINITIONS
-
-    if (slug && (PAGE_DEFINITIONS as any)[slug]) {
+    // استخدام البيانات الافتراضية من PAGE_DEFINITIONS (فقط إذا لم يتم جلب البيانات من الـ backend)
+    if (!tenantData && slug && (PAGE_DEFINITIONS as any)[slug]) {
+      console.log("✅ Using PAGE_DEFINITIONS (fallback) for:", slug);
       const defaultPageData = (PAGE_DEFINITIONS as any)[slug];
 
       const components = Object.entries(defaultPageData)
@@ -170,11 +207,13 @@ export default function TenantPageWrapper({
         })
         .sort((a, b) => (a.position || 0) - (b.position || 0));
 
+      console.log("✅ Components from PAGE_DEFINITIONS:", components);
       return components;
     }
 
+    console.log("❌ No components found for:", slug);
     return [];
-  }, [tenantData?.componentSettings, slug]);
+  }, [tenantData?.componentSettings, slug, tenantData]);
 
   // إذا كان التحميل جارياً، أظهر skeleton loading
   // دالة لتحديد الـ skeleton المناسب حسب الـ slug
@@ -202,6 +241,13 @@ export default function TenantPageWrapper({
             <ContactCardsSkeleton1 />
           </main>
         );
+      case "projects":
+        return (
+          <main className="flex-1">
+            <HeroSkeleton2 />
+            <GridSkeleton1 />
+          </main>
+        );
       default:
         // الصفحات الأخرى تعرض HeroSkeleton1
         return (
@@ -213,6 +259,7 @@ export default function TenantPageWrapper({
   };
 
   if (loadingTenantData) {
+    console.log("⏳ Loading tenant data, showing skeleton...");
     return (
       <I18nProvider>
         <div className="min-h-screen flex flex-col" dir="rtl">
@@ -228,6 +275,35 @@ export default function TenantPageWrapper({
 
   // إذا لم يكن الـ slug موجود في componentSettings، أظهر 404
   if (!slugExists) {
+    console.log(
+      "❌ Slug not found:",
+      slug,
+      "Available slugs:",
+      Object.keys(tenantData?.componentSettings || {}),
+    );
+    console.log("❌ TenantData status:", {
+      hasTenantData: !!tenantData,
+      loadingTenantData,
+      error,
+      componentSettings: tenantData?.componentSettings,
+    });
+
+    // إذا لم يتم جلب البيانات بعد، انتظر قليلاً
+    if (!tenantData && !loadingTenantData && !error) {
+      console.log("⏳ No data yet, waiting for fetchTenantData to complete...");
+      return (
+        <I18nProvider>
+          <div className="min-h-screen flex flex-col" dir="rtl">
+            {/* Header Skeleton */}
+            <StaticHeaderSkeleton1 />
+
+            {/* Page-specific Skeleton Content */}
+            {renderSkeletonContent()}
+          </div>
+        </I18nProvider>
+      );
+    }
+
     notFound();
   }
 
@@ -248,7 +324,18 @@ export default function TenantPageWrapper({
   });
 
   if (error || !tenantId) {
-    // console.log("🏠 HomePageWrapper - Showing not-found due to:", { error, hasTenantData: !!tenantData, tenantId });
+    console.log("❌ Tenant error or missing tenantId:", {
+      error,
+      tenantId,
+      hasTenantData: !!tenantData,
+    });
+    console.log("❌ Full error details:", {
+      error,
+      tenantId,
+      hasTenantData: !!tenantData,
+      loadingTenantData,
+      componentSettings: tenantData?.componentSettings,
+    });
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4">
         <h1 className="text-6xl font-bold text-red-600 mb-4">404</h1>
@@ -266,6 +353,15 @@ export default function TenantPageWrapper({
       </div>
     );
   }
+
+  console.log("🎉 Rendering page with components:", {
+    slug,
+    componentsCount: filteredComponentsList.length,
+    components: filteredComponentsList.map((c) => ({
+      id: c.id,
+      name: c.componentName,
+    })),
+  });
 
   return (
     <I18nProvider>
@@ -314,7 +410,7 @@ export default function TenantPageWrapper({
                   <div
                     key={comp.id}
                     className={centerWrapperClasses}
-                    style={centerWrapperStyles}
+                    style={centerWrapperStyles as React.CSSProperties}
                   >
                     {componentElement}
                   </div>

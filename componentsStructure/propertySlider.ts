@@ -17,6 +17,70 @@ export const propertySliderStructure: ComponentStructure = {
           description: "Whether the component is visible",
         },
         {
+          key: "cardSettings",
+          label: "تحديد شكل الكارت",
+          type: "object",
+          fields: [
+            {
+              key: "theme",
+              label: "Card Theme",
+              type: "select",
+              defaultValue: "card1",
+              options: [
+                {
+                  value: "card1",
+                  label: "Card 1 - Classic",
+                },
+                {
+                  value: "card2",
+                  label: "Card 2 - Modern",
+                },
+                {
+                  value: "card3",
+                  label: "Card 3 - Vertical Overlay",
+                },
+              ],
+              description: "Choose the card theme/design",
+            },
+            {
+              key: "showImage",
+              label: "Show Image",
+              type: "boolean",
+              defaultValue: true,
+              description: "Whether to show property image",
+            },
+            {
+              key: "showPrice",
+              label: "Show Price",
+              type: "boolean",
+              defaultValue: true,
+              description: "Whether to show property price",
+            },
+            {
+              key: "showDetails",
+              label: "Show Details",
+              type: "boolean",
+              defaultValue: true,
+              description:
+                "Whether to show property details (bedrooms, bathrooms, area)",
+            },
+            {
+              key: "showViews",
+              label: "Show Views",
+              type: "boolean",
+              defaultValue: true,
+              description: "Whether to show views counter",
+            },
+            {
+              key: "showStatus",
+              label: "Show Status",
+              type: "boolean",
+              defaultValue: true,
+              description: "Whether to show property status badge",
+            },
+          ],
+        },
+        {
           key: "layout",
           label: "Layout",
           type: "object",
@@ -129,6 +193,11 @@ export const propertySliderStructure: ComponentStructure = {
                   value:
                     "/v1/tenant-website/{tenantId}/properties?purpose=sale&latest=1&limit=10",
                   label: "Latest Sales",
+                },
+                {
+                  value:
+                    "/v1/tenant-website/{tenantId}/projects?featured=1&limit=10",
+                  label: "Latest Projects",
                 },
               ],
               description: "API endpoint to fetch properties data",
@@ -637,6 +706,11 @@ export const propertySliderStructure: ComponentStructure = {
                 "/v1/tenant-website/{tenantId}/properties?purpose=sale&latest=1&limit=10",
               label: "Latest Sales",
             },
+            {
+              value:
+                "/v1/tenant-website/{tenantId}/projects?featured=1&limit=10",
+              label: "أحدث المشاريع",
+            },
           ],
           description: "API endpoint to fetch properties data",
         },
@@ -709,6 +783,70 @@ export const propertySliderStructure: ComponentStructure = {
           type: "text",
           defaultValue: "#059669",
           description: "Link color",
+        },
+        {
+          key: "cardSettings",
+          label: "تحديد شكل الكارت",
+          type: "object",
+          fields: [
+            {
+              key: "theme",
+              label: "Card Theme",
+              type: "select",
+              defaultValue: "card1",
+              options: [
+                {
+                  value: "card1",
+                  label: "Card 1 - Classic",
+                },
+                {
+                  value: "card2",
+                  label: "Card 2 - Modern",
+                },
+                {
+                  value: "card3",
+                  label: "Card 3 - Vertical Overlay",
+                },
+              ],
+              description: "Choose the card theme/design",
+            },
+            {
+              key: "showImage",
+              label: "Show Image",
+              type: "boolean",
+              defaultValue: true,
+              description: "Whether to show property image",
+            },
+            {
+              key: "showPrice",
+              label: "Show Price",
+              type: "boolean",
+              defaultValue: true,
+              description: "Whether to show property price",
+            },
+            {
+              key: "showDetails",
+              label: "Show Details",
+              type: "boolean",
+              defaultValue: true,
+              description:
+                "Whether to show property details (bedrooms, bathrooms, area)",
+            },
+            {
+              key: "showViews",
+              label: "Show Views",
+              type: "boolean",
+              defaultValue: true,
+              description: "Whether to show views counter",
+            },
+            {
+              key: "showStatus",
+              label: "Show Status",
+              type: "boolean",
+              defaultValue: true,
+              description: "Whether to show property status badge",
+            },
+          ],
         },
       ],
     },

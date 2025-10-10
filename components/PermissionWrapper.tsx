@@ -11,16 +11,19 @@ interface PermissionWrapperProps {
   fallback?: React.ReactNode;
 }
 
-export default function PermissionWrapper({ 
-  children, 
-  fallback 
+export default function PermissionWrapper({
+  children,
+  fallback,
 }: PermissionWrapperProps) {
   const { hasPermission, loading, error, userData } = usePermissions();
 
   // Show loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+      <div
+        className="min-h-screen flex items-center justify-center bg-gray-50"
+        dir="rtl"
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">جاري التحقق من الصلاحيات...</p>
@@ -32,13 +35,18 @@ export default function PermissionWrapper({
   // Show error state
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+      <div
+        className="min-h-screen flex items-center justify-center bg-gray-50"
+        dir="rtl"
+      >
         <Card className="max-w-md mx-auto">
           <CardContent className="p-6 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">خطأ في النظام</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              خطأ في النظام
+            </h2>
             <p className="text-gray-600 mb-4">{error}</p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             >
@@ -57,7 +65,7 @@ export default function PermissionWrapper({
     }
 
     return (
-        <div className="flex min-h-screen flex-col" dir="rtl">
+      <div className="flex min-h-screen flex-col" dir="rtl">
         <DashboardHeader />
         <div className="flex flex-1 flex-col md:flex-row">
           <EnhancedSidebar />
@@ -67,19 +75,21 @@ export default function PermissionWrapper({
                 <Card className="max-w-md mx-auto">
                   <CardContent className="p-6 text-center">
                     <Shield className="h-12 w-12 text-orange-500 mx-auto mb-4" />
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">ليس لديك صلاحية للوصول</h2>
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">
+                      ليس لديك صلاحية للوصول
+                    </h2>
                     <p className="text-gray-600 mb-4">
                       عذراً، ليس لديك الصلاحية المطلوبة للوصول إلى هذه الصفحة.
                     </p>
                     <div className="space-y-2">
-                      <button 
+                      <button
                         onClick={() => window.history.back()}
                         className="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
                       >
                         العودة للخلف
                       </button>
-                      <button 
-                        onClick={() => window.location.href = '/dashboard'}
+                      <button
+                        onClick={() => (window.location.href = "/dashboard")}
                         className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                       >
                         الذهاب للوحة التحكم
@@ -97,4 +107,4 @@ export default function PermissionWrapper({
 
   // User has permission, show only the content without sidebar and header
   return <>{children}</>;
-};
+}

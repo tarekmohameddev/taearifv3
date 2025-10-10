@@ -391,6 +391,8 @@ export function translateLabel(
       "components_structure.property_slider_specific.latest_rentals",
     "Latest Sales":
       "components_structure.property_slider_specific.latest_sales",
+    "Latest Projects":
+      "components_structure.property_slider_specific.latest_projects",
     "Use API Data":
       "components_structure.property_slider_specific.use_api_data",
     Typography: "components_structure.property_slider_specific.typography",

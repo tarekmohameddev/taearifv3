@@ -1,88 +1,126 @@
-# نظام الـ Caching للمكونات - Components Caching System
+# نظام الـ Caching الخاص بالمكونات - شرح مفصل ومبالغ فيه
 
-## 📋 **نظرة عامة**
+## نظرة عامة على البنية المعمارية
 
-نظام الـ caching في المشروع يهدف إلى إدارة البيانات بشكل فعال مع ضمان التزامن بين الـ stores المختلفة. يعتمد النظام على **Zustand** لإدارة الحالة مع دعم **React Context** للتوافق مع المكونات القديمة.
+نظام الـ caching في هذا المشروع هو نظام معقد ومتعدد الطبقات يربط بين المكونات (Components) والـ stores والـ default data بطريقة ذكية وفعالة. هذا النظام يضمن أن البيانات تتدفق بسلاسة من المصادر المختلفة إلى المكونات النهائية.
 
-## 🏗️ **البنية الأساسية**
+## المكونات المستهدفة في هذا الشرح
 
-### 1. **الـ Stores الرئيسية**
+1. **`components/tenant/whyChooseUs/whyChooseUs1.tsx`** - مكون "لماذا تختارنا"
+2. **`components/tenant/testimonials/testimonials1.tsx`** - مكون الشهادات
 
-#### **AuthContext.js** - إدارة المصادقة
+## العناصر الأساسية في النظام
 
-```javascript
-// Zustand Store للـ authentication
-const useAuthStore = create((set, get) => ({
-  UserIslogged: false,
-  IsLoading: false,
-  authenticated: false,
-  userData: null,
-  liveEditorUser: null,
-  liveEditorLoading: false,
-  liveEditorError: null,
+### 1. Default Data Functions
 
-  // دوال المصادقة
-  login: async (email, password) => {
-    /* ... */
-  },
-  register: async (userData) => {
-    /* ... */
-  },
-  logout: async () => {
-    /* ... */
-  },
-  fetchUserData: async (username) => {
-    /* ... */
-  },
+**الموقع:** `context-liveeditor/editorStoreFunctions/`
 
-  // دوال خاصة بالـ Live Editor
-  liveEditorLogin: async (email, password) => {
-    /* ... */
+هذه الدوال تحتوي على البيانات الافتراضية لكل مكون:
+
+```typescript
+// في whyChooseUsFunctions.ts
+export const getDefaultWhyChooseUsData = (): any => ({
+  visible: true,
+  layout: {
+    direction: "rtl",
+    maxWidth: "1600px",
+    padding: {
+      y: "py-14",
+      smY: "sm:py-16",
+    },
   },
-  liveEditorRegister: async (userData) => {
-    /* ... */
+  header: {
+    title: "لماذا تختارنا؟",
+    description:
+      "مكتبنا يجمع بين الخبرة والالتزام لتقديم خدمات مميزة في مجال العقارات",
+    // ... المزيد من البيانات الافتراضية
   },
-  liveEditorFetchUser: async (username) => {
-    /* ... */
-  },
-  liveEditorLogout: async () => {
-    /* ... */
-  },
+  // ... باقي البيانات
+});
+```
+
+### 2. Component Structures
+
+**الموقع:** `componentsStructure/`
+
+هذه الملفات تحدد هيكل البيانات لكل مكون:
+
+```typescript
+// في whyChooseUs.ts
+export const whyChooseUsStructure: ComponentStructure = {
+  componentType: "whyChooseUs",
+  variants: [
+    {
+      id: "whyChooseUs1",
+      name: "Why Choose Us 1 - Features Grid",
+      fields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        {
+          key: "layout",
+          label: "Layout Settings",
+          type: "object",
+          fields: [
+            {
+              key: "direction",
+              label: "Direction",
+              type: "select",
+              options: [
+                { value: "rtl", label: "Right to Left" },
+                { value: "ltr", label: "Left to Right" },
+              ],
+            },
+            // ... المزيد من الحقول
+          ],
+        },
+        // ... باقي الحقول
+      ],
+    },
+  ],
+};
+```
+
+### 3. Editor Store
+
+**الموقع:** `context-liveeditor/editorStore.ts`
+
+هذا هو الـ store الرئيسي الذي يدير جميع المكونات:
+
+```typescript
+export const useEditorStore = create<EditorStore>((set, get) => ({
+  // Dynamic component states - يتم إنشاؤها تلقائياً من ComponentsList
+  componentStates: Record<string, Record<string, ComponentData>>,
+
+  // Generic functions for all components
+  ensureComponentVariant: (
+    componentType: string,
+    variantId: string,
+    initial?: ComponentData,
+  ) => void,
+  getComponentData: (componentType: string, variantId: string) => ComponentData,
+  setComponentData: (
+    componentType: string,
+    variantId: string,
+    data: ComponentData,
+  ) => void,
+  updateComponentByPath: (
+    componentType: string,
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void,
+
+  // Specific component states
+  whyChooseUsStates: Record<string, ComponentData>,
+  testimonialsStates: Record<string, ComponentData>,
+  // ... باقي المكونات
 }));
 ```
 
-#### **editorStore.ts** - إدارة الـ Live Editor
+### 4. Tenant Store
 
-```typescript
-interface EditorStore {
-  // حالة حفظ البيانات
-  showDialog: boolean;
-  openSaveDialogFn: OpenDialogFn;
+**الموقع:** `context-liveeditor/tenantStore.jsx`
 
-  // Current page for tracking
-  currentPage: string;
-
-  // بيانات التعديل المؤقتة
-  tempData: ComponentData;
-
-  // Global Components
-  globalHeaderData: ComponentData;
-  globalFooterData: ComponentData;
-  globalComponentsData: {
-    header: ComponentData;
-    footer: ComponentData;
-  };
-
-  // Dynamic component states
-  componentStates: Record<string, Record<string, ComponentData>>;
-  componentGetters: Record<string, (variantId: string) => ComponentData>;
-
-  // Page-wise components
-  pageComponentsByPage: Record<string, ComponentInstanceWithPosition[]>;
-}
-```
-
-#### **tenantStore.jsx** - إدارة بيانات الـ Tenant
+هذا الـ store يدير بيانات المستأجر (Tenant):
 
 ```javascript
 const useTenantStore = create((set) => ({
@@ -91,1064 +129,623 @@ const useTenantStore = create((set) => ({
   error: null,
   tenant: null,
   tenantId: null,
+  lastFetchedWebsite: null,
 
-  // دوال التحديث
-  updateHeader: (headerData) => {
-    /* ... */
-  },
-  updateHero: (heroData) => {
-    /* ... */
-  },
-  updateFooter: (footerData) => {
-    /* ... */
-  },
-
-  // دوال الحفظ
-  saveHeaderChanges: async (tenantId, headerData, variant) => {
-    /* ... */
-  },
-  saveHeroChanges: async (tenantId, heroData, variant) => {
-    /* ... */
-  },
-  saveFooterChanges: async (tenantId, footerData, variant) => {
-    /* ... */
-  },
-
-  // تحميل البيانات
   fetchTenantData: async (websiteName) => {
-    /* ... */
+    // منطق جلب بيانات المستأجر من API
   },
+
+  // دوال حفظ التغييرات
+  saveHeaderChanges: async (tenantId, headerData, variant) => {
+    // منطق حفظ تغييرات الهيدر
+  },
+  // ... باقي دوال الحفظ
 }));
 ```
 
-## 🔄 **تدفق البيانات (Data Flow)**
+## تدفق البيانات المفصل - من البداية للنهاية
 
-### 1. **تحميل البيانات الأولي**
+### المرحلة الأولى: تهيئة المكون
 
-```
-المستخدم يدخل الموقع
-  ↓
-tenantStore.fetchTenantData(websiteName)
-  ↓
-API: /api/tenant/getTenant
-  ↓
-تحميل globalComponentsData
-  ↓
-editorStore.setGlobalComponentsData()
-  ↓
-تحميل componentSettings
-  ↓
-editorStore.loadFromDatabase()
-  ↓
-تحديث جميع component states
-  ↓
-عرض الموقع
-```
-
-### 2. **تعديل المكونات**
-
-```
-المستخدم يعدل في Sidebar
-  ↓
-SidebarStateManager.updateComponentData()
-  ↓
-تحديث pageComponentsByPage
-  ↓
-تحديث component states
-  ↓
-إعادة عرض المكون
-```
-
-### 3. **حفظ التغييرات**
-
-```
-المستخدم يضغط حفظ
-  ↓
-EditorProvider.confirmSave()
-  ↓
-جمع البيانات من editorStore
-  ↓
-API: /api/tenant/save-pages
-  ↓
-حفظ في MongoDB
-  ↓
-عرض رسالة نجاح
-```
-
-## 🧩 **نظام المكونات المعياري**
-
-### **editorStoreFunctions** - دوال متخصصة لكل مكون
-
-#### **مثال: contactCardsFunctions.ts**
+عندما يتم تحميل مكون `whyChooseUs1.tsx`، يحدث التالي:
 
 ```typescript
-export const contactCardsFunctions = {
-  // دوال أساسية
-  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    /* ... */
-  },
-  getData: (state: any, variantId: string): ComponentData => {
-    /* ... */
-  },
-  setData: (state: any, variantId: string, data: ComponentData) => {
-    /* ... */
-  },
-  updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    /* ... */
-  },
+export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
+  // 1. تحديد معرف المكون
+  const variantId = props.variant || "whyChooseUs1";
+  const uniqueId = props.id || variantId;
 
-  // دوال متخصصة
-  addContactCard: (currentData: ComponentData, card: any): ComponentData => {
-    /* ... */
-  },
-  removeContactCard: (
-    currentData: ComponentData,
-    index: number,
-  ): ComponentData => {
-    /* ... */
-  },
-  updateContactCard: (
-    currentData: ComponentData,
-    index: number,
-    updates: any,
-  ): ComponentData => {
-    /* ... */
-  },
-
-  // دوال التحقق
-  validate: (data: ComponentData): { isValid: boolean; errors: string[] } => {
-    /* ... */
-  },
-};
-```
-
-#### **مثال: mapSectionFunctions.ts**
-
-```typescript
-export const mapSectionFunctions = {
-  // دوال أساسية
-  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    /* ... */
-  },
-  getData: (state: any, variantId: string): ComponentData => {
-    /* ... */
-  },
-  setData: (state: any, variantId: string, data: ComponentData) => {
-    /* ... */
-  },
-  updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    /* ... */
-  },
-
-  // دوال متخصصة للخرائط
-  addMarker: (currentData: ComponentData, marker: any): ComponentData => {
-    /* ... */
-  },
-  removeMarker: (
-    currentData: ComponentData,
-    markerId: string,
-  ): ComponentData => {
-    /* ... */
-  },
-  updateMarker: (
-    currentData: ComponentData,
-    markerId: string,
-    updates: any,
-  ): ComponentData => {
-    /* ... */
-  },
-  updateMapCenter: (
-    currentData: ComponentData,
-    lat: number,
-    lng: number,
-  ): ComponentData => {
-    /* ... */
-  },
-  updateMapZoom: (currentData: ComponentData, zoom: number): ComponentData => {
-    /* ... */
-  },
-
-  // دوال مساعدة
-  getMapBounds: (
-    data: ComponentData,
-  ): { north: number; south: number; east: number; west: number } | null => {
-    /* ... */
-  },
-  generateEmbedUrl: (data: ComponentData): string => {
-    /* ... */
-  },
-};
-```
-
-## 🔗 **ربط المكونات بالـ Stores**
-
-### **مثال: ContactCards1.tsx**
-
-```typescript
-const ContactCards1: React.FC<ContactCardsProps> = ({
-  useStore = true,
-  variant = "contactCards1",
-  id,
-  ...props
-}) => {
-  // Initialize variant id early so hooks can depend on it
-  const variantId = variant || "contactCards1";
-  const uniqueId = id || variantId;
-
-  // Add state to force re-renders when store updates
-  const [forceUpdate, setForceUpdate] = useState(0);
-
-  // Subscribe to editor store updates for this contactCards variant
+  // 2. الاشتراك في editor store
   const ensureComponentVariant = useEditorStore(
     (s) => s.ensureComponentVariant,
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
-  const contactCardsStates = useEditorStore((s) => s.contactCardsStates);
+  const whyChooseUsStates = useEditorStore((s) => s.whyChooseUsStates);
+```
 
-  useEffect(() => {
-    if (props.useStore) {
-      const initialData = {
-        ...getDefaultContactCardsData(),
-        ...props,
-      };
-      ensureComponentVariant("contactCards", uniqueId, initialData);
-    }
-  }, [uniqueId, props.useStore, ensureComponentVariant]);
+### المرحلة الثانية: تهيئة البيانات في الـ Store
 
-  // Add effect to listen for store updates
+```typescript
 useEffect(() => {
-    if (props.useStore) {
-      // Force re-render when store data changes
-  const unsubscribe = useEditorStore.subscribe((state) => {
-    const newContactCardsStates = state.contactCardsStates;
-    if (newContactCardsStates[uniqueId]) {
-      setForceUpdate(prev => prev + 1);
-    }
-  });
-
-  return unsubscribe;
-    }
-}, [props.useStore, uniqueId]);
-
-  // Get tenant data
-  const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
-  const tenantId = useTenantStore((s) => s.tenantId);
-
-  // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore
-    ? getComponentData("contactCards", uniqueId) || {}
-    : {};
-  const currentStoreData = props.useStore
-    ? contactCardsStates[uniqueId] || {}
-    : {};
-
-  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
-  const defaultData = getDefaultContactCardsData();
-  const mergedData = {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
-    ...currentStoreData,
-    // Ensure nested objects are properly merged
-    layout: {
-      ...defaultData.layout,
-      ...(props.layout || {}),
-      ...(tenantComponentData?.layout || {}),
-      ...(storeData?.layout || {}),
-      ...(currentStoreData?.layout || {}),
-    },
-    cards: (currentStoreData?.cards || storeData?.cards || tenantComponentData?.cards || props.cards || defaultData.cards),
-  };
-
-  // Don't render if not visible
-  if (!mergedData.visible) {
-    return null;
+  if (props.useStore) {
+    const initialData = {
+      ...getDefaultWhyChooseUsData(), // البيانات الافتراضية
+      ...props, // البيانات المرسلة كـ props
+    };
+    ensureComponentVariant("whyChooseUs", uniqueId, initialData);
   }
+}, [uniqueId, props.useStore, ensureComponentVariant]);
+```
 
-  // Use merged data for cards with proper fallbacks
-const cards: ContactCardProps[] = (mergedData.cards || defaultData.cards).map((card: ContactCardProps) => ({
-  ...card,
-  icon: {
-    ...card.icon,
-      src: card.icon.src || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCA0NUw0NSA0MEw0MCAzNUwzMCA0MFYyMEw0MCAyNVY0MEwzMCA0NVoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+"
+**شرح مفصل لما يحدث هنا:**
+
+1. **`getDefaultWhyChooseUsData()`** - يتم استدعاء هذه الدالة من `whyChooseUsFunctions.ts` للحصول على البيانات الافتراضية
+2. **`...props`** - يتم دمج البيانات المرسلة كـ props مع البيانات الافتراضية
+3. **`ensureComponentVariant()`** - يتم استدعاء هذه الدالة من الـ editor store لضمان وجود المكون في الـ store
+
+### المرحلة الثالثة: منطق `ensureComponentVariant`
+
+```typescript
+// في editorStore.ts
+ensureComponentVariant: (componentType, variantId, initial) =>
+  set((state) => {
+    switch (componentType) {
+      case "whyChooseUs":
+        return whyChooseUsFunctions.ensureVariant(state, variantId, initial);
+      // ... باقي المكونات
+    }
+  }),
+```
+
+**شرح مفصل:**
+
+1. يتم التحقق من نوع المكون (`whyChooseUs`)
+2. يتم استدعاء `whyChooseUsFunctions.ensureVariant()` من `whyChooseUsFunctions.ts`
+3. هذه الدالة تتحقق من وجود المكون في الـ store، وإذا لم يكن موجوداً، تضيفه
+
+### المرحلة الرابعة: منطق `ensureVariant` في whyChooseUsFunctions
+
+```typescript
+// في whyChooseUsFunctions.ts
+export const whyChooseUsFunctions = {
+  ensureVariant: (state: any, variantId: string, initial?: any) => {
+    if (state.whyChooseUsStates[variantId]) {
+      return state; // المكون موجود بالفعل
+    }
+
+    const defaultData = getDefaultWhyChooseUsData();
+    const data: any = initial || state.tempData || defaultData;
+
+    return {
+      ...state,
+      whyChooseUsStates: {
+        ...state.whyChooseUsStates,
+        [variantId]: data
+      },
+    };
   },
-  cardStyle: {
-    ...defaultData.cards[0]?.cardStyle,
-    ...card.cardStyle
-  }
-}));
-
-  return (
-    <div
-      className={`${mergedData.layout?.container?.padding?.vertical || "py-[48px] md:py-[104px]"} ${mergedData.layout?.container?.padding?.horizontal || "px-4 sm:px-10"}`}
-      dir="rtl"
-    >
-      <div
-        className={`grid ${mergedData.layout?.grid?.columns?.mobile || "grid-cols-1"} ${mergedData.layout?.grid?.columns?.desktop || "md:grid-cols-3"} ${mergedData.layout?.grid?.gap || "gap-[24px]"} ${mergedData.layout?.grid?.borderRadius || "rounded-[10px]"}`}
-      >
-        {cards.map((card, index) => (
-          <div
-            key={index}
-            className={`w-full flex flex-col ${card.cardStyle.alignment.horizontal} ${card.cardStyle.alignment.vertical} ${card.cardStyle.height.mobile} ${card.cardStyle.height.desktop} ${card.cardStyle.gap.main}`}
-            style={
-              card.cardStyle.shadow.enabled
-                ? { boxShadow: card.cardStyle.shadow.value }
-                : {}
-            }
-          >
-            {/* Card content */}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
 ```
 
-### **مثال: MapSection1.tsx**
+**شرح مفصل:**
+
+1. **التحقق من الوجود:** يتم التحقق من وجود المكون في `state.whyChooseUsStates[variantId]`
+2. **البيانات الافتراضية:** إذا لم يكن موجوداً، يتم استدعاء `getDefaultWhyChooseUsData()`
+3. **أولوية البيانات:** `initial` (البيانات المرسلة) > `state.tempData` (البيانات المؤقتة) > `defaultData` (البيانات الافتراضية)
+4. **إضافة المكون:** يتم إضافة المكون إلى `whyChooseUsStates` في الـ store
+
+### المرحلة الخامسة: جلب بيانات المستأجر
 
 ```typescript
-const MapSection1: React.FC<MapSectionProps> = ({
-  useStore = true,
-  variant = "mapSection1",
-  id,
-  ...props
-}) => {
-  // Initialize variant id early so hooks can depend on it
-  const variantId = variant || "mapSection1";
-  const uniqueId = id || variantId;
-
-  // Add state to force re-renders when store updates
-  const [forceUpdate, setForceUpdate] = useState(0);
-
-  // Subscribe to editor store updates for this mapSection variant
-  const ensureComponentVariant = useEditorStore(
-    (s) => s.ensureComponentVariant,
-  );
-  const getComponentData = useEditorStore((s) => s.getComponentData);
-  const mapSectionStates = useEditorStore((s) => s.mapSectionStates);
-
-  useEffect(() => {
-    if (props.useStore) {
-      const initialData = {
-        ...getDefaultMapSectionData(),
-        ...props,
-      };
-      ensureComponentVariant("mapSection", uniqueId, initialData);
-    }
-  }, [uniqueId, props.useStore, ensureComponentVariant]);
-
-  // Add effect to listen for store updates
-  useEffect(() => {
-    if (props.useStore) {
-      // Force re-render when store data changes
-      const unsubscribe = useEditorStore.subscribe((state) => {
-        const newMapSectionStates = state.mapSectionStates;
-        if (newMapSectionStates[uniqueId]) {
-          setForceUpdate(prev => prev + 1);
-        }
-      });
-
-      return unsubscribe;
-    }
-  }, [props.useStore, uniqueId]);
-
-  // Get tenant data
-  const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
-  const tenantId = useTenantStore((s) => s.tenantId);
-
-  // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore
-    ? getComponentData("mapSection", uniqueId) || {}
-    : {};
-  const currentStoreData = props.useStore
-    ? mapSectionStates[uniqueId] || {}
-    : {};
-
-  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
-  const defaultData = getDefaultMapSectionData();
-  const mergedData = {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
-    ...currentStoreData,
-    // Ensure nested objects are properly merged
-    map: {
-      ...defaultData.map,
-      ...(props.map || {}),
-      ...(tenantComponentData?.map || {}),
-      ...(storeData?.map || {}),
-      ...(currentStoreData?.map || {}),
-    },
-    content: {
-      ...defaultData.content,
-      ...(props.content || {}),
-      ...(tenantComponentData?.content || {}),
-      ...(storeData?.content || {}),
-      ...(currentStoreData?.content || {}),
-    },
-    markers: {
-      ...defaultData.markers,
-      ...(props.markers || {}),
-      ...(tenantComponentData?.markers || {}),
-      ...(storeData?.markers || {}),
-      ...(currentStoreData?.markers || {}),
-    },
-  };
-
-  // Don't render if not visible
-  if (!mergedData.visible) {
-    return null;
-  }
-
-  // Use merged data with proper fallbacks
-  const title = mergedData.content?.title || defaultData.content.title;
-  const subtitle = mergedData.content?.subtitle || defaultData.content.subtitle;
-  const description = mergedData.content?.description || defaultData.content.description;
-  const mapSrc = mergedData.map?.embedUrl || defaultData.map.embedUrl;
-  const mapHeight = mergedData.height?.desktop || defaultData.height.desktop;
-
-  return (
-    <section className="container mx-auto px-4 py-8">
-      {mergedData.content?.enabled && (
-        <div className="text-center mb-8">
-          <h2
-            className="text-3xl font-bold mb-4"
-            style={{
-              fontFamily: mergedData.content?.font?.title?.family || defaultData.content.font.title.family,
-              fontSize: mergedData.content?.font?.title?.size || defaultData.content.font.title.size,
-              fontWeight: mergedData.content?.font?.title?.weight || defaultData.content.font.title.weight,
-              color: mergedData.content?.font?.title?.color || defaultData.content.font.title.color,
-              lineHeight: mergedData.content?.font?.title?.lineHeight || defaultData.content.font.title.lineHeight,
-            }}
-          >
-            {title}
-          </h2>
-          <p
-            className="text-lg text-gray-600 mb-4"
-            style={{
-              fontFamily: mergedData.content?.font?.subtitle?.family || defaultData.content.font.subtitle.family,
-              fontSize: mergedData.content?.font?.subtitle?.size || defaultData.content.font.subtitle.size,
-              fontWeight: mergedData.content?.font?.subtitle?.weight || defaultData.content.font.subtitle.weight,
-              color: mergedData.content?.font?.subtitle?.color || defaultData.content.font.subtitle.color,
-              lineHeight: mergedData.content?.font?.subtitle?.lineHeight || defaultData.content.font.subtitle.lineHeight,
-            }}
-          >
-            {subtitle}
-          </p>
-          {description && (
-            <p
-              className="text-base text-gray-500"
-              style={{
-                fontFamily: mergedData.content?.font?.description?.family || defaultData.content.font.description.family,
-                fontSize: mergedData.content?.font?.description?.size || defaultData.content.font.description.size,
-                fontWeight: mergedData.content?.font?.description?.weight || defaultData.content.font.description.weight,
-                color: mergedData.content?.font?.description?.color || defaultData.content.font.description.color,
-                lineHeight: mergedData.content?.font?.description?.lineHeight || defaultData.content.font.description.lineHeight,
-              }}
-            >
-              {description}
-            </p>
-          )}
-        </div>
-      )}
-
-      {mergedData.map?.enabled && (
-        <div className="w-full max-w-[1600px] mx-auto">
-          <iframe
-            src={mapSrc}
-            width="100%"
-            height={mapHeight}
-            style={{ border: 0 }}
-            allowFullScreen={true}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </div>
-      )}
-    </section>
-  );
-};
-```
-
-## 🎯 **المميزات الرئيسية**
-
-### 1. **نظام التحديث الديناميكي**
-
-- **تحديث عميق**: `updateDataByPath` للتنقل في البيانات المعقدة
-- **إنشاء تلقائي**: إنشاء الكائنات والمصفوفات المطلوبة
-- **تحقق من الأنواع**: التحقق من نوع البيانات قبل التحديث
-
-### 2. **إدارة الحالة المتقدمة**
-
-- **فصل البيانات**: فصل بيانات المكونات عن بيانات الصفحات
-- **تزامن البيانات**: تزامن البيانات بين stores مختلفة
-- **إدارة الذاكرة**: إدارة فعالة للذاكرة مع Zustand
-
-### 3. **نظام التحقق**
-
-- **تحقق من صحة البيانات**: `validate` functions لكل مكون
-- **معالجة الأخطاء**: معالجة شاملة للأخطاء
-- **رسائل واضحة**: رسائل خطأ واضحة للمطورين
-
-### 4. **الأداء والتحسين**
-
-- **تحديث انتقائي**: تحديث المكونات المتأثرة فقط
-- **تخزين مؤقت**: تخزين البيانات في localStorage
-- **تحميل كسول**: تحميل البيانات عند الحاجة
-
-## 🔧 **أفضل الممارسات**
-
-### 1. **استخدام الـ Stores**
-
-```typescript
-// ✅ صحيح
-const storeData = useEditorStore((s) =>
-  s.getComponentData("contactCards", uniqueId),
-);
+// في whyChooseUs1.tsx
 const tenantData = useTenantStore((s) => s.tenantData);
+const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+const tenantId = useTenantStore((s) => s.tenantId);
 
-// ❌ خطأ
-const allStoreData = useEditorStore((s) => s); // يحمل كل البيانات
-```
-
-### 2. **إدارة التحديثات**
-
-```typescript
-// ✅ صحيح
 useEffect(() => {
-  if (props.useStore) {
-    const unsubscribe = useEditorStore.subscribe((state) => {
-      if (state.contactCardsStates[uniqueId]) {
-        setForceUpdate((prev) => prev + 1);
-      }
-    });
-
-    return unsubscribe;
+  if (tenantId) {
+    fetchTenantData(tenantId);
   }
-}, [props.useStore, uniqueId]);
-
-// ❌ خطأ
-useEffect(() => {
-  // لا يوجد cleanup للـ subscription
-  useEditorStore.subscribe((state) => {
-    // logic
-  });
-}, []);
+}, [tenantId, fetchTenantData]);
 ```
 
-### 3. **دمج البيانات**
+**شرح مفصل:**
 
-```typescript
-// ✅ صحيح
-const mergedData = {
-  ...defaultData,
-  ...props,
-  ...tenantComponentData,
-  ...storeData,
-  ...currentStoreData,
-  // Ensure nested objects are properly merged
-  layout: {
-    ...defaultData.layout,
-    ...(props.layout || {}),
-    ...(tenantComponentData?.layout || {}),
-    ...(storeData?.layout || {}),
-    ...(currentStoreData?.layout || {}),
-  },
-};
+1. **جلب بيانات المستأجر:** يتم جلب `tenantData` من الـ tenant store
+2. **دالة الجلب:** `fetchTenantData` تقوم بجلب البيانات من API
+3. **التحقق من المعرف:** يتم التحقق من وجود `tenantId` قبل جلب البيانات
 
-// ❌ خطأ
-const mergedData = {
-  ...defaultData,
-  ...props,
-  ...tenantComponentData,
-  ...storeData,
-  ...currentStoreData,
-  // nested objects will be overwritten
-};
-```
+### المرحلة السادسة: منطق `fetchTenantData`
 
-## 📊 **مراقبة الأداء**
+```javascript
+// في tenantStore.jsx
+fetchTenantData: async (websiteName) => {
+  const state = useTenantStore.getState();
 
-### **Debug Logging**
-
-```typescript
-// Debug: Log when data changes
-useEffect(() => {
-  if (props.useStore) {
-    console.log("🔄 ContactCards Data Updated:", {
-      uniqueId,
-      storeData,
-      currentStoreData,
-      forceUpdate,
-      contactCardsStates,
-      allContactCardsStates: Object.keys(contactCardsStates),
-      getComponentDataResult: getComponentData("contactCards", uniqueId),
-    });
-  }
-}, [
-  storeData,
-  currentStoreData,
-  forceUpdate,
-  props.useStore,
-  uniqueId,
-  contactCardsStates,
-  getComponentData,
-]);
-```
-
-### **Performance Monitoring**
-
-```typescript
-// Track component render performance
-const startTime = performance.now();
-// ... component logic
-const endTime = performance.now();
-console.log(`Component render time: ${endTime - startTime}ms`);
-```
-
-## 🔄 **نظام التحديث الديناميكي المتقدم**
-
-### **1. Subscription Management**
-
-```typescript
-// مثال: ContactFormSection1.tsx
-useEffect(() => {
-  if (props.useStore) {
-    // Force re-render when store data changes
-    const unsubscribe = useEditorStore.subscribe((state) => {
-      const newContactFormSectionStates = state.contactFormSectionStates;
-      console.log("🔄 ContactFormSection Store subscription triggered:", {
-        uniqueId,
-        newContactFormSectionStates,
-        hasData: !!newContactFormSectionStates[uniqueId],
-        allKeys: Object.keys(newContactFormSectionStates),
-      });
-      if (newContactFormSectionStates[uniqueId]) {
-        console.log(
-          "🔄 ContactFormSection Store subscription triggered for:",
-          uniqueId,
-          newContactFormSectionStates[uniqueId],
-        );
-        // Force re-render by updating state
-        setForceUpdate((prev) => prev + 1);
-      }
-    });
-
-    return unsubscribe;
-  }
-}, [props.useStore, uniqueId]);
-```
-
-### **2. Data Merging Strategy**
-
-```typescript
-// Priority System: currentStoreData > storeData > tenantComponentData > props > default
-const mergedData = {
-  ...defaultData,
-  ...props,
-  ...tenantComponentData,
-  ...storeData,
-  ...currentStoreData,
-  // Ensure nested objects are properly merged
-  content: {
-    ...defaultData.content,
-    ...(props.content || {}),
-    ...(tenantComponentData?.content || {}),
-    ...(storeData?.content || {}),
-    ...(currentStoreData?.content || {}),
-  },
-  form: {
-    ...defaultData.form,
-    ...(props.form || {}),
-    ...(tenantComponentData?.form || {}),
-    ...(storeData?.form || {}),
-    ...(currentStoreData?.form || {}),
-  },
-  layout: {
-    ...defaultData.layout,
-    ...(props.layout || {}),
-    ...(tenantComponentData?.layout || {}),
-    ...(storeData?.layout || {}),
-    ...(currentStoreData?.layout || {}),
-  },
-  styling: {
-    ...defaultData.styling,
-    ...(props.styling || {}),
-    ...(tenantComponentData?.styling || {}),
-    ...(storeData?.styling || {}),
-    ...(currentStoreData?.styling || {}),
-  },
-};
-```
-
-### **3. Dynamic Form Rendering**
-
-```typescript
-// Dynamic form fields rendering
-{formFields.map((field: any, index: number) => {
-  if (field.type === "textarea") {
-    return (
-      <textarea
-        key={field.id || index}
-        id={field.id}
-        name={field.id}
-        rows={field.rows || 2}
-        placeholder={field.placeholder}
-        required={field.required}
-        className={field.style?.className || "border rounded p-2 mb-[12px] outline-custom-secondarycolor"}
-      />
-    );
-  }
-  return (
-    <input
-      key={field.id || index}
-      id={field.id}
-      name={field.id}
-      type={field.type}
-      placeholder={field.placeholder}
-      required={field.required}
-      className={field.style?.className || "border rounded-[6px] p-2 outline-custom-secondarycolor"}
-    />
-  );
-})}
-```
-
-## 🎨 **نظام التصميم الديناميكي**
-
-### **1. Responsive Layout System**
-
-```typescript
-// Dynamic layout classes
-<div className={`flex ${layout?.grid?.columns?.mobile || "flex-col"} ${layout?.grid?.columns?.desktop || "md:flex-row"} w-full justify-between ${layout?.grid?.gap || "gap-[16px]"}`}>
-  <div className={`details ${styling?.layout?.detailsWidth || "w-full md:w-[35%]"} flex flex-col items-start justify-center ${styling?.layout?.gap || "gap-[16px] md:gap-[10px]"}`}>
-    {/* Content */}
-  </div>
-  <div className={`${styling?.layout?.formWidth || "w-full md:w-[50%]"}`}>
-    {/* Form */}
-  </div>
-</div>
-```
-
-### **2. Dynamic Styling**
-
-```typescript
-// Dynamic title styling
-<h4
-  className={`${styling?.title?.size || "text-[15px] md:text-[24px]"} ${styling?.title?.color || "text-custom-maincolor"} ${styling?.title?.weight || "font-normal"} xs:text-[20px] mb-[24px]`}
->
-  {title}
-</h4>
-```
-
-## 🔧 **أدوات التطوير والـ Debugging**
-
-### **1. Comprehensive Logging**
-
-```typescript
-// Debug: Log when data changes
-useEffect(() => {
-  if (props.useStore) {
-    console.log("🔄 ContactFormSection Data Updated:", {
-      uniqueId,
-      storeData,
-      currentStoreData,
-      forceUpdate,
-      contactFormSectionStates,
-      allContactFormSectionStates: Object.keys(contactFormSectionStates),
-      getComponentDataResult: getComponentData("contactFormSection", uniqueId),
-    });
-  }
-}, [
-  storeData,
-  currentStoreData,
-  forceUpdate,
-  props.useStore,
-  uniqueId,
-  contactFormSectionStates,
-  getComponentData,
-]);
-```
-
-### **2. Final Merge Logging**
-
-```typescript
-// Debug: Log the final merged data
-console.log("🔍 ContactFormSection Final Merge:", {
-  uniqueId,
-  currentStoreData,
-  storeData,
-  mergedData,
-  contentTitle: mergedData.content?.title,
-  socialLinksCount: mergedData.content?.socialLinks?.length || 0,
-  formFieldsCount: mergedData.form?.fields?.length || 0,
-  contactFormSectionStatesKeys: Object.keys(contactFormSectionStates),
-  getComponentDataResult: getComponentData("contactFormSection", uniqueId),
-});
-```
-
-## 📊 **مقاييس الأداء**
-
-### **1. Component Performance**
-
-```typescript
-// Track component render performance
-const startTime = performance.now();
-// ... component logic
-const endTime = performance.now();
-console.log(`ContactFormSection render time: ${endTime - startTime}ms`);
-```
-
-### **2. Store Update Performance**
-
-```typescript
-// Track store update frequency
-let updateCount = 0;
-useEffect(() => {
-  updateCount++;
-  console.log(`Store updates count: ${updateCount}`);
-}, [currentStoreData]);
-```
-
-## 🚀 **التحسينات المتقدمة**
-
-### **1. Memoization**
-
-```typescript
-// Memoize expensive calculations
-const memoizedData = useMemo(() => {
-  return {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
-    ...currentStoreData,
-  };
-}, [defaultData, props, tenantComponentData, storeData, currentStoreData]);
-```
-
-### **2. Lazy Loading**
-
-```typescript
-// Lazy load heavy components
-const LazySocialLink = lazy(() => import("./SocialLink"));
-```
-
-### **3. Error Boundaries**
-
-```typescript
-// Error boundary for component errors
-class ContactFormSectionErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
+  // منع الطلبات المكررة
+  if (
+    state.loadingTenantData ||
+    (state.tenantData && state.tenantData.username === websiteName)
+  ) {
+    return;
   }
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error('ContactFormSection Error:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <div>Something went wrong with ContactFormSection.</div>;
-    }
-
-    return this.props.children;
-  }
-}
-```
-
-## 🔄 **نظام التحديث التلقائي**
-
-### **1. Real-time Updates**
-
-```typescript
-// Real-time store synchronization
-useEffect(() => {
-  const interval = setInterval(() => {
-    // Check for updates every 100ms
-    const latestData = getComponentData("contactFormSection", uniqueId);
-    if (JSON.stringify(latestData) !== JSON.stringify(currentStoreData)) {
-      setForceUpdate((prev) => prev + 1);
-    }
-  }, 100);
-
-  return () => clearInterval(interval);
-}, [uniqueId, currentStoreData, getComponentData]);
-```
-
-### **2. Optimistic Updates**
-
-```typescript
-// Optimistic UI updates
-const handleFormSubmit = async (formData) => {
-  // Update UI immediately
-  setForceUpdate((prev) => prev + 1);
+  set({ loadingTenantData: true, error: null });
 
   try {
-    // Send to server
-    await submitForm(formData);
+    const response = await axiosInstance.post(
+      "/v1/tenant-website/getTenant",
+      { websiteName },
+    );
+
+    const data = response.data || {};
+
+    // تحميل البيانات في editor store
+    const { useEditorStore } = await import("./editorStore");
+    const editorStore = useEditorStore.getState();
+
+    if (data.globalComponentsData) {
+      editorStore.setGlobalComponentsData(data.globalComponentsData);
+    }
+
+    set({
+      tenantData: data,
+      loadingTenantData: false,
+      lastFetchedWebsite: websiteName,
+    });
   } catch (error) {
-    // Revert on error
-    setForceUpdate((prev) => prev + 1);
+    console.error("[tenantStore] Error fetching tenant data:", error);
+    set({ error: error.message, loadingTenantData: false });
   }
+},
+```
+
+**شرح مفصل:**
+
+1. **منع التكرار:** يتم التحقق من عدم وجود طلب جاري أو بيانات موجودة لنفس الموقع
+2. **إرسال الطلب:** يتم إرسال طلب POST إلى `/v1/tenant-website/getTenant`
+3. **تحميل البيانات:** يتم تحميل البيانات في الـ editor store
+4. **تحديث الحالة:** يتم تحديث حالة الـ loading والـ error
+
+### المرحلة السابعة: دمج البيانات في المكون
+
+```typescript
+// في whyChooseUs1.tsx
+const getTenantComponentData = () => {
+  if (!tenantData) {
+    return {};
+  }
+
+  // البحث في البيانات الجديدة (components array)
+  if (tenantData.components && Array.isArray(tenantData.components)) {
+    for (const component of tenantData.components) {
+      if (
+        component.type === "whyChooseUs" &&
+        component.componentName === variantId
+      ) {
+        const componentData = component.data;
+        return {
+          visible: componentData.visible,
+          header: {
+            title: componentData.texts?.title || componentData.header?.title,
+            description:
+              componentData.texts?.subtitle ||
+              componentData.header?.description,
+            // ... باقي البيانات
+          },
+          // ... باقي البيانات
+        };
+      }
+    }
+  }
+
+  // البحث في البيانات القديمة (componentSettings)
+  if (tenantData?.componentSettings) {
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          if (
+            (component as any).type === "whyChooseUs" &&
+            (component as any).componentName === variantId
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+    }
+  }
+
+  return {};
+};
+
+const tenantComponentData = getTenantComponentData();
+```
+
+**شرح مفصل:**
+
+1. **التحقق من وجود البيانات:** يتم التحقق من وجود `tenantData`
+2. **البحث في البيانات الجديدة:** يتم البحث في `tenantData.components` (هيكل جديد)
+3. **البحث في البيانات القديمة:** يتم البحث في `tenantData.componentSettings` (هيكل قديم)
+4. **تحويل البيانات:** يتم تحويل البيانات من هيكل API إلى هيكل المكون
+
+### المرحلة الثامنة: دمج البيانات النهائي
+
+```typescript
+// في whyChooseUs1.tsx
+const storeData = props.useStore
+  ? getComponentData("whyChooseUs", uniqueId) || {}
+  : {};
+const currentStoreData = props.useStore
+  ? whyChooseUsStates[uniqueId] || {}
+  : {};
+
+// دمج البيانات مع الأولوية: currentStoreData > storeData > tenantComponentData > props > default
+const defaultData = getDefaultWhyChooseUsData();
+const mergedData = {
+  ...defaultData,
+  ...props,
+  ...tenantComponentData,
+  ...storeData,
+  ...currentStoreData,
+  // دمج الكائنات المتداخلة
+  header: {
+    ...defaultData.header,
+    ...(props.header || {}),
+    ...(tenantComponentData.header || {}),
+    ...(storeData.header || {}),
+    ...(currentStoreData.header || {}),
+    typography: {
+      ...defaultData.header?.typography,
+      ...(props.header?.typography || {}),
+      ...(tenantComponentData.header?.typography || {}),
+      ...(storeData.header?.typography || {}),
+      ...(currentStoreData.header?.typography || {}),
+    },
+  },
+  features: {
+    ...defaultData.features,
+    ...(props.features || {}),
+    ...(tenantComponentData.features || {}),
+    ...(storeData.features || {}),
+    ...(currentStoreData.features || {}),
+    // ... باقي الكائنات المتداخلة
+  },
+  // ... باقي البيانات
 };
 ```
 
-## 📱 **دعم الأجهزة المختلفة**
+**شرح مفصل لأولوية البيانات:**
 
-### **1. Responsive Design**
+1. **`defaultData`** - البيانات الافتراضية (الأولوية الأقل)
+2. **`props`** - البيانات المرسلة كـ props
+3. **`tenantComponentData`** - البيانات من قاعدة البيانات
+4. **`storeData`** - البيانات المحفوظة في الـ store
+5. **`currentStoreData`** - البيانات الحالية في الـ store (الأولوية الأعلى)
 
-```typescript
-// Responsive layout system
-const getResponsiveClasses = (deviceType: "mobile" | "tablet" | "desktop") => {
-  const responsiveConfig = {
-    mobile: {
-      container: "px-4 py-8",
-      grid: "flex-col",
-      detailsWidth: "w-full",
-      formWidth: "w-full",
-    },
-    tablet: {
-      container: "px-6 py-12",
-      grid: "md:flex-row",
-      detailsWidth: "md:w-[35%]",
-      formWidth: "md:w-[50%]",
-    },
-    desktop: {
-      container: "px-8 py-16",
-      grid: "lg:flex-row",
-      detailsWidth: "lg:w-[35%]",
-      formWidth: "lg:w-[50%]",
-    },
-  };
-
-  return responsiveConfig[deviceType];
-};
-```
-
-### **2. Device-specific Styling**
+### المرحلة التاسعة: تطبيق البيانات في الـ JSX
 
 ```typescript
-// Device-specific styling
-const getDeviceSpecificStyle = (deviceType: string) => {
-  const deviceStyles = {
-    mobile: {
-      titleSize: "text-[15px]",
-      formGap: "gap-[12px]",
-      buttonSize: "text-[14px]",
-    },
-    tablet: {
-      titleSize: "text-[20px]",
-      formGap: "gap-[18px]",
-      buttonSize: "text-[16px]",
-    },
-    desktop: {
-      titleSize: "text-[24px]",
-      formGap: "gap-[24px]",
-      buttonSize: "text-[20px]",
-    },
-  };
-
-  return deviceStyles[deviceType] || deviceStyles.desktop;
-};
-```
-
-## 🎯 **أفضل الممارسات المتقدمة**
-
-### **1. Type Safety**
-
-```typescript
-// Strong typing for all data structures
-interface ContactFormSectionData {
-  visible: boolean;
-  content: {
-    title: string;
-    socialLinks: SocialLink[];
-  };
-  form: {
-    fields: FormField[];
-    submitButton: SubmitButton;
-  };
-  layout: LayoutConfig;
-  styling: StylingConfig;
-}
-
-// Type-safe component props
-interface ContactFormSectionProps {
-  useStore?: boolean;
-  variant?: string;
-  id?: string;
-  data?: Partial<ContactFormSectionData>;
-  [key: string]: any;
-}
-```
-
-### **2. Performance Optimization**
-
-```typescript
-// Debounced updates
-const debouncedUpdate = useCallback(
-  debounce((data) => {
-    updateComponentData(data);
-  }, 300),
-  [],
+// في whyChooseUs1.tsx
+return (
+  <section
+    className="w-full bg-background"
+    style={{
+      backgroundColor:
+        mergedData.background?.color ||
+        mergedData.styling?.bgColor ||
+        mergedData.colors?.background ||
+        "#ffffff",
+      paddingTop: mergedData.layout?.padding?.y || "py-14",
+      paddingBottom: mergedData.layout?.padding?.smY || "sm:py-16",
+    }}
+  >
+    <div
+      className="mx-auto"
+      style={{ maxWidth: mergedData.layout?.maxWidth || "1600px" }}
+      dir={mergedData.layout?.direction || "rtl"}
+    >
+      <header
+        className={`${mergedData.header?.marginBottom || "mb-10"} ${mergedData.header?.textAlign || "text-right"} ${mergedData.header?.paddingX || "px-5"}`}
+      >
+        <h2
+          className={
+            mergedData.header?.typography?.title?.className ||
+            "section-title text-right"
+          }
+          style={{
+            color:
+              mergedData.styling?.textColor ||
+              mergedData.colors?.textColor ||
+              undefined,
+          }}
+        >
+          {mergedData.header?.title || "لماذا تختارنا؟"}
+        </h2>
+        {/* ... باقي المحتوى */}
+      </header>
+      {/* ... باقي المكون */}
+    </div>
+  </section>
 );
-
-// Memoized components
-const MemoizedSocialLink = React.memo(SocialLink);
-const MemoizedFormField = React.memo(FormField);
 ```
 
-### **3. Accessibility**
+## مثال مفصل: مكون Testimonials
+
+### تهيئة المكون
 
 ```typescript
-// ARIA attributes for accessibility
-<form
-  className="flex flex-col gap-[12px] md:gap-[24px]"
-  role="form"
-  aria-label="Contact Form"
->
-  {formFields.map((field: any, index: number) => (
-    <input
-      key={field.id || index}
-      id={field.id}
-      name={field.id}
-      type={field.type}
-      placeholder={field.placeholder}
-      required={field.required}
-      aria-label={field.placeholder}
-      aria-required={field.required}
-      className={field.style?.className || "border rounded-[6px] p-2 outline-custom-secondarycolor"}
-    />
-  ))}
-</form>
+// في testimonials1.tsx
+export default function TestimonialsSection(props: TestimonialsProps = {}) {
+  const variantId = props.variant || "testimonials1";
+
+  // الاشتراك في editor store
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
 ```
 
-هذا النظام يوفر **مرونة كاملة** في إدارة المكونات مع الحفاظ على **الأداء والتنظيم**، مما يجعله مثالياً لمشاريع Live Editor المعقدة! 🚀
+### منطق دمج البيانات
 
-## 📈 **إحصائيات الأداء**
+```typescript
+// في testimonials1.tsx
+const getTenantComponentData = () => {
+  if (!tenantData?.componentSettings) return {};
 
-### **مقاييس الأداء الرئيسية:**
+  // البحث في جميع الصفحات
+  for (const [pageSlug, pageComponents] of Object.entries(
+    tenantData.componentSettings,
+  )) {
+    if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+      for (const [componentId, component] of Object.entries(
+        pageComponents as any,
+      )) {
+        if (
+          (component as any).type === "testimonials" &&
+          (component as any).componentName === variantId &&
+          componentId === props.id
+        ) {
+          return (component as any).data;
+        }
+      }
+    }
+  }
+  return {};
+};
 
-- **Render Time**: < 50ms للمكونات البسيطة
-- **Store Update Time**: < 10ms للتحديثات
-- **Memory Usage**: < 5MB للبيانات المخزنة
-- **Bundle Size**: < 100KB للمكونات الإضافية
+const tenantComponentData = getTenantComponentData();
 
-### **تحسينات الأداء:**
+// دمج البيانات مع الأولوية: storeData > tenantComponentData > props > default
+const mergedData = {
+  ...getDefaultTestimonialsData(),
+  ...props,
+  ...tenantComponentData,
+  ...storeData,
+};
+```
 
-- **Lazy Loading**: تحميل المكونات عند الحاجة
-- **Memoization**: تخزين النتائج المحسوبة
-- **Debouncing**: تقليل عدد التحديثات
-- **Code Splitting**: تقسيم الكود لتحسين الأداء
+## آلية الـ Caching المتقدمة
 
-هذا النظام يوفر **حلول متكاملة** لإدارة المكونات المعقدة مع ضمان **الأداء العالي** و**سهولة الصيانة**! 🎯
+### 1. Cache Invalidation
+
+```typescript
+// في editorStore.ts
+updateComponentByPath: (componentType, variantId, path, value) =>
+  set((state) => {
+    // استخدام دوال المكونات المحددة
+    let newState: any = {};
+
+    switch (componentType) {
+      case "whyChooseUs":
+        newState = whyChooseUsFunctions.updateByPath(state, variantId, path, value);
+        break;
+      case "testimonials":
+        newState = testimonialsFunctions.updateByPath(state, variantId, path, value);
+        break;
+      // ... باقي المكونات
+    }
+
+    // تحديث pageComponents
+    const updatedState = { ...state, ...newState };
+    const updatedPageComponents = updatedState.pageComponentsByPage[updatedState.currentPage] || [];
+
+    const updatedComponents = updatedPageComponents.map((comp: any) => {
+      if (comp.type === componentType && comp.id === variantId) {
+        const updatedData = updatedState[`${componentType}States`]?.[variantId] || comp.data;
+        return {
+          ...comp,
+          data: updatedData,
+        };
+      }
+      return comp;
+    });
+
+    return {
+      ...newState,
+      pageComponentsByPage: {
+        ...updatedState.pageComponentsByPage,
+        [updatedState.currentPage]: updatedComponents,
+      },
+    };
+  }),
+```
+
+### 2. Deep Merge Algorithm
+
+```typescript
+// في editorStore.ts
+const deepMerge = (target: any, source: any): any => {
+  if (!source || typeof source !== "object") return target || source;
+  if (!target || typeof target !== "object") return source;
+
+  const result = { ...target };
+
+  for (const key in source) {
+    if (source.hasOwnProperty(key)) {
+      if (
+        source[key] &&
+        typeof source[key] === "object" &&
+        !Array.isArray(source[key])
+      ) {
+        result[key] = deepMerge(target[key], source[key]);
+      } else {
+        result[key] = source[key];
+      }
+    }
+  }
+
+  return result;
+};
+```
+
+### 3. Path-based Updates
+
+```typescript
+// في editorStoreFunctions/types.ts
+export const updateDataByPath = (data: any, path: string, value: any): any => {
+  const segments = path
+    .replace(/\[(\d+)\]/g, ".$1")
+    .split(".")
+    .filter(Boolean);
+  const newData = { ...data };
+  let cursor: any = newData;
+
+  for (let i = 0; i < segments.length - 1; i++) {
+    const key = segments[i]!;
+    const nextIsIndex = !Number.isNaN(Number(segments[i + 1]));
+    const existing = cursor[key];
+
+    if (
+      existing == null ||
+      typeof existing === "string" ||
+      typeof existing === "number" ||
+      typeof existing === "boolean"
+    ) {
+      cursor[key] = nextIsIndex ? [] : {};
+    } else if (Array.isArray(existing) && !nextIsIndex) {
+      cursor[key] = {};
+    } else if (
+      typeof existing === "object" &&
+      !Array.isArray(existing) &&
+      nextIsIndex
+    ) {
+      cursor[key] = [];
+    }
+    cursor = cursor[key];
+  }
+
+  const lastKey = segments[segments.length - 1]!;
+  cursor[lastKey] = value;
+
+  return newData;
+};
+```
+
+## استدعاءات الكود المفصلة
+
+### 1. استدعاء `useEditorStore`
+
+```typescript
+// في whyChooseUs1.tsx
+const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
+```
+
+**ما يحدث هنا:**
+
+1. يتم استدعاء `useEditorStore` من Zustand
+2. يتم استخراج `ensureComponentVariant` من الـ store
+3. هذه الدالة مسؤولة عن ضمان وجود المكون في الـ store
+
+### 2. استدعاء `useTenantStore`
+
+```typescript
+// في whyChooseUs1.tsx
+const tenantData = useTenantStore((s) => s.tenantData);
+const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+const tenantId = useTenantStore((s) => s.tenantId);
+```
+
+**ما يحدث هنا:**
+
+1. يتم استخراج `tenantData` من الـ tenant store
+2. يتم استخراج `fetchTenantData` للجلب من API
+3. يتم استخراج `tenantId` للتحقق من وجود المستأجر
+
+### 3. استدعاء `getDefaultWhyChooseUsData`
+
+```typescript
+// في whyChooseUs1.tsx
+const defaultData = getDefaultWhyChooseUsData();
+```
+
+**ما يحدث هنا:**
+
+1. يتم استدعاء الدالة من `whyChooseUsFunctions.ts`
+2. يتم إرجاع البيانات الافتراضية للمكون
+3. هذه البيانات تستخدم كـ fallback عند عدم وجود بيانات أخرى
+
+### 4. استدعاء `getComponentData`
+
+```typescript
+// في whyChooseUs1.tsx
+const storeData = props.useStore
+  ? getComponentData("whyChooseUs", uniqueId) || {}
+  : {};
+```
+
+**ما يحدث هنا:**
+
+1. يتم التحقق من `props.useStore` لمعرفة إذا كان المكون يستخدم الـ store
+2. إذا كان يستخدم، يتم استدعاء `getComponentData` من الـ editor store
+3. يتم البحث عن البيانات باستخدام `componentType` و `variantId`
+
+### 5. استدعاء `getTenantComponentData`
+
+```typescript
+// في whyChooseUs1.tsx
+const tenantComponentData = getTenantComponentData();
+```
+
+**ما يحدث هنا:**
+
+1. يتم البحث في `tenantData.components` (الهيكل الجديد)
+2. يتم البحث في `tenantData.componentSettings` (الهيكل القديم)
+3. يتم إرجاع البيانات المطابقة للمكون المطلوب
+
+## مثال عملي: تدفق البيانات الكامل
+
+### السيناريو: تحميل مكون WhyChooseUs1
+
+1. **البداية:** المستخدم يفتح الصفحة
+2. **تحميل المكون:** يتم تحميل `WhyChooseUsSection` مع `props.useStore = true`
+3. **تهيئة الـ Store:** يتم استدعاء `ensureComponentVariant("whyChooseUs", "whyChooseUs1", initialData)`
+4. **البيانات الافتراضية:** يتم استدعاء `getDefaultWhyChooseUsData()` للحصول على البيانات الافتراضية
+5. **جلب بيانات المستأجر:** يتم استدعاء `fetchTenantData(tenantId)` لجلب البيانات من API
+6. **دمج البيانات:** يتم دمج البيانات من جميع المصادر مع الأولوية المحددة
+7. **عرض المكون:** يتم عرض المكون بالبيانات المدمجة
+
+### السيناريو: تحديث مكون Testimonials
+
+1. **التحديث:** المستخدم يغير عنوان الشهادات
+2. **استدعاء التحديث:** يتم استدعاء `updateComponentByPath("testimonials", "testimonials1", "title", "عنوان جديد")`
+3. **تحديث الـ Store:** يتم تحديث `testimonialsStates["testimonials1"]` في الـ editor store
+4. **تحديث الصفحة:** يتم تحديث `pageComponentsByPage` للصفحة الحالية
+5. **إعادة العرض:** يتم إعادة عرض المكون بالبيانات الجديدة
+
+## الخلاصة
+
+نظام الـ caching في هذا المشروع هو نظام معقد ومتطور يتضمن:
+
+1. **طبقات متعددة:** Default Data → Store → Component
+2. **دمج ذكي:** دمج البيانات من مصادر متعددة مع الأولوية
+3. **تحديث فوري:** تحديث فوري للواجهة عند تغيير البيانات
+4. **إدارة الحالة:** إدارة شاملة لحالة المكونات والبيانات
+5. **تحسين الأداء:** تجنب الطلبات المكررة والتحميل غير الضروري
+
+هذا النظام يضمن أن المكونات تعمل بكفاءة عالية مع إمكانية التخصيص الكامل للبيانات والعرض.

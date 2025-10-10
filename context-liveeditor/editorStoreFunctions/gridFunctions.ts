@@ -30,6 +30,43 @@ export const getDefaultGridData = (): ComponentData => ({
       horizontal: "1rem",
     },
   },
+  dataSource: {
+    apiUrl: "/v1/tenant-website/{{tenantID}}/properties",
+    enabled: true,
+    cache: {
+      enabled: true,
+      duration: 30,
+    },
+  },
+  cardSettings: {
+    theme: "card1",
+    showImage: true,
+    showPrice: true,
+    showDetails: true,
+    showViews: true,
+    showStatus: true,
+    cardStyle: {
+      borderRadius: "rounded-xl",
+      shadow: "lg",
+      hoverEffect: "scale",
+    },
+    imageSettings: {
+      aspectRatio: "16/10",
+      objectFit: "cover",
+    },
+    contentSettings: {
+      titleStyle: {
+        fontSize: "lg",
+        fontWeight: "bold",
+        color: "#1f2937",
+      },
+      priceStyle: {
+        fontSize: "xl",
+        color: "#059669",
+        currency: "ريال",
+      },
+    },
+  },
 });
 
 export const gridFunctions = {

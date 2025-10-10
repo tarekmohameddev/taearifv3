@@ -5,11 +5,11 @@
 
 /* Font preloading for better performance */
 @font-face {
-  font-family: 'Tajawal';
+  font-family: "Tajawal";
   font-style: normal;
   font-weight: 300 400 500 700 800 900;
   font-display: swap;
-  src: url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');
+  src: url("https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap");
 }
 
 /* ========================================
@@ -150,7 +150,7 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
-    
+
     /* Additional variables from styles/globals.css */
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -195,7 +195,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-    
+
     /* Additional dark mode variables from styles/globals.css */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -219,7 +219,16 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "Tajawal", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family:
+      "Tajawal",
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      "Helvetica Neue",
+      Arial,
+      sans-serif;
     font-display: swap;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

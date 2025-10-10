@@ -1154,21 +1154,23 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   )}
                 </motion.div>
 
-                {/* Coming Soon Overlay - Disabled all components */}
-                <div
-                  className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto"
-                  style={{ paddingTop: "250px" }}
-                >
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">🚧</div>
-                    <h2 className="text-2xl font-bold text-red-600 mb-2">
-                      {t("live_editor.coming_soon")}
-                    </h2>
-                    <p className="text-red-500 font-medium">
-                      {t("live_editor.components_disabled")}
-                    </p>
+                {/* Coming Soon Overlay - Disabled all components - Only show in production */}
+                {process.env.NODE_ENV !== "development" && (
+                  <div
+                    className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto"
+                    style={{ paddingTop: "250px" }}
+                  >
+                    <div className="text-center">
+                      <div className="text-6xl mb-4">🚧</div>
+                      <h2 className="text-2xl font-bold text-red-600 mb-2">
+                        {t("live_editor.coming_soon")}
+                      </h2>
+                      <p className="text-red-500 font-medium">
+                        {t("live_editor.components_disabled")}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -1793,21 +1795,23 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                 {t("live_editor.yes_im_sure")}
               </AlertDialogAction>
             </AlertDialogFooter>
-            {/* Coming Soon Overlay - Disabled add page functionality */}
-            <div
-              className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto"
-              style={{ paddingTop: "200px" }}
-            >
-              <div className="text-center">
-                <div className="text-6xl mb-4">🚧</div>
-                <h2 className="text-2xl font-bold text-red-600 mb-2">
-                  {t("live_editor.coming_soon")}
-                </h2>
-                <p className="text-red-500 font-medium">
-                  {t("live_editor.components_disabled")}
-                </p>
+            {/* Coming Soon Overlay - Disabled add page functionality - Only show in production */}
+            {process.env.NODE_ENV !== "development" && (
+              <div
+                className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto"
+                style={{ paddingTop: "200px" }}
+              >
+                <div className="text-center">
+                  <div className="text-6xl mb-4">🚧</div>
+                  <h2 className="text-2xl font-bold text-red-600 mb-2">
+                    {t("live_editor.coming_soon")}
+                  </h2>
+                  <p className="text-red-500 font-medium">
+                    {t("live_editor.components_disabled")}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </AlertDialogContent>
         </AlertDialog>
 

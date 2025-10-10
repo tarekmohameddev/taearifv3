@@ -1,6 +1,6 @@
 "use client";
 
-import { PropertyCard } from "@/components/property-card";
+import { PropertyCard } from "@/components/tenant/cards/card1";
 import { Property } from "@/lib/mock-data";
 
 interface PropertyGridProps {

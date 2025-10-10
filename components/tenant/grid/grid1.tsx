@@ -1,45 +1,294 @@
 "use client";
 
-import { useEffect } from "react";
-import { PropertyCard } from "@/components/property-card";
+import { useEffect, useState } from "react";
+import { PropertyCard } from "@/components/tenant/cards/card1";
+import PropertyCard2 from "@/components/tenant/cards/card2";
+import PropertyCard3 from "@/components/tenant/cards/card3";
 import { usePropertiesStore } from "@/store/propertiesStore";
 import { useTenantId } from "@/hooks/useTenantId";
 import Pagination from "@/components/ui/pagination";
+import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context-liveeditor/editorStore";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface PropertyGridProps {
   emptyMessage?: string;
   className?: string;
+  cardSettings?: {
+    theme?: string;
+    showImage?: boolean;
+    showPrice?: boolean;
+    showDetails?: boolean;
+    showViews?: boolean;
+    showStatus?: boolean;
+  };
+  dataSource?: {
+    apiUrl?: string;
+    enabled?: boolean;
+  };
+  useStore?: boolean;
+  variant?: string;
+  id?: string;
 }
 
-export default function PropertyGrid({
-  emptyMessage = "لم يتم العثور على نتائج.",
-  className,
-}: PropertyGridProps) {
+export default function PropertyGrid(props: PropertyGridProps = {}) {
+  // Initialize variant id early so hooks can depend on it
+  const variantId = props.variant || "grid1";
+
   // Tenant ID hook
-  const { tenantId, isLoading: tenantLoading } = useTenantId();
+  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
 
-  // Store state
-  const {
-    filteredProperties,
-    loading,
-    error,
-    total,
-    pagination,
-    fetchProperties,
-    setCurrentPage,
-    goToNextPage,
-    goToPreviousPage,
-    setTenantId,
-  } = usePropertiesStore();
+  // State for API data
+  const [apiProperties, setApiProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // تعيين tenantId في الـ store عند تحميله
+  // Subscribe to editor store updates for this component variant
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+
+  // Get tenant data
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+
+  useEffect(() => {
+    if (props.useStore) {
+      ensureComponentVariant("grid", variantId, props);
+    }
+  }, [variantId, props.useStore, ensureComponentVariant]);
+
   useEffect(() => {
     if (tenantId) {
-      setTenantId(tenantId);
+      fetchTenantData(tenantId);
     }
-  }, [tenantId, setTenantId]);
+  }, [tenantId, fetchTenantData]);
 
-  // إذا كان tenantId لا يزال يتم تحميله
+  // Get data from store or tenantData with fallback logic
+  const storeData = props.useStore
+    ? getComponentData("grid", variantId) || {}
+    : {};
+
+  // Get tenant data for this specific component variant
+  const getTenantComponentData = () => {
+    if (!tenantData?.componentSettings) {
+      return {};
+    }
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          if (
+            (component as any).type === "grid" &&
+            (component as any).componentName === variantId &&
+            componentId === props.id
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+    }
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
+
+  // Merge data with priority: storeData > tenantComponentData > props > default
+  const mergedData = {
+    ...props,
+    ...tenantComponentData,
+    ...storeData,
+  };
+
+  // Default API URL
+  const defaultUrl = "/v1/tenant-website/{{tenantID}}/properties";
+
+  // Function to convert API URL format
+  const convertApiUrl = (url: string, tenantId: string): string => {
+    return url.replace("{{tenantID}}", tenantId);
+  };
+
+  // Function to fetch properties from API
+  const fetchPropertiesFromApi = async (apiUrl?: string) => {
+    try {
+      setLoading(true);
+
+      if (!currentTenantId) {
+        setLoading(false);
+        return;
+      }
+
+      const url = convertApiUrl(apiUrl || defaultUrl, currentTenantId);
+
+      const response = await axiosInstance.get(url);
+
+      // Handle different API response formats
+      if (response.data) {
+        let dataToSet = [];
+
+        // Check if it's projects API response
+        if (url.includes("/projects")) {
+          console.log("Grid: Processing projects data");
+          let projectsData = [];
+
+          if (response.data.projects) {
+            projectsData = response.data.projects;
+            console.log(
+              "Grid: Found projects in response.data.projects:",
+              projectsData.length,
+            );
+          } else if (Array.isArray(response.data)) {
+            projectsData = response.data;
+            console.log(
+              "Grid: Found projects in direct array:",
+              projectsData.length,
+            );
+          } else if (response.data.data && Array.isArray(response.data.data)) {
+            projectsData = response.data.data;
+            console.log(
+              "Grid: Found projects in response.data.data:",
+              projectsData.length,
+            );
+          }
+
+          // Convert projects to property format
+          if (projectsData.length > 0) {
+            dataToSet = projectsData.map((project: any) => {
+              console.log("Grid: Converting project:", project.title);
+              return convertProjectToProperty(project);
+            });
+            console.log(
+              "Grid: Converted",
+              projectsData.length,
+              "projects to property format",
+            );
+          } else {
+            console.log("Grid: No projects data found");
+            dataToSet = [];
+          }
+        }
+        // Check if it's properties API response
+        else if (response.data.properties) {
+          console.log("Grid: Processing properties data");
+          dataToSet = response.data.properties;
+        }
+        // Handle direct array response
+        else if (Array.isArray(response.data)) {
+          console.log("Grid: Processing direct array data");
+          dataToSet = response.data;
+        }
+        // Handle pagination wrapper
+        else if (response.data.data && Array.isArray(response.data.data)) {
+          console.log("Grid: Processing paginated data");
+          dataToSet = response.data.data;
+        }
+
+        console.log("Grid: Setting data:", dataToSet.length, "items");
+        setApiProperties(dataToSet);
+
+        if (response.data.pagination) {
+          // Handle pagination if needed
+          console.log("Grid: Pagination info:", response.data.pagination);
+        }
+      } else {
+        console.log("Grid: No data received");
+        setApiProperties([]);
+      }
+    } catch (error) {
+      console.error("Grid: Error fetching properties:", error);
+      console.error("Grid: URL that failed:", apiUrl);
+      // Set empty array on error
+      setApiProperties([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper function to convert project data to property format
+  const convertProjectToProperty = (project: any): any => {
+    // Format price display
+    const formatPrice = (minPrice: string, maxPrice: string) => {
+      if (!minPrice && !maxPrice) return "غير محدد";
+      if (minPrice === maxPrice) return minPrice;
+      if (minPrice && maxPrice) return `${minPrice} - ${maxPrice}`;
+      return minPrice || maxPrice;
+    };
+
+    // Format completion date
+    const formatCompletionDate = (date: string) => {
+      if (!date) return new Date().toISOString();
+      try {
+        return new Date(date).toISOString();
+      } catch {
+        return new Date().toISOString();
+      }
+    };
+
+    return {
+      id: project.id,
+      slug: project.slug,
+      title: project.title,
+      district: project.address || project.location?.address || "غير محدد",
+      price: formatPrice(project.minPrice, project.maxPrice),
+      views: 0, // Projects don't have views
+      bedrooms: 0, // Projects don't have bedrooms
+      bathrooms: 0, // Projects don't have bathrooms
+      area: project.units ? `${project.units} وحدة` : "غير محدد",
+      type: "مشروع", // Project type
+      transactionType: "project", // Project transaction type
+      image: project.image || project.images?.[0] || "",
+      status: project.completeStatus === "1" ? "مكتمل" : "قيد الإنشاء",
+      createdAt: formatCompletionDate(project.completionDate),
+      description: project.description || "",
+      features: project.amenities || [],
+      location: {
+        lat: project.location?.lat || 0,
+        lng: project.location?.lng || 0,
+        address: project.location?.address || project.address || "غير محدد",
+      },
+      images: project.images || [project.image].filter(Boolean),
+    };
+  };
+
+  // Fetch properties on component mount and when API URL changes
+  useEffect(() => {
+    const apiUrl =
+      mergedData.dataSource?.apiUrl ||
+      "/v1/tenant-website/{{tenantID}}/properties";
+    const useApiData = mergedData.dataSource?.enabled !== false;
+
+    if (useApiData && currentTenantId) {
+      fetchPropertiesFromApi(apiUrl);
+    }
+  }, [
+    mergedData.dataSource?.apiUrl,
+    mergedData.dataSource?.enabled,
+    currentTenantId,
+  ]);
+
+  // Use API data if enabled, otherwise use static data
+  const useApiData = mergedData.dataSource?.enabled !== false;
+  const properties = useApiData
+    ? apiProperties
+    : mergedData.items || mergedData.properties || [];
+
+  // Check if component should be visible
+  if (!mergedData.visible) {
+    return null;
+  }
+
+  // Show loading state while tenant is loading
   if (tenantLoading) {
     return (
       <section className="w-full bg-background py-8">
@@ -55,8 +304,8 @@ export default function PropertyGrid({
     );
   }
 
-  // إذا لم نجد tenantId
-  if (!tenantId) {
+  // Show error if no tenant ID
+  if (!currentTenantId) {
     return (
       <section className="w-full bg-background py-8">
         <div className="mx-auto max-w-[1600px] px-4">
@@ -88,104 +337,102 @@ export default function PropertyGrid({
     );
   }
 
-  if (loading) {
-    return (
-      <section className="w-full bg-background py-8">
-        <div className="mx-auto max-w-[1600px] px-4">
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-            <p className="text-lg text-gray-600 mt-4">جاري تحميل العقارات...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="w-full bg-background py-8">
-        <div className="mx-auto max-w-[1600px] px-4">
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-red-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <p className="text-lg text-red-600 font-medium">
-              حدث خطأ في تحميل العقارات
-            </p>
-            <p className="text-sm text-gray-500 mt-2">{error}</p>
-            <button
-              onClick={() => fetchProperties(1)}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              إعادة المحاولة
-            </button>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section
-      className={`w-full bg-background py-8 ${className || ""}`}
+      className={`w-full bg-background py-8 ${mergedData.className || ""}`}
       style={{
-        backgroundColor: "transparent", // يمكن إضافة mergedData.background?.color هنا لاحقاً
+        backgroundColor:
+          mergedData.background?.color ||
+          mergedData.styling?.bgColor ||
+          "transparent",
+        paddingTop: mergedData.layout?.padding?.top || "2rem",
+        paddingBottom: mergedData.layout?.padding?.bottom || "2rem",
       }}
     >
       <div
-        className="mx-auto max-w-[1600px] px-4"
+        className="mx-auto px-4"
         style={{
-          gridTemplateColumns: "repeat(4, 1fr)", // يمكن إضافة mergedData.grid?.columns?.desktop هنا لاحقاً
-          gap: "24px", // يمكن إضافة mergedData.grid?.gapX || mergedData.grid?.gapY هنا لاحقاً
+          maxWidth:
+            mergedData.layout?.maxWidth ||
+            mergedData.styling?.maxWidth ||
+            "1600px",
         }}
       >
-        {filteredProperties.length > 0 ? (
+        {/* Section Title */}
+        {mergedData.content?.title && (
+          <div className="mb-6 text-center">
+            <h2
+              className="text-2xl font-bold mb-2"
+              style={{
+                color:
+                  mergedData.styling?.titleColor ||
+                  mergedData.typography?.title?.color ||
+                  "#1f2937",
+              }}
+            >
+              {mergedData.content.title}
+            </h2>
+            {mergedData.content.subtitle && (
+              <p
+                className="text-gray-600"
+                style={{
+                  color:
+                    mergedData.styling?.subtitleColor ||
+                    mergedData.typography?.subtitle?.color ||
+                    "#6b7280",
+                }}
+              >
+                {mergedData.content.subtitle}
+              </p>
+            )}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">جاري تحميل العقارات...</p>
+            </div>
+          </div>
+        ) : properties.length > 0 ? (
           <>
             <div className="mb-6">
               <p className="text-sm text-gray-600">
-                تم العثور على {total} عقار{total !== 1 ? "ات" : ""}
+                تم العثور على {properties.length} عقار
+                {properties.length !== 1 ? "ات" : ""}
               </p>
             </div>
             <div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
               style={{
-                gridTemplateColumns: "repeat(4, 1fr)", // يمكن إضافة mergedData.grid?.columns?.desktop هنا لاحقاً
-                gap: "24px", // يمكن إضافة mergedData.grid?.gapX || mergedData.grid?.gapY هنا لاحقاً
+                gap: mergedData.styling?.gridGap || "24px",
               }}
             >
-              {filteredProperties.map((property) => (
-                <PropertyCard key={property.id} p={property} />
-              ))}
-            </div>
+              {properties.map((property: any) => {
+                const cardSettings = mergedData.cardSettings || {};
+                const theme = cardSettings.theme || "card1";
+                let CardComponent = PropertyCard;
 
-            {/* Pagination */}
-            {pagination.last_page > 1 && (
-              <div className="mt-8">
-                <Pagination
-                  currentPage={pagination.current_page}
-                  totalPages={pagination.last_page}
-                  onPageChange={setCurrentPage}
-                  onNextPage={goToNextPage}
-                  onPreviousPage={goToPreviousPage}
-                  totalItems={pagination.total}
-                  itemsPerPage={pagination.per_page}
-                  showingFrom={pagination.from}
-                  showingTo={pagination.to}
-                />
-              </div>
-            )}
+                if (theme === "card2") {
+                  CardComponent = PropertyCard2;
+                } else if (theme === "card3") {
+                  CardComponent = PropertyCard3;
+                }
+
+                return (
+                  <CardComponent
+                    key={property.id}
+                    property={property}
+                    showImage={cardSettings.showImage !== false}
+                    showPrice={cardSettings.showPrice !== false}
+                    showDetails={cardSettings.showDetails !== false}
+                    showViews={cardSettings.showViews !== false}
+                    showStatus={cardSettings.showStatus !== false}
+                  />
+                );
+              })}
+            </div>
           </>
         ) : (
           <div className="text-center py-12">
@@ -204,9 +451,13 @@ export default function PropertyGrid({
                 />
               </svg>
             </div>
-            <p className="text-lg text-gray-600 font-medium">{emptyMessage}</p>
+            <p className="text-lg text-gray-600 font-medium">
+              {mergedData.content?.emptyMessage ||
+                mergedData.emptyMessage ||
+                "لا توجد عقارات متاحة حالياً"}
+            </p>
             <p className="text-sm text-gray-500 mt-2">
-              جرب تغيير الفلاتر أو البحث بكلمات أخرى
+              يرجى المحاولة مرة أخرى لاحقاً
             </p>
           </div>
         )}

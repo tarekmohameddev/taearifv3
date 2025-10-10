@@ -55,6 +55,48 @@ export const getDefaultPropertySliderData = (): ComponentData => ({
   background: {
     color: "transparent",
   },
+  cardSettings: {
+    theme: "card1",
+    showImage: true,
+    showPrice: true,
+    showDetails: true,
+    showViews: true,
+    showStatus: true,
+    cardStyle: {
+      borderRadius: "rounded-xl",
+      shadow: "lg",
+      hoverEffect: "scale",
+    },
+    imageSettings: {
+      aspectRatio: "16/10",
+      objectFit: "cover",
+      overlay: {
+        enabled: false,
+        color: "rgba(0, 0, 0, 0.3)",
+        gradient: false,
+      },
+    },
+    contentSettings: {
+      titleStyle: {
+        fontSize: "lg",
+        fontWeight: "bold",
+        color: "#1f2937",
+      },
+      priceStyle: {
+        fontSize: "xl",
+        color: "#059669",
+        currency: "ريال",
+      },
+    },
+    interactionSettings: {
+      clickable: true,
+      buttonText: "تفاصيل",
+      buttonStyle: {
+        variant: "ghost",
+        color: "#059669",
+      },
+    },
+  },
 });
 
 export const propertySliderFunctions = {

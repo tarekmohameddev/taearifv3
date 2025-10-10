@@ -440,7 +440,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   closeDialog: () => set(() => ({ showDialog: false })),
   setHasChangesMade: (hasChanges) => {
     console.log("🏪 Store: setHasChangesMade called with:", hasChanges);
-    set(() => ({ hasChangesMade: hasChanges }));
+    set((state) => {
+      // Only update if the value is actually different to prevent infinite loops
+      if (state.hasChangesMade !== hasChanges) {
+        return { hasChangesMade: hasChanges };
+      }
+      return state; // Return current state if no change needed
+    });
   },
 
   setCurrentPage: (page) => set(() => ({ currentPage: page })),

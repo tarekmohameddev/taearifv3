@@ -128,19 +128,26 @@ export function UpdatedAddRentalForm({
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>("");
 
   // Dynamic Cost Center State
-  const [costCenterItems, setCostCenterItems] = useState<Array<{
-    id: string;
-    name: string;
-    cost: string;
-    type: 'percentage' | 'amount';
-    payer: 'tenant' | 'landlord';
-    payment_frequency: 'one_time' | 'per_installment';
-    description: string;
-  }>>([]);
+  const [costCenterItems, setCostCenterItems] = useState<
+    Array<{
+      id: string;
+      name: string;
+      cost: string;
+      type: "percentage" | "amount";
+      payer: "tenant" | "landlord";
+      payment_frequency: "one_time" | "per_installment";
+      description: string;
+    }>
+  >([]);
 
   // Function to calculate payment amounts based on contract type, duration, and payment frequency
   const calculatePaymentAmount = () => {
-    if (!formData.base_rent_amount || !formData.rental_duration || !formData.rental_type || !formData.paying_plan) {
+    if (
+      !formData.base_rent_amount ||
+      !formData.rental_duration ||
+      !formData.rental_type ||
+      !formData.paying_plan
+    ) {
       return null;
     }
 
@@ -185,7 +192,7 @@ export function UpdatedAddRentalForm({
       paymentPeriods,
       periodName,
       totalMonths,
-      totalAmount
+      totalAmount,
     };
   };
 
@@ -193,26 +200,24 @@ export function UpdatedAddRentalForm({
   const addCostCenterItem = () => {
     const newItem = {
       id: Date.now().toString(),
-      name: '',
-      cost: '',
-      type: 'amount' as const,
-      payer: 'tenant' as const,
-      payment_frequency: 'per_installment' as const,
-      description: ''
+      name: "",
+      cost: "",
+      type: "amount" as const,
+      payer: "tenant" as const,
+      payment_frequency: "per_installment" as const,
+      description: "",
     };
-    setCostCenterItems(prev => [...prev, newItem]);
+    setCostCenterItems((prev) => [...prev, newItem]);
   };
 
   const updateCostCenterItem = (id: string, field: string, value: string) => {
-    setCostCenterItems(prev => 
-      prev.map(item => 
-        item.id === id ? { ...item, [field]: value } : item
-      )
+    setCostCenterItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
     );
   };
 
   const removeCostCenterItem = (id: string) => {
-    setCostCenterItems(prev => prev.filter(item => item.id !== id));
+    setCostCenterItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   const [selectedProject, setSelectedProject] = useState<string>("");
@@ -420,11 +425,11 @@ export function UpdatedAddRentalForm({
       currency: formData.currency,
       contract_number: formData.contract_number,
       notes: formData.notes,
-      cost_items: costCenterItems.map(item => ({
+      cost_items: costCenterItems.map((item) => ({
         name: item.name,
         cost: item.cost ? parseFloat(item.cost) : 0,
-        type: item.type === 'amount' ? 'fixed' : 'percentage',
-        payer: item.payer === 'landlord' ? 'owner' : item.payer,
+        type: item.type === "amount" ? "fixed" : "percentage",
+        payer: item.payer === "landlord" ? "owner" : item.payer,
         payment_frequency: item.payment_frequency,
         description: item.description,
       })),
@@ -968,15 +973,18 @@ export function UpdatedAddRentalForm({
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                       <span className="font-semibold text-blue-800">
-                        المبلغ {calculation.periodName}: {calculation.paymentAmount.toLocaleString()} ريال
+                        المبلغ {calculation.periodName}:{" "}
+                        {calculation.paymentAmount.toLocaleString()} ريال
                       </span>
                     </div>
-                    
+
                     <div className="space-y-2 text-xs">
                       <div className="bg-white px-3 py-2 rounded-md border border-blue-200">
                         <div className="grid grid-cols-2 gap-2 text-center">
                           <div>
-                            <span className="text-gray-600">المدة الإجمالية:</span>
+                            <span className="text-gray-600">
+                              المدة الإجمالية:
+                            </span>
                             <span className="font-medium text-blue-800 block">
                               {calculation.totalMonths} شهر
                             </span>
@@ -989,10 +997,12 @@ export function UpdatedAddRentalForm({
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="text-center text-blue-600 bg-white px-2 py-1 rounded-md border">
                         <span className="font-medium">
-                          {calculation.totalAmount.toLocaleString()} ÷ {calculation.paymentPeriods} = {calculation.paymentAmount.toLocaleString()} ريال
+                          {calculation.totalAmount.toLocaleString()} ÷{" "}
+                          {calculation.paymentPeriods} ={" "}
+                          {calculation.paymentAmount.toLocaleString()} ريال
                         </span>
                       </div>
                     </div>
@@ -1104,8 +1114,18 @@ export function UpdatedAddRentalForm({
               onClick={addCostCenterItem}
               className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
               </svg>
               إضافة تكلفة
             </Button>
@@ -1114,17 +1134,32 @@ export function UpdatedAddRentalForm({
           {costCenterItems.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 011.414.586l5.414 5.414a1 1 0 01.586 1.414V19a2 2 0 01-2 2z" />
+                <svg
+                  className="w-8 h-8 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 011.414.586l5.414 5.414a1 1 0 01.586 1.414V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <p>لا توجد تكاليف مضافة بعد</p>
-              <p className="text-sm">اضغط على "إضافة تكلفة" لإضافة تكلفة جديدة</p>
+              <p className="text-sm">
+                اضغط على "إضافة تكلفة" لإضافة تكلفة جديدة
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
               {costCenterItems.map((item, index) => (
-                <div key={item.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div
+                  key={item.id}
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                >
                   <div className="flex items-center justify-between mb-4">
                     <h5 className="font-medium text-gray-900">
                       تكلفة #{index + 1}
@@ -1135,8 +1170,18 @@ export function UpdatedAddRentalForm({
                       className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2"
                       variant="ghost"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
                       </svg>
                     </Button>
                   </div>
@@ -1149,7 +1194,9 @@ export function UpdatedAddRentalForm({
                       </Label>
                       <Input
                         value={item.name}
-                        onChange={(e) => updateCostCenterItem(item.id, 'name', e.target.value)}
+                        onChange={(e) =>
+                          updateCostCenterItem(item.id, "name", e.target.value)
+                        }
                         placeholder="مثال: رسوم الصيانة"
                         className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
                       />
@@ -1164,7 +1211,9 @@ export function UpdatedAddRentalForm({
                         type="number"
                         step="0.01"
                         value={item.cost}
-                        onChange={(e) => updateCostCenterItem(item.id, 'cost', e.target.value)}
+                        onChange={(e) =>
+                          updateCostCenterItem(item.id, "cost", e.target.value)
+                        }
                         placeholder="100.00"
                         className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
                       />
@@ -1177,7 +1226,9 @@ export function UpdatedAddRentalForm({
                       </Label>
                       <Select
                         value={item.type}
-                        onValueChange={(value) => updateCostCenterItem(item.id, 'type', value)}
+                        onValueChange={(value) =>
+                          updateCostCenterItem(item.id, "type", value)
+                        }
                       >
                         <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
                           <SelectValue />
@@ -1196,7 +1247,9 @@ export function UpdatedAddRentalForm({
                       </Label>
                       <Select
                         value={item.payer}
-                        onValueChange={(value) => updateCostCenterItem(item.id, 'payer', value)}
+                        onValueChange={(value) =>
+                          updateCostCenterItem(item.id, "payer", value)
+                        }
                       >
                         <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
                           <SelectValue />
@@ -1215,14 +1268,22 @@ export function UpdatedAddRentalForm({
                       </Label>
                       <Select
                         value={item.payment_frequency}
-                        onValueChange={(value) => updateCostCenterItem(item.id, 'payment_frequency', value)}
+                        onValueChange={(value) =>
+                          updateCostCenterItem(
+                            item.id,
+                            "payment_frequency",
+                            value,
+                          )
+                        }
                       >
                         <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="one_time">مرة واحدة</SelectItem>
-                          <SelectItem value="per_installment">لكل قسط</SelectItem>
+                          <SelectItem value="per_installment">
+                            لكل قسط
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1234,7 +1295,13 @@ export function UpdatedAddRentalForm({
                       </Label>
                       <Textarea
                         value={item.description}
-                        onChange={(e) => updateCostCenterItem(item.id, 'description', e.target.value)}
+                        onChange={(e) =>
+                          updateCostCenterItem(
+                            item.id,
+                            "description",
+                            e.target.value,
+                          )
+                        }
                         placeholder="وصف التكلفة..."
                         rows={2}
                         className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"

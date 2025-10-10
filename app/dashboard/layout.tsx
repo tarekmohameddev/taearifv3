@@ -57,7 +57,6 @@ export default function DashboardLayout({
     `;
     document.head.appendChild(style);
 
-
     // تنظيف عند الخروج من المجلد
     return () => {
       // إزالة الـ CSS
@@ -65,7 +64,6 @@ export default function DashboardLayout({
       if (styleElement) {
         styleElement.remove();
       }
-
     };
   }, []);
 
@@ -87,9 +85,7 @@ export default function DashboardLayout({
   return (
     <GTMProvider containerId="GTM-KBL37C9T">
       <div dir="rtl" style={{ direction: "rtl" }}>
-        <PermissionWrapper>
-          {children}
-        </PermissionWrapper>
+        <PermissionWrapper>{children}</PermissionWrapper>
       </div>
     </GTMProvider>
   );

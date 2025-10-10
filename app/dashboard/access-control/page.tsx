@@ -578,7 +578,6 @@ export default function AccessControlPage() {
     }
   };
 
-
   // Fetch roles data
   const fetchRoles = async () => {
     console.log("🔍 Fetching roles from /v1/employees/available-roles");
@@ -1458,7 +1457,9 @@ export default function AccessControlPage() {
                                   <div className="p-1.5 sm:p-2 bg-black rounded-lg">
                                     <UserPlus className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                                   </div>
-                                  <span className="text-sm sm:text-base">إضافة موظف جديد</span>
+                                  <span className="text-sm sm:text-base">
+                                    إضافة موظف جديد
+                                  </span>
                                 </DialogTitle>
                                 <DialogDescription className="text-gray-600 text-sm sm:text-base">
                                   قم بإنشاء حساب جديد للموظف وتخصيص الصلاحيات
@@ -1710,41 +1711,44 @@ export default function AccessControlPage() {
                                   <Separator className="my-6 sm:my-8" />
                                 </div>
 
-                              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200">
-                                <Button
-                                  variant="outline"
-                                  onClick={() => setShowCreateDialog(false)}
-                                  className="border-gray-300 text-gray-700 hover:bg-gray-50 text-sm sm:text-base w-full sm:w-auto"
-                                >
-                                  إلغاء
-                                </Button>
-                                <Button
-                                  onClick={createEmployee}
-                                  disabled={
-                                    createLoading ||
-                                    !formData.first_name ||
-                                    !formData.last_name ||
-                                    !formData.email ||
-                                    !formData.phone ||
-                                    !formData.password
-                                  }
-                                  className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400 text-sm sm:text-base w-full sm:w-auto"
-                                >
-                                  {createLoading ? (
-                                    <>
-                                      <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2 animate-spin" />
-                                      <span className="text-xs sm:text-sm">جاري الإنشاء...</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
-                                      <span className="text-xs sm:text-sm">إنشاء الموظف</span>
-                                    </>
-                                  )}
-                                </Button>
-                              </div>
+                                <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200">
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => setShowCreateDialog(false)}
+                                    className="border-gray-300 text-gray-700 hover:bg-gray-50 text-sm sm:text-base w-full sm:w-auto"
+                                  >
+                                    إلغاء
+                                  </Button>
+                                  <Button
+                                    onClick={createEmployee}
+                                    disabled={
+                                      createLoading ||
+                                      !formData.first_name ||
+                                      !formData.last_name ||
+                                      !formData.email ||
+                                      !formData.phone ||
+                                      !formData.password
+                                    }
+                                    className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400 text-sm sm:text-base w-full sm:w-auto"
+                                  >
+                                    {createLoading ? (
+                                      <>
+                                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2 animate-spin" />
+                                        <span className="text-xs sm:text-sm">
+                                          جاري الإنشاء...
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                                        <span className="text-xs sm:text-sm">
+                                          إنشاء الموظف
+                                        </span>
+                                      </>
+                                    )}
+                                  </Button>
+                                </div>
                               </ScrollArea>
-
                             </DialogContent>
                           </Dialog>
                         </div>
@@ -2351,40 +2355,39 @@ export default function AccessControlPage() {
                         <Separator className="my-8" />
                       </div>
 
-                    <div className="flex justify-end gap-3 pt-4 ">
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowEditDialog(false)}
-                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                      >
-                        إلغاء
-                      </Button>
-                      <Button
-                        onClick={updateEmployee}
-                        disabled={
-                          editLoading ||
-                          !editFormData.first_name ||
-                          !editFormData.last_name ||
-                          !editFormData.email ||
-                          !editFormData.phone
-                        }
-                        className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400"
-                      >
-                        {editLoading ? (
-                          <>
-                            <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                            جاري التحديث...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="h-4 w-4 ml-2" />
-                            حفظ التغييرات
-                          </>
-                        )}
-                      </Button>
-                    </div>
+                      <div className="flex justify-end gap-3 pt-4 ">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowEditDialog(false)}
+                          className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                        >
+                          إلغاء
+                        </Button>
+                        <Button
+                          onClick={updateEmployee}
+                          disabled={
+                            editLoading ||
+                            !editFormData.first_name ||
+                            !editFormData.last_name ||
+                            !editFormData.email ||
+                            !editFormData.phone
+                          }
+                          className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400"
+                        >
+                          {editLoading ? (
+                            <>
+                              <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                              جاري التحديث...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="h-4 w-4 ml-2" />
+                              حفظ التغييرات
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </ScrollArea>
-
                   </DialogContent>
                 </Dialog>
               </TabsContent>

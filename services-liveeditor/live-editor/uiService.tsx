@@ -207,7 +207,91 @@ export const CachedComponent = React.memo(
         }
       >
         {/* Pass useStore & variant so components read live state from EditorStore */}
-        <LoadedComponent {...(data as any)} useStore variant={data.variant} />
+        <LoadedComponent
+          {...(() => {
+            // Deep filter function to remove any objects that might cause React child errors
+            const deepFilterObjects = (obj: any): any => {
+              if (obj === null || obj === undefined) return obj;
+
+              if (Array.isArray(obj)) {
+                return obj.map(deepFilterObjects);
+              }
+
+              if (typeof obj === "object") {
+                // Check if this is a React element or component
+                if (
+                  obj.$$typeof ||
+                  obj.type ||
+                  obj.props ||
+                  obj.key ||
+                  obj.ref
+                ) {
+                  // This is likely a React element, convert to string or remove
+                  return null;
+                }
+
+                // Check for Lucide React icons or other React components
+                if (
+                  obj.$$typeof === Symbol.for("react.element") ||
+                  obj.$$typeof === Symbol.for("react.forward_ref") ||
+                  obj.$$typeof === Symbol.for("react.memo")
+                ) {
+                  return null;
+                }
+
+                // Check if this is a function (React component)
+                if (typeof obj === "function") {
+                  return null;
+                }
+
+                // Check if this is a Date object
+                if (obj instanceof Date) {
+                  return obj.toISOString();
+                }
+
+                // Check if this object has keys that might be React elements
+                const filtered: any = {};
+                for (const [key, value] of Object.entries(obj)) {
+                  // Skip known problematic keys
+                  if (
+                    key === "icon" ||
+                    key === "children" ||
+                    key === "element" ||
+                    key === "Icon" ||
+                    key === "Component" ||
+                    key === "ReactElement"
+                  ) {
+                    continue;
+                  }
+
+                  const filteredValue = deepFilterObjects(value);
+                  if (filteredValue !== null) {
+                    filtered[key] = filteredValue;
+                  }
+                }
+                return filtered;
+              }
+
+              return obj;
+            };
+
+            try {
+              return deepFilterObjects(data);
+            } catch (error) {
+              console.warn("Error filtering data for component:", error);
+              // Return a safe fallback object
+              return {
+                id: data.id,
+                type: data.type,
+                variant: data.variant,
+              };
+            }
+          })()}
+          useStore
+          variant={data.variant}
+          // Ensure no React child objects are passed
+          key={data.id || "component"}
+        />
       </Suspense>
     );
   },

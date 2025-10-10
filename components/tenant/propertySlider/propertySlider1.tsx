@@ -5,10 +5,23 @@ import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import SwiperCarousel from "@/components/ui/swiper-carousel";
-import { PropertyCard } from "@/components/property-card";
+import { PropertyCard } from "@/components/tenant/cards/card1";
+import PropertyCard2 from "@/components/tenant/cards/card2";
+import PropertyCard3 from "@/components/tenant/cards/card3";
 import Link from "next/link";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
+
+/**
+ * PropertySlider Component
+ *
+ * Supports both Properties and Projects data sources:
+ * - Properties: /v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10
+ * - Properties: /v1/tenant-website/{tenantId}/properties?purpose=sale&latest=1&limit=10
+ * - Projects: /v1/tenant-website/{tenantId}/projects?featured=1&limit=10
+ *
+ * The component automatically detects the data source type and handles different response formats.
+ */
 
 type Property = {
   id: string;
@@ -115,9 +128,58 @@ const convertLegacyApiUrl = (url: string, tenantId: string): string => {
   } else if (url === "/api/properties/latestRentals") {
     const newUrl = `/v1/tenant-website/${tenantId}/properties?purpose=rent&latest=1&limit=10`;
     return newUrl;
+  } else if (url === "/api/projects/latestProjects") {
+    const newUrl = `/v1/tenant-website/${tenantId}/projects?featured=1&limit=10`;
+    return newUrl;
   }
   // If it's already the new format with placeholder, replace tenantId
   return url.replace("{tenantId}", tenantId);
+};
+
+// Helper function to convert project data to property format
+const convertProjectToProperty = (project: any): Property => {
+  // Format price display
+  const formatPrice = (minPrice: string, maxPrice: string) => {
+    if (!minPrice && !maxPrice) return "غير محدد";
+    if (minPrice === maxPrice) return minPrice;
+    if (minPrice && maxPrice) return `${minPrice} - ${maxPrice}`;
+    return minPrice || maxPrice;
+  };
+
+  // Format completion date
+  const formatCompletionDate = (date: string) => {
+    if (!date) return new Date().toISOString();
+    try {
+      return new Date(date).toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
+  };
+
+  return {
+    id: project.id,
+    slug: project.slug,
+    title: project.title,
+    district: project.address || project.location?.address || "غير محدد",
+    price: formatPrice(project.minPrice, project.maxPrice),
+    views: 0, // Projects don't have views
+    bedrooms: 0, // Projects don't have bedrooms
+    bathrooms: 0, // Projects don't have bathrooms
+    area: project.units ? `${project.units} وحدة` : "غير محدد",
+    type: "مشروع", // Project type
+    transactionType: "project", // Project transaction type
+    image: project.image || project.images?.[0] || "",
+    status: project.completeStatus === "1" ? "مكتمل" : "قيد الإنشاء",
+    createdAt: formatCompletionDate(project.completionDate),
+    description: project.description || "",
+    features: project.amenities || [],
+    location: {
+      lat: project.location?.lat || 0,
+      lng: project.location?.lng || 0,
+      address: project.location?.address || project.address || "غير محدد",
+    },
+    images: project.images || [project.image].filter(Boolean),
+  };
 };
 
 export default function PropertySlider(props: PropertySliderProps = {}) {
@@ -137,7 +199,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
 
-  // Fetch properties from API
+  // Fetch properties/projects from API
   const fetchProperties = async (apiUrl?: string) => {
     try {
       setLoading(true);
@@ -154,12 +216,79 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
 
       const response = await axiosInstance.get(url);
 
-      // Handle new API response format
-      if (response.data && response.data.properties) {
-        setApiProperties(response.data.properties);
+      // Handle different API response formats
+      if (response.data) {
+        let dataToSet = [];
+
+        // Check if it's projects API response
+        if (url.includes("/projects")) {
+          console.log("PropertySlider: Processing projects data");
+          let projectsData = [];
+
+          if (response.data.projects) {
+            projectsData = response.data.projects;
+            console.log(
+              "PropertySlider: Found projects in response.data.projects:",
+              projectsData.length,
+            );
+          } else if (Array.isArray(response.data)) {
+            projectsData = response.data;
+            console.log(
+              "PropertySlider: Found projects in direct array:",
+              projectsData.length,
+            );
+          } else if (response.data.data && Array.isArray(response.data.data)) {
+            projectsData = response.data.data;
+            console.log(
+              "PropertySlider: Found projects in response.data.data:",
+              projectsData.length,
+            );
+          }
+
+          // Convert projects to property format
+          if (projectsData.length > 0) {
+            dataToSet = projectsData.map((project: any) => {
+              console.log("PropertySlider: Converting project:", project.title);
+              return convertProjectToProperty(project);
+            });
+            console.log(
+              "PropertySlider: Converted",
+              projectsData.length,
+              "projects to property format",
+            );
+          } else {
+            console.log("PropertySlider: No projects data found");
+            dataToSet = [];
+          }
+        }
+        // Check if it's properties API response
+        else if (response.data.properties) {
+          console.log("PropertySlider: Processing properties data");
+          dataToSet = response.data.properties;
+        }
+        // Handle direct array response
+        else if (Array.isArray(response.data)) {
+          console.log("PropertySlider: Processing direct array data");
+          dataToSet = response.data;
+        }
+        // Handle pagination wrapper
+        else if (response.data.data && Array.isArray(response.data.data)) {
+          console.log("PropertySlider: Processing paginated data");
+          dataToSet = response.data.data;
+        }
+
+        console.log("PropertySlider: Setting data:", dataToSet.length, "items");
+        setApiProperties(dataToSet);
+
         if (response.data.pagination) {
+          // Handle pagination if needed
+          console.log(
+            "PropertySlider: Pagination info:",
+            response.data.pagination,
+          );
         }
       } else {
+        console.log("PropertySlider: No data received");
         setApiProperties([]);
       }
     } catch (error) {
@@ -381,7 +510,8 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
             <h2
               className="section-title font-extrabold"
               style={{
-                fontFamily: mergedData.typography?.title?.fontFamily || "Tajawal",
+                fontFamily:
+                  mergedData.typography?.title?.fontFamily || "Tajawal",
                 fontSize:
                   mergedData.typography?.title?.fontSize?.desktop || "2xl",
                 fontWeight:
@@ -481,11 +611,29 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
             <SwiperCarousel
               desktopCount={mergedData.carousel?.desktopCount || 4}
               slideClassName="!h-[360px] sm:!h-[400px] md:!h-[420px]"
-              items={properties.map((p: Property) => (
-                <div key={p.id} className="h-full w-full">
-                  <PropertyCard p={p} />
-                </div>
-              ))}
+              items={properties.map((p: Property) => {
+                const cardSettings = mergedData.cardSettings || {};
+                let CardComponent = PropertyCard;
+
+                if (cardSettings.theme === "card2") {
+                  CardComponent = PropertyCard2;
+                } else if (cardSettings.theme === "card3") {
+                  CardComponent = PropertyCard3;
+                }
+
+                return (
+                  <div key={p.id} className="h-full w-full">
+                    <CardComponent
+                      property={p}
+                      showImage={cardSettings.showImage !== false}
+                      showPrice={cardSettings.showPrice !== false}
+                      showDetails={cardSettings.showDetails !== false}
+                      showViews={cardSettings.showViews !== false}
+                      showStatus={cardSettings.showStatus !== false}
+                    />
+                  </div>
+                );
+              })}
               space={parseInt(slideGap) || 16}
               autoplay={mergedData.carousel?.autoplay || true}
             />
