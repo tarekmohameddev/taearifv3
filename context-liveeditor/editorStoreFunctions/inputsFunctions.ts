@@ -22,6 +22,30 @@ export const getDefaultInputsData = (): ComponentData => ({
     text: "إرسال",
     show: true,
     className: "w-full",
+    backgroundColor: "#3b82f6",
+    textColor: "#ffffff",
+    hoverColor: "#1e40af",
+    borderRadius: "8px",
+    padding: "12px 24px",
+    apiEndpoint: "/api/submit-form",
+  },
+  cardsLayout: {
+    columns: "1",
+    gap: "24px",
+    responsive: {
+      mobile: "1",
+      tablet: "2",
+      desktop: "3",
+    },
+  },
+  fieldsLayout: {
+    columns: "1",
+    gap: "16px",
+    responsive: {
+      mobile: "1",
+      tablet: "2",
+      desktop: "3",
+    },
   },
   cards: [
     {

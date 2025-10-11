@@ -83,6 +83,8 @@ interface InputsProps {
   variant?: string;
   useStore?: boolean;
   id?: string;
+  // API endpoint for form submission
+  apiEndpoint?: string;
 }
 
 // Use the default data from inputsFunctions
@@ -331,12 +333,47 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
     cards = [],
     theme,
     submitButton = {},
+    cardsLayout = {},
+    fieldsLayout = {}, // New: fields layout settings
+    apiEndpoint = "/api/submit-form", // Default API endpoint
     className = "",
     visible = true,
   } = finalData;
 
   const submitButtonText = submitButton.text || "حفظ البيانات";
   const showSubmitButton = submitButton.show !== false;
+  
+  // Get cards layout settings
+  const columns = cardsLayout.columns || "1";
+  const gap = cardsLayout.gap || "24px";
+  const responsive = cardsLayout.responsive || {
+    mobile: "1",
+    tablet: "2",
+    desktop: "3"
+  };
+
+  // Get fields layout settings
+  const fieldsColumns = fieldsLayout.columns || "1";
+  const fieldsGap = fieldsLayout.gap || "16px";
+  const fieldsResponsive = fieldsLayout.responsive || {
+    mobile: "1",
+    tablet: "2",
+    desktop: "3"
+  };
+
+  // Debug logging
+  console.log("🔍 Layout Debug:", {
+    cardsLayout,
+    fieldsLayout,
+    responsive,
+    fieldsResponsive,
+    columns,
+    fieldsColumns,
+    finalData: {
+      cardsLayout: finalData.cardsLayout,
+      fieldsLayout: finalData.fieldsLayout
+    }
+  });
 
   // Use cards from finalData, with fallback to default data
   const safeCards = useMemo(() => {
@@ -634,10 +671,31 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
         console.log("📊 CSV Format:", exportFormData("csv"));
         console.log("📋 Table Format:", exportFormData("table"));
 
-        // You can now send organizedData or formSummary to your API
-        // await submitToAPI(organizedData);
-        // or
-        // await submitToAPI(formSummary);
+        // Send data to API endpoint
+        if (apiEndpoint) {
+          try {
+            const response = await fetch(apiEndpoint, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                formData: organizedData,
+                summary: formSummary,
+                timestamp: new Date().toISOString(),
+              }),
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              console.log("✅ Form submitted successfully:", result);
+            } else {
+              console.error("❌ Form submission failed:", response.statusText);
+            }
+          } catch (apiError) {
+            console.error("❌ API Error:", apiError);
+          }
+        }
       } catch (error) {
         console.error("Error submitting form:", error);
       }
@@ -1071,7 +1129,21 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
               transition={{ duration: 0.3 }}
               className="p-6"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div
+                  className="fields-grid"
+                  style={{
+                    gap: fieldsGap,
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${fieldsColumns}, 1fr)`,
+                    '--fields-columns': fieldsColumns,
+                    '--fields-mobile': fieldsResponsive.mobile,
+                    '--fields-tablet': fieldsResponsive.tablet,
+                    '--fields-desktop': fieldsResponsive.desktop,
+                  } as React.CSSProperties}
+                  data-fields-responsive-mobile={fieldsResponsive.mobile}
+                  data-fields-responsive-tablet={fieldsResponsive.tablet}
+                  data-fields-responsive-desktop={fieldsResponsive.desktop}
+                >
                 {card.fields && Array.isArray(card.fields)
                   ? card.fields
                       .filter(
@@ -1128,9 +1200,282 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
             background-position: 0% 50%;
           }
         }
+        
+        /* Responsive Grid Layout for Cards */
+        .grid {
+          display: grid !important;
+          grid-template-columns: repeat(var(--cards-columns, 1), 1fr) !important;
+        }
+        
+        /* Mobile First Approach */
+        .grid[data-responsive-mobile="1"] {
+          grid-template-columns: repeat(1, 1fr) !important;
+        }
+        .grid[data-responsive-mobile="2"] {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .grid[data-responsive-mobile="3"] {
+          grid-template-columns: repeat(3, 1fr) !important;
+        }
+        .grid[data-responsive-mobile="4"] {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+        
+        /* Tablet Override */
+        @media (min-width: 768px) {
+          .grid[data-responsive-tablet="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .grid[data-responsive-tablet="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .grid[data-responsive-tablet="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .grid[data-responsive-tablet="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        }
+        
+        /* Desktop Override */
+        @media (min-width: 1024px) {
+          .grid[data-responsive-desktop="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .grid[data-responsive-desktop="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .grid[data-responsive-desktop="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .grid[data-responsive-desktop="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        }
+        
+        /* Force override with CSS variables */
+        .grid {
+          grid-template-columns: repeat(var(--cards-columns, 1), 1fr) !important;
+        }
+        
+        @media (min-width: 768px) {
+          .grid {
+            grid-template-columns: repeat(var(--cards-tablet, var(--cards-columns, 1)), 1fr) !important;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .grid {
+            grid-template-columns: repeat(var(--cards-desktop, var(--cards-tablet, var(--cards-columns, 1))), 1fr) !important;
+          }
+        }
+        
+        /* Additional force override */
+        .grid[data-responsive-mobile="1"] {
+          grid-template-columns: repeat(1, 1fr) !important;
+        }
+        .grid[data-responsive-mobile="2"] {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .grid[data-responsive-mobile="3"] {
+          grid-template-columns: repeat(3, 1fr) !important;
+        }
+        .grid[data-responsive-mobile="4"] {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+
+        /* Responsive Grid Layout for Fields */
+        .fields-grid {
+          display: grid !important;
+          grid-template-columns: repeat(var(--fields-columns, 1), 1fr) !important;
+        }
+        
+        /* Mobile First Approach for Fields */
+        .fields-grid[data-fields-responsive-mobile="1"] {
+          grid-template-columns: repeat(1, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="2"] {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="3"] {
+          grid-template-columns: repeat(3, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="4"] {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+        
+        /* Tablet Override for Fields */
+        @media (min-width: 768px) {
+          .fields-grid[data-fields-responsive-tablet="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-tablet="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-tablet="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-tablet="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        }
+        
+        /* Desktop Override for Fields */
+        @media (min-width: 1024px) {
+          .fields-grid[data-fields-responsive-desktop="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-desktop="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-desktop="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-desktop="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        }
+        
+        /* Force override with CSS variables for Fields */
+        .fields-grid {
+          grid-template-columns: repeat(var(--fields-columns, 1), 1fr) !important;
+        }
+        
+        @media (min-width: 768px) {
+          .fields-grid {
+            grid-template-columns: repeat(var(--fields-tablet, var(--fields-columns, 1)), 1fr) !important;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .fields-grid {
+            grid-template-columns: repeat(var(--fields-desktop, var(--fields-tablet, var(--fields-columns, 1))), 1fr) !important;
+          }
+        }
+        
+        /* Additional force override for Fields */
+        .fields-grid[data-fields-responsive-mobile="1"] {
+          grid-template-columns: repeat(1, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="2"] {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="3"] {
+          grid-template-columns: repeat(3, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="4"] {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+        
+        /* Force override with CSS variables for Fields */
+        .fields-grid {
+          grid-template-columns: repeat(var(--fields-columns, 1), 1fr) !important;
+        }
+        
+        @media (min-width: 768px) {
+          .fields-grid {
+            grid-template-columns: repeat(var(--fields-tablet, var(--fields-columns, 1)), 1fr) !important;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .fields-grid {
+            grid-template-columns: repeat(var(--fields-desktop, var(--fields-tablet, var(--fields-columns, 1))), 1fr) !important;
+          }
+        }
+        
+        /* Additional force override for Fields */
+        .fields-grid[data-fields-responsive-mobile="1"] {
+          grid-template-columns: repeat(1, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="2"] {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="3"] {
+          grid-template-columns: repeat(3, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="4"] {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+        
+        /* Force override with CSS variables for Fields */
+        .fields-grid {
+          grid-template-columns: repeat(var(--fields-columns, 1), 1fr) !important;
+        }
+        
+        @media (min-width: 768px) {
+          .fields-grid {
+            grid-template-columns: repeat(var(--fields-tablet, var(--fields-columns, 1)), 1fr) !important;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .fields-grid {
+            grid-template-columns: repeat(var(--fields-desktop, var(--fields-tablet, var(--fields-columns, 1))), 1fr) !important;
+          }
+        }
+        
+        /* Additional force override for Fields */
+        .fields-grid[data-fields-responsive-mobile="1"] {
+          grid-template-columns: repeat(1, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="2"] {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="3"] {
+          grid-template-columns: repeat(3, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="4"] {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+        
+        /* Force override with CSS variables for Fields */
+        .fields-grid {
+          grid-template-columns: repeat(var(--fields-columns, 1), 1fr) !important;
+        }
+        
+        @media (min-width: 768px) {
+          .fields-grid {
+            grid-template-columns: repeat(var(--fields-tablet, var(--fields-columns, 1)), 1fr) !important;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .fields-grid {
+            grid-template-columns: repeat(var(--fields-desktop, var(--fields-tablet, var(--fields-columns, 1))), 1fr) !important;
+          }
+        }
+        
+        /* Additional force override for Fields */
+        .fields-grid[data-fields-responsive-mobile="1"] {
+          grid-template-columns: repeat(1, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="2"] {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="3"] {
+          grid-template-columns: repeat(3, 1fr) !important;
+        }
+        .fields-grid[data-fields-responsive-mobile="4"] {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
       `}</style>
 
-      <div className="space-y-8">
+      <div 
+        className="grid"
+        style={{
+          gap: gap,
+          display: 'grid',
+          gridTemplateColumns: `repeat(${columns}, 1fr)`,
+          '--cards-columns': columns,
+          '--cards-mobile': responsive.mobile,
+          '--cards-tablet': responsive.tablet,
+          '--cards-desktop': responsive.desktop,
+        } as React.CSSProperties}
+        data-responsive-mobile={responsive.mobile}
+        data-responsive-tablet={responsive.tablet}
+        data-responsive-desktop={responsive.desktop}
+      >
         {safeCards && Array.isArray(safeCards)
           ? safeCards.map((card, index) => {
               if (card && card.id) {
@@ -1151,13 +1496,20 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="px-8 py-4 text-white rounded-xl transition-all duration-300 flex items-center space-x-2 rtl:space-x-reverse font-bold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            className="transition-all duration-300 flex items-center space-x-2 rtl:space-x-reverse font-bold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              background:
-                safeTheme?.submitButtonGradient ||
-                "linear-gradient(135deg, #3b82f6 0%, #6366f1 25%, #8b5cf6 50%, #ec4899 75%, #f59e0b 100%)",
-              backgroundSize: "200% 200%",
-              animation: "gradientShift 3s ease infinite",
+              backgroundColor: submitButton.backgroundColor || "#3b82f6",
+              color: submitButton.textColor || "#ffffff",
+              borderRadius: submitButton.borderRadius || "8px",
+              padding: submitButton.padding || "12px 24px",
+              width: "100%",
+              justifyContent: "center",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = submitButton.hoverColor || "#1e40af";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = submitButton.backgroundColor || "#3b82f6";
             }}
           >
             {isSubmitting ? (

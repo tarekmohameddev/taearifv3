@@ -24,7 +24,22 @@ export function ArrayFieldRenderer({
   const [nestedExpanded, setNestedExpanded] = useState<Record<string, boolean>>(
     {},
   );
+  const [fieldTypes, setFieldTypes] = useState<Record<string, string>>({});
   const arrDef = def as any;
+
+  // Update field types when value changes
+  React.useEffect(() => {
+    if (Array.isArray(value)) {
+      const newFieldTypes: Record<string, string> = {};
+      value.forEach((item, idx) => {
+        if (item && typeof item === 'object' && item.type) {
+          newFieldTypes[`${normalizedPath}.${idx}`] = item.type;
+        }
+      });
+      setFieldTypes(newFieldTypes);
+    }
+  }, [value, normalizedPath]);
+
 
   // Primitive array support (e.g., movingServices.en: string[])
   if (arrDef.itemType === "text") {
@@ -322,16 +337,17 @@ export function ArrayFieldRenderer({
             {nestedExpanded[`${itemPath}.${field.key}.${nestedIdx}`] &&
               field.of &&
               field.of.map((nestedField: any) => {
-                // Conditional rendering for Select Options field in nested arrays
+                // Conditional rendering for Options field in nested arrays
                 if (
                   nestedField.key === "options" &&
-                  nestedField.label === "Select Options"
+                  (nestedField.label === "Select Options" || nestedField.label === "Field Options (for Select/Radio)")
                 ) {
-                  // Only show Select Options if Field Type is "select"
+                  // Only show Options if Field Type is "select" or "radio"
                   const fieldType = getValueByPath(
                     `${itemPath}.${field.key}.${nestedIdx}.type`,
                   );
-                  if (fieldType !== "select") {
+                  
+                  if (fieldType !== "select" && fieldType !== "radio") {
                     return null;
                   }
                 }
@@ -849,11 +865,13 @@ export function ArrayFieldRenderer({
                     arrDef.of.map((f: any) => {
                       // Conditional rendering for Options field
                       if (f.key === "options" && f.label === "Field Options (for Select/Radio)") {
-                        // Only show Options if Field Type is "radio"
-                        const fieldType = getValueByPath(
-                          `${normalizedPath}.${idx}.type`,
-                        );
-                        if (fieldType !== "radio") {
+                        // Get current field type from multiple sources
+                        const currentFieldType = fieldTypes[`${normalizedPath}.${idx}`] || 
+                                              value?.[idx]?.type || 
+                                              getValueByPath(`${normalizedPath}.${idx}.type`);
+                        
+                        // Hide options field if field type is not select or radio
+                        if (currentFieldType !== "radio" && currentFieldType !== "select") {
                           return null;
                         }
                       }
