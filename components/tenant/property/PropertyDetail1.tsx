@@ -708,7 +708,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       </div>
                     ))}
                   space={16}
-                  autoplay={false}
+                  autoplay={true}
                   desktopCount={4}
                   slideClassName="!h-[10rem] md:!h-[96px]"
                 />

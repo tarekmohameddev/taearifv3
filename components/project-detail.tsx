@@ -17,36 +17,49 @@ interface Project {
   id: string;
   slug?: string;
   title: string;
-  district: string;
-  price: string;
-  views: number;
-  bedrooms: number;
-  bathrooms?: number;
-  area?: string;
-  type: string;
-  transactionType: string;
-  image: string;
-  status?: string;
-  createdAt?: string;
   description?: string;
-  features?: string[];
+  address?: string;
+  metaKeyword?: string;
+  metaDescription?: string;
+  developer?: string;
+  units?: number;
+  completionDate?: string;
+  completeStatus?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  image?: string;
+  images?: string[];
+  floorplans?: string[];
+  videoUrl?: string | null;
+  amenities?: string[];
+  featured?: boolean;
+  published?: boolean;
   location?: {
     lat: number;
     lng: number;
     address: string;
   };
+  specifications?: any[];
+  types?: any[];
+  createdAt?: string;
+  updatedAt?: string;
+  // Legacy fields for compatibility
+  district?: string;
+  price?: string;
+  views?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  area?: string;
+  type?: string;
+  transactionType?: string;
+  status?: string;
+  features?: string[];
   contact?: {
     name: string;
     phone: string;
     email: string;
   };
-  images?: string[];
-  // حقول إضافية للمشروع العقاري
-  developer?: string;
-  units?: number;
   floors?: number;
-  completionDate?: string;
-  amenities?: string[];
 }
 
 import { Button } from "@/components/ui/button";
@@ -522,7 +535,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
             <div className="flex flex-col gap-y-8 lg:gap-y-10">
               {/* العنوان ونوع العرض */}
               <div className="flex flex-row items-center justify-between">
-                <h1 className="font-bold text-xs xs:text-sm leading-4 rounded-md text-white bg-emerald-600 w-20 h-8 flex items-center justify-center md:text-xl lg:text-2xl md:w-28 md:h-11">
+                <h1 className="font-bold text-xs xs:text-sm leading-4 rounded-md text-white bg-emerald-600 px-3 py-2 flex items-center justify-center md:text-xl lg:text-2xl md:px-4 md:py-3 whitespace-nowrap">
                   مشروع عقاري
                 </h1>
                 <div className="sharesocials flex flex-row gap-x-6" dir="ltr">
@@ -540,9 +553,37 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 <p className="font-bold text-gray-600 text-xl leading-6 md:leading-7">
                   {project.title}
                 </p>
-                <p className="text-emerald-600 text-2xl leading-7 font-bold md:text-3xl lg:leading-9">
-                  {project.price} ريال سعودي
-                </p>
+                {(project.minPrice && project.minPrice.trim() !== "" && parseFloat(project.minPrice) > 0) || 
+                 (project.maxPrice && project.maxPrice.trim() !== "" && parseFloat(project.maxPrice) > 0) || 
+                 (project.price && project.price.trim() !== "") ? (
+                  <p className="text-emerald-600 text-2xl leading-7 font-bold md:text-3xl lg:leading-9 flex items-center gap-2">
+                    {project.minPrice && project.maxPrice && parseFloat(project.minPrice) > 0 && parseFloat(project.maxPrice) > 0 ? (
+                      <>
+                        {project.minPrice} - {project.maxPrice}
+                        <img 
+                          src="/Saudi_Riyal_Symbol.svg" 
+                          alt="ريال سعودي" 
+                          className="w-6 h-6"
+                          style={{
+                            filter: 'brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)'
+                          }}
+                        />
+                      </>
+                    ) : project.price ? (
+                      <>
+                        {project.price}
+                        <img 
+                          src="/Saudi_Riyal_Symbol.svg" 
+                          alt="ريال سعودي" 
+                          className="w-6 h-6"
+                          style={{
+                            filter: 'brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)'
+                          }}
+                        />
+                      </>
+                    ) : null}
+                  </p>
+                ) : null}
                 <p className="text-gray-600 text-sm leading-6 font-normal md:text-base lg:text-xl lg:leading-7">
                   {project.description || "لا يوجد وصف متاح لهذا المشروع"}
                 </p>
@@ -550,43 +591,23 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
 
               {/* تفاصيل المشروع في شبكة */}
               <div className="grid grid-cols-2 gap-y-6 lg:gap-y-10">
-                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                  <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                      نوع العرض:
+                {/* عنوان المشروع */}
+                {project.address && project.address.trim() !== "" && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <MapPinIcon className="w-4 h-4 text-emerald-600" />
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        العنوان:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.address}
                     </p>
                   </div>
-                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {project.transactionType === "rent" ? "للإيجار" : "للبيع"}
-                  </p>
-                </div>
+                )}
 
-                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                  <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                      المساحة:
-                    </p>
-                  </div>
-                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {project.area ? `${project.area} م²` : "غير محدد"}
-                  </p>
-                </div>
-
-                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                  <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                      نوع العقار:
-                    </p>
-                  </div>
-                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {project.type}
-                  </p>
-                </div>
-
-                {project.developer && (
+                {/* المطور */}
+                {project.developer && project.developer.trim() !== "" && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <BuildingIcon className="w-4 h-4 text-emerald-600" />
@@ -600,7 +621,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   </div>
                 )}
 
-                {project.units && (
+                {/* عدد الوحدات */}
+                {project.units && project.units > 0 && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <HomeIcon className="w-4 h-4 text-emerald-600" />
@@ -609,26 +631,13 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       </p>
                     </div>
                     <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.units}
+                      {project.units} وحدة
                     </p>
                   </div>
                 )}
 
-                {project.floors && (
-                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                    <div className="flex flex-row gap-x-2">
-                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                        عدد الطوابق:
-                      </p>
-                    </div>
-                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.floors}
-                    </p>
-                  </div>
-                )}
-
-                {project.completionDate && (
+                {/* تاريخ التسليم */}
+                {project.completionDate && project.completionDate.trim() !== "" && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <CalendarIcon className="w-4 h-4 text-emerald-600" />
@@ -637,10 +646,198 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       </p>
                     </div>
                     <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {new Date(project.completionDate).toLocaleDateString(
-                        "ar-US",
-                      )}
+                      {new Date(project.completionDate).toLocaleDateString("ar-US")}
                     </p>
+                  </div>
+                )}
+
+                {/* حالة الإكمال */}
+                {project.completeStatus && project.completeStatus.trim() !== "" && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        حالة الإكمال:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.completeStatus === "1" ? "مكتمل" : "قيد الإنشاء"}
+                    </p>
+                  </div>
+                )}
+
+                {/* السعر الأدنى */}
+                {project.minPrice && project.minPrice.trim() !== "" && parseFloat(project.minPrice) > 0 && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        السعر الأدنى:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.minPrice} ريال
+                    </p>
+                  </div>
+                )}
+
+                {/* السعر الأعلى */}
+                {project.maxPrice && project.maxPrice.trim() !== "" && parseFloat(project.maxPrice) > 0 && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        السعر الأعلى:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.maxPrice} ريال
+                    </p>
+                  </div>
+                )}
+
+                {/* فيديو المشروع */}
+                {project.videoUrl && project.videoUrl.trim() !== "" && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        فيديو المشروع:
+                      </p>
+                    </div>
+                    <a
+                      href={project.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold leading-4 text-xs xs:text-sm md:text-base text-emerald-600 underline"
+                    >
+                      مشاهدة الفيديو
+                    </a>
+                  </div>
+                )}
+
+                {/* الموقع */}
+                {project.location && ((project.location.lat && project.location.lng) || (project.location.address && project.location.address.trim() !== "")) && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <MapPinIcon className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    {project.location.lat && project.location.lng ? (
+                      <a
+                        href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-bold leading-4 text-xs xs:text-sm md:text-base text-emerald-600 underline"
+                      >
+                        عرض الموقع
+                      </a>
+                    ) : (
+                      <span className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                        {project.location.address}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* تاريخ الإنشاء */}
+                {project.createdAt && project.createdAt.trim() !== "" && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <CalendarIcon className="w-4 h-4 text-emerald-600" />
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        تاريخ الإنشاء:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {new Date(project.createdAt).toLocaleDateString("ar-US")}
+                    </p>
+                  </div>
+                )}
+
+                {/* تاريخ التحديث */}
+                {project.updatedAt && project.updatedAt.trim() !== "" && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <ClockIcon className="w-4 h-4 text-emerald-600" />
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        آخر تحديث:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {new Date(project.updatedAt).toLocaleDateString("ar-US")}
+                    </p>
+                  </div>
+                )}
+
+                {/* المرافق */}
+                {project.amenities && project.amenities.length > 0 && (
+                  <div className="col-span-2">
+                    <div className="flex flex-row gap-x-2 md:gap-x-6">
+                      <div className="flex flex-row gap-x-2">
+                        <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                          المرافق:
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {project.amenities.map((amenity, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full"
+                          >
+                            {amenity}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* المواصفات */}
+                {project.specifications && project.specifications.length > 0 && (
+                  <div className="col-span-2">
+                    <div className="flex flex-row gap-x-2 md:gap-x-6">
+                      <div className="flex flex-row gap-x-2">
+                        <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                          المواصفات:
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {project.specifications.map((spec, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+                          >
+                            {typeof spec === 'object' ? spec.name || spec.title : spec}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* الأنواع */}
+                {project.types && project.types.length > 0 && (
+                  <div className="col-span-2">
+                    <div className="flex flex-row gap-x-2 md:gap-x-6">
+                      <div className="flex flex-row gap-x-2">
+                        <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                          الأنواع:
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {project.types.map((type, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
+                          >
+                            {typeof type === 'object' ? type.name || type.title : type}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -694,7 +891,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                     </p>
                   </div>
                   <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {project.bedrooms > 0 ? project.bedrooms : "غير محدد"}
+                    {project.bedrooms && project.bedrooms > 0 ? project.bedrooms : "غير محدد"}
                   </p>
                 </div>
 
@@ -817,152 +1014,46 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   slideClassName="!h-[10rem] md:!h-[96px]"
                 />
               )}
+
+              {/* مخططات الأرضية */}
+              {project.floorplans && project.floorplans.length > 0 && project.floorplans.some(plan => plan && plan.trim() !== "") && (
+                <div className="mt-8">
+              <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                    مخططات الأرضية
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {project.floorplans
+                      .filter(plan => plan && plan.trim() !== "")
+                      .map((floorplan, index) => (
+                      <div key={index} className="relative group">
+                        <Image
+                          src={floorplan}
+                          alt={`مخطط الأرضية ${index + 1}`}
+                          width={200}
+                          height={150}
+                          className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => {
+                            setSelectedImage(floorplan);
+                            setSelectedImageIndex(0);
+                            setIsDialogOpen(true);
+                          }}
+                        />
+                        <div className="absolute bottom-1 right-1 opacity-50">
+                          <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
+                            <span className="text-white text-xs">مخطط</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* القسم السفلي */}
         <div className="flex flex-col md:flex-row gap-x-6 gap-y-8">
-          {/* وصف المشروع ونموذج الحجز */}
-          <div className="flex-1">
-            <div className="mb-8 md:mb-18">
-              <div className="flex flex-col justify-center items-start gap-y-6 md:gap-y-8">
-                <h3 className="text-gray-600 font-bold text-xl leading-6 lg:text-2xl lg:leading-7">
-                  وصف المشروع
-                </h3>
-                <p className="text-gray-600 font-normal text-sm leading-6 md:text-base md:leading-7">
-                  {project.description || "لا يوجد وصف مفصل متاح لهذا المشروع"}
-                </p>
-              </div>
-            </div>
-
-            {/* نموذج الحجز */}
-            <div className="flex flex-col gap-y-6">
-              <h2 className="pr-4 text-white font-bold rounded-md leading-6 bg-emerald-600 w-full h-10 flex items-center justify-start">
-                احجز الآن
-              </h2>
-              <p className="text-sm text-gray-600 font-normal">
-                احجز الآن وقم باختيار الوقت والتاريخ المناسب لك، وسيتم التواصل
-                معك لتأكيد الحجز وتقديم التفاصيل اللازمة.
-              </p>
-
-              <form
-                onSubmit={handleBookingSubmit}
-                className="flex flex-col gap-y-6 md:gap-y-8"
-              >
-                <div className="flex flex-row gap-x-4">
-                  <div className="flex flex-col gap-y-6 flex-1">
-                    <label
-                      htmlFor="name"
-                      className="text-gray-600 text-base font-bold leading-4"
-                    >
-                      الاسم
-                    </label>
-                    <input
-                      id="name"
-                      type="text"
-                      placeholder="ادخل الاسم"
-                      value={bookingForm.name}
-                      onChange={(e) =>
-                        handleInputChange("name", e.target.value)
-                      }
-                      className="w-full h-12 outline-none border border-gray-300 rounded-lg placeholder:text-sm px-2"
-                      name="name"
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col gap-y-6 flex-1">
-                    <label
-                      htmlFor="phone"
-                      className="text-gray-600 text-base font-bold leading-4"
-                    >
-                      رقم الهاتف
-                    </label>
-                    <input
-                      id="phone"
-                      type="tel"
-                      placeholder="ادخل رقم الهاتف"
-                      value={bookingForm.phone}
-                      onChange={(e) =>
-                        handleInputChange("phone", e.target.value)
-                      }
-                      className="w-full h-12 outline-none border border-gray-300 rounded-lg placeholder:text-sm px-2 text-end"
-                      name="phone"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-row gap-x-4">
-                  <div className="flex-1 flex flex-col gap-y-6 relative">
-                    <label
-                      htmlFor="date"
-                      className="text-gray-600 text-base font-bold leading-4"
-                    >
-                      التاريخ
-                    </label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-right font-normal cursor-pointer text-base font-medium text-gray-600 rounded-lg border border-gray-300 p-2 outline-none focus:border-emerald-600 h-12"
-                        >
-                          <CalendarIcon className="ml-2 h-4 w-4" />
-                          {selectedDate ? (
-                            format(selectedDate, "PPP", { locale: ar })
-                          ) : (
-                            <span className="text-gray-500">اختر التاريخ</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={selectedDate}
-                          onSelect={setSelectedDate}
-                          initialFocus
-                          locale={ar}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-
-                  <div className="flex-1 flex flex-col gap-y-6 relative">
-                    <label
-                      htmlFor="time"
-                      className="text-gray-600 text-base font-bold leading-4"
-                    >
-                      الوقت
-                    </label>
-                    <div className="w-full relative">
-                      <input
-                        id="time"
-                        required
-                        className="order-1 w-full font-medium text-gray-600 rounded-lg border border-gray-300 p-2 outline-none pr-10 focus:border-emerald-600 h-12"
-                        type="time"
-                        value={selectedTime}
-                        onChange={(e) => setSelectedTime(e.target.value)}
-                        disabled={!selectedDate}
-                      />
-                      <div className="absolute pointer-events-none top-0 bottom-0 right-3 flex items-center order-2">
-                        <ClockIcon className="w-5 h-5 text-emerald-600" />
-                      </div>
-                      {!selectedDate && (
-                        <div className="absolute top-0 left-0 w-full h-full bg-white/70 z-10 cursor-not-allowed rounded-lg" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-[200px] mx-auto h-12 rounded-md bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition-colors"
-                >
-                  تأكيد الحجز
-                </button>
-              </form>
-            </div>
-          </div>
 
           {/* المشاريع المشابهة */}
           <div className="flex-1">
@@ -1027,14 +1118,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           <div className="flex flex-row items-center justify-center gap-x-1">
                             <div className="w-4 h-4 bg-gray-400 rounded"></div>
                             <p className="text-sm md:text-base font-bold text-gray-600">
-                              {similarProject.bedrooms > 0
+                              {similarProject.bedrooms && similarProject.bedrooms > 0
                                 ? similarProject.bedrooms
                                 : 0}
                             </p>
                           </div>
                         </div>
                         <Image
-                          src={similarProject.image}
+                          src={similarProject.image ?? "/placeholder.jpg"}
                           alt="Project Image"
                           fill
                           className="w-full h-full object-cover rounded-lg overflow-hidden relative -z-10"
@@ -1081,7 +1172,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                               <div className="flex flex-row items-center justify-center gap-x-1">
                                 <div className="w-4 h-4 bg-gray-400 rounded"></div>
                                 <p className="text-sm md:text-base font-bold text-gray-600">
-                                  {similarProject.bedrooms > 0
+                                  {similarProject.bedrooms && similarProject.bedrooms > 0
                                     ? similarProject.bedrooms
                                     : 0}
                                 </p>
@@ -1089,7 +1180,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                             </div>
                             <figure className="relative w-full h-64 flex items-center justify-center rounded-2xl overflow-hidden">
                               <Image
-                                src={similarProject.image}
+                                src={similarProject.image ?? "/placeholder.jpg"}
                                 alt="ProjectImage"
                                 width={800}
                                 height={600}
