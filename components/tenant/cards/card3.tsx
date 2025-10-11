@@ -186,7 +186,9 @@ export default function PropertyCard3({
             )}
 
             {/* Price and Action */}
-            {showPrice && (
+{/* its only hidden for now , i dont want to delete it */}
+
+            {/* {showPrice && (
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold text-white">
@@ -208,7 +210,7 @@ export default function PropertyCard3({
                   عرض التفاصيل
                 </Button>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       )}
@@ -251,7 +253,8 @@ export default function PropertyCard3({
             </div>
           )}
 
-          {showPrice && (
+{/* its only hidden for now , i dont want to delete it */}
+          {/* {showPrice && (
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold text-gray-900">
@@ -273,7 +276,7 @@ export default function PropertyCard3({
                 عرض التفاصيل
               </Button>
             </div>
-          )}
+          )} */}
         </div>
       )}
     </div>

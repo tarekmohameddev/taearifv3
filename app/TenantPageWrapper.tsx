@@ -247,6 +247,24 @@ export default function TenantPageWrapper({
             <ContactCardsSkeleton1 />
           </main>
         );
+      case "property-requests/create":
+        return (
+          <main className="flex-1">
+            <HeroSkeleton2 />
+            <div className="max-w-4xl mx-auto p-6">
+              <div className="bg-white rounded-lg shadow-lg p-8">
+                <div className="animate-pulse">
+                  <div className="h-8 bg-gray-200 rounded mb-6"></div>
+                  <div className="space-y-4">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        );
       default:
         // الصفحات الأخرى تعرض HeroSkeleton1
         return (

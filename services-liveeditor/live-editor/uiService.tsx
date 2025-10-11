@@ -1,8 +1,23 @@
 import React, { Suspense, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
-import { ComponentData, ComponentInstance } from "@/lib/types";
 import { loadComponent } from "./componentService";
+
+// Local type definitions
+interface ComponentData {
+  id: string;
+  type: string;
+  variant: string;
+  [key: string]: any;
+}
+
+interface ComponentInstance {
+  id: string;
+  componentName: string;
+  data: ComponentData;
+  position: number;
+  layout?: any;
+}
 
 // مكون منطقة الإفلات بين الصفوف
 export function RowDropZone({
@@ -171,10 +186,12 @@ export const CachedComponent = React.memo(
     componentName,
     section,
     data,
+    componentId,
   }: {
     componentName: string;
     section: string;
     data: ComponentData;
+    componentId?: string;
   }) => {
     const LoadedComponent = useMemo(
       () => loadComponent(section, componentName),
@@ -209,88 +226,36 @@ export const CachedComponent = React.memo(
         {/* Pass useStore & variant so components read live state from EditorStore */}
         <LoadedComponent
           {...(() => {
-            // Deep filter function to remove any objects that might cause React child errors
-            const deepFilterObjects = (obj: any): any => {
-              if (obj === null || obj === undefined) return obj;
-
-              if (Array.isArray(obj)) {
-                return obj.map(deepFilterObjects);
-              }
-
-              if (typeof obj === "object") {
-                // Check if this is a React element or component
-                if (
-                  obj.$$typeof ||
-                  obj.type ||
-                  obj.props ||
-                  obj.key ||
-                  obj.ref
-                ) {
-                  // This is likely a React element, convert to string or remove
-                  return null;
-                }
-
-                // Check for Lucide React icons or other React components
-                if (
-                  obj.$$typeof === Symbol.for("react.element") ||
-                  obj.$$typeof === Symbol.for("react.forward_ref") ||
-                  obj.$$typeof === Symbol.for("react.memo")
-                ) {
-                  return null;
-                }
-
-                // Check if this is a function (React component)
-                if (typeof obj === "function") {
-                  return null;
-                }
-
-                // Check if this is a Date object
-                if (obj instanceof Date) {
-                  return obj.toISOString();
-                }
-
-                // Check if this object has keys that might be React elements
-                const filtered: any = {};
-                for (const [key, value] of Object.entries(obj)) {
-                  // Skip known problematic keys
-                  if (
-                    key === "icon" ||
-                    key === "children" ||
-                    key === "element" ||
-                    key === "Icon" ||
-                    key === "Component" ||
-                    key === "ReactElement"
-                  ) {
-                    continue;
-                  }
-
-                  const filteredValue = deepFilterObjects(value);
-                  if (filteredValue !== null) {
-                    filtered[key] = filteredValue;
-                  }
-                }
-                return filtered;
-              }
-
-              return obj;
+            // Absolute maximum safety: pass only the most basic props
+            const getAbsoluteSafeProps = (data: any) => {
+              // Only return the absolute minimum required props
+              const safeVariant = (data?.variant && typeof data.variant === "string" && data.variant.length < 100) ? data.variant : "default";
+              const safeUseStore = (typeof data?.useStore === "boolean") ? data.useStore : true;
+              
+              return {
+                id: componentId || (data?.id && typeof data.id === "string" && data.id.length < 100) ? data.id : "component",
+                type: (data?.type && typeof data.type === "string" && data.type.length < 100) ? data.type : "unknown",
+                visible: (typeof data?.visible === "boolean") ? data.visible : true,
+                variant: safeVariant,
+                useStore: safeUseStore,
+              };
             };
 
             try {
-              return deepFilterObjects(data);
+              return getAbsoluteSafeProps(data);
             } catch (error) {
-              console.warn("Error filtering data for component:", error);
-              // Return a safe fallback object
+              console.warn("Error creating absolute safe props for component:", error);
+              // Return only the most basic props
               return {
-                id: data.id,
-                type: data.type,
-                variant: data.variant,
+                id: componentId || "component",
+                type: "unknown",
+                visible: true,
+                variant: "default",
+                useStore: true,
               };
             }
           })()}
-          useStore
-          variant={data.variant}
-          // Ensure no React child objects are passed
-          key={data.id || "component"}
+          key={componentId || data.id || "component"}
         />
       </Suspense>
     );

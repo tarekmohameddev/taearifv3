@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
+import { getDefaultInputsData } from "@/context-liveeditor/editorStoreFunctions/inputsFunctions";
 
 // Generate random ID function
 const generateRandomId = (prefix: string = "id"): string => {
@@ -40,7 +41,8 @@ interface InputField {
     | "date"
     | "select"
     | "textarea"
-    | "currency";
+    | "currency"
+    | "radio";
   label: string;
   placeholder?: string;
   required?: boolean;
@@ -83,96 +85,12 @@ interface InputsProps {
   id?: string;
 }
 
-// Default inputs data
-const getDefaultInputsData = () => ({
-  visible: true,
-  layout: {
-    direction: "rtl",
-    maxWidth: "1600px",
-    padding: {
-      y: "py-14",
-      smY: "sm:py-16",
-    },
-  },
-  theme: {
-    primaryColor: "#3b82f6",
-    secondaryColor: "#1e40af",
-    accentColor: "#60a5fa",
-    submitButtonGradient: "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)",
-  },
-  submitButton: {
-    text: "إرسال",
-    show: true,
-    className: "w-full",
-  },
-  cards: [
-    {
-      id: generateRandomId("card"),
-      title: "المصاريف",
-      description: "أدخل تفاصيل المصاريف",
-      fields: [
-        {
-          id: generateRandomId("field"),
-          type: "text",
-          label: "اسم المصروف",
-          placeholder: "أدخل اسم المصروف",
-          required: true,
-        },
-        {
-          id: generateRandomId("field"),
-          type: "currency",
-          label: "المبلغ",
-          placeholder: "أدخل المبلغ",
-          required: true,
-        },
-        {
-          id: generateRandomId("field"),
-          type: "date",
-          label: "التاريخ",
-          required: true,
-        },
-      ],
-      customColors: {
-        primary: "#10b981",
-        secondary: "#059669",
-        hover: "#34d399",
-        shadow: "rgba(16, 185, 129, 0.1)",
-      },
-    },
-    {
-      id: generateRandomId("card"),
-      title: "إضافة مصروف جديد",
-      description: "أضف مصروف جديد للنظام",
-      fields: [
-        {
-          id: generateRandomId("field"),
-          type: "text",
-          label: "اسم المصروف الجديد",
-          placeholder: "أدخل اسم المصروف الجديد",
-          required: true,
-        },
-        {
-          id: generateRandomId("field"),
-          type: "currency",
-          label: "المبلغ",
-          placeholder: "أدخل المبلغ",
-          required: true,
-        },
-      ],
-      customColors: {
-        primary: "#f59e0b",
-        secondary: "#d97706",
-        hover: "#fbbf24",
-        shadow: "rgba(245, 158, 11, 0.1)",
-      },
-    },
-  ],
-});
+// Use the default data from inputsFunctions
 
 // Dynamic color system - Fully customizable from props
 const getDynamicColors = (card: InputCard, theme?: any) => {
-  // If custom colors are provided, use them
-  if (card.customColors) {
+  // If custom colors are provided and it's an object (not array), use them
+  if (card.customColors && typeof card.customColors === 'object' && !Array.isArray(card.customColors) && Object.keys(card.customColors).length > 0) {
     return {
       primary: card.customColors.primary || "#3b82f6",
       secondary: card.customColors.secondary || "#2563eb",
@@ -318,10 +236,13 @@ const getDynamicColors = (card: InputCard, theme?: any) => {
   };
 
   // Get colors from palette or use theme colors
-  const palette = colorPalettes[card.color || "blue"] || colorPalettes["blue"];
+  const cardColor = card.color || "blue";
+  const palette = colorPalettes[cardColor] || colorPalettes["blue"];
+  
 
-  // Override with theme colors if provided
-  if (theme) {
+
+  // Override with theme colors if provided, but only if no specific card color is set
+  if (theme && (!card.color || card.color === 'blue')) {
     return {
       primary: theme.primaryColor || palette.primary,
       secondary: theme.secondaryColor || palette.secondary,
@@ -344,7 +265,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
     (s) => s.ensureComponentVariant,
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
-  const inputsStates = useEditorStore((s) => (s as any).inputsStates);
+  const inputsStates = useEditorStore((s) => s.inputsStates);
 
   useEffect(() => {
     if (props.useStore) {
@@ -352,9 +273,9 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
         ...getDefaultInputsData(),
         ...props,
       };
-      ensureComponentVariant("inputs", uniqueId, initialData);
+      ensureComponentVariant("inputs", variantId, initialData);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant]);
+  }, [variantId, props.useStore, ensureComponentVariant]);
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -369,10 +290,10 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore
-    ? getComponentData("inputs", uniqueId) || {}
+    ? getComponentData("inputs", variantId) || {}
     : {};
   const currentStoreData =
-    props.useStore && inputsStates ? inputsStates[uniqueId] || {} : {};
+    props.useStore && inputsStates ? inputsStates[variantId] || {} : {};
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
@@ -403,6 +324,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
     ...storeData,
     ...currentStoreData,
   };
+  
 
   // Extract data from finalData
   const {
@@ -418,8 +340,9 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
 
   // Use cards from finalData, with fallback to default data
   const safeCards = useMemo(() => {
+    console.log("Cards from finalData:", cards);
     if (cards && Array.isArray(cards) && cards.length > 0) {
-      return cards
+      const processedCards = cards
         .filter((card) => card && card.fields && Array.isArray(card.fields))
         .map((card) => ({
           ...card,
@@ -431,9 +354,13 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
               id: field.id || generateRandomId("field"),
             })),
         }));
+      console.log("Processed cards:", processedCards);
+      return processedCards;
     }
-    return getDefaultInputsData().cards;
-  }, [cards]);
+    const defaultCards = getDefaultInputsData().cards;
+    console.log("Using default cards:", defaultCards);
+    return defaultCards;
+  }, [cards?.length, cards?.[0]?.id, cards?.[0]?.fields?.length]);
 
   // Use theme from finalData
   const safeTheme = theme || getDefaultInputsData().theme;
@@ -459,12 +386,17 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
           }
         });
       }
-      setFormData(initialData);
+      
+      // Only update if the data has actually changed
+      setFormData(prevData => {
+        const hasChanged = JSON.stringify(prevData) !== JSON.stringify(initialData);
+        return hasChanged ? initialData : prevData;
+      });
     } catch (error) {
       console.error("Error initializing form data:", error);
       setFormData({});
     }
-  }, [safeCards]); // Now safeCards is memoized, so it won't cause infinite loop
+  }, [safeCards]);
 
   // Handle input changes
   const handleInputChange = useCallback(
@@ -720,6 +652,8 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
       console.warn("Inputs1: Invalid field data:", field);
       return null;
     }
+    
+    // Debug: console.log("Rendering field:", field.id, "type:", field.type, "options:", field.options);
 
     // Handle null, undefined, or empty string type - default to 'text'
     const fieldType =
@@ -936,6 +870,34 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
                 $
               </div>
             </div>
+          ) : fieldType === "radio" ? (
+            <div className="radio-group flex flex-wrap gap-3 mt-2">
+              {field.options && Array.isArray(field.options) && field.options.length > 0 ? (
+                field.options.map((option, index) => (
+                  <div
+                    key={`${field.id}_option_${index}_${option.value}`}
+                    className={`radio-item flex items-center px-4 py-3 bg-white border-2 border-gray-300 rounded-full cursor-pointer transition-all duration-300 min-w-[120px] justify-center relative text-gray-700 hover:border-blue-400 hover:bg-blue-50 hover:transform hover:-translate-y-1 ${
+                      formData[field.id] === option.value
+                        ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-transparent shadow-lg"
+                        : ""
+                    }`}
+                    onClick={() => handleInputChange(field.id, option.value)}
+                  >
+                    <input
+                      type="radio"
+                      name={field.id}
+                      value={option.value}
+                      checked={formData[field.id] === option.value}
+                      onChange={() => handleInputChange(field.id, option.value)}
+                      className="sr-only"
+                    />
+                    <span className="text-sm font-medium">{option.label || option.value}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-gray-500 text-sm">لا توجد خيارات متاحة</div>
+              )}
+            </div>
           ) : (
             <input
               type={isPassword && !showPassword ? "password" : "text"}
@@ -989,6 +951,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
 
     const isCollapsed = collapsedCards.has(card.id);
     const colors = getDynamicColors(card, safeTheme);
+    
 
     return (
       <motion.div

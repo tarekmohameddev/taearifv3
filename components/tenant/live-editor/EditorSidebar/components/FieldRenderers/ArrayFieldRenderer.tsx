@@ -385,7 +385,7 @@ export function ArrayFieldRenderer({
     // Check required fields based on field definitions
     if (arrDef.of && Array.isArray(arrDef.of)) {
       for (const f of arrDef.of) {
-        if (f.type === "text" && (!item[f.key] || item[f.key].trim() === "")) {
+        if (f.type === "text" && (!item[f.key] || (typeof item[f.key] === "string" && item[f.key].trim() === ""))) {
           // Only mark as error if it's a critical field
           if (
             f.key.includes("title") ||
@@ -847,13 +847,13 @@ export function ArrayFieldRenderer({
                   {arrDef.of &&
                     Array.isArray(arrDef.of) &&
                     arrDef.of.map((f: any) => {
-                      // Conditional rendering for Select Options field
-                      if (f.key === "options" && f.label === "Select Options") {
-                        // Only show Select Options if Field Type is "select"
+                      // Conditional rendering for Options field
+                      if (f.key === "options" && f.label === "Field Options (for Select/Radio)") {
+                        // Only show Options if Field Type is "radio"
                         const fieldType = getValueByPath(
                           `${normalizedPath}.${idx}.type`,
                         );
-                        if (fieldType !== "select") {
+                        if (fieldType !== "radio") {
                           return null;
                         }
                       }

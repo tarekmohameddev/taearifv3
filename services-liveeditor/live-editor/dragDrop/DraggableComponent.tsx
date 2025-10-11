@@ -212,7 +212,7 @@ export const LiveEditorDraggableComponent = ({
       el.removeEventListener("mouseenter", _onMouseOver);
       el.removeEventListener("mouseleave", _onMouseLeave);
     };
-  }, [ref.current, onClick, id]);
+  }, [id, index, onClick]);
 
   // تحسين تحديد dragAxis بناءً على العنصر
   useEffect(() => {

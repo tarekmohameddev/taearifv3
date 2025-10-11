@@ -907,6 +907,21 @@ const useTenantStore = create((set) => ({
           }
         : state.tenantData,
     })),
+  updateApplicationForm: (applicationFormData) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              applicationForm: {
+                ...state.tenantData.componentSettings?.applicationForm,
+                data: applicationFormData,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
   updatePropertyFilterVariant: (variant) =>
     set((state) => ({
       tenantData: state.tenantData
@@ -916,6 +931,21 @@ const useTenantStore = create((set) => ({
               ...state.tenantData.componentSettings,
               propertyFilter: {
                 ...state.tenantData.componentSettings?.propertyFilter,
+                variant,
+              },
+            },
+          }
+        : state.tenantData,
+    })),
+  updateApplicationFormVariant: (variant) =>
+    set((state) => ({
+      tenantData: state.tenantData
+        ? {
+            ...state.tenantData,
+            componentSettings: {
+              ...state.tenantData.componentSettings,
+              applicationForm: {
+                ...state.tenantData.componentSettings?.applicationForm,
                 variant,
               },
             },
@@ -962,6 +992,50 @@ const useTenantStore = create((set) => ({
       return true;
     } catch (error) {
       console.error("Save property filter error:", error);
+      return false;
+    }
+  },
+
+  saveApplicationFormChanges: async (tenantId, applicationFormData, variant) => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    let userData;
+    try {
+      const authModule = await import("../context/AuthContext");
+      const useAuthStore = authModule.default;
+      userData = useAuthStore.getState().userData;
+      if (!userData?.token) {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+
+    try {
+      const response = await fetch("/api/tenant/applicationForm", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userData.token}`,
+        },
+        body: JSON.stringify({
+          tenantId,
+          applicationFormData,
+          variant,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save application form changes");
+      }
+
+      const updatedTenant = await response.json();
+      set((state) => ({
+        tenantData: updatedTenant,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Save application form error:", error);
       return false;
     }
   },

@@ -58,6 +58,8 @@ import { propertyFilterFunctions } from "./editorStoreFunctions/propertyFilterFu
 import { mapSectionFunctions } from "./editorStoreFunctions/mapSectionFunctions";
 import { contactCardsFunctions } from "./editorStoreFunctions/contactCardsFunctions";
 import { contactFormSectionFunctions } from "./editorStoreFunctions/contactFormSectionFunctions";
+import { applicationFormFunctions } from "./editorStoreFunctions/applicationFormFunctions";
+import { inputsFunctions } from "./editorStoreFunctions/inputsFunctions";
 import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
@@ -340,6 +342,34 @@ interface EditorStore {
     value: any,
   ) => void;
 
+  // Application Form states
+  applicationFormStates: Record<string, ComponentData>;
+  ensureApplicationFormVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getApplicationFormData: (variantId: string) => ComponentData;
+  setApplicationFormData: (variantId: string, data: ComponentData) => void;
+  updateApplicationFormByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
+  // Inputs states
+  inputsStates: Record<string, ComponentData>;
+  ensureInputsVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getInputsData: (variantId: string) => ComponentData;
+  setInputsData: (variantId: string, data: ComponentData) => void;
+  updateInputsByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
   // Page-wise components aggregation (for saving all pages)
   pageComponentsByPage: Record<string, ComponentInstanceWithPosition[]>;
   setPageComponentsForPage: (
@@ -416,6 +446,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   mapSectionStates: {},
   contactCardsStates: {},
   contactFormSectionStates: {},
+  applicationFormStates: {},
+  inputsStates: {},
 
   // Dynamic component states
   componentStates: {},
@@ -821,12 +853,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           );
         case "contactCards":
           return contactCardsFunctions.ensureVariant(state, variantId, initial);
-        case "contactFormSection":
-          return contactFormSectionFunctions.ensureVariant(
-            state,
-            variantId,
-            initial,
-          );
+        case "applicationForm":
+          return applicationFormFunctions.ensureVariant(state, variantId, initial);
+        case "inputs":
+          return inputsFunctions.ensureVariant(state, variantId, initial);
         default:
           // Fallback to generic component handling
           if (!state.componentStates[componentType]) {
@@ -841,15 +871,15 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             return {} as any;
           }
 
-          const defaultData = createDefaultData(componentType);
-          const data: ComponentData = initial || defaultData;
+          const fallbackDefaultData = createDefaultData(componentType);
+          const fallbackData: ComponentData = initial || fallbackDefaultData;
 
           return {
             componentStates: {
               ...state.componentStates,
               [componentType]: {
                 ...state.componentStates[componentType],
-                [variantId]: data,
+                [variantId]: fallbackData,
               },
             },
           } as any;
@@ -893,6 +923,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return contactCardsFunctions.getData(state, variantId);
       case "contactFormSection":
         return contactFormSectionFunctions.getData(state, variantId);
+      case "applicationForm":
+        return applicationFormFunctions.getData(state, variantId);
+      case "inputs":
+        return inputsFunctions.getData(state, variantId);
       default:
         // Fallback to generic component data with default data creation
         const data = state.componentStates[componentType]?.[variantId];
@@ -968,6 +1002,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             variantId,
             data,
           );
+          break;
+        case "applicationForm":
+          newState = applicationFormFunctions.setData(state, variantId, data);
+          break;
+        case "inputs":
+          newState = inputsFunctions.setData(state, variantId, data);
           break;
         default:
           // Fallback to generic component handling
@@ -1138,6 +1178,17 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             path,
             value,
           );
+          break;
+        case "applicationForm":
+          newState = applicationFormFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "inputs":
+          newState = inputsFunctions.updateByPath(state, variantId, path, value);
           break;
         default:
           // Fallback to generic component handling
@@ -1448,7 +1499,33 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       contactCardsFunctions.updateByPath(state, variantId, path, value),
     ),
 
-  // Contact Form Section functions (second set removed - using the one above)
+  // Application Form functions using modular approach
+  ensureApplicationFormVariant: (variantId, initial) =>
+    set((state) =>
+      applicationFormFunctions.ensureVariant(state, variantId, initial),
+    ),
+  getApplicationFormData: (variantId) => {
+    const state = get();
+    return applicationFormFunctions.getData(state, variantId);
+  },
+  setApplicationFormData: (variantId, data) =>
+    set((state) => applicationFormFunctions.setData(state, variantId, data)),
+  updateApplicationFormByPath: (variantId, path, value) =>
+    set((state) =>
+      applicationFormFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // Inputs functions using modular approach
+  ensureInputsVariant: (variantId, initial) =>
+    set((state) => inputsFunctions.ensureVariant(state, variantId, initial)),
+  getInputsData: (variantId) => {
+    const state = get();
+    return inputsFunctions.getData(state, variantId);
+  },
+  setInputsData: (variantId, data) =>
+    set((state) => inputsFunctions.setData(state, variantId, data)),
+  updateInputsByPath: (variantId, path, value) =>
+    set((state) => inputsFunctions.updateByPath(state, variantId, path, value)),
 
   // Page components management
   setPageComponentsForPage: (page, components) =>
@@ -1681,6 +1758,21 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                           comp.data,
                         ).contactCardsStates;
                       break;
+                    case "applicationForm":
+                      newState.applicationFormStates =
+                        applicationFormFunctions.setData(
+                          newState,
+                          comp.componentName,
+                          comp.data,
+                        ).applicationFormStates;
+                      break;
+                    case "inputs":
+                      newState.inputsStates = inputsFunctions.setData(
+                        newState,
+                        comp.componentName,
+                        comp.data,
+                      ).inputsStates;
+                      break;
                   }
                 }
               },
@@ -1816,6 +1908,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.componentName,
                 comp.data,
               ).contactCardsStates;
+              break;
+            case "applicationForm":
+              newState.applicationFormStates = applicationFormFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).applicationFormStates;
+              break;
+            case "inputs":
+              newState.inputsStates = inputsFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).inputsStates;
               break;
             case "contactFormSection":
               newState.contactFormSectionStates =

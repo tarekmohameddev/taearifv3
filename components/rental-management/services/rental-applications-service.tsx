@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusChangeDialog } from "./status-change-dialog";
@@ -149,6 +150,7 @@ interface RentalApplicationsServiceProps {
 export function RentalApplicationsService({
   openAddDialogCounter = 0,
 }: RentalApplicationsServiceProps) {
+  const router = useRouter();
   const {
     rentalApplications,
     setRentalApplications,
@@ -658,39 +660,13 @@ export function RentalApplicationsService({
     <div className="space-y-6">
       {/* Header and Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <Dialog
-          open={isAddRentalDialogOpen}
-          onOpenChange={(open) =>
-            setRentalApplications({ isAddRentalDialogOpen: open })
-          }
+        <Button 
+          onClick={() => router.push("/dashboard/rental-management/create")}
+          className="bg-gray-700 hover:bg-gray-800"
         >
-          <DialogTrigger asChild>
-            <Button className="bg-gray-700 hover:bg-gray-800">
-              <Plus className="ml-2 h-4 w-4" />
-              إضافة إيجار جديد
-            </Button>
-          </DialogTrigger>
-          <DialogContent
-            className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto text-right"
-            dir="rtl"
-          >
-            <DialogHeader>
-              <DialogTitle className="text-right" dir="rtl">
-                إضافة عقد إيجار جديد
-              </DialogTitle>
-              <DialogDescription className="text-right" dir="rtl">
-                أدخل تفاصيل طلب الإيجار الجديد
-              </DialogDescription>
-            </DialogHeader>
-            <UpdatedAddRentalForm
-              onSubmit={handleCreateRental}
-              onCancel={() =>
-                setRentalApplications({ isAddRentalDialogOpen: false })
-              }
-              isSubmitting={isSubmitting}
-            />
-          </DialogContent>
-        </Dialog>
+          <Plus className="ml-2 h-4 w-4" />
+          إضافة إيجار جديد
+        </Button>
       </div>
 
       {/* Search and Filter */}
@@ -1069,9 +1045,7 @@ export function RentalApplicationsService({
                 : "ابدأ بإضافة إيجار جديد"}
             </p>
             <Button
-              onClick={() =>
-                setRentalApplications({ isAddRentalDialogOpen: true })
-              }
+              onClick={() => router.push("/dashboard/rental-management/create")}
               className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
             >
               <Plus className="ml-2 h-4 w-4" />

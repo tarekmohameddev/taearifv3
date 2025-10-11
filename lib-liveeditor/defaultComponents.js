@@ -2921,6 +2921,322 @@ export const PAGE_DEFINITIONS = {
       position: 6,
     },
   },
+  "property-requests/create": {
+    "hero-property-request": {
+      type: "hero",
+      name: "Hero",
+      componentName: "hero2",
+      data: {
+        visible: true,
+        height: {
+          desktop: "70vh",
+          tablet: "70vh",
+          mobile: "70vh",
+        },
+        minHeight: {
+          desktop: "400px",
+          tablet: "400px",
+          mobile: "400px",
+        },
+        background: {
+          image: "https://dalel-lovat.vercel.app/images/hero.webp",
+          alt: "صورة خلفية لطلب عقاري",
+          overlay: {
+            enabled: true,
+            opacity: "0.45",
+            color: "#000000",
+          },
+        },
+        content: {
+          title: "سجل طلبك العقاري",
+          subtitle: "ابحث عن العقار المثالي بسهولة ويسر",
+          font: {
+            title: {
+              family: "Tajawal",
+              size: {
+                desktop: "4xl",
+                tablet: "3xl",
+                mobile: "2xl",
+              },
+              weight: "extrabold",
+              color: "#ffffff",
+              lineHeight: "1.25",
+            },
+            subtitle: {
+              family: "Tajawal",
+              size: {
+                desktop: "xl",
+                tablet: "lg",
+                mobile: "lg",
+              },
+              weight: "normal",
+              color: "rgba(255, 255, 255, 0.85)",
+            },
+          },
+          alignment: "center",
+          maxWidth: "4xl",
+          paddingTop: "150px",
+        },
+        animations: {
+          title: {
+            enabled: true,
+            type: "fade-up",
+            duration: 600,
+            delay: 200,
+          },
+          subtitle: {
+            enabled: true,
+            type: "fade-up",
+            duration: 600,
+            delay: 400,
+          },
+        },
+        useStore: true,
+        variant: "hero-property-request",
+        deviceType: "laptop",
+      },
+      position: 0,
+    },
+    "application-form": {
+      type: "applicationForm",
+      name: "Application Form",
+      componentName: "applicationForm1",
+      data: {
+        visible: true,
+        formSettings: {
+          formId: "propertyRequestForm",
+          formAction: "front.user.property-requests.store",
+          submitButton: {
+            text: "إرسال الطلب",
+            icon: "fas fa-paper-plane",
+          },
+          validation: {
+            requiredFieldsValidation: true,
+            clientSideValidation: true,
+          },
+        },
+        formCards: [
+          {
+            cardId: "property_info",
+            cardTitle: "معلومات العقار المطلوب",
+            cardIcon: "fas fa-building",
+            inputs: [
+              {
+                inputId: "category_id",
+                inputType: "select",
+                label: "نوع العقار",
+                placeholder: "اختر نوع العقار",
+                required: true,
+                options: "dynamic_from_allCategories",
+                emptyOption: "لا توجد أنواع متاحة حاليًا",
+              },
+              {
+                inputId: "property_type",
+                inputType: "radio",
+                label: "تصنيف العقار",
+                required: true,
+                options: ["سكني", "تجاري", "صناعي", "زراعي"],
+              },
+              {
+                inputId: "city_id",
+                inputType: "select",
+                label: "المدينة",
+                placeholder: "اختر المدينة",
+                required: true,
+                options: "dynamic_from_citiesList",
+                dependentField: "districts_id",
+              },
+              {
+                inputId: "districts_id",
+                inputType: "select",
+                label: "الحي",
+                placeholder: "اختر الحي",
+                required: true,
+                options: "dynamic_from_districts_by_city",
+                dependsOn: "city_id",
+              },
+              {
+                inputId: "area_from",
+                inputType: "number",
+                label: "المساحة من (م²)",
+                placeholder: "مثال: 100",
+                required: false,
+              },
+              {
+                inputId: "area_to",
+                inputType: "number",
+                label: "المساحة إلى (م²)",
+                placeholder: "مثال: 200",
+                required: false,
+              },
+            ],
+          },
+          {
+            cardId: "budget_info",
+            cardTitle: "معلومات الميزانية والدفع",
+            cardIcon: "fas fa-money-bill-wave",
+            inputs: [
+              {
+                inputId: "purchase_method",
+                inputType: "radio",
+                label: "طريقة الشراء",
+                required: true,
+                options: ["كاش", "تمويل بنكي"],
+              },
+              {
+                inputId: "budget_from",
+                inputType: "number",
+                label: "الميزانية من (ر.س)",
+                placeholder: "مثال: 500000",
+                required: false,
+              },
+              {
+                inputId: "budget_to",
+                inputType: "number",
+                label: "الميزانية إلى (ر.س)",
+                placeholder: "مثال: 800000",
+                required: false,
+              },
+            ],
+          },
+          {
+            cardId: "extra_details",
+            cardTitle: "تفاصيل إضافية",
+            cardIcon: "fas fa-clipboard-check",
+            inputs: [
+              {
+                inputId: "seriousness",
+                inputType: "radio",
+                label: "ما مدى جديتك في الشراء؟",
+                required: true,
+                options: ["مستعد فورًا", "خلال شهر", "خلال 3 أشهر", "لاحقًا / استكشاف فقط"],
+              },
+              {
+                inputId: "purchase_goal",
+                inputType: "radio",
+                label: "هدف الشراء",
+                required: true,
+                options: ["سكن خاص", "استثمار وتأجير", "بناء وبيع", "مشروع تجاري"],
+              },
+              {
+                inputId: "wants_similar_offers",
+                inputType: "radio",
+                label: "هل ترغب باستقبال عروض مشابهة؟",
+                required: true,
+                options: [
+                  {
+                    value: "1",
+                    label: "نعم",
+                  },
+                  {
+                    value: "0",
+                    label: "لا",
+                  },
+                ],
+                defaultValue: "1",
+              },
+            ],
+          },
+          {
+            cardId: "contact_info",
+            cardTitle: "بيانات التواصل",
+            cardIcon: "fas fa-user",
+            inputs: [
+              {
+                inputId: "full_name",
+                inputType: "text",
+                label: "الاسم الكامل",
+                placeholder: "أدخل اسمك الكامل",
+                required: true,
+              },
+              {
+                inputId: "phone",
+                inputType: "text",
+                label: "رقم الجوال",
+                placeholder: "05xxxxxxxx",
+                required: true,
+              },
+              {
+                inputId: "contact_on_whatsapp",
+                inputType: "radio",
+                label: "هل ترغب بالتواصل عبر واتساب؟",
+                required: true,
+                options: [
+                  {
+                    value: "1",
+                    label: "نعم",
+                  },
+                  {
+                    value: "0",
+                    label: "لا",
+                  },
+                ],
+                defaultValue: "1",
+              },
+              {
+                inputId: "notes",
+                inputType: "textarea",
+                label: "تفاصيل إضافية أو ملاحظات",
+                placeholder: "أي متطلبات أو ملاحظات إضافية تود إضافتها...",
+                required: false,
+              },
+            ],
+          },
+        ],
+        dynamicDataSources: {
+          allCategories: "قائمة فئات العقارات من قاعدة البيانات",
+          citiesList: "قائمة المدن من قاعدة البيانات",
+          districtsByCity: "قائمة الأحياء حسب المدينة المحددة",
+        },
+        formBehavior: {
+          cityDistrictDependency: {
+            enabled: true,
+            cityField: "city_id",
+            districtField: "districts_id",
+            apiEndpoint: "/geo/districts/by-city",
+          },
+          radioButtonBehavior: {
+            customStyling: true,
+            clickHandler: "data-radio attribute",
+          },
+          formValidation: {
+            realTimeValidation: true,
+            errorStyling: "shake animation",
+            requiredFieldHighlighting: true,
+          },
+        },
+        styling: {
+          formContainer: {
+            maxWidth: "800px",
+            margin: "0 auto",
+            padding: "40px 30px",
+          },
+          cardSpacing: {
+            marginBottom: "40px",
+            padding: "30px",
+            borderRadius: "15px",
+            border: "1px solid #e1e8ff",
+            backgroundColor: "#f8fafc",
+          },
+          inputSpacing: {
+            marginBottom: "20px",
+          },
+          buttonStyle: {
+            backgroundColor: "#059669",
+            textColor: "#ffffff",
+            padding: "15px 40px",
+            borderRadius: "50px",
+            fontSize: "1.1rem",
+            fontWeight: "600",
+          },
+        },
+        useStore: true,
+        variant: "application-form",
+        deviceType: "laptop",
+      },
+      position: 1,
+    },
+  },
 };
 
 // Export للتوافق مع الكود القديم

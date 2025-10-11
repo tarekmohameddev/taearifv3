@@ -8,6 +8,7 @@
 
 1. **`components/tenant/whyChooseUs/whyChooseUs1.tsx`** - مكون "لماذا تختارنا"
 2. **`components/tenant/testimonials/testimonials1.tsx`** - مكون الشهادات
+3. **`context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions.ts`** - دوال إدارة مكون النص والصورة
 
 ## العناصر الأساسية في النظام
 
@@ -749,3 +750,443 @@ const tenantComponentData = getTenantComponentData();
 5. **تحسين الأداء:** تجنب الطلبات المكررة والتحميل غير الضروري
 
 هذا النظام يضمن أن المكونات تعمل بكفاءة عالية مع إمكانية التخصيص الكامل للبيانات والعرض.
+
+---
+
+# Advanced Component Functions: halfTextHalfImageFunctions.ts
+
+## Overview
+
+The `halfTextHalfImageFunctions.ts` file is a comprehensive example of how to implement component-specific store management functions in the caching system. This file demonstrates advanced patterns including multiple variants, complex data structures, and sophisticated state management.
+
+## File Structure Analysis
+
+### 1. Multiple Default Data Functions
+
+The file contains **three different default data functions** for different variants of the same component type:
+
+```typescript
+// Basic variant - Simple text and image layout
+export const getDefaultHalfTextHalfImageData = (): ComponentData => ({
+  visible: true,
+  layout: {
+    direction: "rtl",
+    textWidth: 52.8,
+    imageWidth: 47.2,
+    gap: "16",
+    minHeight: "369px",
+  },
+  // ... complex nested structure
+});
+
+// Advanced variant - With statistics and enhanced features
+export const getDefaultHalfTextHalfImage2Data = (): ComponentData => ({
+  visible: true,
+  layout: {
+    direction: "rtl",
+    maxWidth: "1600px",
+    gridCols: "md:grid-cols-10",
+    // ... more complex layout options
+  },
+  content: {
+    // ... content with stats
+    stats: {
+      stat1: { value: "+100", label: "عميل سعيد" },
+      stat2: { value: "+50", label: "عقار تم بيعه" },
+      // ... more statistics
+    },
+  },
+  // ... enhanced features
+});
+
+// Legacy variant - Backward compatibility
+export const getDefaultHalfTextHalfImage3Data = (): ComponentData => ({
+  visible: true,
+  // Legacy props for backward compatibility
+  title: "رسالتنا",
+  description: "نحن في مكتب دليل الجواء العقاري...",
+  imageSrc: "https://dalel-lovat.vercel.app//images/aboutUs-page/message.webp",
+  // New structure for editor compatibility - MUST match the legacy props
+  content: {
+    title: "رسالتنا",
+    description: "نحن في مكتب دليل الجواء العقاري...",
+    imagePosition: "left",
+  },
+  // ... rest of structure
+});
+```
+
+**Key Insights:**
+- **Variant-specific defaults**: Each function provides different default data based on the component variant
+- **Backward compatibility**: Legacy props are maintained alongside new structure
+- **Complex nested objects**: Deep object structures with multiple levels of configuration
+- **Responsive design**: Mobile, tablet, and desktop configurations
+- **Animation support**: Built-in animation configurations
+
+### 2. Advanced State Management Functions
+
+The `halfTextHalfImageFunctions` object contains sophisticated state management:
+
+```typescript
+export const halfTextHalfImageFunctions = {
+  // Ensure variant exists with intelligent data selection
+  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
+    // Comprehensive logging for debugging
+    logEditorStore("ENSURE_VARIANT_CALLED", variantId, "unknown", {
+      variantId,
+      hasInitial: !!(initial && Object.keys(initial).length > 0),
+      initialKeys: initial ? Object.keys(initial) : [],
+      existingData: state.halfTextHalfImageStates[variantId]
+        ? Object.keys(state.halfTextHalfImageStates[variantId])
+        : [],
+      allVariants: Object.keys(state.halfTextHalfImageStates),
+    });
+
+    // Priority 1: Always use new initial data if provided
+    if (initial && Object.keys(initial).length > 0) {
+      logEditorStore("OVERRIDE_EXISTING_DATA", variantId, "unknown", {
+        oldData: state.halfTextHalfImageStates[variantId],
+        newData: initial,
+        reason: "Initial data provided",
+      });
+
+      return {
+        halfTextHalfImageStates: {
+          ...state.halfTextHalfImageStates,
+          [variantId]: initial,
+        },
+      };
+    }
+
+    // Priority 2: Check if variant already exists
+    if (
+      state.halfTextHalfImageStates[variantId] &&
+      Object.keys(state.halfTextHalfImageStates[variantId]).length > 0
+    ) {
+      logEditorStore("VARIANT_ALREADY_EXISTS", variantId, "unknown", {
+        existingData: state.halfTextHalfImageStates[variantId],
+        reason: "Variant already exists with data",
+      });
+      return {}; // No changes needed
+    }
+
+    // Priority 3: Select appropriate default data based on variant
+    let defaultData;
+    if (variantId === "halfTextHalfImage2") {
+      defaultData = getDefaultHalfTextHalfImage2Data();
+    } else if (variantId === "halfTextHalfImage3") {
+      defaultData = getDefaultHalfTextHalfImage3Data();
+    } else {
+      defaultData = getDefaultHalfTextHalfImageData(); // Fallback
+    }
+
+    // Priority 4: Use initial data, temp data, or default data
+    const data: ComponentData = initial || state.tempData || defaultData;
+
+    return {
+      halfTextHalfImageStates: {
+        ...state.halfTextHalfImageStates,
+        [variantId]: data,
+      },
+    };
+  },
+
+  // Simple data retrieval
+  getData: (state: any, variantId: string) =>
+    state.halfTextHalfImageStates[variantId] || {},
+
+  // Advanced data setting with page component synchronization
+  setData: (state: any, variantId: string, data: ComponentData) => {
+    const currentPage = state.currentPage;
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+    
+    // Update page components to keep them in sync
+    const updatedComponents = updatedPageComponents.map((comp: any) => {
+      if (comp.type === "halfTextHalfImage" && comp.id === variantId) {
+        return { ...comp, data: data };
+      }
+      return comp;
+    });
+
+    return {
+      halfTextHalfImageStates: {
+        ...state.halfTextHalfImageStates,
+        [variantId]: data,
+      },
+      pageComponentsByPage: {
+        ...state.pageComponentsByPage,
+        [currentPage]: updatedComponents,
+      },
+    };
+  },
+
+  // Path-based updates with page component synchronization
+  updateByPath: (state: any, variantId: string, path: string, value: any) => {
+    const source = state.halfTextHalfImageStates[variantId] || {};
+    const newData = updateDataByPath(source, path, value);
+
+    const currentPage = state.currentPage;
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+    
+    // Update page components to keep them in sync
+    const updatedComponents = updatedPageComponents.map((comp: any) => {
+      if (comp.type === "halfTextHalfImage" && comp.id === variantId) {
+        return { ...comp, data: newData };
+      }
+      return comp;
+    });
+
+    return {
+      halfTextHalfImageStates: {
+        ...state.halfTextHalfImageStates,
+        [variantId]: newData,
+      },
+      pageComponentsByPage: {
+        ...state.pageComponentsByPage,
+        [currentPage]: updatedComponents,
+      },
+    };
+  },
+};
+```
+
+## Advanced Patterns Demonstrated
+
+### 1. **Intelligent Data Selection**
+The `ensureVariant` function demonstrates sophisticated data selection logic:
+
+```typescript
+// Priority system for data selection:
+// 1. New initial data (always overrides)
+// 2. Existing variant data (preserves current state)
+// 3. Variant-specific default data (smart defaults)
+// 4. Fallback default data (safety net)
+```
+
+### 2. **Comprehensive Logging System**
+Every operation is logged for debugging and monitoring:
+
+```typescript
+logEditorStore("ENSURE_VARIANT_CALLED", variantId, "unknown", {
+  variantId,
+  hasInitial: !!(initial && Object.keys(initial).length > 0),
+  initialKeys: initial ? Object.keys(initial) : [],
+  existingData: state.halfTextHalfImageStates[variantId]
+    ? Object.keys(state.halfTextHalfImageStates[variantId])
+    : [],
+  allVariants: Object.keys(state.halfTextHalfImageStates),
+});
+```
+
+### 3. **Page Component Synchronization**
+All state changes are synchronized with page components:
+
+```typescript
+// Update both component state and page components
+const updatedComponents = updatedPageComponents.map((comp: any) => {
+  if (comp.type === "halfTextHalfImage" && comp.id === variantId) {
+    return { ...comp, data: newData };
+  }
+  return comp;
+});
+```
+
+### 4. **Complex Data Structures**
+The default data includes sophisticated configurations:
+
+```typescript
+// Responsive design configuration
+responsive: {
+  mobile: {
+    textOrder: 2,
+    imageOrder: 1,
+    textWidth: "w-full",
+    imageWidth: "w-full",
+    marginBottom: "mb-10",
+  },
+  tablet: {
+    textOrder: 2,
+    imageOrder: 1,
+    textWidth: "w-full",
+    imageWidth: "w-full",
+    marginBottom: "mb-10",
+  },
+  desktop: {
+    textOrder: 1,
+    imageOrder: 2,
+    textWidth: "md:w-[52.8%]",
+    imageWidth: "md:w-[47.2%]",
+    marginBottom: "md:mb-0",
+  },
+},
+
+// Animation configuration
+animations: {
+  text: {
+    enabled: true,
+    type: "fade-up",
+    duration: 600,
+    delay: 200,
+  },
+  image: {
+    enabled: true,
+    type: "fade-up",
+    duration: 600,
+    delay: 400,
+  },
+},
+```
+
+## Implementation Guide for New Components
+
+When creating a new component following this pattern:
+
+### 1. **Create Default Data Functions**
+```typescript
+export const getDefaultYourComponentData = (): ComponentData => ({
+  visible: true,
+  layout: {
+    // Your layout configuration
+  },
+  content: {
+    // Your content structure
+  },
+  // ... other sections
+});
+```
+
+### 2. **Implement Component Functions**
+```typescript
+export const yourComponentFunctions = {
+  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
+    // Log the operation
+    logEditorStore("ENSURE_VARIANT_CALLED", variantId, "yourComponent", {
+      // Logging data
+    });
+
+    // Priority 1: Use initial data if provided
+    if (initial && Object.keys(initial).length > 0) {
+      return {
+        yourComponentStates: {
+          ...state.yourComponentStates,
+          [variantId]: initial,
+        },
+      };
+    }
+
+    // Priority 2: Check if variant exists
+    if (state.yourComponentStates[variantId] && 
+        Object.keys(state.yourComponentStates[variantId]).length > 0) {
+      return {}; // No changes needed
+    }
+
+    // Priority 3: Use default data
+    const defaultData = getDefaultYourComponentData();
+    const data: ComponentData = initial || state.tempData || defaultData;
+
+    return {
+      yourComponentStates: {
+        ...state.yourComponentStates,
+        [variantId]: data,
+      },
+    };
+  },
+
+  getData: (state: any, variantId: string) =>
+    state.yourComponentStates[variantId] || {},
+
+  setData: (state: any, variantId: string, data: ComponentData) => {
+    // Update page components for synchronization
+    const currentPage = state.currentPage;
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+    const updatedComponents = updatedPageComponents.map((comp: any) => {
+      if (comp.type === "yourComponent" && comp.id === variantId) {
+        return { ...comp, data: data };
+      }
+      return comp;
+    });
+
+    return {
+      yourComponentStates: {
+        ...state.yourComponentStates,
+        [variantId]: data,
+      },
+      pageComponentsByPage: {
+        ...state.pageComponentsByPage,
+        [currentPage]: updatedComponents,
+      },
+    };
+  },
+
+  updateByPath: (state: any, variantId: string, path: string, value: any) => {
+    const source = state.yourComponentStates[variantId] || {};
+    const newData = updateDataByPath(source, path, value);
+
+    // Update page components for synchronization
+    const currentPage = state.currentPage;
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+    const updatedComponents = updatedPageComponents.map((comp: any) => {
+      if (comp.type === "yourComponent" && comp.id === variantId) {
+        return { ...comp, data: newData };
+      }
+      return comp;
+    });
+
+    return {
+      yourComponentStates: {
+        ...state.yourComponentStates,
+        [variantId]: newData,
+      },
+      pageComponentsByPage: {
+        ...state.pageComponentsByPage,
+        [currentPage]: updatedComponents,
+      },
+    };
+  },
+};
+```
+
+### 3. **Update Editor Store**
+Add your component to the editor store interface and implementation:
+
+```typescript
+// In editorStore.ts interface
+yourComponentStates: Record<string, ComponentData>;
+ensureYourComponentVariant: (variantId: string, initial?: ComponentData) => void;
+getYourComponentData: (variantId: string) => ComponentData;
+setYourComponentData: (variantId: string, data: ComponentData) => void;
+updateYourComponentByPath: (variantId: string, path: string, value: any) => void;
+
+// In editorStore.ts implementation
+yourComponentStates: {},
+
+// Add to ensureComponentVariant switch
+case "yourComponent":
+  return yourComponentFunctions.ensureVariant(state, variantId, initial);
+
+// Add to getComponentData switch
+case "yourComponent":
+  return yourComponentFunctions.getData(state, variantId);
+
+// Add to setComponentData switch
+case "yourComponent":
+  newState = yourComponentFunctions.setData(state, variantId, data);
+  break;
+
+// Add to updateComponentByPath switch
+case "yourComponent":
+  newState = yourComponentFunctions.updateByPath(state, variantId, path, value);
+  break;
+```
+
+## Key Benefits of This Pattern
+
+1. **Type Safety**: Full TypeScript support with proper interfaces
+2. **Debugging**: Comprehensive logging for troubleshooting
+3. **Performance**: Efficient state management with minimal re-renders
+4. **Flexibility**: Support for multiple variants and complex data structures
+5. **Synchronization**: Automatic page component updates
+6. **Maintainability**: Clear separation of concerns and modular design
+7. **Scalability**: Easy to extend with new features and variants
+
+This pattern ensures that your components integrate seamlessly with the caching system while maintaining high performance and developer experience.
