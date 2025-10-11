@@ -62,10 +62,21 @@ export function PropertyCard({
   const handleClick = () => {
     if (!isUnavailable && tenantId) {
       const propertySlug = p.slug || p.id; // Use slug if available, fallback to id
-      console.log(
-        `PropertyCard: Navigating to property ${propertySlug} with tenantId: ${tenantId}`,
-      );
-      router.push(`/property/${propertySlug}`);
+      
+      // Check if this is a project (based on transactionType or type)
+      const isProject = p.transactionType === "project" || p.type === "مشروع";
+      
+      if (isProject) {
+        console.log(
+          `PropertyCard: Navigating to project ${propertySlug} with tenantId: ${tenantId}`,
+        );
+        router.push(`/ar/project/${propertySlug}`);
+      } else {
+        console.log(
+          `PropertyCard: Navigating to property ${propertySlug} with tenantId: ${tenantId}`,
+        );
+        router.push(`/property/${propertySlug}`);
+      }
     } else if (!tenantId) {
       console.log("PropertyCard: No tenantId available, cannot navigate");
     } else if (isUnavailable) {

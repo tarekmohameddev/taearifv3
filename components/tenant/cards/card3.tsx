@@ -59,7 +59,14 @@ export default function PropertyCard3({
 
   const handleClick = () => {
     if (property.slug) {
-      router.push(`/${tenantId}/property/${property.slug}`);
+      // Check if this is a project (based on transactionType or type)
+      const isProject = property.transactionType === "project" || property.type === "مشروع";
+      
+      if (isProject) {
+        router.push(`/ar/project/${property.slug}`);
+      } else {
+        router.push(`/property/${property.slug}`);
+      }
     }
   };
 
