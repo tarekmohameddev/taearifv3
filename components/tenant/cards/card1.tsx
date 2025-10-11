@@ -99,14 +99,12 @@ export function PropertyCard({
             {/* المستطيل العلوي الأيمن - غرف النوم والمشاهدات */}
             {showDetails && (
               <div className="absolute right-3 top-3 flex items-center gap-2 rounded-lg bg-white/95 px-3 py-2 shadow-sm">
-                {p.bedrooms && (
                   <div className="flex items-center gap-1">
                     <Bed className="size-4 text-emerald-600" />
                     <span className="text-sm font-semibold text-gray-700">
                       {p.bedrooms}
                     </span>
                   </div>
-                )}
                 {showViews && (
                   <div className="flex items-center gap-1">
                     <span className="text-sm font-semibold text-gray-700">
