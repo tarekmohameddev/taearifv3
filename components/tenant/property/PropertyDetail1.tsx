@@ -613,8 +613,18 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 <p className="font-bold text-gray-600 text-xl leading-6 md:leading-7">
                   {property.title}
                 </p>
-                <p className="text-emerald-600 text-2xl leading-7 font-bold md:text-3xl lg:leading-9">
-                  {property.price} ريال سعودي
+                <p className="text-emerald-600 text-2xl leading-7 font-bold md:text-3xl lg:leading-9 flex items-center gap-2">
+                  {property.price}
+                  <img 
+                    src="/Saudi_Riyal_Symbol.svg" 
+                    alt="ريال سعودي" 
+                    className="w-6 h-6"
+                    style={{
+                        filter:
+                          'brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)'
+                      }}
+                      
+                  />
                 </p>
                 <p className="text-gray-600 text-sm leading-6 font-normal md:text-base lg:text-xl lg:leading-7">
                   {property.description || "لا يوجد وصف متاح لهذا العقار"}
