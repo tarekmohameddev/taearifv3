@@ -3109,14 +3109,24 @@ export const PAGE_DEFINITIONS = {
                 inputType: "radio",
                 label: "ما مدى جديتك في الشراء؟",
                 required: true,
-                options: ["مستعد فورًا", "خلال شهر", "خلال 3 أشهر", "لاحقًا / استكشاف فقط"],
+                options: [
+                  "مستعد فورًا",
+                  "خلال شهر",
+                  "خلال 3 أشهر",
+                  "لاحقًا / استكشاف فقط",
+                ],
               },
               {
                 inputId: "purchase_goal",
                 inputType: "radio",
                 label: "هدف الشراء",
                 required: true,
-                options: ["سكن خاص", "استثمار وتأجير", "بناء وبيع", "مشروع تجاري"],
+                options: [
+                  "سكن خاص",
+                  "استثمار وتأجير",
+                  "بناء وبيع",
+                  "مشروع تجاري",
+                ],
               },
               {
                 inputId: "wants_similar_offers",

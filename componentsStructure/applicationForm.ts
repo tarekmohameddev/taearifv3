@@ -70,7 +70,8 @@ export const applicationFormStructure: ComponentStructure = {
               key: "description",
               label: "Description",
               type: "textarea",
-              defaultValue: "املأ البيانات المطلوبة لتقديم طلب المعاينة. سيتم التواصل معك قريبًا لترتيب موعد لزيارة العقار ومعاينته بشكل دقيق.",
+              defaultValue:
+                "املأ البيانات المطلوبة لتقديم طلب المعاينة. سيتم التواصل معك قريبًا لترتيب موعد لزيارة العقار ومعاينته بشكل دقيق.",
             },
             {
               key: "textAlign",
@@ -103,7 +104,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "className",
                       label: "CSS Classes",
                       type: "text",
-                      defaultValue: "font-bold text-[20px] text-emerald-600 md:text-[32px] leading-[22.32px] md:leading-[35.71px]",
+                      defaultValue:
+                        "font-bold text-[20px] text-emerald-600 md:text-[32px] leading-[22.32px] md:leading-[35.71px]",
                     },
                     {
                       key: "fontSize",
@@ -134,7 +136,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "className",
                       label: "CSS Classes",
                       type: "text",
-                      defaultValue: "font-normal text-[16px] leading-[17.86px] text-gray-600 md:text-[20px] md:leading-[22.32px]",
+                      defaultValue:
+                        "font-normal text-[16px] leading-[17.86px] text-gray-600 md:text-[20px] md:leading-[22.32px]",
                     },
                     {
                       key: "fontSize",
@@ -203,7 +206,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "className",
                       label: "CSS Classes",
                       type: "text",
-                      defaultValue: "text-[16px] font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
+                      defaultValue:
+                        "text-[16px] font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
                     },
                   ],
                 },
@@ -240,7 +244,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "className",
                       label: "CSS Classes",
                       type: "text",
-                      defaultValue: "text-[16px] placeholder:text-end font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
+                      defaultValue:
+                        "text-[16px] placeholder:text-end font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
                     },
                   ],
                 },
@@ -277,7 +282,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "className",
                       label: "CSS Classes",
                       type: "text",
-                      defaultValue: "text-[16px] font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
+                      defaultValue:
+                        "text-[16px] font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
                     },
                   ],
                 },
@@ -314,7 +320,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "className",
                       label: "CSS Classes",
                       type: "text",
-                      defaultValue: "text-[16px] font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
+                      defaultValue:
+                        "text-[16px] font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
                     },
                   ],
                 },
@@ -351,7 +358,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "className",
                       label: "CSS Classes",
                       type: "text",
-                      defaultValue: "w-full justify-start text-right font-normal cursor-pointer text-[16px] font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
+                      defaultValue:
+                        "w-full justify-start text-right font-normal cursor-pointer text-[16px] font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
                     },
                   ],
                 },
@@ -388,7 +396,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "className",
                       label: "CSS Classes",
                       type: "text",
-                      defaultValue: "order-1 w-full font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none pr-10 focus:border-emerald-600",
+                      defaultValue:
+                        "order-1 w-full font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none pr-10 focus:border-emerald-600",
                     },
                     {
                       key: "disabled",
@@ -434,7 +443,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "className",
                       label: "CSS Classes",
                       type: "text",
-                      defaultValue: "appearance-none border-2 border-emerald-600 rounded-full w-4 h-4 checked:bg-emerald-600 checked:border-emerald-600 focus:outline-none",
+                      defaultValue:
+                        "appearance-none border-2 border-emerald-600 rounded-full w-4 h-4 checked:bg-emerald-600 checked:border-emerald-600 focus:outline-none",
                     },
                   ],
                 },
@@ -453,7 +463,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "placeholder",
                       label: "Placeholder",
                       type: "textarea",
-                      defaultValue: "يرجى تقديم وصف دقيق للعقار يشمل نوعه (شقة، فيلا، مكتب)، المساحة، الحالة (جديد/مستعمل)، وأي مميزات إضافية (مثل وجود حديقة، مسبح، أو قربه من الخدمات)",
+                      defaultValue:
+                        "يرجى تقديم وصف دقيق للعقار يشمل نوعه (شقة، فيلا، مكتب)، المساحة، الحالة (جديد/مستعمل)، وأي مميزات إضافية (مثل وجود حديقة، مسبح، أو قربه من الخدمات)",
                     },
                     {
                       key: "required",
@@ -471,7 +482,8 @@ export const applicationFormStructure: ComponentStructure = {
                       key: "className",
                       label: "CSS Classes",
                       type: "text",
-                      defaultValue: "h-48 resize-none text-[16px] font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
+                      defaultValue:
+                        "h-48 resize-none text-[16px] font-medium text-gray-600 rounded-md border border-gray-300 p-2 outline-none focus:border-emerald-600",
                     },
                   ],
                 },
@@ -492,7 +504,8 @@ export const applicationFormStructure: ComponentStructure = {
                   key: "className",
                   label: "CSS Classes",
                   type: "text",
-                  defaultValue: "rounded-md bg-emerald-600 text-white font-semibold text-[16px] py-2 w-full md:w-[400px] mx-auto mb-10 hover:bg-emerald-700 transition-colors",
+                  defaultValue:
+                    "rounded-md bg-emerald-600 text-white font-semibold text-[16px] py-2 w-full md:w-[400px] mx-auto mb-10 hover:bg-emerald-700 transition-colors",
                 },
               ],
             },
@@ -511,7 +524,8 @@ export const applicationFormStructure: ComponentStructure = {
                   key: "description",
                   label: "Description",
                   type: "textarea",
-                  defaultValue: "يرجى تحميل 3 صور واضحة للعقار، بما في ذلك واجهته الداخلية والخارجية. يُفضل أن تكون الصور بأعلى جودة لتسهيل عملية المعاينة",
+                  defaultValue:
+                    "يرجى تحميل 3 صور واضحة للعقار، بما في ذلك واجهته الداخلية والخارجية. يُفضل أن تكون الصور بأعلى جودة لتسهيل عملية المعاينة",
                 },
                 {
                   key: "maxImages",
@@ -523,7 +537,8 @@ export const applicationFormStructure: ComponentStructure = {
                   key: "className",
                   label: "CSS Classes",
                   type: "text",
-                  defaultValue: "relative bg-gray-100 w-[300px] h-64 flex flex-col items-center justify-center rounded-md mx-auto",
+                  defaultValue:
+                    "relative bg-gray-100 w-[300px] h-64 flex flex-col items-center justify-center rounded-md mx-auto",
                 },
               ],
             },

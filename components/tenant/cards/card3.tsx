@@ -186,7 +186,7 @@ export default function PropertyCard3({
             )}
 
             {/* Price and Action */}
-{/* its only hidden for now , i dont want to delete it */}
+            {/* its only hidden for now , i dont want to delete it */}
 
             {/* {showPrice && (
               <div className="flex items-center justify-between">
@@ -253,7 +253,7 @@ export default function PropertyCard3({
             </div>
           )}
 
-{/* its only hidden for now , i dont want to delete it */}
+          {/* its only hidden for now , i dont want to delete it */}
           {/* {showPrice && (
             <div className="flex items-center justify-between">
               <div>

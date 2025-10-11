@@ -32,14 +32,13 @@ export function ArrayFieldRenderer({
     if (Array.isArray(value)) {
       const newFieldTypes: Record<string, string> = {};
       value.forEach((item, idx) => {
-        if (item && typeof item === 'object' && item.type) {
+        if (item && typeof item === "object" && item.type) {
           newFieldTypes[`${normalizedPath}.${idx}`] = item.type;
         }
       });
       setFieldTypes(newFieldTypes);
     }
   }, [value, normalizedPath]);
-
 
   // Primitive array support (e.g., movingServices.en: string[])
   if (arrDef.itemType === "text") {
@@ -340,13 +339,14 @@ export function ArrayFieldRenderer({
                 // Conditional rendering for Options field in nested arrays
                 if (
                   nestedField.key === "options" &&
-                  (nestedField.label === "Select Options" || nestedField.label === "Field Options (for Select/Radio)")
+                  (nestedField.label === "Select Options" ||
+                    nestedField.label === "Field Options (for Select/Radio)")
                 ) {
                   // Only show Options if Field Type is "select" or "radio"
                   const fieldType = getValueByPath(
                     `${itemPath}.${field.key}.${nestedIdx}.type`,
                   );
-                  
+
                   if (fieldType !== "select" && fieldType !== "radio") {
                     return null;
                   }
@@ -401,7 +401,11 @@ export function ArrayFieldRenderer({
     // Check required fields based on field definitions
     if (arrDef.of && Array.isArray(arrDef.of)) {
       for (const f of arrDef.of) {
-        if (f.type === "text" && (!item[f.key] || (typeof item[f.key] === "string" && item[f.key].trim() === ""))) {
+        if (
+          f.type === "text" &&
+          (!item[f.key] ||
+            (typeof item[f.key] === "string" && item[f.key].trim() === ""))
+        ) {
           // Only mark as error if it's a critical field
           if (
             f.key.includes("title") ||
@@ -864,14 +868,21 @@ export function ArrayFieldRenderer({
                     Array.isArray(arrDef.of) &&
                     arrDef.of.map((f: any) => {
                       // Conditional rendering for Options field
-                      if (f.key === "options" && f.label === "Field Options (for Select/Radio)") {
+                      if (
+                        f.key === "options" &&
+                        f.label === "Field Options (for Select/Radio)"
+                      ) {
                         // Get current field type from multiple sources
-                        const currentFieldType = fieldTypes[`${normalizedPath}.${idx}`] || 
-                                              value?.[idx]?.type || 
-                                              getValueByPath(`${normalizedPath}.${idx}.type`);
-                        
+                        const currentFieldType =
+                          fieldTypes[`${normalizedPath}.${idx}`] ||
+                          value?.[idx]?.type ||
+                          getValueByPath(`${normalizedPath}.${idx}.type`);
+
                         // Hide options field if field type is not select or radio
-                        if (currentFieldType !== "radio" && currentFieldType !== "select") {
+                        if (
+                          currentFieldType !== "radio" &&
+                          currentFieldType !== "select"
+                        ) {
                           return null;
                         }
                       }

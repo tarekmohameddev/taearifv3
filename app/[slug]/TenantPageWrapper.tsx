@@ -103,13 +103,11 @@ export default function TenantPageWrapper({
 
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
-
     if (tenantId && !tenantData && !loadingTenantData) {
       fetchTenantData(tenantId);
     } else {
     }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
-
 
   // التحقق من وجود الـ slug في componentSettings أو البيانات الافتراضية
   const slugExists = useMemo(() => {
@@ -238,7 +236,6 @@ export default function TenantPageWrapper({
 
   // إذا لم يكن الـ slug موجود في componentSettings، أظهر 404
   if (!slugExists) {
-
     // إذا لم يتم جلب البيانات بعد، انتظر قليلاً
     if (!tenantData && !loadingTenantData && !error) {
       return (
@@ -291,7 +288,6 @@ export default function TenantPageWrapper({
       </div>
     );
   }
-
 
   return (
     <I18nProvider>

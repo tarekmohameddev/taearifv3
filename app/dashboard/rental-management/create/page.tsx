@@ -22,10 +22,15 @@ export default function CreateRentalPage() {
         // إعادة التوجيه إلى صفحة إدارة الإيجارات
         router.push("/dashboard/rental-management");
       } else {
-        alert("فشل في إضافة الإيجار: " + (response.data.message || "خطأ غير معروف"));
+        alert(
+          "فشل في إضافة الإيجار: " + (response.data.message || "خطأ غير معروف"),
+        );
       }
     } catch (err: any) {
-      alert("خطأ في إضافة الإيجار: " + (err.response?.data?.message || err.message || "خطأ غير معروف"));
+      alert(
+        "خطأ في إضافة الإيجار: " +
+          (err.response?.data?.message || err.message || "خطأ غير معروف"),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -53,9 +58,7 @@ export default function CreateRentalPage() {
             <h1 className="text-3xl font-bold text-gray-900">
               إضافة عقد إيجار جديد
             </h1>
-            <p className="text-gray-600 mt-2">
-              أدخل تفاصيل طلب الإيجار الجديد
-            </p>
+            <p className="text-gray-600 mt-2">أدخل تفاصيل طلب الإيجار الجديد</p>
           </div>
           <Button
             variant="outline"

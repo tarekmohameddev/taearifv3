@@ -13,9 +13,7 @@ export default function CreateRentalLayout({
       <DashboardHeader />
       <div className="flex flex-1 flex-col md:flex-row">
         <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
-        <main className="flex-1 p-4 md:p-6">
-          {children}
-        </main>
+        <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

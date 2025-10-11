@@ -7,7 +7,7 @@
       "inputs": [
         {
           "input_id": "category_id",
-          "input_type": "select",   
+          "input_type": "select",
           "label": "نوع العقار",
           "placeholder": "اختر نوع العقار",
           "required": true,
@@ -93,7 +93,12 @@
           "input_type": "radio",
           "label": "ما مدى جديتك في الشراء؟",
           "required": true,
-          "options": ["مستعد فورًا", "خلال شهر", "خلال 3 أشهر", "لاحقًا / استكشاف فقط"]
+          "options": [
+            "مستعد فورًا",
+            "خلال شهر",
+            "خلال 3 أشهر",
+            "لاحقًا / استكشاف فقط"
+          ]
         },
         {
           "input_id": "purchase_goal",

@@ -14,6 +14,7 @@ export default async function PropertyRequestsCreatePage() {
     notFound();
   }
 
-  return <TenantPageWrapper tenantId={tenantId} slug={"property-requests/create"} />;
+  return (
+    <TenantPageWrapper tenantId={tenantId} slug={"property-requests/create"} />
+  );
 }
-

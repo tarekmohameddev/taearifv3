@@ -817,6 +817,7 @@ export const getDefaultHalfTextHalfImage3Data = (): ComponentData => ({
 ```
 
 **Key Insights:**
+
 - **Variant-specific defaults**: Each function provides different default data based on the component variant
 - **Backward compatibility**: Legacy props are maintained alongside new structure
 - **Complex nested objects**: Deep object structures with multiple levels of configuration
@@ -899,7 +900,7 @@ export const halfTextHalfImageFunctions = {
   setData: (state: any, variantId: string, data: ComponentData) => {
     const currentPage = state.currentPage;
     const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
-    
+
     // Update page components to keep them in sync
     const updatedComponents = updatedPageComponents.map((comp: any) => {
       if (comp.type === "halfTextHalfImage" && comp.id === variantId) {
@@ -927,7 +928,7 @@ export const halfTextHalfImageFunctions = {
 
     const currentPage = state.currentPage;
     const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
-    
+
     // Update page components to keep them in sync
     const updatedComponents = updatedPageComponents.map((comp: any) => {
       if (comp.type === "halfTextHalfImage" && comp.id === variantId) {
@@ -953,6 +954,7 @@ export const halfTextHalfImageFunctions = {
 ## Advanced Patterns Demonstrated
 
 ### 1. **Intelligent Data Selection**
+
 The `ensureVariant` function demonstrates sophisticated data selection logic:
 
 ```typescript
@@ -964,6 +966,7 @@ The `ensureVariant` function demonstrates sophisticated data selection logic:
 ```
 
 ### 2. **Comprehensive Logging System**
+
 Every operation is logged for debugging and monitoring:
 
 ```typescript
@@ -979,6 +982,7 @@ logEditorStore("ENSURE_VARIANT_CALLED", variantId, "unknown", {
 ```
 
 ### 3. **Page Component Synchronization**
+
 All state changes are synchronized with page components:
 
 ```typescript
@@ -992,6 +996,7 @@ const updatedComponents = updatedPageComponents.map((comp: any) => {
 ```
 
 ### 4. **Complex Data Structures**
+
 The default data includes sophisticated configurations:
 
 ```typescript
@@ -1042,6 +1047,7 @@ animations: {
 When creating a new component following this pattern:
 
 ### 1. **Create Default Data Functions**
+
 ```typescript
 export const getDefaultYourComponentData = (): ComponentData => ({
   visible: true,
@@ -1056,6 +1062,7 @@ export const getDefaultYourComponentData = (): ComponentData => ({
 ```
 
 ### 2. **Implement Component Functions**
+
 ```typescript
 export const yourComponentFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
@@ -1075,8 +1082,10 @@ export const yourComponentFunctions = {
     }
 
     // Priority 2: Check if variant exists
-    if (state.yourComponentStates[variantId] && 
-        Object.keys(state.yourComponentStates[variantId]).length > 0) {
+    if (
+      state.yourComponentStates[variantId] &&
+      Object.keys(state.yourComponentStates[variantId]).length > 0
+    ) {
       return {}; // No changes needed
     }
 
@@ -1147,6 +1156,7 @@ export const yourComponentFunctions = {
 ```
 
 ### 3. **Update Editor Store**
+
 Add your component to the editor store interface and implementation:
 
 ```typescript

@@ -92,7 +92,12 @@ interface InputsProps {
 // Dynamic color system - Fully customizable from props
 const getDynamicColors = (card: InputCard, theme?: any) => {
   // If custom colors are provided and it's an object (not array), use them
-  if (card.customColors && typeof card.customColors === 'object' && !Array.isArray(card.customColors) && Object.keys(card.customColors).length > 0) {
+  if (
+    card.customColors &&
+    typeof card.customColors === "object" &&
+    !Array.isArray(card.customColors) &&
+    Object.keys(card.customColors).length > 0
+  ) {
     return {
       primary: card.customColors.primary || "#3b82f6",
       secondary: card.customColors.secondary || "#2563eb",
@@ -240,11 +245,9 @@ const getDynamicColors = (card: InputCard, theme?: any) => {
   // Get colors from palette or use theme colors
   const cardColor = card.color || "blue";
   const palette = colorPalettes[cardColor] || colorPalettes["blue"];
-  
-
 
   // Override with theme colors if provided, but only if no specific card color is set
-  if (theme && (!card.color || card.color === 'blue')) {
+  if (theme && (!card.color || card.color === "blue")) {
     return {
       primary: theme.primaryColor || palette.primary,
       secondary: theme.secondaryColor || palette.secondary,
@@ -326,7 +329,6 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
     ...storeData,
     ...currentStoreData,
   };
-  
 
   // Extract data from finalData
   const {
@@ -342,14 +344,14 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
 
   const submitButtonText = submitButton.text || "حفظ البيانات";
   const showSubmitButton = submitButton.show !== false;
-  
+
   // Get cards layout settings
   const columns = cardsLayout.columns || "1";
   const gap = cardsLayout.gap || "24px";
   const responsive = cardsLayout.responsive || {
     mobile: "1",
     tablet: "2",
-    desktop: "3"
+    desktop: "3",
   };
 
   // Get fields layout settings
@@ -358,7 +360,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
   const fieldsResponsive = fieldsLayout.responsive || {
     mobile: "1",
     tablet: "2",
-    desktop: "3"
+    desktop: "3",
   };
 
   // Debug logging
@@ -371,8 +373,8 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
     fieldsColumns,
     finalData: {
       cardsLayout: finalData.cardsLayout,
-      fieldsLayout: finalData.fieldsLayout
-    }
+      fieldsLayout: finalData.fieldsLayout,
+    },
   });
 
   // Use cards from finalData, with fallback to default data
@@ -423,10 +425,11 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
           }
         });
       }
-      
+
       // Only update if the data has actually changed
-      setFormData(prevData => {
-        const hasChanged = JSON.stringify(prevData) !== JSON.stringify(initialData);
+      setFormData((prevData) => {
+        const hasChanged =
+          JSON.stringify(prevData) !== JSON.stringify(initialData);
         return hasChanged ? initialData : prevData;
       });
     } catch (error) {
@@ -675,9 +678,9 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
         if (apiEndpoint) {
           try {
             const response = await fetch(apiEndpoint, {
-              method: 'POST',
+              method: "POST",
               headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               body: JSON.stringify({
                 formData: organizedData,
@@ -710,7 +713,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
       console.warn("Inputs1: Invalid field data:", field);
       return null;
     }
-    
+
     // Debug: console.log("Rendering field:", field.id, "type:", field.type, "options:", field.options);
 
     // Handle null, undefined, or empty string type - default to 'text'
@@ -823,10 +826,10 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
             />
           ) : fieldType === "select" ? (
             <div className="relative w-full">
-  <select
-    value={formData[field.id] || ""}
-    onChange={(e) => handleInputChange(field.id, e.target.value)}
-    className={`
+              <select
+                value={formData[field.id] || ""}
+                onChange={(e) => handleInputChange(field.id, e.target.value)}
+                className={`
       w-full px-4 py-3 pr-12 border rounded-xl transition-all duration-300
       appearance-none
       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
@@ -837,35 +840,42 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
           : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
       }
     `}
-  >
-    <option value="">اختر {field.label}</option>
-    {field.options?.length > 0 ? (
-      field.options.map((option, index) => (
-        <option key={`${field.id}_option_${index}_${option.value}`} value={option.value}>
-          {option.label || option.value}
-        </option>
-      ))
-    ) : (
-      <option value="" disabled>
-        لا توجد خيارات متاحة
-      </option>
-    )}
-  </select>
+              >
+                <option value="">اختر {field.label}</option>
+                {field.options?.length > 0 ? (
+                  field.options.map((option, index) => (
+                    <option
+                      key={`${field.id}_option_${index}_${option.value}`}
+                      value={option.value}
+                    >
+                      {option.label || option.value}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>
+                    لا توجد خيارات متاحة
+                  </option>
+                )}
+              </select>
 
-  {/* السهم */}
-  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
-    <svg
-      className="w-5 h-5 text-gray-500 dark:text-gray-400"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-    </svg>
-  </span>
-</div>
-
+              {/* السهم */}
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+                <svg
+                  className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </span>
+            </div>
           ) : fieldType === "email" ? (
             <input
               type="email"
@@ -942,7 +952,9 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
             </div>
           ) : fieldType === "radio" ? (
             <div className="radio-group flex flex-wrap gap-3 mt-2">
-              {field.options && Array.isArray(field.options) && field.options.length > 0 ? (
+              {field.options &&
+              Array.isArray(field.options) &&
+              field.options.length > 0 ? (
                 field.options.map((option, index) => (
                   <div
                     key={`${field.id}_option_${index}_${option.value}`}
@@ -961,11 +973,15 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
                       onChange={() => handleInputChange(field.id, option.value)}
                       className="sr-only"
                     />
-                    <span className="text-sm font-medium">{option.label || option.value}</span>
+                    <span className="text-sm font-medium">
+                      {option.label || option.value}
+                    </span>
                   </div>
                 ))
               ) : (
-                <div className="text-gray-500 text-sm">لا توجد خيارات متاحة</div>
+                <div className="text-gray-500 text-sm">
+                  لا توجد خيارات متاحة
+                </div>
               )}
             </div>
           ) : (
@@ -1021,7 +1037,6 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
 
     const isCollapsed = collapsedCards.has(card.id);
     const colors = getDynamicColors(card, safeTheme);
-    
 
     return (
       <motion.div
@@ -1141,21 +1156,23 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
               transition={{ duration: 0.3 }}
               className="p-6"
             >
-                <div
-                  className="fields-grid"
-                  style={{
+              <div
+                className="fields-grid"
+                style={
+                  {
                     gap: fieldsGap,
-                    display: 'grid',
+                    display: "grid",
                     gridTemplateColumns: `repeat(${fieldsColumns}, 1fr)`,
-                    '--fields-columns': fieldsColumns,
-                    '--fields-mobile': fieldsResponsive.mobile,
-                    '--fields-tablet': fieldsResponsive.tablet,
-                    '--fields-desktop': fieldsResponsive.desktop,
-                  } as React.CSSProperties}
-                  data-fields-responsive-mobile={fieldsResponsive.mobile}
-                  data-fields-responsive-tablet={fieldsResponsive.tablet}
-                  data-fields-responsive-desktop={fieldsResponsive.desktop}
-                >
+                    "--fields-columns": fieldsColumns,
+                    "--fields-mobile": fieldsResponsive.mobile,
+                    "--fields-tablet": fieldsResponsive.tablet,
+                    "--fields-desktop": fieldsResponsive.desktop,
+                  } as React.CSSProperties
+                }
+                data-fields-responsive-mobile={fieldsResponsive.mobile}
+                data-fields-responsive-tablet={fieldsResponsive.tablet}
+                data-fields-responsive-desktop={fieldsResponsive.desktop}
+              >
                 {card.fields && Array.isArray(card.fields)
                   ? card.fields
                       .filter(
@@ -1212,13 +1229,16 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
             background-position: 0% 50%;
           }
         }
-        
+
         /* Responsive Grid Layout for Cards */
         .grid {
           display: grid !important;
-          grid-template-columns: repeat(var(--cards-columns, 1), 1fr) !important;
+          grid-template-columns: repeat(
+            var(--cards-columns, 1),
+            1fr
+          ) !important;
         }
-        
+
         /* Mobile First Approach */
         .grid[data-responsive-mobile="1"] {
           grid-template-columns: repeat(1, 1fr) !important;
@@ -1232,7 +1252,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
         .grid[data-responsive-mobile="4"] {
           grid-template-columns: repeat(4, 1fr) !important;
         }
-        
+
         /* Tablet Override */
         @media (min-width: 768px) {
           .grid[data-responsive-tablet="1"] {
@@ -1248,7 +1268,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
             grid-template-columns: repeat(4, 1fr) !important;
           }
         }
-        
+
         /* Desktop Override */
         @media (min-width: 1024px) {
           .grid[data-responsive-desktop="1"] {
@@ -1264,24 +1284,36 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
             grid-template-columns: repeat(4, 1fr) !important;
           }
         }
-        
+
         /* Force override with CSS variables */
         .grid {
-          grid-template-columns: repeat(var(--cards-columns, 1), 1fr) !important;
+          grid-template-columns: repeat(
+            var(--cards-columns, 1),
+            1fr
+          ) !important;
         }
-        
+
         @media (min-width: 768px) {
           .grid {
-            grid-template-columns: repeat(var(--cards-tablet, var(--cards-columns, 1)), 1fr) !important;
+            grid-template-columns: repeat(
+              var(--cards-tablet, var(--cards-columns, 1)),
+              1fr
+            ) !important;
           }
         }
-        
+
         @media (min-width: 1024px) {
           .grid {
-            grid-template-columns: repeat(var(--cards-desktop, var(--cards-tablet, var(--cards-columns, 1))), 1fr) !important;
+            grid-template-columns: repeat(
+              var(
+                --cards-desktop,
+                var(--cards-tablet, var(--cards-columns, 1))
+              ),
+              1fr
+            ) !important;
           }
         }
-        
+
         /* Additional force override */
         .grid[data-responsive-mobile="1"] {
           grid-template-columns: repeat(1, 1fr) !important;
@@ -1299,9 +1331,12 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
         /* Responsive Grid Layout for Fields */
         .fields-grid {
           display: grid !important;
-          grid-template-columns: repeat(var(--fields-columns, 1), 1fr) !important;
+          grid-template-columns: repeat(
+            var(--fields-columns, 1),
+            1fr
+          ) !important;
         }
-        
+
         /* Mobile First Approach for Fields */
         .fields-grid[data-fields-responsive-mobile="1"] {
           grid-template-columns: repeat(1, 1fr) !important;
@@ -1315,7 +1350,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
         .fields-grid[data-fields-responsive-mobile="4"] {
           grid-template-columns: repeat(4, 1fr) !important;
         }
-        
+
         /* Tablet Override for Fields */
         @media (min-width: 768px) {
           .fields-grid[data-fields-responsive-tablet="1"] {
@@ -1331,7 +1366,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
             grid-template-columns: repeat(4, 1fr) !important;
           }
         }
-        
+
         /* Desktop Override for Fields */
         @media (min-width: 1024px) {
           .fields-grid[data-fields-responsive-desktop="1"] {
@@ -1347,24 +1382,36 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
             grid-template-columns: repeat(4, 1fr) !important;
           }
         }
-        
+
         /* Force override with CSS variables for Fields */
         .fields-grid {
-          grid-template-columns: repeat(var(--fields-columns, 1), 1fr) !important;
+          grid-template-columns: repeat(
+            var(--fields-columns, 1),
+            1fr
+          ) !important;
         }
-        
+
         @media (min-width: 768px) {
           .fields-grid {
-            grid-template-columns: repeat(var(--fields-tablet, var(--fields-columns, 1)), 1fr) !important;
+            grid-template-columns: repeat(
+              var(--fields-tablet, var(--fields-columns, 1)),
+              1fr
+            ) !important;
           }
         }
-        
+
         @media (min-width: 1024px) {
           .fields-grid {
-            grid-template-columns: repeat(var(--fields-desktop, var(--fields-tablet, var(--fields-columns, 1))), 1fr) !important;
+            grid-template-columns: repeat(
+              var(
+                --fields-desktop,
+                var(--fields-tablet, var(--fields-columns, 1))
+              ),
+              1fr
+            ) !important;
           }
         }
-        
+
         /* Additional force override for Fields */
         .fields-grid[data-fields-responsive-mobile="1"] {
           grid-template-columns: repeat(1, 1fr) !important;
@@ -1378,24 +1425,36 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
         .fields-grid[data-fields-responsive-mobile="4"] {
           grid-template-columns: repeat(4, 1fr) !important;
         }
-        
+
         /* Force override with CSS variables for Fields */
         .fields-grid {
-          grid-template-columns: repeat(var(--fields-columns, 1), 1fr) !important;
+          grid-template-columns: repeat(
+            var(--fields-columns, 1),
+            1fr
+          ) !important;
         }
-        
+
         @media (min-width: 768px) {
           .fields-grid {
-            grid-template-columns: repeat(var(--fields-tablet, var(--fields-columns, 1)), 1fr) !important;
+            grid-template-columns: repeat(
+              var(--fields-tablet, var(--fields-columns, 1)),
+              1fr
+            ) !important;
           }
         }
-        
+
         @media (min-width: 1024px) {
           .fields-grid {
-            grid-template-columns: repeat(var(--fields-desktop, var(--fields-tablet, var(--fields-columns, 1))), 1fr) !important;
+            grid-template-columns: repeat(
+              var(
+                --fields-desktop,
+                var(--fields-tablet, var(--fields-columns, 1))
+              ),
+              1fr
+            ) !important;
           }
         }
-        
+
         /* Additional force override for Fields */
         .fields-grid[data-fields-responsive-mobile="1"] {
           grid-template-columns: repeat(1, 1fr) !important;
@@ -1409,24 +1468,36 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
         .fields-grid[data-fields-responsive-mobile="4"] {
           grid-template-columns: repeat(4, 1fr) !important;
         }
-        
+
         /* Force override with CSS variables for Fields */
         .fields-grid {
-          grid-template-columns: repeat(var(--fields-columns, 1), 1fr) !important;
+          grid-template-columns: repeat(
+            var(--fields-columns, 1),
+            1fr
+          ) !important;
         }
-        
+
         @media (min-width: 768px) {
           .fields-grid {
-            grid-template-columns: repeat(var(--fields-tablet, var(--fields-columns, 1)), 1fr) !important;
+            grid-template-columns: repeat(
+              var(--fields-tablet, var(--fields-columns, 1)),
+              1fr
+            ) !important;
           }
         }
-        
+
         @media (min-width: 1024px) {
           .fields-grid {
-            grid-template-columns: repeat(var(--fields-desktop, var(--fields-tablet, var(--fields-columns, 1))), 1fr) !important;
+            grid-template-columns: repeat(
+              var(
+                --fields-desktop,
+                var(--fields-tablet, var(--fields-columns, 1))
+              ),
+              1fr
+            ) !important;
           }
         }
-        
+
         /* Additional force override for Fields */
         .fields-grid[data-fields-responsive-mobile="1"] {
           grid-template-columns: repeat(1, 1fr) !important;
@@ -1440,24 +1511,36 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
         .fields-grid[data-fields-responsive-mobile="4"] {
           grid-template-columns: repeat(4, 1fr) !important;
         }
-        
+
         /* Force override with CSS variables for Fields */
         .fields-grid {
-          grid-template-columns: repeat(var(--fields-columns, 1), 1fr) !important;
+          grid-template-columns: repeat(
+            var(--fields-columns, 1),
+            1fr
+          ) !important;
         }
-        
+
         @media (min-width: 768px) {
           .fields-grid {
-            grid-template-columns: repeat(var(--fields-tablet, var(--fields-columns, 1)), 1fr) !important;
+            grid-template-columns: repeat(
+              var(--fields-tablet, var(--fields-columns, 1)),
+              1fr
+            ) !important;
           }
         }
-        
+
         @media (min-width: 1024px) {
           .fields-grid {
-            grid-template-columns: repeat(var(--fields-desktop, var(--fields-tablet, var(--fields-columns, 1))), 1fr) !important;
+            grid-template-columns: repeat(
+              var(
+                --fields-desktop,
+                var(--fields-tablet, var(--fields-columns, 1))
+              ),
+              1fr
+            ) !important;
           }
         }
-        
+
         /* Additional force override for Fields */
         .fields-grid[data-fields-responsive-mobile="1"] {
           grid-template-columns: repeat(1, 1fr) !important;
@@ -1473,17 +1556,19 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
         }
       `}</style>
 
-      <div 
+      <div
         className="grid"
-        style={{
-          gap: gap,
-          display: 'grid',
-          gridTemplateColumns: `repeat(${columns}, 1fr)`,
-          '--cards-columns': columns,
-          '--cards-mobile': responsive.mobile,
-          '--cards-tablet': responsive.tablet,
-          '--cards-desktop': responsive.desktop,
-        } as React.CSSProperties}
+        style={
+          {
+            gap: gap,
+            display: "grid",
+            gridTemplateColumns: `repeat(${columns}, 1fr)`,
+            "--cards-columns": columns,
+            "--cards-mobile": responsive.mobile,
+            "--cards-tablet": responsive.tablet,
+            "--cards-desktop": responsive.desktop,
+          } as React.CSSProperties
+        }
         data-responsive-mobile={responsive.mobile}
         data-responsive-tablet={responsive.tablet}
         data-responsive-desktop={responsive.desktop}
@@ -1518,10 +1603,12 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
               justifyContent: "center",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = submitButton.hoverColor || "#1e40af";
+              e.currentTarget.style.backgroundColor =
+                submitButton.hoverColor || "#1e40af";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = submitButton.backgroundColor || "#3b82f6";
+              e.currentTarget.style.backgroundColor =
+                submitButton.backgroundColor || "#3b82f6";
             }}
           >
             {isSubmitting ? (

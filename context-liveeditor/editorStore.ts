@@ -358,17 +358,10 @@ interface EditorStore {
 
   // Inputs states
   inputsStates: Record<string, ComponentData>;
-  ensureInputsVariant: (
-    variantId: string,
-    initial?: ComponentData,
-  ) => void;
+  ensureInputsVariant: (variantId: string, initial?: ComponentData) => void;
   getInputsData: (variantId: string) => ComponentData;
   setInputsData: (variantId: string, data: ComponentData) => void;
-  updateInputsByPath: (
-    variantId: string,
-    path: string,
-    value: any,
-  ) => void;
+  updateInputsByPath: (variantId: string, path: string, value: any) => void;
 
   // Page-wise components aggregation (for saving all pages)
   pageComponentsByPage: Record<string, ComponentInstanceWithPosition[]>;
@@ -854,7 +847,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         case "contactCards":
           return contactCardsFunctions.ensureVariant(state, variantId, initial);
         case "applicationForm":
-          return applicationFormFunctions.ensureVariant(state, variantId, initial);
+          return applicationFormFunctions.ensureVariant(
+            state,
+            variantId,
+            initial,
+          );
         case "inputs":
           return inputsFunctions.ensureVariant(state, variantId, initial);
         default:
@@ -1188,7 +1185,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           );
           break;
         case "inputs":
-          newState = inputsFunctions.updateByPath(state, variantId, path, value);
+          newState = inputsFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
           break;
         default:
           // Fallback to generic component handling

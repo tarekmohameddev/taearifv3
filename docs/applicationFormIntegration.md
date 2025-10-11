@@ -7,12 +7,14 @@
 ## الملفات المحدثة
 
 ### 1. `context-liveeditor/editorStoreFunctions/applicationFormFunctions.ts`
+
 - **الوظيفة:** دوال إدارة بيانات مكون Application Form
 - **المحتوى:**
   - `getDefaultApplicationFormData()` - البيانات الافتراضية للمكون
   - `applicationFormFunctions` - دوال إدارة المكون (ensureVariant, getData, setData, updateByPath)
 
 ### 2. `context-liveeditor/editorStore.ts`
+
 - **الوظيفة:** إضافة Application Form إلى الـ editor store
 - **التحديثات:**
   - إضافة `applicationFormStates` إلى interface
@@ -21,18 +23,21 @@
   - إضافة Application Form إلى `loadFromDatabase` و `createPage`
 
 ### 3. `context-liveeditor/tenantStore.jsx`
+
 - **الوظيفة:** إضافة Application Form إلى الـ tenant store
 - **التحديثات:**
   - إضافة `updateApplicationForm` و `updateApplicationFormVariant`
   - إضافة `saveApplicationFormChanges` لحفظ التغييرات في قاعدة البيانات
 
 ### 4. `componentsStructure/applicationForm.ts`
+
 - **الوظيفة:** هيكل بيانات مكون Application Form
 - **المحتوى:**
   - تعريف هيكل البيانات الكامل للمكون
   - جميع الحقول والإعدادات القابلة للتخصيص
 
 ### 5. `components/tenant/applicationForm/applicationForm1.tsx`
+
 - **الوظيفة:** تحديث المكون لاستخدام الـ stores
 - **التحديثات:**
   - إضافة interface `ApplicationFormProps`
@@ -43,6 +48,7 @@
 ## تدفق البيانات
 
 ### 1. تهيئة المكون
+
 ```typescript
 // تحديد معرف المكون
 const variantId = props.variant || "applicationForm1";
@@ -60,6 +66,7 @@ const tenantId = useTenantStore((s: any) => s.tenantId);
 ```
 
 ### 2. تهيئة البيانات في الـ Store
+
 ```typescript
 useEffect(() => {
   if (props.useStore) {
@@ -73,6 +80,7 @@ useEffect(() => {
 ```
 
 ### 3. جلب بيانات المستأجر
+
 ```typescript
 useEffect(() => {
   if (tenantId) {
@@ -82,14 +90,15 @@ useEffect(() => {
 ```
 
 ### 4. دمج البيانات مع الأولوية
+
 ```typescript
 const mergedData = {
-  ...defaultData,           // البيانات الافتراضية (الأولوية الأقل)
-  ...props,                 // البيانات المرسلة كـ props
-  ...tenantComponentData,   // البيانات من قاعدة البيانات
-  ...storeData,            // البيانات المحفوظة في الـ store
-  ...currentStoreData,     // البيانات الحالية في الـ store (الأولوية الأعلى)
-  
+  ...defaultData, // البيانات الافتراضية (الأولوية الأقل)
+  ...props, // البيانات المرسلة كـ props
+  ...tenantComponentData, // البيانات من قاعدة البيانات
+  ...storeData, // البيانات المحفوظة في الـ store
+  ...currentStoreData, // البيانات الحالية في الـ store (الأولوية الأعلى)
+
   // دمج الكائنات المتداخلة
   header: {
     ...defaultData.header,
@@ -112,13 +121,15 @@ const mergedData = {
 ## استخدام المكون
 
 ### 1. الاستخدام الأساسي
+
 ```tsx
 <ApplicationFormSection />
 ```
 
 ### 2. الاستخدام مع الـ Store
+
 ```tsx
-<ApplicationFormSection 
+<ApplicationFormSection
   useStore={true}
   id="custom-form"
   variant="applicationForm1"
@@ -126,17 +137,18 @@ const mergedData = {
 ```
 
 ### 3. الاستخدام مع البيانات المخصصة
+
 ```tsx
-<ApplicationFormSection 
+<ApplicationFormSection
   useStore={true}
   header={{
     title: "نموذج مخصص",
-    description: "وصف مخصص للنموذج"
+    description: "وصف مخصص للنموذج",
   }}
   styling={{
     bgColor: "#f0f0f0",
     textColor: "#333333",
-    focusColor: "#007bff"
+    focusColor: "#007bff",
   }}
 />
 ```
@@ -144,17 +156,20 @@ const mergedData = {
 ## الميزات المتقدمة
 
 ### 1. إدارة الحالة
+
 - **Editor Store:** إدارة حالة المكون في المحرر
 - **Tenant Store:** إدارة بيانات المستأجر
 - **دمج البيانات:** دمج البيانات من مصادر متعددة مع الأولوية
 
 ### 2. التخصيص الكامل
+
 - **العنوان والوصف:** قابل للتخصيص بالكامل
 - **حقول النموذج:** جميع الحقول قابلة للتخصيص
 - **الألوان والتصميم:** تخصيص كامل للألوان والتصميم
 - **التخطيط:** تخصيص الاتجاه والعرض والمسافات
 
 ### 3. الأداء المحسن
+
 - **منع الطلبات المكررة:** تجنب جلب البيانات المكررة
 - **تحديث فوري:** تحديث فوري للواجهة عند تغيير البيانات
 - **إدارة الذاكرة:** إدارة فعالة للذاكرة
@@ -162,6 +177,7 @@ const mergedData = {
 ## API Endpoints المطلوبة
 
 ### 1. حفظ بيانات Application Form
+
 ```
 PUT /api/tenant/applicationForm
 Content-Type: application/json
@@ -175,6 +191,7 @@ Authorization: Bearer <token>
 ```
 
 ### 2. جلب بيانات المستأجر
+
 ```
 POST /v1/tenant-website/getTenant
 Content-Type: application/json

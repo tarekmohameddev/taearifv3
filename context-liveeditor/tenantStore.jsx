@@ -996,7 +996,11 @@ const useTenantStore = create((set) => ({
     }
   },
 
-  saveApplicationFormChanges: async (tenantId, applicationFormData, variant) => {
+  saveApplicationFormChanges: async (
+    tenantId,
+    applicationFormData,
+    variant,
+  ) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     let userData;
     try {

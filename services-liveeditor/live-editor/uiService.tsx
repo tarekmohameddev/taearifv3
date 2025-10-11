@@ -229,13 +229,31 @@ export const CachedComponent = React.memo(
             // Absolute maximum safety: pass only the most basic props
             const getAbsoluteSafeProps = (data: any) => {
               // Only return the absolute minimum required props
-              const safeVariant = (data?.variant && typeof data.variant === "string" && data.variant.length < 100) ? data.variant : "default";
-              const safeUseStore = (typeof data?.useStore === "boolean") ? data.useStore : true;
-              
+              const safeVariant =
+                data?.variant &&
+                typeof data.variant === "string" &&
+                data.variant.length < 100
+                  ? data.variant
+                  : "default";
+              const safeUseStore =
+                typeof data?.useStore === "boolean" ? data.useStore : true;
+
               return {
-                id: componentId || (data?.id && typeof data.id === "string" && data.id.length < 100) ? data.id : "component",
-                type: (data?.type && typeof data.type === "string" && data.type.length < 100) ? data.type : "unknown",
-                visible: (typeof data?.visible === "boolean") ? data.visible : true,
+                id:
+                  componentId ||
+                  (data?.id &&
+                    typeof data.id === "string" &&
+                    data.id.length < 100)
+                    ? data.id
+                    : "component",
+                type:
+                  data?.type &&
+                  typeof data.type === "string" &&
+                  data.type.length < 100
+                    ? data.type
+                    : "unknown",
+                visible:
+                  typeof data?.visible === "boolean" ? data.visible : true,
                 variant: safeVariant,
                 useStore: safeUseStore,
               };
@@ -244,7 +262,10 @@ export const CachedComponent = React.memo(
             try {
               return getAbsoluteSafeProps(data);
             } catch (error) {
-              console.warn("Error creating absolute safe props for component:", error);
+              console.warn(
+                "Error creating absolute safe props for component:",
+                error,
+              );
               // Return only the most basic props
               return {
                 id: componentId || "component",
