@@ -822,38 +822,50 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
               rows={4}
             />
           ) : fieldType === "select" ? (
-            <select
-              value={formData[field.id] || ""}
-              onChange={(e) => handleInputChange(field.id, e.target.value)}
-              className={`
-                w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                dark:bg-gray-800 dark:border-gray-600 dark:text-white
-                ${
-                  hasError
-                    ? "border-red-500 bg-red-50 dark:bg-red-900/20"
-                    : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
-                }
-              `}
-            >
-              <option value="">اختر {field.label}</option>
-              {field.options &&
-              Array.isArray(field.options) &&
-              field.options.length > 0 ? (
-                field.options.map((option, index) => (
-                  <option
-                    key={`${field.id}_option_${index}_${option.value}`}
-                    value={option.value}
-                  >
-                    {option.label || option.value}
-                  </option>
-                ))
-              ) : (
-                <option value="" disabled>
-                  لا توجد خيارات متاحة
-                </option>
-              )}
-            </select>
+            <div className="relative w-full">
+  <select
+    value={formData[field.id] || ""}
+    onChange={(e) => handleInputChange(field.id, e.target.value)}
+    className={`
+      w-full px-4 py-3 pr-12 border rounded-xl transition-all duration-300
+      appearance-none
+      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+      dark:bg-gray-800 dark:border-gray-600 dark:text-white
+      ${
+        hasError
+          ? "border-red-500 bg-red-50 dark:bg-red-900/20"
+          : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
+      }
+    `}
+  >
+    <option value="">اختر {field.label}</option>
+    {field.options?.length > 0 ? (
+      field.options.map((option, index) => (
+        <option key={`${field.id}_option_${index}_${option.value}`} value={option.value}>
+          {option.label || option.value}
+        </option>
+      ))
+    ) : (
+      <option value="" disabled>
+        لا توجد خيارات متاحة
+      </option>
+    )}
+  </select>
+
+  {/* السهم */}
+  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+    <svg
+      className="w-5 h-5 text-gray-500 dark:text-gray-400"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </span>
+</div>
+
           ) : fieldType === "email" ? (
             <input
               type="email"
