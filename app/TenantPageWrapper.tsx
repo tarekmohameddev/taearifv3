@@ -8,7 +8,7 @@ import {
   getComponentSubPath,
 } from "@/lib-liveeditor/ComponentsList";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
-import Footer1 from "@/components/tenant/footer/footer1";
+import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/LanguageDropdown";
 import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
@@ -372,7 +372,7 @@ export default function TenantPageWrapper({
         </main>
 
         {/* Footer with i18n support */}
-        <Footer1 />
+        <StaticFooter1 />
       </div>
     </I18nProvider>
   );

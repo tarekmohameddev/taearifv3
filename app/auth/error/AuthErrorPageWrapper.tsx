@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
-import Header1 from "@/components/tenant/header/header1";
-import Footer1 from "@/components/tenant/footer/footer1";
+import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
+import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 
 interface AuthErrorPageWrapperProps {
   tenantId: string | null;
@@ -33,7 +33,7 @@ export default function AuthErrorPageWrapper({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header1 />
+      <StaticHeader1 />
       <main className="flex-1 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600 mb-4">
@@ -44,7 +44,7 @@ export default function AuthErrorPageWrapper({
           </p>
         </div>
       </main>
-      <Footer1 />
+      <StaticFooter1 />
     </div>
   );
 }

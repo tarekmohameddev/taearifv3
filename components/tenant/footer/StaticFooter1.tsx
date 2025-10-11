@@ -37,6 +37,15 @@ type FooterData = {
       color: string;
       blendMode: string;
     };
+    textOverlay: {
+      enabled: boolean;
+      text: string;
+      position: string;
+      fontSize: string;
+      fontWeight: string;
+      color: string;
+      opacity: string;
+    };
   };
   layout: {
     columns: string;
@@ -129,6 +138,15 @@ const getDefaultFooterData = (): FooterData => ({
       color: "#000000",
       blendMode: "multiply",
     },
+    textOverlay: {
+      enabled: false,
+      text: "",
+      position: "center",
+      fontSize: "2xl",
+      fontWeight: "bold",
+      color: "#ffffff",
+      opacity: "0.8",
+    },
   },
   layout: {
     columns: "3",
@@ -213,40 +231,116 @@ const getDefaultFooterData = (): FooterData => ({
 
 export default function StaticFooter({
   overrideData,
-}: { overrideData?: any } = {}) {
-  // Subscribe to global components data
-  const globalComponentsData = useEditorStore((s) => s.globalComponentsData);
-  const globalFooterData = globalComponentsData?.footer;
-
+  useStore = true,
+  variant = "footer1",
+  id = "global-footer",
+}: { 
+  overrideData?: any;
+  useStore?: boolean;
+  variant?: string;
+  id?: string;
+} = {}) {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+
+  // Subscribe to editor store functions
+  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+  const globalComponentsData = useEditorStore((s) => s.globalComponentsData);
+  const globalFooterData = useEditorStore((s) => s.globalFooterData);
 
   // Get global components data from tenantData
   const tenantGlobalComponentsData = tenantData?.globalComponentsData;
   const tenantGlobalFooterData = tenantGlobalComponentsData?.footer;
-  const tenantId = useTenantStore((s) => s.tenantId);
 
+  // Fetch tenant data when tenantId is available
   useEffect(() => {
     if (tenantId) {
+      console.log("🔄 StaticFooter: Fetching tenant data for:", tenantId);
       fetchTenantData(tenantId);
     }
   }, [tenantId, fetchTenantData]);
 
+
+  // Ensure component variant exists in store
+  useEffect(() => {
+    if (useStore) {
+      const initialData = {
+        ...getDefaultFooterData(),
+        ...overrideData,
+      };
+      ensureComponentVariant("footer", id, initialData);
+    }
+  }, [useStore, id, ensureComponentVariant, overrideData]);
+
+  // Get data from store
+  const storeData = useStore ? getComponentData("footer", id) || {} : {};
+  const currentStoreData = useStore ? globalFooterData || {} : {};
+
   // Get default data once
   const defaultData = useMemo(() => getDefaultFooterData(), []);
 
-  // Merge data with priority: overrideData > tenantGlobalFooterData > globalFooterData > default
+  // Merge data with priority: overrideData > currentStoreData > storeData > tenantGlobalFooterData > globalFooterData > default
   const mergedData = useMemo(() => {
     const result = {
       ...defaultData,
-      ...globalFooterData, // globalFooterData from editorStore overrides default
-      ...tenantGlobalFooterData, // tenantGlobalFooterData overrides editorStore
+      ...globalFooterData, // globalFooterData from editorStore
+      ...tenantGlobalFooterData, // tenantGlobalFooterData from backend
+      ...storeData, // storeData from component store
+      ...currentStoreData, // currentStoreData from global store
       ...(overrideData || {}), // overrideData overrides everything (for iframe)
     };
 
+    // Deep merge for nested objects
+    if (result.content) {
+      result.content = {
+        ...defaultData.content,
+        ...(globalFooterData?.content || {}),
+        ...(tenantGlobalFooterData?.content || {}),
+        ...(storeData?.content || {}),
+        ...(currentStoreData?.content || {}),
+        ...(overrideData?.content || {}),
+      };
+    }
+
+    if (result.styling) {
+      result.styling = {
+        ...defaultData.styling,
+        ...(globalFooterData?.styling || {}),
+        ...(tenantGlobalFooterData?.styling || {}),
+        ...(storeData?.styling || {}),
+        ...(currentStoreData?.styling || {}),
+        ...(overrideData?.styling || {}),
+      };
+    }
+
     return result;
-  }, [defaultData, globalComponentsData, tenantGlobalFooterData, overrideData]);
+  }, [
+    defaultData, 
+    globalFooterData, 
+    tenantGlobalFooterData, 
+    storeData, 
+    currentStoreData, 
+    overrideData
+  ]);
+
+  // Debug logging for data sources
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("🔍 StaticFooter Debug Info:", {
+        tenantId,
+        hasTenantData: !!tenantData,
+        hasGlobalFooterData: !!globalFooterData,
+        hasTenantGlobalFooterData: !!tenantGlobalFooterData,
+        hasStoreData: !!storeData,
+        hasCurrentStoreData: !!currentStoreData,
+        hasOverrideData: !!overrideData,
+        mergedDataKeys: Object.keys(mergedData),
+      });
+    }
+  }, [tenantId, tenantData, globalFooterData, tenantGlobalFooterData, storeData, currentStoreData, overrideData, mergedData]);
 
   // Don't render if not visible
   if (!mergedData.visible) {

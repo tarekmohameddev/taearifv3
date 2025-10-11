@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
-import Header1 from "@/components/tenant/header/header1";
-import Footer1 from "@/components/tenant/footer/footer1";
+import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
+import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import SignInForm from "@/components/tenant/auth/signin-form";
 
 interface SignInPageWrapperProps {
@@ -34,11 +34,11 @@ export default function SignInPageWrapper({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header1 />
+      <StaticHeader1 />
       <main className="flex-1 flex items-center justify-center">
         <SignInForm />
       </main>
-      <Footer1 />
+      <StaticFooter1 />
     </div>
   );
 }
