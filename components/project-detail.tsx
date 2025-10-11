@@ -21,6 +21,12 @@ import {
   TagIcon,
   WrenchIcon,
   StarIcon,
+  CopyIcon,
+  FacebookIcon,
+  TwitterIcon,
+  InstagramIcon,
+  LinkedinIcon,
+  MessageCircleIcon,
 } from "lucide-react";
 
 interface Project {
@@ -86,6 +92,7 @@ import {
   DialogContent,
   DialogTrigger,
   DialogTitle,
+  DialogHeader,
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -110,6 +117,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
   const [mainImage, setMainImage] = useState<string>("");
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Tenant ID hook
   const { tenantId, isLoading: tenantLoading } = useTenantId();
@@ -199,6 +208,65 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
 
   const handleInputChange = (field: string, value: string) => {
     setBookingForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Sharing functions
+  const getCurrentUrl = () => {
+    if (typeof window !== 'undefined') {
+      return window.location.href;
+    }
+    return '';
+  };
+
+  const getShareText = () => {
+    if (!project) return '';
+    return `شاهد هذا المشروع العقاري الرائع: ${project.title} - ${project.address || project.district}`;
+  };
+
+  const shareToFacebook = () => {
+    const url = getCurrentUrl();
+    const text = getShareText();
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
+    window.open(facebookUrl, '_blank', 'width=600,height=400');
+  };
+
+  const shareToTwitter = () => {
+    const url = getCurrentUrl();
+    const text = getShareText();
+    const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+    window.open(twitterUrl, '_blank', 'width=600,height=400');
+  };
+
+  const shareToLinkedIn = () => {
+    const url = getCurrentUrl();
+    const text = getShareText();
+    const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
+    window.open(linkedinUrl, '_blank', 'width=600,height=400');
+  };
+
+  const shareToWhatsApp = () => {
+    const url = getCurrentUrl();
+    const text = getShareText();
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const shareToTelegram = () => {
+    const url = getCurrentUrl();
+    const text = getShareText();
+    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+    window.open(telegramUrl, '_blank');
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      const url = getCurrentUrl();
+      await navigator.clipboard.writeText(url);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
   };
 
   const handleImageClick = (imageSrc: string, index?: number) => {
@@ -549,7 +617,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   مشروع عقاري
                 </h1>
                 <div className="sharesocials flex flex-row gap-x-6" dir="ltr">
-                  <button className="cursor-pointer">
+                  <button 
+                    className="cursor-pointer"
+                    onClick={() => setIsShareDialogOpen(true)}
+                  >
                     <ShareIcon className="w-5 h-5 text-gray-600" />
                   </button>
                 </div>
@@ -1224,6 +1295,74 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog لمشاركة المشروع */}
+      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-lg font-bold text-gray-800">
+              مشاركة المشروع
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-center text-gray-600 text-sm">
+              شارك هذا المشروع مع أصدقائك
+            </p>
+            
+            {/* Social Media Icons */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Facebook */}
+              <button
+                onClick={shareToFacebook}
+                className="flex items-center justify-center gap-2 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <FacebookIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">فيسبوك</span>
+              </button>
+
+              {/* Twitter */}
+              <button
+                onClick={shareToTwitter}
+                className="flex items-center justify-center gap-2 p-3 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
+              >
+                <TwitterIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">تويتر</span>
+              </button>
+
+              {/* LinkedIn */}
+              <button
+                onClick={shareToLinkedIn}
+                className="flex items-center justify-center gap-2 p-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
+              >
+                <LinkedinIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">لينكد إن</span>
+              </button>
+
+              {/* WhatsApp */}
+              <button
+                onClick={shareToWhatsApp}
+                className="flex items-center justify-center gap-2 p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                <MessageCircleIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">واتساب</span>
+              </button>
+            </div>
+
+            {/* Copy Link Button */}
+            <div className="pt-4 border-t">
+              <button
+                onClick={copyToClipboard}
+                className="w-full flex items-center justify-center gap-2 p-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <CopyIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">
+                  {copySuccess ? "تم النسخ!" : "نسخ الرابط"}
+                </span>
+              </button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </section>
