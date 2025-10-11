@@ -1288,23 +1288,21 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       <div className="grid grid-cols-2 gap-3">
                         {property.floor_planning_image.map(
                           (planImage, index) => (
-                        <div key={index} className="relative group">
+                        <div key={index} className="relative group"
+                        onClick={(e) => {
+                            handleThumbnailClick(planImage, index)
+                        }}
+                        >
                           <img
                             src={planImage}
                             alt={`مخطط الأرضية ${index + 1}`}
                             className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                             onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              console.log('Floor plan clicked:', planImage);
-                              console.log('Property data:', property);
-                              console.log('Floor planning images:', property?.floor_planning_image);
-                              
+                              handleThumbnailClick(planImage, index)
                               // Simple test - just open dialog with the image
                               setSelectedImage(planImage);
                               setSelectedImageIndex(0);
                               setIsDialogOpen(true);
-                              console.log('Dialog should open now');
                             }}
                           />
                               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
