@@ -1769,11 +1769,21 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         ).applicationFormStates;
                       break;
                     case "inputs":
+                      console.log("🔍 Loading inputs data into editorStore:", {
+                        componentName: comp.componentName,
+                        data: comp.data,
+                        hasData: !!comp.data,
+                        dataKeys: comp.data ? Object.keys(comp.data) : [],
+                      });
                       newState.inputsStates = inputsFunctions.setData(
                         newState,
                         comp.componentName,
                         comp.data,
                       ).inputsStates;
+                      console.log(
+                        "✅ Inputs data loaded into editorStore:",
+                        newState.inputsStates,
+                      );
                       break;
                   }
                 }

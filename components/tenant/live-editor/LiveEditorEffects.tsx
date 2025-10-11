@@ -53,16 +53,17 @@ export function useLiveEditorEffects(state: any) {
   // Database Loading Effect
   useEffect(() => {
     if (!initialized && !authLoading && !tenantLoading && tenantData) {
-      // Only load data into editorStore if not already loaded
+      // Always load data into editorStore when tenantData is available
       const editorStore = useEditorStore.getState();
-      const hasGlobalComponentsData =
-        editorStore.globalComponentsData &&
-        Object.keys(editorStore.globalComponentsData).length > 0;
 
-      if (!hasGlobalComponentsData) {
-        // Load data into editorStore
-        editorStore.loadFromDatabase(tenantData);
-      }
+      console.log("🔄 Loading tenant data into editorStore:", {
+        tenantData: !!tenantData,
+        hasComponentSettings: !!tenantData?.componentSettings,
+        hasGlobalComponentsData: !!tenantData?.globalComponentsData,
+      });
+
+      // Load data into editorStore
+      editorStore.loadFromDatabase(tenantData);
 
       // Load page components from database or use defaults
       if (

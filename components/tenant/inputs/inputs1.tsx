@@ -22,6 +22,7 @@ import {
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { getDefaultInputsData } from "@/context-liveeditor/editorStoreFunctions/inputsFunctions";
+import { useTenantId } from "@/hooks/useTenantId";
 
 // Generate random ID function
 const generateRandomId = (prefix: string = "id"): string => {
@@ -85,6 +86,9 @@ interface InputsProps {
   id?: string;
   // API endpoint for form submission
   apiEndpoint?: string;
+  // Additional props for store integration
+  className?: string;
+  visible?: boolean;
 }
 
 // Use the default data from inputsFunctions
@@ -265,6 +269,9 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
   const variantId = props.variant || "inputs1";
   const uniqueId = props.id || variantId;
 
+  // Tenant ID hook
+  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+
   // Subscribe to editor store updates for this inputs variant
   const ensureComponentVariant = useEditorStore(
     (s) => s.ensureComponentVariant,
@@ -274,11 +281,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
 
   useEffect(() => {
     if (props.useStore) {
-      const initialData = {
-        ...getDefaultInputsData(),
-        ...props,
-      };
-      ensureComponentVariant("inputs", variantId, initialData);
+      ensureComponentVariant("inputs", variantId, props);
     }
   }, [variantId, props.useStore, ensureComponentVariant]);
 
@@ -300,47 +303,69 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
   const currentStoreData =
     props.useStore && inputsStates ? inputsStates[variantId] || {} : {};
 
+  // Debug logging for store data
+  console.log("🔍 Store data debug:", {
+    useStore: props.useStore,
+    variantId,
+    hasStoreData: !!storeData && Object.keys(storeData).length > 0,
+    hasInputsStates: !!inputsStates,
+    inputsStatesKeys: inputsStates ? Object.keys(inputsStates) : [],
+    hasCurrentStoreData:
+      !!currentStoreData && Object.keys(currentStoreData).length > 0,
+  });
+
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
-    if (!tenantData) {
+    if (!tenantData?.componentSettings) {
       return {};
     }
-
-    // First, check if data comes directly from API response (new structure)
-    if (tenantData.components && Array.isArray(tenantData.components)) {
-      for (const component of tenantData.components) {
-        if (
-          component.type === "inputs" &&
-          component.componentName === variantId
-        ) {
-          return component.data;
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          if (
+            (component as any).type === "inputs" &&
+            (component as any).componentName === variantId &&
+            componentId === props.id
+          ) {
+            return (component as any).data;
+          }
         }
       }
     }
-
-    // Fallback to old structure
-    return tenantData.inputs || {};
+    return {};
   };
 
-  // Merge all data sources with proper fallback
-  const finalData = {
-    ...getDefaultInputsData(),
-    ...getTenantComponentData(),
+  const tenantComponentData = getTenantComponentData();
+
+  // Merge data with priority: storeData > tenantComponentData > props > default
+  const mergedData = {
+    ...props,
+    ...tenantComponentData,
     ...storeData,
-    ...currentStoreData,
   };
 
-  // Extract data from finalData
+  // Extract data from mergedData
   const {
     cards = [],
     theme,
     submitButton = {},
     cardsLayout = {},
     fieldsLayout = {}, // New: fields layout settings
-    apiEndpoint = "/api/submit-form", // Default API endpoint
+    apiEndpoint = submitButton.apiEndpoint || "/api/submit-form",
     className = "",
     visible = true,
-  } = finalData;
+  } = mergedData;
 
   const submitButtonText = submitButton.text || "حفظ البيانات";
   const showSubmitButton = submitButton.show !== false;
@@ -363,23 +388,8 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
     desktop: "3",
   };
 
-  // Debug logging
-  console.log("🔍 Layout Debug:", {
-    cardsLayout,
-    fieldsLayout,
-    responsive,
-    fieldsResponsive,
-    columns,
-    fieldsColumns,
-    finalData: {
-      cardsLayout: finalData.cardsLayout,
-      fieldsLayout: finalData.fieldsLayout,
-    },
-  });
-
-  // Use cards from finalData, with fallback to default data
+  // Use cards from mergedData, with fallback to default data
   const safeCards = useMemo(() => {
-    console.log("Cards from finalData:", cards);
     if (cards && Array.isArray(cards) && cards.length > 0) {
       const processedCards = cards
         .filter((card) => card && card.fields && Array.isArray(card.fields))
@@ -393,15 +403,14 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
               id: field.id || generateRandomId("field"),
             })),
         }));
-      console.log("Processed cards:", processedCards);
       return processedCards;
     }
     const defaultCards = getDefaultInputsData().cards;
-    console.log("Using default cards:", defaultCards);
+    console.log("⚠️ Using default cards:", defaultCards);
     return defaultCards;
   }, [cards?.length, cards?.[0]?.id, cards?.[0]?.fields?.length]);
 
-  // Use theme from finalData
+  // Use theme from mergedData
   const safeTheme = theme || getDefaultInputsData().theme;
 
   const [formData, setFormData] = useState<Record<string, any>>({});
@@ -409,6 +418,21 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
   const [collapsedCards, setCollapsedCards] = useState<Set<string>>(new Set());
   const [showPasswords, setShowPasswords] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
+
+  // Auto-hide status messages after 5 seconds
+  useEffect(() => {
+    if (submitStatus.type) {
+      const timer = setTimeout(() => {
+        setSubmitStatus({ type: null, message: "" });
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [submitStatus.type]);
 
   // Initialize form data
   useEffect(() => {
@@ -483,12 +507,51 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
     });
   };
 
-  // Validate field
+  // Validate field with enhanced validation for specific field types
   const validateField = (field: InputField, value: any): string => {
     if (field.required && (!value || value.toString().trim() === "")) {
       return `${field.label} مطلوب`;
     }
 
+    // Skip validation for empty optional fields
+    if (!value || value.toString().trim() === "") {
+      return "";
+    }
+
+    // Integer validation for specific fields
+    const integerFields = ["districts_id", "area_from", "area_to"];
+    if (integerFields.includes(field.id)) {
+      const numValue = Number(value);
+      if (isNaN(numValue) || !Number.isInteger(numValue)) {
+        return `${field.label} يجب أن يكون رقماً صحيحاً`;
+      }
+      if (numValue < 0) {
+        return `${field.label} يجب أن يكون رقماً موجباً`;
+      }
+    }
+
+    // Boolean validation for specific fields
+    const booleanFields = ["wants_similar_offers", "contact_on_whatsapp"];
+    if (booleanFields.includes(field.id)) {
+      const stringValue = value.toString().toLowerCase();
+      if (
+        !["true", "false", "نعم", "لا", "yes", "no", "1", "0"].includes(
+          stringValue,
+        )
+      ) {
+        return `${field.label} يجب أن يكون نعم أو لا`;
+      }
+    }
+
+    // Phone number validation
+    if (field.id === "phone") {
+      const phoneRegex = /^[\+]?[0-9\s\-\(\)]{7,15}$/;
+      if (!phoneRegex.test(value.toString())) {
+        return `رقم الهاتف غير صحيح`;
+      }
+    }
+
+    // Standard validation rules
     if (field.validation) {
       const { min, max, pattern, message } = field.validation;
 
@@ -619,6 +682,69 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
     }
   };
 
+  // Map form field IDs to the required JSON field names with proper type conversion
+  const mapFormDataToJsonFormat = (formData: Record<string, any>) => {
+    // Create a mapping object for field IDs to JSON field names
+    const fieldMapping: Record<string, string> = {
+      // Property details
+      property_type: "property_type",
+      category: "category",
+      region: "region",
+      districts_id: "districts_id",
+      area_from: "area_from",
+      area_to: "area_to",
+      purchase_method: "purchase_method",
+      budget_from: "budget_from",
+      budget_to: "budget_to",
+      seriousness: "seriousness",
+      purchase_goal: "purchase_goal",
+      wants_similar_offers: "wants_similar_offers",
+      // Contact details
+      full_name: "full_name",
+      phone: "phone",
+      contact_on_whatsapp: "contact_on_whatsapp",
+      notes: "notes",
+    };
+
+    // Create the JSON object with the exact format you specified
+    const jsonData: Record<string, any> = {};
+
+    // Map each field from formData to the JSON format with proper type conversion
+    Object.keys(fieldMapping).forEach((fieldId) => {
+      const jsonFieldName = fieldMapping[fieldId];
+      const value = formData[fieldId] || "";
+
+      // Convert data types based on field requirements
+      if (["districts_id", "area_from", "area_to"].includes(fieldId)) {
+        // Convert to integer for these fields
+        jsonData[jsonFieldName] = value ? parseInt(value.toString()) : null;
+      } else if (
+        ["wants_similar_offers", "contact_on_whatsapp"].includes(fieldId)
+      ) {
+        // Convert to boolean for these fields
+        if (value) {
+          const stringValue = value.toString().toLowerCase();
+          jsonData[jsonFieldName] = ["true", "نعم", "yes", "1"].includes(
+            stringValue,
+          );
+        } else {
+          jsonData[jsonFieldName] = false;
+        }
+      } else {
+        // Keep as string for other fields
+        jsonData[jsonFieldName] = value;
+      }
+    });
+
+    // Add tenant_username with the tenant ID from the store
+    const tenantId = useTenantStore.getState().tenantId;
+    if (tenantId) {
+      jsonData["tenant_username"] = tenantId;
+    }
+
+    return jsonData;
+  };
+
   // Handle form submission
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -647,57 +773,100 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
 
     if (!hasErrors) {
       try {
-        // Create organized data and summary
-        const organizedData = organizeFormDataByCards();
-        const formSummary = createFormSummary();
+        // Create the JSON data in the exact format you specified
+        const jsonFormData = mapFormDataToJsonFormat(formData);
 
         console.log("=== FORM SUBMISSION DATA ===");
         console.log("📊 Raw form data (flat):", formData);
-        console.log("🗂️ Organized by cards:", organizedData);
-        console.log("📋 Clean summary report:", formSummary);
-
-        // Display formatted data in console
-        console.log("=== FORMATTED OUTPUT ===");
-        console.table(
-          formSummary.cards.map((card: any) => ({
-            "Card Title": card.title,
-            "Field Count": card.fieldCount,
-            Fields: card.fields
-              .map((f: any) => `${f.label}: ${f.value}`)
-              .join(", "),
-          })),
+        console.log("📋 JSON Format Data:", jsonFormData);
+        console.log(
+          "📄 JSON String (exact format you requested):",
+          JSON.stringify(jsonFormData, null, 2),
         );
 
-        // Export in different formats
-        console.log("=== EXPORT OPTIONS ===");
-        console.log("📄 JSON Format:", exportFormData("json"));
-        console.log("📊 CSV Format:", exportFormData("csv"));
-        console.log("📋 Table Format:", exportFormData("table"));
+        // Display the exact format you specified
+        console.log("=== EXACT JSON FORMAT ===");
+        console.log(JSON.stringify(jsonFormData));
+
+        // Show tenant_username specifically
+        console.log(
+          "🏢 Tenant Username:",
+          jsonFormData.tenant_username || "Not found",
+        );
+
+        // Show data types for validation
+        console.log("=== DATA TYPES VALIDATION ===");
+        console.log("🔢 Integer fields:", {
+          districts_id: typeof jsonFormData.districts_id,
+          area_from: typeof jsonFormData.area_from,
+          area_to: typeof jsonFormData.area_to,
+        });
+        console.log("✅ Boolean fields:", {
+          wants_similar_offers: typeof jsonFormData.wants_similar_offers,
+          contact_on_whatsapp: typeof jsonFormData.contact_on_whatsapp,
+        });
 
         // Send data to API endpoint
-        if (apiEndpoint) {
+        if (apiEndpoint && apiEndpoint.trim() !== "") {
           try {
+            // Parse custom headers if provided
+            let headers: Record<string, string> = {
+              "Content-Type": "application/json",
+            };
+
+            if (
+              submitButton.apiHeaders &&
+              submitButton.apiHeaders.trim() !== ""
+            ) {
+              try {
+                const customHeaders = JSON.parse(submitButton.apiHeaders);
+                headers = { ...headers, ...customHeaders };
+              } catch (headerError) {
+                console.warn("Invalid custom headers format:", headerError);
+              }
+            }
+
             const response = await fetch(apiEndpoint, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                formData: organizedData,
-                summary: formSummary,
-                timestamp: new Date().toISOString(),
-              }),
+              method: submitButton.apiMethod || "POST",
+              headers,
+              body: JSON.stringify(jsonFormData),
             });
 
             if (response.ok) {
               const result = await response.json();
               console.log("✅ Form submitted successfully:", result);
+              setSubmitStatus({
+                type: "success",
+                message: "تم إرسال البيانات بنجاح!",
+              });
+
+              // Clear form data after successful submission
+              setFormData({});
             } else {
-              console.error("❌ Form submission failed:", response.statusText);
+              const errorText = await response.text();
+              console.error(
+                "❌ Form submission failed:",
+                response.statusText,
+                errorText,
+              );
+              setSubmitStatus({
+                type: "error",
+                message: `فشل في إرسال البيانات: ${response.statusText}`,
+              });
             }
           } catch (apiError) {
             console.error("❌ API Error:", apiError);
+            setSubmitStatus({
+              type: "error",
+              message: "حدث خطأ في الاتصال بالخادم",
+            });
           }
+        } else {
+          // If no API endpoint, just show success message
+          setSubmitStatus({
+            type: "success",
+            message: "تم حفظ البيانات محلياً!",
+          });
         }
       } catch (error) {
         console.error("Error submitting form:", error);
@@ -842,7 +1011,7 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
     `}
               >
                 <option value="">اختر {field.label}</option>
-                {field.options?.length > 0 ? (
+                {field.options && field.options.length > 0 ? (
                   field.options.map((option, index) => (
                     <option
                       key={`${field.id}_option_${index}_${option.value}`}
@@ -1210,426 +1379,525 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
     );
   };
 
-  // Don't render if not visible
-  if (!visible) {
+  // Check if component should be visible
+  if (!mergedData.visible) {
     return null;
   }
 
-  return (
-    <div className={`w-full max-w-7xl mx-auto p-4 ${className}`}>
-      <style jsx>{`
-        @keyframes gradientShift {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
+  // Show loading state while tenant is loading
+  if (tenantLoading) {
+    return (
+      <section className="w-full bg-background py-8">
+        <div className="mx-auto max-w-[1600px] px-4">
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+            <p className="text-lg text-gray-600 mt-4">
+              جاري تحميل بيانات الموقع...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-        /* Responsive Grid Layout for Cards */
-        .grid {
-          display: grid !important;
-          grid-template-columns: repeat(
-            var(--cards-columns, 1),
-            1fr
-          ) !important;
-        }
-
-        /* Mobile First Approach */
-        .grid[data-responsive-mobile="1"] {
-          grid-template-columns: repeat(1, 1fr) !important;
-        }
-        .grid[data-responsive-mobile="2"] {
-          grid-template-columns: repeat(2, 1fr) !important;
-        }
-        .grid[data-responsive-mobile="3"] {
-          grid-template-columns: repeat(3, 1fr) !important;
-        }
-        .grid[data-responsive-mobile="4"] {
-          grid-template-columns: repeat(4, 1fr) !important;
-        }
-
-        /* Tablet Override */
-        @media (min-width: 768px) {
-          .grid[data-responsive-tablet="1"] {
-            grid-template-columns: repeat(1, 1fr) !important;
-          }
-          .grid[data-responsive-tablet="2"] {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          .grid[data-responsive-tablet="3"] {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-          .grid[data-responsive-tablet="4"] {
-            grid-template-columns: repeat(4, 1fr) !important;
-          }
-        }
-
-        /* Desktop Override */
-        @media (min-width: 1024px) {
-          .grid[data-responsive-desktop="1"] {
-            grid-template-columns: repeat(1, 1fr) !important;
-          }
-          .grid[data-responsive-desktop="2"] {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          .grid[data-responsive-desktop="3"] {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-          .grid[data-responsive-desktop="4"] {
-            grid-template-columns: repeat(4, 1fr) !important;
-          }
-        }
-
-        /* Force override with CSS variables */
-        .grid {
-          grid-template-columns: repeat(
-            var(--cards-columns, 1),
-            1fr
-          ) !important;
-        }
-
-        @media (min-width: 768px) {
-          .grid {
-            grid-template-columns: repeat(
-              var(--cards-tablet, var(--cards-columns, 1)),
-              1fr
-            ) !important;
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .grid {
-            grid-template-columns: repeat(
-              var(
-                --cards-desktop,
-                var(--cards-tablet, var(--cards-columns, 1))
-              ),
-              1fr
-            ) !important;
-          }
-        }
-
-        /* Additional force override */
-        .grid[data-responsive-mobile="1"] {
-          grid-template-columns: repeat(1, 1fr) !important;
-        }
-        .grid[data-responsive-mobile="2"] {
-          grid-template-columns: repeat(2, 1fr) !important;
-        }
-        .grid[data-responsive-mobile="3"] {
-          grid-template-columns: repeat(3, 1fr) !important;
-        }
-        .grid[data-responsive-mobile="4"] {
-          grid-template-columns: repeat(4, 1fr) !important;
-        }
-
-        /* Responsive Grid Layout for Fields */
-        .fields-grid {
-          display: grid !important;
-          grid-template-columns: repeat(
-            var(--fields-columns, 1),
-            1fr
-          ) !important;
-        }
-
-        /* Mobile First Approach for Fields */
-        .fields-grid[data-fields-responsive-mobile="1"] {
-          grid-template-columns: repeat(1, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="2"] {
-          grid-template-columns: repeat(2, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="3"] {
-          grid-template-columns: repeat(3, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="4"] {
-          grid-template-columns: repeat(4, 1fr) !important;
-        }
-
-        /* Tablet Override for Fields */
-        @media (min-width: 768px) {
-          .fields-grid[data-fields-responsive-tablet="1"] {
-            grid-template-columns: repeat(1, 1fr) !important;
-          }
-          .fields-grid[data-fields-responsive-tablet="2"] {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          .fields-grid[data-fields-responsive-tablet="3"] {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-          .fields-grid[data-fields-responsive-tablet="4"] {
-            grid-template-columns: repeat(4, 1fr) !important;
-          }
-        }
-
-        /* Desktop Override for Fields */
-        @media (min-width: 1024px) {
-          .fields-grid[data-fields-responsive-desktop="1"] {
-            grid-template-columns: repeat(1, 1fr) !important;
-          }
-          .fields-grid[data-fields-responsive-desktop="2"] {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          .fields-grid[data-fields-responsive-desktop="3"] {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-          .fields-grid[data-fields-responsive-desktop="4"] {
-            grid-template-columns: repeat(4, 1fr) !important;
-          }
-        }
-
-        /* Force override with CSS variables for Fields */
-        .fields-grid {
-          grid-template-columns: repeat(
-            var(--fields-columns, 1),
-            1fr
-          ) !important;
-        }
-
-        @media (min-width: 768px) {
-          .fields-grid {
-            grid-template-columns: repeat(
-              var(--fields-tablet, var(--fields-columns, 1)),
-              1fr
-            ) !important;
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .fields-grid {
-            grid-template-columns: repeat(
-              var(
-                --fields-desktop,
-                var(--fields-tablet, var(--fields-columns, 1))
-              ),
-              1fr
-            ) !important;
-          }
-        }
-
-        /* Additional force override for Fields */
-        .fields-grid[data-fields-responsive-mobile="1"] {
-          grid-template-columns: repeat(1, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="2"] {
-          grid-template-columns: repeat(2, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="3"] {
-          grid-template-columns: repeat(3, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="4"] {
-          grid-template-columns: repeat(4, 1fr) !important;
-        }
-
-        /* Force override with CSS variables for Fields */
-        .fields-grid {
-          grid-template-columns: repeat(
-            var(--fields-columns, 1),
-            1fr
-          ) !important;
-        }
-
-        @media (min-width: 768px) {
-          .fields-grid {
-            grid-template-columns: repeat(
-              var(--fields-tablet, var(--fields-columns, 1)),
-              1fr
-            ) !important;
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .fields-grid {
-            grid-template-columns: repeat(
-              var(
-                --fields-desktop,
-                var(--fields-tablet, var(--fields-columns, 1))
-              ),
-              1fr
-            ) !important;
-          }
-        }
-
-        /* Additional force override for Fields */
-        .fields-grid[data-fields-responsive-mobile="1"] {
-          grid-template-columns: repeat(1, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="2"] {
-          grid-template-columns: repeat(2, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="3"] {
-          grid-template-columns: repeat(3, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="4"] {
-          grid-template-columns: repeat(4, 1fr) !important;
-        }
-
-        /* Force override with CSS variables for Fields */
-        .fields-grid {
-          grid-template-columns: repeat(
-            var(--fields-columns, 1),
-            1fr
-          ) !important;
-        }
-
-        @media (min-width: 768px) {
-          .fields-grid {
-            grid-template-columns: repeat(
-              var(--fields-tablet, var(--fields-columns, 1)),
-              1fr
-            ) !important;
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .fields-grid {
-            grid-template-columns: repeat(
-              var(
-                --fields-desktop,
-                var(--fields-tablet, var(--fields-columns, 1))
-              ),
-              1fr
-            ) !important;
-          }
-        }
-
-        /* Additional force override for Fields */
-        .fields-grid[data-fields-responsive-mobile="1"] {
-          grid-template-columns: repeat(1, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="2"] {
-          grid-template-columns: repeat(2, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="3"] {
-          grid-template-columns: repeat(3, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="4"] {
-          grid-template-columns: repeat(4, 1fr) !important;
-        }
-
-        /* Force override with CSS variables for Fields */
-        .fields-grid {
-          grid-template-columns: repeat(
-            var(--fields-columns, 1),
-            1fr
-          ) !important;
-        }
-
-        @media (min-width: 768px) {
-          .fields-grid {
-            grid-template-columns: repeat(
-              var(--fields-tablet, var(--fields-columns, 1)),
-              1fr
-            ) !important;
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .fields-grid {
-            grid-template-columns: repeat(
-              var(
-                --fields-desktop,
-                var(--fields-tablet, var(--fields-columns, 1))
-              ),
-              1fr
-            ) !important;
-          }
-        }
-
-        /* Additional force override for Fields */
-        .fields-grid[data-fields-responsive-mobile="1"] {
-          grid-template-columns: repeat(1, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="2"] {
-          grid-template-columns: repeat(2, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="3"] {
-          grid-template-columns: repeat(3, 1fr) !important;
-        }
-        .fields-grid[data-fields-responsive-mobile="4"] {
-          grid-template-columns: repeat(4, 1fr) !important;
-        }
-      `}</style>
-
-      <div
-        className="grid"
-        style={
-          {
-            gap: gap,
-            display: "grid",
-            gridTemplateColumns: `repeat(${columns}, 1fr)`,
-            "--cards-columns": columns,
-            "--cards-mobile": responsive.mobile,
-            "--cards-tablet": responsive.tablet,
-            "--cards-desktop": responsive.desktop,
-          } as React.CSSProperties
-        }
-        data-responsive-mobile={responsive.mobile}
-        data-responsive-tablet={responsive.tablet}
-        data-responsive-desktop={responsive.desktop}
-      >
-        {safeCards && Array.isArray(safeCards)
-          ? safeCards.map((card, index) => {
-              if (card && card.id) {
-                return renderCard(card);
-              }
-              return null;
-            })
-          : null}
-      </div>
-
-      {showSubmitButton && (
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-8 flex justify-center"
-        >
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="transition-all duration-300 flex items-center space-x-2 rtl:space-x-reverse font-bold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: submitButton.backgroundColor || "#3b82f6",
-              color: submitButton.textColor || "#ffffff",
-              borderRadius: submitButton.borderRadius || "8px",
-              padding: submitButton.padding || "12px 24px",
-              width: "100%",
-              justifyContent: "center",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor =
-                submitButton.hoverColor || "#1e40af";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor =
-                submitButton.backgroundColor || "#3b82f6";
-            }}
-          >
-            {isSubmitting ? (
-              <>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+  // Show error if no tenant ID
+  if (!currentTenantId) {
+    return (
+      <section className="w-full bg-background py-8">
+        <div className="mx-auto max-w-[1600px] px-4">
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-yellow-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
                 />
-                <span>جاري الحفظ...</span>
-              </>
-            ) : (
-              <>
-                <CheckCircle size={24} />
-                <span>{submitButtonText}</span>
-              </>
-            )}
-          </button>
-        </motion.div>
-      )}
-    </div>
+              </svg>
+            </div>
+            <p className="text-lg text-yellow-600 font-medium">
+              لم يتم العثور على معرف الموقع
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              تأكد من أنك تصل إلى الموقع من الرابط الصحيح
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section
+      className={`w-full bg-background py-8 ${mergedData.className || ""}`}
+      style={{
+        backgroundColor:
+          mergedData.background?.color ||
+          mergedData.styling?.bgColor ||
+          "transparent",
+        paddingTop: mergedData.layout?.padding?.top || "2rem",
+        paddingBottom: mergedData.layout?.padding?.bottom || "2rem",
+      }}
+    >
+      <div
+        className="mx-auto px-4"
+        style={{
+          maxWidth:
+            mergedData.layout?.maxWidth ||
+            mergedData.styling?.maxWidth ||
+            "1600px",
+        }}
+      >
+        <style jsx>{`
+          @keyframes gradientShift {
+            0% {
+              background-position: 0% 50%;
+            }
+            50% {
+              background-position: 100% 50%;
+            }
+            100% {
+              background-position: 0% 50%;
+            }
+          }
+
+          /* Responsive Grid Layout for Cards */
+          .grid {
+            display: grid !important;
+            grid-template-columns: repeat(
+              var(--cards-columns, 1),
+              1fr
+            ) !important;
+          }
+
+          /* Mobile First Approach */
+          .grid[data-responsive-mobile="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .grid[data-responsive-mobile="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .grid[data-responsive-mobile="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .grid[data-responsive-mobile="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+
+          /* Tablet Override */
+          @media (min-width: 768px) {
+            .grid[data-responsive-tablet="1"] {
+              grid-template-columns: repeat(1, 1fr) !important;
+            }
+            .grid[data-responsive-tablet="2"] {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .grid[data-responsive-tablet="3"] {
+              grid-template-columns: repeat(3, 1fr) !important;
+            }
+            .grid[data-responsive-tablet="4"] {
+              grid-template-columns: repeat(4, 1fr) !important;
+            }
+          }
+
+          /* Desktop Override */
+          @media (min-width: 1024px) {
+            .grid[data-responsive-desktop="1"] {
+              grid-template-columns: repeat(1, 1fr) !important;
+            }
+            .grid[data-responsive-desktop="2"] {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .grid[data-responsive-desktop="3"] {
+              grid-template-columns: repeat(3, 1fr) !important;
+            }
+            .grid[data-responsive-desktop="4"] {
+              grid-template-columns: repeat(4, 1fr) !important;
+            }
+          }
+
+          /* Force override with CSS variables */
+          .grid {
+            grid-template-columns: repeat(
+              var(--cards-columns, 1),
+              1fr
+            ) !important;
+          }
+
+          @media (min-width: 768px) {
+            .grid {
+              grid-template-columns: repeat(
+                var(--cards-tablet, var(--cards-columns, 1)),
+                1fr
+              ) !important;
+            }
+          }
+
+          @media (min-width: 1024px) {
+            .grid {
+              grid-template-columns: repeat(
+                var(
+                  --cards-desktop,
+                  var(--cards-tablet, var(--cards-columns, 1))
+                ),
+                1fr
+              ) !important;
+            }
+          }
+
+          /* Additional force override */
+          .grid[data-responsive-mobile="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .grid[data-responsive-mobile="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .grid[data-responsive-mobile="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .grid[data-responsive-mobile="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+
+          /* Responsive Grid Layout for Fields */
+          .fields-grid {
+            display: grid !important;
+            grid-template-columns: repeat(
+              var(--fields-columns, 1),
+              1fr
+            ) !important;
+          }
+
+          /* Mobile First Approach for Fields */
+          .fields-grid[data-fields-responsive-mobile="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+
+          /* Tablet Override for Fields */
+          @media (min-width: 768px) {
+            .fields-grid[data-fields-responsive-tablet="1"] {
+              grid-template-columns: repeat(1, 1fr) !important;
+            }
+            .fields-grid[data-fields-responsive-tablet="2"] {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .fields-grid[data-fields-responsive-tablet="3"] {
+              grid-template-columns: repeat(3, 1fr) !important;
+            }
+            .fields-grid[data-fields-responsive-tablet="4"] {
+              grid-template-columns: repeat(4, 1fr) !important;
+            }
+          }
+
+          /* Desktop Override for Fields */
+          @media (min-width: 1024px) {
+            .fields-grid[data-fields-responsive-desktop="1"] {
+              grid-template-columns: repeat(1, 1fr) !important;
+            }
+            .fields-grid[data-fields-responsive-desktop="2"] {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .fields-grid[data-fields-responsive-desktop="3"] {
+              grid-template-columns: repeat(3, 1fr) !important;
+            }
+            .fields-grid[data-fields-responsive-desktop="4"] {
+              grid-template-columns: repeat(4, 1fr) !important;
+            }
+          }
+
+          /* Force override with CSS variables for Fields */
+          .fields-grid {
+            grid-template-columns: repeat(
+              var(--fields-columns, 1),
+              1fr
+            ) !important;
+          }
+
+          @media (min-width: 768px) {
+            .fields-grid {
+              grid-template-columns: repeat(
+                var(--fields-tablet, var(--fields-columns, 1)),
+                1fr
+              ) !important;
+            }
+          }
+
+          @media (min-width: 1024px) {
+            .fields-grid {
+              grid-template-columns: repeat(
+                var(
+                  --fields-desktop,
+                  var(--fields-tablet, var(--fields-columns, 1))
+                ),
+                1fr
+              ) !important;
+            }
+          }
+
+          /* Additional force override for Fields */
+          .fields-grid[data-fields-responsive-mobile="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+
+          /* Force override with CSS variables for Fields */
+          .fields-grid {
+            grid-template-columns: repeat(
+              var(--fields-columns, 1),
+              1fr
+            ) !important;
+          }
+
+          @media (min-width: 768px) {
+            .fields-grid {
+              grid-template-columns: repeat(
+                var(--fields-tablet, var(--fields-columns, 1)),
+                1fr
+              ) !important;
+            }
+          }
+
+          @media (min-width: 1024px) {
+            .fields-grid {
+              grid-template-columns: repeat(
+                var(
+                  --fields-desktop,
+                  var(--fields-tablet, var(--fields-columns, 1))
+                ),
+                1fr
+              ) !important;
+            }
+          }
+
+          /* Additional force override for Fields */
+          .fields-grid[data-fields-responsive-mobile="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+
+          /* Force override with CSS variables for Fields */
+          .fields-grid {
+            grid-template-columns: repeat(
+              var(--fields-columns, 1),
+              1fr
+            ) !important;
+          }
+
+          @media (min-width: 768px) {
+            .fields-grid {
+              grid-template-columns: repeat(
+                var(--fields-tablet, var(--fields-columns, 1)),
+                1fr
+              ) !important;
+            }
+          }
+
+          @media (min-width: 1024px) {
+            .fields-grid {
+              grid-template-columns: repeat(
+                var(
+                  --fields-desktop,
+                  var(--fields-tablet, var(--fields-columns, 1))
+                ),
+                1fr
+              ) !important;
+            }
+          }
+
+          /* Additional force override for Fields */
+          .fields-grid[data-fields-responsive-mobile="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+
+          /* Force override with CSS variables for Fields */
+          .fields-grid {
+            grid-template-columns: repeat(
+              var(--fields-columns, 1),
+              1fr
+            ) !important;
+          }
+
+          @media (min-width: 768px) {
+            .fields-grid {
+              grid-template-columns: repeat(
+                var(--fields-tablet, var(--fields-columns, 1)),
+                1fr
+              ) !important;
+            }
+          }
+
+          @media (min-width: 1024px) {
+            .fields-grid {
+              grid-template-columns: repeat(
+                var(
+                  --fields-desktop,
+                  var(--fields-tablet, var(--fields-columns, 1))
+                ),
+                1fr
+              ) !important;
+            }
+          }
+
+          /* Additional force override for Fields */
+          .fields-grid[data-fields-responsive-mobile="1"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="2"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="3"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .fields-grid[data-fields-responsive-mobile="4"] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        `}</style>
+
+        <div
+          className="grid"
+          style={
+            {
+              gap: gap,
+              display: "grid",
+              gridTemplateColumns: `repeat(${columns}, 1fr)`,
+              "--cards-columns": columns,
+              "--cards-mobile": responsive.mobile,
+              "--cards-tablet": responsive.tablet,
+              "--cards-desktop": responsive.desktop,
+            } as React.CSSProperties
+          }
+          data-responsive-mobile={responsive.mobile}
+          data-responsive-tablet={responsive.tablet}
+          data-responsive-desktop={responsive.desktop}
+        >
+          {safeCards && Array.isArray(safeCards)
+            ? safeCards.map((card, index) => {
+                if (card && card.id) {
+                  return renderCard(card);
+                }
+                return null;
+              })
+            : null}
+        </div>
+
+        {showSubmitButton && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8 flex flex-col items-center space-y-4"
+          >
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="transition-all duration-300 flex items-center space-x-2 rtl:space-x-reverse font-bold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: submitButton.backgroundColor || "#3b82f6",
+                color: submitButton.textColor || "#ffffff",
+                borderRadius: submitButton.borderRadius || "8px",
+                padding: submitButton.padding || "12px 24px",
+                width: "100%",
+                justifyContent: "center",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  submitButton.hoverColor || "#1e40af";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  submitButton.backgroundColor || "#3b82f6";
+              }}
+            >
+              {isSubmitting ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                  />
+                  <span>جاري الحفظ...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle size={24} />
+                  <span>{submitButtonText}</span>
+                </>
+              )}
+            </button>
+
+            {/* Status Messages */}
+            <AnimatePresence>
+              {submitStatus.type && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className={`w-full max-w-md p-4 rounded-lg flex items-center space-x-2 rtl:space-x-reverse ${
+                    submitStatus.type === "success"
+                      ? "bg-green-50 border border-green-200 text-green-800"
+                      : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
+                >
+                  {submitStatus.type === "success" ? (
+                    <CheckCircle size={20} className="text-green-600" />
+                  ) : (
+                    <AlertCircle size={20} className="text-red-600" />
+                  )}
+                  <span className="text-sm font-medium">
+                    {submitStatus.message}
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </div>
+    </section>
   );
 };
 

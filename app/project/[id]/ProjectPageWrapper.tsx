@@ -5,17 +5,17 @@ import useTenantStore from "@/context-liveeditor/tenantStore";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
-import PropertyDetail1 from "@/components/tenant/property/PropertyDetail1";
+import ProjectDetail from "@/components/project-detail";
 
-interface PropertyPageWrapperProps {
+interface ProjectPageWrapperProps {
   tenantId: string | null;
-  propertySlug: string;
+  projectSlug: string;
 }
 
-export default function PropertyPageWrapper({
+export default function ProjectPageWrapper({
   tenantId,
-  propertySlug,
-}: PropertyPageWrapperProps) {
+  projectSlug,
+}: ProjectPageWrapperProps) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -40,7 +40,7 @@ export default function PropertyPageWrapper({
       <div className="min-h-screen flex flex-col" dir="rtl">
         <StaticHeader1 />
         <main className="flex-1">
-          <PropertyDetail1 propertySlug={propertySlug} />
+          <ProjectDetail projectSlug={projectSlug} />
         </main>
         <StaticFooter1 />
       </div>

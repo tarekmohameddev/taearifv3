@@ -8,9 +8,12 @@ import {
   ShareIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  BuildingIcon,
+  UsersIcon,
+  HomeIcon,
 } from "lucide-react";
 
-interface Property {
+interface Project {
   id: string;
   slug?: string;
   title: string;
@@ -38,7 +41,14 @@ interface Property {
     email: string;
   };
   images?: string[];
+  // حقول إضافية للمشروع العقاري
+  developer?: string;
+  units?: number;
+  floors?: number;
+  completionDate?: string;
+  amenities?: string[];
 }
+
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
@@ -60,11 +70,11 @@ import Link from "next/link";
 import Image from "next/image";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 
-interface PropertyDetailProps {
-  propertySlug: string;
+interface ProjectDetailProps {
+  projectSlug: string;
 }
 
-export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
+export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("");
   const [bookingForm, setBookingForm] = useState({
@@ -81,49 +91,49 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
   // Tenant ID hook
   const { tenantId, isLoading: tenantLoading } = useTenantId();
 
-  // Property data state
-  const [property, setProperty] = useState<Property | null>(null);
-  const [loadingProperty, setLoadingProperty] = useState(true);
-  const [propertyError, setPropertyError] = useState<string | null>(null);
+  // Project data state
+  const [project, setProject] = useState<Project | null>(null);
+  const [loadingProject, setLoadingProject] = useState(true);
+  const [projectError, setProjectError] = useState<string | null>(null);
 
-  // الحصول على عقارات مشابهة من API
-  const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
+  // الحصول على مشاريع مشابهة من API
+  const [similarProjects, setSimilarProjects] = useState<Project[]>([]);
   const [loadingSimilar, setLoadingSimilar] = useState(true);
 
-  // جلب بيانات العقار
-  const fetchProperty = async () => {
+  // جلب بيانات المشروع
+  const fetchProject = async () => {
     try {
-      setLoadingProperty(true);
-      setPropertyError(null);
+      setLoadingProject(true);
+      setProjectError(null);
 
       if (!tenantId) {
-        setLoadingProperty(false);
+        setLoadingProject(false);
         return;
       }
 
       const response = await axiosInstance.get(
-        `/v1/tenant-website/${tenantId}/properties/${propertySlug}`,
+        `/v1/tenant-website/${tenantId}/projects/${projectSlug}`,
       );
 
       // Handle new API response format
-      if (response.data && response.data.property) {
-        setProperty(response.data.property);
+      if (response.data && response.data.project) {
+        setProject(response.data.project);
       } else if (response.data) {
-        // If the property is returned directly
-        setProperty(response.data);
+        // If the project is returned directly
+        setProject(response.data);
       } else {
-        setPropertyError("العقار غير موجود");
+        setProjectError("المشروع غير موجود");
       }
     } catch (error) {
-      console.error("PropertyDetail: Error fetching property:", error);
-      setPropertyError("حدث خطأ في تحميل بيانات العقار");
+      console.error("ProjectDetail: Error fetching project:", error);
+      setProjectError("حدث خطأ في تحميل بيانات المشروع");
     } finally {
-      setLoadingProperty(false);
+      setLoadingProject(false);
     }
   };
 
-  // جلب العقارات المشابهة
-  const fetchSimilarProperties = async () => {
+  // جلب المشاريع المشابهة
+  const fetchSimilarProjects = async () => {
     try {
       setLoadingSimilar(true);
 
@@ -133,29 +143,27 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
       }
 
       const response = await axiosInstance.get(
-        `/v1/tenant-website/${tenantId}/properties?purpose=rent&latest=1&limit=10`,
+        `/v1/tenant-website/${tenantId}/projects?latest=1&limit=10`,
       );
 
       // Handle new API response format
-      if (response.data && response.data.properties) {
-        setSimilarProperties(response.data.properties);
+      if (response.data && response.data.projects) {
+        setSimilarProjects(response.data.projects);
         console.log(
-          `PropertyDetail: ✅ Similar properties loaded: ${response.data.properties.length} items`,
+          `ProjectDetail: ✅ Similar projects loaded: ${response.data.projects.length} items`,
         );
       } else if (response.data && Array.isArray(response.data)) {
-        // If properties are returned directly as array
-        setSimilarProperties(response.data);
+        // If projects are returned directly as array
+        setSimilarProjects(response.data);
         console.log(
-          `PropertyDetail: ✅ Similar properties loaded: ${response.data.length} items`,
+          `ProjectDetail: ✅ Similar projects loaded: ${response.data.length} items`,
         );
       } else {
-        console.log(
-          "PropertyDetail: ⚠️ No similar properties found in response",
-        );
-        setSimilarProperties([]);
+        console.log("ProjectDetail: ⚠️ No similar projects found in response");
+        setSimilarProjects([]);
       }
     } catch (error) {
-      console.error("Error fetching similar properties:", error);
+      console.error("Error fetching similar projects:", error);
     } finally {
       setLoadingSimilar(false);
     }
@@ -184,14 +192,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
   };
 
   const handlePreviousImage = () => {
-    if (propertyImages.length === 0) return;
+    if (projectImages.length === 0) return;
 
     const prevIndex =
       selectedImageIndex > 0
         ? selectedImageIndex - 1
-        : propertyImages.length - 1;
+        : projectImages.length - 1;
 
-    const prevImage = propertyImages[prevIndex];
+    const prevImage = projectImages[prevIndex];
     if (prevImage && prevImage.trim() !== "") {
       setSelectedImageIndex(prevIndex);
       setSelectedImage(prevImage);
@@ -199,14 +207,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
   };
 
   const handleNextImage = () => {
-    if (propertyImages.length === 0) return;
+    if (projectImages.length === 0) return;
 
     const nextIndex =
-      selectedImageIndex < propertyImages.length - 1
+      selectedImageIndex < projectImages.length - 1
         ? selectedImageIndex + 1
         : 0;
 
-    const nextImage = propertyImages[nextIndex];
+    const nextImage = projectImages[nextIndex];
     if (nextImage && nextImage.trim() !== "") {
       setSelectedImageIndex(nextIndex);
       setSelectedImage(nextImage);
@@ -237,32 +245,32 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
     }
   };
 
-  // جلب بيانات العقار والعقارات المشابهة عند تحميل المكون
+  // جلب بيانات المشروع والمشاريع المشابهة عند تحميل المكون
   useEffect(() => {
     if (tenantId) {
-      fetchProperty();
-      fetchSimilarProperties();
+      fetchProject();
+      fetchSimilarProjects();
     }
-  }, [tenantId, propertySlug]);
+  }, [tenantId, projectSlug]);
 
-  // تحديث الصورة الرئيسية عند تحميل العقار
+  // تحديث الصورة الرئيسية عند تحميل المشروع
   useEffect(() => {
-    if (property?.image) {
-      setMainImage(property.image);
+    if (project?.image) {
+      setMainImage(project.image);
     }
-  }, [property]);
+  }, [project]);
 
-  // صور العقار - computed value
-  const propertyImages =
-    property && property.image
+  // صور المشروع - computed value
+  const projectImages =
+    project && project.image
       ? [
-          property.image,
-          ...(property.images || []), // Add additional images if available
+          project.image,
+          ...(project.images || []), // Add additional images if available
         ].filter((img) => img && img.trim() !== "")
       : []; // Filter out empty images
 
-  // Show skeleton loading while tenant or property is loading
-  if (tenantLoading || loadingProperty) {
+  // Show skeleton loading while tenant or project is loading
+  if (tenantLoading || loadingProject) {
     return (
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">
@@ -276,7 +284,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
                 </div>
 
-                {/* تفاصيل العقار - Skeleton */}
+                {/* تفاصيل المشروع - Skeleton */}
                 <div className="space-y-4">
                   <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4 md:h-6"></div>
                   <div className="h-6 bg-gray-200 rounded animate-pulse w-full"></div>
@@ -288,7 +296,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   </div>
                 </div>
 
-                {/* تفاصيل العقار في شبكة - Skeleton */}
+                {/* تفاصيل المشروع في شبكة - Skeleton */}
                 <div className="grid grid-cols-2 gap-y-6 lg:gap-y-10">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                     <div
@@ -335,7 +343,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
           {/* القسم السفلي - Skeleton */}
           <div className="flex flex-col md:flex-row gap-x-6 gap-y-8">
-            {/* وصف العقار ونموذج الحجز - Skeleton */}
+            {/* وصف المشروع ونموذج الحجز - Skeleton */}
             <div className="flex-1">
               <div className="mb-8 md:mb-18">
                 <div className="flex flex-col justify-center items-start gap-y-6 md:gap-y-8">
@@ -381,11 +389,11 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               </div>
             </div>
 
-            {/* العقارات المشابهة - Skeleton */}
+            {/* المشاريع المشابهة - Skeleton */}
             <div className="flex-1">
               <div className="h-10 bg-emerald-200 rounded-md animate-pulse w-full mb-8 md:h-13"></div>
 
-              {/* عرض العقارات المشابهة للديسكتوب - Skeleton */}
+              {/* عرض المشاريع المشابهة للديسكتوب - Skeleton */}
               <div className="hidden md:block space-y-8">
                 {[1, 2, 3].map((i) => (
                   <div
@@ -407,7 +415,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 ))}
               </div>
 
-              {/* عرض العقارات المشابهة للموبايل - Skeleton */}
+              {/* عرض المشاريع المشابهة للموبايل - Skeleton */}
               <div className="block md:hidden">
                 <div className="flex gap-4 overflow-x-auto">
                   {[1, 2, 3].map((i) => (
@@ -466,8 +474,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
     );
   }
 
-  // Show error if property failed to load
-  if (propertyError || !property) {
+  // Show error if project failed to load
+  if (projectError || !project) {
     return (
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">
@@ -488,13 +496,13 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               </svg>
             </div>
             <p className="text-lg text-red-600 font-medium">
-              {propertyError || "العقار غير موجود"}
+              {projectError || "المشروع غير موجود"}
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              تأكد من صحة رابط العقار
+              تأكد من صحة رابط المشروع
             </p>
             <button
-              onClick={() => fetchProperty()}
+              onClick={() => fetchProject()}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               إعادة المحاولة
@@ -508,14 +516,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
   return (
     <section className="py-12">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="mb-12 md:mb-20 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="mb-12 md:mb-20 flex flex-col md:flex-row gap-x-6 gap-y-8">
           {/* المحتوى الرئيسي */}
-          <div className="order-2 lg:order-1">
+          <div className="md:w-1/2 order-2 md:order-1 mb-12 md:mb-0">
             <div className="flex flex-col gap-y-8 lg:gap-y-10">
               {/* العنوان ونوع العرض */}
               <div className="flex flex-row items-center justify-between">
                 <h1 className="font-bold text-xs xs:text-sm leading-4 rounded-md text-white bg-emerald-600 w-20 h-8 flex items-center justify-center md:text-xl lg:text-2xl md:w-28 md:h-11">
-                  {property.transactionType === "rent" ? "للإيجار" : "للبيع"}
+                  مشروع عقاري
                 </h1>
                 <div className="sharesocials flex flex-row gap-x-6" dir="ltr">
                   <button className="cursor-pointer">
@@ -524,23 +532,23 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 </div>
               </div>
 
-              {/* تفاصيل العقار */}
+              {/* تفاصيل المشروع */}
               <div className="space-y-4">
                 <p className="font-bold text-gray-600 text-xs xs:text-sm leading-4 md:text-2xl md:leading-7">
-                  {property.district}
+                  {project.district}
                 </p>
                 <p className="font-bold text-gray-600 text-xl leading-6 md:leading-7">
-                  {property.title}
+                  {project.title}
                 </p>
                 <p className="text-emerald-600 text-2xl leading-7 font-bold md:text-3xl lg:leading-9">
-                  {property.price} ريال سعودي
+                  {project.price} ريال سعودي
                 </p>
                 <p className="text-gray-600 text-sm leading-6 font-normal md:text-base lg:text-xl lg:leading-7">
-                  {property.description || "لا يوجد وصف متاح لهذا العقار"}
+                  {project.description || "لا يوجد وصف متاح لهذا المشروع"}
                 </p>
               </div>
 
-              {/* تفاصيل العقار في شبكة */}
+              {/* تفاصيل المشروع في شبكة */}
               <div className="grid grid-cols-2 gap-y-6 lg:gap-y-10">
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
@@ -550,7 +558,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     </p>
                   </div>
                   <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {property.transactionType === "rent" ? "للإيجار" : "للبيع"}
+                    {project.transactionType === "rent" ? "للإيجار" : "للبيع"}
                   </p>
                 </div>
 
@@ -562,7 +570,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     </p>
                   </div>
                   <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {property.area ? `${property.area} م²` : "غير محدد"}
+                    {project.area ? `${project.area} م²` : "غير محدد"}
                   </p>
                 </div>
 
@@ -574,11 +582,69 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     </p>
                   </div>
                   <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {property.type}
+                    {project.type}
                   </p>
                 </div>
 
-                {property.features && property.features.length > 0 && (
+                {project.developer && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <BuildingIcon className="w-4 h-4 text-emerald-600" />
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        المطور:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.developer}
+                    </p>
+                  </div>
+                )}
+
+                {project.units && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <HomeIcon className="w-4 h-4 text-emerald-600" />
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        عدد الوحدات:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.units}
+                    </p>
+                  </div>
+                )}
+
+                {project.floors && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        عدد الطوابق:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.floors}
+                    </p>
+                  </div>
+                )}
+
+                {project.completionDate && (
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
+                      <CalendarIcon className="w-4 h-4 text-emerald-600" />
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        تاريخ التسليم:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {new Date(project.completionDate).toLocaleDateString(
+                        "ar-US",
+                      )}
+                    </p>
+                  </div>
+                )}
+
+                {project.features && project.features.length > 0 && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <div className="w-4 h-4 bg-emerald-600 rounded"></div>
@@ -587,12 +653,12 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       </p>
                     </div>
                     <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {property.features.join(", ")}
+                      {project.features.join(", ")}
                     </p>
                   </div>
                 )}
 
-                {property.status && (
+                {project.status && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <div className="w-4 h-4 bg-emerald-600 rounded"></div>
@@ -601,14 +667,12 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       </p>
                     </div>
                     <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {property.status === "available"
-                        ? "متاح"
-                        : property.status}
+                      {project.status === "available" ? "متاح" : project.status}
                     </p>
                   </div>
                 )}
 
-                {property.createdAt && (
+                {project.createdAt && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <div className="w-4 h-4 bg-emerald-600 rounded"></div>
@@ -617,7 +681,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       </p>
                     </div>
                     <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {new Date(property.createdAt).toLocaleDateString("ar-US")}
+                      {new Date(project.createdAt).toLocaleDateString("ar-US")}
                     </p>
                   </div>
                 )}
@@ -630,7 +694,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     </p>
                   </div>
                   <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {property.bedrooms > 0 ? property.bedrooms : "غير محدد"}
+                    {project.bedrooms > 0 ? project.bedrooms : "غير محدد"}
                   </p>
                 </div>
 
@@ -642,8 +706,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     </p>
                   </div>
                   <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {property.bathrooms && property.bathrooms > 0
-                      ? property.bathrooms
+                    {project.bathrooms && project.bathrooms > 0
+                      ? project.bathrooms
                       : "غير محدد"}
                   </p>
                 </div>
@@ -652,11 +716,11 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   <div className="flex flex-row gap-x-2">
                     <MapPinIcon className="w-4 h-4 text-emerald-600" />
                   </div>
-                  {property.location &&
-                  property.location.lat &&
-                  property.location.lng ? (
+                  {project.location &&
+                  project.location.lat &&
+                  project.location.lng ? (
                     <a
-                      href={`https://maps.google.com/?q=${property.location.lat},${property.location.lng}&entry=gps`}
+                      href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-bold leading-4 text-xs xs:text-sm md:text-base text-emerald-600 underline"
@@ -665,7 +729,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     </a>
                   ) : (
                     <span className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {property.location?.address || "العنوان غير متاح"}
+                      {project.location?.address || "العنوان غير متاح"}
                     </span>
                   )}
                 </div>
@@ -678,10 +742,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             <div className="gallery w-full mx-auto px-4 md:px-6 order-1 md:order-2 relative">
               {/* الصورة الأساسية */}
               <div className="relative h-80 md:h-80 xl:h-96 mb-6">
-                {mainImage && property ? (
+                {mainImage && project ? (
                   <Image
                     src={mainImage}
-                    alt={property.title || "صورة العقار"}
+                    alt={project.title || "صورة المشروع"}
                     fill
                     className="w-full h-full object-cover cursor-pointer rounded-lg"
                     onClick={() => handleImageClick(mainImage, 0)}
@@ -716,22 +780,22 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               </div>
 
               {/* نص توضيحي - يظهر فقط عند وجود صور إضافية */}
-              {propertyImages.length > 1 && (
+              {projectImages.length > 1 && (
                 <p className="text-xs text-gray-500 mb-2 text-center">
                   اضغط على أي صورة لفتحها في نافذة منبثقة
                 </p>
               )}
 
               {/* Carousel للصور المصغرة - يظهر فقط عند وجود صور إضافية */}
-              {propertyImages.length > 0 && property && (
+              {projectImages.length > 0 && project && (
                 <SwiperCarousel
-                  items={propertyImages
+                  items={projectImages
                     .filter((imageSrc) => imageSrc && imageSrc.trim() !== "") // Filter out empty images
                     .map((imageSrc, index) => (
                       <div key={index} className="relative h-[10rem] md:h-24">
                         <Image
                           src={imageSrc}
-                          alt={`${property.title || "العقار"} - صورة ${index + 1}`}
+                          alt={`${project.title || "المشروع"} - صورة ${index + 1}`}
                           fill
                           className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
                             mainImage === imageSrc
@@ -755,214 +819,159 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               )}
             </div>
           </div>
-
-          {/* Sidebar */}
-          <div className="order-1 lg:order-2">
-            <div className="space-y-6">
-              {/* نموذج الحجز */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h2 className="pr-4 text-white font-bold rounded-md leading-6 bg-emerald-600 w-full h-10 flex items-center justify-start mb-6">
-                  احجز الآن
-                </h2>
-                <p className="text-sm text-gray-600 font-normal mb-6">
-                  احجز الآن وقم باختيار الوقت والتاريخ المناسب لك، وسيتم التواصل
-                  معك لتأكيد الحجز وتقديم التفاصيل اللازمة.
-                </p>
-
-                <form
-                  onSubmit={handleBookingSubmit}
-                  className="flex flex-col gap-y-6"
-                >
-                  <div className="flex flex-col gap-y-4">
-                    <div className="flex flex-col gap-y-2">
-                      <label
-                        htmlFor="name"
-                        className="text-gray-600 text-base font-bold leading-4"
-                      >
-                        الاسم
-                      </label>
-                      <input
-                        id="name"
-                        type="text"
-                        placeholder="ادخل الاسم"
-                        value={bookingForm.name}
-                        onChange={(e) =>
-                          handleInputChange("name", e.target.value)
-                        }
-                        className="w-full h-12 outline-none border border-gray-300 rounded-lg placeholder:text-sm px-2"
-                        name="name"
-                        required
-                      />
-                    </div>
-                    <div className="flex flex-col gap-y-2">
-                      <label
-                        htmlFor="phone"
-                        className="text-gray-600 text-base font-bold leading-4"
-                      >
-                        رقم الهاتف
-                      </label>
-                      <input
-                        id="phone"
-                        type="tel"
-                        placeholder="ادخل رقم الهاتف"
-                        value={bookingForm.phone}
-                        onChange={(e) =>
-                          handleInputChange("phone", e.target.value)
-                        }
-                        className="w-full h-12 outline-none border border-gray-300 rounded-lg placeholder:text-sm px-2 text-end"
-                        name="phone"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-y-4">
-                    <div className="flex flex-col gap-y-2 relative">
-                      <label
-                        htmlFor="date"
-                        className="text-gray-600 text-base font-bold leading-4"
-                      >
-                        التاريخ
-                      </label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-start text-right font-normal cursor-pointer text-base font-medium text-gray-600 rounded-lg border border-gray-300 p-2 outline-none focus:border-emerald-600 h-12"
-                          >
-                            <CalendarIcon className="ml-2 h-4 w-4" />
-                            {selectedDate ? (
-                              format(selectedDate, "PPP", { locale: ar })
-                            ) : (
-                              <span className="text-gray-500">
-                                اختر التاريخ
-                              </span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={selectedDate}
-                            onSelect={setSelectedDate}
-                            initialFocus
-                            locale={ar}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-
-                    <div className="flex flex-col gap-y-2 relative">
-                      <label
-                        htmlFor="time"
-                        className="text-gray-600 text-base font-bold leading-4"
-                      >
-                        الوقت
-                      </label>
-                      <div className="w-full relative">
-                        <input
-                          id="time"
-                          required
-                          className="order-1 w-full font-medium text-gray-600 rounded-lg border border-gray-300 p-2 outline-none pr-10 focus:border-emerald-600 h-12"
-                          type="time"
-                          value={selectedTime}
-                          onChange={(e) => setSelectedTime(e.target.value)}
-                          disabled={!selectedDate}
-                        />
-                        <div className="absolute pointer-events-none top-0 bottom-0 right-3 flex items-center order-2">
-                          <ClockIcon className="w-5 h-5 text-emerald-600" />
-                        </div>
-                        {!selectedDate && (
-                          <div className="absolute top-0 left-0 w-full h-full bg-white/70 z-10 cursor-not-allowed rounded-lg" />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full h-12 rounded-md bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition-colors"
-                  >
-                    تأكيد الحجز
-                  </button>
-                </form>
-              </div>
-
-              {/* معلومات الاتصال */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  معلومات الاتصال
-                </h3>
-                <div className="space-y-4">
-                  <button className="w-full bg-green-600 text-white py-3 px-4 rounded-lg flex items-center justify-center hover:bg-green-700">
-                    <span className="mr-2">📞</span>
-                    اتصل الآن
-                  </button>
-                  <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center hover:bg-blue-700">
-                    <span className="mr-2">💬</span>
-                    واتساب
-                  </button>
-                </div>
-              </div>
-
-              {/* إحصائيات العقار */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  إحصائيات العقار
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">المشاهدات:</span>
-                    <span className="font-medium">{property.views}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">تاريخ النشر:</span>
-                    <span className="font-medium">
-                      {property.createdAt
-                        ? new Date(property.createdAt).toLocaleDateString(
-                            "ar-SA",
-                          )
-                        : "غير محدد"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">الحالة:</span>
-                    <span className="font-medium text-green-600">
-                      {property.status === "available"
-                        ? "متاح"
-                        : property.status || "متاح"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* القسم السفلي */}
         <div className="flex flex-col md:flex-row gap-x-6 gap-y-8">
-          {/* وصف العقار */}
+          {/* وصف المشروع ونموذج الحجز */}
           <div className="flex-1">
             <div className="mb-8 md:mb-18">
               <div className="flex flex-col justify-center items-start gap-y-6 md:gap-y-8">
                 <h3 className="text-gray-600 font-bold text-xl leading-6 lg:text-2xl lg:leading-7">
-                  وصف العقار
+                  وصف المشروع
                 </h3>
                 <p className="text-gray-600 font-normal text-sm leading-6 md:text-base md:leading-7">
-                  {property.description || "لا يوجد وصف مفصل متاح لهذا العقار"}
+                  {project.description || "لا يوجد وصف مفصل متاح لهذا المشروع"}
                 </p>
               </div>
             </div>
+
+            {/* نموذج الحجز */}
+            <div className="flex flex-col gap-y-6">
+              <h2 className="pr-4 text-white font-bold rounded-md leading-6 bg-emerald-600 w-full h-10 flex items-center justify-start">
+                احجز الآن
+              </h2>
+              <p className="text-sm text-gray-600 font-normal">
+                احجز الآن وقم باختيار الوقت والتاريخ المناسب لك، وسيتم التواصل
+                معك لتأكيد الحجز وتقديم التفاصيل اللازمة.
+              </p>
+
+              <form
+                onSubmit={handleBookingSubmit}
+                className="flex flex-col gap-y-6 md:gap-y-8"
+              >
+                <div className="flex flex-row gap-x-4">
+                  <div className="flex flex-col gap-y-6 flex-1">
+                    <label
+                      htmlFor="name"
+                      className="text-gray-600 text-base font-bold leading-4"
+                    >
+                      الاسم
+                    </label>
+                    <input
+                      id="name"
+                      type="text"
+                      placeholder="ادخل الاسم"
+                      value={bookingForm.name}
+                      onChange={(e) =>
+                        handleInputChange("name", e.target.value)
+                      }
+                      className="w-full h-12 outline-none border border-gray-300 rounded-lg placeholder:text-sm px-2"
+                      name="name"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col gap-y-6 flex-1">
+                    <label
+                      htmlFor="phone"
+                      className="text-gray-600 text-base font-bold leading-4"
+                    >
+                      رقم الهاتف
+                    </label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      placeholder="ادخل رقم الهاتف"
+                      value={bookingForm.phone}
+                      onChange={(e) =>
+                        handleInputChange("phone", e.target.value)
+                      }
+                      className="w-full h-12 outline-none border border-gray-300 rounded-lg placeholder:text-sm px-2 text-end"
+                      name="phone"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-row gap-x-4">
+                  <div className="flex-1 flex flex-col gap-y-6 relative">
+                    <label
+                      htmlFor="date"
+                      className="text-gray-600 text-base font-bold leading-4"
+                    >
+                      التاريخ
+                    </label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-right font-normal cursor-pointer text-base font-medium text-gray-600 rounded-lg border border-gray-300 p-2 outline-none focus:border-emerald-600 h-12"
+                        >
+                          <CalendarIcon className="ml-2 h-4 w-4" />
+                          {selectedDate ? (
+                            format(selectedDate, "PPP", { locale: ar })
+                          ) : (
+                            <span className="text-gray-500">اختر التاريخ</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={setSelectedDate}
+                          initialFocus
+                          locale={ar}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div className="flex-1 flex flex-col gap-y-6 relative">
+                    <label
+                      htmlFor="time"
+                      className="text-gray-600 text-base font-bold leading-4"
+                    >
+                      الوقت
+                    </label>
+                    <div className="w-full relative">
+                      <input
+                        id="time"
+                        required
+                        className="order-1 w-full font-medium text-gray-600 rounded-lg border border-gray-300 p-2 outline-none pr-10 focus:border-emerald-600 h-12"
+                        type="time"
+                        value={selectedTime}
+                        onChange={(e) => setSelectedTime(e.target.value)}
+                        disabled={!selectedDate}
+                      />
+                      <div className="absolute pointer-events-none top-0 bottom-0 right-3 flex items-center order-2">
+                        <ClockIcon className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      {!selectedDate && (
+                        <div className="absolute top-0 left-0 w-full h-full bg-white/70 z-10 cursor-not-allowed rounded-lg" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-[200px] mx-auto h-12 rounded-md bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition-colors"
+                >
+                  تأكيد الحجز
+                </button>
+              </form>
+            </div>
           </div>
 
-          {/* العقارات المشابهة */}
+          {/* المشاريع المشابهة */}
           <div className="flex-1">
             <div>
               <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
-                عقارات مشابهة
+                مشاريع مشابهة
               </h3>
 
-              {/* عرض العقارات المشابهة للديسكتوب */}
+              {/* عرض المشاريع المشابهة للديسكتوب */}
               <div className="hidden md:block space-y-8">
                 {loadingSimilar ? (
                   <div className="space-y-4">
@@ -983,24 +992,24 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     ))}
                   </div>
                 ) : (
-                  similarProperties.map((similarProperty) => (
+                  similarProjects.map((similarProject) => (
                     <div
-                      key={similarProperty.id}
+                      key={similarProject.id}
                       className="flex mb-8 gap-x-6 h-48 w-full rounded-xl px-4 border border-gray-200 shadow-lg"
                     >
                       <div className="flex-[48.6%] py-8 flex flex-col gap-y-4 justify-center">
                         <h4 className="text-ellipsis overflow-hidden font-bold text-xl text-gray-600">
-                          {similarProperty.title}
+                          {similarProject.title}
                         </h4>
                         <p className="text-ellipsis font-bold text-base text-gray-600 leading-5">
-                          {similarProperty.district}
+                          {similarProject.district}
                         </p>
                         <div className="flex flex-row items-center justify-between">
                           <p className="flex items-center justify-center leading-6 font-bold text-xl">
-                            {similarProperty.price} ريال
+                            {similarProject.price} ريال
                           </p>
                           <Link
-                            href={`/property/${similarProperty.slug || similarProperty.id}`}
+                            href={`/project/${similarProject.slug || similarProject.id}`}
                             className="font-bold text-lg text-emerald-600 hover:text-emerald-700"
                           >
                             تفاصيل
@@ -1012,21 +1021,21 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                           <div className="flex flex-row items-center justify-center gap-x-1">
                             <div className="w-4 h-4 bg-gray-400 rounded"></div>
                             <p className="text-sm md:text-base font-bold text-gray-600">
-                              {similarProperty.views}
+                              {similarProject.views}
                             </p>
                           </div>
                           <div className="flex flex-row items-center justify-center gap-x-1">
                             <div className="w-4 h-4 bg-gray-400 rounded"></div>
                             <p className="text-sm md:text-base font-bold text-gray-600">
-                              {similarProperty.bedrooms > 0
-                                ? similarProperty.bedrooms
+                              {similarProject.bedrooms > 0
+                                ? similarProject.bedrooms
                                 : 0}
                             </p>
                           </div>
                         </div>
                         <Image
-                          src={similarProperty.image}
-                          alt="RealEstate Image"
+                          src={similarProject.image}
+                          alt="Project Image"
                           fill
                           className="w-full h-full object-cover rounded-lg overflow-hidden relative -z-10"
                         />
@@ -1041,7 +1050,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 )}
               </div>
 
-              {/* عرض العقارات المشابهة للموبايل */}
+              {/* عرض المشاريع المشابهة للموبايل */}
               <div className="block md:hidden">
                 <div className="flex gap-4 overflow-x-auto">
                   {loadingSimilar
@@ -1056,32 +1065,32 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                           <div className="h-4 bg-gray-200 rounded w-1/3 mt-4"></div>
                         </div>
                       ))
-                    : similarProperties.map((similarProperty) => (
+                    : similarProjects.map((similarProject) => (
                         <Link
-                          key={similarProperty.id}
-                          href={`/property/${similarProperty.slug || similarProperty.id}`}
+                          key={similarProject.id}
+                          href={`/project/${similarProject.slug || similarProject.id}`}
                         >
                           <div className="relative h-88 md:h-91 flex flex-col justify-center min-w-[280px]">
                             <div className="bg-white z-40 absolute w-36 mt-3 h-7 md:w-46 md:h-9 flex items-center justify-between px-3 top-4 md:top-5 lg:top-4 right-2 rounded-md">
                               <div className="flex flex-row items-center justify-center gap-x-1">
                                 <div className="w-4 h-4 bg-gray-400 rounded"></div>
                                 <p className="text-sm md:text-base font-bold text-gray-600">
-                                  {similarProperty.views}
+                                  {similarProject.views}
                                 </p>
                               </div>
                               <div className="flex flex-row items-center justify-center gap-x-1">
                                 <div className="w-4 h-4 bg-gray-400 rounded"></div>
                                 <p className="text-sm md:text-base font-bold text-gray-600">
-                                  {similarProperty.bedrooms > 0
-                                    ? similarProperty.bedrooms
+                                  {similarProject.bedrooms > 0
+                                    ? similarProject.bedrooms
                                     : 0}
                                 </p>
                               </div>
                             </div>
                             <figure className="relative w-full h-64 flex items-center justify-center rounded-2xl overflow-hidden">
                               <Image
-                                src={similarProperty.image}
-                                alt="RealEstateImage"
+                                src={similarProject.image}
+                                alt="ProjectImage"
                                 width={800}
                                 height={600}
                                 className="w-full h-full object-cover"
@@ -1095,14 +1104,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               </div>
                             </figure>
                             <p className="text-gray-800 pt-4 text-base md:text-lg xl:text-xl font-normal leading-5 xl:leading-6 text-ellipsis overflow-hidden">
-                              {similarProperty.title}
+                              {similarProject.title}
                             </p>
                             <p className="text-gray-500 pt-2 font-normal text-sm xl:text-base text-ellipsis overflow-hidden leading-4 xl:leading-5">
-                              {similarProperty.district}
+                              {similarProject.district}
                             </p>
                             <div className="flex flex-row items-center justify-between pt-4">
                               <p className="text-ellipsis overflow-hidden text-gray-800 font-bold text-base leading-5 md:text-lg xl:text-xl xl:leading-6">
-                                {similarProperty.price} ريال
+                                {similarProject.price} ريال
                               </p>
                               <p className="text-emerald-600 font-bold text-base leading-5 xl:leading-6 xl:text-lg">
                                 تفاصيل
@@ -1121,8 +1130,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
       {/* Dialog لعرض الصورة المكبرة */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-5xl max-h-[90vh] p-0">
-          <DialogTitle className="sr-only">عرض صورة العقار</DialogTitle>
-          {selectedImage && selectedImage.trim() !== "" && property && (
+          <DialogTitle className="sr-only">عرض صورة المشروع</DialogTitle>
+          {selectedImage && selectedImage.trim() !== "" && project && (
             <div
               className="relative w-full h-[80vh] group"
               onTouchStart={handleTouchStart}
@@ -1131,7 +1140,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             >
               <Image
                 src={selectedImage}
-                alt={property.title || "صورة العقار"}
+                alt={project.title || "صورة المشروع"}
                 fill
                 className="object-contain rounded-lg"
               />
@@ -1155,7 +1164,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
               {/* عداد الصور */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                {selectedImageIndex + 1} / {propertyImages.length}
+                {selectedImageIndex + 1} / {projectImages.length}
               </div>
             </div>
           )}

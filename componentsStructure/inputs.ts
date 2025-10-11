@@ -146,6 +146,25 @@ export const inputsStructure: ComponentStructure = {
               defaultValue: "/api/submit-form",
               placeholder: "Enter API endpoint URL",
             },
+            {
+              key: "apiMethod",
+              label: "HTTP Method",
+              type: "select",
+              options: [
+                { value: "POST", label: "POST" },
+                { value: "PUT", label: "PUT" },
+                { value: "PATCH", label: "PATCH" },
+              ],
+              defaultValue: "POST",
+            },
+            {
+              key: "apiHeaders",
+              label: "Custom Headers (JSON)",
+              type: "textarea",
+              placeholder:
+                '{"Content-Type": "application/json", "Authorization": "Bearer token"}',
+              defaultValue: '{"Content-Type": "application/json"}',
+            },
           ],
         },
         {
