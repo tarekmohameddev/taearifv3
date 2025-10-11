@@ -11,6 +11,16 @@ import {
   BuildingIcon,
   UsersIcon,
   HomeIcon,
+  DollarSignIcon,
+  CreditCardIcon,
+  CalendarDaysIcon,
+  PlayIcon,
+  LayersIcon,
+  ArrowUpDownIcon,
+  RulerIcon,
+  TagIcon,
+  WrenchIcon,
+  StarIcon,
 } from "lucide-react";
 
 interface Project {
@@ -593,47 +603,47 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
               <div className="grid grid-cols-2 gap-y-6 lg:gap-y-10">
                 {/* عنوان المشروع */}
                 {project.address && project.address.trim() !== "" && (
-                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                    <div className="flex flex-row gap-x-2">
+                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                  <div className="flex flex-row gap-x-2">
                       <MapPinIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         العنوان:
-                      </p>
-                    </div>
-                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.address}
                     </p>
                   </div>
+                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.address}
+                  </p>
+                </div>
                 )}
 
                 {/* المطور */}
                 {project.developer && project.developer.trim() !== "" && (
-                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                    <div className="flex flex-row gap-x-2">
+                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                  <div className="flex flex-row gap-x-2">
                       <BuildingIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         المطور:
-                      </p>
-                    </div>
-                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.developer}
                     </p>
                   </div>
+                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.developer}
+                  </p>
+                </div>
                 )}
 
                 {/* عدد الوحدات */}
                 {project.units && project.units > 0 && (
-                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                    <div className="flex flex-row gap-x-2">
+                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                  <div className="flex flex-row gap-x-2">
                       <HomeIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         عدد الوحدات:
-                      </p>
-                    </div>
-                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.units} وحدة
                     </p>
                   </div>
+                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.units} وحدة
+                  </p>
+                </div>
                 )}
 
                 {/* تاريخ التسليم */}
@@ -655,7 +665,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.completeStatus && project.completeStatus.trim() !== "" && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                      <WrenchIcon className="w-4 h-4 text-emerald-600" />
                       <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         حالة الإكمال:
                       </p>
@@ -670,7 +680,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.minPrice && project.minPrice.trim() !== "" && parseFloat(project.minPrice) > 0 && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                      <DollarSignIcon className="w-4 h-4 text-emerald-600" />
                       <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         السعر الأدنى:
                       </p>
@@ -685,7 +695,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.maxPrice && project.maxPrice.trim() !== "" && parseFloat(project.maxPrice) > 0 && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                      <DollarSignIcon className="w-4 h-4 text-emerald-600" />
                       <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         السعر الأعلى:
                       </p>
@@ -700,7 +710,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.videoUrl && project.videoUrl.trim() !== "" && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                      <PlayIcon className="w-4 h-4 text-emerald-600" />
                       <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         فيديو المشروع:
                       </p>
@@ -774,7 +784,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   <div className="col-span-2">
                     <div className="flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                        <StarIcon className="w-4 h-4 text-emerald-600" />
                         <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                           المرافق:
                         </p>
@@ -798,7 +808,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   <div className="col-span-2">
                     <div className="flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                        <WrenchIcon className="w-4 h-4 text-emerald-600" />
                         <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                           المواصفات:
                         </p>
@@ -822,7 +832,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   <div className="col-span-2">
                     <div className="flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                        <TagIcon className="w-4 h-4 text-emerald-600" />
                         <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                           الأنواع:
                         </p>
@@ -872,7 +882,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.createdAt && (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                      <CalendarDaysIcon className="w-4 h-4 text-emerald-600" />
                       <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         تاريخ الإضافة:
                       </p>
@@ -883,53 +893,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   </div>
                 )}
 
-                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                  <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                      عدد الغرف:
-                    </p>
-                  </div>
-                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {project.bedrooms && project.bedrooms > 0 ? project.bedrooms : "غير محدد"}
-                  </p>
-                </div>
 
-                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                  <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                      الحمامات:
-                    </p>
-                  </div>
-                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {project.bathrooms && project.bathrooms > 0
-                      ? project.bathrooms
-                      : "غير محدد"}
-                  </p>
-                </div>
 
-                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                  <div className="flex flex-row gap-x-2">
-                    <MapPinIcon className="w-4 h-4 text-emerald-600" />
-                  </div>
-                  {project.location &&
-                  project.location.lat &&
-                  project.location.lng ? (
-                    <a
-                      href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-bold leading-4 text-xs xs:text-sm md:text-base text-emerald-600 underline"
-                    >
-                      عرض العنوان
-                    </a>
-                  ) : (
-                    <span className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.location?.address || "العنوان غير متاح"}
-                    </span>
-                  )}
-                </div>
               </div>
             </div>
           </div>
@@ -1020,7 +985,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 <div className="mt-8">
               <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
                     مخططات الأرضية
-                  </h3>
+                </h3>
                   <div className="grid grid-cols-2 gap-4">
                     {project.floorplans
                       .filter(plan => plan && plan.trim() !== "")
@@ -1041,16 +1006,16 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                         <div className="absolute bottom-1 right-1 opacity-50">
                           <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
                             <span className="text-white text-xs">مخطط</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  </div>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
+                    ))}
+                  </div>
+                      </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
         {/* القسم السفلي */}
         <div className="flex flex-col md:flex-row gap-x-6 gap-y-8">

@@ -10,6 +10,30 @@ import {
   ChevronRightIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  HomeIcon,
+  BuildingIcon,
+  CarIcon,
+  CreditCardIcon,
+  DollarSignIcon,
+  CalendarDaysIcon,
+  LayersIcon,
+  ArrowUpDownIcon,
+  BedIcon,
+  BathIcon,
+  ChefHatIcon,
+  SofaIcon,
+  UsersIcon,
+  UtensilsIcon,
+  UserIcon,
+  Car,
+  PackageIcon,
+  Layers,
+  WavesIcon,
+  SquareIcon,
+  TreePineIcon,
+  ArrowUpDown,
+  ParkingCircleIcon,
+  RulerIcon,
 } from "lucide-react";
 
 interface Property {
@@ -725,7 +749,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             <div className="grid grid-cols-2 gap-y-6 lg:gap-y-10">
               <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                 <div className="flex flex-row gap-x-2">
-                  <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                  <HomeIcon className="w-4 h-4 text-emerald-600" />
                   <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                     نوع العرض:
                   </p>
@@ -738,7 +762,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.area && parseFloat(property.area) > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <RulerIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       المساحة:
                     </p>
@@ -751,7 +775,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
               <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                 <div className="flex flex-row gap-x-2">
-                  <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                  <BuildingIcon className="w-4 h-4 text-emerald-600" />
                   <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                     نوع العقار:
                   </p>
@@ -764,7 +788,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.payment_method && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <CreditCardIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       طريقة الدفع:
                     </p>
@@ -784,7 +808,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.pricePerMeter && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <DollarSignIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       السعر للمتر:
                     </p>
@@ -798,7 +822,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.building_age && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <CalendarDaysIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       عمر المبنى:
                     </p>
@@ -812,7 +836,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.floors && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <LayersIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       عدد الطوابق:
                     </p>
@@ -826,7 +850,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.floor_number && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <ArrowUpDownIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       رقم الطابق:
                     </p>
@@ -840,7 +864,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.bedrooms > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <BedIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       عدد الغرف:
                     </p>
@@ -854,7 +878,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.bathrooms && property.bathrooms > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <BathIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       الحمامات:
                     </p>
@@ -868,7 +892,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.kitchen && property.kitchen > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <ChefHatIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       المطابخ:
                     </p>
@@ -882,7 +906,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.living_room && property.living_room > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <SofaIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       الصالات:
                     </p>
@@ -896,7 +920,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.majlis && property.majlis > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <UsersIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       المجالس:
                     </p>
@@ -910,7 +934,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.dining_room && property.dining_room > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <UtensilsIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       غرف الطعام:
                     </p>
@@ -924,7 +948,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.maid_room && property.maid_room > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <UserIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       غرف الخدم:
                     </p>
@@ -938,7 +962,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.driver_room && property.driver_room > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <CarIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       غرف السائق:
                     </p>
@@ -952,7 +976,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.storage_room && property.storage_room > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <PackageIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       المخازن:
                     </p>
@@ -966,7 +990,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.basement && property.basement > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <Layers className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       القبو:
                     </p>
@@ -980,7 +1004,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.swimming_pool && property.swimming_pool > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <WavesIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       المسبح:
                     </p>
@@ -994,7 +1018,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.balcony && property.balcony > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <SquareIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       الشرفات:
                     </p>
@@ -1008,7 +1032,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.garden && property.garden > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <TreePineIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       الحدائق:
                     </p>
@@ -1022,7 +1046,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.elevator && property.elevator > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <ArrowUpDown className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       المصاعد:
                     </p>
@@ -1036,7 +1060,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.private_parking && property.private_parking > 0 && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <ParkingCircleIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       مواقف السيارات:
                     </p>
@@ -1050,7 +1074,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.length && property.width && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <div className="w-4 h-4 bg-emerald-600 rounded"></div>
+                    <RulerIcon className="w-4 h-4 text-emerald-600" />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       الأبعاد:
                     </p>
