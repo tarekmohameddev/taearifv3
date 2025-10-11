@@ -465,7 +465,7 @@ export function UpdatedAddRentalForm({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 p-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <h4 className="font-semibold text-lg text-gray-900 border-b border-gray-200 pb-2">
