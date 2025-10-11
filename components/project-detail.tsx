@@ -1003,11 +1003,15 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                     </div>
                   </div>
                 )}
-                                  <div className="absolute bottom-2 right-2 opacity-50">
-  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-    <span className="text-white text-sm font-bold whitespace-nowrap">
-      تعاريف
-    </span>
+                                  <div className="absolute bottom-2 right-2 opacity-80">
+  <div className="w-24 h-fit bg-white/20 rounded flex items-center justify-center">
+    <Image
+      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+      alt="تعاريف العقارية"
+      width={160}
+      height={80}
+      className="object-contain"
+    />
   </div>
 </div>
               </div>
@@ -1037,11 +1041,15 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           }`}
                           onClick={() => handleThumbnailClick(imageSrc, index)}
                         />
-                                                          <div className="absolute bottom-2 right-2 opacity-50">
+                                                          <div className="absolute bottom-2 right-2 opacity-80">
   <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-    <span className="text-white text-sm font-bold whitespace-nowrap">
-      تعاريف
-    </span>
+    <Image
+      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+      alt="تعاريف العقارية"
+      width={160}
+      height={80}
+      className="object-contain"
+    />
   </div>
 </div>
                       </div>
@@ -1170,9 +1178,13 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                         />
                                   <div className="absolute bottom-2 right-2 opacity-50">
   <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-    <span className="text-white text-sm font-bold whitespace-nowrap">
-      تعاريف
-    </span>
+    <Image
+      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+      alt="تعاريف العقارية"
+      width={160}
+      height={80}
+      className="object-contain"
+    />
   </div>
 </div>
                       </figure>
@@ -1228,9 +1240,13 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                               />
                                   <div className="absolute bottom-2 right-2 opacity-50">
   <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-    <span className="text-white text-sm font-bold whitespace-nowrap">
-      تعاريف
-    </span>
+    <Image
+      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+      alt="تعاريف العقارية"
+      width={160}
+      height={80}
+      className="object-contain"
+    />
   </div>
 </div>
                             </figure>

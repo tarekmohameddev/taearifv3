@@ -356,9 +356,21 @@ export default function StaticFooter({
           {mergedData.content.companyInfo.enabled && (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="grid size-10 place-items-center rounded-full border border-emerald-500">
-                  <MapPin className="size-5" />
-                </div>
+                {mergedData.content.companyInfo.logo ? (
+                  <div className="flex ">
+                    <Image
+                      src={mergedData.content.companyInfo.logo}
+                      alt={mergedData.content.companyInfo.name}
+                      width={100}
+                      height={100}
+                      className="rounded-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="grid size-10 place-items-center rounded-full border border-emerald-500">
+                    <MapPin className="size-5" />
+                  </div>
+                )}
                 <div>
                   <h3
                     className={`text-lg font-${mergedData.styling.typography.titleWeight} text-white`}
