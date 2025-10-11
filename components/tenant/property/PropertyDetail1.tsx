@@ -762,12 +762,12 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   </div>
                 )}
                 <div className="absolute bottom-2 right-2 opacity-50">
-                  <div className="w-12 h-12 bg-white/20 rounded flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">
-                      دليل الجواء
-                    </span>
-                  </div>
-                </div>
+  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+    <span className="text-white text-sm font-bold whitespace-nowrap">
+      تعاريف
+    </span>
+  </div>
+</div>
               </div>
 
               {/* نص توضيحي - يظهر فقط عند وجود صور إضافية */}
@@ -795,11 +795,13 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                           }`}
                           onClick={() => handleThumbnailClick(imageSrc, index)}
                         />
-                        <div className="absolute bottom-1 right-1 opacity-50">
-                          <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
-                            <span className="text-white text-xs">دليل</span>
-                          </div>
-                        </div>
+                        <div className="absolute bottom-2 right-2 opacity-50">
+  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+    <span className="text-white text-sm font-bold whitespace-nowrap">
+      تعاريف
+    </span>
+  </div>
+</div>
                       </div>
                     ))}
                   space={16}
@@ -1499,11 +1501,13 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               fill
                               className="w-full h-full object-cover rounded-lg overflow-hidden relative -z-10"
                             />
-                            <div className="absolute bottom-5 right-2 opacity-50">
-                              <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
-                                <span className="text-white text-xs">دليل</span>
-                              </div>
-                            </div>
+                            <div className="absolute bottom-2 right-2 opacity-50">
+  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+    <span className="text-white text-sm font-bold whitespace-nowrap">
+      تعاريف
+    </span>
+  </div>
+</div>
                           </figure>
                         </div>
                       ))
@@ -1554,12 +1558,12 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                                     className="w-full h-full object-cover"
                                   />
                                   <div className="absolute bottom-2 right-2 opacity-50">
-                                    <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
-                                      <span className="text-white text-xs">
-                                        دليل
-                                      </span>
-                                    </div>
-                                  </div>
+  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+    <span className="text-white text-sm font-bold whitespace-nowrap">
+      تعاريف
+    </span>
+  </div>
+</div>
                                 </figure>
                                 <p className="text-gray-800 pt-4 text-base md:text-lg xl:text-xl font-normal leading-5 xl:leading-6 text-ellipsis overflow-hidden">
                                   {similarProperty.title}
