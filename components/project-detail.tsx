@@ -212,14 +212,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
 
   // Sharing functions
   const getCurrentUrl = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return window.location.href;
     }
-    return '';
+    return "";
   };
 
   const getShareText = () => {
-    if (!project) return '';
+    if (!project) return "";
     return `شاهد هذا المشروع العقاري الرائع: ${project.title} - ${project.address || project.district}`;
   };
 
@@ -227,35 +227,35 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
     const url = getCurrentUrl();
     const text = getShareText();
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
-    window.open(facebookUrl, '_blank', 'width=600,height=400');
+    window.open(facebookUrl, "_blank", "width=600,height=400");
   };
 
   const shareToTwitter = () => {
     const url = getCurrentUrl();
     const text = getShareText();
     const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-    window.open(twitterUrl, '_blank', 'width=600,height=400');
+    window.open(twitterUrl, "_blank", "width=600,height=400");
   };
 
   const shareToLinkedIn = () => {
     const url = getCurrentUrl();
     const text = getShareText();
     const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
-    window.open(linkedinUrl, '_blank', 'width=600,height=400');
+    window.open(linkedinUrl, "_blank", "width=600,height=400");
   };
 
   const shareToWhatsApp = () => {
     const url = getCurrentUrl();
     const text = getShareText();
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
-    window.open(whatsappUrl, '_blank');
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`;
+    window.open(whatsappUrl, "_blank");
   };
 
   const shareToTelegram = () => {
     const url = getCurrentUrl();
     const text = getShareText();
     const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-    window.open(telegramUrl, '_blank');
+    window.open(telegramUrl, "_blank");
   };
 
   const copyToClipboard = async () => {
@@ -265,7 +265,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      console.error("Failed to copy: ", err);
     }
   };
 
@@ -617,7 +617,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   مشروع عقاري
                 </h1>
                 <div className="sharesocials flex flex-row gap-x-6" dir="ltr">
-                  <button 
+                  <button
                     className="cursor-pointer"
                     onClick={() => setIsShareDialogOpen(true)}
                   >
@@ -634,31 +634,40 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 <p className="font-bold text-gray-600 text-xl leading-6 md:leading-7">
                   {project.title}
                 </p>
-                {(project.minPrice && project.minPrice.trim() !== "" && parseFloat(project.minPrice) > 0) || 
-                 (project.maxPrice && project.maxPrice.trim() !== "" && parseFloat(project.maxPrice) > 0) || 
-                 (project.price && project.price.trim() !== "") ? (
+                {(project.minPrice &&
+                  project.minPrice.trim() !== "" &&
+                  parseFloat(project.minPrice) > 0) ||
+                (project.maxPrice &&
+                  project.maxPrice.trim() !== "" &&
+                  parseFloat(project.maxPrice) > 0) ||
+                (project.price && project.price.trim() !== "") ? (
                   <p className="text-emerald-600 text-2xl leading-7 font-bold md:text-3xl lg:leading-9 flex items-center gap-2">
-                    {project.minPrice && project.maxPrice && parseFloat(project.minPrice) > 0 && parseFloat(project.maxPrice) > 0 ? (
+                    {project.minPrice &&
+                    project.maxPrice &&
+                    parseFloat(project.minPrice) > 0 &&
+                    parseFloat(project.maxPrice) > 0 ? (
                       <>
                         {project.minPrice} - {project.maxPrice}
-                        <img 
-                          src="/Saudi_Riyal_Symbol.svg" 
-                          alt="ريال سعودي" 
+                        <img
+                          src="/Saudi_Riyal_Symbol.svg"
+                          alt="ريال سعودي"
                           className="w-6 h-6"
                           style={{
-                            filter: 'brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)'
+                            filter:
+                              "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)",
                           }}
                         />
                       </>
                     ) : project.price ? (
                       <>
                         {project.price}
-                        <img 
-                          src="/Saudi_Riyal_Symbol.svg" 
-                          alt="ريال سعودي" 
+                        <img
+                          src="/Saudi_Riyal_Symbol.svg"
+                          alt="ريال سعودي"
                           className="w-6 h-6"
                           style={{
-                            filter: 'brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)'
+                            filter:
+                              "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)",
                           }}
                         />
                       </>
@@ -674,108 +683,118 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
               <div className="grid grid-cols-2 gap-y-6 lg:gap-y-10">
                 {/* عنوان المشروع */}
                 {project.address && project.address.trim() !== "" && (
-                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                  <div className="flex flex-row gap-x-2">
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
                       <MapPinIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         العنوان:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.address}
                     </p>
                   </div>
-                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.address}
-                  </p>
-                </div>
                 )}
 
                 {/* المطور */}
                 {project.developer && project.developer.trim() !== "" && (
-                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                  <div className="flex flex-row gap-x-2">
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
                       <BuildingIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         المطور:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.developer}
                     </p>
                   </div>
-                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.developer}
-                  </p>
-                </div>
                 )}
 
                 {/* عدد الوحدات */}
                 {project.units && project.units > 0 && (
-                <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                  <div className="flex flex-row gap-x-2">
+                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                    <div className="flex flex-row gap-x-2">
                       <HomeIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                         عدد الوحدات:
+                      </p>
+                    </div>
+                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                      {project.units} وحدة
                     </p>
                   </div>
-                  <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.units} وحدة
-                  </p>
-                </div>
                 )}
 
                 {/* تاريخ التسليم */}
-                {project.completionDate && project.completionDate.trim() !== "" && (
-                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                    <div className="flex flex-row gap-x-2">
-                      <CalendarIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                        تاريخ التسليم:
+                {project.completionDate &&
+                  project.completionDate.trim() !== "" && (
+                    <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                      <div className="flex flex-row gap-x-2">
+                        <CalendarIcon className="w-4 h-4 text-emerald-600" />
+                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                          تاريخ التسليم:
+                        </p>
+                      </div>
+                      <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                        {new Date(project.completionDate).toLocaleDateString(
+                          "ar-US",
+                        )}
                       </p>
                     </div>
-                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {new Date(project.completionDate).toLocaleDateString("ar-US")}
-                    </p>
-                  </div>
-                )}
+                  )}
 
                 {/* حالة الإكمال */}
-                {project.completeStatus && project.completeStatus.trim() !== "" && (
-                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                    <div className="flex flex-row gap-x-2">
-                      <WrenchIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                        حالة الإكمال:
+                {project.completeStatus &&
+                  project.completeStatus.trim() !== "" && (
+                    <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                      <div className="flex flex-row gap-x-2">
+                        <WrenchIcon className="w-4 h-4 text-emerald-600" />
+                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                          حالة الإكمال:
+                        </p>
+                      </div>
+                      <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                        {project.completeStatus === "1"
+                          ? "مكتمل"
+                          : "قيد الإنشاء"}
                       </p>
                     </div>
-                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.completeStatus === "1" ? "مكتمل" : "قيد الإنشاء"}
-                    </p>
-                  </div>
-                )}
+                  )}
 
                 {/* السعر الأدنى */}
-                {project.minPrice && project.minPrice.trim() !== "" && parseFloat(project.minPrice) > 0 && (
-                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                    <div className="flex flex-row gap-x-2">
-                      <DollarSignIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                        السعر الأدنى:
+                {project.minPrice &&
+                  project.minPrice.trim() !== "" &&
+                  parseFloat(project.minPrice) > 0 && (
+                    <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                      <div className="flex flex-row gap-x-2">
+                        <DollarSignIcon className="w-4 h-4 text-emerald-600" />
+                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                          السعر الأدنى:
+                        </p>
+                      </div>
+                      <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                        {project.minPrice} ريال
                       </p>
                     </div>
-                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.minPrice} ريال
-                    </p>
-                  </div>
-                )}
+                  )}
 
                 {/* السعر الأعلى */}
-                {project.maxPrice && project.maxPrice.trim() !== "" && parseFloat(project.maxPrice) > 0 && (
-                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                    <div className="flex flex-row gap-x-2">
-                      <DollarSignIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                        السعر الأعلى:
+                {project.maxPrice &&
+                  project.maxPrice.trim() !== "" &&
+                  parseFloat(project.maxPrice) > 0 && (
+                    <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                      <div className="flex flex-row gap-x-2">
+                        <DollarSignIcon className="w-4 h-4 text-emerald-600" />
+                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                          السعر الأعلى:
+                        </p>
+                      </div>
+                      <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                        {project.maxPrice} ريال
                       </p>
                     </div>
-                    <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.maxPrice} ريال
-                    </p>
-                  </div>
-                )}
+                  )}
 
                 {/* فيديو المشروع */}
                 {project.videoUrl && project.videoUrl.trim() !== "" && (
@@ -798,27 +817,30 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 )}
 
                 {/* الموقع */}
-                {project.location && ((project.location.lat && project.location.lng) || (project.location.address && project.location.address.trim() !== "")) && (
-                  <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
-                    <div className="flex flex-row gap-x-2">
-                      <MapPinIcon className="w-4 h-4 text-emerald-600" />
+                {project.location &&
+                  ((project.location.lat && project.location.lng) ||
+                    (project.location.address &&
+                      project.location.address.trim() !== "")) && (
+                    <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
+                      <div className="flex flex-row gap-x-2">
+                        <MapPinIcon className="w-4 h-4 text-emerald-600" />
+                      </div>
+                      {project.location.lat && project.location.lng ? (
+                        <a
+                          href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-bold leading-4 text-xs xs:text-sm md:text-base text-emerald-600 underline"
+                        >
+                          عرض الموقع
+                        </a>
+                      ) : (
+                        <span className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
+                          {project.location.address}
+                        </span>
+                      )}
                     </div>
-                    {project.location.lat && project.location.lng ? (
-                      <a
-                        href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-bold leading-4 text-xs xs:text-sm md:text-base text-emerald-600 underline"
-                      >
-                        عرض الموقع
-                      </a>
-                    ) : (
-                      <span className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                        {project.location.address}
-                      </span>
-                    )}
-                  </div>
-                )}
+                  )}
 
                 {/* تاريخ الإنشاء */}
                 {project.createdAt && project.createdAt.trim() !== "" && (
@@ -875,28 +897,31 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 )}
 
                 {/* المواصفات */}
-                {project.specifications && project.specifications.length > 0 && (
-                  <div className="col-span-2">
-                    <div className="flex flex-row gap-x-2 md:gap-x-6">
-                      <div className="flex flex-row gap-x-2">
-                        <WrenchIcon className="w-4 h-4 text-emerald-600" />
-                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
-                          المواصفات:
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {project.specifications.map((spec, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
-                          >
-                            {typeof spec === 'object' ? spec.name || spec.title : spec}
-                          </span>
-                        ))}
+                {project.specifications &&
+                  project.specifications.length > 0 && (
+                    <div className="col-span-2">
+                      <div className="flex flex-row gap-x-2 md:gap-x-6">
+                        <div className="flex flex-row gap-x-2">
+                          <WrenchIcon className="w-4 h-4 text-emerald-600" />
+                          <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                            المواصفات:
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {project.specifications.map((spec, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+                            >
+                              {typeof spec === "object"
+                                ? spec.name || spec.title
+                                : spec}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* الأنواع */}
                 {project.types && project.types.length > 0 && (
@@ -914,7 +939,9 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                             key={index}
                             className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
                           >
-                            {typeof type === 'object' ? type.name || type.title : type}
+                            {typeof type === "object"
+                              ? type.name || type.title
+                              : type}
                           </span>
                         ))}
                       </div>
@@ -963,9 +990,6 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                     </p>
                   </div>
                 )}
-
-
-
               </div>
             </div>
           </div>
@@ -1003,17 +1027,17 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                     </div>
                   </div>
                 )}
-                                  <div className="absolute bottom-2 right-2 opacity-80">
-  <div className="w-24 h-fit bg-white/20 rounded flex items-center justify-center">
-    <Image
-      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-      alt="تعاريف العقارية"
-      width={160}
-      height={80}
-      className="object-contain"
-    />
-  </div>
-</div>
+                <div className="absolute bottom-2 right-2 opacity-80">
+                  <div className="w-24 h-fit bg-white/20 rounded flex items-center justify-center">
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+                      alt="تعاريف العقارية"
+                      width={160}
+                      height={80}
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* نص توضيحي - يظهر فقط عند وجود صور إضافية */}
@@ -1041,17 +1065,17 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           }`}
                           onClick={() => handleThumbnailClick(imageSrc, index)}
                         />
-                                                          <div className="absolute bottom-2 right-2 opacity-80">
-  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-    <Image
-      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-      alt="تعاريف العقارية"
-      width={160}
-      height={80}
-      className="object-contain"
-    />
-  </div>
-</div>
+                        <div className="absolute bottom-2 right-2 opacity-80">
+                          <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+                              alt="تعاريف العقارية"
+                              width={160}
+                              height={80}
+                              className="object-contain"
+                            />
+                          </div>
+                        </div>
                       </div>
                     ))}
                   space={16}
@@ -1062,45 +1086,48 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
               )}
 
               {/* مخططات الأرضية */}
-              {project.floorplans && project.floorplans.length > 0 && project.floorplans.some(plan => plan && plan.trim() !== "") && (
-                <div className="mt-8">
-              <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
-                    مخططات الأرضية
-                </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {project.floorplans
-                      .filter(plan => plan && plan.trim() !== "")
-                      .map((floorplan, index) => (
-                      <div key={index} className="relative group">
-                        <Image
-                          src={floorplan}
-                          alt={`مخطط الأرضية ${index + 1}`}
-                          width={200}
-                          height={150}
-                          className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                          onClick={() => {
-                            setSelectedImage(floorplan);
-                            setSelectedImageIndex(0);
-                            setIsDialogOpen(true);
-                          }}
-                        />
-                        <div className="absolute bottom-1 right-1 opacity-50">
-                          <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
-                            <span className="text-white text-xs">مخطط</span>
-                  </div>
-                  </div>
-                </div>
-                    ))}
-                  </div>
-                      </div>
-                      )}
+              {project.floorplans &&
+                project.floorplans.length > 0 &&
+                project.floorplans.some(
+                  (plan) => plan && plan.trim() !== "",
+                ) && (
+                  <div className="mt-8">
+                    <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                      مخططات الأرضية
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      {project.floorplans
+                        .filter((plan) => plan && plan.trim() !== "")
+                        .map((floorplan, index) => (
+                          <div key={index} className="relative group">
+                            <Image
+                              src={floorplan}
+                              alt={`مخطط الأرضية ${index + 1}`}
+                              width={200}
+                              height={150}
+                              className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                              onClick={() => {
+                                setSelectedImage(floorplan);
+                                setSelectedImageIndex(0);
+                                setIsDialogOpen(true);
+                              }}
+                            />
+                            <div className="absolute bottom-1 right-1 opacity-50">
+                              <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
+                                <span className="text-white text-xs">مخطط</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                     </div>
                   </div>
-                </div>
+                )}
+            </div>
+          </div>
+        </div>
 
         {/* القسم السفلي */}
         <div className="flex flex-col md:flex-row gap-x-6 gap-y-8">
-
           {/* المشاريع المشابهة */}
           <div className="flex-1">
             <div>
@@ -1164,7 +1191,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           <div className="flex flex-row items-center justify-center gap-x-1">
                             <div className="w-4 h-4 bg-gray-400 rounded"></div>
                             <p className="text-sm md:text-base font-bold text-gray-600">
-                              {similarProject.bedrooms && similarProject.bedrooms > 0
+                              {similarProject.bedrooms &&
+                              similarProject.bedrooms > 0
                                 ? similarProject.bedrooms
                                 : 0}
                             </p>
@@ -1176,17 +1204,17 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           fill
                           className="w-full h-full object-cover rounded-lg overflow-hidden relative -z-10"
                         />
-                                  <div className="absolute bottom-2 right-2 opacity-50">
-  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-    <Image
-      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-      alt="تعاريف العقارية"
-      width={160}
-      height={80}
-      className="object-contain"
-    />
-  </div>
-</div>
+                        <div className="absolute bottom-2 right-2 opacity-50">
+                          <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+                              alt="تعاريف العقارية"
+                              width={160}
+                              height={80}
+                              className="object-contain"
+                            />
+                          </div>
+                        </div>
                       </figure>
                     </div>
                   ))
@@ -1224,7 +1252,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                               <div className="flex flex-row items-center justify-center gap-x-1">
                                 <div className="w-4 h-4 bg-gray-400 rounded"></div>
                                 <p className="text-sm md:text-base font-bold text-gray-600">
-                                  {similarProject.bedrooms && similarProject.bedrooms > 0
+                                  {similarProject.bedrooms &&
+                                  similarProject.bedrooms > 0
                                     ? similarProject.bedrooms
                                     : 0}
                                 </p>
@@ -1238,17 +1267,17 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                                 height={600}
                                 className="w-full h-full object-cover"
                               />
-                                  <div className="absolute bottom-2 right-2 opacity-50">
-  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-    <Image
-      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-      alt="تعاريف العقارية"
-      width={160}
-      height={80}
-      className="object-contain"
-    />
-  </div>
-</div>
+                              <div className="absolute bottom-2 right-2 opacity-50">
+                                <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                                  <Image
+                                    src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+                                    alt="تعاريف العقارية"
+                                    width={160}
+                                    height={80}
+                                    className="object-contain"
+                                  />
+                                </div>
+                              </div>
                             </figure>
                             <p className="text-gray-800 pt-4 text-base md:text-lg xl:text-xl font-normal leading-5 xl:leading-6 text-ellipsis overflow-hidden">
                               {similarProject.title}
@@ -1330,7 +1359,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
             <p className="text-center text-gray-600 text-sm">
               شارك هذا المشروع مع أصدقائك
             </p>
-            
+
             {/* Social Media Icons */}
             <div className="grid grid-cols-2 gap-4">
               {/* Facebook */}

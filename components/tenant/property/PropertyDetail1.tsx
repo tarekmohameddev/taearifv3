@@ -172,14 +172,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
   // Sharing functions
   const getCurrentUrl = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return window.location.href;
     }
-    return '';
+    return "";
   };
 
   const getShareText = () => {
-    if (!property) return '';
+    if (!property) return "";
     return `شاهد هذا العقار الرائع: ${property.title} - ${property.district} - ${property.price} ريال`;
   };
 
@@ -187,35 +187,35 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
     const url = getCurrentUrl();
     const text = getShareText();
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
-    window.open(facebookUrl, '_blank', 'width=600,height=400');
+    window.open(facebookUrl, "_blank", "width=600,height=400");
   };
 
   const shareToTwitter = () => {
     const url = getCurrentUrl();
     const text = getShareText();
     const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-    window.open(twitterUrl, '_blank', 'width=600,height=400');
+    window.open(twitterUrl, "_blank", "width=600,height=400");
   };
 
   const shareToLinkedIn = () => {
     const url = getCurrentUrl();
     const text = getShareText();
     const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
-    window.open(linkedinUrl, '_blank', 'width=600,height=400');
+    window.open(linkedinUrl, "_blank", "width=600,height=400");
   };
 
   const shareToWhatsApp = () => {
     const url = getCurrentUrl();
     const text = getShareText();
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
-    window.open(whatsappUrl, '_blank');
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`;
+    window.open(whatsappUrl, "_blank");
   };
 
   const shareToTelegram = () => {
     const url = getCurrentUrl();
     const text = getShareText();
     const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-    window.open(telegramUrl, '_blank');
+    window.open(telegramUrl, "_blank");
   };
 
   const copyToClipboard = async () => {
@@ -225,7 +225,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      console.error("Failed to copy: ", err);
     }
   };
 
@@ -261,7 +261,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
     if (property?.floor_planning_image) {
       allImages.push(...property.floor_planning_image);
     }
-    console.log('getAllImages result:', allImages);
+    console.log("getAllImages result:", allImages);
     return allImages;
   };
 
@@ -270,7 +270,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
     const allImages = getAllImages();
     if (allImages.length > 0) {
       const currentIndex = selectedImageIndex;
-      const previousIndex = currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
+      const previousIndex =
+        currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
       setSelectedImage(allImages[previousIndex]);
       setSelectedImageIndex(previousIndex);
     }
@@ -280,7 +281,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
     const allImages = getAllImages();
     if (allImages.length > 0) {
       const currentIndex = selectedImageIndex;
-      const nextIndex = currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
+      const nextIndex =
+        currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
       setSelectedImage(allImages[nextIndex]);
       setSelectedImageIndex(nextIndex);
     }
@@ -384,7 +386,6 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
     // افتح الصورة في dialog عند الضغط عليها
     handleImageClick(imageSrc, index);
   };
-
 
   // وظائف السحب باليد
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -691,7 +692,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   {property.transactionType === "rent" ? "للإيجار" : "للبيع"}
                 </h1>
                 <div className="sharesocials flex flex-row gap-x-6" dir="ltr">
-                  <button 
+                  <button
                     className="cursor-pointer"
                     onClick={() => setIsShareDialogOpen(true)}
                   >
@@ -710,15 +711,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 </p>
                 <p className="text-emerald-600 text-2xl leading-7 font-bold md:text-3xl lg:leading-9 flex items-center gap-2">
                   {property.price}
-                  <img 
-                    src="/Saudi_Riyal_Symbol.svg" 
-                    alt="ريال سعودي" 
+                  <img
+                    src="/Saudi_Riyal_Symbol.svg"
+                    alt="ريال سعودي"
                     className="w-6 h-6"
                     style={{
-                        filter:
-                          'brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)'
-                      }}
-                      
+                      filter:
+                        "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)",
+                    }}
                   />
                 </p>
                 <p className="text-gray-600 text-sm leading-6 font-normal md:text-base lg:text-xl lg:leading-7">
@@ -762,16 +762,16 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   </div>
                 )}
                 <div className="absolute bottom-2 right-2 opacity-80">
-  <div className="w-24 h-fit bg-white/20 rounded flex items-center justify-center">
-    <Image
-      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-      alt="تعاريف العقارية"
-      width={160}
-      height={80}
-      className="object-contain"
-    />
-  </div>
-</div>
+                  <div className="w-24 h-fit bg-white/20 rounded flex items-center justify-center">
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+                      alt="تعاريف العقارية"
+                      width={160}
+                      height={80}
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* نص توضيحي - يظهر فقط عند وجود صور إضافية */}
@@ -800,16 +800,16 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                           onClick={() => handleThumbnailClick(imageSrc, index)}
                         />
                         <div className="absolute bottom-2 right-2 opacity-80">
-  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-    <Image
-      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-      alt="تعاريف العقارية"
-      width={160}
-      height={80}
-      className="object-contain"
-    />
-  </div>
-</div>
+                          <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+                              alt="تعاريف العقارية"
+                              width={160}
+                              height={80}
+                              className="object-contain"
+                            />
+                          </div>
+                        </div>
                       </div>
                     ))}
                   space={16}
@@ -1393,23 +1393,25 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       <div className="grid grid-cols-2 gap-3">
                         {property.floor_planning_image.map(
                           (planImage, index) => (
-                        <div key={index} className="relative group"
-                        onClick={(e) => {
-                            handleThumbnailClick(planImage, index)
-                        }}
-                        >
-                          <img
-                            src={planImage}
-                            alt={`مخطط الأرضية ${index + 1}`}
-                            className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                            onClick={(e) => {
-                              handleThumbnailClick(planImage, index)
-                              // Simple test - just open dialog with the image
-                              setSelectedImage(planImage);
-                              setSelectedImageIndex(0);
-                              setIsDialogOpen(true);
-                            }}
-                          />
+                            <div
+                              key={index}
+                              className="relative group"
+                              onClick={(e) => {
+                                handleThumbnailClick(planImage, index);
+                              }}
+                            >
+                              <img
+                                src={planImage}
+                                alt={`مخطط الأرضية ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                onClick={(e) => {
+                                  handleThumbnailClick(planImage, index);
+                                  // Simple test - just open dialog with the image
+                                  setSelectedImage(planImage);
+                                  setSelectedImageIndex(0);
+                                  setIsDialogOpen(true);
+                                }}
+                              />
                               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                   <svg
@@ -1510,16 +1512,16 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               className="w-full h-full object-cover rounded-lg overflow-hidden relative -z-10"
                             />
                             <div className="absolute bottom-2 right-2 opacity-50">
-  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-    <Image
-      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-      alt="تعاريف العقارية"
-      width={160}
-      height={80}
-      className="object-contain"
-    />
-  </div>
-</div>
+                              <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                                <Image
+                                  src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+                                  alt="تعاريف العقارية"
+                                  width={160}
+                                  height={80}
+                                  className="object-contain"
+                                />
+                              </div>
+                            </div>
                           </figure>
                         </div>
                       ))
@@ -1570,16 +1572,16 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                                     className="w-full h-full object-cover"
                                   />
                                   <div className="absolute bottom-2 right-2 opacity-50">
-  <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-    <Image
-      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-      alt="تعاريف العقارية"
-      width={160}
-      height={80}
-      className="object-contain"
-    />
-  </div>
-</div>
+                                    <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                                      <Image
+                                        src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
+                                        alt="تعاريف العقارية"
+                                        width={160}
+                                        height={80}
+                                        className="object-contain"
+                                      />
+                                    </div>
+                                  </div>
                                 </figure>
                                 <p className="text-gray-800 pt-4 text-base md:text-lg xl:text-xl font-normal leading-5 xl:leading-6 text-ellipsis overflow-hidden">
                                   {similarProperty.title}
@@ -1670,7 +1672,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             <p className="text-center text-gray-600 text-sm">
               شارك هذا العقار مع أصدقائك
             </p>
-            
+
             {/* Social Media Icons */}
             <div className="grid grid-cols-2 gap-4">
               {/* Facebook */}

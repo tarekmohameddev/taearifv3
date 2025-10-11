@@ -62,10 +62,10 @@ export function PropertyCard({
   const handleClick = () => {
     if (!isUnavailable && tenantId) {
       const propertySlug = p.slug || p.id; // Use slug if available, fallback to id
-      
+
       // Check if this is a project (based on transactionType or type)
       const isProject = p.transactionType === "project" || p.type === "مشروع";
-      
+
       if (isProject) {
         console.log(
           `PropertyCard: Navigating to project ${propertySlug} with tenantId: ${tenantId}`,
@@ -110,12 +110,12 @@ export function PropertyCard({
             {/* المستطيل العلوي الأيمن - غرف النوم والمشاهدات */}
             {showDetails && (
               <div className="absolute right-3 top-3 flex items-center gap-2 rounded-lg bg-white/95 px-3 py-2 shadow-sm">
-                  <div className="flex items-center gap-1">
-                    <Bed className="size-4 text-emerald-600" />
-                    <span className="text-sm font-semibold text-gray-700">
-                      {p.bedrooms}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <Bed className="size-4 text-emerald-600" />
+                  <span className="text-sm font-semibold text-gray-700">
+                    {p.bedrooms}
+                  </span>
+                </div>
                 {showViews && (
                   <div className="flex items-center gap-1">
                     <span className="text-sm font-semibold text-gray-700">
