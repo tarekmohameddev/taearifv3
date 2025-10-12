@@ -271,6 +271,58 @@
   position: relative;
 }
 
+/* Production-specific fixes */
+[data-radix-popper-content-wrapper] {
+  z-index: 1001 !important;
+}
+
+[data-radix-select-content] {
+  z-index: 1001 !important;
+}
+
+[data-radix-popover-content] {
+  z-index: 1001 !important;
+}
+
+[data-radix-command-item] {
+  z-index: 1002 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+[data-radix-select-item] {
+  z-index: 1002 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+/* Force higher z-index for production */
+.popup [data-radix-popper-content-wrapper],
+.popup [data-radix-select-content],
+.popup [data-radix-popover-content] {
+  z-index: 1001 !important;
+}
+
+.popup [data-radix-command-item],
+.popup [data-radix-select-item] {
+  z-index: 1002 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+/* Additional production fixes */
+[data-radix-command-item] {
+  z-index: 1003 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+.popup [data-radix-command-item] {
+  z-index: 1003 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
 /* ========================================
    UTILITY CLASSES
    ======================================== */
