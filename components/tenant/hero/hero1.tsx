@@ -24,126 +24,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { getDefaultHeroData } from "@/context-liveeditor/editorStoreFunctions/heroFunctions";
 
-// Default hero data
-const getDefaultHeroData = () => ({
-  visible: true,
-  height: {
-    desktop: "90vh",
-    tablet: "90vh",
-    mobile: "90vh",
-  },
-  minHeight: {
-    desktop: "520px",
-    tablet: "520px",
-    mobile: "520px",
-  },
-  background: {
-    image: "https://dalel-lovat.vercel.app/images/hero.webp",
-    alt: "صورة خلفية لغرفة معيشة حديثة",
-    overlay: {
-      enabled: true,
-      opacity: "0.45",
-      color: "#000000",
-    },
-  },
-  content: {
-    title: "اكتشف عقارك المثالي في أفضل المواقع",
-    subtitle: "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
-    font: {
-      title: {
-        family: "Tajawal",
-        size: { desktop: "5xl", tablet: "4xl", mobile: "2xl" },
-        weight: "extrabold",
-        color: "#ffffff",
-        lineHeight: "1.25",
-      },
-      subtitle: {
-        family: "Tajawal",
-        size: { desktop: "2xl", tablet: "2xl", mobile: "2xl" },
-        weight: "normal",
-        color: "rgba(255, 255, 255, 0.85)",
-      },
-    },
-    alignment: "center",
-    maxWidth: "5xl",
-    paddingTop: "200px",
-  },
-  searchForm: {
-    enabled: true,
-    position: "bottom",
-    offset: "32",
-    background: {
-      color: "#ffffff",
-      opacity: "1",
-      shadow: "2xl",
-      border: "1px solid rgba(0, 0, 0, 0.05)",
-      borderRadius: "lg",
-    },
-    fields: {
-      purpose: {
-        enabled: true,
-        options: [
-          { value: "rent", label: "إيجار" },
-          { value: "sell", label: "بيع" },
-        ],
-        default: "rent",
-      },
-      city: {
-        enabled: true,
-        placeholder: "أدخل المدينة أو المنطقة",
-        icon: "MapPin",
-      },
-      type: {
-        enabled: true,
-        placeholder: "نوع العقار",
-        icon: "Home",
-        options: ["شقة", "فيلا", "دوبلكس", "أرض", "شاليه", "مكتب"],
-      },
-      price: {
-        enabled: true,
-        placeholder: "السعر",
-        icon: "CircleDollarSign",
-        options: [
-          { id: "any", label: "أي سعر" },
-          { id: "0-200k", label: "0 - 200 ألف" },
-          { id: "200k-500k", label: "200 - 500 ألف" },
-          { id: "500k-1m", label: "500 ألف - 1 مليون" },
-          { id: "1m+", label: "أكثر من 1 مليون" },
-        ],
-      },
-      keywords: {
-        enabled: true,
-        placeholder: "كلمات مفتاحية...",
-      },
-    },
-    responsive: {
-      desktop: "all-in-row",
-      tablet: "two-rows",
-      mobile: "stacked",
-    },
-  },
-  animations: {
-    title: {
-      enabled: true,
-      type: "fade-up",
-      duration: 600,
-      delay: 200,
-    },
-    subtitle: {
-      enabled: true,
-      type: "fade-up",
-      duration: 600,
-      delay: 400,
-    },
-    searchForm: {
-      enabled: true,
-      type: "fade-up",
-      duration: 600,
-      delay: 600,
-    },
-  },
-});
 
 interface HeroProps {
   visible?: boolean;
@@ -694,10 +576,28 @@ function Divider() {
   return <span aria-hidden="true" className="my-2 w-px bg-border" />;
 }
 
+/**
+ * Hero1 Component - Advanced Hero Section
+ * 
+ * This component follows the same pattern as componentsCachingSystem.md:
+ * - 99% of the data comes from getDefaultHeroData() (default data)
+ * - 1% of the data comes from store/tenant data (customizations)
+ * 
+ * Data Priority Order (highest to lowest):
+ * 1. Store Data (storeData) - Highest priority (editor changes)
+ * 2. Backend Data (tenantComponentData) - Backend data
+ * 3. Props Data (props) - Component props
+ * 4. Default Data (defaultData) - Base data (99%)
+ * 
+ * This follows the exact same pattern as whyChooseUs1.tsx and testimonials1.tsx
+ * in the componentsCachingSystem.md documentation.
+ */
 const Hero1 = (props: HeroProps = {}) => {
   // Initialize variant id early so hooks can depend on it
   const variantId = props.variant || "hero1";
-  // Subscribe to editor store updates for this hero variant - use generic approach
+  const uniqueId = props.id || variantId;
+
+  // Subscribe to editor store updates for this hero variant
   const ensureComponentVariant = useEditorStore(
     (s) => s.ensureComponentVariant,
   );
@@ -705,11 +605,9 @@ const Hero1 = (props: HeroProps = {}) => {
 
   useEffect(() => {
     if (props.useStore) {
-      // Use component.id as unique identifier instead of variantId
-      const uniqueId = props.id || variantId;
       ensureComponentVariant("hero", uniqueId, props);
     }
-  }, [variantId, props.useStore, props.id, ensureComponentVariant]);
+  }, [uniqueId, props.useStore, ensureComponentVariant]);
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -723,16 +621,40 @@ const Hero1 = (props: HeroProps = {}) => {
   }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
-  const uniqueId = props.id || variantId;
   const storeData = props.useStore
     ? getComponentData("hero", uniqueId) || {}
     : {};
 
   // Subscribe to store updates to re-render when data changes
   const heroStates = useEditorStore((s) => s.heroStates);
-  const currentStoreData = props.useStore ? heroStates[uniqueId] || {} : {};
+  
+  // Find the actual hero data in heroStates
+  // The data might be stored with a different key than uniqueId
+  const findHeroData = () => {
+    if (!props.useStore || !heroStates) return {};
+    
+    // Look for the first hero data in the store that has actual content
+    // Skip entries that only contain metadata (id, type, visible, variant, useStore)
+    for (const [key, data] of Object.entries(heroStates)) {
+      if (data && typeof data === 'object' && data.visible !== undefined) {
+        // Check if this is actual hero data (has content, background, etc.)
+        if (data.content || data.background || data.searchForm) {
+          return data;
+        }
+      }
+    }
+    
+    // Fallback: try to get data by uniqueId if no actual hero data found
+    if (heroStates[uniqueId]) {
+      return heroStates[uniqueId];
+    }
+    
+    return {};
+  };
+  
+  const currentStoreData = findHeroData();
 
-  // Get tenant data for this specific component variant
+  // Get tenant data for this specific component variant - memoized
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
       return {};
@@ -766,12 +688,29 @@ const Hero1 = (props: HeroProps = {}) => {
 
   const tenantComponentData = getTenantComponentData();
 
+  // Debug: Log the data sources to help troubleshoot
+  if (props.useStore) {
+    console.log("Hero1 Debug:", {
+      uniqueId,
+      storeData,
+      currentStoreData,
+      heroStates,
+      tenantComponentData,
+      foundHeroData: findHeroData(),
+    });
+  }
+
+  // Get default data as base (99% of the data) - memoized
+  const defaultData = getDefaultHeroData();
+
   // Merge data with priority: currentStoreData > tenantComponentData > props > default
+  // This follows the exact same pattern as componentsCachingSystem.md
+  // Priority order: Current Store > Backend > Props > Default
   const mergedData = {
-    ...getDefaultHeroData(),
-    ...props,
-    ...tenantComponentData,
-    ...currentStoreData,
+    ...defaultData,           // 99% - Default data as base
+    ...props,                 // Props from parent component
+    ...tenantComponentData,   // Backend data (tenant data)
+    ...currentStoreData,      // Current store data (highest priority)
   };
 
   const { user, loading } = useAuth();
