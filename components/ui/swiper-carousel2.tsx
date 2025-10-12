@@ -2,9 +2,10 @@
 
 import type { ReactNode } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination } from "swiper/modules";
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
+import "swiper/css/navigation";
 
 type Props = {
   items: ReactNode[];
@@ -14,6 +15,8 @@ type Props = {
   showPagination?: boolean;
   // يسمح بضبط ارتفاع/نمط السلايد لتوحيد القياسات
   slideClassName?: string;
+  // إظهار الأسهم على الهاتف فقط
+  showMobileArrows?: boolean;
 };
 
 /**
@@ -24,6 +27,7 @@ type Props = {
  * - RTL بإضافة dir="rtl"
  * - Pagination اختياري
  * - slideClassName لتوحيد ارتفاع السلايدات
+ * - أسهم التنقل على الهاتف فقط
  */
 export default function SwiperCarousel({
   items,
@@ -32,13 +36,20 @@ export default function SwiperCarousel({
   desktopCount = 4,
   showPagination = false,
   slideClassName = "h-full",
+  showMobileArrows = true,
 }: Props) {
   return (
-    <div dir="rtl">
+    <div dir="rtl" className="relative">
       <Swiper
-        modules={showPagination ? [Autoplay, Pagination] : [Autoplay]}
+        modules={
+          showPagination 
+            ? [Autoplay, Pagination, Navigation] 
+            : showMobileArrows 
+            ? [Autoplay, Navigation] 
+            : [Autoplay]
+        }
         loop
-        grabCursor
+        grabCursor 
         spaceBetween={space}
         slidesPerView={1.05}
         slidesPerGroup={1}
@@ -46,15 +57,32 @@ export default function SwiperCarousel({
           autoplay ? { delay: 3500, disableOnInteraction: false } : false
         }
         pagination={showPagination ? { clickable: true } : undefined}
+        navigation={showMobileArrows ? true : false}
         breakpoints={{
-          480: { slidesPerView: 1.2, centeredSlides: true },
-          640: { slidesPerView: 2, centeredSlides: false },
-          900: { slidesPerView: 3, centeredSlides: false },
-          1280: { slidesPerView: desktopCount, centeredSlides: false },
+          480: { 
+            slidesPerView: 1.2, 
+            centeredSlides: true,
+            navigation: false // إخفاء الأسهم على الشاشات الأكبر
+          },
+          640: { 
+            slidesPerView: 2, 
+            centeredSlides: false,
+            navigation: false
+          },
+          900: { 
+            slidesPerView: 3, 
+            centeredSlides: false,
+            navigation: false
+          },
+          1280: { 
+            slidesPerView: desktopCount, 
+            centeredSlides: false,
+            navigation: false
+          },
         }}
         centeredSlides={true}
         autoHeight={false}
-        className="!py-0"
+        className="!py-0 [&_.swiper-button-next]:!text-white [&_.swiper-button-prev]:!text-white [&_.swiper-button-next]:!bg-black/20 [&_.swiper-button-prev]:!bg-black/20 [&_.swiper-button-next]:!rounded-full [&_.swiper-button-prev]:!rounded-full [&_.swiper-button-next]:!w-10 [&_.swiper-button-prev]:!w-10 [&_.swiper-button-next]:!h-10 [&_.swiper-button-prev]:!h-10 [&_.swiper-button-next]:!text-sm [&_.swiper-button-prev]:!text-sm sm:[&_.swiper-button-next]:!hidden sm:[&_.swiper-button-prev]:!hidden"
       >
         {items.map((el, i) => (
           <SwiperSlide

@@ -133,8 +133,8 @@ export function UpdatedAddRentalForm({
       id: string;
       name: string;
       cost: string;
-      type: "percentage" | "amount";
-      payer: "tenant" | "landlord";
+      type: "percentage" | "fixed";
+      payer: "tenant" | "owner";
       payment_frequency: "one_time" | "per_installment";
       description: string;
     }>
@@ -153,11 +153,11 @@ export function UpdatedAddRentalForm({
 
     const totalAmount = parseFloat(formData.base_rent_amount);
     const duration = formData.rental_duration;
-    const contractType = formData.rental_type; // "monthly" or "yearly"
+    const contractType = formData.rental_type; // "monthly" or "annual"
     const paymentFrequency = formData.paying_plan; // "monthly", "quarterly", "semi_annual", "annual"
 
     // Convert duration to months
-    const totalMonths = contractType === "yearly" ? duration * 12 : duration;
+    const totalMonths = contractType === "annual" ? duration * 12 : duration;
 
     // Calculate how many payment periods based on frequency
     let paymentPeriods = 0;
@@ -202,7 +202,7 @@ export function UpdatedAddRentalForm({
       id: Date.now().toString(),
       name: "",
       cost: "",
-      type: "amount" as const,
+      type: "fixed" as const,
       payer: "tenant" as const,
       payment_frequency: "per_installment" as const,
       description: "",
@@ -304,93 +304,134 @@ export function UpdatedAddRentalForm({
     fetchData();
   }, [userData?.token]);
 
-  // دالة التحقق من البيانات
+  // دالة التحقق من البيانات - محدثة حسب API
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    // التحقق من الحقول الإجبارية
+    // === الحقول المطلوبة حسب API ===
+    
+    // التحقق من الاسم الكامل (مطلوب، أقصى 150 حرف)
     if (!formData.tenant_full_name.trim()) {
       newErrors.tenant_full_name = "الاسم الكامل مطلوب";
+    } else if (formData.tenant_full_name.length > 150) {
+      newErrors.tenant_full_name = "الاسم الكامل لا يجب أن يتجاوز 150 حرف";
     }
-    if (!formData.contract_number.trim()) {
-      newErrors.contract_number = "رقم العقد مطلوب";
-    }
+
+    // التحقق من رقم الهاتف (مطلوب، أقصى 32 حرف)
     if (!formData.tenant_phone.trim()) {
       newErrors.tenant_phone = "رقم الهاتف مطلوب";
+    } else if (formData.tenant_phone.length > 32) {
+      newErrors.tenant_phone = "رقم الهاتف لا يجب أن يتجاوز 32 حرف";
     }
-    if (!formData.property_id.trim()) {
-      newErrors.property_number = "العقار مطلوب";
-    }
-    if (!formData.move_in_date.trim()) {
-      newErrors.move_in_date = "تاريخ الانتقال مطلوب";
-    }
-    if (!formData.rental_period || formData.rental_period <= 0) {
-      newErrors.rental_period = "مدة الإيجار مطلوبة ولا تقل عن شهر واحد";
-    }
-    if (
-      !formData.base_rent_amount ||
-      parseFloat(formData.base_rent_amount) < 100
-    ) {
-      newErrors.base_rent_amount = "مبلغ الإيجار مطلوب ولا يقل عن 100 ريال";
-    }
+
+    // التحقق من نوع الإيجار (مطلوب، enum: monthly, annual)
     if (!formData.rental_type.trim()) {
       newErrors.rental_type = "نوع الإيجار مطلوب";
+    } else if (!['monthly', 'annual'].includes(formData.rental_type)) {
+      newErrors.rental_type = "نوع الإيجار يجب أن يكون شهري أو سنوي";
     }
-    if (!formData.rental_duration || formData.rental_duration <= 0) {
+
+    // التحقق من مدة الإيجار (مطلوب، أقصى 1)
+    if (!formData.rental_duration || formData.rental_duration < 1) {
       newErrors.rental_duration = "مدة الإيجار مطلوبة ولا تقل عن 1";
+    } else if (!Number.isInteger(formData.rental_duration)) {
+      newErrors.rental_duration = "مدة الإيجار يجب أن تكون رقم صحيح";
     }
 
-    // التحقق من صحة رقم الهاتف
-    if (
-      formData.tenant_phone &&
-      !/^[0-9+\-\s()]+$/.test(formData.tenant_phone)
-    ) {
-      newErrors.tenant_phone = "رقم الهاتف غير صحيح";
+    // التحقق من خطة الدفع (مطلوب، enum: monthly, quarterly, semi_annual, annual)
+    if (!formData.paying_plan.trim()) {
+      newErrors.paying_plan = "خطة الدفع مطلوبة";
+    } else if (!['monthly', 'quarterly', 'semi_annual', 'annual'].includes(formData.paying_plan)) {
+      newErrors.paying_plan = "خطة الدفع غير صحيحة";
     }
 
-    // التحقق من صحة البريد الإلكتروني (إذا تم إدخاله)
-    if (
-      formData.tenant_email &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.tenant_email)
-    ) {
+    // التحقق من إجمالي مبلغ الإيجار (مطلوب، أقصى 0)
+    if (!formData.base_rent_amount || parseFloat(formData.base_rent_amount) < 0) {
+      newErrors.base_rent_amount = "مبلغ الإيجار مطلوب ولا يجب أن يكون سالب";
+    } else if (isNaN(parseFloat(formData.base_rent_amount))) {
+      newErrors.base_rent_amount = "مبلغ الإيجار يجب أن يكون رقم صحيح";
+    }
+
+    // === الحقول الاختيارية ===
+
+    // التحقق من البريد الإلكتروني (اختياري، صيغة email)
+    if (formData.tenant_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.tenant_email)) {
       newErrors.tenant_email = "البريد الإلكتروني غير صحيح";
     }
 
-    // التحقق من قيمة العمولة
-    if (
-      formData.office_commission_value &&
-      isNaN(parseFloat(formData.office_commission_value))
-    ) {
-      newErrors.office_commission_value = "قيمة العمولة يجب أن تكون رقماً";
+    // التحقق من المهنة (اختياري، أقصى 120 حرف)
+    if (formData.tenant_job_title && formData.tenant_job_title.length > 120) {
+      newErrors.tenant_job_title = "المهنة لا يجب أن تتجاوز 120 حرف";
     }
 
-    // التحقق من صحة تاريخ الانتقال
-    if (formData.move_in_date) {
-      const selectedDate = new Date(formData.move_in_date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // إزالة الوقت للمقارنة الصحيحة
+    // التحقق من الحالة الاجتماعية (اختياري، enum)
+    if (formData.tenant_social_status && !['single', 'married', 'divorced', 'widowed', 'other'].includes(formData.tenant_social_status)) {
+      newErrors.tenant_social_status = "الحالة الاجتماعية غير صحيحة";
+    }
 
-      if (selectedDate < today) {
-        newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي";
+    // التحقق من رقم الهوية (اختياري، أقصى 20 حرف)
+    if (formData.tenant_national_id && formData.tenant_national_id.length > 20) {
+      newErrors.tenant_national_id = "رقم الهوية لا يجب أن يتجاوز 20 حرف";
+    }
+
+    // التحقق من تاريخ الانتقال (اختياري، صيغة YYYY-MM-DD)
+    if (formData.move_in_date) {
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(formData.move_in_date)) {
+        newErrors.move_in_date = "تاريخ الانتقال يجب أن يكون بصيغة YYYY-MM-DD";
+      } else {
+        const selectedDate = new Date(formData.move_in_date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDate < today) {
+          newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي";
+        }
       }
     }
 
-    // التحقق من صحة مدة الإيجار
-    if (
-      formData.rental_period &&
-      (isNaN(formData.rental_period) || formData.rental_period <= 0)
-    ) {
-      newErrors.rental_period = "مدة الإيجار يجب أن تكون رقم صحيح أكبر من 0";
+    // التحقق من العملة (اختياري، 3 أحرف بالضبط)
+    if (formData.currency && formData.currency.length !== 3) {
+      newErrors.currency = "رمز العملة يجب أن يكون 3 أحرف بالضبط";
     }
 
-    // التحقق من صحة مبلغ الإيجار
-    if (
-      formData.base_rent_amount &&
-      (isNaN(parseFloat(formData.base_rent_amount)) ||
-        parseFloat(formData.base_rent_amount) < 100)
-    ) {
-      newErrors.base_rent_amount =
-        "مبلغ الإيجار يجب أن يكون رقم صحيح لا يقل عن 100 ريال";
+    // التحقق من رقم العقد (اختياري، أقصى 255 حرف)
+    if (formData.contract_number && formData.contract_number.length > 255) {
+      newErrors.contract_number = "رقم العقد لا يجب أن يتجاوز 255 حرف";
+    }
+
+    // === التحقق من cost_items ===
+    if (costCenterItems.length > 0) {
+      costCenterItems.forEach((item, index) => {
+        // التحقق من اسم التكلفة (مطلوب إذا كان هناك cost_items)
+        if (!item.name.trim()) {
+          newErrors[`cost_item_${index}_name`] = `اسم التكلفة ${index + 1} مطلوب`;
+        } else if (item.name.length > 255) {
+          newErrors[`cost_item_${index}_name`] = `اسم التكلفة ${index + 1} لا يجب أن يتجاوز 255 حرف`;
+        }
+
+        // التحقق من التكلفة (مطلوب إذا كان هناك cost_items، أقصى 0)
+        if (!item.cost || parseFloat(item.cost) < 0) {
+          newErrors[`cost_item_${index}_cost`] = `تكلفة ${index + 1} مطلوبة ولا يجب أن تكون سالبة`;
+        } else if (isNaN(parseFloat(item.cost))) {
+          newErrors[`cost_item_${index}_cost`] = `تكلفة ${index + 1} يجب أن تكون رقم صحيح`;
+        }
+
+        // التحقق من نوع التكلفة (مطلوب إذا كان هناك cost_items، enum)
+        if (!item.type || !['fixed', 'percentage'].includes(item.type)) {
+          newErrors[`cost_item_${index}_type`] = `نوع التكلفة ${index + 1} يجب أن يكون مبلغ ثابت أو نسبة مئوية`;
+        }
+
+        // التحقق من من يدفع (مطلوب إذا كان هناك cost_items، enum)
+        if (!item.payer || !['owner', 'tenant'].includes(item.payer)) {
+          newErrors[`cost_item_${index}_payer`] = `من يدفع ${index + 1} يجب أن يكون مالك أو مستأجر`;
+        }
+
+        // التحقق من تكرار الدفع (مطلوب إذا كان هناك cost_items، enum)
+        if (!item.payment_frequency || !['one_time', 'per_installment'].includes(item.payment_frequency)) {
+          newErrors[`cost_item_${index}_payment_frequency`] = `تكرار الدفع ${index + 1} يجب أن يكون مرة واحدة أو لكل قسط`;
+        }
+      });
     }
 
     setErrors(newErrors);
@@ -408,31 +449,31 @@ export function UpdatedAddRentalForm({
     const processedFormData: any = {
       tenant_full_name: formData.tenant_full_name,
       tenant_phone: formData.tenant_phone,
-      tenant_email: formData.tenant_email,
-      tenant_job_title: formData.tenant_job_title,
-      tenant_social_status: formData.tenant_social_status,
-      tenant_national_id: formData.tenant_national_id,
+      tenant_email: formData.tenant_email || null,
+      tenant_job_title: formData.tenant_job_title || null,
+      tenant_social_status: formData.tenant_social_status || null,
+      tenant_national_id: formData.tenant_national_id || null,
       unit_id: formData.property_id ? parseInt(formData.property_id) : null,
       project_id: formData.project_id ? parseInt(formData.project_id) : null,
-      building_id: selectedBuildingId,
-      move_in_date: formData.move_in_date,
+      building_id: selectedBuildingId || null,
+      move_in_date: formData.move_in_date || null,
       rental_type: formData.rental_type,
       rental_duration: Number(formData.rental_duration),
       paying_plan: formData.paying_plan,
       total_rental_amount: formData.base_rent_amount
         ? parseFloat(formData.base_rent_amount)
         : 0,
-      currency: formData.currency,
-      contract_number: formData.contract_number,
-      notes: formData.notes,
-      cost_items: costCenterItems.map((item) => ({
+      currency: formData.currency || null,
+      contract_number: formData.contract_number || null,
+      notes: formData.notes || null,
+      cost_items: costCenterItems.length > 0 ? costCenterItems.map((item) => ({
         name: item.name,
         cost: item.cost ? parseFloat(item.cost) : 0,
-        type: item.type === "amount" ? "fixed" : "percentage",
-        payer: item.payer === "landlord" ? "owner" : item.payer,
+        type: item.type,
+        payer: item.payer,
         payment_frequency: item.payment_frequency,
-        description: item.description,
-      })),
+        description: item.description || null,
+      })) : null,
     };
 
     console.log("Processed form data for API:", processedFormData);
@@ -974,7 +1015,7 @@ export function UpdatedAddRentalForm({
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                       <span className="font-semibold text-blue-800">
                         المبلغ {calculation.periodName}:{" "}
-                        {calculation.paymentAmount.toLocaleString()} ريال
+                        {calculation.paymentAmount.toLocaleString()} {formData.currency || 'ريال'}
                       </span>
                     </div>
 
@@ -1002,13 +1043,45 @@ export function UpdatedAddRentalForm({
                         <span className="font-medium">
                           {calculation.totalAmount.toLocaleString()} ÷{" "}
                           {calculation.paymentPeriods} ={" "}
-                          {calculation.paymentAmount.toLocaleString()} ريال
+                          {calculation.paymentAmount.toLocaleString()} {formData.currency || 'ريال'}
                         </span>
                       </div>
                     </div>
                   </div>
                 );
               })()}
+            </div>
+
+            {/* العملة */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="currency"
+                className="text-sm font-medium text-gray-700"
+              >
+                العملة
+              </Label>
+              <Input
+                id="currency"
+                value={formData.currency}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    currency: e.target.value.toUpperCase(),
+                  }));
+                  if (errors.currency) {
+                    setErrors((prev) => ({ ...prev, currency: "" }));
+                  }
+                }}
+                placeholder="SAR"
+                maxLength={3}
+                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.currency ? "border-red-500" : ""}`}
+              />
+              {errors.currency && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-3 w-3 ml-1" />
+                  {errors.currency}
+                </p>
+              )}
             </div>
 
             {/* خيار الإيجار */}
@@ -1036,7 +1109,7 @@ export function UpdatedAddRentalForm({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="monthly">شهري</SelectItem>
-                  <SelectItem value="yearly">سنوي</SelectItem>
+                  <SelectItem value="annual">سنوي</SelectItem>
                 </SelectContent>
               </Select>
               {errors.rental_type && (
@@ -1053,7 +1126,7 @@ export function UpdatedAddRentalForm({
                 htmlFor="rental_duration"
                 className="text-sm font-medium text-gray-700"
               >
-                {formData.rental_type === "yearly"
+                {formData.rental_type === "annual"
                   ? "عدد السنوات"
                   : "عدد الشهور"}{" "}
                 (مدة العقد) <span className="text-red-500">*</span>
@@ -1072,7 +1145,7 @@ export function UpdatedAddRentalForm({
                     setErrors((prev) => ({ ...prev, rental_duration: "" }));
                   }
                 }}
-                placeholder={formData.rental_type === "yearly" ? "1" : "12"}
+                placeholder={formData.rental_type === "annual" ? "1" : "12"}
                 min="1"
                 className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.rental_duration ? "border-red-500" : ""}`}
               />
@@ -1088,8 +1161,8 @@ export function UpdatedAddRentalForm({
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                     <span className="text-blue-800 font-medium">
                       المدة الإجمالية: {formData.rental_duration}{" "}
-                      {formData.rental_type === "yearly" ? "سنة" : "شهر"}
-                      {formData.rental_type === "yearly" && (
+                      {formData.rental_type === "annual" ? "سنة" : "شهر"}
+                      {formData.rental_type === "annual" && (
                         <span className="text-gray-600">
                           {" "}
                           ({formData.rental_duration * 12} شهر)
@@ -1234,7 +1307,7 @@ export function UpdatedAddRentalForm({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="amount">مبلغ ثابت</SelectItem>
+                          <SelectItem value="fixed">مبلغ ثابت</SelectItem>
                           <SelectItem value="percentage">نسبة مئوية</SelectItem>
                         </SelectContent>
                       </Select>
@@ -1256,7 +1329,7 @@ export function UpdatedAddRentalForm({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="tenant">المستأجر</SelectItem>
-                          <SelectItem value="landlord">المالك</SelectItem>
+                          <SelectItem value="owner">المالك</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
