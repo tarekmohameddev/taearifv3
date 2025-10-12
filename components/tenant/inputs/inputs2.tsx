@@ -527,6 +527,32 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     return "propertyInfoCard"; // default
   }, []);
 
+  // Helper function to get field visibility key - memoized
+  const getFieldVisibilityKey = useCallback((fieldId: string): string => {
+    // Map field IDs to the keys used in backend data (old format)
+    const fieldIdMapping: Record<string, string> = {
+      'property_type': 'propertyType',
+      'category': 'propertyCategory', 
+      'region': 'city',
+      'districts_id': 'district',
+      'area_from': 'areaFrom',
+      'area_to': 'areaTo',
+      'purchase_method': 'purchaseMethod',
+      'budget_from': 'budgetFrom',
+      'budget_to': 'budgetTo',
+      'seriousness': 'seriousness',
+      'purchase_goal': 'purchaseGoal',
+      'wants_similar_offers': 'similarOffers',
+      'full_name': 'fullName',
+      'phone': 'phone',
+      'contact_on_whatsapp': 'whatsapp',
+      'notes': 'notes'
+    };
+    
+    // Return the mapped key if it exists, otherwise return the original field ID
+    return fieldIdMapping[fieldId] || fieldId;
+  }, []);
+
   // Filter cards and fields based on visibility controls (1% control)
   const safeCards = useMemo(() => {
     if (!cards || !Array.isArray(cards) || cards.length === 0) {
@@ -557,7 +583,8 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
 
             // Check if field should be visible based on fieldVisibility controls
             const fieldId = field.id;
-            const isFieldVisible = visibilityControls.fieldVisibility[fieldId] !== false;
+            const fieldVisibilityKey = getFieldVisibilityKey(fieldId);
+            const isFieldVisible = visibilityControls.fieldVisibility[fieldVisibilityKey] !== false;
             
             return isFieldVisible;
           })
