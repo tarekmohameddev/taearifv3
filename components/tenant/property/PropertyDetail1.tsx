@@ -1467,30 +1467,25 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       </div>
                     ) : (
                       similarProperties.map((similarProperty) => (
-                        <div
+                        <Link
                           key={similarProperty.id}
-                          className="flex mb-8 gap-x-6 h-48 w-full rounded-xl px-4 border border-gray-200 shadow-lg"
+                          href={`/property/${similarProperty.slug || similarProperty.id}`}
+                          className="flex mb-8 gap-x-6 h-48 w-full rounded-xl px-4 border border-gray-200 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
                         >
-                          <div className="flex-[48.6%] py-8 flex flex-col gap-y-4 justify-center">
+                          <div className="flex-[30%] py-8 flex flex-col gap-y-4 justify-center">
                             <h4 className="text-ellipsis overflow-hidden font-bold text-xl text-gray-600">
                               {similarProperty.title}
                             </h4>
                             <p className="text-ellipsis font-bold text-base text-gray-600 leading-5">
                               {similarProperty.district}
                             </p>
-                            <div className="flex flex-row items-center justify-between">
+                            <div className="flex flex-row items-center justify-start">
                               <p className="flex items-center justify-center leading-6 font-bold text-xl">
                                 {similarProperty.price} ريال
                               </p>
-                              <Link
-                                href={`/property/${similarProperty.slug || similarProperty.id}`}
-                                className="font-bold text-lg text-emerald-600 hover:text-emerald-700"
-                              >
-                                تفاصيل
-                              </Link>
                             </div>
                           </div>
-                          <figure className="relative flex-[42.4%] py-4 rounded-lg overflow-hidden w-full h-full">
+                          <figure className="relative flex-[70%] py-4 rounded-lg overflow-hidden w-full h-full">
                             <div className="bg-white mt-3 absolute w-36 h-7 md:w-29 lg:w-40 xl:w-46 md:h-9 flex items-center justify-between px-3 top-4 md:top-5 lg:top-4 right-2 rounded-md">
                               <div className="flex flex-row items-center justify-center gap-x-1">
                                 <div className="w-4 h-4 bg-gray-400 rounded"></div>
@@ -1523,7 +1518,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               </div>
                             </div>
                           </figure>
-                        </div>
+                        </Link>
                       ))
                     )}
                   </div>
@@ -1548,7 +1543,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               key={similarProperty.id}
                               href={`/property/${similarProperty.slug || similarProperty.id}`}
                             >
-                              <div className="relative h-88 md:h-91 flex flex-col justify-center min-w-[280px]">
+                              <div className="relative h-88 md:h-91 flex flex-col justify-center min-w-[300px]">
                                 <div className="bg-white z-40 absolute w-36 mt-3 h-7 md:w-46 md:h-9 flex items-center justify-between px-3 top-4 md:top-5 lg:top-4 right-2 rounded-md">
                                   <div className="flex flex-row items-center justify-center gap-x-1">
                                     <div className="w-4 h-4 bg-gray-400 rounded"></div>

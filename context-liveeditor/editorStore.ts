@@ -1680,14 +1680,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                     case "header":
                       newState.headerStates = headerFunctions.setData(
                         newState,
-                        comp.componentName,
+                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).headerStates;
                       break;
                     case "hero":
                       newState.heroStates = heroFunctions.setData(
                         newState,
-                        comp.componentName,
+                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).heroStates;
                       break;
@@ -1695,7 +1695,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.halfTextHalfImageStates =
                         halfTextHalfImageFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).halfTextHalfImageStates;
                       break;
@@ -1703,7 +1703,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.propertySliderStates =
                         propertySliderFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).propertySliderStates;
                       break;
@@ -1711,7 +1711,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.ctaValuationStates =
                         ctaValuationFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).ctaValuationStates;
                       break;
@@ -1719,7 +1719,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.stepsSectionStates =
                         stepsSectionFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).stepsSectionStates;
                       break;
@@ -1727,14 +1727,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.testimonialsStates =
                         testimonialsFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).testimonialsStates;
                       break;
                     case "whyChooseUs":
                       newState.whyChooseUsStates = whyChooseUsFunctions.setData(
                         newState,
-                        comp.componentName,
+                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).whyChooseUsStates;
                       break;
@@ -1742,21 +1742,21 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.contactMapSectionStates =
                         contactMapSectionFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).contactMapSectionStates;
                       break;
                     case "footer":
                       newState.footerStates = footerFunctions.setData(
                         newState,
-                        comp.componentName,
+                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).footerStates;
                       break;
                     case "grid":
                       newState.gridStates = gridFunctions.setData(
                         newState,
-                        comp.componentName,
+                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).gridStates;
                       break;
@@ -1764,7 +1764,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.filterButtonsStates =
                         filterButtonsFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).filterButtonsStates;
                       break;
@@ -1772,14 +1772,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.propertyFilterStates =
                         propertyFilterFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).propertyFilterStates;
                       break;
                     case "mapSection":
                       newState.mapSectionStates = mapSectionFunctions.setData(
                         newState,
-                        comp.componentName,
+                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).mapSectionStates;
                       break;
@@ -1787,7 +1787,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.contactFormSectionStates =
                         contactFormSectionFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).contactFormSectionStates;
                       break;
@@ -1795,7 +1795,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.contactCardsStates =
                         contactCardsFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).contactCardsStates;
                       break;
@@ -1803,12 +1803,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.applicationFormStates =
                         applicationFormFunctions.setData(
                           newState,
-                          comp.componentName,
+                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).applicationFormStates;
                       break;
                     case "inputs":
                       console.log("🔍 Loading inputs data into editorStore:", {
+                        componentId: comp.id,  // ✅ استخدام comp.id في الـ log
                         componentName: comp.componentName,
                         data: comp.data,
                         hasData: !!comp.data,
@@ -1816,7 +1817,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       });
                       newState.inputsStates = inputsFunctions.setData(
                         newState,
-                        comp.componentName,
+                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).inputsStates;
                       console.log(
@@ -1826,6 +1827,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       break;
                     case "inputs2":
                       console.log("🔍 Loading inputs2 data into editorStore:", {
+                        componentId: comp.id,  // ✅ استخدام comp.id في الـ log
                         componentName: comp.componentName,
                         data: comp.data,
                         hasData: !!comp.data,
@@ -1833,7 +1835,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       });
                       newState.inputs2States = inputs2Functions.setData(
                         newState,
-                        comp.componentName,
+                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).inputs2States;
                       console.log(

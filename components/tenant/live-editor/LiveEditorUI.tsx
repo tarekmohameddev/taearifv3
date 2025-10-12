@@ -826,66 +826,89 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                 !component.componentName?.startsWith("header") &&
                 !component.componentName?.startsWith("footer"),
             )
-            .map((component: any, index: number) => (
-              <motion.div
-                key={component.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                layout
-                className={`relative ${
-                  component.layout?.span === 2
-                    ? selectedDevice === "phone"
-                      ? "w-full"
+            .map((component: any, index: number) => {
+              // قراءة البيانات من editorStore باستخدام component.id
+              const storeData = useEditorStore.getState().getComponentData(
+                component.type,
+                component.id
+              );
+              
+              // دمج البيانات: أولوية للبيانات من editorStore
+              const mergedData = storeData && Object.keys(storeData).length > 0
+                ? storeData
+                : component.data;
+
+              // Debug log للتحقق من تدفق البيانات
+              console.log("🔍 Component data in LiveEditorUI:", {
+                componentId: component.id,
+                componentType: component.type,
+                componentName: component.componentName,
+                storeData: storeData ? Object.keys(storeData) : 'none',
+                componentData: component.data ? Object.keys(component.data) : 'none',
+                mergedDataKeys: mergedData ? Object.keys(mergedData) : 'none'
+              });
+
+              return (
+                <motion.div
+                  key={component.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  layout
+                  className={`relative ${
+                    component.layout?.span === 2
+                      ? selectedDevice === "phone"
+                        ? "w-full"
+                        : "w-full"
                       : "w-full"
-                    : "w-full"
-                }`}
-              >
-                <LiveEditorDraggableComponent
-                  id={component.id}
-                  componentType={component.componentName}
-                  depth={1}
-                  index={index}
-                  zoneCompound="root"
-                  isLoading={false}
-                  isSelected={selectedComponentId === component.id}
-                  label={component.componentName}
-                  onEditClick={() => handleEditClick(component.id)}
-                  onDeleteClick={() => handleDeleteClick(component.id)}
-                  inDroppableZone={true}
-                  autoDragAxis="both"
+                  }`}
                 >
-                  {(ref: any) => (
-                    <div
-                      ref={ref}
-                      className={`relative ${
-                        selectedDevice === "phone"
-                          ? "text-sm"
-                          : selectedDevice === "tablet"
-                            ? "text-base"
-                            : "text-base"
-                      }`}
-                    >
-                      <CachedComponent
-                        key={`${component.id}-${component.forceUpdate || 0}-${selectedDevice}`}
-                        componentName={component.componentName}
-                        section={state.slug}
-                        data={
-                          {
-                            ...component.data,
-                            useStore: true,
-                            variant: component.id,
-                            deviceType: selectedDevice,
-                            forceUpdate: component.forceUpdate,
-                          } as any
-                        }
-                      />
-                    </div>
-                  )}
-                </LiveEditorDraggableComponent>
-              </motion.div>
-            ))}
+                  <LiveEditorDraggableComponent
+                    id={component.id}
+                    componentType={component.componentName}
+                    depth={1}
+                    index={index}
+                    zoneCompound="root"
+                    isLoading={false}
+                    isSelected={selectedComponentId === component.id}
+                    label={component.componentName}
+                    onEditClick={() => handleEditClick(component.id)}
+                    onDeleteClick={() => handleDeleteClick(component.id)}
+                    inDroppableZone={true}
+                    autoDragAxis="both"
+                  >
+                    {(ref: any) => (
+                      <div
+                        ref={ref}
+                        className={`relative ${
+                          selectedDevice === "phone"
+                            ? "text-sm"
+                            : selectedDevice === "tablet"
+                              ? "text-base"
+                              : "text-base"
+                        }`}
+                      >
+                        <CachedComponent
+                          key={`${component.id}-${component.forceUpdate || 0}-${selectedDevice}`}
+                          componentName={component.componentName}
+                          section={state.slug}
+                          data={
+                            {
+                              ...mergedData,  // ✅ استخدام البيانات المدمجة من editorStore
+                              useStore: true,
+                              variant: component.id,
+                              deviceType: selectedDevice,
+                              forceUpdate: component.forceUpdate,
+                            } as any
+                          }
+                        />
+                      </div>
+                    )}
+                  </LiveEditorDraggableComponent>
+                </motion.div>
+              );
+            })}
         </LiveEditorDropZone>
 
         {/* Static Footer - Clickable for editing */}
