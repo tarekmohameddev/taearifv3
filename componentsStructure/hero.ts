@@ -305,41 +305,6 @@ export const heroStructure: ComponentStructure = {
         { key: "background.image", label: "Background Image", type: "image" },
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.subtitle", label: "Subtitle", type: "text" },
-        {
-          key: "content.paddingTop",
-          label: "Content Padding Top",
-          type: "text",
-        },
-        {
-          key: "searchForm.enabled",
-          label: "Show Search Form",
-          type: "boolean",
-        },
-        {
-          key: "searchForm.fields.purpose.enabled",
-          label: "Show Purpose Field",
-          type: "boolean",
-        },
-        {
-          key: "searchForm.fields.city.enabled",
-          label: "Show City Field",
-          type: "boolean",
-        },
-        {
-          key: "searchForm.fields.type.enabled",
-          label: "Show Type Field",
-          type: "boolean",
-        },
-        {
-          key: "searchForm.fields.price.enabled",
-          label: "Show Price Field",
-          type: "boolean",
-        },
-        {
-          key: "searchForm.fields.keywords.enabled",
-          label: "Show Keywords Field",
-          type: "boolean",
-        },
       ],
     },
     {
@@ -545,21 +510,6 @@ export const heroStructure: ComponentStructure = {
         { key: "background.image", label: "Background Image", type: "image" },
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.description", label: "Description", type: "text" },
-        {
-          key: "background.overlay.enabled",
-          label: "Show Overlay",
-          type: "boolean",
-        },
-        {
-          key: "background.overlay.opacity",
-          label: "Overlay Opacity",
-          type: "text",
-        },
-        {
-          key: "background.overlay.color",
-          label: "Overlay Color",
-          type: "color",
-        },
       ],
     },
   ],
