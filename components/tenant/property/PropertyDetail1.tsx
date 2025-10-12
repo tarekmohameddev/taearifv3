@@ -40,6 +40,7 @@ import {
   InstagramIcon,
   LinkedinIcon,
   MessageCircleIcon,
+  EyeIcon,
 } from "lucide-react";
 
 interface Property {
@@ -1472,7 +1473,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                           href={`/property/${similarProperty.slug || similarProperty.id}`}
                           className="flex mb-8 gap-x-6 h-48 w-full rounded-xl px-4 border border-gray-200 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
                         >
-                          <div className="flex-[30%] py-8 flex flex-col gap-y-4 justify-center">
+                          <div className="flex-[40%] py-8 flex flex-col gap-y-4 justify-center">
                             <h4 className="text-ellipsis overflow-hidden font-bold text-xl text-gray-600">
                               {similarProperty.title}
                             </h4>
@@ -1480,21 +1481,29 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               {similarProperty.district}
                             </p>
                             <div className="flex flex-row items-center justify-start">
-                              <p className="flex items-center justify-center leading-6 font-bold text-xl">
-                                {similarProperty.price} ريال
+                              <p className="flex items-center justify-center leading-6 font-bold text-xl gap-2">
+                                {similarProperty.price}
+                                <img
+                                  src="/Saudi_Riyal_Symbol.svg"
+                                  alt="ريال سعودي"
+                                  className="w-5 h-5"
+                                  style={{
+                                    filter: "brightness(0) saturate(100%)",
+                                  }}
+                                />
                               </p>
                             </div>
                           </div>
-                          <figure className="relative flex-[70%] py-4 rounded-lg overflow-hidden w-full h-full">
+                          <figure className="relative flex-[60%] py-4 rounded-lg overflow-hidden w-full h-full">
                             <div className="bg-white mt-3 absolute w-36 h-7 md:w-29 lg:w-40 xl:w-46 md:h-9 flex items-center justify-between px-3 top-4 md:top-5 lg:top-4 right-2 rounded-md">
                               <div className="flex flex-row items-center justify-center gap-x-1">
-                                <div className="w-4 h-4 bg-gray-400 rounded"></div>
+                                <EyeIcon className="w-4 h-4 text-gray-600" />
                                 <p className="text-sm md:text-base font-bold text-gray-600">
                                   {similarProperty.views}
                                 </p>
                               </div>
                               <div className="flex flex-row items-center justify-center gap-x-1">
-                                <div className="w-4 h-4 bg-gray-400 rounded"></div>
+                                <BedIcon className="w-4 h-4 text-gray-600" />
                                 <p className="text-sm md:text-base font-bold text-gray-600">
                                   {similarProperty.bedrooms || 0}
                                 </p>
@@ -1546,13 +1555,13 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               <div className="relative h-88 md:h-91 flex flex-col justify-center min-w-[300px]">
                                 <div className="bg-white z-40 absolute w-36 mt-3 h-7 md:w-46 md:h-9 flex items-center justify-between px-3 top-4 md:top-5 lg:top-4 right-2 rounded-md">
                                   <div className="flex flex-row items-center justify-center gap-x-1">
-                                    <div className="w-4 h-4 bg-gray-400 rounded"></div>
+                                    <EyeIcon className="w-4 h-4 text-gray-600" />
                                     <p className="text-sm md:text-base font-bold text-gray-600">
                                       {similarProperty.views}
                                     </p>
                                   </div>
                                   <div className="flex flex-row items-center justify-center gap-x-1">
-                                    <div className="w-4 h-4 bg-gray-400 rounded"></div>
+                                    <BedIcon className="w-4 h-4 text-gray-600" />
                                     <p className="text-sm md:text-base font-bold text-gray-600">
                                       {similarProperty.bedrooms || 0}
                                     </p>
@@ -1585,8 +1594,16 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                                   {similarProperty.district}
                                 </p>
                                 <div className="flex flex-row items-center justify-between pt-4">
-                                  <p className="text-ellipsis overflow-hidden text-gray-800 font-bold text-base leading-5 md:text-lg xl:text-xl xl:leading-6">
-                                    {similarProperty.price} ريال
+                                  <p className="text-ellipsis overflow-hidden text-gray-800 font-bold text-base leading-5 md:text-lg xl:text-xl xl:leading-6 flex items-center gap-2">
+                                    {similarProperty.price}
+                                    <img
+                                      src="/Saudi_Riyal_Symbol.svg"
+                                      alt="ريال سعودي"
+                                      className="w-5 h-5"
+                                      style={{
+                                        filter: "brightness(0) saturate(100%)",
+                                      }}
+                                    />
                                   </p>
                                   <p className="text-emerald-600 font-bold text-base leading-5 xl:leading-6 xl:text-lg">
                                     تفاصيل

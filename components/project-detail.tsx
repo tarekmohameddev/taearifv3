@@ -27,6 +27,13 @@ import {
   InstagramIcon,
   LinkedinIcon,
   MessageCircleIcon,
+  EyeIcon,
+  BedIcon,
+  Eye,
+  Bed,
+  Bath,
+  Square,
+  MapPin,
 } from "lucide-react";
 
 interface Project {
@@ -1136,88 +1143,124 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
               </h3>
 
               {/* عرض المشاريع المشابهة للديسكتوب */}
-              <div className="hidden md:block space-y-8">
+              <div className="hidden md:block">
                 {loadingSimilar ? (
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
                       <div
                         key={i}
-                        className="flex mb-8 gap-x-6 h-48 w-full rounded-xl px-4 border border-gray-200 shadow-lg animate-pulse"
+                        className="group relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 animate-pulse"
                       >
-                        <div className="flex-[48.6%] py-8 flex flex-col gap-y-4 justify-center">
-                          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-                          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                          <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+                        <div className="relative w-full h-96 bg-gray-200"></div>
+                        <div className="p-6">
+                          <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                          <div className="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
+                          <div className="flex gap-2">
+                            <div className="h-8 bg-gray-200 rounded w-16"></div>
+                            <div className="h-8 bg-gray-200 rounded w-16"></div>
                         </div>
-                        <div className="flex-[42.4%] py-4 rounded-lg overflow-hidden w-full h-full">
-                          <div className="w-full h-full bg-gray-200 rounded-lg"></div>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  similarProjects.map((similarProject) => (
-                    <div
-                      key={similarProject.id}
-                      className="flex mb-8 gap-x-6 h-48 w-full rounded-xl px-4 border border-gray-200 shadow-lg"
-                    >
-                      <div className="flex-[48.6%] py-8 flex flex-col gap-y-4 justify-center">
-                        <h4 className="text-ellipsis overflow-hidden font-bold text-xl text-gray-600">
-                          {similarProject.title}
-                        </h4>
-                        <p className="text-ellipsis font-bold text-base text-gray-600 leading-5">
-                          {similarProject.district}
-                        </p>
-                        <div className="flex flex-row items-center justify-between">
-                          <p className="flex items-center justify-center leading-6 font-bold text-xl">
-                            {similarProject.price} ريال
-                          </p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {similarProjects.map((similarProject) => (
                           <Link
+                        key={similarProject.id}
                             href={`/project/${similarProject.slug || similarProject.id}`}
-                            className="font-bold text-lg text-emerald-600 hover:text-emerald-700"
-                          >
-                            تفاصيل
-                          </Link>
+                        className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200 cursor-pointer"
+                      >
+                        {/* Image Container */}
+                        <div className="relative w-full h-96 overflow-hidden">
+                          <Image
+                            src={similarProject.image ?? "/placeholder.jpg"}
+                            alt={similarProject.title}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+
+                          {/* Gradient Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                          {/* Views Counter - Top Right */}
+                          {similarProject.views && (
+                          <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-lg flex items-center gap-1 text-sm backdrop-blur-sm">
+                            <>
+                            <Eye className="w-4 h-4" />
+                            <span>{similarProject.views}</span>
+                            </>
                         </div>
-                      </div>
-                      <figure className="relative flex-[42.4%] py-4 rounded-lg overflow-hidden w-full h-full">
-                        <div className="bg-white mt-3 absolute w-36 h-7 md:w-29 lg:w-40 xl:w-46 md:h-9 flex items-center justify-between px-3 top-4 md:top-5 lg:top-4 right-2 rounded-md">
-                          <div className="flex flex-row items-center justify-center gap-x-1">
-                            <div className="w-4 h-4 bg-gray-400 rounded"></div>
-                            <p className="text-sm md:text-base font-bold text-gray-600">
-                              {similarProject.views}
-                            </p>
-                          </div>
-                          <div className="flex flex-row items-center justify-center gap-x-1">
-                            <div className="w-4 h-4 bg-gray-400 rounded"></div>
-                            <p className="text-sm md:text-base font-bold text-gray-600">
-                              {similarProject.bedrooms &&
-                              similarProject.bedrooms > 0
-                                ? similarProject.bedrooms
-                                : 0}
-                            </p>
-                          </div>
-                        </div>
-                        <Image
-                          src={similarProject.image ?? "/placeholder.jpg"}
-                          alt="Project Image"
-                          fill
-                          className="w-full h-full object-cover rounded-lg overflow-hidden relative -z-10"
-                        />
-                        <div className="absolute bottom-2 right-2 opacity-50">
-                          <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-                            <Image
-                              src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-                              alt="تعاريف العقارية"
-                              width={160}
-                              height={80}
-                              className="object-contain"
+                          )}
+                          {/* Content Overlay - Bottom */}
+                          <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                            {/* Title */}
+                            <h3 className="text-xl font-bold mb-2 line-clamp-2 group-hover:text-blue-300 transition-colors">
+                              {similarProject.title}
+                            </h3>
+
+                            {/* District */}
+                            {similarProject.district && similarProject.district.trim() !== "" && (
+                              <div className="flex items-center gap-2 mb-3">
+                                <MapPin className="w-4 h-4 text-blue-300" />
+                                <span className="text-sm text-gray-200">{similarProject.district}</span>
+                              </div>
+                            )}
+
+                            {/* Project Details */}
+                            <div className="flex items-center gap-4 mb-4 flex-wrap">
+                              {similarProject.developer && 
+                               similarProject.developer.trim() !== "" && 
+                               similarProject.developer !== "Unknown Developer" && (
+                                <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
+                                  <BuildingIcon className="w-4 h-4" />
+                                  <span className="text-sm font-medium">
+                                    {similarProject.developer}
+                                  </span>
+                                </div>
+                              )}
+                              {similarProject.completionDate && (
+                                <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
+                                  <CalendarIcon className="w-4 h-4" />
+                                  <span className="text-sm font-medium">
+                                    {new Date(similarProject.completionDate).toLocaleDateString("ar-US")}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Price */}
+                            {((similarProject.minPrice && similarProject.minPrice.trim() !== "" && parseFloat(similarProject.minPrice) > 0) ||
+                              (similarProject.maxPrice && similarProject.maxPrice.trim() !== "" && parseFloat(similarProject.maxPrice) > 0) ||
+                              (similarProject.price && similarProject.price.trim() !== "")) && (
+                              <div className="flex items-center gap-2">
+                                <p className="text-2xl font-bold text-white">
+                                  {similarProject.minPrice && similarProject.maxPrice && 
+                                   parseFloat(similarProject.minPrice) > 0 && parseFloat(similarProject.maxPrice) > 0 ? (
+                                    `${similarProject.minPrice} - ${similarProject.maxPrice}`
+                                  ) : similarProject.price ? (
+                                    similarProject.price
+                                  ) : similarProject.minPrice && parseFloat(similarProject.minPrice) > 0 ? (
+                                    similarProject.minPrice
+                                  ) : similarProject.maxPrice && parseFloat(similarProject.maxPrice) > 0 ? (
+                                    similarProject.maxPrice
+                                  ) : null}
+                                </p>
+                                <img
+                                  src="/Saudi_Riyal_Symbol.svg"
+                                  alt="ريال سعودي"
+                                  className="w-6 h-6"
+                                  style={{
+                                    filter: "brightness(0) saturate(100%)",
+                                  }}
                             />
                           </div>
+                            )}
                         </div>
-                      </figure>
                     </div>
-                  ))
+                      </Link>
+                    ))}
+                  </div>
                 )}
               </div>
 
@@ -1228,70 +1271,120 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                     ? [1, 2, 3].map((i) => (
                         <div
                           key={i}
-                          className="relative h-88 md:h-91 flex flex-col justify-center min-w-[280px] animate-pulse"
+                          className="group relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 min-w-[300px] animate-pulse"
                         >
-                          <div className="relative w-full h-64 flex items-center justify-center rounded-2xl overflow-hidden bg-gray-200"></div>
-                          <div className="h-4 bg-gray-200 rounded w-3/4 mt-4"></div>
-                          <div className="h-3 bg-gray-200 rounded w-1/2 mt-2"></div>
-                          <div className="h-4 bg-gray-200 rounded w-1/3 mt-4"></div>
+                          <div className="relative w-full h-64 bg-gray-200"></div>
+                          <div className="p-4">
+                            <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div className="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
+                            <div className="flex gap-2">
+                              <div className="h-6 bg-gray-200 rounded w-12"></div>
+                              <div className="h-6 bg-gray-200 rounded w-12"></div>
+                            </div>
+                          </div>
                         </div>
                       ))
                     : similarProjects.map((similarProject) => (
                         <Link
                           key={similarProject.id}
                           href={`/project/${similarProject.slug || similarProject.id}`}
+                          className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200 cursor-pointer min-w-[300px]"
                         >
-                          <div className="relative h-88 md:h-91 flex flex-col justify-center min-w-[280px]">
-                            <div className="bg-white z-40 absolute w-36 mt-3 h-7 md:w-46 md:h-9 flex items-center justify-between px-3 top-4 md:top-5 lg:top-4 right-2 rounded-md">
-                              <div className="flex flex-row items-center justify-center gap-x-1">
-                                <div className="w-4 h-4 bg-gray-400 rounded"></div>
-                                <p className="text-sm md:text-base font-bold text-gray-600">
-                                  {similarProject.views}
-                                </p>
-                              </div>
-                              <div className="flex flex-row items-center justify-center gap-x-1">
-                                <div className="w-4 h-4 bg-gray-400 rounded"></div>
-                                <p className="text-sm md:text-base font-bold text-gray-600">
-                                  {similarProject.bedrooms &&
-                                  similarProject.bedrooms > 0
-                                    ? similarProject.bedrooms
-                                    : 0}
-                                </p>
-                              </div>
-                            </div>
-                            <figure className="relative w-full h-64 flex items-center justify-center rounded-2xl overflow-hidden">
+                          {/* Image Container */}
+                          <div className="relative w-full h-64 overflow-hidden">
                               <Image
                                 src={similarProject.image ?? "/placeholder.jpg"}
-                                alt="ProjectImage"
-                                width={800}
-                                height={600}
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute bottom-2 right-2 opacity-50">
-                                <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-                                  <Image
-                                    src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-                                    alt="تعاريف العقارية"
-                                    width={160}
-                                    height={80}
-                                    className="object-contain"
+                              alt={similarProject.title}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+
+                            {/* Gradient Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                            {/* Views Counter - Top Right */}
+                            {similarProject.views && (
+                              <div className="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded-lg flex items-center gap-1 text-xs backdrop-blur-sm">
+                                <Eye className="w-3 h-3" />
+                                <span>{similarProject.views}</span>
+                                </div>
+                            )}
+
+                            {/* Content Overlay - Bottom */}
+                            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                              {/* Title */}
+                              <h3 className="text-lg font-bold mb-1 line-clamp-2 group-hover:text-blue-300 transition-colors">
+                              {similarProject.title}
+                              </h3>
+
+                              {/* District */}
+                              {similarProject.district && similarProject.district.trim() !== "" && (
+                                <div className="flex items-center gap-1 mb-2">
+                                  <MapPin className="w-3 h-3 text-blue-300" />
+                                  <span className="text-xs text-gray-200">{similarProject.district}</span>
+                                </div>
+                              )}
+
+                              {/* Project Details */}
+                              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                {similarProject.developer && 
+                                 similarProject.developer.trim() !== "" && 
+                                 similarProject.developer !== "Unknown Developer" && (
+                                  <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
+                                    <BuildingIcon className="w-3 h-3" />
+                                    <span className="text-xs font-medium">
+                                      {similarProject.developer}
+                                    </span>
+                                  </div>
+                                )}
+                                {similarProject.units && 
+                               similarProject.units !== 0 && 
+                               similarProject.units !== "0" && 
+                               Number(similarProject.units) > 0 && (
+                                  <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
+                                    <HomeIcon className="w-3 h-3" />
+                                    <span className="text-xs font-medium">
+                                      {similarProject.units} وحدة
+                                    </span>
+                                  </div>
+                                )}
+                                {similarProject.completionDate && (
+                                  <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
+                                    <CalendarIcon className="w-3 h-3" />
+                                    <span className="text-xs font-medium">
+                                      {new Date(similarProject.completionDate).toLocaleDateString("ar-US")}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Price */}
+                              {((similarProject.minPrice && similarProject.minPrice.trim() !== "" && parseFloat(similarProject.minPrice) > 0) ||
+                                (similarProject.maxPrice && similarProject.maxPrice.trim() !== "" && parseFloat(similarProject.maxPrice) > 0) ||
+                                (similarProject.price && similarProject.price.trim() !== "")) && (
+                                <div className="flex items-center gap-1">
+                                  <p className="text-lg font-bold text-white">
+                                    {similarProject.minPrice && similarProject.maxPrice && 
+                                     parseFloat(similarProject.minPrice) > 0 && parseFloat(similarProject.maxPrice) > 0 ? (
+                                      `${similarProject.minPrice} - ${similarProject.maxPrice}`
+                                    ) : similarProject.price ? (
+                                      similarProject.price
+                                    ) : similarProject.minPrice && parseFloat(similarProject.minPrice) > 0 ? (
+                                      similarProject.minPrice
+                                    ) : similarProject.maxPrice && parseFloat(similarProject.maxPrice) > 0 ? (
+                                      similarProject.maxPrice
+                                    ) : null}
+                                  </p>
+                                  <img
+                                    src="/Saudi_Riyal_Symbol.svg"
+                                    alt="ريال سعودي"
+                                    className="w-4 h-4"
+                                    style={{
+                                      filter: "brightness(0) saturate(100%)",
+                                    }}
                                   />
                                 </div>
-                              </div>
-                            </figure>
-                            <p className="text-gray-800 pt-4 text-base md:text-lg xl:text-xl font-normal leading-5 xl:leading-6 text-ellipsis overflow-hidden">
-                              {similarProject.title}
-                            </p>
-                            <p className="text-gray-500 pt-2 font-normal text-sm xl:text-base text-ellipsis overflow-hidden leading-4 xl:leading-5">
-                              {similarProject.district}
-                            </p>
-                            <div className="flex flex-row items-center justify-between pt-4">
-                              <p className="text-ellipsis overflow-hidden text-gray-800 font-bold text-base leading-5 md:text-lg xl:text-xl xl:leading-6">
-                                {similarProject.price} ريال
-                              </p>
-                              <p className="text-emerald-600 font-bold text-base leading-5 xl:leading-6 xl:text-lg">
-                                تفاصيل
-                              </p>
+                              )}
                             </div>
                           </div>
                         </Link>
