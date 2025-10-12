@@ -40,14 +40,14 @@ export default function SwiperCarousel({
         loop
         grabCursor
         spaceBetween={space}
-        slidesPerView={1.05}
+        slidesPerView={1.5}
         slidesPerGroup={1}
         autoplay={
           autoplay ? { delay: 3500, disableOnInteraction: false } : false
         }
         pagination={showPagination ? { clickable: true } : undefined}
         breakpoints={{
-          480: { slidesPerView: 1.2, centeredSlides: true },
+          480: { slidesPerView: 1.8, centeredSlides: true },
           640: { slidesPerView: 2, centeredSlides: false },
           900: { slidesPerView: 3, centeredSlides: false },
           1280: { slidesPerView: desktopCount, centeredSlides: false },

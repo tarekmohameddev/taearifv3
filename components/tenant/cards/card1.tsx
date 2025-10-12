@@ -86,11 +86,11 @@ export function PropertyCard({
 
   return (
     <div
-      className={`block h-full w-full ${isUnavailable ? "pointer-events-none" : "cursor-pointer"}`}
+      className={`block h-fit w-full ${isUnavailable ? "pointer-events-none" : "cursor-pointer"}`}
       aria-disabled={isUnavailable}
       onClick={handleClick}
     >
-      <div className="h-full w-full transition-transform hover:scale-[1.02]">
+      <div className="h-fit w-full transition-transform hover:scale-[1.02]">
         {/* صورة العقار مع الأيقونات */}
         {showImage && (
           <div className="relative w-full" style={{ aspectRatio: "16 / 10" }}>
@@ -155,8 +155,17 @@ export function PropertyCard({
           {showPrice && (
             <div className="flex items-center justify-between">
               {/* السعر على اليسار */}
-              <span className="text-lg font-extrabold text-foreground">
-                {p.price} ريال
+              <span className="flex items-center gap-1 text-lg font-extrabold text-foreground">
+                {p.price}
+                <img
+                  src="/Saudi_Riyal_Symbol.svg"
+                  alt="ريال سعودي"
+                  className="w-5 h-5"
+                  style={{
+                    filter:
+                      "brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%)",
+                  }}
+                />
               </span>
               {/* زر التفاصيل على اليمين - بدون Link لتجنب التداخل */}
               <Button

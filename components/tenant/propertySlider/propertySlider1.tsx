@@ -610,7 +610,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
           ) : properties.length > 0 ? (
             <SwiperCarousel
               desktopCount={mergedData.carousel?.desktopCount || 4}
-              slideClassName="!h-[360px] sm:!h-[400px] md:!h-[420px]"
+              slideClassName="!h-fit sm:!h-[400px] md:!h-[420px]"
               items={properties.map((p: Property) => {
                 const cardSettings = mergedData.cardSettings || {};
                 let CardComponent = PropertyCard;
