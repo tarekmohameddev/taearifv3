@@ -54,7 +54,7 @@ export default function SwiperCarousel({
         slidesPerView={1.05}
         slidesPerGroup={1}
         autoplay={
-          autoplay ? { delay: 3500, disableOnInteraction: false } : false
+          true
         }
         pagination={showPagination ? { clickable: true } : undefined}
         navigation={showMobileArrows ? true : false}
