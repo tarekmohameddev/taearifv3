@@ -34,6 +34,20 @@ import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { getDefaultInputs2Data } from "../../../context-liveeditor/editorStoreFunctions/inputs2Functions";
 import { useTenantId } from "@/hooks/useTenantId";
+import axios from "axios";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandItem,
+} from "@/components/ui/command";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // Generate random ID function
 const generateRandomId = (prefix: string = "id"): string => {
@@ -41,6 +55,17 @@ const generateRandomId = (prefix: string = "id"): string => {
   const random = Math.random().toString(36).substr(2, 5);
   return `${prefix}_${timestamp}_${random}`;
 };
+
+// API Data Interfaces
+interface City {
+  id: number;
+  name_ar: string;
+}
+
+interface District {
+  id: number;
+  name_ar: string;
+}
 
 // Types
 interface InputField {
@@ -522,6 +547,18 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     message: string;
   }>({ type: null, message: "" });
 
+  // API Data States
+  const [cities, setCities] = useState<City[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [loadingCities, setLoadingCities] = useState(true);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
+  const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
+  const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
+  
+  // Dropdown states
+  const [cityOpen, setCityOpen] = useState(false);
+  const [districtOpen, setDistrictOpen] = useState(false);
+
   // Auto-hide status messages after 5 seconds
   useEffect(() => {
     if (submitStatus.type) {
@@ -532,6 +569,47 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
       return () => clearTimeout(timer);
     }
   }, [submitStatus.type]);
+
+  // Fetch cities on component mount
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        setLoadingCities(true);
+        const response = await axios.get(
+          "https://nzl-backend.com/api/cities?country_id=1",
+        );
+        setCities(response.data.data);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      } finally {
+        setLoadingCities(false);
+      }
+    };
+    fetchCities();
+  }, []);
+
+  // Fetch districts when city is selected
+  useEffect(() => {
+    if (selectedCityId) {
+      const fetchDistricts = async () => {
+        try {
+          setLoadingDistricts(true);
+          const response = await axios.get(
+            `https://nzl-backend.com/api/districts?city_id=${selectedCityId}`,
+          );
+          setDistricts(response.data.data);
+        } catch (error) {
+          console.error("Error fetching districts:", error);
+        } finally {
+          setLoadingDistricts(false);
+        }
+      };
+      fetchDistricts();
+    } else {
+      setDistricts([]);
+      setSelectedDistrictId(null);
+    }
+  }, [selectedCityId]);
 
   // Initialize form data
   useEffect(() => {
@@ -581,6 +659,25 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     },
     [],
   );
+
+  // Handle city selection
+  const handleCitySelect = useCallback((cityId: number) => {
+    setSelectedCityId(cityId);
+    setSelectedDistrictId(null);
+    setFormData((prev) => ({
+      ...prev,
+      region: cityId,
+    }));
+  }, []);
+
+  // Handle district selection
+  const handleDistrictSelect = useCallback((districtId: number) => {
+    setSelectedDistrictId(districtId);
+    setFormData((prev) => ({
+      ...prev,
+      districts_id: districtId,
+    }));
+  }, []);
 
   // Toggle card collapse - memoized
   const toggleCardCollapse = useCallback((cardId: string) => {
@@ -993,6 +1090,160 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     const hasError = !!errors[field.id];
     const isPassword = fieldType === "password";
     const showPassword = showPasswords.has(field.id);
+
+    // Special handling for region (city) field
+    if (field.id === "region") {
+      const selectedCity = cities.find((city) => city.id === selectedCityId);
+
+      return (
+        <motion.div
+          key={field.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="relative"
+        >
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {field.label}
+            {field.required && <span className="text-red-500 mr-1">*</span>}
+          </label>
+
+          {field.description && field.description.trim() !== "" && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              {field.description}
+            </p>
+          )}
+
+          <Popover open={cityOpen} onOpenChange={setCityOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-between text-black",
+                  hasError
+                    ? "border-red-500 bg-red-50 dark:bg-red-900/20"
+                    : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
+                )}
+                disabled={loadingCities}
+              >
+                {loadingCities
+                  ? "جاري التحميل..."
+                  : selectedCity
+                    ? selectedCity.name_ar
+                    : "اختر المدينة"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent side="bottom" align="start" className="w-full p-0">
+              <Command>
+                <CommandInput placeholder="ابحث عن مدينة..." />
+                <CommandList className="text-black max-h-[200px] overflow-y-auto">
+                  {cities.map((city) => (
+                    <CommandItem
+                      key={city.id}
+                      onSelect={() => {
+                        handleCitySelect(city.id);
+                        setCityOpen(false);
+                      }}
+                      className="text-black"
+                    >
+                      {city.name_ar}
+                    </CommandItem>
+                  ))}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+
+          {hasError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center mt-2 text-red-500 text-sm"
+            >
+              <AlertCircle size={16} className="mr-1" />
+              {errors[field.id]}
+            </motion.div>
+          )}
+        </motion.div>
+      );
+    }
+
+    // Special handling for districts_id field
+    if (field.id === "districts_id") {
+      const selectedDistrict = districts.find((district) => district.id === selectedDistrictId);
+
+      return (
+        <motion.div
+          key={field.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="relative"
+        >
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {field.label}
+            {field.required && <span className="text-red-500 mr-1">*</span>}
+          </label>
+
+          {field.description && field.description.trim() !== "" && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              {field.description}
+            </p>
+          )}
+
+          <Popover open={districtOpen} onOpenChange={setDistrictOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-between text-black",
+                  hasError
+                    ? "border-red-500 bg-red-50 dark:bg-red-900/20"
+                    : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
+                )}
+                disabled={!selectedCityId || loadingDistricts}
+              >
+                {loadingDistricts
+                  ? "جاري التحميل..."
+                  : selectedDistrict
+                    ? selectedDistrict.name_ar
+                    : "اختر المنطقة"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent side="bottom" align="start" className="w-full p-0">
+              <Command>
+                <CommandInput placeholder="ابحث عن منطقة..." />
+                <CommandList className="text-black max-h-[200px] overflow-y-auto">
+                  {districts.map((district) => (
+                    <CommandItem
+                      key={district.id}
+                      onSelect={() => {
+                        handleDistrictSelect(district.id);
+                        setDistrictOpen(false);
+                      }}
+                      className="text-black"
+                    >
+                      {district.name_ar}
+                    </CommandItem>
+                  ))}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+
+          {hasError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center mt-2 text-red-500 text-sm"
+            >
+              <AlertCircle size={16} className="mr-1" />
+              {errors[field.id]}
+            </motion.div>
+          )}
+        </motion.div>
+      );
+    }
 
     return (
       <motion.div
