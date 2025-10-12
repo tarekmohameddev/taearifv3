@@ -504,6 +504,10 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   // دالة بسيطة لإضافة رقم 1 لكل مكون
   const getComponentNameWithOne = useCallback(
     (componentType: string): string => {
+      // إذا كان المكون يحتوي بالفعل على رقم، لا نضيف رقم آخر
+      if (componentType.match(/\d+$/)) {
+        return componentType;
+      }
       return `${componentType}1`;
     },
     [],

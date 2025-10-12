@@ -6,6 +6,7 @@ import {
   getDefaultHalfTextHalfImage2Data,
   getDefaultHalfTextHalfImage3Data,
 } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
+import { getDefaultInputs2Data } from "@/context-liveeditor/editorStoreFunctions/inputs2Functions";
 import { logSidebar } from "@/lib-liveeditor/debugLogger";
 
 // دالة لإنشاء البيانات الافتراضية لكل نوع مكون
@@ -739,6 +740,9 @@ export const createDefaultData = (
           },
         },
       };
+
+    case "inputs2":
+      return getDefaultInputs2Data();
 
     default:
       // للمكونات الأخرى، إرجاع بيانات افتراضية عامة

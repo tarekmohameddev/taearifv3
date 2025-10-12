@@ -164,6 +164,10 @@
     "propertiesPage": {
       "display_name": "Properties Page",
       "description": "Complete properties listing page with filter, search, and grid components"
+    },
+    "inputs2": {
+      "display_name": "Advanced Input System",
+      "description": "Dynamic form system with customizable cards and fields with visibility controls"
     }
   },
   "components_old": {
@@ -2948,6 +2952,30 @@
       "loading": "Loading...",
       "apply_theme": "Apply Theme",
       "confirm_save": "Confirm Save"
+    },
+    "inputs2": {
+      "card_visibility_controls": "Card Visibility Controls",
+      "show_property_info_card": "Show Property Information Card",
+      "show_budget_card": "Show Budget & Payment Card",
+      "show_additional_details_card": "Show Additional Details Card",
+      "show_contact_card": "Show Contact Information Card",
+      "field_visibility_controls": "Field Visibility Controls",
+      "show_property_type_field": "Show Property Type Field",
+      "show_property_category_field": "Show Property Category Field",
+      "show_city_field": "Show City Field",
+      "show_district_field": "Show District Field",
+      "show_area_from_field": "Show Area From Field",
+      "show_area_to_field": "Show Area To Field",
+      "show_purchase_method_field": "Show Purchase Method Field",
+      "show_budget_from_field": "Show Budget From Field",
+      "show_budget_to_field": "Show Budget To Field",
+      "show_seriousness_field": "Show Seriousness Field",
+      "show_purchase_goal_field": "Show Purchase Goal Field",
+      "show_similar_offers_field": "Show Similar Offers Field",
+      "show_full_name_field": "Show Full Name Field",
+      "show_phone_field": "Show Phone Field",
+      "show_whatsapp_field": "Show WhatsApp Field",
+      "show_notes_field": "Show Notes Field"
     }
   }
 }

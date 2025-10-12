@@ -141,11 +141,15 @@ export const createNewComponent = (
   }
 
   // للصفحات الجديدة، استخدم المكونات الافتراضية من homepage
+  const defaultComponentName = definition.component.match(/\d+$/) 
+    ? definition.component 
+    : `${definition.component}1`;
+    
   const componentName =
     registeredComponents?.[slug]?.[definition.component] ||
     (defaultComponents as any)[slug]?.[definition.component] ||
     (defaultComponents as any)?.homepage?.[definition.component] ||
-    `${definition.component}1`;
+    defaultComponentName;
 
   return {
     id: uuidv4(),

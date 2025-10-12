@@ -2197,6 +2197,30 @@ export function translateLabel(
     "Loading...": "save_dialog.loading",
     "Apply Theme": "save_dialog.apply_theme",
     "Confirm Save": "save_dialog.confirm_save",
+
+    // Inputs2 specific labels
+    "🎛️ Card Visibility Controls": "components_structure.inputs2.card_visibility_controls",
+    "🎯 Field Visibility Controls": "components_structure.inputs2.field_visibility_controls",
+    "Show Property Information Card": "components_structure.inputs2.show_property_info_card",
+    "Show Budget & Payment Card": "components_structure.inputs2.show_budget_card",
+    "Show Additional Details Card": "components_structure.inputs2.show_additional_details_card",
+    "Show Contact Information Card": "components_structure.inputs2.show_contact_card",
+    "Show Property Type Field": "components_structure.inputs2.show_property_type_field",
+    "Show Property Category Field": "components_structure.inputs2.show_property_category_field",
+    "Show City Field": "components_structure.inputs2.show_city_field",
+    "Show District Field": "components_structure.inputs2.show_district_field",
+    "Show Area From Field": "components_structure.inputs2.show_area_from_field",
+    "Show Area To Field": "components_structure.inputs2.show_area_to_field",
+    "Show Purchase Method Field": "components_structure.inputs2.show_purchase_method_field",
+    "Show Budget From Field": "components_structure.inputs2.show_budget_from_field",
+    "Show Budget To Field": "components_structure.inputs2.show_budget_to_field",
+    "Show Seriousness Field": "components_structure.inputs2.show_seriousness_field",
+    "Show Purchase Goal Field": "components_structure.inputs2.show_purchase_goal_field",
+    "Show Similar Offers Field": "components_structure.inputs2.show_similar_offers_field",
+    "Show Full Name Field": "components_structure.inputs2.show_full_name_field",
+    "Show Phone Field": "components_structure.inputs2.show_phone_field",
+    "Show WhatsApp Field": "components_structure.inputs2.show_whatsapp_field",
+    "Show Notes Field": "components_structure.inputs2.show_notes_field",
   };
 
   const translationKey = labelMappings[label];

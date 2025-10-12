@@ -40,6 +40,7 @@ import { contactFormSectionStructure } from "@/componentsStructure/contactFormSe
 import { contactCardsStructure } from "@/componentsStructure/contactCards";
 import { propertiesPageStructure } from "@/componentsStructure/propertiesPage";
 import { inputsStructure } from "@/componentsStructure/inputs";
+import { inputs2Structure } from "@/componentsStructure/inputs2";
 
 export interface ComponentType {
   id: string;
@@ -96,6 +97,7 @@ export const getSections = (
       "contactCards",
       "propertiesPage",
       "inputs",
+      "inputs2",
     ],
   },
 });
@@ -128,6 +130,7 @@ export const SECTIONS: Record<string, SectionType> = {
       "contactCards",
       "propertiesPage",
       "inputs",
+      "inputs2",
     ],
   },
 };
@@ -334,6 +337,17 @@ export const getComponents = (
     subPath: "inputs",
     icon: "📝",
     ...inputsStructure,
+  },
+  inputs2: {
+    id: "inputs2",
+    name: "inputs2",
+    displayName: t("components.inputs2.display_name"),
+    description: t("components.inputs2.description"),
+    category: "form",
+    section: "homepage",
+    subPath: "inputs2",
+    icon: "📝",
+    ...inputs2Structure,
   },
 });
 
@@ -549,6 +563,18 @@ export const COMPONENTS: Record<string, any> = {
     subPath: "inputs",
     icon: "📝",
     ...inputsStructure,
+  },
+  inputs2: {
+    id: "inputs2",
+    name: "inputs2",
+    displayName: "Advanced Inputs System 2",
+    description:
+      "Enhanced dynamic form system with improved cards, fields, and validation",
+    category: "form",
+    section: "homepage",
+    subPath: "inputs2",
+    icon: "📝",
+    ...inputs2Structure,
   },
 };
 

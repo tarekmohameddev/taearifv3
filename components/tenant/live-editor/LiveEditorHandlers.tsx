@@ -18,6 +18,10 @@ import { toast } from "sonner";
 
 // دالة بسيطة لإضافة رقم 1 لكل مكون
 const getComponentNameWithOne = (componentType: string): string => {
+  // إذا كان المكون يحتوي بالفعل على رقم، لا نضيف رقم آخر
+  if (componentType.match(/\d+$/)) {
+    return componentType;
+  }
   return `${componentType}1`;
 };
 

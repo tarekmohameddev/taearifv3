@@ -168,6 +168,10 @@
     "inputs": {
       "display_name": "نظام الإدخال المتقدم",
       "description": "نظام نماذج ديناميكي مع بطاقات قابلة للتخصيص وحقول وتحقق من الصحة"
+    },
+    "inputs2": {
+      "display_name": "نظام الإدخال المتقدم 2",
+      "description": "نظام نماذج ديناميكي مع عناصر تحكم في رؤية البطاقات والحقول"
     }
   },
   "components_old": {
@@ -2953,6 +2957,30 @@
       "loading": "جاري التحميل...",
       "apply_theme": "تطبيق السمة",
       "confirm_save": "تأكيد الحفظ"
+    },
+    "inputs2": {
+      "card_visibility_controls": "عناصر التحكم في رؤية البطاقات",
+      "show_property_info_card": "إظهار بطاقة معلومات العقار",
+      "show_budget_card": "إظهار بطاقة الميزانية والدفع",
+      "show_additional_details_card": "إظهار بطاقة التفاصيل الإضافية",
+      "show_contact_card": "إظهار بطاقة معلومات الاتصال",
+      "field_visibility_controls": "عناصر التحكم في رؤية الحقول",
+      "show_property_type_field": "إظهار حقل نوع العقار",
+      "show_property_category_field": "إظهار حقل فئة العقار",
+      "show_city_field": "إظهار حقل المدينة",
+      "show_district_field": "إظهار حقل الحي",
+      "show_area_from_field": "إظهار حقل المساحة من",
+      "show_area_to_field": "إظهار حقل المساحة إلى",
+      "show_purchase_method_field": "إظهار حقل طريقة الشراء",
+      "show_budget_from_field": "إظهار حقل الميزانية من",
+      "show_budget_to_field": "إظهار حقل الميزانية إلى",
+      "show_seriousness_field": "إظهار حقل الجدية",
+      "show_purchase_goal_field": "إظهار حقل هدف الشراء",
+      "show_similar_offers_field": "إظهار حقل العروض المماثلة",
+      "show_full_name_field": "إظهار حقل الاسم الكامل",
+      "show_phone_field": "إظهار حقل الهاتف",
+      "show_whatsapp_field": "إظهار حقل واتساب",
+      "show_notes_field": "إظهار حقل الملاحظات"
     }
   }
 }

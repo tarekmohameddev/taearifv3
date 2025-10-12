@@ -16,6 +16,8 @@ import { propertyFilterStructure } from "@/componentsStructure/propertyFilter";
 import { mapSectionStructure } from "@/componentsStructure/mapSection";
 import { contactFormSectionStructure } from "@/componentsStructure/contactFormSection";
 import { contactCardsStructure } from "@/componentsStructure/contactCards";
+import { inputsStructure } from "@/componentsStructure/inputs";
+import { inputs2Structure } from "@/componentsStructure/inputs2";
 
 // Deep merge function for nested objects
 const deepMerge = (target: any, source: any): any => {
@@ -60,9 +62,11 @@ import { contactCardsFunctions } from "./editorStoreFunctions/contactCardsFuncti
 import { contactFormSectionFunctions } from "./editorStoreFunctions/contactFormSectionFunctions";
 import { applicationFormFunctions } from "./editorStoreFunctions/applicationFormFunctions";
 import { inputsFunctions } from "./editorStoreFunctions/inputsFunctions";
+import { inputs2Functions } from "./editorStoreFunctions/inputs2Functions";
 import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
+import { getDefaultInputs2Data } from "./editorStoreFunctions/inputs2Functions";
 
 type OpenDialogFn = () => void;
 
@@ -363,6 +367,13 @@ interface EditorStore {
   setInputsData: (variantId: string, data: ComponentData) => void;
   updateInputsByPath: (variantId: string, path: string, value: any) => void;
 
+  // Inputs2 states
+  inputs2States: Record<string, ComponentData>;
+  ensureInputs2Variant: (variantId: string, initial?: ComponentData) => void;
+  getInputs2Data: (variantId: string) => ComponentData;
+  setInputs2Data: (variantId: string, data: ComponentData) => void;
+  updateInputs2ByPath: (variantId: string, path: string, value: any) => void;
+
   // Page-wise components aggregation (for saving all pages)
   pageComponentsByPage: Record<string, ComponentInstanceWithPosition[]>;
   setPageComponentsForPage: (
@@ -441,6 +452,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   contactFormSectionStates: {},
   applicationFormStates: {},
   inputsStates: {},
+  inputs2States: {},
 
   // Dynamic component states
   componentStates: {},
@@ -854,6 +866,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           );
         case "inputs":
           return inputsFunctions.ensureVariant(state, variantId, initial);
+        case "inputs2":
+          return inputs2Functions.ensureVariant(state, variantId, initial);
         default:
           // Fallback to generic component handling
           if (!state.componentStates[componentType]) {
@@ -924,6 +938,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return applicationFormFunctions.getData(state, variantId);
       case "inputs":
         return inputsFunctions.getData(state, variantId);
+      case "inputs2":
+        return inputs2Functions.getData(state, variantId);
       default:
         // Fallback to generic component data with default data creation
         const data = state.componentStates[componentType]?.[variantId];
@@ -1005,6 +1021,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "inputs":
           newState = inputsFunctions.setData(state, variantId, data);
+          break;
+        case "inputs2":
+          newState = inputs2Functions.setData(state, variantId, data);
           break;
         default:
           // Fallback to generic component handling
@@ -1186,6 +1205,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "inputs":
           newState = inputsFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "inputs2":
+          newState = inputs2Functions.updateByPath(
             state,
             variantId,
             path,
@@ -1529,6 +1556,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   updateInputsByPath: (variantId, path, value) =>
     set((state) => inputsFunctions.updateByPath(state, variantId, path, value)),
 
+  // Inputs2 functions using modular approach
+  ensureInputs2Variant: (variantId, initial) =>
+    set((state) => inputs2Functions.ensureVariant(state, variantId, initial)),
+  getInputs2Data: (variantId) => {
+    const state = get();
+    return inputs2Functions.getData(state, variantId);
+  },
+  setInputs2Data: (variantId, data) =>
+    set((state) => inputs2Functions.setData(state, variantId, data)),
+  updateInputs2ByPath: (variantId, path, value) =>
+    set((state) => inputs2Functions.updateByPath(state, variantId, path, value)),
+
   // Page components management
   setPageComponentsForPage: (page, components) =>
     set((state) => {
@@ -1785,6 +1824,23 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         newState.inputsStates,
                       );
                       break;
+                    case "inputs2":
+                      console.log("🔍 Loading inputs2 data into editorStore:", {
+                        componentName: comp.componentName,
+                        data: comp.data,
+                        hasData: !!comp.data,
+                        dataKeys: comp.data ? Object.keys(comp.data) : [],
+                      });
+                      newState.inputs2States = inputs2Functions.setData(
+                        newState,
+                        comp.componentName,
+                        comp.data,
+                      ).inputs2States;
+                      console.log(
+                        "✅ Inputs2 data loaded into editorStore:",
+                        newState.inputs2States,
+                      );
+                      break;
                   }
                 }
               },
@@ -1792,6 +1848,22 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           }
         },
       );
+
+      // Initialize default inputs2 data if no inputs2 components exist in database
+      const hasInputs2InDatabase = Object.values(tenantData.componentSettings || {}).some((pageSettings: any) => {
+        if (!pageSettings || typeof pageSettings !== 'object') return false;
+        return Object.values(pageSettings).some((comp: any) => comp.type === 'inputs2');
+      });
+
+      if (!hasInputs2InDatabase) {
+        console.log("🔍 No inputs2 components found in database, initializing default inputs2 data");
+        const defaultInputs2Data = getDefaultInputs2Data();
+        newState.inputs2States = {
+          ...newState.inputs2States,
+          "inputs2-default": defaultInputs2Data
+        };
+        console.log("✅ Default inputs2 data initialized in editorStore:", newState.inputs2States);
+      }
 
       return newState;
     }),
@@ -1934,6 +2006,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.componentName,
                 comp.data,
               ).inputsStates;
+              break;
+            case "inputs2":
+              newState.inputs2States = inputs2Functions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).inputs2States;
               break;
             case "contactFormSection":
               newState.contactFormSectionStates =
