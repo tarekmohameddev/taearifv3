@@ -259,6 +259,18 @@
   background-color: white;
 }
 
+/* Fix for dropdown inside popup */
+.popup .dropdown-content,
+.popup [data-radix-popper-content-wrapper] {
+  z-index: 1001 !important;
+}
+
+.popup .dropdown-item,
+.popup [data-radix-command-item] {
+  z-index: 1002 !important;
+  position: relative;
+}
+
 /* ========================================
    UTILITY CLASSES
    ======================================== */

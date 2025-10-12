@@ -69,10 +69,10 @@ const CitySelector: React.FC<CitySelectorProps> = ({
           {selectedCity ? selectedCity.name_ar : "اختر مدينة"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent side="bottom" align="start" className="z-[9999]" container={document.body}>
+      <PopoverContent side="bottom" align="start" className="z-[1001]">
         <Command>
           <CommandInput placeholder="ابحث عن مدينة..." />
-          <CommandList className="text-black max-h-[200px] overflow-y-auto z-9999">
+          <CommandList className="text-black max-h-[200px] overflow-y-auto z-[1002]">
             {cities.map((city) => (
               <CommandItem
                 key={city.id}
