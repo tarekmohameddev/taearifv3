@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:windows": "cross-env NODE_ENV=production next build",
     "start": "next start",
     "format": "prettier --write .",
     "lint": "next lint"

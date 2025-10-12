@@ -33,8 +33,8 @@ const nextConfig = {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
-  // تحسين البناء للصفحات الثابتة
-  output: "standalone",
+  // تحسين البناء للصفحات الثابتة - معالجة مشكلة symlink على Windows
+  output: process.platform === "win32" ? undefined : "standalone",
 };
 
 mergeConfig(nextConfig, userConfig);
