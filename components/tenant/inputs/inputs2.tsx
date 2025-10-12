@@ -341,6 +341,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
 
   // Get tenant data for this specific component variant - memoized
   const tenantComponentData = useMemo(() => {
+    
     if (!tenantData?.componentSettings) {
       return {};
     }
@@ -348,16 +349,44 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     for (const [pageSlug, pageComponents] of Object.entries(
       tenantData.componentSettings,
     )) {
-      // Check if pageComponents is an object (not array)
-      if (
+      // Handle both array and object structures
+      if (Array.isArray(pageComponents)) {
+        // Handle array structure (like in JSON file)
+        for (const component of pageComponents) {
+          // Try exact match first
+          if (
+            component.type === "inputs2" &&
+            component.componentName === variantId &&
+            component.id === props.id
+          ) {
+            return component.data;
+          }
+          
+          // Fallback: match without ID if props.id is undefined or empty
+          if (
+            component.type === "inputs2" &&
+            component.componentName === variantId &&
+            (!props.id || props.id === "" || props.id === component.id)
+          ) {
+            return component.data;
+          }
+          
+          // Last resort: match only type and componentName
+          if (
+            component.type === "inputs2" &&
+            component.componentName === variantId
+          ) {
+            return component.data;
+          }
+        }
+      } else if (
         typeof pageComponents === "object" &&
         !Array.isArray(pageComponents)
       ) {
-        // Search through all components in this page
+        // Handle object structure (legacy)
         for (const [componentId, component] of Object.entries(
           pageComponents as any,
         )) {
-          // Check if this is the exact component we're looking for by ID
           if (
             (component as any).type === "inputs2" &&
             (component as any).componentName === variantId &&
@@ -372,11 +401,14 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
   }, [tenantData?.componentSettings, variantId, props.id]);
 
   // Merge data with priority: storeData > tenantComponentData > props > default - memoized
-  const mergedData = useMemo(() => ({
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
-  }), [props, tenantComponentData, storeData]);
+  const mergedData = useMemo(() => {
+    const merged = {
+      ...props,
+      ...tenantComponentData,
+      ...storeData,
+    };
+    return merged;
+  }, [props, tenantComponentData, storeData]);
 
   // Get default data as base (99% of the data) - memoized
   const defaultData = useMemo(() => getDefaultInputs2Data(), []);
@@ -389,12 +421,15 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
 
   // Use default data for everything else (99%) - memoized
   const componentData = useMemo(() => {
+    // Use mergedData if it has fieldsLayout, otherwise use defaultData
+    const baseData = mergedData.fieldsLayout ? mergedData : defaultData;
+    
     const {
       cards = defaultData.cards,
       theme = defaultData.theme,
       submitButton = defaultData.submitButton,
-      cardsLayout = defaultData.cardsLayout,
-      fieldsLayout = defaultData.fieldsLayout,
+      cardsLayout = baseData.cardsLayout || defaultData.cardsLayout,
+      fieldsLayout = baseData.fieldsLayout || defaultData.fieldsLayout,
       texts = defaultData.texts,
       colors = defaultData.colors,
       settings = defaultData.settings,
@@ -402,7 +437,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
       apiEndpoint = defaultData.submitButton.apiEndpoint,
       className = "",
       visible = defaultData.visible,
-    } = defaultData;
+    } = baseData;
 
     const submitButtonText = submitButton.text || "حفظ البيانات";
     const showSubmitButton = submitButton.show !== false;
@@ -422,8 +457,9 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     const fieldsResponsive = fieldsLayout.responsive || {
       mobile: "1",
       tablet: "2",
-      desktop: "3",
+      desktop: "2",
     };
+    
 
     return {
       cards,
@@ -1678,21 +1714,31 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               className="p-6"
             >
               <div
-                className="fields-grid"
+                className={`grid gap-4 ${
+                  fieldsResponsive.mobile === "1" ? "grid-cols-1" :
+                  fieldsResponsive.mobile === "2" ? "grid-cols-2" :
+                  fieldsResponsive.mobile === "3" ? "grid-cols-3" :
+                  "grid-cols-4"
+                } ${
+                  fieldsResponsive.tablet === "1" ? "md:grid-cols-1" :
+                  fieldsResponsive.tablet === "2" ? "md:grid-cols-2" :
+                  fieldsResponsive.tablet === "3" ? "md:grid-cols-3" :
+                  "md:grid-cols-4"
+                } ${
+                  fieldsResponsive.desktop === "1" ? "lg:grid-cols-1" :
+                  fieldsResponsive.desktop === "2" ? "lg:grid-cols-2" :
+                  fieldsResponsive.desktop === "3" ? "lg:grid-cols-3" :
+                  "lg:grid-cols-4"
+                }`}
                 style={
                   {
                     gap: fieldsGap,
-                    display: "grid",
-                    gridTemplateColumns: `repeat(${fieldsColumns}, 1fr)`,
                     "--fields-columns": fieldsColumns,
                     "--fields-mobile": fieldsResponsive.mobile,
                     "--fields-tablet": fieldsResponsive.tablet,
                     "--fields-desktop": fieldsResponsive.desktop,
                   } as React.CSSProperties
                 }
-                data-fields-responsive-mobile={fieldsResponsive.mobile}
-                data-fields-responsive-tablet={fieldsResponsive.tablet}
-                data-fields-responsive-desktop={fieldsResponsive.desktop}
               >
                 {card.fields && Array.isArray(card.fields)
                   ? card.fields
@@ -1926,44 +1972,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
             ) !important;
           }
 
-          /* Mobile First Approach for Fields */
-          .fields-grid[data-fields-responsive-mobile="1"] {
-            grid-template-columns: repeat(1, 1fr) !important;
-          }
-          .fields-grid[data-fields-responsive-mobile="2"] {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          .fields-grid[data-fields-responsive-mobile="3"] {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-          .fields-grid[data-fields-responsive-mobile="4"] {
-            grid-template-columns: repeat(4, 1fr) !important;
-          }
 
-          /* Tablet Override for Fields */
-          @media (min-width: 768px) {
-            .fields-grid[data-fields-responsive-tablet="1"] {
-              grid-template-columns: repeat(1, 1fr) !important;
-            }
-            .fields-grid[data-fields-responsive-tablet="2"] {
-              grid-template-columns: repeat(2, 1fr) !important;
-            }
-            .fields-grid[data-fields-responsive-tablet="3"] {
-              grid-template-columns: repeat(3, 1fr) !important;
-            }
-            .fields-grid[data-fields-responsive-tablet="4"] {
-              grid-template-columns: repeat(4, 1fr) !important;
-            }
-          }
-
-          /* Desktop Override for Fields */
-          @media (min-width: 1024px) {
-            .fields-grid[data-fields-responsive-desktop="1"] {
-              grid-template-columns: repeat(1, 1fr) !important;
-            }
-            .fields-grid[data-fields-responsive-desktop="2"] {
-              grid-template-columns: repeat(2, 1fr) !important;
-            }
         `}</style>
 
         <div

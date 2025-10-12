@@ -63,7 +63,7 @@ export const getDefaultInputs2Data = (): ComponentData => ({
     responsive: {
       mobile: "1",
       tablet: "2",
-      desktop: "3"
+      desktop: "2"
     }
   },
   // Card visibility controls (1% of the data)
