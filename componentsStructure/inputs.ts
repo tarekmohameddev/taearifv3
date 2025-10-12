@@ -499,6 +499,11 @@ export const inputsStructure: ComponentStructure = {
           ],
         },
       ],
+      simpleFields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "submitButton.text", label: "Submit Button Text", type: "text" },
+        { key: "cards", label: "Form Cards", type: "array" },
+      ],
     },
   ],
 };

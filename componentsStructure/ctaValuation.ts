@@ -102,18 +102,6 @@ export const ctaValuationStructure: ComponentStructure = {
         { key: "content.buttonUrl", label: "Button URL", type: "text" },
         { key: "image.src", label: "Image Source", type: "image" },
         { key: "image.alt", label: "Image Alt Text", type: "text" },
-        { key: "styling.bgColor", label: "Background Color", type: "text" },
-        { key: "styling.textColor", label: "Text Color", type: "text" },
-        {
-          key: "styling.buttonBgColor",
-          label: "Button Background Color",
-          type: "text",
-        },
-        {
-          key: "styling.buttonTextColor",
-          label: "Button Text Color",
-          type: "text",
-        },
       ],
     },
   ],

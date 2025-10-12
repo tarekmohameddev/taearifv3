@@ -329,11 +329,6 @@ export const halfTextHalfImageStructure: ComponentStructure = {
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.description", label: "Description", type: "text" },
         { key: "content.button.text", label: "Button Text", type: "text" },
-        {
-          key: "content.button.enabled",
-          label: "Show Button",
-          type: "boolean",
-        },
         { key: "image.src", label: "Image", type: "image" },
         { key: "image.alt", label: "Image Alt Text", type: "text" },
       ],
@@ -807,7 +802,6 @@ export const halfTextHalfImageStructure: ComponentStructure = {
         { key: "content.eyebrow", label: "Eyebrow Text", type: "text" },
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.description", label: "Description", type: "text" },
-        // Statistics Section
         {
           key: "content.stats.stat1.value",
           label: "Stat 1 Value",
@@ -848,58 +842,8 @@ export const halfTextHalfImageStructure: ComponentStructure = {
           label: "Stat 4 Label",
           type: "text",
         },
-        // Stats Styling
-        {
-          key: "typography.stats.valueClassName",
-          label: "Stats Value Style",
-          type: "text",
-        },
-        {
-          key: "typography.stats.labelClassName",
-          label: "Stats Label Style",
-          type: "text",
-        },
-        {
-          key: "responsive.stats.gridCols",
-          label: "Stats Grid Layout",
-          type: "text",
-        },
-        { key: "responsive.stats.gap", label: "Stats Gap", type: "text" },
-        {
-          key: "responsive.stats.marginTop",
-          label: "Stats Margin Top",
-          type: "text",
-        },
-        // Image Section
         { key: "image.src", label: "Image", type: "image" },
         { key: "image.alt", label: "Image Alt Text", type: "text" },
-        {
-          key: "image.background.enabled",
-          label: "Show Green Block",
-          type: "boolean",
-        },
-        {
-          key: "image.background.color",
-          label: "Background Color",
-          type: "color",
-        },
-        // Layout & Animations
-        { key: "layout.direction", label: "Direction", type: "select" },
-        {
-          key: "animations.text.enabled",
-          label: "Text Animation",
-          type: "boolean",
-        },
-        {
-          key: "animations.image.enabled",
-          label: "Image Animation",
-          type: "boolean",
-        },
-        {
-          key: "animations.stats.enabled",
-          label: "Stats Animation",
-          type: "boolean",
-        },
       ],
     },
     {
@@ -1265,33 +1209,8 @@ export const halfTextHalfImageStructure: ComponentStructure = {
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.description", label: "Description", type: "text" },
         { key: "content.button.text", label: "Button Text", type: "text" },
-        {
-          key: "content.button.enabled",
-          label: "Show Button",
-          type: "boolean",
-        },
         { key: "image.src", label: "Image", type: "image" },
         { key: "image.alt", label: "Image Alt Text", type: "text" },
-        {
-          key: "image.background.enabled",
-          label: "Show Background Block",
-          type: "boolean",
-        },
-        {
-          key: "animations.text.enabled",
-          label: "Text Animation",
-          type: "boolean",
-        },
-        {
-          key: "animations.image.enabled",
-          label: "Image Animation",
-          type: "boolean",
-        },
-        {
-          key: "animations.button.enabled",
-          label: "Button Animation",
-          type: "boolean",
-        },
       ],
     },
   ],

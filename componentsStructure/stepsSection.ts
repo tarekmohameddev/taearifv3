@@ -411,31 +411,13 @@ export const stepsSectionStructure: ComponentStructure = {
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
-        { key: "background.color", label: "Background Color", type: "color" },
         { key: "header.title.text", label: "Section Title", type: "text" },
         {
           key: "header.description.text",
           label: "Section Description",
           type: "text",
         },
-        { key: "grid.columns.mobile", label: "Mobile Columns", type: "number" },
-        { key: "grid.columns.tablet", label: "Tablet Columns", type: "number" },
-        {
-          key: "grid.columns.desktop",
-          label: "Desktop Columns",
-          type: "number",
-        },
-        { key: "layout.direction", label: "Text Direction", type: "select" },
-        {
-          key: "animations.header.enabled",
-          label: "Header Animation",
-          type: "boolean",
-        },
-        {
-          key: "animations.steps.enabled",
-          label: "Steps Animation",
-          type: "boolean",
-        },
+        { key: "steps", label: "Steps List", type: "array" },
       ],
     },
   ],

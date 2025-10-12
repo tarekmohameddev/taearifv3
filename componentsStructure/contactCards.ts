@@ -452,32 +452,7 @@ export const contactCardsStructure: ComponentStructure = {
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
-        {
-          key: "layout.grid.columns.desktop",
-          label: "Desktop Columns",
-          type: "text",
-        },
-        {
-          key: "layout.grid.columns.mobile",
-          label: "Mobile Columns",
-          type: "text",
-        },
-        { key: "layout.grid.gap", label: "Grid Gap", type: "text" },
-        {
-          key: "cardStyle.shadow.enabled",
-          label: "Enable Card Shadow",
-          type: "boolean",
-        },
-        {
-          key: "animations.cards.enabled",
-          label: "Enable Cards Animation",
-          type: "boolean",
-        },
-        {
-          key: "animations.icons.enabled",
-          label: "Enable Icons Animation",
-          type: "boolean",
-        },
+        { key: "cards", label: "Contact Cards", type: "array" },
       ],
     },
   ],

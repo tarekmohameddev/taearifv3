@@ -559,46 +559,11 @@ export const contactFormSectionStructure: ComponentStructure = {
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "content.title.text", label: "Title", type: "text" },
-        {
-          key: "form.submitButton.text",
-          label: "Submit Button Text",
-          type: "text",
-        },
-        {
-          key: "form.fields.name.enabled",
-          label: "Show Name Field",
-          type: "boolean",
-        },
-        {
-          key: "form.fields.email.enabled",
-          label: "Show Email Field",
-          type: "boolean",
-        },
-        {
-          key: "form.fields.message.enabled",
-          label: "Show Message Field",
-          type: "boolean",
-        },
-        {
-          key: "form.submitButton.enabled",
-          label: "Show Submit Button",
-          type: "boolean",
-        },
-        {
-          key: "animations.title.enabled",
-          label: "Enable Title Animation",
-          type: "boolean",
-        },
-        {
-          key: "animations.socialLinks.enabled",
-          label: "Enable Social Links Animation",
-          type: "boolean",
-        },
-        {
-          key: "animations.form.enabled",
-          label: "Enable Form Animation",
-          type: "boolean",
-        },
+        { key: "content.socialLinks", label: "Social Links", type: "array" },
+        { key: "form.fields.name.placeholder", label: "Name Field Placeholder", type: "text" },
+        { key: "form.fields.email.placeholder", label: "Email Field Placeholder", type: "text" },
+        { key: "form.fields.message.placeholder", label: "Message Field Placeholder", type: "text" },
+        { key: "form.submitButton.text", label: "Submit Button Text", type: "text" },
       ],
     },
   ],
