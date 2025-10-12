@@ -72,10 +72,10 @@ const CitySelector: React.FC<CitySelectorProps> = ({
       <PopoverContent 
         side="bottom" 
         align="start" 
-        className="z-[1001] !z-[1001]"
+        className="z-[1001] !z-[1001] w-full"
         style={{ zIndex: 1001 }}
       >
-        <Command>
+        <Command className="z-[1001]">
           <CommandInput placeholder="ابحث عن مدينة..." />
           <CommandList 
             className="text-black max-h-[200px] overflow-y-auto z-[1002] !z-[1002]"
@@ -88,8 +88,12 @@ const CitySelector: React.FC<CitySelectorProps> = ({
                   onCitySelect(city.id);
                   setOpen(false);
                 }}
-                className="text-black !z-[1003]"
-                style={{ zIndex: 1003 }}
+                className="text-black !z-[1003] cursor-pointer hover:bg-gray-100"
+                style={{ 
+                  zIndex: 1003,
+                  pointerEvents: 'auto',
+                  cursor: 'pointer'
+                }}
               >
                 {city.name_ar}
               </CommandItem>

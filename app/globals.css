@@ -323,6 +323,37 @@
   pointer-events: auto !important;
 }
 
+/* Command component specific fixes */
+[cmdk-root] {
+  z-index: 1001 !important;
+}
+
+[cmdk-list] {
+  z-index: 1002 !important;
+}
+
+[cmdk-item] {
+  z-index: 1003 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.popup [cmdk-root] {
+  z-index: 1001 !important;
+}
+
+.popup [cmdk-list] {
+  z-index: 1002 !important;
+}
+
+.popup [cmdk-item] {
+  z-index: 1003 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
 /* ========================================
    UTILITY CLASSES
    ======================================== */
