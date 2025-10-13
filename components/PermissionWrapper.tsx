@@ -1,8 +1,9 @@
 "use client";
 
 import { usePermissions } from "@/hooks/usePermissions";
+import { useUserStore } from "@/store/userStore";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, Shield } from "lucide-react";
+import { AlertCircle, Shield, RefreshCw } from "lucide-react";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 
@@ -16,6 +17,7 @@ export default function PermissionWrapper({
   fallback,
 }: PermissionWrapperProps) {
   const { hasPermission, loading, error, userData } = usePermissions();
+  const { refreshUserData } = useUserStore();
 
   // Show loading state
   if (loading) {
@@ -47,9 +49,10 @@ export default function PermissionWrapper({
             </h2>
             <p className="text-gray-600 mb-4">{error}</p>
             <button
-              onClick={() => window.location.reload()}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              onClick={() => refreshUserData()}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
             >
+              <RefreshCw className="h-4 w-4" />
               إعادة المحاولة
             </button>
           </CardContent>
