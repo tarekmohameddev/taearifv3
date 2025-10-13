@@ -14,6 +14,7 @@ import {
   Dock,
   Bot,
   Link as LinkIcon,
+  SquarePen,
 } from "lucide-react";
 
 const getIconComponent = (iconName) => {
@@ -44,6 +45,8 @@ const getIconComponent = (iconName) => {
       return LayoutGrid;
     case "bot":
       return Bot;
+      case "square-pen":
+        return SquarePen;
     default:
       return FileText;
   }

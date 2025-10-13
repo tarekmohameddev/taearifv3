@@ -233,15 +233,9 @@ export function EnhancedSidebar({
                     }
 
                     const domain = userData?.domain || "";
-                    console.log("🔗 Domain after fallback:", domain);
-                    console.log("🔗 Domain type:", typeof domain);
-                    console.log("🔗 Domain length:", domain.length);
 
                     // التحقق من صحة الـ domain
                     if (!domain || domain.trim() === "") {
-                      console.warn("Domain is empty or invalid");
-                      console.warn("Domain value:", domain);
-                      console.warn("Domain trimmed:", domain.trim());
                       alert("يرجى إعداد domain صحيح في إعدادات الحساب");
                       return;
                     }
@@ -254,7 +248,6 @@ export function EnhancedSidebar({
                       !cleanDomain.includes(".") &&
                       !cleanDomain.startsWith("http")
                     ) {
-                      console.warn("Invalid domain format:", cleanDomain);
                       alert(
                         "تنسيق الـ domain غير صحيح. يجب أن يحتوي على نقطة (مثل: example.com) أو يكون URL صحيح",
                       );
@@ -296,55 +289,6 @@ export function EnhancedSidebar({
 
           {!loading && !error && (
             <div className="space-y-1">
-              {/* Live Editor Link */}
-              <TooltipProvider delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={
-                        currentTab === "live-editor" ? "secondary" : "ghost"
-                      }
-                      className={cn(
-                        "justify-start gap-3 h-auto py-2 px-3 w-full",
-                        isCollapsed && "justify-center px-2",
-                        currentTab === "live-editor" &&
-                          "bg-primary/10 text-primary border-r-2 border-primary",
-                      )}
-                      asChild
-                    >
-                      <Link href="/live-editor">
-                        <svg
-                          className="h-5 w-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                        {!isCollapsed && (
-                          <div className="flex flex-col items-start ml-3">
-                            <span className="text-sm font-medium">
-                              Live Editor
-                            </span>
-                            <span className="text-xs text-muted-foreground hidden md:inline-block">
-                              محرر الموقع المباشر
-                            </span>
-                          </div>
-                        )}
-                      </Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>Live Editor - محرر الموقع المباشر</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
               {mainNavItems.map((item: any) => (
                 <NavItem
                   key={item.id}

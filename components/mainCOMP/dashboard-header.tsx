@@ -286,7 +286,8 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
           {useAuthStore.getState().UserIslogged && (
             <>
               {useAuthStore.getState().userData?.package_title !==
-                undefined && (
+                undefined && 
+                useAuthStore.getState().userData?.account_type === "tenant" && (
                 <Button
                   variant={
                     useAuthStore.getState().userData?.is_free_plan
@@ -423,7 +424,8 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
       <div className="flex h-5 items-center justify-center border-b px-4 md:px-6 md:hidden ">
         {useAuthStore.getState().UserIslogged && (
           <>
-            {useAuthStore.getState().userData?.package_title !== undefined && (
+            {useAuthStore.getState().userData?.package_title !== undefined && 
+              useAuthStore.getState().userData?.account_type === "tenant" && (
               <Button
                 variant={
                   useAuthStore.getState().userData?.is_free_plan

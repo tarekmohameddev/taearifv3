@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Button } from "@/components/ui/button";
@@ -257,6 +258,7 @@ interface UpdateEmployeeRequest {
 }
 
 export default function AccessControlPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("employees");
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
@@ -1393,23 +1395,19 @@ export default function AccessControlPage() {
               onValueChange={setActiveTab}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-2">
+              {/* <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger
                   value="employees"
                   className="flex items-center gap-2"
                 >
                   <Users className="h-4 w-4" />
                   الموظفين
-                </TabsTrigger>
-                <TabsTrigger value="roles" className="flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
-                  الأدوار
-                </TabsTrigger>
+                </TabsTrigger> */}
                 {/* <TabsTrigger value="permissions" className="flex items-center gap-2">
                   <Key className="h-4 w-4" />
                   الصلاحيات
                 </TabsTrigger> */}
-              </TabsList>
+              {/* </TabsList> */}
 
               {/* Employees Tab */}
               <TabsContent value="employees" className="mt-6">
@@ -1441,16 +1439,25 @@ export default function AccessControlPage() {
                           <p className="text-sm text-gray-600">
                             إجمالي الموظفين: {employees.length}
                           </p>
-                          <Dialog
-                            open={showCreateDialog}
-                            onOpenChange={setShowCreateDialog}
-                          >
-                            <DialogTrigger asChild>
-                              <Button className="bg-black hover:bg-gray-800 text-white">
-                                <UserPlus className="h-4 w-4 ml-2" />
-                                إضافة موظف جديد
-                              </Button>
-                            </DialogTrigger>
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => router.push('/dashboard/access-control/roles')}
+                              variant="outline"
+                              className="border-black text-black hover:bg-black hover:text-white"
+                            >
+                              <Shield className="h-4 w-4 ml-2" />
+                              إدارة الأدوار
+                            </Button>
+                            <Dialog
+                              open={showCreateDialog}
+                              onOpenChange={setShowCreateDialog}
+                            >
+                              <DialogTrigger asChild>
+                                <Button className="bg-black hover:bg-gray-800 text-white">
+                                  <UserPlus className="h-4 w-4 ml-2" />
+                                  إضافة موظف جديد
+                                </Button>
+                              </DialogTrigger>
                             <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-white mx-2 sm:mx-0">
                               <DialogHeader className="border-b border-gray-200 pb-4">
                                 <DialogTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-2xl font-bold text-black">
@@ -1751,6 +1758,7 @@ export default function AccessControlPage() {
                               </ScrollArea>
                             </DialogContent>
                           </Dialog>
+                          </div>
                         </div>
 
                         <Table>
@@ -2443,7 +2451,8 @@ export default function AccessControlPage() {
                     ) : rolesTabData.length > 0 ? (
                       <div className="space-y-6">
                         {/* Statistics Cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                        {/* مخفي فقط لوقت لاحق */}
+                        {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                           <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-blue-500 rounded-lg">
@@ -2495,7 +2504,7 @@ export default function AccessControlPage() {
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </div> */}
 
                         {/* Search Bar */}
                         <div className="relative">
