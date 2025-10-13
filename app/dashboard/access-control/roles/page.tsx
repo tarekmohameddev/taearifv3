@@ -302,6 +302,25 @@ export default function RolesPage() {
     return translations[permission.toLowerCase()] || permission;
   };
 
+  // Translate group name
+  const translateGroupName = (groupName: string): string => {
+    const translations: Record<string, string> = {
+      "Live.Editor": "المحرر المباشر",
+      "Live": "المحرر المباشر",
+      "affiliate": "الشراكة",
+      "apps": "التطبيقات",
+      "content": "المحتوى",
+      "crm": "إدارة العملاء",
+      "customers": "العملاء",
+      "dashboard": "لوحة التحكم",
+      "live_editor": "المحرر المباشر",
+      "projects": "المشاريع",
+      "properties": "العقارات",
+      "settings": "الإعدادات",
+    };
+    return translations[groupName] || groupName;
+  };
+
   // Toggle permission selection
   const togglePermission = (permission: string) => {
     setSelectedPermissionsForRole((prev) =>
@@ -534,7 +553,7 @@ export default function RolesPage() {
                                 ([groupName, permissions]: [string, any]) => (
                                   <div key={groupName} className="space-y-2">
                                     <h5 className="font-medium text-gray-900 capitalize">
-                                      {groupName}
+                                      {translateGroupName(groupName)}
                                     </h5>
                                     <div className="space-y-2 pl-4">
                                       {Array.isArray(permissions) && permissions.length > 0 ? permissions.map((permission: any) => (
@@ -977,7 +996,7 @@ export default function RolesPage() {
                               <Key className="h-4 w-4 text-gray-600" />
                             </div>
                             <h4 className="font-medium text-gray-900 capitalize">
-                              {groupName}
+                              {translateGroupName(groupName)} 
                             </h4>
                           </div>
                           <div className="space-y-2 pr-4">
@@ -1139,7 +1158,7 @@ export default function RolesPage() {
                               <Key className="h-4 w-4 text-gray-600" />
                             </div>
                             <h4 className="font-medium text-gray-900 capitalize">
-                              {groupName}
+                              {translateGroupName(groupName)}
                             </h4>
                           </div>
                           <div className="space-y-2 pr-4">
