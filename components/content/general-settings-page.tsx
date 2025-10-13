@@ -199,7 +199,7 @@ export function GeneralSettingsPage() {
         <main className="flex-1 p-3">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Link href="/content">
+              <Link href="/dashboard/content/">
                 <Button variant="outline" size="icon" className="h-8 w-8 mr-2">
                   <ArrowRight className="h-4 w-4" />
                 </Button>

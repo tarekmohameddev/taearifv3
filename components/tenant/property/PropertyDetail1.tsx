@@ -1253,7 +1253,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             )}
 
             {/* نموذج الحجز */}
-            <div className="flex flex-col gap-y-6">
+            {/* انه مخفي فقط الان ولا اريد ازالته */}
+            {/* <div className="flex flex-col gap-y-6">
               <h2 className="pr-4 text-white font-bold rounded-md leading-6 bg-emerald-600 w-full h-10 flex items-center justify-start">
                 احجز الآن
               </h2>
@@ -1377,7 +1378,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   تأكيد الحجز
                 </button>
               </form>
-            </div>
+            </div> */}
           </div>
 
           {/* العمود الثاني - الصور والعقارات المشابهة ونموذج الحجز */}
