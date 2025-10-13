@@ -782,15 +782,21 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       >
         {/* Static Header - Clickable for editing */}
         <div
-          onClick={() => {
+          onClick={(e) => {
+            // منع جميع الأحداث داخل الـ Header
+            e.preventDefault();
+            e.stopPropagation();
             handleEditClick("global-header");
           }}
           className="cursor-pointer hover:ring-2 hover:ring-blue-500 hover:ring-opacity-50 transition-all duration-200"
           style={{
             position: "relative",
+            pointerEvents: "auto",
           }}
         >
-          <StaticHeader1 overrideData={globalHeaderData} />
+          <div style={{ pointerEvents: "none" }}>
+            <StaticHeader1 overrideData={globalHeaderData} />
+          </div>
           {/* Overlay indicator */}
           <div
             className="absolute inset-0 pointer-events-none opacity-0 hover:opacity-100 transition-opacity duration-200"
@@ -913,15 +919,21 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
 
         {/* Static Footer - Clickable for editing */}
         <div
-          onClick={() => {
+          onClick={(e) => {
+            // منع جميع الأحداث داخل الـ Footer
+            e.preventDefault();
+            e.stopPropagation();
             handleEditClick("global-footer");
           }}
           className="cursor-pointer hover:ring-2 hover:ring-green-500 hover:ring-opacity-50 transition-all duration-200"
           style={{
             position: "relative",
+            pointerEvents: "auto",
           }}
         >
-          <StaticFooter1 overrideData={globalFooterData} />
+          <div style={{ pointerEvents: "none" }}>
+            <StaticFooter1 overrideData={globalFooterData} />
+          </div>
           {/* Overlay indicator */}
           <div
             className="absolute inset-0 pointer-events-none opacity-0 hover:opacity-100 transition-opacity duration-200"
