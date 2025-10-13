@@ -2020,7 +2020,31 @@
       "metaTags": {
         "pages": [
           {
-            "name": "الرئيسية",
+            "TitleAr": "الرئيسية",
+            "TitleEn": "Home",
+            "DescriptionAr": "الرئيسية",
+            "DescriptionEn": "Home",
+            "KeywordsAr": "الرئيسية",
+            "KeywordsEn": "Home",
+            "Author": "الرئيسية",
+            "AuthorEn": "Home",
+            "Robots": "الرئيسية",
+            "RobotsEn": "Home",
+            "og:title": "الرئيسية",
+            "og:description": "الرئيسية",
+            "og:keywords": "الرئيسية",
+            "og:author": "الرئيسية",
+            "og:robots": "الرئيسية",
+            "og:url": "الرئيسية",
+            "og:image": "الرئيسية",
+            "og:type": "الرئيسية",
+            "og:locale": "الرئيسية",
+            "og:locale:alternate": "الرئيسية",
+            "og:site_name": "الرئيسية",
+            "og:image:width": "الرئيسية",
+            "og:image:height": "الرئيسية",
+            "og:image:type": "الرئيسية",
+            "og:image:alt": "الرئيسية",
             "path": "/"
           }
         ]
