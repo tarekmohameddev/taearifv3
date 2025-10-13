@@ -1,8 +1,6 @@
 "use client";
 
 export default function HalfTextHalfImageSkeleton1() {
-  console.log("🎨 HalfTextHalfImageSkeleton1: Component is rendering!");
-
   return (
     <section
       className="mx-auto max-w-[1600px] px-4"

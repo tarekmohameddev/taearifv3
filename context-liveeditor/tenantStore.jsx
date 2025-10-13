@@ -275,7 +275,6 @@ const useTenantStore = create((set) => ({
     })),
 
   fetchTenantData: async (websiteName) => {
-    console.log("🔄 fetchTenantData called with websiteName:", websiteName);
     const state = useTenantStore.getState();
 
     // Prevent duplicate requests - تحقق من أن البيانات موجودة ونفس الـ username
@@ -283,30 +282,20 @@ const useTenantStore = create((set) => ({
       state.loadingTenantData ||
       (state.tenantData && state.tenantData.username === websiteName)
     ) {
-      console.log(
-        "⏭️ Skipping fetchTenantData - already loading or data exists",
-      );
       return;
     }
 
     // منع الـ duplicate calls إذا كان نفس الـ websiteName
     if (state.lastFetchedWebsite === websiteName) {
-      console.log("⏭️ Skipping fetchTenantData - already fetched this website");
       return;
     }
 
-    console.log("🚀 Starting fetchTenantData for:", websiteName);
     set({ loadingTenantData: true, error: null });
     try {
-      console.log("📡 Making API call to /v1/tenant-website/getTenant with:", {
-        websiteName,
-      });
       const response = await axiosInstance.post(
         "/v1/tenant-website/getTenant",
         { websiteName },
       );
-      console.log("📡 API response status:", response.status);
-      console.log("📡 API response data:", response.data);
       if (response.status === 404) {
         throw new Error("Tenant not found");
       } else if (response.status === 204) {
@@ -314,11 +303,9 @@ const useTenantStore = create((set) => ({
       }
 
       const data = response.data || {}; // If response is empty, use an empty object
-      console.log("📊 Processed data:", data);
 
       // تحقق من أن البيانات ليست فارغة
       if (!data || Object.keys(data).length === 0) {
-        console.log("⚠️ Empty data received, using default data");
         // بدلاً من رمي خطأ، استخدم بيانات افتراضية
         const defaultData = {
           username: websiteName,
@@ -336,7 +323,6 @@ const useTenantStore = create((set) => ({
             propertyFilter: {},
           },
         };
-        console.log("📊 Setting default data:", defaultData);
         set({
           tenantData: defaultData,
           loadingTenantData: false,
@@ -365,19 +351,12 @@ const useTenantStore = create((set) => ({
         // Don't set anything - let the component use its default data
       }
 
-      console.log("✅ Successfully fetched tenant data, setting in store");
       set({
         tenantData: data,
         loadingTenantData: false,
         lastFetchedWebsite: websiteName,
       });
     } catch (error) {
-      console.error("❌ [tenantStore] Error fetching tenant data:", error);
-      console.error("❌ Error details:", {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-      });
       set({ error: error.message, loadingTenantData: false });
     }
   },
@@ -421,7 +400,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save header error:", error);
       return false;
     }
   },
@@ -464,7 +442,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save hero error:", error);
       return false;
     }
   },
@@ -507,7 +484,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save footer error:", error);
       return false;
     }
   },
@@ -554,7 +530,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save half text half image error:", error);
       return false;
     }
   },
@@ -601,7 +576,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save half text half image2 error:", error);
       return false;
     }
   },
@@ -648,7 +622,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save half text half image3 error:", error);
       return false;
     }
   },
@@ -692,7 +665,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save property slider error:", error);
       return false;
     }
   },
@@ -736,7 +708,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save cta valuation error:", error);
       return false;
     }
   },
@@ -811,7 +782,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save grid error:", error);
       return false;
     }
   },
@@ -886,7 +856,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save filter buttons error:", error);
       return false;
     }
   },
@@ -991,7 +960,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save property filter error:", error);
       return false;
     }
   },
@@ -1039,7 +1007,6 @@ const useTenantStore = create((set) => ({
 
       return true;
     } catch (error) {
-      console.error("Save application form error:", error);
       return false;
     }
   },

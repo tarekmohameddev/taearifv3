@@ -1,8 +1,6 @@
 "use client";
 
 export default function MapSectionSkeleton1() {
-  console.log("🎨 MapSectionSkeleton1: Component is rendering!");
-
   return (
     <section className="container mx-auto px-4 py-8 animate-pulse">
       {/* Enhanced Background Shimmer Effect */}

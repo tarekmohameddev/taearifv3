@@ -46,6 +46,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   const [apiProperties, setApiProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Subscribe to properties store for transactionType changes
+  const transactionType = usePropertiesStore((state) => state.transactionType);
+  const setTransactionType = usePropertiesStore((state) => state.setTransactionType);
+  const setTenantId = usePropertiesStore((state) => state.setTenantId);
+  const filteredProperties = usePropertiesStore((state) => state.filteredProperties);
+  const storeLoading = usePropertiesStore((state) => state.loading);
+
   // Subscribe to editor store updates for this component variant
   const ensureComponentVariant = useEditorStore(
     (s) => s.ensureComponentVariant,
@@ -68,6 +75,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       fetchTenantData(tenantId);
     }
   }, [tenantId, fetchTenantData]);
+
+  // Set tenantId in properties store when it changes
+  useEffect(() => {
+    if (currentTenantId) {
+      setTenantId(currentTenantId);
+    }
+  }, [currentTenantId, setTenantId]);
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore
@@ -142,8 +156,6 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       }
 
       const url = convertApiUrl(apiUrl || defaultUrl, currentTenantId, purpose);
-      
-      console.log('Grid1: Making API request to:', url);
 
       const response = await axiosInstance.get(url);
 
@@ -153,75 +165,43 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
         // Check if it's projects API response
         if (url.includes("/projects")) {
-          console.log("Grid: Processing projects data");
           let projectsData = [];
 
           if (response.data.projects) {
             projectsData = response.data.projects;
-            console.log(
-              "Grid: Found projects in response.data.projects:",
-              projectsData.length,
-            );
           } else if (Array.isArray(response.data)) {
             projectsData = response.data;
-            console.log(
-              "Grid: Found projects in direct array:",
-              projectsData.length,
-            );
           } else if (response.data.data && Array.isArray(response.data.data)) {
             projectsData = response.data.data;
-            console.log(
-              "Grid: Found projects in response.data.data:",
-              projectsData.length,
-            );
           }
 
           // Convert projects to property format
           if (projectsData.length > 0) {
             dataToSet = projectsData.map((project: any) => {
-              console.log("Grid: Converting project:", project.title);
               return convertProjectToProperty(project);
             });
-            console.log(
-              "Grid: Converted",
-              projectsData.length,
-              "projects to property format",
-            );
           } else {
-            console.log("Grid: No projects data found");
             dataToSet = [];
           }
         }
         // Check if it's properties API response
         else if (response.data.properties) {
-          console.log("Grid: Processing properties data");
           dataToSet = response.data.properties;
         }
         // Handle direct array response
         else if (Array.isArray(response.data)) {
-          console.log("Grid: Processing direct array data");
           dataToSet = response.data;
         }
         // Handle pagination wrapper
         else if (response.data.data && Array.isArray(response.data.data)) {
-          console.log("Grid: Processing paginated data");
           dataToSet = response.data.data;
         }
 
-        console.log("Grid: Setting data:", dataToSet.length, "items");
         setApiProperties(dataToSet);
-
-        if (response.data.pagination) {
-          // Handle pagination if needed
-          console.log("Grid: Pagination info:", response.data.pagination);
-        }
       } else {
-        console.log("Grid: No data received");
         setApiProperties([]);
       }
     } catch (error) {
-      console.error("Grid: Error fetching properties:", error);
-      console.error("Grid: URL that failed:", apiUrl);
       // Set empty array on error
       setApiProperties([]);
     } finally {
@@ -285,19 +265,29 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     return undefined;
   };
 
-  // Fetch properties on component mount and when API URL or pathname changes
+  // Update transactionType in store when pathname changes
+  useEffect(() => {
+    const purpose = getPurposeFromPath();
+    if (purpose && purpose !== transactionType) {
+      setTransactionType(purpose as 'rent' | 'sale');
+    }
+  }, [pathname, transactionType, setTransactionType]);
+
+  // Fetch properties on component mount and when API URL, pathname, or transactionType changes
   useEffect(() => {
     const apiUrl =
       mergedData.dataSource?.apiUrl ||
       "/v1/tenant-website/{{tenantID}}/properties";
     const useApiData = mergedData.dataSource?.enabled !== false;
 
-    if (useApiData && currentTenantId) {
+    // Only use grid1's own API if propertiesStore is not available or has no data
+    const shouldUseOwnApi = useApiData && currentTenantId && filteredProperties.length === 0;
+    
+    if (shouldUseOwnApi) {
       // Clear existing data before fetching new data
       setApiProperties([]);
       
-      const purpose = getPurposeFromPath();
-      console.log('Grid1: Fetching data with purpose:', purpose, 'for pathname:', pathname);
+      const purpose = getPurposeFromPath() || transactionType;
       fetchPropertiesFromApi(apiUrl, purpose);
     }
   }, [
@@ -305,12 +295,14 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     mergedData.dataSource?.enabled,
     currentTenantId,
     pathname, // Add pathname to dependencies
+    transactionType, // Add transactionType to dependencies
+    filteredProperties.length, // Add filteredProperties to dependencies
   ]);
 
   // Use API data if enabled, otherwise use static data
   const useApiData = mergedData.dataSource?.enabled !== false;
   const properties = useApiData
-    ? apiProperties
+    ? (filteredProperties.length > 0 ? filteredProperties : apiProperties)
     : mergedData.items || mergedData.properties || [];
 
   // Check if component should be visible
@@ -418,7 +410,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
           </div>
         )}
 
-        {loading ? (
+        {(loading || storeLoading) ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>

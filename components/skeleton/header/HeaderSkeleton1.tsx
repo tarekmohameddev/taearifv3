@@ -1,8 +1,6 @@
 "use client";
 
 export default function HeaderSkeleton1() {
-  console.log("🎨 HeaderSkeleton1: Component is rendering!");
-
   return (
     <header
       className="w-full transition-all duration-300"

@@ -1,8 +1,6 @@
 "use client";
 
 export default function HalfTextHalfImageSkeleton2() {
-  console.log("🎨 HalfTextHalfImageSkeleton2: Component is rendering!");
-
   return (
     <section
       className="w-full bg-background px-4 py-5 sm:px-6 sm:py-20 lg:px-8"

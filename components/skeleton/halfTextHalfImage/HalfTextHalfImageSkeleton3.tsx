@@ -1,8 +1,6 @@
 "use client";
 
 export default function HalfTextHalfImageSkeleton3() {
-  console.log("🎨 HalfTextHalfImageSkeleton3: Component is rendering!");
-
   return (
     <div
       className="py-[24px] lg:py-[52px] max-w-[1600px] mx-auto px-4 sm:px-0"

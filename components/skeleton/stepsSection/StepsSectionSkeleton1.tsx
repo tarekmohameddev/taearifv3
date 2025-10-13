@@ -1,8 +1,6 @@
 "use client";
 
 export default function StepsSectionSkeleton1() {
-  console.log("🎨 StepsSectionSkeleton1: Component is rendering!");
-
   return (
     <section className="w-full bg-background sm:py-16">
       <div

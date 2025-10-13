@@ -1,8 +1,6 @@
 "use client";
 
 export default function PropertySliderSkeleton1() {
-  console.log("🎨 PropertySliderSkeleton1: Component is rendering!");
-
   return (
     <section
       className="w-full bg-background py-14 sm:py-16"

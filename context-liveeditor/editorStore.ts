@@ -476,7 +476,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   requestSave: () => set(() => ({ showDialog: true })),
   closeDialog: () => set(() => ({ showDialog: false })),
   setHasChangesMade: (hasChanges) => {
-    console.log("🏪 Store: setHasChangesMade called with:", hasChanges);
     set((state) => {
       // Only update if the value is actually different to prevent infinite loops
       if (state.hasChangesMade !== hasChanges) {
@@ -1808,40 +1807,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         ).applicationFormStates;
                       break;
                     case "inputs":
-                      console.log("🔍 Loading inputs data into editorStore:", {
-                        componentId: comp.id,  // ✅ استخدام comp.id في الـ log
-                        componentName: comp.componentName,
-                        data: comp.data,
-                        hasData: !!comp.data,
-                        dataKeys: comp.data ? Object.keys(comp.data) : [],
-                      });
                       newState.inputsStates = inputsFunctions.setData(
                         newState,
                         comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).inputsStates;
-                      console.log(
-                        "✅ Inputs data loaded into editorStore:",
-                        newState.inputsStates,
-                      );
                       break;
                     case "inputs2":
-                      console.log("🔍 Loading inputs2 data into editorStore:", {
-                        componentId: comp.id,  // ✅ استخدام comp.id في الـ log
-                        componentName: comp.componentName,
-                        data: comp.data,
-                        hasData: !!comp.data,
-                        dataKeys: comp.data ? Object.keys(comp.data) : [],
-                      });
                       newState.inputs2States = inputs2Functions.setData(
                         newState,
                         comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).inputs2States;
-                      console.log(
-                        "✅ Inputs2 data loaded into editorStore:",
-                        newState.inputs2States,
-                      );
                       break;
                   }
                 }
@@ -1858,13 +1835,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       });
 
       if (!hasInputs2InDatabase) {
-        console.log("🔍 No inputs2 components found in database, initializing default inputs2 data");
         const defaultInputs2Data = getDefaultInputs2Data();
         newState.inputs2States = {
           ...newState.inputs2States,
           "inputs2-default": defaultInputs2Data
         };
-        console.log("✅ Default inputs2 data initialized in editorStore:", newState.inputs2States);
       }
 
       return newState;

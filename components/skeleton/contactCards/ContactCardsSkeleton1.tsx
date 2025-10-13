@@ -1,8 +1,6 @@
 "use client";
 
 export default function ContactCardsSkeleton1() {
-  console.log("🎨 ContactCardsSkeleton1: Component is rendering!");
-
   return (
     <div
       className="py-[48px] md:py-[104px] px-4 sm:px-10 animate-pulse"

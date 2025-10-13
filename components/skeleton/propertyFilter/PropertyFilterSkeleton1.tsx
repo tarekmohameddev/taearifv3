@@ -1,8 +1,6 @@
 "use client";
 
 export default function PropertyFilterSkeleton1() {
-  console.log("🎨 PropertyFilterSkeleton1: Component is rendering!");
-
   return (
     <div className="mb-6 md:mb-18 max-w-[1600px] mx-auto animate-pulse">
       {/* Enhanced Background Shimmer Effect */}

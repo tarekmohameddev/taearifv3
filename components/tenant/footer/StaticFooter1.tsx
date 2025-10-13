@@ -258,7 +258,6 @@ export default function StaticFooter({
   // Fetch tenant data when tenantId is available
   useEffect(() => {
     if (tenantId) {
-      console.log("🔄 StaticFooter: Fetching tenant data for:", tenantId);
       fetchTenantData(tenantId);
     }
   }, [tenantId, fetchTenantData]);
@@ -327,20 +326,6 @@ export default function StaticFooter({
   ]);
 
   // Debug logging for data sources
-  useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      console.log("🔍 StaticFooter Debug Info:", {
-        tenantId,
-        hasTenantData: !!tenantData,
-        hasGlobalFooterData: !!globalFooterData,
-        hasTenantGlobalFooterData: !!tenantGlobalFooterData,
-        hasStoreData: !!storeData,
-        hasCurrentStoreData: !!currentStoreData,
-        hasOverrideData: !!overrideData,
-        mergedDataKeys: Object.keys(mergedData),
-      });
-    }
-  }, [tenantId, tenantData, globalFooterData, tenantGlobalFooterData, storeData, currentStoreData, overrideData, mergedData]);
 
   // Don't render if not visible
   if (!mergedData.visible) {

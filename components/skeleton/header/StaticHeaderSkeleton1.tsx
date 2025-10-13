@@ -1,8 +1,6 @@
 "use client";
 
 export default function StaticHeaderSkeleton1() {
-  console.log("🎨 StaticHeaderSkeleton1: Component is rendering!");
-
   return (
     <>
       {/* Dynamic CSS for responsive heights - matching original */}

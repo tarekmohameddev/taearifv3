@@ -1,8 +1,6 @@
 "use client";
 
 export default function ContactFormSectionSkeleton1() {
-  console.log("🎨 ContactFormSectionSkeleton1: Component is rendering!");
-
   return (
     <section
       className="container mx-auto px-4 py-8 lg:w-full sm:max-w-[1600px] animate-pulse"

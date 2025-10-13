@@ -1,8 +1,6 @@
 "use client";
 
 export default function CtaValuationSkeleton1() {
-  console.log("🎨 CtaValuationSkeleton1: Component is rendering!");
-
   return (
     <section className="w-full bg-background py-14 sm:py-16 animate-pulse">
       {/* Enhanced Background Shimmer Effect */}

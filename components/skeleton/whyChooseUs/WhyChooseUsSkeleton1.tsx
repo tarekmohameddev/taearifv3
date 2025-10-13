@@ -1,8 +1,6 @@
 "use client";
 
 export default function WhyChooseUsSkeleton1() {
-  console.log("🎨 WhyChooseUsSkeleton1: Component is rendering!");
-
   return (
     <section
       className="w-full bg-background"

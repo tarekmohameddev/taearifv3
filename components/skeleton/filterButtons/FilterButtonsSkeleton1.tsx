@@ -1,8 +1,6 @@
 "use client";
 
 export default function FilterButtonsSkeleton1() {
-  console.log("🎨 FilterButtonsSkeleton1: Component is rendering!");
-
   return (
     <div className="flex flex-col md:flex-row justify-between max-w-[1600px] mx-auto animate-pulse">
       {/* Enhanced Background Shimmer Effect */}

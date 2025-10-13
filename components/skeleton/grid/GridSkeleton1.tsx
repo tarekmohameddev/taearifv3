@@ -1,8 +1,6 @@
 "use client";
 
 export default function GridSkeleton1() {
-  console.log("🎨 GridSkeleton1: Component is rendering!");
-
   return (
     <section className="w-full bg-background py-8">
       <div className="mx-auto max-w-[1600px] px-4">

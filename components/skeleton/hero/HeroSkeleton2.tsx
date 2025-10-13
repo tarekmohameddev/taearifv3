@@ -1,8 +1,6 @@
 "use client";
 
 export default function HeroSkeleton2() {
-  console.log("🎨 HeroSkeleton2: Component is rendering!");
-
   return (
     <section className="relative w-full min-h-[229px] md:min-h-[368px] flex items-center justify-center overflow-hidden bg-white">
       {/* White Background with Subtle Pattern */}
