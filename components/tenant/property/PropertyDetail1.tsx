@@ -14,7 +14,6 @@ import {
   BuildingIcon,
   CarIcon,
   CreditCardIcon,
-  DollarSignIcon,
   CalendarDaysIcon,
   LayersIcon,
   ArrowUpDownIcon,
@@ -890,13 +889,13 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.pricePerMeter && (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <DollarSignIcon className="w-4 h-4 text-emerald-600" />
+                    <img src="/Saudi_Riyal_Symbol.svg" alt="ريال سعودي" className="w-4 h-4" style={{ filter: "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)" }} />
                     <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                       السعر للمتر:
                     </p>
                   </div>
                   <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                    {property.pricePerMeter} ريال/م²
+                    {property.pricePerMeter}
                   </p>
                 </div>
               )}

@@ -11,7 +11,6 @@ import {
   BuildingIcon,
   UsersIcon,
   HomeIcon,
-  DollarSignIcon,
   CreditCardIcon,
   CalendarDaysIcon,
   PlayIcon,
@@ -661,7 +660,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           className="w-6 h-6"
                           style={{
                             filter:
-                              "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)",
+                              "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)" ,
                           }}
                         />
                       </>
@@ -674,7 +673,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           className="w-6 h-6"
                           style={{
                             filter:
-                              "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)",
+                              "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)",
                           }}
                         />
                       </>
@@ -775,7 +774,11 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   parseFloat(project.minPrice) > 0 && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <DollarSignIcon className="w-4 h-4 text-emerald-600" />
+                        <img src="/Saudi_Riyal_Symbol.svg" alt="ريال سعودي" className="w-4 h-4" style={{
+  filter:
+    "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)"
+}}
+ />
                         <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                           السعر الأدنى:
                         </p>
@@ -792,7 +795,11 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   parseFloat(project.maxPrice) > 0 && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <DollarSignIcon className="w-4 h-4 text-emerald-600" />
+                        <img src="/Saudi_Riyal_Symbol.svg" alt="ريال سعودي" className="w-4 h-4" style={{
+  filter:
+    "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)"
+}}
+ />
                         <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
                           السعر الأعلى:
                         </p>
@@ -1251,8 +1258,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                                   alt="ريال سعودي"
                                   className="w-6 h-6"
                                   style={{
-                                    filter: "brightness(0) saturate(100%)",
+                                    filter:
+                                      "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)"
                                   }}
+                                  
                             />
                           </div>
                             )}

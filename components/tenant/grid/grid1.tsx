@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { PropertyCard } from "@/components/tenant/cards/card1";
 import PropertyCard2 from "@/components/tenant/cards/card2";
 import PropertyCard3 from "@/components/tenant/cards/card3";
@@ -34,6 +35,9 @@ interface PropertyGridProps {
 export default function PropertyGrid(props: PropertyGridProps = {}) {
   // Initialize variant id early so hooks can depend on it
   const variantId = props.variant || "grid1";
+
+  // Get current pathname
+  const pathname = usePathname();
 
   // Tenant ID hook
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
@@ -115,12 +119,20 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   const defaultUrl = "/v1/tenant-website/{{tenantID}}/properties";
 
   // Function to convert API URL format
-  const convertApiUrl = (url: string, tenantId: string): string => {
-    return url.replace("{{tenantID}}", tenantId);
+  const convertApiUrl = (url: string, tenantId: string, purpose?: string): string => {
+    let convertedUrl = url.replace("{{tenantID}}", tenantId);
+    
+    // Add purpose parameter if not already in URL
+    if (purpose && !convertedUrl.includes('purpose=')) {
+      const separator = convertedUrl.includes('?') ? '&' : '?';
+      convertedUrl += `${separator}purpose=${purpose}`;
+    }
+    
+    return convertedUrl;
   };
 
   // Function to fetch properties from API
-  const fetchPropertiesFromApi = async (apiUrl?: string) => {
+  const fetchPropertiesFromApi = async (apiUrl?: string, purpose?: string) => {
     try {
       setLoading(true);
 
@@ -129,7 +141,9 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         return;
       }
 
-      const url = convertApiUrl(apiUrl || defaultUrl, currentTenantId);
+      const url = convertApiUrl(apiUrl || defaultUrl, currentTenantId, purpose);
+      
+      console.log('Grid1: Making API request to:', url);
 
       const response = await axiosInstance.get(url);
 
@@ -261,7 +275,17 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     };
   };
 
-  // Fetch properties on component mount and when API URL changes
+  // Get purpose from current pathname
+  const getPurposeFromPath = () => {
+    if (pathname?.includes('/for-rent')) {
+      return 'rent';
+    } else if (pathname?.includes('/for-sale')) {
+      return 'sale';
+    }
+    return undefined;
+  };
+
+  // Fetch properties on component mount and when API URL or pathname changes
   useEffect(() => {
     const apiUrl =
       mergedData.dataSource?.apiUrl ||
@@ -269,12 +293,18 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     const useApiData = mergedData.dataSource?.enabled !== false;
 
     if (useApiData && currentTenantId) {
-      fetchPropertiesFromApi(apiUrl);
+      // Clear existing data before fetching new data
+      setApiProperties([]);
+      
+      const purpose = getPurposeFromPath();
+      console.log('Grid1: Fetching data with purpose:', purpose, 'for pathname:', pathname);
+      fetchPropertiesFromApi(apiUrl, purpose);
     }
   }, [
     mergedData.dataSource?.apiUrl,
     mergedData.dataSource?.enabled,
     currentTenantId,
+    pathname, // Add pathname to dependencies
   ]);
 
   // Use API data if enabled, otherwise use static data
