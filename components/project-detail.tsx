@@ -1259,7 +1259,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                                   className="w-6 h-6"
                                   style={{
                                     filter:
-                                      "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)"
+                                      "brightness(100)"
                                   }}
                                   
                             />
