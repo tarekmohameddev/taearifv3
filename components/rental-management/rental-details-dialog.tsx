@@ -151,14 +151,22 @@ export function RentalDetailsDialog() {
     }
   }, [isRentalDetailsDialogOpen, selectedRentalId, userData?.token]);
 
-  // Simple cleanup when dialog closes
+  // Cleanup effect to fix pointer-events issue
   useEffect(() => {
     if (!isRentalDetailsDialogOpen) {
-      // Reset only essential states
+      // Reset states
       setActiveTab("tenant");
       setIsAddExpenseDialogOpen(false);
       setIsDeleteExpenseDialogOpen(false);
       setExpenseToDelete(null);
+      
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === 'none') {
+          body.style.pointerEvents = '';
+        }
+      }, 100);
     }
   }, [isRentalDetailsDialogOpen]);
 
