@@ -80,6 +80,7 @@ import {
   Check,
   ChevronsUpDown,
   CreditCard,
+  RotateCcw,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
@@ -87,6 +88,7 @@ import { RentalDetailsDialog } from "../rental-details-dialog";
 import { UpdatedAddRentalForm } from "./updated-rental-form";
 import { PaymentCollectionDialog } from "../payment-collection-dialog";
 import { RentalWhatsAppDialog } from "../rental-whatsapp-dialog";
+import { RenewalDialog } from "../rental-renewal-dialog";
 import useAuthStore from "@/context/AuthContext";
 import { MessageSquare, Activity } from "lucide-react";
 
@@ -169,6 +171,90 @@ export function RentalApplicationsService({
     useState<any>(null);
   const [newStatus, setNewStatus] = useState<string>("");
   const [statusChangeLoading, setStatusChangeLoading] = useState(false);
+
+  // Renewal dialog state
+  const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
+  const [selectedRentalForRenewal, setSelectedRentalForRenewal] = useState<any>(null);
+  const [renewalFormData, setRenewalFormData] = useState({
+    rental_type: "monthly",
+    rental_duration: 12,
+    paying_plan: "monthly",
+    total_rental_amount: "",
+    payment_frequency: "per_installment",
+    description: "",
+  });
+  const [renewalLoading, setRenewalLoading] = useState(false);
+
+  // Function to open renewal dialog
+  const openRenewalDialog = (rental: any) => {
+    setSelectedRentalForRenewal(rental);
+    setRenewalFormData({
+      rental_type: "monthly",
+      rental_duration: 12,
+      paying_plan: "monthly",
+      total_rental_amount: "",
+      payment_frequency: "per_installment",
+      description: "",
+    });
+    setIsRenewalDialogOpen(true);
+  };
+
+  // Function to close renewal dialog
+  const closeRenewalDialog = () => {
+    setIsRenewalDialogOpen(false);
+    setSelectedRentalForRenewal(null);
+    setRenewalFormData({
+      rental_type: "monthly",
+      rental_duration: 12,
+      paying_plan: "monthly",
+      total_rental_amount: "",
+      payment_frequency: "per_installment",
+      description: "",
+    });
+  };
+
+  // Function to handle rental renewal
+  const handleRentalRenewal = async () => {
+    if (!selectedRentalForRenewal) return;
+
+    try {
+      setRenewalLoading(true);
+      
+      const renewalData = {
+        rental_type: renewalFormData.rental_type,
+        rental_duration: parseInt(renewalFormData.rental_duration.toString()),
+        paying_plan: renewalFormData.paying_plan,
+        total_rental_amount: parseFloat(renewalFormData.total_rental_amount),
+        notes: renewalFormData.description,
+        cost_items: [{
+          name: "Platform Fee",
+          cost: 500,
+          type: "fixed",
+          payer: "tenant",
+          payment_frequency: renewalFormData.payment_frequency,
+          description: renewalFormData.description
+        }]
+      };
+
+      const response = await axiosInstance.post(
+        `/v1/rms/rentals/${selectedRentalForRenewal.id}/renew`,
+        renewalData
+      );
+
+      if (response.data.status) {
+        alert("تم تجديد العقد بنجاح");
+        closeRenewalDialog();
+        // Refresh the rentals list
+        window.location.reload();
+      } else {
+        alert("فشل في تجديد العقد: " + (response.data.message || "خطأ غير معروف"));
+      }
+    } catch (error: any) {
+      alert("خطأ في تجديد العقد: " + (error.response?.data?.message || error.message || "خطأ غير معروف"));
+    } finally {
+      setRenewalLoading(false);
+    }
+  };
 
   // Function to open status change dialog
   const openStatusChangeDialog = (rental: any) => {
@@ -971,11 +1057,11 @@ export function RentalApplicationsService({
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              openPaymentCollectionDialog(rental.id);
+                              openRenewalDialog(rental);
                             }}
                             className="cursor-pointer hover:bg-gray-100"
                           >
-                            <CreditCard className="h-4 w-4 ml-2 text-gray-600" />
+                            <RotateCcw className="h-4 w-4 ml-2 text-gray-600" />
                             تجديد العقد
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -1588,6 +1674,17 @@ export function RentalApplicationsService({
         isOpen={rentalApplications.isRentalWhatsAppDialogOpen || false}
         onClose={closeRentalWhatsAppDialog}
         rental={rentalApplications.selectedRentalForWhatsApp}
+      />
+
+      {/* Renewal Dialog */}
+      <RenewalDialog
+        isOpen={isRenewalDialogOpen}
+        onClose={closeRenewalDialog}
+        rental={selectedRentalForRenewal}
+        formData={renewalFormData}
+        setFormData={setRenewalFormData}
+        onRenew={handleRentalRenewal}
+        loading={renewalLoading}
       />
     </div>
   );
