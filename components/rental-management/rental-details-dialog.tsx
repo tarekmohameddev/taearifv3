@@ -151,6 +151,29 @@ export function RentalDetailsDialog() {
     }
   }, [isRentalDetailsDialogOpen, selectedRentalId, userData?.token]);
 
+  // Cleanup when dialog closes
+  useEffect(() => {
+    if (!isRentalDetailsDialogOpen) {
+      // Reset all states when dialog closes
+      setDetails(null);
+      setError(null);
+      setActiveTab("tenant");
+      setExpensesData(null);
+      setExpensesError(null);
+      setActualExpensesData(null);
+      setActualExpensesError(null);
+      setIsAddExpenseDialogOpen(false);
+      setIsDeleteExpenseDialogOpen(false);
+      setExpenseToDelete(null);
+      
+      // Force remove any backdrop/overlay
+      setTimeout(() => {
+        const backdrops = document.querySelectorAll('[data-radix-dialog-overlay]');
+        backdrops.forEach(backdrop => backdrop.remove());
+      }, 100);
+    }
+  }, [isRentalDetailsDialogOpen]);
+
   // Fetch expenses data when expenses tab is active
   useEffect(() => {
     if (activeTab === "expenses" && details?.property?.id) {
@@ -475,12 +498,21 @@ export function RentalDetailsDialog() {
   return (
     <>
       <Dialog
+        key={`rental-details-${selectedRentalId}`}
         open={isRentalDetailsDialogOpen}
-        onOpenChange={closeRentalDetailsDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeRentalDetailsDialog();
+          }
+        }}
+        modal={true}
       >
         <DialogContent
           className="w-[95vw] max-w-6xl max-h-[95vh] overflow-y-auto text-right p-2 sm:p-4 md:p-6"
           dir="rtl"
+          onInteractOutside={(e) => {
+            e.preventDefault();
+          }}
         >
           <DialogHeader className="space-y-2 sm:space-y-4 text-right">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
