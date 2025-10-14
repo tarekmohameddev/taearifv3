@@ -32,6 +32,7 @@ import {
   Hash,
   Loader2,
   RefreshCw,
+  ClipboardList,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
@@ -103,13 +104,28 @@ export function RentalDetailsDialog() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("tenant");
+  
+  // States for expenses data
+  const [expensesData, setExpensesData] = useState<any>(null);
+  const [expensesLoading, setExpensesLoading] = useState(false);
+  const [expensesError, setExpensesError] = useState<string | null>(null);
 
   // Fetch rental details when dialog opens
   useEffect(() => {
     if (isRentalDetailsDialogOpen && selectedRentalId && userData?.token) {
       fetchRentalDetails();
+      // Reset expenses data when opening new rental
+      setExpensesData(null);
+      setExpensesError(null);
     }
   }, [isRentalDetailsDialogOpen, selectedRentalId, userData?.token]);
+
+  // Fetch expenses data when expenses tab is active
+  useEffect(() => {
+    if (activeTab === "expenses" && details?.property?.id) {
+      fetchExpensesData();
+    }
+  }, [activeTab, details?.property?.id]);
 
   const fetchRentalDetails = async () => {
     if (!selectedRentalId) return;
@@ -138,6 +154,36 @@ export function RentalDetailsDialog() {
       setError(err.response?.data?.message || "حدث خطأ أثناء تحميل التفاصيل");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchExpensesData = async () => {
+    if (!details?.property?.id) return;
+
+    setExpensesLoading(true);
+    setExpensesError(null);
+
+    try {
+      const response = await axiosInstance.get(
+        `/v1/rms/payment-report?property_id=${details.property.id}`,
+      );
+
+      if (response.data.status) {
+        setExpensesData(response.data.data);
+      } else {
+        setExpensesError("فشل في تحميل بيانات المصروفات");
+      }
+    } catch (err: any) {
+      console.error("Error fetching expenses data:", err);
+      
+      // Check if the error is about invalid property_id
+      if (err.response?.data?.errors?.property_id?.includes("The selected property id is invalid.")) {
+        setExpensesError("العقار تم حذفه من النظام");
+      } else {
+        setExpensesError(err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات المصروفات");
+      }
+    } finally {
+      setExpensesLoading(false);
     }
   };
 
@@ -318,50 +364,63 @@ export function RentalDetailsDialog() {
               {/* Custom Tabs Navigation */}
               <div className="w-full" dir="rtl">
                 <div
-                  className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2 bg-gray-100 p-1 rounded-lg"
+                  className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 sm:gap-2 bg-gray-100 p-1 rounded-lg"
                   dir="rtl"
                 >
                   <button
                     onClick={() => setActiveTab("tenant")}
-                    className={`flex items-center gap-1 sm:gap-2 text-center text-xs sm:text-sm p-2 rounded-md transition-all ${
+                    className={`flex items-center justify-center gap-1 sm:gap-2 text-center text-xs sm:text-sm p-2 rounded-md transition-all ${
                       activeTab === "tenant" ? "bg-white " : ""
                     }`}
                     dir="rtl"
                   >
-                    <span className="hidden sm:inline">بيانات المستأجر</span>
-                    <span className="sm:hidden">المستأجر</span>
+                    <span className="hidden lg:inline">بيانات المستأجر</span>
+                    <span className="lg:hidden">المستأجر</span>
                     <User className="h-3 w-3 sm:h-4 sm:w-4" />
                   </button>
                   <button
                     onClick={() => setActiveTab("property")}
-                    className={`flex items-center gap-1 sm:gap-2 text-center text-xs sm:text-sm p-2 rounded-md transition-all ${
+                    className={`flex items-center justify-center gap-1 sm:gap-2 text-center text-xs sm:text-sm p-2 rounded-md transition-all ${
                       activeTab === "property" ? "bg-white " : ""
                     }`}
                     dir="rtl"
                   >
-                    <span className="hidden sm:inline">بيانات العقار</span>
-                    <span className="sm:hidden">العقار</span>
+                    <span className="hidden lg:inline">بيانات العقار</span>
+                    <span className="lg:hidden">العقار</span>
                     <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
                   </button>
                   <button
                     onClick={() => setActiveTab("contract")}
-                    className={`flex items-center gap-1 sm:gap-2 text-center text-xs sm:text-sm p-2 rounded-md transition-all ${
+                    className={`flex items-center justify-center gap-1 sm:gap-2 text-center text-xs sm:text-sm p-2 rounded-md transition-all ${
                       activeTab === "contract" ? "bg-white " : ""
                     }`}
                     dir="rtl"
                   >
-                    العقد
+                    <span className="hidden lg:inline">العقد</span>
+                    <span className="lg:hidden">العقد</span>
                     <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
                   </button>
                   <button
                     onClick={() => setActiveTab("payments")}
-                    className={`flex items-center gap-1 sm:gap-2 text-center text-xs sm:text-sm p-2 rounded-md transition-all ${
+                    className={`flex items-center justify-center gap-1 sm:gap-2 text-center text-xs sm:text-sm p-2 rounded-md transition-all ${
                       activeTab === "payments" ? "bg-white " : ""
                     }`}
                     dir="rtl"
                   >
-                    المدفوعات
+                    <span className="hidden lg:inline">المدفوعات</span>
+                    <span className="lg:hidden">المدفوعات</span>
                     <CreditCard className="h-3 w-3 sm:h-4 sm:w-4" />
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("expenses")}
+                    className={`flex items-center justify-center gap-1 sm:gap-2 text-center text-xs sm:text-sm p-2 rounded-md transition-all ${
+                      activeTab === "expenses" ? "bg-white " : ""
+                    }`}
+                    dir="rtl"
+                  >
+                    <span className="hidden lg:inline">المصروفات</span>
+                    <span className="lg:hidden">المصروفات</span>
+                    <ClipboardList className="h-3 w-3 sm:h-4 sm:w-4" />
                   </button>
                 </div>
               </div>
@@ -794,6 +853,131 @@ export function RentalDetailsDialog() {
                           </div>
                         ))}
                       </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              {activeTab === "expenses" && (
+                <div className="space-y-3 sm:space-y-4 text-right" dir="rtl">
+                  <Card>
+                    <CardContent className="text-right p-3 sm:p-6" dir="rtl">
+                      {expensesLoading && (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-center">
+                            <Loader2 className="h-8 w-8 animate-spin text-gray-500 mx-auto mb-2" />
+                            <p className="text-gray-600">جاري تحميل بيانات المدفوعات...</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {expensesError && (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-center">
+                            <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                            <p className="text-red-600">{expensesError}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {expensesData && !expensesLoading && (
+                        <div className="space-y-6">
+                          {/* Summary Cards */}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="bg-gray-50 p-4 rounded-lg text-center">
+                              <p className="text-sm text-gray-600 mb-1">إجمالي المتوقع</p>
+                              <p className="text-xl font-bold text-gray-900">
+                                {formatCurrency(expensesData.summary?.total_expected || 0)}
+                              </p>
+                            </div>
+                            <div className="bg-green-50 p-4 rounded-lg text-center">
+                              <p className="text-sm text-gray-600 mb-1">إجمالي المحصل</p>
+                              <p className="text-xl font-bold text-green-700">
+                                {formatCurrency(expensesData.summary?.total_collected || 0)}
+                              </p>
+                            </div>
+                            <div className="bg-red-50 p-4 rounded-lg text-center">
+                              <p className="text-sm text-gray-600 mb-1">إجمالي المتبقي</p>
+                              <p className="text-xl font-bold text-red-700">
+                                {formatCurrency(expensesData.summary?.total_outstanding || 0)}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Payment History Only */}
+                          {expensesData.properties?.map((property: any, propertyIndex: number) => (
+                            <div key={propertyIndex} className="space-y-4">
+                              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+
+                                {/* Payment History */}
+                                {property.rentals?.map((rental: any, rentalIndex: number) => (
+                                  rental.payment_history?.length > 0 && (
+                                    <div key={`history-${rentalIndex}`} className="border-t border-gray-200">
+                                      <div className="px-4 py-3 bg-gray-50">
+                                        <h4 className="font-medium text-gray-900">
+                                          سجل المدفوعات - {rental.tenant_name}
+                                        </h4>
+                                      </div>
+                                      <div className="overflow-x-auto">
+                                        <table className="w-full">
+                                          <thead className="bg-gray-100">
+                                            <tr>
+                                              <th className="px-4 py-2 text-right text-xs font-medium text-gray-700 border-b border-gray-200">
+                                                نوع الدفع
+                                              </th>
+                                              <th className="px-4 py-2 text-right text-xs font-medium text-gray-700 border-b border-gray-200">
+                                                المبلغ
+                                              </th>
+                                              <th className="px-4 py-2 text-right text-xs font-medium text-gray-700 border-b border-gray-200">
+                                                تاريخ الدفع
+                                              </th>
+                                              <th className="px-4 py-2 text-right text-xs font-medium text-gray-700 border-b border-gray-200">
+                                                المرجع
+                                              </th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {rental.payment_history.map((payment: any, paymentIndex: number) => (
+                                              <tr key={paymentIndex} className="border-b border-gray-100">
+                                                <td className="px-4 py-2 text-xs text-gray-900">
+                                                  {payment.payment_type === "rent" ? "إيجار" : payment.payment_type}
+                                                </td>
+                                                <td className="px-4 py-2 text-xs font-medium text-gray-900">
+                                                  {formatCurrency(payment.amount)}
+                                                </td>
+                                                <td className="px-4 py-2 text-xs text-gray-600">
+                                                  {new Date(payment.payment_date).toLocaleDateString("ar-US")}
+                                                </td>
+                                                <td className="px-4 py-2 text-xs text-gray-600">
+                                                  {payment.reference || "غير محدد"}
+                                                </td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </div>
+                                  )
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {!expensesData && !expensesLoading && !expensesError && (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-center">
+                            <ClipboardList className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4" />
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                              لا توجد بيانات مدفوعات
+                            </h3>
+                            <p className="text-gray-600">
+                              لم يتم العثور على أي بيانات مدفوعات لهذا العقار
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </div>
