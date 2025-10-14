@@ -6,12 +6,17 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { PaymentCollectionDialog } from "./payment-collection-dialog";
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -33,10 +38,13 @@ import {
   Loader2,
   RefreshCw,
   ClipboardList,
+  Receipt,
+  Trash2,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import toast from "react-hot-toast";
 
 interface RentalDetails {
   rental: {
@@ -109,6 +117,29 @@ export function RentalDetailsDialog() {
   const [expensesData, setExpensesData] = useState<any>(null);
   const [expensesLoading, setExpensesLoading] = useState(false);
   const [expensesError, setExpensesError] = useState<string | null>(null);
+  
+  // States for actual expenses data
+  const [actualExpensesData, setActualExpensesData] = useState<any>(null);
+  const [actualExpensesLoading, setActualExpensesLoading] = useState(false);
+  const [actualExpensesError, setActualExpensesError] = useState<string | null>(null);
+  
+  // States for add expense dialog
+  const [isAddExpenseDialogOpen, setIsAddExpenseDialogOpen] = useState(false);
+  const [expenseFormData, setExpenseFormData] = useState({
+    expense_name: "",
+    amount_type: "fixed",
+    amount_value: "",
+    cost_center: "tenant",
+    is_active: true,
+    image: null as File | null,
+    image_path: "",
+  });
+  const [expenseFormLoading, setExpenseFormLoading] = useState(false);
+  
+  // States for delete expense dialog
+  const [isDeleteExpenseDialogOpen, setIsDeleteExpenseDialogOpen] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState<any>(null);
+  const [deleteExpenseLoading, setDeleteExpenseLoading] = useState(false);
 
   // Fetch rental details when dialog opens
   useEffect(() => {
@@ -126,6 +157,13 @@ export function RentalDetailsDialog() {
       fetchExpensesData();
     }
   }, [activeTab, details?.property?.id]);
+
+  // Fetch actual expenses data when actual-expenses tab is active
+  useEffect(() => {
+    if (activeTab === "actual-expenses" && selectedRentalId) {
+      fetchActualExpensesData();
+    }
+  }, [activeTab, selectedRentalId]);
 
   const fetchRentalDetails = async () => {
     if (!selectedRentalId) return;
@@ -171,7 +209,7 @@ export function RentalDetailsDialog() {
       if (response.data.status) {
         setExpensesData(response.data.data);
       } else {
-        setExpensesError("فشل في تحميل بيانات المصروفات");
+        setExpensesError("فشل في تحميل بيانات تقارير الدفع");
       }
     } catch (err: any) {
       console.error("Error fetching expenses data:", err);
@@ -180,11 +218,141 @@ export function RentalDetailsDialog() {
       if (err.response?.data?.errors?.property_id?.includes("The selected property id is invalid.")) {
         setExpensesError("العقار تم حذفه من النظام");
       } else {
-        setExpensesError(err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات المصروفات");
+        setExpensesError(err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات تقارير الدفع");
       }
     } finally {
       setExpensesLoading(false);
     }
+  };
+
+  const fetchActualExpensesData = async () => {
+    if (!selectedRentalId) return;
+
+    try {
+      setActualExpensesLoading(true);
+      setActualExpensesError(null);
+
+      const response = await axiosInstance.get(
+        `/v1/rms/rentals/${selectedRentalId}/expenses`
+      );
+
+      if (response.data.status) {
+        setActualExpensesData(response.data.data);
+      } else {
+        setActualExpensesError("فشل في تحميل بيانات المصروفات");
+      }
+    } catch (err: any) {
+      console.error("Error fetching actual expenses data:", err);
+      setActualExpensesError(err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات المصروفات");
+    } finally {
+      setActualExpensesLoading(false);
+    }
+  };
+
+  const uploadExpenseImage = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await axiosInstance.post('/v1/rms/expenses/upload-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.status) {
+        return response.data.data.image_path;
+      } else {
+        throw new Error(response.data.message || 'فشل في رفع الصورة');
+      }
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      throw new Error(error.response?.data?.message || 'فشل في رفع الصورة');
+    }
+  };
+
+  const handleCreateExpense = async () => {
+    if (!selectedRentalId) return;
+
+    try {
+      setExpenseFormLoading(true);
+
+      let imagePath = "";
+      if (expenseFormData.image) {
+        imagePath = await uploadExpenseImage(expenseFormData.image);
+      }
+
+      const expenseData = {
+        expense_name: expenseFormData.expense_name,
+        amount_type: expenseFormData.amount_type,
+        amount_value: parseFloat(expenseFormData.amount_value),
+        cost_center: expenseFormData.cost_center,
+        is_active: expenseFormData.is_active,
+        ...(imagePath && { image_path: imagePath }),
+      };
+
+      const response = await axiosInstance.post(
+        `/v1/rms/rentals/${selectedRentalId}/expenses`,
+        expenseData
+      );
+
+      if (response.data.status) {
+        // إغلاق الـ dialog وإعادة تحميل البيانات
+        setIsAddExpenseDialogOpen(false);
+        setExpenseFormData({
+          expense_name: "",
+          amount_type: "fixed",
+          amount_value: "",
+          cost_center: "tenant",
+          is_active: true,
+          image: null,
+          image_path: "",
+        });
+        // إعادة تحميل بيانات المصروفات
+        fetchActualExpensesData();
+        toast.success("تم إضافة المصروف بنجاح");
+      } else {
+        toast.error("فشل في إضافة المصروف: " + (response.data.message || "خطأ غير معروف"));
+      }
+    } catch (error: any) {
+      console.error('Error creating expense:', error);
+      toast.error("خطأ في إضافة المصروف: " + (error.response?.data?.message || error.message || "خطأ غير معروف"));
+    } finally {
+      setExpenseFormLoading(false);
+    }
+  };
+
+  const handleDeleteExpense = async () => {
+    if (!selectedRentalId || !expenseToDelete?.id) return;
+
+    try {
+      setDeleteExpenseLoading(true);
+
+      const response = await axiosInstance.delete(
+        `/v1/rms/rentals/${selectedRentalId}/expenses/${expenseToDelete.id}`
+      );
+
+      if (response.data.status) {
+        // إغلاق الـ dialog وإعادة تحميل البيانات
+        setIsDeleteExpenseDialogOpen(false);
+        setExpenseToDelete(null);
+        // إعادة تحميل بيانات المصروفات
+        fetchActualExpensesData();
+        toast.success("تم حذف المصروف بنجاح");
+      } else {
+        toast.error("فشل في حذف المصروف: " + (response.data.message || "خطأ غير معروف"));
+      }
+    } catch (error: any) {
+      console.error('Error deleting expense:', error);
+      toast.error("خطأ في حذف المصروف: " + (error.response?.data?.message || error.message || "خطأ غير معروف"));
+    } finally {
+      setDeleteExpenseLoading(false);
+    }
+  };
+
+  const openDeleteExpenseDialog = (expense: any) => {
+    setExpenseToDelete(expense);
+    setIsDeleteExpenseDialogOpen(true);
   };
 
   const formatCurrency = (amount: number, currency: string = "SAR") => {
@@ -364,7 +532,7 @@ export function RentalDetailsDialog() {
               {/* Custom Tabs Navigation */}
               <div className="w-full" dir="rtl">
                 <div
-                  className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 sm:gap-2 bg-gray-100 p-1 rounded-lg"
+                  className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1 sm:gap-2 bg-gray-100 p-1 rounded-lg"
                   dir="rtl"
                 >
                   <button
@@ -418,9 +586,20 @@ export function RentalDetailsDialog() {
                     }`}
                     dir="rtl"
                   >
+                    <span className="hidden lg:inline">تقارير الدفع</span>
+                    <span className="lg:hidden">تقارير الدفع</span>
+                    <ClipboardList className="h-3 w-3 sm:h-4 sm:w-4" />
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("actual-expenses")}
+                    className={`flex items-center justify-center gap-1 sm:gap-2 text-center text-xs sm:text-sm p-2 rounded-md transition-all ${
+                      activeTab === "actual-expenses" ? "bg-white " : ""
+                    }`}
+                    dir="rtl"
+                  >
                     <span className="hidden lg:inline">المصروفات</span>
                     <span className="lg:hidden">المصروفات</span>
-                    <ClipboardList className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <Receipt className="h-3 w-3 sm:h-4 sm:w-4" />
                   </button>
                 </div>
               </div>
@@ -982,6 +1161,138 @@ export function RentalDetailsDialog() {
                   </Card>
                 </div>
               )}
+
+              {activeTab === "actual-expenses" && (
+                <div className="space-y-3 sm:space-y-4 text-right" dir="rtl">
+                  {/* Add Expense Button */}
+                  <div className="flex justify-end">
+                    <Button
+                      onClick={() => setIsAddExpenseDialogOpen(true)}
+                      className="bg-black hover:scale-105 transition-all duration-300 text-white"
+                    >
+                      <Receipt className="ml-2 h-4 w-4" />
+                      إضافة مصروف
+                    </Button>
+                  </div>
+                  
+                  <Card>
+                    <CardContent className="text-right p-3 sm:p-6" dir="rtl">
+                      {actualExpensesLoading && (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-center">
+                            <Loader2 className="h-8 w-8 animate-spin text-gray-500 mx-auto mb-2" />
+                            <p className="text-gray-600">جاري تحميل بيانات المصروفات...</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {actualExpensesError && (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-center">
+                            <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                            <p className="text-red-600">{actualExpensesError}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {actualExpensesData && actualExpensesData.length > 0 && !actualExpensesLoading && (
+                        <div className="space-y-6">
+                          {/* Expenses List */}
+                          <div className="space-y-4">
+                            {actualExpensesData.map((expense: any, index: number) => (
+                              <div key={expense.id || index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="flex-1">
+                                    <h4 className="text-lg font-semibold text-gray-900 mb-1">
+                                      {expense.expense_name}
+                                    </h4>
+                                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                                      <span className="flex items-center gap-1">
+                                        <DollarSign className="h-4 w-4" />
+                                        {formatCurrency(expense.calculated_amount)}
+                                      </span>
+                                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                        expense.amount_type === 'fixed' 
+                                          ? 'bg-blue-100 text-blue-800' 
+                                          : 'bg-green-100 text-green-800'
+                                      }`}>
+                                        {expense.amount_type === 'fixed' ? 'ثابت' : 'متغير'}
+                                      </span>
+                                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                        expense.cost_center === 'tenant' 
+                                          ? 'bg-orange-100 text-orange-800' 
+                                          : 'bg-purple-100 text-purple-800'
+                                      }`}>
+                                        {expense.cost_center === 'tenant' ? 'المستأجر' : 'المالك'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  
+                                  {expense.image_url && (
+                                    <div className="ml-4">
+                                      <img
+                                        src={expense.image_url}
+                                        alt={expense.expense_name}
+                                        className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                                        onError={(e) => {
+                                          e.currentTarget.style.display = 'none';
+                                        }}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                  <span>
+                                    تم الإنشاء: {new Date(expense.created_at).toLocaleDateString("ar-US")}
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      expense.is_active 
+                                        ? 'bg-green-100 text-green-800' 
+                                        : 'bg-red-100 text-red-800'
+                                    }`}>
+                                      {expense.is_active ? 'نشط' : 'غير نشط'}
+                                    </span>
+                                    {expense.can_be_modified && (
+                                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        قابل للتعديل
+                                      </span>
+                                    )}
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => openDeleteExpenseDialog(expense)}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300"
+                                    >
+                                      <Trash2 className="h-3 w-3 ml-1" />
+                                      إزالة
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {(!actualExpensesData || actualExpensesData.length === 0) && !actualExpensesLoading && !actualExpensesError && (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-center">
+                            <DollarSign className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4" />
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                              لا توجد مصروفات
+                            </h3>
+                            <p className="text-gray-600">
+                              لم يتم العثور على أي مصروفات لهذا العقد
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
@@ -989,6 +1300,192 @@ export function RentalDetailsDialog() {
 
       {/* Payment Collection Dialog */}
       <PaymentCollectionDialog />
+
+      {/* Add Expense Dialog */}
+      <Dialog open={isAddExpenseDialogOpen} onOpenChange={setIsAddExpenseDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>إضافة مصروف جديد</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* اسم المصروف */}
+            <div className="space-y-2">
+              <Label htmlFor="expense_name">اسم المصروف <span className="text-red-500">*</span></Label>
+              <Input
+                id="expense_name"
+                value={expenseFormData.expense_name}
+                onChange={(e) => setExpenseFormData({ ...expenseFormData, expense_name: e.target.value })}
+                placeholder="مثال: تكييف الهواء"
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+            </div>
+
+            {/* نوع المبلغ */}
+            <div className="space-y-2">
+              <Label htmlFor="amount_type">نوع المبلغ <span className="text-red-500">*</span></Label>
+              <Select
+                value={expenseFormData.amount_type}
+                onValueChange={(value) => setExpenseFormData({ ...expenseFormData, amount_type: value })}
+              >
+                <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fixed">ثابت</SelectItem>
+                  <SelectItem value="percentage">نسبة مئوية</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* قيمة المبلغ */}
+            <div className="space-y-2">
+              <Label htmlFor="amount_value">قيمة المبلغ <span className="text-red-500">*</span></Label>
+              <Input
+                id="amount_value"
+                type="number"
+                step="0.01"
+                value={expenseFormData.amount_value}
+                onChange={(e) => setExpenseFormData({ ...expenseFormData, amount_value: e.target.value })}
+                placeholder={expenseFormData.amount_type === "fixed" ? "150.00" : "5.0"}
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+              <p className="text-xs text-gray-500">
+                {expenseFormData.amount_type === "fixed" 
+                  ? "أدخل المبلغ بالريال" 
+                  : "أدخل النسبة المئوية (مثال: 5.0 لـ 5%)"
+                }
+              </p>
+            </div>
+
+            {/* مركز التكلفة */}
+            <div className="space-y-2">
+              <Label htmlFor="cost_center">مركز التكلفة <span className="text-red-500">*</span></Label>
+              <Select
+                value={expenseFormData.cost_center}
+                onValueChange={(value) => setExpenseFormData({ ...expenseFormData, cost_center: value })}
+              >
+                <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tenant">المستأجر</SelectItem>
+                  <SelectItem value="owner">المالك</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* رفع الصورة */}
+            <div className="space-y-2">
+              <Label htmlFor="expense_image">صورة المصروف</Label>
+              <Input
+                id="expense_image"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setExpenseFormData({ ...expenseFormData, image: file });
+                  }
+                }}
+                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+              />
+              <p className="text-xs text-gray-500">اختر صورة للمصروف (اختياري)</p>
+            </div>
+
+            {/* حالة النشاط */}
+            <div className="flex items-center justify-between">
+              <Label htmlFor="is_active">نشط</Label>
+              <Switch
+                id="is_active"
+                checked={expenseFormData.is_active}
+                onCheckedChange={(checked) => setExpenseFormData({ ...expenseFormData, is_active: checked })}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddExpenseDialogOpen(false)}
+              disabled={expenseFormLoading}
+            >
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleCreateExpense}
+              disabled={expenseFormLoading || !expenseFormData.expense_name || !expenseFormData.amount_value}
+              className="bg-black hover:scale-105 transition-all duration-300 text-white "
+            >
+              {expenseFormLoading ? (
+                <>
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  جاري الإضافة...
+                </>
+              ) : (
+                "إضافة المصروف"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Expense Dialog */}
+      <Dialog open={isDeleteExpenseDialogOpen} onOpenChange={setIsDeleteExpenseDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-red-600">تأكيد حذف المصروف</DialogTitle>
+          </DialogHeader>
+
+          <div className="py-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <AlertCircle className="h-6 w-6 text-red-500" />
+              </div>
+              <div className="text-right" dir="rtl">
+                <p className="text-gray-900 font-medium mb-2">
+                  هل أنت متأكد من حذف هذا المصروف؟
+                </p>
+                <p className="text-sm text-gray-600 mb-3">
+                  سيتم حذف المصروف: <span className="font-semibold text-gray-900">{expenseToDelete?.expense_name}</span>
+                </p>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="text-sm text-red-800 font-medium">
+                    ⚠️ تحذير: لا يمكن التراجع عن هذا الإجراء
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteExpenseDialogOpen(false)}
+              disabled={deleteExpenseLoading}
+            >
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleDeleteExpense}
+              disabled={deleteExpenseLoading}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deleteExpenseLoading ? (
+                <>
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  جاري الحذف...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="ml-2 h-4 w-4" />
+                  حذف المصروف
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
