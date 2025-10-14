@@ -146,6 +146,11 @@ export function EnhancedSidebar({
               // إذا لم يكن APP، استخدام Link العادي
               <Link
                 href={(() => {
+                  // التحقق من المسارات المباشرة (بدون dashboard)
+                  if (item.isDirectPath) {
+                    return item.path;
+                  }
+                  
                   // التحقق من وجود dashboard في بداية المسار
                   if (item.path.startsWith("/dashboard")) {
                     // إذا كان موجود، إزالته
@@ -154,7 +159,7 @@ export function EnhancedSidebar({
                     // إذا كان يبدأ بـ /، إضافة dashboard قبل /
                     return `/dashboard${item.path}`;
                   } else {
-                    // إذا لم يكن يبدأ بـ /، إضافة dashboard/
+                    // إذا لم يكن يبدأ بـ /، إضافة dashboard/ والـ slug
                     return `/dashboard/${item.path}`;
                   }
                 })()}

@@ -164,7 +164,19 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                               className="justify-start gap-2"
                               asChild
                             >
-                              <Link href={`dashboard/${item.path}`}>
+                              <Link href={(() => {
+                                // التحقق من المسارات المباشرة (بدون dashboard)
+                                if (item.isDirectPath) {
+                                  return item.path;
+                                }
+                                
+                                // معالجة الـ path: إذا لم يبدأ بـ /، إضافة الـ slug بعد الـ domain
+                                if (item.path.startsWith('/')) {
+                                  return `dashboard${item.path}`;
+                                } else {
+                                  return `dashboard/${item.path}`;
+                                }
+                              })()}>
                                 <item.icon className="h-4 w-4" />
                                 {item.label}
                               </Link>

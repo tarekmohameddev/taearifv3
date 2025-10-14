@@ -86,14 +86,28 @@ module.exports = (set, get) => ({
     try {
       const response = await axiosInstance.get("/settings/side-menus");
       const sections = response.data.data.sections;
-      const items = sections.map((section) => ({
-        id: section.path.split("/").pop(),
-        label: section.title,
-        description: section.description,
-        icon: getIconComponent(section.icon),
-        path: section.path,
-        isAPP: section.isAPP || false,
-      }));
+      const items = sections.map((section) => {
+        // معالجة الـ path: إذا لم يبدأ بـ /، إضافة الـ slug بعد الـ domain
+        let processedPath = section.path;
+        let isDirectPath = false; // تحديد ما إذا كان المسار يجب أن يفتح مباشرة
+        
+        if (!section.path.startsWith('/')) {
+          // إضافة الـ slug بعد الـ domain مباشرة
+          processedPath = `/${section.path}`;
+          // تحديد المسارات التي يجب أن تفتح مباشرة (بدون dashboard)
+          isDirectPath = section.path === 'live-editor';
+        }
+        
+        return {
+          id: section.path.split("/").pop(),
+          label: section.title,
+          description: section.description,
+          icon: getIconComponent(section.icon),
+          path: processedPath,
+          isAPP: section.isAPP || false,
+          isDirectPath: isDirectPath, // إضافة خاصية للمسارات المباشرة
+        };
+      });
 
       set((state) => ({
         sidebarData: {
