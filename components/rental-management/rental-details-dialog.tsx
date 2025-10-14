@@ -599,7 +599,7 @@ export function RentalDetailsDialog() {
                   >
                     <span className="hidden lg:inline">المصروفات</span>
                     <span className="lg:hidden">المصروفات</span>
-                    <Receipt className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
                   </button>
                 </div>
               </div>
@@ -1170,7 +1170,7 @@ export function RentalDetailsDialog() {
                       onClick={() => setIsAddExpenseDialogOpen(true)}
                       className="bg-black hover:scale-105 transition-all duration-300 text-white"
                     >
-                      <Receipt className="ml-2 h-4 w-4" />
+                      <FileText className="ml-2 h-4 w-4" />
                       إضافة مصروف
                     </Button>
                   </div>
@@ -1208,7 +1208,6 @@ export function RentalDetailsDialog() {
                                     </h4>
                                     <div className="flex items-center gap-4 text-sm text-gray-600">
                                       <span className="flex items-center gap-1">
-                                        <DollarSign className="h-4 w-4" />
                                         {formatCurrency(expense.calculated_amount)}
                                       </span>
                                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -1279,7 +1278,7 @@ export function RentalDetailsDialog() {
                       {(!actualExpensesData || actualExpensesData.length === 0) && !actualExpensesLoading && !actualExpensesError && (
                         <div className="flex items-center justify-center py-8">
                           <div className="text-center">
-                            <DollarSign className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4" />
+                            <FileText className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4" />
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">
                               لا توجد مصروفات
                             </h3>
