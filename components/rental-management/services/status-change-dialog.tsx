@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { RotateCcw } from "lucide-react";
 
 interface StatusChangeDialogProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ interface StatusChangeDialogProps {
   rental: any;
   onStatusChange: (status: string) => void;
   isLoading: boolean;
+  onOpenRenewal?: () => void;
 }
 
 export function StatusChangeDialog({
@@ -33,6 +35,7 @@ export function StatusChangeDialog({
   rental,
   onStatusChange,
   isLoading,
+  onOpenRenewal,
 }: StatusChangeDialogProps) {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
 
@@ -72,8 +75,26 @@ export function StatusChangeDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>تغيير حالة العقد</DialogTitle>
-          <DialogDescription>اختر الحالة الجديدة للعقد</DialogDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle>تغيير حالة العقد</DialogTitle>
+              <DialogDescription>اختر الحالة الجديدة للعقد</DialogDescription>
+            </div>
+            {onOpenRenewal && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onClose(); // إغلاق dialog تغيير الحالة
+                  onOpenRenewal(); // فتح dialog التجديد
+                }}
+                className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 hover:border-blue-300 text-xs"
+              >
+                <RotateCcw className="ml-1 h-3 w-3" />
+                تجديد العقد
+              </Button>
+            )}
+          </div>
         </DialogHeader>
 
         <div className="space-y-4">

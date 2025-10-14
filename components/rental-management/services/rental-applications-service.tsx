@@ -1567,6 +1567,7 @@ export function RentalApplicationsService({
         rental={selectedRentalForStatusChange}
         onStatusChange={handleStatusChange}
         isLoading={statusChangeLoading}
+        onOpenRenewal={() => openRenewalDialog(selectedRentalForStatusChange)}
       />
 
       {/* Pagination */}
