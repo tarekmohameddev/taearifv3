@@ -1052,38 +1052,6 @@ export function UpdatedAddRentalForm({
               })()}
             </div>
 
-            {/* العملة */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="currency"
-                className="text-sm font-medium text-gray-700"
-              >
-                العملة
-              </Label>
-              <Input
-                id="currency"
-                value={formData.currency}
-                onChange={(e) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    currency: e.target.value.toUpperCase(),
-                  }));
-                  if (errors.currency) {
-                    setErrors((prev) => ({ ...prev, currency: "" }));
-                  }
-                }}
-                placeholder="SAR"
-                maxLength={3}
-                className={`border-gray-300 focus:border-gray-900 focus:ring-gray-900 ${errors.currency ? "border-red-500" : ""}`}
-              />
-              {errors.currency && (
-                <p className="text-sm text-red-600 flex items-center">
-                  <AlertCircle className="h-3 w-3 ml-1" />
-                  {errors.currency}
-                </p>
-              )}
-            </div>
-
             {/* خيار الإيجار */}
             <div className="space-y-2">
               <Label

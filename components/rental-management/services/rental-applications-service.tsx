@@ -971,6 +971,16 @@ export function RentalApplicationsService({
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
+                              openPaymentCollectionDialog(rental.id);
+                            }}
+                            className="cursor-pointer hover:bg-gray-100"
+                          >
+                            <CreditCard className="h-4 w-4 ml-2 text-gray-600" />
+                            تجديد العقد
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
                               openStatusChangeDialog(rental);
                             }}
                             className="cursor-pointer hover:bg-gray-100"
