@@ -119,6 +119,19 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
             return (component as any).data;
           }
         }
+        // Fallback: if no explicit id, return first matching grid component with this variant
+        if (!props.id) {
+          for (const [_componentId, component] of Object.entries(
+            pageComponents as any,
+          )) {
+            if (
+              (component as any).type === "grid" &&
+              (component as any).componentName === variantId
+            ) {
+              return (component as any).data;
+            }
+          }
+        }
       }
     }
     return {};
@@ -133,8 +146,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     ...storeData,
   };
 
-  // Default API URL
-  const defaultUrl = "/v1/tenant-website/{{tenantID}}/properties";
+  // Resolve default API URL based on current page
+  const resolveDefaultUrl = () => {
+    if (pathname?.includes("/projects")) {
+      return "/v1/tenant-website/{{tenantID}}/projects";
+    }
+    return "/v1/tenant-website/{{tenantID}}/properties";
+  };
 
   // Function to convert API URL format
   const convertApiUrl = (
@@ -145,7 +163,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     let convertedUrl = url.replace("{{tenantID}}", tenantId);
 
     // Add purpose parameter if not already in URL
-    if (purpose && !convertedUrl.includes("purpose=")) {
+    if (purpose && !convertedUrl.includes("purpose=") && !convertedUrl.includes("/projects")) {
       const separator = convertedUrl.includes("?") ? "&" : "?";
       convertedUrl += `${separator}purpose=${purpose}`;
     }
@@ -163,7 +181,11 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         return;
       }
 
-      const url = convertApiUrl(apiUrl || defaultUrl, currentTenantId, purpose);
+      const url = convertApiUrl(
+        apiUrl || resolveDefaultUrl(),
+        currentTenantId,
+        purpose,
+      );
 
       const response = await axiosInstance.get(url);
 
@@ -283,20 +305,22 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   // Fetch properties on component mount and when API URL, pathname, or transactionType changes
   useEffect(() => {
-    const apiUrl =
-      mergedData.dataSource?.apiUrl ||
-      "/v1/tenant-website/{{tenantID}}/properties";
+    // Always prioritize the configured apiUrl from dataSource
+    console.log("mergedData",mergedData)
+    const apiUrl = mergedData.dataSource?.apiUrl;
     const useApiData = mergedData.dataSource?.enabled !== false;
 
-    // Only use grid1's own API if propertiesStore is not available or has no data
+    // Always use API when enabled and apiUrl is configured
     const shouldUseOwnApi =
-      useApiData && currentTenantId && filteredProperties.length === 0;
+      useApiData && currentTenantId && apiUrl;
 
     if (shouldUseOwnApi) {
       // Clear existing data before fetching new data
       setApiProperties([]);
 
-      const purpose = getPurposeFromPath() || transactionType;
+      const purpose = apiUrl.includes("/projects")
+        ? undefined
+        : getPurposeFromPath() || transactionType;
       fetchPropertiesFromApi(apiUrl, purpose);
     }
   }, [
@@ -310,10 +334,15 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   // Use API data if enabled, otherwise use static data
   const useApiData = mergedData.dataSource?.enabled !== false;
+  console.log("useApiData",useApiData)
+  console.log("filteredProperties",filteredProperties)
+  console.log("apiProperties",apiProperties)
+  console.log("mergedData.items",mergedData.items)
+  console.log("mergedData.properties",mergedData.properties)
+  
+  // Always use API data when enabled, ignore store data completely
   const properties = useApiData
-    ? filteredProperties.length > 0
-      ? filteredProperties
-      : apiProperties
+    ? apiProperties
     : mergedData.items || mergedData.properties || [];
 
   // Check if component should be visible
