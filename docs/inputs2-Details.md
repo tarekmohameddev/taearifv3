@@ -39,9 +39,7 @@ interface InputsProps {
 
 ```typescript
 // Subscribe to editor store updates for this inputs variant
-const ensureComponentVariant = useEditorStore(
-  (s) => s.ensureComponentVariant,
-);
+const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
 const getComponentData = useEditorStore((s) => s.getComponentData);
 const inputs2States = useEditorStore((s) => s.inputs2States);
 

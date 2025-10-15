@@ -174,7 +174,8 @@ export function RentalApplicationsService({
 
   // Renewal dialog state
   const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
-  const [selectedRentalForRenewal, setSelectedRentalForRenewal] = useState<any>(null);
+  const [selectedRentalForRenewal, setSelectedRentalForRenewal] =
+    useState<any>(null);
   const [renewalFormData, setRenewalFormData] = useState({
     rental_type: "monthly",
     rental_duration: 12,
@@ -219,26 +220,28 @@ export function RentalApplicationsService({
 
     try {
       setRenewalLoading(true);
-      
+
       const renewalData = {
         rental_type: renewalFormData.rental_type,
         rental_duration: parseInt(renewalFormData.rental_duration.toString()),
         paying_plan: renewalFormData.paying_plan,
         total_rental_amount: parseFloat(renewalFormData.total_rental_amount),
         notes: renewalFormData.description,
-        cost_items: [{
-          name: "Platform Fee",
-          cost: 500,
-          type: "fixed",
-          payer: "tenant",
-          payment_frequency: renewalFormData.payment_frequency,
-          description: renewalFormData.description
-        }]
+        cost_items: [
+          {
+            name: "Platform Fee",
+            cost: 500,
+            type: "fixed",
+            payer: "tenant",
+            payment_frequency: renewalFormData.payment_frequency,
+            description: renewalFormData.description,
+          },
+        ],
       };
 
       const response = await axiosInstance.post(
         `/v1/rms/rentals/${selectedRentalForRenewal.id}/renew`,
-        renewalData
+        renewalData,
       );
 
       if (response.data.status) {
@@ -247,10 +250,15 @@ export function RentalApplicationsService({
         // Refresh the rentals list
         window.location.reload();
       } else {
-        alert("فشل في تجديد العقد: " + (response.data.message || "خطأ غير معروف"));
+        alert(
+          "فشل في تجديد العقد: " + (response.data.message || "خطأ غير معروف"),
+        );
       }
     } catch (error: any) {
-      alert("خطأ في تجديد العقد: " + (error.response?.data?.message || error.message || "خطأ غير معروف"));
+      alert(
+        "خطأ في تجديد العقد: " +
+          (error.response?.data?.message || error.message || "خطأ غير معروف"),
+      );
     } finally {
       setRenewalLoading(false);
     }

@@ -352,7 +352,11 @@ const useTenantStore = create((set) => ({
       }
 
       // Load WebsiteLayout data into editor store
-      if (data.WebsiteLayout && data.WebsiteLayout.metaTags && data.WebsiteLayout.metaTags.pages) {
+      if (
+        data.WebsiteLayout &&
+        data.WebsiteLayout.metaTags &&
+        data.WebsiteLayout.metaTags.pages
+      ) {
         editorStore.setWebsiteLayout(data.WebsiteLayout);
       }
 

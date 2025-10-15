@@ -110,20 +110,20 @@ export const ImageFieldRenderer: React.FC<{
     setIsUploading(true);
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('context', 'template');
+      formData.append("file", file);
+      formData.append("context", "template");
 
-      const response = await axiosInstance.post('/upload', formData, {
+      const response = await axiosInstance.post("/upload", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      if (response.data.status === 'success' && response.data.data?.url) {
+      if (response.data.status === "success" && response.data.data?.url) {
         updateValue(path, response.data.data.url);
       }
     } catch (error) {
-      console.error('خطأ في رفع الصورة:', error);
+      console.error("خطأ في رفع الصورة:", error);
       // يمكن إضافة إشعار خطأ هنا
     } finally {
       setIsUploading(false);
@@ -196,7 +196,7 @@ export const ImageFieldRenderer: React.FC<{
             className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-700"
             placeholder="https://example.com/image.jpg"
           />
-          
+
           {/* زر رفع الصورة */}
           <button
             type="button"
@@ -206,15 +206,35 @@ export const ImageFieldRenderer: React.FC<{
           >
             {isUploading ? (
               <>
-                <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <svg
+                  className="w-4 h-4 animate-spin"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
                 </svg>
                 <span>جاري الرفع...</span>
               </>
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  />
                 </svg>
                 <span>رفع صورة</span>
               </>

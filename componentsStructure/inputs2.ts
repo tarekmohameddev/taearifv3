@@ -2,10 +2,10 @@ import { ComponentStructure } from "./types";
 
 /**
  * Inputs2 Structure - Visibility Controls Only
- * 
+ *
  * This structure contains ONLY visibility controls for cards and fields.
  * All other data (styling, layout, content) comes from default data.
- * 
+ *
  * This follows the 99% default data + 1% visibility control approach.
  */
 
@@ -15,7 +15,8 @@ export const inputs2Structure: ComponentStructure = {
     {
       id: "inputs2",
       name: "Inputs 2 - Visibility Controls",
-      description: "Visibility controls for cards and fields only. All other data comes from default.",
+      description:
+        "Visibility controls for cards and fields only. All other data comes from default.",
       fields: [
         // ========================================
         // CARD VISIBILITY CONTROLS

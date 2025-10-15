@@ -834,24 +834,26 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             )
             .map((component: any, index: number) => {
               // قراءة البيانات من editorStore باستخدام component.id
-              const storeData = useEditorStore.getState().getComponentData(
-                component.type,
-                component.id
-              );
-              
+              const storeData = useEditorStore
+                .getState()
+                .getComponentData(component.type, component.id);
+
               // دمج البيانات: أولوية للبيانات من editorStore
-              const mergedData = storeData && Object.keys(storeData).length > 0
-                ? storeData
-                : component.data;
+              const mergedData =
+                storeData && Object.keys(storeData).length > 0
+                  ? storeData
+                  : component.data;
 
               // Debug log للتحقق من تدفق البيانات
               console.log("🔍 Component data in LiveEditorUI:", {
                 componentId: component.id,
                 componentType: component.type,
                 componentName: component.componentName,
-                storeData: storeData ? Object.keys(storeData) : 'none',
-                componentData: component.data ? Object.keys(component.data) : 'none',
-                mergedDataKeys: mergedData ? Object.keys(mergedData) : 'none'
+                storeData: storeData ? Object.keys(storeData) : "none",
+                componentData: component.data
+                  ? Object.keys(component.data)
+                  : "none",
+                mergedDataKeys: mergedData ? Object.keys(mergedData) : "none",
               });
 
               return (
@@ -901,7 +903,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                           section={state.slug}
                           data={
                             {
-                              ...mergedData,  // ✅ استخدام البيانات المدمجة من editorStore
+                              ...mergedData, // ✅ استخدام البيانات المدمجة من editorStore
                               useStore: true,
                               variant: component.id,
                               deviceType: selectedDevice,

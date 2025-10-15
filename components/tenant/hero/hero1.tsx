@@ -26,7 +26,6 @@ import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { getDefaultHeroData } from "@/context-liveeditor/editorStoreFunctions/heroFunctions";
 
-
 interface HeroProps {
   visible?: boolean;
   height?: {
@@ -578,17 +577,17 @@ function Divider() {
 
 /**
  * Hero1 Component - Advanced Hero Section
- * 
+ *
  * This component follows the same pattern as componentsCachingSystem.md:
  * - 99% of the data comes from getDefaultHeroData() (default data)
  * - 1% of the data comes from store/tenant data (customizations)
- * 
+ *
  * Data Priority Order (highest to lowest):
  * 1. Store Data (storeData) - Highest priority (editor changes)
  * 2. Backend Data (tenantComponentData) - Backend data
  * 3. Props Data (props) - Component props
  * 4. Default Data (defaultData) - Base data (99%)
- * 
+ *
  * This follows the exact same pattern as whyChooseUs1.tsx and testimonials1.tsx
  * in the componentsCachingSystem.md documentation.
  */
@@ -627,31 +626,31 @@ const Hero1 = (props: HeroProps = {}) => {
 
   // Subscribe to store updates to re-render when data changes
   const heroStates = useEditorStore((s) => s.heroStates);
-  
+
   // Find the actual hero data in heroStates
   // The data might be stored with a different key than uniqueId
   const findHeroData = () => {
     if (!props.useStore || !heroStates) return {};
-    
+
     // Look for the first hero data in the store that has actual content
     // Skip entries that only contain metadata (id, type, visible, variant, useStore)
     for (const [key, data] of Object.entries(heroStates)) {
-      if (data && typeof data === 'object' && data.visible !== undefined) {
+      if (data && typeof data === "object" && data.visible !== undefined) {
         // Check if this is actual hero data (has content, background, etc.)
         if (data.content || data.background || data.searchForm) {
           return data;
         }
       }
     }
-    
+
     // Fallback: try to get data by uniqueId if no actual hero data found
     if (heroStates[uniqueId]) {
       return heroStates[uniqueId];
     }
-    
+
     return {};
   };
-  
+
   const currentStoreData = findHeroData();
 
   // Get tenant data for this specific component variant - memoized
@@ -707,10 +706,10 @@ const Hero1 = (props: HeroProps = {}) => {
   // This follows the exact same pattern as componentsCachingSystem.md
   // Priority order: Current Store > Backend > Props > Default
   const mergedData = {
-    ...defaultData,           // 99% - Default data as base
-    ...props,                 // Props from parent component
-    ...tenantComponentData,   // Backend data (tenant data)
-    ...currentStoreData,      // Current store data (highest priority)
+    ...defaultData, // 99% - Default data as base
+    ...props, // Props from parent component
+    ...tenantComponentData, // Backend data (tenant data)
+    ...currentStoreData, // Current store data (highest priority)
   };
 
   const { user, loading } = useAuth();

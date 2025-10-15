@@ -45,8 +45,8 @@ const getIconComponent = (iconName) => {
       return LayoutGrid;
     case "bot":
       return Bot;
-      case "square-pen":
-        return SquarePen;
+    case "square-pen":
+      return SquarePen;
     default:
       return FileText;
   }
@@ -90,14 +90,14 @@ module.exports = (set, get) => ({
         // معالجة الـ path: إذا لم يبدأ بـ /، إضافة الـ slug بعد الـ domain
         let processedPath = section.path;
         let isDirectPath = false; // تحديد ما إذا كان المسار يجب أن يفتح مباشرة
-        
-        if (!section.path.startsWith('/')) {
+
+        if (!section.path.startsWith("/")) {
           // إضافة الـ slug بعد الـ domain مباشرة
           processedPath = `/${section.path}`;
           // تحديد المسارات التي يجب أن تفتح مباشرة (بدون dashboard)
-          isDirectPath = section.path === 'live-editor';
+          isDirectPath = section.path === "live-editor";
         }
-        
+
         return {
           id: section.path.split("/").pop(),
           label: section.title,

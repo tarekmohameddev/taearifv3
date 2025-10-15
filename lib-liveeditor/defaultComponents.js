@@ -3254,15 +3254,15 @@ export const PAGE_DEFINITIONS = {
         visible: true,
         texts: {
           title: "Advanced Inputs System Title",
-          subtitle: "This is a sample subtitle for the section."
+          subtitle: "This is a sample subtitle for the section.",
         },
         colors: {
           background: "#FFFFFF",
-          textColor: "#1F2937"
+          textColor: "#1F2937",
         },
         settings: {
           enabled: true,
-          layout: "default"
+          layout: "default",
         },
         layout: {
           direction: "rtl",
@@ -3271,13 +3271,14 @@ export const PAGE_DEFINITIONS = {
             y: "py-14",
             smY: "sm:py-16",
           },
-          columns: "1"
+          columns: "1",
         },
         theme: {
           primaryColor: "#3b82f6",
           secondaryColor: "#1e40af",
           accentColor: "#60a5fa",
-          submitButtonGradient: "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)"
+          submitButtonGradient:
+            "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)",
         },
         submitButton: {
           text: "إرسال",
@@ -3288,7 +3289,7 @@ export const PAGE_DEFINITIONS = {
           hoverColor: "#067a55",
           borderRadius: "8px",
           padding: "12px 24px",
-          apiEndpoint: "https://taearif.com/api/v1/property-requests/public"
+          apiEndpoint: "https://taearif.com/api/v1/property-requests/public",
         },
         cardsLayout: {
           columns: "1",
@@ -3296,8 +3297,8 @@ export const PAGE_DEFINITIONS = {
           responsive: {
             mobile: "1",
             tablet: "2",
-            desktop: "3"
-          }
+            desktop: "3",
+          },
         },
         fieldsLayout: {
           columns: "2",
@@ -3305,8 +3306,8 @@ export const PAGE_DEFINITIONS = {
           responsive: {
             mobile: "1",
             tablet: "2",
-            desktop: "3"
-          }
+            desktop: "3",
+          },
         },
         cards: [
           {
@@ -3328,76 +3329,76 @@ export const PAGE_DEFINITIONS = {
                 options: [
                   {
                     value: "14",
-                    label: "آخرى"
+                    label: "آخرى",
                   },
                   {
                     value: "4",
-                    label: "أرض"
+                    label: "أرض",
                   },
                   {
                     value: "7",
-                    label: "استراحة"
+                    label: "استراحة",
                   },
                   {
                     value: "13",
-                    label: "دور في فيلا"
+                    label: "دور في فيلا",
                   },
                   {
                     value: "18",
-                    label: "شقة"
+                    label: "شقة",
                   },
                   {
                     value: "2",
-                    label: "شقة في برج"
+                    label: "شقة في برج",
                   },
                   {
                     value: "3",
-                    label: "شقة في عمارة"
+                    label: "شقة في عمارة",
                   },
                   {
                     value: "17",
-                    label: "شقة في فيلا"
+                    label: "شقة في فيلا",
                   },
                   {
                     value: "15",
-                    label: "عمارة"
+                    label: "عمارة",
                   },
                   {
                     value: "1",
-                    label: "فيلا"
+                    label: "فيلا",
                   },
                   {
                     value: "5",
-                    label: "قصر"
+                    label: "قصر",
                   },
                   {
                     value: "12",
-                    label: "مبنى"
+                    label: "مبنى",
                   },
                   {
                     value: "8",
-                    label: "محل تجاري"
+                    label: "محل تجاري",
                   },
                   {
                     value: "6",
-                    label: "مزرعة"
+                    label: "مزرعة",
                   },
                   {
                     value: "11",
-                    label: "معرض"
+                    label: "معرض",
                   },
                   {
                     value: "9",
-                    label: "مكتب"
+                    label: "مكتب",
                   },
                   {
                     value: "10",
-                    label: "منتجع"
-                  }
+                    label: "منتجع",
+                  },
                 ],
                 validation: null,
                 icon: null,
-                id: "property_type"
+                id: "property_type",
               },
               {
                 label: "نوع الملكية",
@@ -3408,24 +3409,24 @@ export const PAGE_DEFINITIONS = {
                 options: [
                   {
                     value: "زراعي",
-                    label: "زراعي"
+                    label: "زراعي",
                   },
                   {
                     value: "صناعي",
-                    label: "صناعي"
+                    label: "صناعي",
                   },
                   {
                     value: "تجاري",
-                    label: "تجاري"
+                    label: "تجاري",
                   },
                   {
                     value: "سكني",
-                    label: "سكني"
-                  }
+                    label: "سكني",
+                  },
                 ],
                 validation: null,
                 icon: null,
-                id: "category"
+                id: "category",
               },
               {
                 id: "region",
@@ -3436,7 +3437,7 @@ export const PAGE_DEFINITIONS = {
                 description: null,
                 icon: null,
                 options: null,
-                validation: null
+                validation: null,
               },
               {
                 id: "districts_id",
@@ -3447,7 +3448,7 @@ export const PAGE_DEFINITIONS = {
                 description: null,
                 icon: null,
                 options: null,
-                validation: null
+                validation: null,
               },
               {
                 id: "area_from",
@@ -3458,7 +3459,7 @@ export const PAGE_DEFINITIONS = {
                 description: null,
                 icon: null,
                 options: null,
-                validation: null
+                validation: null,
               },
               {
                 id: "area_to",
@@ -3469,9 +3470,9 @@ export const PAGE_DEFINITIONS = {
                 description: null,
                 icon: null,
                 options: null,
-                validation: null
-              }
-            ]
+                validation: null,
+              },
+            ],
           },
           {
             id: "معلومات الميزانية والدفع",
@@ -3495,14 +3496,14 @@ export const PAGE_DEFINITIONS = {
                 options: [
                   {
                     value: "كاش",
-                    label: "كاش"
+                    label: "كاش",
                   },
                   {
                     value: "تمويل بنكي",
-                    label: "تمويل بنكي"
-                  }
+                    label: "تمويل بنكي",
+                  },
                 ],
-                validation: null
+                validation: null,
               },
               {
                 id: "budget_from",
@@ -3513,7 +3514,7 @@ export const PAGE_DEFINITIONS = {
                 description: null,
                 icon: null,
                 options: null,
-                validation: null
+                validation: null,
               },
               {
                 id: "budget_to",
@@ -3524,9 +3525,9 @@ export const PAGE_DEFINITIONS = {
                 description: null,
                 icon: null,
                 options: null,
-                validation: null
-              }
-            ]
+                validation: null,
+              },
+            ],
           },
           {
             id: "تفاصيل إضافية",
@@ -3550,22 +3551,22 @@ export const PAGE_DEFINITIONS = {
                 options: [
                   {
                     value: "مستعد فورًا",
-                    label: "مستعد فورًا"
+                    label: "مستعد فورًا",
                   },
                   {
                     value: "خلال شهر",
-                    label: "خلال شهر"
+                    label: "خلال شهر",
                   },
                   {
                     value: "خلال 3 أشهر",
-                    label: "خلال 3 أشهر"
+                    label: "خلال 3 أشهر",
                   },
                   {
                     value: "لاحقًا / استكشاف فقط",
-                    label: "لاحقًا / استكشاف فقط"
-                  }
+                    label: "لاحقًا / استكشاف فقط",
+                  },
                 ],
-                validation: null
+                validation: null,
               },
               {
                 id: "purchase_goal",
@@ -3578,22 +3579,22 @@ export const PAGE_DEFINITIONS = {
                 options: [
                   {
                     value: "سكن خاص",
-                    label: "سكن خاص"
+                    label: "سكن خاص",
                   },
                   {
                     value: "استثمار وتأجير",
-                    label: "استثمار وتأجير"
+                    label: "استثمار وتأجير",
                   },
                   {
                     value: "بناء وبيع",
-                    label: "بناء وبيع"
+                    label: "بناء وبيع",
                   },
                   {
                     value: "مشروع تجاري",
-                    label: "مشروع تجاري"
-                  }
+                    label: "مشروع تجاري",
+                  },
                 ],
-                validation: null
+                validation: null,
               },
               {
                 id: "wants_similar_offers",
@@ -3606,16 +3607,16 @@ export const PAGE_DEFINITIONS = {
                 options: [
                   {
                     value: "نعم",
-                    label: "نعم"
+                    label: "نعم",
                   },
                   {
                     value: "لا",
-                    label: "لا"
-                  }
+                    label: "لا",
+                  },
                 ],
-                validation: null
-              }
-            ]
+                validation: null,
+              },
+            ],
           },
           {
             id: "بيانات التواصل",
@@ -3637,7 +3638,7 @@ export const PAGE_DEFINITIONS = {
                 description: null,
                 icon: null,
                 options: null,
-                validation: null
+                validation: null,
               },
               {
                 id: "phone",
@@ -3648,7 +3649,7 @@ export const PAGE_DEFINITIONS = {
                 description: "رقم الهاتف",
                 icon: null,
                 options: null,
-                validation: null
+                validation: null,
               },
               {
                 id: "contact_on_whatsapp",
@@ -3661,14 +3662,14 @@ export const PAGE_DEFINITIONS = {
                 options: [
                   {
                     value: "نعم",
-                    label: "نعم"
+                    label: "نعم",
                   },
                   {
                     value: "لا",
-                    label: "لا"
-                  }
+                    label: "لا",
+                  },
                 ],
-                validation: null
+                validation: null,
               },
               {
                 id: "notes",
@@ -3679,11 +3680,11 @@ export const PAGE_DEFINITIONS = {
                 description: null,
                 icon: null,
                 options: null,
-                validation: null
-              }
-            ]
-          }
-        ]
+                validation: null,
+              },
+            ],
+          },
+        ],
       },
       position: 2,
     },

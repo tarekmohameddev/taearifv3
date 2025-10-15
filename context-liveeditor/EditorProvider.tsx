@@ -32,8 +32,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       globalComponentsData: state.globalComponentsData,
       WebsiteLayout: state.WebsiteLayout || {
         metaTags: {
-          pages: []
-        }
+          pages: [],
+        },
       },
     };
 

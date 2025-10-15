@@ -7,39 +7,47 @@
 ## الملفات المنشأة
 
 ### 1. المكونات الرئيسية
+
 - `components/tenant/inputs/inputs2.tsx` - المكون الرئيسي
 - `components/tenant/inputs/inputs2-example.tsx` - مثال على الاستخدام
 - `components/tenant/inputs/index.ts` - ملف التصدير (محدث)
 
 ### 2. ملفات البيانات والوظائف
+
 - `context-liveeditor/editorStoreFunctions/inputs2Functions.ts` - وظائف إدارة البيانات
 - `componentsStructure/inputs2.ts` - هيكل المكون
 
 ### 3. ملفات التكوين
+
 - `lib-liveeditor/ComponentsList.tsx` - قائمة المكونات (محدث)
 - `context-liveeditor/editorStore.ts` - مخزن البيانات (محدث)
 - `lib/ComponentsInCenter.js` - قائمة المكونات المتوسطة (محدث)
 
 ### 4. ملفات التوثيق
+
 - `docs/inputs2-Details.md` - تفاصيل تقنية مفصلة
 - `docs/inputs2-README.md` - هذا الملف
 
 ### 5. صفحة الاختبار
+
 - `app/dashboard/inputs2-test/page.tsx` - صفحة اختبار المكون
 
 ## المميزات الجديدة
 
 ### 1. تحسينات الأداء
+
 - تحسين في استخدام الذاكرة
 - تحسين في سرعة التحميل
 - تحسين في معالجة البيانات
 
 ### 2. تحسينات الوظائف
+
 - نظام تحقق محسن من صحة البيانات
 - معالجة أخطاء أفضل
 - دعم أفضل للـ API calls
 
 ### 3. تحسينات التصميم
+
 - ألوان ديناميكية محسنة
 - تخطيط متجاوب أفضل
 - تأثيرات بصرية محسنة
@@ -56,7 +64,7 @@ import { Inputs2 } from "@/components/tenant/inputs";
   variant="inputs2"
   id="my-form"
   apiEndpoint="/api/submit-form"
-/>
+/>;
 ```
 
 ### 2. الاستخدام مع Store
@@ -69,7 +77,7 @@ import { Inputs2 } from "@/components/tenant/inputs";
   variant="inputs2"
   id="my-form"
   apiEndpoint="/api/submit-form"
-/>
+/>;
 ```
 
 ### 3. استخدام المثال
@@ -77,21 +85,24 @@ import { Inputs2 } from "@/components/tenant/inputs";
 ```tsx
 import { Inputs2Example } from "@/components/tenant/inputs";
 
-<Inputs2Example />
+<Inputs2Example />;
 ```
 
 ## الاختلافات عن Inputs1
 
 ### 1. الـ Store Integration
+
 - `inputs2States` بدلاً من `inputsStates`
 - `inputs2Functions` بدلاً من `inputsFunctions`
 - `inputs2Structure` بدلاً من `inputsStructure`
 
 ### 2. الـ Component Type
+
 - `inputs2` بدلاً من `inputs`
 - `Inputs2` بدلاً من `Inputs1`
 
 ### 3. الـ Default Data
+
 - `getDefaultInputs2Data()` بدلاً من `getDefaultInputsData()`
 
 ## الاختبار
@@ -105,6 +116,7 @@ import { Inputs2Example } from "@/components/tenant/inputs";
 ## التطوير
 
 ### 1. إضافة حقول جديدة
+
 ```typescript
 // في inputs2Functions.ts
 export const getDefaultInputs2Data = (): ComponentData => ({
@@ -116,13 +128,14 @@ export const getDefaultInputs2Data = (): ComponentData => ({
       title: "كارت جديد",
       fields: [
         // ... الحقول الجديدة
-      ]
-    }
-  ]
+      ],
+    },
+  ],
 });
 ```
 
 ### 2. إضافة أنواع حقول جديدة
+
 ```typescript
 // في inputs2.tsx
 interface InputField {
@@ -141,6 +154,7 @@ interface InputField {
 ```
 
 ### 3. إضافة ألوان جديدة
+
 ```typescript
 // في inputs2.tsx
 const colorPalettes: Record<string, any> = {
@@ -157,6 +171,7 @@ const colorPalettes: Record<string, any> = {
 ## استكشاف الأخطاء
 
 ### 1. مشاكل الـ Import
+
 ```bash
 # تأكد من وجود الملفات
 ls -la context-liveeditor/editorStoreFunctions/inputs2Functions.ts
@@ -164,12 +179,14 @@ ls -la components/tenant/inputs/inputs2.tsx
 ```
 
 ### 2. مشاكل الـ Store
+
 ```typescript
 // تأكد من إضافة inputs2States في editorStore.ts
 inputs2States: {},
 ```
 
 ### 3. مشاكل الـ Types
+
 ```typescript
 // تأكد من إضافة inputs2 في ComponentsList.tsx
 inputs2: {

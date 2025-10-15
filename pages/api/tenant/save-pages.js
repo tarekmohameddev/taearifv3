@@ -11,7 +11,8 @@ export default async function handler(req, res) {
   try {
     await dbConnect();
 
-    const { tenantId, pages, globalComponentsData, WebsiteLayout } = req.body || {};
+    const { tenantId, pages, globalComponentsData, WebsiteLayout } =
+      req.body || {};
 
     if (!tenantId || typeof tenantId !== "string") {
       return res.status(400).json({ message: "tenantId is required" });

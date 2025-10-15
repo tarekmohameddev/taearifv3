@@ -2,11 +2,11 @@
 
 /**
  * Inputs2 Component - Advanced Property Request Form
- * 
+ *
  * This component follows a 99% default data + 1% visibility control approach:
  * - 99% of the data comes from getDefaultInputs2Data() (default data)
  * - 1% of the data comes from visibility controls (cardVisibility, fieldVisibility)
- * 
+ *
  * This ensures consistent behavior while allowing fine-grained control over
  * which cards and fields are visible to users.
  */
@@ -341,7 +341,6 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
 
   // Get tenant data for this specific component variant - memoized
   const tenantComponentData = useMemo(() => {
-    
     if (!tenantData?.componentSettings) {
       return {};
     }
@@ -361,7 +360,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
           ) {
             return component.data;
           }
-          
+
           // Fallback: match without ID if props.id is undefined or empty
           if (
             component.type === "inputs2" &&
@@ -370,7 +369,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
           ) {
             return component.data;
           }
-          
+
           // Last resort: match only type and componentName
           if (
             component.type === "inputs2" &&
@@ -412,18 +411,28 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
 
   // Get default data as base (99% of the data) - memoized
   const defaultData = useMemo(() => getDefaultInputs2Data(), []);
-  
+
   // Only get visibility controls from store/tenant data (1% of the data) - memoized
-  const visibilityControls = useMemo(() => ({
-    cardVisibility: mergedData.cardVisibility || defaultData.cardVisibility || {},
-    fieldVisibility: mergedData.fieldVisibility || defaultData.fieldVisibility || {},
-  }), [mergedData.cardVisibility, mergedData.fieldVisibility, defaultData.cardVisibility, defaultData.fieldVisibility]);
+  const visibilityControls = useMemo(
+    () => ({
+      cardVisibility:
+        mergedData.cardVisibility || defaultData.cardVisibility || {},
+      fieldVisibility:
+        mergedData.fieldVisibility || defaultData.fieldVisibility || {},
+    }),
+    [
+      mergedData.cardVisibility,
+      mergedData.fieldVisibility,
+      defaultData.cardVisibility,
+      defaultData.fieldVisibility,
+    ],
+  );
 
   // Use default data for everything else (99%) - memoized
   const componentData = useMemo(() => {
     // Use mergedData if it has fieldsLayout, otherwise use defaultData
     const baseData = mergedData.fieldsLayout ? mergedData : defaultData;
-    
+
     const {
       cards = defaultData.cards,
       theme = defaultData.theme,
@@ -459,7 +468,6 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
       tablet: "2",
       desktop: "2",
     };
-    
 
     return {
       cards,
@@ -512,7 +520,10 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
   // Helper function to get card visibility key - memoized
   const getCardVisibilityKey = useCallback((cardId: string): string => {
     const cardIdLower = cardId.toLowerCase();
-    if (cardIdLower.includes("معلومات العقار") || cardIdLower.includes("property")) {
+    if (
+      cardIdLower.includes("معلومات العقار") ||
+      cardIdLower.includes("property")
+    ) {
       return "propertyInfoCard";
     }
     if (cardIdLower.includes("ميزانية") || cardIdLower.includes("budget")) {
@@ -531,24 +542,24 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
   const getFieldVisibilityKey = useCallback((fieldId: string): string => {
     // Map field IDs to the keys used in backend data (old format)
     const fieldIdMapping: Record<string, string> = {
-      'property_type': 'propertyType',
-      'category': 'propertyCategory', 
-      'region': 'city',
-      'districts_id': 'district',
-      'area_from': 'areaFrom',
-      'area_to': 'areaTo',
-      'purchase_method': 'purchaseMethod',
-      'budget_from': 'budgetFrom',
-      'budget_to': 'budgetTo',
-      'seriousness': 'seriousness',
-      'purchase_goal': 'purchaseGoal',
-      'wants_similar_offers': 'similarOffers',
-      'full_name': 'fullName',
-      'phone': 'phone',
-      'contact_on_whatsapp': 'whatsapp',
-      'notes': 'notes'
+      property_type: "propertyType",
+      category: "propertyCategory",
+      region: "city",
+      districts_id: "district",
+      area_from: "areaFrom",
+      area_to: "areaTo",
+      purchase_method: "purchaseMethod",
+      budget_from: "budgetFrom",
+      budget_to: "budgetTo",
+      seriousness: "seriousness",
+      purchase_goal: "purchaseGoal",
+      wants_similar_offers: "similarOffers",
+      full_name: "fullName",
+      phone: "phone",
+      contact_on_whatsapp: "whatsapp",
+      notes: "notes",
     };
-    
+
     // Return the mapped key if it exists, otherwise return the original field ID
     return fieldIdMapping[fieldId] || fieldId;
   }, []);
@@ -568,8 +579,9 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
         // Check if card should be visible based on cardVisibility controls
         const cardId = card.id || card.title;
         const cardVisibilityKey = getCardVisibilityKey(cardId);
-        const isCardVisible = visibilityControls.cardVisibility[cardVisibilityKey] !== false;
-        
+        const isCardVisible =
+          visibilityControls.cardVisibility[cardVisibilityKey] !== false;
+
         return isCardVisible;
       })
       .map((card) => ({
@@ -584,8 +596,9 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
             // Check if field should be visible based on fieldVisibility controls
             const fieldId = field.id;
             const fieldVisibilityKey = getFieldVisibilityKey(fieldId);
-            const isFieldVisible = visibilityControls.fieldVisibility[fieldVisibilityKey] !== false;
-            
+            const isFieldVisible =
+              visibilityControls.fieldVisibility[fieldVisibilityKey] !== false;
+
             return isFieldVisible;
           })
           .map((field: any) => ({
@@ -616,8 +629,10 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
   const [loadingCities, setLoadingCities] = useState(true);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
-  const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
-  
+  const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(
+    null,
+  );
+
   // Dropdown states
   const [cityOpen, setCityOpen] = useState(false);
   const [districtOpen, setDistrictOpen] = useState(false);
@@ -703,25 +718,22 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
   }, [safeCards]);
 
   // Handle input changes - memoized
-  const handleInputChange = useCallback(
-    (fieldId: string, value: any) => {
-      setFormData((prev) => ({
-        ...prev,
-        [fieldId]: value,
-      }));
+  const handleInputChange = useCallback((fieldId: string, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [fieldId]: value,
+    }));
 
-      // Clear error when user starts typing
-      setErrors((prev) => {
-        if (prev[fieldId]) {
-          const newErrors = { ...prev };
-          delete newErrors[fieldId];
-          return newErrors;
-        }
-        return prev;
-      });
-    },
-    [],
-  );
+    // Clear error when user starts typing
+    setErrors((prev) => {
+      if (prev[fieldId]) {
+        const newErrors = { ...prev };
+        delete newErrors[fieldId];
+        return newErrors;
+      }
+      return prev;
+    });
+  }, []);
 
   // Handle city selection
   const handleCitySelect = useCallback((cityId: number) => {
@@ -1185,7 +1197,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                   "w-full justify-between text-black",
                   hasError
                     ? "border-red-500 bg-red-50 dark:bg-red-900/20"
-                    : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
+                    : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500",
                 )}
                 disabled={loadingCities}
               >
@@ -1233,7 +1245,9 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
 
     // Special handling for districts_id field
     if (field.id === "districts_id") {
-      const selectedDistrict = districts.find((district) => district.id === selectedDistrictId);
+      const selectedDistrict = districts.find(
+        (district) => district.id === selectedDistrictId,
+      );
 
       return (
         <motion.div
@@ -1262,7 +1276,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                   "w-full justify-between text-black",
                   hasError
                     ? "border-red-500 bg-red-50 dark:bg-red-900/20"
-                    : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
+                    : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500",
                 )}
                 disabled={!selectedCityId || loadingDistricts}
               >
@@ -1742,20 +1756,29 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
             >
               <div
                 className={`grid gap-4 ${
-                  fieldsResponsive.mobile === "1" ? "grid-cols-1" :
-                  fieldsResponsive.mobile === "2" ? "grid-cols-2" :
-                  fieldsResponsive.mobile === "3" ? "grid-cols-3" :
-                  "grid-cols-4"
+                  fieldsResponsive.mobile === "1"
+                    ? "grid-cols-1"
+                    : fieldsResponsive.mobile === "2"
+                      ? "grid-cols-2"
+                      : fieldsResponsive.mobile === "3"
+                        ? "grid-cols-3"
+                        : "grid-cols-4"
                 } ${
-                  fieldsResponsive.tablet === "1" ? "md:grid-cols-1" :
-                  fieldsResponsive.tablet === "2" ? "md:grid-cols-2" :
-                  fieldsResponsive.tablet === "3" ? "md:grid-cols-3" :
-                  "md:grid-cols-4"
+                  fieldsResponsive.tablet === "1"
+                    ? "md:grid-cols-1"
+                    : fieldsResponsive.tablet === "2"
+                      ? "md:grid-cols-2"
+                      : fieldsResponsive.tablet === "3"
+                        ? "md:grid-cols-3"
+                        : "md:grid-cols-4"
                 } ${
-                  fieldsResponsive.desktop === "1" ? "lg:grid-cols-1" :
-                  fieldsResponsive.desktop === "2" ? "lg:grid-cols-2" :
-                  fieldsResponsive.desktop === "3" ? "lg:grid-cols-3" :
-                  "lg:grid-cols-4"
+                  fieldsResponsive.desktop === "1"
+                    ? "lg:grid-cols-1"
+                    : fieldsResponsive.desktop === "2"
+                      ? "lg:grid-cols-2"
+                      : fieldsResponsive.desktop === "3"
+                        ? "lg:grid-cols-3"
+                        : "lg:grid-cols-4"
                 }`}
                 style={
                   {
@@ -1998,8 +2021,6 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               1fr
             ) !important;
           }
-
-
         `}</style>
 
         <div

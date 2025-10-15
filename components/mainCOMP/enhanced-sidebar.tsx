@@ -150,7 +150,7 @@ export function EnhancedSidebar({
                   if (item.isDirectPath) {
                     return item.path;
                   }
-                  
+
                   // التحقق من وجود dashboard في بداية المسار
                   if (item.path.startsWith("/dashboard")) {
                     // إذا كان موجود، إزالته

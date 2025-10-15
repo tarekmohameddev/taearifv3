@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import axiosInstance from '@/lib/axiosInstance';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface Permission {
   id: number;
@@ -64,9 +64,13 @@ export const useUserStore = create<UserState & UserActions>()(
       // Actions
       fetchUserData: async () => {
         const { lastFetched, userData } = get();
-        
+
         // Check if we have cached data that's still valid
-        if (userData && lastFetched && Date.now() - lastFetched < CACHE_DURATION) {
+        if (
+          userData &&
+          lastFetched &&
+          Date.now() - lastFetched < CACHE_DURATION
+        ) {
           set({ isInitialized: true });
           return;
         }
@@ -74,9 +78,9 @@ export const useUserStore = create<UserState & UserActions>()(
         set({ loading: true, error: null });
 
         try {
-          const response = await axiosInstance.get('/user');
-          
-          if (response.data.status === 'success' && response.data.data) {
+          const response = await axiosInstance.get("/user");
+
+          if (response.data.status === "success" && response.data.data) {
             const userData: UserData = response.data.data;
             set({
               userData,
@@ -86,13 +90,13 @@ export const useUserStore = create<UserState & UserActions>()(
               isInitialized: true,
             });
           } else {
-            throw new Error('Failed to fetch user data');
+            throw new Error("Failed to fetch user data");
           }
         } catch (error: any) {
-          console.error('Error fetching user data:', error);
+          console.error("Error fetching user data:", error);
           set({
             loading: false,
-            error: error.message || 'خطأ في جلب بيانات المستخدم',
+            error: error.message || "خطأ في جلب بيانات المستخدم",
             isInitialized: true,
           });
         }
@@ -127,9 +131,9 @@ export const useUserStore = create<UserState & UserActions>()(
       checkPermission: (permissionName: string) => {
         const { userData } = get();
         if (!userData || !userData.permissions) return false;
-        
+
         return userData.permissions.some(
-          (permission) => permission.name === permissionName
+          (permission) => permission.name === permissionName,
         );
       },
 
@@ -138,43 +142,44 @@ export const useUserStore = create<UserState & UserActions>()(
         if (!userData || !pageSlug) return false;
 
         // Special handling for access-control page - only for tenants
-        if (pageSlug === 'access-control') {
-          return userData.account_type === 'tenant';
+        if (pageSlug === "access-control") {
+          return userData.account_type === "tenant";
         }
 
         // If user is a tenant, give full access to other pages
-        if (userData.account_type === 'tenant') {
+        if (userData.account_type === "tenant") {
           return true;
         }
 
         // Map page slugs to permission names
         const permissionMap: { [key: string]: string } = {
-          customers: 'customers.view',
-          live_editor: 'live_editor.view',
-          properties: 'properties.view',
-          rentals: 'rentals.view',
-          projects: 'projects.view',
-          employees: 'employees.view',
-          analytics: 'analytics.view',
-          settings: 'settings.view',
-          'access-control': 'access.control',
-          marketing: 'marketing.view',
-          templates: 'templates.view',
-          websites: 'websites.view',
-          'activity-logs': 'activity.logs.view',
-          'purchase-management': 'purchase.management',
-          'rental-management': 'rental.management',
-          'financial-reporting': 'financial.reporting',
-          affiliate: 'affiliate.view',
-          'help-center': 'help.center',
-          solutions: 'solutions.view',
-          apps: 'apps.view',
-          blogs: 'blogs.view',
-          messages: 'messages.view',
-          'whatsapp-ai': 'whatsapp.ai',
+          customers: "customers.view",
+          live_editor: "live_editor.view",
+          properties: "properties.view",
+          rentals: "rentals.view",
+          projects: "projects.view",
+          employees: "employees.view",
+          analytics: "analytics.view",
+          settings: "settings.view",
+          "access-control": "access.control",
+          marketing: "marketing.view",
+          templates: "templates.view",
+          websites: "websites.view",
+          "activity-logs": "activity.logs.view",
+          "purchase-management": "purchase.management",
+          "rental-management": "rental.management",
+          "financial-reporting": "financial.reporting",
+          affiliate: "affiliate.view",
+          "help-center": "help.center",
+          solutions: "solutions.view",
+          apps: "apps.view",
+          blogs: "blogs.view",
+          messages: "messages.view",
+          "whatsapp-ai": "whatsapp.ai",
         };
 
-        const requiredPermission = permissionMap[pageSlug] || `${pageSlug}.view`;
+        const requiredPermission =
+          permissionMap[pageSlug] || `${pageSlug}.view`;
         return get().checkPermission(requiredPermission);
       },
 
@@ -184,12 +189,12 @@ export const useUserStore = create<UserState & UserActions>()(
       },
     }),
     {
-      name: 'user-store',
+      name: "user-store",
       partialize: (state) => ({
         userData: state.userData,
         lastFetched: state.lastFetched,
         isInitialized: state.isInitialized,
       }),
-    }
-  )
+    },
+  ),
 );

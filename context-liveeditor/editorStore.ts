@@ -466,8 +466,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   // WebsiteLayout - Meta tags and SEO data
   WebsiteLayout: {
     metaTags: {
-      pages: []
-    }
+      pages: [],
+    },
   },
 
   structures: Object.keys(COMPONENTS).reduce(
@@ -1608,7 +1608,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setInputs2Data: (variantId, data) =>
     set((state) => inputs2Functions.setData(state, variantId, data)),
   updateInputs2ByPath: (variantId, path, value) =>
-    set((state) => inputs2Functions.updateByPath(state, variantId, path, value)),
+    set((state) =>
+      inputs2Functions.updateByPath(state, variantId, path, value),
+    ),
 
   // Page components management
   setPageComponentsForPage: (page, components) =>
@@ -1722,14 +1724,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                     case "header":
                       newState.headerStates = headerFunctions.setData(
                         newState,
-                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).headerStates;
                       break;
                     case "hero":
                       newState.heroStates = heroFunctions.setData(
                         newState,
-                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).heroStates;
                       break;
@@ -1737,7 +1739,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.halfTextHalfImageStates =
                         halfTextHalfImageFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).halfTextHalfImageStates;
                       break;
@@ -1745,7 +1747,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.propertySliderStates =
                         propertySliderFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).propertySliderStates;
                       break;
@@ -1753,7 +1755,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.ctaValuationStates =
                         ctaValuationFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).ctaValuationStates;
                       break;
@@ -1761,7 +1763,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.stepsSectionStates =
                         stepsSectionFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).stepsSectionStates;
                       break;
@@ -1769,14 +1771,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.testimonialsStates =
                         testimonialsFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).testimonialsStates;
                       break;
                     case "whyChooseUs":
                       newState.whyChooseUsStates = whyChooseUsFunctions.setData(
                         newState,
-                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).whyChooseUsStates;
                       break;
@@ -1784,21 +1786,21 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.contactMapSectionStates =
                         contactMapSectionFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).contactMapSectionStates;
                       break;
                     case "footer":
                       newState.footerStates = footerFunctions.setData(
                         newState,
-                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).footerStates;
                       break;
                     case "grid":
                       newState.gridStates = gridFunctions.setData(
                         newState,
-                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).gridStates;
                       break;
@@ -1806,7 +1808,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.filterButtonsStates =
                         filterButtonsFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).filterButtonsStates;
                       break;
@@ -1814,14 +1816,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.propertyFilterStates =
                         propertyFilterFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).propertyFilterStates;
                       break;
                     case "mapSection":
                       newState.mapSectionStates = mapSectionFunctions.setData(
                         newState,
-                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).mapSectionStates;
                       break;
@@ -1829,7 +1831,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.contactFormSectionStates =
                         contactFormSectionFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).contactFormSectionStates;
                       break;
@@ -1837,7 +1839,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.contactCardsStates =
                         contactCardsFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).contactCardsStates;
                       break;
@@ -1845,21 +1847,21 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                       newState.applicationFormStates =
                         applicationFormFunctions.setData(
                           newState,
-                          comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).applicationFormStates;
                       break;
                     case "inputs":
                       newState.inputsStates = inputsFunctions.setData(
                         newState,
-                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).inputsStates;
                       break;
                     case "inputs2":
                       newState.inputs2States = inputs2Functions.setData(
                         newState,
-                        comp.id,  // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).inputs2States;
                       break;
@@ -1872,16 +1874,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       );
 
       // Initialize default inputs2 data if no inputs2 components exist in database
-      const hasInputs2InDatabase = Object.values(tenantData.componentSettings || {}).some((pageSettings: any) => {
-        if (!pageSettings || typeof pageSettings !== 'object') return false;
-        return Object.values(pageSettings).some((comp: any) => comp.type === 'inputs2');
+      const hasInputs2InDatabase = Object.values(
+        tenantData.componentSettings || {},
+      ).some((pageSettings: any) => {
+        if (!pageSettings || typeof pageSettings !== "object") return false;
+        return Object.values(pageSettings).some(
+          (comp: any) => comp.type === "inputs2",
+        );
       });
 
       if (!hasInputs2InDatabase) {
         const defaultInputs2Data = getDefaultInputs2Data();
         newState.inputs2States = {
           ...newState.inputs2States,
-          "inputs2-default": defaultInputs2Data
+          "inputs2-default": defaultInputs2Data,
         };
       }
 

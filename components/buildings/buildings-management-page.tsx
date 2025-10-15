@@ -1,6 +1,13 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
-import { Building2, Plus, Search, Grid3X3, List, ArrowLeft } from "lucide-react";
+import {
+  Building2,
+  Plus,
+  Search,
+  Grid3X3,
+  List,
+  ArrowLeft,
+} from "lucide-react";
 import BuildingCard from "./building-card";
 import BuildingsStats from "./buildings-stats";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
@@ -188,14 +195,14 @@ export default function BuildingsManagementPage() {
         <div className="p-6 space-y-6 bg-white flex-1">
           {/* Header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <Button
-                onClick={() => router.push("/dashboard/properties")}
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                العودة للعقارات
-              </Button>
+            <Button
+              onClick={() => router.push("/dashboard/properties")}
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              العودة للعقارات
+            </Button>
             <div>
               <h1 className="text-3xl font-bold text-black mb-2 text-center">
                 إدارة العمارات
@@ -205,7 +212,6 @@ export default function BuildingsManagementPage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              
               <Button
                 onClick={() => router.push("/dashboard/buildings/add")}
                 className="bg-black hover:bg-gray-800 text-white"

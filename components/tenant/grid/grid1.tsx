@@ -48,9 +48,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   // Subscribe to properties store for transactionType changes
   const transactionType = usePropertiesStore((state) => state.transactionType);
-  const setTransactionType = usePropertiesStore((state) => state.setTransactionType);
+  const setTransactionType = usePropertiesStore(
+    (state) => state.setTransactionType,
+  );
   const setTenantId = usePropertiesStore((state) => state.setTenantId);
-  const filteredProperties = usePropertiesStore((state) => state.filteredProperties);
+  const filteredProperties = usePropertiesStore(
+    (state) => state.filteredProperties,
+  );
   const storeLoading = usePropertiesStore((state) => state.loading);
 
   // Subscribe to editor store updates for this component variant
@@ -133,15 +137,19 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   const defaultUrl = "/v1/tenant-website/{{tenantID}}/properties";
 
   // Function to convert API URL format
-  const convertApiUrl = (url: string, tenantId: string, purpose?: string): string => {
+  const convertApiUrl = (
+    url: string,
+    tenantId: string,
+    purpose?: string,
+  ): string => {
     let convertedUrl = url.replace("{{tenantID}}", tenantId);
-    
+
     // Add purpose parameter if not already in URL
-    if (purpose && !convertedUrl.includes('purpose=')) {
-      const separator = convertedUrl.includes('?') ? '&' : '?';
+    if (purpose && !convertedUrl.includes("purpose=")) {
+      const separator = convertedUrl.includes("?") ? "&" : "?";
       convertedUrl += `${separator}purpose=${purpose}`;
     }
-    
+
     return convertedUrl;
   };
 
@@ -257,10 +265,10 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   // Get purpose from current pathname
   const getPurposeFromPath = () => {
-    if (pathname?.includes('/for-rent')) {
-      return 'rent';
-    } else if (pathname?.includes('/for-sale')) {
-      return 'sale';
+    if (pathname?.includes("/for-rent")) {
+      return "rent";
+    } else if (pathname?.includes("/for-sale")) {
+      return "sale";
     }
     return undefined;
   };
@@ -269,7 +277,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   useEffect(() => {
     const purpose = getPurposeFromPath();
     if (purpose && purpose !== transactionType) {
-      setTransactionType(purpose as 'rent' | 'sale');
+      setTransactionType(purpose as "rent" | "sale");
     }
   }, [pathname, transactionType, setTransactionType]);
 
@@ -281,12 +289,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     const useApiData = mergedData.dataSource?.enabled !== false;
 
     // Only use grid1's own API if propertiesStore is not available or has no data
-    const shouldUseOwnApi = useApiData && currentTenantId && filteredProperties.length === 0;
-    
+    const shouldUseOwnApi =
+      useApiData && currentTenantId && filteredProperties.length === 0;
+
     if (shouldUseOwnApi) {
       // Clear existing data before fetching new data
       setApiProperties([]);
-      
+
       const purpose = getPurposeFromPath() || transactionType;
       fetchPropertiesFromApi(apiUrl, purpose);
     }
@@ -302,7 +311,9 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   // Use API data if enabled, otherwise use static data
   const useApiData = mergedData.dataSource?.enabled !== false;
   const properties = useApiData
-    ? (filteredProperties.length > 0 ? filteredProperties : apiProperties)
+    ? filteredProperties.length > 0
+      ? filteredProperties
+      : apiProperties
     : mergedData.items || mergedData.properties || [];
 
   // Check if component should be visible
@@ -410,7 +421,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
           </div>
         )}
 
-        {(loading || storeLoading) ? (
+        {loading || storeLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>

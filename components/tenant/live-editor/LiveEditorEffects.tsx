@@ -191,14 +191,23 @@ export function useLiveEditorEffects(state: any) {
       }
 
       // Initialize default inputs2 data in editorStore if no inputs2 components exist
-      const hasInputs2InStore = Object.keys(editorStore.inputs2States || {}).length > 0;
-      
+      const hasInputs2InStore =
+        Object.keys(editorStore.inputs2States || {}).length > 0;
+
       if (!hasInputs2InStore) {
-        console.log("🔍 No inputs2 data in editorStore, initializing default inputs2 data");
-        const { getDefaultInputs2Data } = require("@/context-liveeditor/editorStoreFunctions/inputs2Functions");
+        console.log(
+          "🔍 No inputs2 data in editorStore, initializing default inputs2 data",
+        );
+        const {
+          getDefaultInputs2Data,
+        } = require("@/context-liveeditor/editorStoreFunctions/inputs2Functions");
         const defaultInputs2Data = getDefaultInputs2Data();
-        
-        editorStore.ensureComponentVariant("inputs2", "inputs2-default", defaultInputs2Data);
+
+        editorStore.ensureComponentVariant(
+          "inputs2",
+          "inputs2-default",
+          defaultInputs2Data,
+        );
         console.log("✅ Default inputs2 data initialized in editorStore");
       }
 

@@ -11,7 +11,7 @@ interface PermissionCheck {
 
 export const usePermissions = () => {
   const pathname = usePathname();
-  
+
   // Get state and actions from Zustand store
   const {
     userData,
@@ -87,7 +87,7 @@ export const usePermissions = () => {
 
   return {
     ...permissionCheck,
-    getPageSlug: () => pathname ? getPageSlug(pathname) : "",
+    getPageSlug: () => (pathname ? getPageSlug(pathname) : ""),
     getPermissionName: (slug: string) => getPermissionName(slug),
   };
 };

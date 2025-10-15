@@ -41,6 +41,7 @@
 ### 2. lib/i18n/locales/en.json
 
 #### أ. في قسم `components`:
+
 ```json
 "inputs2": {
   "display_name": "Advanced Input System",
@@ -49,6 +50,7 @@
 ```
 
 #### ب. في قسم `components_structure`:
+
 ```json
 "inputs2": {
   "card_visibility_controls": "Card Visibility Controls",
@@ -79,6 +81,7 @@
 ### 3. lib/i18n/locales/ar.json
 
 #### أ. في قسم `components`:
+
 ```json
 "inputs2": {
   "display_name": "نظام الإدخال المتقدم 2",
@@ -87,6 +90,7 @@
 ```
 
 #### ب. في قسم `components_structure`:
+
 ```json
 "inputs2": {
   "card_visibility_controls": "عناصر التحكم في رؤية البطاقات",
@@ -174,6 +178,7 @@ en.json أو ar.json حسب الـ locale
 ### حقول التحكم (Field Visibility Controls)
 
 #### حقول معلومات العقار:
+
 1. **Property Type** - نوع العقار
 2. **Property Category** - فئة العقار
 3. **City** - المدينة
@@ -182,16 +187,19 @@ en.json أو ar.json حسب الـ locale
 6. **Area To** - المساحة إلى
 
 #### حقول الميزانية والدفع:
+
 7. **Purchase Method** - طريقة الشراء
 8. **Budget From** - الميزانية من
 9. **Budget To** - الميزانية إلى
 
 #### حقول التفاصيل الإضافية:
+
 10. **Seriousness** - الجدية
 11. **Purchase Goal** - هدف الشراء
 12. **Similar Offers** - العروض المماثلة
 
 #### حقول معلومات الاتصال:
+
 13. **Full Name** - الاسم الكامل
 14. **Phone** - الهاتف
 15. **WhatsApp** - واتساب

@@ -1,7 +1,4 @@
-
-
 export const PropertyRequestsPageHeader = () => {
-
   return (
     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div>

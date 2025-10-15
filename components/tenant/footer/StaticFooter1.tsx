@@ -234,7 +234,7 @@ export default function StaticFooter({
   useStore = true,
   variant = "footer1",
   id = "global-footer",
-}: { 
+}: {
   overrideData?: any;
   useStore?: boolean;
   variant?: string;
@@ -246,7 +246,9 @@ export default function StaticFooter({
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Subscribe to editor store functions
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const globalComponentsData = useEditorStore((s) => s.globalComponentsData);
   const globalFooterData = useEditorStore((s) => s.globalFooterData);
@@ -261,7 +263,6 @@ export default function StaticFooter({
       fetchTenantData(tenantId);
     }
   }, [tenantId, fetchTenantData]);
-
 
   // Ensure component variant exists in store
   useEffect(() => {
@@ -317,12 +318,12 @@ export default function StaticFooter({
 
     return result;
   }, [
-    defaultData, 
-    globalFooterData, 
-    tenantGlobalFooterData, 
-    storeData, 
-    currentStoreData, 
-    overrideData
+    defaultData,
+    globalFooterData,
+    tenantGlobalFooterData,
+    storeData,
+    currentStoreData,
+    overrideData,
   ]);
 
   // Debug logging for data sources

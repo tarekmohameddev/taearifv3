@@ -164,19 +164,21 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                               className="justify-start gap-2"
                               asChild
                             >
-                              <Link href={(() => {
-                                // التحقق من المسارات المباشرة (بدون dashboard)
-                                if (item.isDirectPath) {
-                                  return item.path;
-                                }
-                                
-                                // معالجة الـ path: إذا لم يبدأ بـ /، إضافة الـ slug بعد الـ domain
-                                if (item.path.startsWith('/')) {
-                                  return `dashboard${item.path}`;
-                                } else {
-                                  return `dashboard/${item.path}`;
-                                }
-                              })()}>
+                              <Link
+                                href={(() => {
+                                  // التحقق من المسارات المباشرة (بدون dashboard)
+                                  if (item.isDirectPath) {
+                                    return item.path;
+                                  }
+
+                                  // معالجة الـ path: إذا لم يبدأ بـ /، إضافة الـ slug بعد الـ domain
+                                  if (item.path.startsWith("/")) {
+                                    return `dashboard${item.path}`;
+                                  } else {
+                                    return `dashboard/${item.path}`;
+                                  }
+                                })()}
+                              >
                                 <item.icon className="h-4 w-4" />
                                 {item.label}
                               </Link>
@@ -297,42 +299,41 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
 
           {useAuthStore.getState().UserIslogged && (
             <>
-              {useAuthStore.getState().userData?.package_title !==
-                undefined && 
+              {useAuthStore.getState().userData?.package_title !== undefined &&
                 useAuthStore.getState().userData?.account_type === "tenant" && (
-                <Button
-                  variant={
-                    useAuthStore.getState().userData?.is_free_plan
-                      ? "outline"
-                      : "secondary"
-                  }
-                  size="sm"
-                  className={
-                    useAuthStore.getState().userData?.is_free_plan
-                      ? "hidden md:flex gap-1"
-                      : "bg-amber-100 text-amber-800 hidden md:flex"
-                  }
-                  onClick={clickedONButton}
-                >
-                  <Link href="/settings">
-                    {useAuthStore.getState().userData?.is_free_plan
-                      ? `الباقة المجانية`
-                      : useAuthStore.getState().userData?.package_title}
-                    {!useAuthStore.getState().userData?.is_free_plan &&
-                      useAuthStore.getState().userData?.days_remaining && (
-                        <span className="mr-2 text-xs opacity-75">
-                          ({useAuthStore.getState().userData?.days_remaining}{" "}
-                          يوم متبقي)
-                        </span>
-                      )}
-                  </Link>
-                  {useAuthStore.getState().userData?.is_free_plan ? (
-                    ""
-                  ) : (
-                    <Star className="h-3 w-3 ml-1" />
-                  )}
-                </Button>
-              )}
+                  <Button
+                    variant={
+                      useAuthStore.getState().userData?.is_free_plan
+                        ? "outline"
+                        : "secondary"
+                    }
+                    size="sm"
+                    className={
+                      useAuthStore.getState().userData?.is_free_plan
+                        ? "hidden md:flex gap-1"
+                        : "bg-amber-100 text-amber-800 hidden md:flex"
+                    }
+                    onClick={clickedONButton}
+                  >
+                    <Link href="/settings">
+                      {useAuthStore.getState().userData?.is_free_plan
+                        ? `الباقة المجانية`
+                        : useAuthStore.getState().userData?.package_title}
+                      {!useAuthStore.getState().userData?.is_free_plan &&
+                        useAuthStore.getState().userData?.days_remaining && (
+                          <span className="mr-2 text-xs opacity-75">
+                            ({useAuthStore.getState().userData?.days_remaining}{" "}
+                            يوم متبقي)
+                          </span>
+                        )}
+                    </Link>
+                    {useAuthStore.getState().userData?.is_free_plan ? (
+                      ""
+                    ) : (
+                      <Star className="h-3 w-3 ml-1" />
+                    )}
+                  </Button>
+                )}
 
               {/* <TooltipProvider>
                 <Tooltip>
@@ -436,39 +437,39 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
       <div className="flex h-5 items-center justify-center border-b px-4 md:px-6 md:hidden ">
         {useAuthStore.getState().UserIslogged && (
           <>
-            {useAuthStore.getState().userData?.package_title !== undefined && 
+            {useAuthStore.getState().userData?.package_title !== undefined &&
               useAuthStore.getState().userData?.account_type === "tenant" && (
-              <Button
-                variant={
-                  useAuthStore.getState().userData?.is_free_plan
-                    ? "outline"
-                    : "secondary"
-                }
-                size="sm"
-                className={
-                  useAuthStore.getState().userData?.is_free_plan
-                    ? "mb-10"
-                    : "bg-amber-100 text-amber-800 mb-10"
-                }
-                onClick={clickedONButton}
-              >
-                <Link href="/settings">
-                  {useAuthStore.getState().userData?.is_free_plan
-                    ? `الباقة المجانية `
-                    : useAuthStore.getState().userData?.package_title}
-                  {!useAuthStore.getState().userData?.is_free_plan &&
-                    useAuthStore.getState().userData?.days_remaining && (
-                      <span className="mr-2 text-xs opacity-75">
-                        ({useAuthStore.getState().userData?.days_remaining} يوم
-                        متبقي)
-                      </span>
-                    )}
-                </Link>
-                {!useAuthStore.getState().userData?.is_free_plan && (
-                  <Star className="h-3 w-3 ml-1" />
-                )}
-              </Button>
-            )}
+                <Button
+                  variant={
+                    useAuthStore.getState().userData?.is_free_plan
+                      ? "outline"
+                      : "secondary"
+                  }
+                  size="sm"
+                  className={
+                    useAuthStore.getState().userData?.is_free_plan
+                      ? "mb-10"
+                      : "bg-amber-100 text-amber-800 mb-10"
+                  }
+                  onClick={clickedONButton}
+                >
+                  <Link href="/settings">
+                    {useAuthStore.getState().userData?.is_free_plan
+                      ? `الباقة المجانية `
+                      : useAuthStore.getState().userData?.package_title}
+                    {!useAuthStore.getState().userData?.is_free_plan &&
+                      useAuthStore.getState().userData?.days_remaining && (
+                        <span className="mr-2 text-xs opacity-75">
+                          ({useAuthStore.getState().userData?.days_remaining}{" "}
+                          يوم متبقي)
+                        </span>
+                      )}
+                  </Link>
+                  {!useAuthStore.getState().userData?.is_free_plan && (
+                    <Star className="h-3 w-3 ml-1" />
+                  )}
+                </Button>
+              )}
           </>
         )}
       </div>

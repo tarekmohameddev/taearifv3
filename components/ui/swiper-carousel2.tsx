@@ -42,42 +42,40 @@ export default function SwiperCarousel({
     <div dir="rtl" className="relative">
       <Swiper
         modules={
-          showPagination 
-            ? [Autoplay, Pagination, Navigation] 
-            : showMobileArrows 
-            ? [Autoplay, Navigation] 
-            : [Autoplay]
+          showPagination
+            ? [Autoplay, Pagination, Navigation]
+            : showMobileArrows
+              ? [Autoplay, Navigation]
+              : [Autoplay]
         }
         loop
-        grabCursor 
+        grabCursor
         spaceBetween={space}
         slidesPerView={1.05}
         slidesPerGroup={1}
-        autoplay={
-          true
-        }
+        autoplay={true}
         pagination={showPagination ? { clickable: true } : undefined}
         navigation={showMobileArrows ? true : false}
         breakpoints={{
-          480: { 
-            slidesPerView: 1.2, 
+          480: {
+            slidesPerView: 1.2,
             centeredSlides: true,
-            navigation: false // إخفاء الأسهم على الشاشات الأكبر
+            navigation: false, // إخفاء الأسهم على الشاشات الأكبر
           },
-          640: { 
-            slidesPerView: 2, 
+          640: {
+            slidesPerView: 2,
             centeredSlides: false,
-            navigation: false
+            navigation: false,
           },
-          900: { 
-            slidesPerView: 3, 
+          900: {
+            slidesPerView: 3,
             centeredSlides: false,
-            navigation: false
+            navigation: false,
           },
-          1280: { 
-            slidesPerView: desktopCount, 
+          1280: {
+            slidesPerView: desktopCount,
             centeredSlides: false,
-            navigation: false
+            navigation: false,
           },
         }}
         centeredSlides={true}

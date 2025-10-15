@@ -7,11 +7,13 @@
 ## 1. البنية الأساسية للنظام
 
 ### 1.1 ملفات الترجمة الرئيسية
+
 - `lib/i18n/locales/en.json` - ملف الترجمة الإنجليزية
-- `lib/i18n/locales/ar.json` - ملف الترجمة العربية  
+- `lib/i18n/locales/ar.json` - ملف الترجمة العربية
 - `componentsStructure/translationHelper.ts` - مساعد الترجمة الرئيسي
 
 ### 1.2 مكونات الترجمة
+
 - `context-liveeditor/editorI18nStore.ts` - مخزن الترجمة
 - `components/tenant/live-editor/EditorSidebar/` - واجهة التحرير
 - `components/tenant/live-editor/EditorSidebar/TranslationFields.tsx` - حقول الترجمة
@@ -19,6 +21,7 @@
 ## 2. تحليل ملف grid.ts
 
 ### 2.1 بنية الملف
+
 ```typescript
 export const gridStructure: ComponentStructure = {
   componentType: "grid",
@@ -45,18 +48,19 @@ export const gridStructure: ComponentStructure = {
                 {
                   value: "card1",
                   label: "Card 1 - Classic",
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
 ```
 
 ### 2.2 ملاحظات مهمة
+
 - الملف يحتوي على labels مختلطة (عربية وإنجليزية)
 - بعض الـ labels مكتوبة مباشرة بالعربية مثل "تحديد شكل الكارت"
 - بعض الـ labels مكتوبة بالإنجليزية مثل "Card Theme"
@@ -65,6 +69,7 @@ export const gridStructure: ComponentStructure = {
 ## 3. تحليل ملفات الترجمة
 
 ### 3.1 ملف en.json
+
 ```json
 {
   "components_structure": {
@@ -88,6 +93,7 @@ export const gridStructure: ComponentStructure = {
 ```
 
 ### 3.2 ملف ar.json
+
 ```json
 {
   "components_structure": {
@@ -113,6 +119,7 @@ export const gridStructure: ComponentStructure = {
 ## 4. تحليل translationHelper.ts
 
 ### 4.1 دالة translateLabel
+
 ```typescript
 export function translateLabel(
   label: string,
@@ -135,6 +142,7 @@ export function translateLabel(
 ```
 
 ### 4.2 دالة translateFieldDefinition
+
 ```typescript
 export function translateFieldDefinition(
   field: FieldDefinition,
@@ -174,6 +182,7 @@ export function translateFieldDefinition(
 ```
 
 ### 4.3 دالة translateComponentStructure
+
 ```typescript
 export function translateComponentStructure(
   structure: ComponentStructure,
@@ -200,6 +209,7 @@ export function translateComponentStructure(
 ## 5. تحليل كيفية استخدام الترجمة في المكونات
 
 ### 5.1 في DynamicFieldsRenderer
+
 ```typescript
 export function DynamicFieldsRenderer({
   fields,
@@ -209,7 +219,7 @@ export function DynamicFieldsRenderer({
   currentData,
 }: DynamicFieldsRendererProps) {
   const t = useEditorT(); // استخدام hook الترجمة
-  
+
   // استخدام الترجمة في عرض الحقول
   const renderField = (def: FieldDefinition, basePath?: string) => {
     // ... منطق العرض
@@ -224,6 +234,7 @@ export function DynamicFieldsRenderer({
 ```
 
 ### 5.2 في AdvancedSimpleSwitcher
+
 ```typescript
 export function AdvancedSimpleSwitcher({
   type,
@@ -233,14 +244,11 @@ export function AdvancedSimpleSwitcher({
   currentData,
 }: AdvancedSimpleSwitcherProps) {
   const t = useEditorT();
-  
+
   // تحميل structure مع الترجمة
   const loadStructure = async (componentType: string) => {
     // ... تحميل الـ structure
-    const translatedStructure = translateComponentStructure(
-      loadedStructure,
-      t
-    );
+    const translatedStructure = translateComponentStructure(loadedStructure, t);
     setStructure(translatedStructure);
   };
 }
@@ -274,7 +282,7 @@ export function AdvancedSimpleSwitcher({
 
 // بعد الترجمة للعربية
 {
-  key: "visible", 
+  key: "visible",
   label: "مرئي", // من ar.json
   type: "boolean"
 }
@@ -290,16 +298,19 @@ export function AdvancedSimpleSwitcher({
 ## 7. نقاط القوة في النظام
 
 ### 7.1 المرونة
+
 - النظام يدعم ترجمة متعددة المستويات
 - يدعم الحقول المتداخلة
 - يدعم أنواع مختلفة من الحقول
 
 ### 7.2 سهولة الصيانة
+
 - ملفات الترجمة منفصلة ومنظمة
 - نظام mapping واضح ومنطقي
 - إمكانية إضافة لغات جديدة بسهولة
 
 ### 7.3 الأداء
+
 - استخدام useMemo للتحسين
 - تحميل ديناميكي للترجمات
 - cache للترجمات
@@ -307,16 +318,19 @@ export function AdvancedSimpleSwitcher({
 ## 8. نقاط الضعف والتحديات
 
 ### 8.1 التعقيد
+
 - النظام معقد ومتعدد الطبقات
 - صعوبة في تتبع الترجمة
 - حاجة لفهم عميق للنظام
 
 ### 8.2 الصيانة
+
 - حاجة لتحديث ملفات الترجمة عند إضافة حقول جديدة
 - صعوبة في تتبع الترجمات المفقودة
 - حاجة لاختبار شامل للترجمات
 
 ### 8.3 الأداء
+
 - تحميل جميع ملفات الترجمة في الذاكرة
 - معالجة متكررة للترجمات
 - حاجة لتحسين الأداء
@@ -324,16 +338,19 @@ export function AdvancedSimpleSwitcher({
 ## 9. التوصيات للتحسين
 
 ### 9.1 تحسين الأداء
+
 - استخدام lazy loading للترجمات
 - تحسين cache system
 - تقليل عدد الملفات المحملة
 
 ### 9.2 تحسين الصيانة
+
 - إضافة نظام validation للترجمات
 - إضافة نظام logging للترجمات المفقودة
 - تحسين نظام testing
 
 ### 9.3 تحسين المطور
+
 - إضافة documentation أفضل
 - تحسين error handling
 - إضافة debugging tools
@@ -343,6 +360,7 @@ export function AdvancedSimpleSwitcher({
 نظام الترجمة في هذا المشروع معقد ومتطور ويستخدم تقنيات متقدمة لتحقيق الترجمة الديناميكية. النظام يعمل بشكل جيد ولكن يحتاج لتحسينات في الأداء والصيانة. الترجمة تتم عبر عدة طبقات من الملفات والمكونات، مما يجعل النظام قوياً ومرناً ولكن معقداً في نفس الوقت.
 
 النظام يستخدم:
+
 - ملفات JSON للترجمات
 - TypeScript للـ type safety
 - React hooks للـ state management

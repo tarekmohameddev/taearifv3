@@ -1,10 +1,23 @@
 "use client";
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, RotateCcw } from "lucide-react";
 
@@ -108,12 +121,17 @@ export function RenewalDialog({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* نوع الإيجار */}
             <div className="space-y-2">
-              <Label htmlFor="renewal_rental_type" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="renewal_rental_type"
+                className="text-sm font-medium text-gray-700"
+              >
                 نوع الإيجار <span className="text-red-500">*</span>
               </Label>
               <Select
                 value={formData.rental_type}
-                onValueChange={(value) => setFormData({ ...formData, rental_type: value })}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, rental_type: value })
+                }
               >
                 <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
                   <SelectValue />
@@ -127,14 +145,22 @@ export function RenewalDialog({
 
             {/* مدة الإيجار */}
             <div className="space-y-2">
-              <Label htmlFor="renewal_rental_duration" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="renewal_rental_duration"
+                className="text-sm font-medium text-gray-700"
+              >
                 مدة الإيجار <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="renewal_rental_duration"
                 type="number"
                 value={formData.rental_duration}
-                onChange={(e) => setFormData({ ...formData, rental_duration: parseInt(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    rental_duration: parseInt(e.target.value) || 0,
+                  })
+                }
                 placeholder={formData.rental_type === "annual" ? "1" : "12"}
                 min="1"
                 className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
@@ -143,12 +169,17 @@ export function RenewalDialog({
 
             {/* خطة الدفع */}
             <div className="space-y-2">
-              <Label htmlFor="renewal_paying_plan" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="renewal_paying_plan"
+                className="text-sm font-medium text-gray-700"
+              >
                 خطة الدفع <span className="text-red-500">*</span>
               </Label>
               <Select
                 value={formData.paying_plan}
-                onValueChange={(value) => setFormData({ ...formData, paying_plan: value })}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, paying_plan: value })
+                }
               >
                 <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
                   <SelectValue />
@@ -164,19 +195,27 @@ export function RenewalDialog({
 
             {/* إجمالي مبلغ الإيجار */}
             <div className="space-y-2">
-              <Label htmlFor="renewal_total_rental_amount" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="renewal_total_rental_amount"
+                className="text-sm font-medium text-gray-700"
+              >
                 إجمالي مبلغ الإيجار <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="renewal_total_rental_amount"
                 type="number"
                 value={formData.total_rental_amount}
-                onChange={(e) => setFormData({ ...formData, total_rental_amount: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    total_rental_amount: e.target.value,
+                  })
+                }
                 placeholder="6500"
                 min="100"
                 className="border-gray-300 focus:border-gray-900 focus:ring-gray-900"
               />
-              
+
               {/* حساب تقسيم مبلغ الإيجار على المدة */}
               {(() => {
                 const calculation = calculatePaymentAmount();
@@ -204,7 +243,9 @@ export function RenewalDialog({
                             </span>
                           </div>
                           <div>
-                            <span className="text-gray-600 block sm:inline">عدد الدفعات:</span>
+                            <span className="text-gray-600 block sm:inline">
+                              عدد الدفعات:
+                            </span>
                             <span className="font-medium text-blue-800 block">
                               {calculation.paymentPeriods} دفعة
                             </span>
@@ -227,12 +268,17 @@ export function RenewalDialog({
 
             {/* تكرار الدفع */}
             <div className="space-y-2">
-              <Label htmlFor="renewal_payment_frequency" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="renewal_payment_frequency"
+                className="text-sm font-medium text-gray-700"
+              >
                 تكرار الدفع <span className="text-red-500">*</span>
               </Label>
               <Select
                 value={formData.payment_frequency}
-                onValueChange={(value) => setFormData({ ...formData, payment_frequency: value })}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, payment_frequency: value })
+                }
               >
                 <SelectTrigger className="border-gray-300 focus:border-gray-900 focus:ring-gray-900">
                   <SelectValue />
@@ -246,13 +292,18 @@ export function RenewalDialog({
 
             {/* الوصف */}
             <div className="space-y-2 lg:col-span-2">
-              <Label htmlFor="renewal_description" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="renewal_description"
+                className="text-sm font-medium text-gray-700"
+              >
                 الوصف
               </Label>
               <Textarea
                 id="renewal_description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="وصف تجديد العقد..."
                 rows={3}
                 className="border-gray-300 focus:border-gray-900 focus:ring-gray-900 resize-none"
@@ -298,4 +349,3 @@ export function RenewalDialog({
     </Dialog>
   );
 }
-

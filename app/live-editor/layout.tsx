@@ -101,7 +101,6 @@ function AddPageDialog({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-
     if (!formData.slug.trim()) {
       newErrors.slug = t("validation.slug_required");
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
@@ -172,10 +171,18 @@ function AddPageDialog({
                 Robots: formData.Robots || "index, follow",
                 RobotsEn: formData.RobotsEn || "index, follow",
                 "og:title": formData["og:title"] || formData.TitleAr,
-                "og:description": formData["og:description"] || formData.DescriptionAr || formData.TitleAr,
-                "og:keywords": formData["og:keywords"] || formData.KeywordsAr || formData.TitleAr,
-                "og:author": formData["og:author"] || formData.Author || formData.TitleAr,
-                "og:robots": formData["og:robots"] || formData.Robots || "index, follow",
+                "og:description":
+                  formData["og:description"] ||
+                  formData.DescriptionAr ||
+                  formData.TitleAr,
+                "og:keywords":
+                  formData["og:keywords"] ||
+                  formData.KeywordsAr ||
+                  formData.TitleAr,
+                "og:author":
+                  formData["og:author"] || formData.Author || formData.TitleAr,
+                "og:robots":
+                  formData["og:robots"] || formData.Robots || "index, follow",
                 "og:url": formData["og:url"] || `/${formData.slug}`,
                 "og:image": formData["og:image"] || "",
                 "og:type": formData["og:type"] || "website",
@@ -187,10 +194,10 @@ function AddPageDialog({
                 "og:image:type": formData["og:image:type"] || "",
                 "og:image:alt": formData["og:image:alt"] || formData.TitleAr,
                 path: `/${formData.slug}`,
-              }
-            ]
-          }
-        }
+              },
+            ],
+          },
+        },
       };
 
       // تحديث الـ store
@@ -210,10 +217,16 @@ function AddPageDialog({
         Robots: formData.Robots || "index, follow",
         RobotsEn: formData.RobotsEn || "index, follow",
         "og:title": formData["og:title"] || formData.TitleAr,
-        "og:description": formData["og:description"] || formData.DescriptionAr || formData.TitleAr,
-        "og:keywords": formData["og:keywords"] || formData.KeywordsAr || formData.TitleAr,
-        "og:author": formData["og:author"] || formData.Author || formData.TitleAr,
-        "og:robots": formData["og:robots"] || formData.Robots || "index, follow",
+        "og:description":
+          formData["og:description"] ||
+          formData.DescriptionAr ||
+          formData.TitleAr,
+        "og:keywords":
+          formData["og:keywords"] || formData.KeywordsAr || formData.TitleAr,
+        "og:author":
+          formData["og:author"] || formData.Author || formData.TitleAr,
+        "og:robots":
+          formData["og:robots"] || formData.Robots || "index, follow",
         "og:url": formData["og:url"] || `/${formData.slug}`,
         "og:image": formData["og:image"] || "",
         "og:type": formData["og:type"] || "website",
@@ -286,7 +299,6 @@ function AddPageDialog({
       setIsLoading(false);
     }
   };
-
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -402,7 +414,6 @@ function AddPageDialog({
                   </p>
                 )}
               </div>
-
             </div>
           </div>
 
@@ -445,7 +456,10 @@ function AddPageDialog({
                   placeholder={t("editor.page_title_ar_placeholder")}
                   value={formData.TitleAr}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, TitleAr: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      TitleAr: e.target.value,
+                    }))
                   }
                   className={`transition-all duration-200 ${errors.TitleAr ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
                 />
@@ -481,7 +495,10 @@ function AddPageDialog({
                   placeholder={t("editor.page_title_en_placeholder")}
                   value={formData.TitleEn}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, TitleEn: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      TitleEn: e.target.value,
+                    }))
                   }
                   className={`transition-all duration-200 ${errors.TitleEn ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
                 />
@@ -517,7 +534,10 @@ function AddPageDialog({
                   placeholder="وصف مختصر للصفحة باللغة العربية"
                   value={formData.DescriptionAr}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, DescriptionAr: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      DescriptionAr: e.target.value,
+                    }))
                   }
                   className="resize-none focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
                   rows={3}
@@ -536,7 +556,10 @@ function AddPageDialog({
                   placeholder="Brief description of the page in English"
                   value={formData.DescriptionEn}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, DescriptionEn: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      DescriptionEn: e.target.value,
+                    }))
                   }
                   className="resize-none focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
                   rows={3}
@@ -555,7 +578,10 @@ function AddPageDialog({
                   placeholder={t("editor.page_keywords_ar_placeholder")}
                   value={formData.KeywordsAr}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, KeywordsAr: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      KeywordsAr: e.target.value,
+                    }))
                   }
                   className="focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
                 />
@@ -573,7 +599,10 @@ function AddPageDialog({
                   placeholder={t("editor.page_keywords_en_placeholder")}
                   value={formData.KeywordsEn}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, KeywordsEn: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      KeywordsEn: e.target.value,
+                    }))
                   }
                   className="focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
                 />
@@ -619,7 +648,10 @@ function AddPageDialog({
                 onClick={() => setShowAdvanced(!showAdvanced)}
                 className="flex items-center gap-2"
               >
-                {showAdvanced ? t("editor.hide_advanced") : t("editor.show_advanced")} {t("editor.advanced_settings_toggle")}
+                {showAdvanced
+                  ? t("editor.hide_advanced")
+                  : t("editor.show_advanced")}{" "}
+                {t("editor.advanced_settings_toggle")}
                 <svg
                   className={`w-4 h-4 transition-transform ${showAdvanced ? "rotate-180" : ""}`}
                   fill="none"
@@ -648,7 +680,10 @@ function AddPageDialog({
                       placeholder="اسم المؤلف"
                       value={formData.Author}
                       onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, Author: e.target.value }))
+                        setFormData((prev) => ({
+                          ...prev,
+                          Author: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -660,7 +695,10 @@ function AddPageDialog({
                       placeholder="Author Name"
                       value={formData.AuthorEn}
                       onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, AuthorEn: e.target.value }))
+                        setFormData((prev) => ({
+                          ...prev,
+                          AuthorEn: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -672,7 +710,10 @@ function AddPageDialog({
                       placeholder="index, follow"
                       value={formData.Robots}
                       onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, Robots: e.target.value }))
+                        setFormData((prev) => ({
+                          ...prev,
+                          Robots: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -684,7 +725,10 @@ function AddPageDialog({
                       placeholder="index, follow"
                       value={formData.RobotsEn}
                       onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, RobotsEn: e.target.value }))
+                        setFormData((prev) => ({
+                          ...prev,
+                          RobotsEn: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -692,7 +736,9 @@ function AddPageDialog({
 
                 {/* Open Graph */}
                 <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-gray-700">Open Graph</h4>
+                  <h4 className="text-sm font-medium text-gray-700">
+                    Open Graph
+                  </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="text-sm font-medium text-gray-700">
@@ -702,7 +748,10 @@ function AddPageDialog({
                         placeholder={t("editor.og_title")}
                         value={formData["og:title"]}
                         onChange={(e) =>
-                          setFormData((prev) => ({ ...prev, "og:title": e.target.value }))
+                          setFormData((prev) => ({
+                            ...prev,
+                            "og:title": e.target.value,
+                          }))
                         }
                       />
                     </div>
@@ -714,7 +763,10 @@ function AddPageDialog({
                         placeholder={t("editor.og_description")}
                         value={formData["og:description"]}
                         onChange={(e) =>
-                          setFormData((prev) => ({ ...prev, "og:description": e.target.value }))
+                          setFormData((prev) => ({
+                            ...prev,
+                            "og:description": e.target.value,
+                          }))
                         }
                       />
                     </div>
@@ -726,7 +778,10 @@ function AddPageDialog({
                         placeholder={t("editor.og_url")}
                         value={formData["og:url"]}
                         onChange={(e) =>
-                          setFormData((prev) => ({ ...prev, "og:url": e.target.value }))
+                          setFormData((prev) => ({
+                            ...prev,
+                            "og:url": e.target.value,
+                          }))
                         }
                       />
                     </div>
@@ -738,7 +793,10 @@ function AddPageDialog({
                         placeholder={t("editor.og_image")}
                         value={formData["og:image"]}
                         onChange={(e) =>
-                          setFormData((prev) => ({ ...prev, "og:image": e.target.value }))
+                          setFormData((prev) => ({
+                            ...prev,
+                            "og:image": e.target.value,
+                          }))
                         }
                       />
                     </div>
@@ -755,7 +813,7 @@ function AddPageDialog({
             onClick={() => setOpen(false)}
             className="w-full sm:w-auto"
           >
-                {t("editor.cancel")}
+            {t("editor.cancel")}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -1013,7 +1071,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-
     if (!formData.slug.trim()) {
       newErrors.slug = t("validation.slug_required");
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
@@ -1084,10 +1141,18 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                 Robots: formData.Robots || "index, follow",
                 RobotsEn: formData.RobotsEn || "index, follow",
                 "og:title": formData["og:title"] || formData.TitleAr,
-                "og:description": formData["og:description"] || formData.DescriptionAr || formData.TitleAr,
-                "og:keywords": formData["og:keywords"] || formData.KeywordsAr || formData.TitleAr,
-                "og:author": formData["og:author"] || formData.Author || formData.TitleAr,
-                "og:robots": formData["og:robots"] || formData.Robots || "index, follow",
+                "og:description":
+                  formData["og:description"] ||
+                  formData.DescriptionAr ||
+                  formData.TitleAr,
+                "og:keywords":
+                  formData["og:keywords"] ||
+                  formData.KeywordsAr ||
+                  formData.TitleAr,
+                "og:author":
+                  formData["og:author"] || formData.Author || formData.TitleAr,
+                "og:robots":
+                  formData["og:robots"] || formData.Robots || "index, follow",
                 "og:url": formData["og:url"] || `/${formData.slug}`,
                 "og:image": formData["og:image"] || "",
                 "og:type": formData["og:type"] || "website",
@@ -1099,10 +1164,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                 "og:image:type": formData["og:image:type"] || "",
                 "og:image:alt": formData["og:image:alt"] || formData.TitleAr,
                 path: `/${formData.slug}`,
-              }
-            ]
-          }
-        }
+              },
+            ],
+          },
+        },
       };
 
       // تحديث الـ store
@@ -1122,10 +1187,16 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
         Robots: formData.Robots || "index, follow",
         RobotsEn: formData.RobotsEn || "index, follow",
         "og:title": formData["og:title"] || formData.TitleAr,
-        "og:description": formData["og:description"] || formData.DescriptionAr || formData.TitleAr,
-        "og:keywords": formData["og:keywords"] || formData.KeywordsAr || formData.TitleAr,
-        "og:author": formData["og:author"] || formData.Author || formData.TitleAr,
-        "og:robots": formData["og:robots"] || formData.Robots || "index, follow",
+        "og:description":
+          formData["og:description"] ||
+          formData.DescriptionAr ||
+          formData.TitleAr,
+        "og:keywords":
+          formData["og:keywords"] || formData.KeywordsAr || formData.TitleAr,
+        "og:author":
+          formData["og:author"] || formData.Author || formData.TitleAr,
+        "og:robots":
+          formData["og:robots"] || formData.Robots || "index, follow",
         "og:url": formData["og:url"] || `/${formData.slug}`,
         "og:image": formData["og:image"] || "",
         "og:type": formData["og:type"] || "website",
@@ -2028,14 +2099,20 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="DescriptionAr" className="text-sm font-medium">
+                  <Label
+                    htmlFor="DescriptionAr"
+                    className="text-sm font-medium"
+                  >
                     {t("editor.page_description_ar")}
                   </Label>
                   <Textarea
                     id="DescriptionAr"
                     value={formData.DescriptionAr}
                     onChange={(e) =>
-                      setFormData({ ...formData, DescriptionAr: e.target.value })
+                      setFormData({
+                        ...formData,
+                        DescriptionAr: e.target.value,
+                      })
                     }
                     placeholder={t("editor.page_description_ar_placeholder")}
                     className="resize-none"
@@ -2044,14 +2121,20 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="DescriptionEn" className="text-sm font-medium">
+                  <Label
+                    htmlFor="DescriptionEn"
+                    className="text-sm font-medium"
+                  >
                     {t("editor.page_description_en")}
                   </Label>
                   <Textarea
                     id="DescriptionEn"
                     value={formData.DescriptionEn}
                     onChange={(e) =>
-                      setFormData({ ...formData, DescriptionEn: e.target.value })
+                      setFormData({
+                        ...formData,
+                        DescriptionEn: e.target.value,
+                      })
                     }
                     placeholder={t("editor.page_description_en_placeholder")}
                     className="resize-none"
@@ -2127,7 +2210,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                   onClick={() => setShowAdvanced(!showAdvanced)}
                   className="flex items-center gap-2"
                 >
-                  {showAdvanced ? t("editor.hide_advanced") : t("editor.show_advanced")} {t("editor.advanced_settings_toggle")}
+                  {showAdvanced
+                    ? t("editor.hide_advanced")
+                    : t("editor.show_advanced")}{" "}
+                  {t("editor.advanced_settings_toggle")}
                   <svg
                     className={`w-4 h-4 transition-transform ${showAdvanced ? "rotate-180" : ""}`}
                     fill="none"
@@ -2200,7 +2286,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
 
                   {/* Open Graph */}
                   <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-700">Open Graph</h4>
+                    <h4 className="text-sm font-medium text-gray-700">
+                      Open Graph
+                    </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-sm font-medium text-gray-700">
@@ -2210,7 +2298,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                           placeholder={t("editor.og_title")}
                           value={formData["og:title"]}
                           onChange={(e) =>
-                            setFormData({ ...formData, "og:title": e.target.value })
+                            setFormData({
+                              ...formData,
+                              "og:title": e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -2222,7 +2313,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                           placeholder={t("editor.og_description")}
                           value={formData["og:description"]}
                           onChange={(e) =>
-                            setFormData({ ...formData, "og:description": e.target.value })
+                            setFormData({
+                              ...formData,
+                              "og:description": e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -2234,7 +2328,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                           placeholder={t("editor.og_url")}
                           value={formData["og:url"]}
                           onChange={(e) =>
-                            setFormData({ ...formData, "og:url": e.target.value })
+                            setFormData({
+                              ...formData,
+                              "og:url": e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -2246,7 +2343,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                           placeholder={t("editor.og_image")}
                           value={formData["og:image"]}
                           onChange={(e) =>
-                            setFormData({ ...formData, "og:image": e.target.value })
+                            setFormData({
+                              ...formData,
+                              "og:image": e.target.value,
+                            })
                           }
                         />
                       </div>
