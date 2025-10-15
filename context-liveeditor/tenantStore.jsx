@@ -351,6 +351,11 @@ const useTenantStore = create((set) => ({
         // Don't set anything - let the component use its default data
       }
 
+      // Load WebsiteLayout data into editor store
+      if (data.WebsiteLayout && data.WebsiteLayout.metaTags && data.WebsiteLayout.metaTags.pages) {
+        editorStore.setWebsiteLayout(data.WebsiteLayout);
+      }
+
       set({
         tenantData: data,
         loadingTenantData: false,

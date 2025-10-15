@@ -2921,7 +2921,7 @@ export const PAGE_DEFINITIONS = {
       position: 6,
     },
   },
-  "property-requests/create": {
+  "create-request": {
     "hero-property-request": {
       type: "hero",
       name: "Hero",

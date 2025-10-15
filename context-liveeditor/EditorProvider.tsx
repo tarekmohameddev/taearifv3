@@ -30,6 +30,11 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       tenantId: tenantId || "",
       pages: state.pageComponentsByPage,
       globalComponentsData: state.globalComponentsData,
+      WebsiteLayout: state.WebsiteLayout || {
+        metaTags: {
+          pages: []
+        }
+      },
     };
 
     // Send to backend to persist

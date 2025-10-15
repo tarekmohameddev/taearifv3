@@ -130,6 +130,42 @@ interface EditorStore {
     value: any,
   ) => void;
 
+  // WebsiteLayout - Meta tags and SEO data
+  WebsiteLayout: {
+    metaTags: {
+      pages: Array<{
+        TitleAr: string;
+        TitleEn: string;
+        DescriptionAr: string;
+        DescriptionEn: string;
+        KeywordsAr: string;
+        KeywordsEn: string;
+        Author: string;
+        AuthorEn: string;
+        Robots: string;
+        RobotsEn: string;
+        "og:title": string;
+        "og:description": string;
+        "og:keywords": string;
+        "og:author": string;
+        "og:robots": string;
+        "og:url": string;
+        "og:image": string;
+        "og:type": string;
+        "og:locale": string;
+        "og:locale:alternate": string;
+        "og:site_name": string;
+        "og:image:width": string;
+        "og:image:height": string;
+        "og:image:type": string;
+        "og:image:alt": string;
+        path: string;
+      }>;
+    };
+  };
+  setWebsiteLayout: (data: any) => void;
+  addPageToWebsiteLayout: (pageData: any) => void;
+
   // Structures registry
   structures: Record<string, any>;
 
@@ -425,6 +461,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   globalComponentsData: {
     header: getDefaultHeaderData(),
     footer: getDefaultFooterData(),
+  },
+
+  // WebsiteLayout - Meta tags and SEO data
+  WebsiteLayout: {
+    metaTags: {
+      pages: []
+    }
   },
 
   structures: Object.keys(COMPONENTS).reduce(
@@ -2027,4 +2070,21 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         },
       };
     }),
+
+  // WebsiteLayout functions
+  setWebsiteLayout: (data) =>
+    set((state) => ({
+      WebsiteLayout: data,
+    })),
+
+  addPageToWebsiteLayout: (pageData) =>
+    set((state) => ({
+      WebsiteLayout: {
+        ...state.WebsiteLayout,
+        metaTags: {
+          ...state.WebsiteLayout.metaTags,
+          pages: [...state.WebsiteLayout.metaTags.pages, pageData],
+        },
+      },
+    })),
 }));

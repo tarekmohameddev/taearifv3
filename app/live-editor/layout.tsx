@@ -50,13 +50,38 @@ function AddPageDialog({
   const setOpen = onOpenChange || setInternalOpen;
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    pageName: "",
     slug: "",
-    metaTitle: "",
-    metaDescription: "",
-    metaKeywords: "",
+    // Basic Meta Tags
+    TitleAr: "",
+    TitleEn: "",
+    DescriptionAr: "",
+    DescriptionEn: "",
+    KeywordsAr: "",
+    KeywordsEn: "",
+    // Advanced Meta Tags
+    Author: "",
+    AuthorEn: "",
+    Robots: "",
+    RobotsEn: "",
+    // Open Graph
+    "og:title": "",
+    "og:description": "",
+    "og:keywords": "",
+    "og:author": "",
+    "og:robots": "",
+    "og:url": "",
+    "og:image": "",
+    "og:type": "",
+    "og:locale": "",
+    "og:locale:alternate": "",
+    "og:site_name": "",
+    "og:image:width": "",
+    "og:image:height": "",
+    "og:image:type": "",
+    "og:image:alt": "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const t = useEditorT();
 
   const { tenantData } = useTenantStore();
@@ -76,9 +101,6 @@ function AddPageDialog({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.pageName.trim()) {
-      newErrors.pageName = t("validation.page_name_required");
-    }
 
     if (!formData.slug.trim()) {
       newErrors.slug = t("validation.slug_required");
@@ -94,15 +116,19 @@ function AddPageDialog({
       newErrors.slug = t("validation.slug_exists");
     }
 
-    if (!formData.metaTitle.trim()) {
-      newErrors.metaTitle = t("validation.meta_title_required");
+    if (!formData.TitleAr.trim()) {
+      newErrors.TitleAr = "عنوان الصفحة بالعربي مطلوب";
+    }
+
+    if (!formData.TitleEn.trim()) {
+      newErrors.TitleEn = "عنوان الصفحة بالإنجليزي مطلوب";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // إنشاء صفحة جديدة
+  // إنشاء صفحة جديدة مع WebsiteLayout
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
@@ -113,10 +139,10 @@ function AddPageDialog({
 
       createPage({
         slug: formData.slug,
-        name: formData.pageName,
-        metaTitle: formData.metaTitle,
-        metaDescription: formData.metaDescription,
-        metaKeywords: formData.metaKeywords,
+        name: formData.slug, // استخدام slug كاسم الصفحة
+        metaTitle: formData.TitleAr, // للتوافق مع النظام القديم
+        metaDescription: formData.DescriptionAr,
+        metaKeywords: formData.KeywordsAr,
       });
 
       // تحديث tenantStore لإضافة الصفحة الجديدة إلى componentSettings
@@ -127,10 +153,79 @@ function AddPageDialog({
           ...tenantData?.componentSettings,
           [formData.slug]: {}, // إضافة الصفحة الجديدة مع object فارغ للمكونات
         },
+        // إضافة WebsiteLayout
+        WebsiteLayout: {
+          ...tenantData?.WebsiteLayout,
+          metaTags: {
+            ...tenantData?.WebsiteLayout?.metaTags,
+            pages: [
+              ...(tenantData?.WebsiteLayout?.metaTags?.pages || []),
+              {
+                TitleAr: formData.TitleAr,
+                TitleEn: formData.TitleEn,
+                DescriptionAr: formData.DescriptionAr || formData.TitleAr,
+                DescriptionEn: formData.DescriptionEn || formData.TitleEn,
+                KeywordsAr: formData.KeywordsAr || formData.TitleAr,
+                KeywordsEn: formData.KeywordsEn || formData.TitleEn,
+                Author: formData.Author || formData.TitleAr,
+                AuthorEn: formData.AuthorEn || formData.TitleEn,
+                Robots: formData.Robots || "index, follow",
+                RobotsEn: formData.RobotsEn || "index, follow",
+                "og:title": formData["og:title"] || formData.TitleAr,
+                "og:description": formData["og:description"] || formData.DescriptionAr || formData.TitleAr,
+                "og:keywords": formData["og:keywords"] || formData.KeywordsAr || formData.TitleAr,
+                "og:author": formData["og:author"] || formData.Author || formData.TitleAr,
+                "og:robots": formData["og:robots"] || formData.Robots || "index, follow",
+                "og:url": formData["og:url"] || `/${formData.slug}`,
+                "og:image": formData["og:image"] || "",
+                "og:type": formData["og:type"] || "website",
+                "og:locale": formData["og:locale"] || "ar",
+                "og:locale:alternate": formData["og:locale:alternate"] || "en",
+                "og:site_name": formData["og:site_name"] || formData.TitleAr,
+                "og:image:width": formData["og:image:width"] || "",
+                "og:image:height": formData["og:image:height"] || "",
+                "og:image:type": formData["og:image:type"] || "",
+                "og:image:alt": formData["og:image:alt"] || formData.TitleAr,
+                path: `/${formData.slug}`,
+              }
+            ]
+          }
+        }
       };
 
       // تحديث الـ store
       useTenantStore.setState({ tenantData: updatedTenantData });
+
+      // تحديث editorStore مع WebsiteLayout
+      const { addPageToWebsiteLayout } = useEditorStore.getState();
+      addPageToWebsiteLayout({
+        TitleAr: formData.TitleAr,
+        TitleEn: formData.TitleEn,
+        DescriptionAr: formData.DescriptionAr || formData.TitleAr,
+        DescriptionEn: formData.DescriptionEn || formData.TitleEn,
+        KeywordsAr: formData.KeywordsAr || formData.TitleAr,
+        KeywordsEn: formData.KeywordsEn || formData.TitleEn,
+        Author: formData.Author || formData.TitleAr,
+        AuthorEn: formData.AuthorEn || formData.TitleEn,
+        Robots: formData.Robots || "index, follow",
+        RobotsEn: formData.RobotsEn || "index, follow",
+        "og:title": formData["og:title"] || formData.TitleAr,
+        "og:description": formData["og:description"] || formData.DescriptionAr || formData.TitleAr,
+        "og:keywords": formData["og:keywords"] || formData.KeywordsAr || formData.TitleAr,
+        "og:author": formData["og:author"] || formData.Author || formData.TitleAr,
+        "og:robots": formData["og:robots"] || formData.Robots || "index, follow",
+        "og:url": formData["og:url"] || `/${formData.slug}`,
+        "og:image": formData["og:image"] || "",
+        "og:type": formData["og:type"] || "website",
+        "og:locale": formData["og:locale"] || "ar",
+        "og:locale:alternate": formData["og:locale:alternate"] || "en",
+        "og:site_name": formData["og:site_name"] || formData.TitleAr,
+        "og:image:width": formData["og:image:width"] || "",
+        "og:image:height": formData["og:image:height"] || "",
+        "og:image:type": formData["og:image:type"] || "",
+        "og:image:alt": formData["og:image:alt"] || formData.TitleAr,
+        path: `/${formData.slug}`,
+      });
 
       // التحقق من نوع الصفحة
       const predefinedPages = [
@@ -143,8 +238,8 @@ function AddPageDialog({
       const isPredefinedPage = predefinedPages.includes(formData.slug);
 
       const successMessage = isPredefinedPage
-        ? t("messages.page_created_with_defaults")
-        : t("messages.custom_page_created");
+        ? "تم إنشاء الصفحة مع المكونات الافتراضية"
+        : "تم إنشاء الصفحة المخصصة بنجاح";
 
       toast.success(successMessage);
       setOpen(false);
@@ -157,36 +252,44 @@ function AddPageDialog({
 
       // إعادة تعيين النموذج
       setFormData({
-        pageName: "",
         slug: "",
-        metaTitle: "",
-        metaDescription: "",
-        metaKeywords: "",
+        TitleAr: "",
+        TitleEn: "",
+        DescriptionAr: "",
+        DescriptionEn: "",
+        KeywordsAr: "",
+        KeywordsEn: "",
+        Author: "",
+        AuthorEn: "",
+        Robots: "",
+        RobotsEn: "",
+        "og:title": "",
+        "og:description": "",
+        "og:keywords": "",
+        "og:author": "",
+        "og:robots": "",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "",
+        "og:locale": "",
+        "og:locale:alternate": "",
+        "og:site_name": "",
+        "og:image:width": "",
+        "og:image:height": "",
+        "og:image:type": "",
+        "og:image:alt": "",
       });
     } catch (error) {
-      toast.error(t("messages.error_creating_page"));
+      toast.error("حدث خطأ في إنشاء الصفحة");
       console.error("Error creating page:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // تحديث الـ slug تلقائياً بناءً على اسم الصفحة
-  const handlePageNameChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      pageName: value,
-      slug: value
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .trim(),
-    }));
-  };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen} style={{ position: "relative" }}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="outline"
@@ -232,10 +335,10 @@ function AddPageDialog({
             </div>
             <div>
               <DialogTitle className="text-2xl font-bold text-gray-900">
-                {t("editor.add_component")}
+                {t("editor.add_page")}
               </DialogTitle>
               <DialogDescription className="text-gray-600 mt-1">
-                {t("editor.page_settings")}
+                {t("editor.page_information")} و {t("editor.seo_settings")}
               </DialogDescription>
             </div>
           </div>
@@ -259,66 +362,27 @@ function AddPageDialog({
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                {t("editor.page_information")}
+                {t("editor.basic_info")}
               </Badge>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <Label
-                  htmlFor="pageName"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  {t("forms.name")} *
-                </Label>
-                <Input
-                  id="pageName"
-                  placeholder={t("forms.page_name_placeholder")}
-                  value={formData.pageName}
-                  onChange={(e) => handlePageNameChange(e.target.value)}
-                  className={`transition-all duration-200 ${errors.pageName ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
-                />
-                {errors.pageName && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    {errors.pageName}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label
                   htmlFor="slug"
                   className="text-sm font-medium text-gray-700"
                 >
-                  {t("forms.slug")} *
+                  {t("editor.slug")} *
                 </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
-                    /tenant/{tenantId}/
-                  </span>
-                  <Input
-                    id="slug"
-                    placeholder="products"
-                    value={formData.slug}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, slug: e.target.value }))
-                    }
-                    className={`pl-32 transition-all duration-200 ${errors.slug ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
-                  />
-                </div>
+                <Input
+                  id="slug"
+                  placeholder="homepage"
+                  value={formData.slug}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, slug: e.target.value }))
+                  }
+                  className={`transition-all duration-200 ${errors.slug ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
+                />
                 {errors.slug && (
                   <p className="text-sm text-red-600 flex items-center gap-1">
                     <svg
@@ -337,61 +401,14 @@ function AddPageDialog({
                     {errors.slug}
                   </p>
                 )}
-                <p className="text-xs text-gray-500">
-                  {t("forms.url_preview", { tenantId, slug: formData.slug })}
-                </p>
-                {formData.slug && (
-                  <div className="mt-2">
-                    {[
-                      "homepage",
-                      "about",
-                      "contact",
-                      "products",
-                      "collections",
-                    ].includes(formData.slug) ? (
-                      <div className="flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-2 rounded-md">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        {t("messages.default_components_note")}
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-3 py-2 rounded-md">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        {t("messages.custom_page_note")}
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
+
             </div>
           </div>
 
           <Separator />
 
-          {/* إعدادات SEO */}
+          {/* إعدادات SEO الأساسية */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Badge
@@ -411,31 +428,28 @@ function AddPageDialog({
                     d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                   />
                 </svg>
-                {t("editor.seo_settings")}
+                {t("editor.seo_settings")} الأساسية
               </Badge>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label
-                  htmlFor="metaTitle"
+                  htmlFor="TitleAr"
                   className="text-sm font-medium text-gray-700"
                 >
-                  {t("forms.meta_title")} *
+                  {t("editor.page_title_ar")} *
                 </Label>
                 <Input
-                  id="metaTitle"
-                  placeholder={t("forms.meta_title_placeholder")}
-                  value={formData.metaTitle}
+                  id="TitleAr"
+                  placeholder={t("editor.page_title_ar_placeholder")}
+                  value={formData.TitleAr}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      metaTitle: e.target.value,
-                    }))
+                    setFormData((prev) => ({ ...prev, TitleAr: e.target.value }))
                   }
-                  className={`transition-all duration-2000 ${errors.metaTitle ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
+                  className={`transition-all duration-200 ${errors.TitleAr ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
                 />
-                {errors.metaTitle && (
+                {errors.TitleAr && (
                   <p className="text-sm text-red-600 flex items-center gap-1">
                     <svg
                       className="w-4 h-4"
@@ -450,72 +464,132 @@ function AddPageDialog({
                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    {errors.metaTitle}
+                    {errors.TitleAr}
                   </p>
                 )}
-                <p className="text-xs text-gray-500">
-                  {t("forms.meta_title_help")}
-                </p>
               </div>
 
               <div className="space-y-2">
                 <Label
-                  htmlFor="metaDescription"
+                  htmlFor="TitleEn"
                   className="text-sm font-medium text-gray-700"
                 >
-                  {t("forms.meta_description")}
+                  {t("editor.page_title_en")} *
+                </Label>
+                <Input
+                  id="TitleEn"
+                  placeholder={t("editor.page_title_en_placeholder")}
+                  value={formData.TitleEn}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, TitleEn: e.target.value }))
+                  }
+                  className={`transition-all duration-200 ${errors.TitleEn ? "border-red-300 focus:border-red-500 focus:ring-red-200" : "focus:border-blue-500 focus:ring-blue-200"}`}
+                />
+                {errors.TitleEn && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {errors.TitleEn}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="DescriptionAr"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  {t("editor.page_description_ar")}
                 </Label>
                 <Textarea
-                  id="metaDescription"
-                  placeholder={t("forms.meta_description_placeholder")}
-                  value={formData.metaDescription}
+                  id="DescriptionAr"
+                  placeholder="وصف مختصر للصفحة باللغة العربية"
+                  value={formData.DescriptionAr}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      metaDescription: e.target.value,
-                    }))
+                    setFormData((prev) => ({ ...prev, DescriptionAr: e.target.value }))
                   }
                   className="resize-none focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
                   rows={3}
                 />
-                <p className="text-xs text-gray-500">
-                  {t("forms.meta_description_help")}
-                </p>
               </div>
 
               <div className="space-y-2">
                 <Label
-                  htmlFor="metaKeywords"
+                  htmlFor="DescriptionEn"
                   className="text-sm font-medium text-gray-700"
                 >
-                  {t("forms.meta_keywords")}
+                  {t("editor.page_description_en")}
+                </Label>
+                <Textarea
+                  id="DescriptionEn"
+                  placeholder="Brief description of the page in English"
+                  value={formData.DescriptionEn}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, DescriptionEn: e.target.value }))
+                  }
+                  className="resize-none focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="KeywordsAr"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  {t("editor.page_keywords_ar")}
                 </Label>
                 <Input
-                  id="metaKeywords"
-                  placeholder={t("forms.meta_keywords_placeholder")}
-                  value={formData.metaKeywords}
+                  id="KeywordsAr"
+                  placeholder={t("editor.page_keywords_ar_placeholder")}
+                  value={formData.KeywordsAr}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      metaKeywords: e.target.value,
-                    }))
+                    setFormData((prev) => ({ ...prev, KeywordsAr: e.target.value }))
                   }
                   className="focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
                 />
-                <p className="text-xs text-gray-500">
-                  {t("forms.meta_keywords_help")}
-                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="KeywordsEn"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  {t("editor.page_keywords_en")}
+                </Label>
+                <Input
+                  id="KeywordsEn"
+                  placeholder={t("editor.page_keywords_en_placeholder")}
+                  value={formData.KeywordsEn}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, KeywordsEn: e.target.value }))
+                  }
+                  className="focus:border-blue-500 focus:ring-blue-200 transition-all duration-200"
+                />
               </div>
             </div>
           </div>
 
-          {/* معاينة سريعة */}
-          {formData.metaTitle && (
-            <div className="space-y-3">
+          <Separator />
+
+          {/* إعدادات متقدمة */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Badge
                   variant="secondary"
-                  className="bg-green-50 text-green-700"
+                  className="bg-orange-50 text-orange-700"
                 >
                   <svg
                     className="w-3 h-3 mr-1"
@@ -527,32 +601,152 @@ function AddPageDialog({
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
                     />
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
-                  {t("editor.quick_preview")}
+                  {t("editor.advanced_settings")}
                 </Badge>
               </div>
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="text-blue-600 text-sm truncate">
-                  /tenant/{tenantId}/{formData.slug}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-2"
+              >
+                {showAdvanced ? t("editor.hide_advanced") : t("editor.show_advanced")} {t("editor.advanced_settings_toggle")}
+                <svg
+                  className={`w-4 h-4 transition-transform ${showAdvanced ? "rotate-180" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </Button>
+            </div>
+
+            {showAdvanced && (
+              <div className="space-y-6 p-4 bg-gray-50 rounded-lg border">
+                {/* Author & Robots */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">
+                      {t("editor.author_ar")}
+                    </Label>
+                    <Input
+                      placeholder="اسم المؤلف"
+                      value={formData.Author}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, Author: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">
+                      {t("editor.author_en")}
+                    </Label>
+                    <Input
+                      placeholder="Author Name"
+                      value={formData.AuthorEn}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, AuthorEn: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">
+                      {t("editor.robots_ar")}
+                    </Label>
+                    <Input
+                      placeholder="index, follow"
+                      value={formData.Robots}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, Robots: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">
+                      {t("editor.robots_en")}
+                    </Label>
+                    <Input
+                      placeholder="index, follow"
+                      value={formData.RobotsEn}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, RobotsEn: e.target.value }))
+                      }
+                    />
+                  </div>
                 </div>
-                <div className="text-lg font-medium text-gray-900 truncate mt-1">
-                  {formData.metaTitle}
-                </div>
-                <div className="text-sm text-gray-600 mt-1 line-clamp-2">
-                  {formData.metaDescription ||
-                    t("forms.page_description_placeholder")}
+
+                {/* Open Graph */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-gray-700">Open Graph</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        og:title
+                      </Label>
+                      <Input
+                        placeholder={t("editor.og_title")}
+                        value={formData["og:title"]}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, "og:title": e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        og:description
+                      </Label>
+                      <Input
+                        placeholder={t("editor.og_description")}
+                        value={formData["og:description"]}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, "og:description": e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        og:url
+                      </Label>
+                      <Input
+                        placeholder={t("editor.og_url")}
+                        value={formData["og:url"]}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, "og:url": e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        og:image
+                      </Label>
+                      <Input
+                        placeholder={t("editor.og_image")}
+                        value={formData["og:image"]}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, "og:image": e.target.value }))
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-3">
@@ -561,7 +755,7 @@ function AddPageDialog({
             onClick={() => setOpen(false)}
             className="w-full sm:w-auto"
           >
-            {t("common.cancel")}
+                {t("editor.cancel")}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -589,7 +783,7 @@ function AddPageDialog({
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                {t("common.creating")}
+                جاري الإنشاء...
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -606,7 +800,7 @@ function AddPageDialog({
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                {t("editor.add_component")}
+                إنشاء الصفحة
               </div>
             )}
           </Button>
@@ -662,12 +856,37 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
   const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
   const [isAddPageDialogOpen, setIsAddPageDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [formData, setFormData] = useState({
-    pageName: "",
     slug: "",
-    metaTitle: "",
-    metaDescription: "",
-    metaKeywords: "",
+    // Basic Meta Tags
+    TitleAr: "",
+    TitleEn: "",
+    DescriptionAr: "",
+    DescriptionEn: "",
+    KeywordsAr: "",
+    KeywordsEn: "",
+    // Advanced Meta Tags
+    Author: "",
+    AuthorEn: "",
+    Robots: "",
+    RobotsEn: "",
+    // Open Graph
+    "og:title": "",
+    "og:description": "",
+    "og:keywords": "",
+    "og:author": "",
+    "og:robots": "",
+    "og:url": "",
+    "og:image": "",
+    "og:type": "",
+    "og:locale": "",
+    "og:locale:alternate": "",
+    "og:site_name": "",
+    "og:image:width": "",
+    "og:image:height": "",
+    "og:image:type": "",
+    "og:image:alt": "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const t = useEditorT();
@@ -794,9 +1013,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.pageName.trim()) {
-      newErrors.pageName = t("validation.page_name_required");
-    }
 
     if (!formData.slug.trim()) {
       newErrors.slug = t("validation.slug_required");
@@ -812,8 +1028,12 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       newErrors.slug = t("validation.slug_exists");
     }
 
-    if (!formData.metaTitle.trim()) {
-      newErrors.metaTitle = t("validation.meta_title_required");
+    if (!formData.TitleAr.trim()) {
+      newErrors.TitleAr = "عنوان الصفحة بالعربي مطلوب";
+    }
+
+    if (!formData.TitleEn.trim()) {
+      newErrors.TitleEn = "عنوان الصفحة بالإنجليزي مطلوب";
     }
 
     setErrors(newErrors);
@@ -831,10 +1051,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
 
       createPage({
         slug: formData.slug,
-        name: formData.pageName,
-        metaTitle: formData.metaTitle,
-        metaDescription: formData.metaDescription,
-        metaKeywords: formData.metaKeywords,
+        name: formData.slug, // استخدام slug كاسم الصفحة
+        metaTitle: formData.TitleAr, // للتوافق مع النظام القديم
+        metaDescription: formData.DescriptionAr,
+        metaKeywords: formData.KeywordsAr,
       });
 
       // تحديث tenantStore لإضافة الصفحة الجديدة إلى componentSettings
@@ -845,10 +1065,79 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
           ...tenantData?.componentSettings,
           [formData.slug]: {}, // إضافة الصفحة الجديدة مع object فارغ للمكونات
         },
+        // إضافة WebsiteLayout
+        WebsiteLayout: {
+          ...tenantData?.WebsiteLayout,
+          metaTags: {
+            ...tenantData?.WebsiteLayout?.metaTags,
+            pages: [
+              ...(tenantData?.WebsiteLayout?.metaTags?.pages || []),
+              {
+                TitleAr: formData.TitleAr,
+                TitleEn: formData.TitleEn,
+                DescriptionAr: formData.DescriptionAr || formData.TitleAr,
+                DescriptionEn: formData.DescriptionEn || formData.TitleEn,
+                KeywordsAr: formData.KeywordsAr || formData.TitleAr,
+                KeywordsEn: formData.KeywordsEn || formData.TitleEn,
+                Author: formData.Author || formData.TitleAr,
+                AuthorEn: formData.AuthorEn || formData.TitleEn,
+                Robots: formData.Robots || "index, follow",
+                RobotsEn: formData.RobotsEn || "index, follow",
+                "og:title": formData["og:title"] || formData.TitleAr,
+                "og:description": formData["og:description"] || formData.DescriptionAr || formData.TitleAr,
+                "og:keywords": formData["og:keywords"] || formData.KeywordsAr || formData.TitleAr,
+                "og:author": formData["og:author"] || formData.Author || formData.TitleAr,
+                "og:robots": formData["og:robots"] || formData.Robots || "index, follow",
+                "og:url": formData["og:url"] || `/${formData.slug}`,
+                "og:image": formData["og:image"] || "",
+                "og:type": formData["og:type"] || "website",
+                "og:locale": formData["og:locale"] || "ar",
+                "og:locale:alternate": formData["og:locale:alternate"] || "en",
+                "og:site_name": formData["og:site_name"] || formData.TitleAr,
+                "og:image:width": formData["og:image:width"] || "",
+                "og:image:height": formData["og:image:height"] || "",
+                "og:image:type": formData["og:image:type"] || "",
+                "og:image:alt": formData["og:image:alt"] || formData.TitleAr,
+                path: `/${formData.slug}`,
+              }
+            ]
+          }
+        }
       };
 
       // تحديث الـ store
       useTenantStore.setState({ tenantData: updatedTenantData });
+
+      // تحديث editorStore مع WebsiteLayout
+      const { addPageToWebsiteLayout } = useEditorStore.getState();
+      addPageToWebsiteLayout({
+        TitleAr: formData.TitleAr,
+        TitleEn: formData.TitleEn,
+        DescriptionAr: formData.DescriptionAr || formData.TitleAr,
+        DescriptionEn: formData.DescriptionEn || formData.TitleEn,
+        KeywordsAr: formData.KeywordsAr || formData.TitleAr,
+        KeywordsEn: formData.KeywordsEn || formData.TitleEn,
+        Author: formData.Author || formData.TitleAr,
+        AuthorEn: formData.AuthorEn || formData.TitleEn,
+        Robots: formData.Robots || "index, follow",
+        RobotsEn: formData.RobotsEn || "index, follow",
+        "og:title": formData["og:title"] || formData.TitleAr,
+        "og:description": formData["og:description"] || formData.DescriptionAr || formData.TitleAr,
+        "og:keywords": formData["og:keywords"] || formData.KeywordsAr || formData.TitleAr,
+        "og:author": formData["og:author"] || formData.Author || formData.TitleAr,
+        "og:robots": formData["og:robots"] || formData.Robots || "index, follow",
+        "og:url": formData["og:url"] || `/${formData.slug}`,
+        "og:image": formData["og:image"] || "",
+        "og:type": formData["og:type"] || "website",
+        "og:locale": formData["og:locale"] || "ar",
+        "og:locale:alternate": formData["og:locale:alternate"] || "en",
+        "og:site_name": formData["og:site_name"] || formData.TitleAr,
+        "og:image:width": formData["og:image:width"] || "",
+        "og:image:height": formData["og:image:height"] || "",
+        "og:image:type": formData["og:image:type"] || "",
+        "og:image:alt": formData["og:image:alt"] || formData.TitleAr,
+        path: `/${formData.slug}`,
+      });
 
       // التحقق من نوع الصفحة
       const predefinedPages = [
@@ -865,11 +1154,32 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
 
       // إعادة تعيين النموذج
       setFormData({
-        pageName: "",
         slug: "",
-        metaTitle: "",
-        metaDescription: "",
-        metaKeywords: "",
+        TitleAr: "",
+        TitleEn: "",
+        DescriptionAr: "",
+        DescriptionEn: "",
+        KeywordsAr: "",
+        KeywordsEn: "",
+        Author: "",
+        AuthorEn: "",
+        Robots: "",
+        RobotsEn: "",
+        "og:title": "",
+        "og:description": "",
+        "og:keywords": "",
+        "og:author": "",
+        "og:robots": "",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "",
+        "og:locale": "",
+        "og:locale:alternate": "",
+        "og:site_name": "",
+        "og:image:width": "",
+        "og:image:height": "",
+        "og:image:type": "",
+        "og:image:alt": "",
       });
       setErrors({});
 
@@ -1633,25 +1943,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                 </Badge>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="pageName" className="text-sm font-medium">
-                    {t("editor.page_name")} *
-                  </Label>
-                  <Input
-                    id="pageName"
-                    value={formData.pageName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, pageName: e.target.value })
-                    }
-                    placeholder={t("editor.page_name_placeholder")}
-                    className={errors.pageName ? "border-red-500" : ""}
-                  />
-                  {errors.pageName && (
-                    <p className="text-sm text-red-500">{errors.pageName}</p>
-                  )}
-                </div>
-
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="slug" className="text-sm font-medium">
                     {t("editor.slug")} *
@@ -1662,7 +1954,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                     onChange={(e) =>
                       setFormData({ ...formData, slug: e.target.value })
                     }
-                    placeholder={t("editor.slug_placeholder")}
+                    placeholder="homepage"
                     className={errors.slug ? "border-red-500" : ""}
                   />
                   {errors.slug && (
@@ -1674,12 +1966,12 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
 
             <Separator />
 
-            {/* معلومات SEO */}
+            {/* إعدادات SEO الأساسية */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <Badge
                   variant="secondary"
-                  className="bg-green-50 text-green-700"
+                  className="bg-purple-50 text-purple-700"
                 >
                   <svg
                     className="w-3 h-3 mr-1"
@@ -1691,67 +1983,277 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                     />
                   </svg>
-                  {t("editor.seo_settings")}
+                  {t("editor.seo_settings")} الأساسية
                 </Badge>
               </div>
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="metaTitle" className="text-sm font-medium">
-                    {t("editor.meta_title")} *
+                  <Label htmlFor="TitleAr" className="text-sm font-medium">
+                    {t("editor.page_title_ar")} *
                   </Label>
                   <Input
-                    id="metaTitle"
-                    value={formData.metaTitle}
+                    id="TitleAr"
+                    value={formData.TitleAr}
                     onChange={(e) =>
-                      setFormData({ ...formData, metaTitle: e.target.value })
+                      setFormData({ ...formData, TitleAr: e.target.value })
                     }
-                    placeholder={t("editor.meta_title_placeholder")}
-                    className={errors.metaTitle ? "border-red-500" : ""}
+                    placeholder={t("editor.page_title_ar_placeholder")}
+                    className={errors.TitleAr ? "border-red-500" : ""}
                   />
-                  {errors.metaTitle && (
-                    <p className="text-sm text-red-500">{errors.metaTitle}</p>
+                  {errors.TitleAr && (
+                    <p className="text-sm text-red-500">{errors.TitleAr}</p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="metaDescription"
-                    className="text-sm font-medium"
-                  >
-                    {t("editor.meta_description")}
+                  <Label htmlFor="TitleEn" className="text-sm font-medium">
+                    {t("editor.page_title_en")} *
+                  </Label>
+                  <Input
+                    id="TitleEn"
+                    value={formData.TitleEn}
+                    onChange={(e) =>
+                      setFormData({ ...formData, TitleEn: e.target.value })
+                    }
+                    placeholder={t("editor.page_title_en_placeholder")}
+                    className={errors.TitleEn ? "border-red-500" : ""}
+                  />
+                  {errors.TitleEn && (
+                    <p className="text-sm text-red-500">{errors.TitleEn}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="DescriptionAr" className="text-sm font-medium">
+                    {t("editor.page_description_ar")}
                   </Label>
                   <Textarea
-                    id="metaDescription"
-                    value={formData.metaDescription}
+                    id="DescriptionAr"
+                    value={formData.DescriptionAr}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        metaDescription: e.target.value,
-                      })
+                      setFormData({ ...formData, DescriptionAr: e.target.value })
                     }
-                    placeholder={t("editor.meta_description_placeholder")}
+                    placeholder={t("editor.page_description_ar_placeholder")}
+                    className="resize-none"
                     rows={3}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="metaKeywords" className="text-sm font-medium">
-                    {t("editor.meta_keywords")}
+                  <Label htmlFor="DescriptionEn" className="text-sm font-medium">
+                    {t("editor.page_description_en")}
+                  </Label>
+                  <Textarea
+                    id="DescriptionEn"
+                    value={formData.DescriptionEn}
+                    onChange={(e) =>
+                      setFormData({ ...formData, DescriptionEn: e.target.value })
+                    }
+                    placeholder={t("editor.page_description_en_placeholder")}
+                    className="resize-none"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="KeywordsAr" className="text-sm font-medium">
+                    {t("editor.page_keywords_ar")}
                   </Label>
                   <Input
-                    id="metaKeywords"
-                    value={formData.metaKeywords}
+                    id="KeywordsAr"
+                    value={formData.KeywordsAr}
                     onChange={(e) =>
-                      setFormData({ ...formData, metaKeywords: e.target.value })
+                      setFormData({ ...formData, KeywordsAr: e.target.value })
                     }
-                    placeholder={t("editor.meta_keywords_placeholder")}
+                    placeholder={t("editor.page_keywords_ar_placeholder")}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="KeywordsEn" className="text-sm font-medium">
+                    {t("editor.page_keywords_en")}
+                  </Label>
+                  <Input
+                    id="KeywordsEn"
+                    value={formData.KeywordsEn}
+                    onChange={(e) =>
+                      setFormData({ ...formData, KeywordsEn: e.target.value })
+                    }
+                    placeholder={t("editor.page_keywords_en_placeholder")}
                   />
                 </div>
               </div>
+            </div>
+
+            <Separator />
+
+            {/* إعدادات متقدمة */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="secondary"
+                    className="bg-orange-50 text-orange-700"
+                  >
+                    <svg
+                      className="w-3 h-3 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    {t("editor.advanced_settings")}
+                  </Badge>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="flex items-center gap-2"
+                >
+                  {showAdvanced ? t("editor.hide_advanced") : t("editor.show_advanced")} {t("editor.advanced_settings_toggle")}
+                  <svg
+                    className={`w-4 h-4 transition-transform ${showAdvanced ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </Button>
+              </div>
+
+              {showAdvanced && (
+                <div className="space-y-6 p-4 bg-gray-50 rounded-lg border">
+                  {/* Author & Robots */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        {t("editor.author_ar")}
+                      </Label>
+                      <Input
+                        placeholder={t("editor.author_ar_placeholder")}
+                        value={formData.Author}
+                        onChange={(e) =>
+                          setFormData({ ...formData, Author: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        {t("editor.author_en")}
+                      </Label>
+                      <Input
+                        placeholder={t("editor.author_en_placeholder")}
+                        value={formData.AuthorEn}
+                        onChange={(e) =>
+                          setFormData({ ...formData, AuthorEn: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        {t("editor.robots_ar")}
+                      </Label>
+                      <Input
+                        placeholder={t("editor.robots_ar_placeholder")}
+                        value={formData.Robots}
+                        onChange={(e) =>
+                          setFormData({ ...formData, Robots: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        {t("editor.robots_en")}
+                      </Label>
+                      <Input
+                        placeholder={t("editor.robots_ar_placeholder")}
+                        value={formData.RobotsEn}
+                        onChange={(e) =>
+                          setFormData({ ...formData, RobotsEn: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {/* Open Graph */}
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-gray-700">Open Graph</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700">
+                          og:title
+                        </Label>
+                        <Input
+                          placeholder={t("editor.og_title")}
+                          value={formData["og:title"]}
+                          onChange={(e) =>
+                            setFormData({ ...formData, "og:title": e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700">
+                          og:description
+                        </Label>
+                        <Input
+                          placeholder={t("editor.og_description")}
+                          value={formData["og:description"]}
+                          onChange={(e) =>
+                            setFormData({ ...formData, "og:description": e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700">
+                          og:url
+                        </Label>
+                        <Input
+                          placeholder={t("editor.og_url")}
+                          value={formData["og:url"]}
+                          onChange={(e) =>
+                            setFormData({ ...formData, "og:url": e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700">
+                          og:image
+                        </Label>
+                        <Input
+                          placeholder={t("editor.og_image")}
+                          value={formData["og:image"]}
+                          onChange={(e) =>
+                            setFormData({ ...formData, "og:image": e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

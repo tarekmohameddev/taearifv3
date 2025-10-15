@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   try {
     await dbConnect();
 
-    const { tenantId, pages, globalComponentsData } = req.body || {};
+    const { tenantId, pages, globalComponentsData, WebsiteLayout } = req.body || {};
 
     if (!tenantId || typeof tenantId !== "string") {
       return res.status(400).json({ message: "tenantId is required" });
@@ -38,6 +38,11 @@ export default async function handler(req, res) {
     // Save global components data
     if (globalComponentsData) {
       setOps.globalComponentsData = globalComponentsData;
+    }
+
+    // Save WebsiteLayout data
+    if (WebsiteLayout) {
+      setOps.WebsiteLayout = WebsiteLayout;
     }
 
     for (const [page, components] of Object.entries(pages)) {
