@@ -1828,8 +1828,9 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
               <AlertDialogAction
                 onClick={confirmDeletePage}
                 disabled={
-                  deletePageConfirmation !==
-                  "I am sure I want to delete this page"
+                  deletePageConfirmation !== "I am sure I want to delete this page" &&
+                  deletePageConfirmation !== "أنا متأكد من أنني أريد حذف هذه الصفحة" &&
+                  deletePageConfirmation !== "أنا متأكد"
                 }
                 className="flex-1 sm:flex-none bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 border-0 px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
