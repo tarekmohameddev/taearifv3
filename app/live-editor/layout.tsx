@@ -1027,6 +1027,179 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
   const { fetchTenantData, tenantData, loadingTenantData, error } =
     useTenantStore();
 
+  // الحصول على WebsiteLayout من editorStore في أعلى المكون
+  const editorStoreWebsiteLayout = useEditorStore((state) => state.WebsiteLayout);
+  const editorWebsiteLayout = editorStoreWebsiteLayout?.metaTags?.pages || [];
+
+  // دالة للحصول على البيانات الافتراضية للصفحة
+  const getDefaultSeoData = (pageSlug: string) => {
+    const defaultData = {
+      "/": {
+        TitleAr: "الصفحة الرئيسية",
+        TitleEn: "Homepage",
+        DescriptionAr: "مرحباً بكم في موقعنا - الصفحة الرئيسية",
+        DescriptionEn: "Welcome to our website - Homepage",
+        KeywordsAr: "الرئيسية, الموقع, الصفحة الرئيسية",
+        KeywordsEn: "homepage, main, website",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "الصفحة الرئيسية",
+        "og:description": "مرحباً بكم في موقعنا",
+        "og:keywords": "الرئيسية, الموقع",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "الصفحة الرئيسية"
+      },
+      "create-request": {
+        TitleAr: "إنشاء طلب",
+        TitleEn: "Create Request",
+        DescriptionAr: "إنشاء طلب جديد للحصول على الخدمات",
+        DescriptionEn: "Create a new request to get our services",
+        KeywordsAr: "إنشاء طلب, خدمات, طلب جديد",
+        KeywordsEn: "create request, services, new request",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "إنشاء طلب",
+        "og:description": "إنشاء طلب جديد للحصول على الخدمات",
+        "og:keywords": "إنشاء طلب, خدمات",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "إنشاء طلب"
+      },
+      "for-rent": {
+        TitleAr: "عقارات للإيجار",
+        TitleEn: "For Rent",
+        DescriptionAr: "عقارات متاحة للإيجار",
+        DescriptionEn: "Properties available for rent",
+        KeywordsAr: "للإيجار, عقارات, شقق, منازل",
+        KeywordsEn: "for rent, properties, apartments, houses",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "للإيجار",
+        "og:description": "عقارات متاحة للإيجار",
+        "og:keywords": "للإيجار, عقارات",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "للإيجار"
+      },
+      "for-sale": {
+        TitleAr: "عقارات للبيع",
+        TitleEn: "For Sale",
+        DescriptionAr: "عقارات متاحة للبيع",
+        DescriptionEn: "Properties available for sale",
+        KeywordsAr: "للبيع, عقارات, شقق, منازل",
+        KeywordsEn: "for sale, properties, apartments, houses",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "للبيع",
+        "og:description": "عقارات متاحة للبيع",
+        "og:keywords": "للبيع, عقارات",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "للبيع"
+      },
+      "projects": {
+        TitleAr: "المشاريع",
+        TitleEn: "Projects",
+        DescriptionAr: "مشاريعنا العقارية المتميزة",
+        DescriptionEn: "Our distinguished real estate projects",
+        KeywordsAr: "مشاريع, عقارية, تطوير, بناء",
+        KeywordsEn: "projects, real estate, development, construction",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "المشاريع",
+        "og:description": "مشاريعنا العقارية المتميزة",
+        "og:keywords": "مشاريع, عقارية",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "المشاريع"
+      }
+    };
+
+    return (defaultData as any)[pageSlug] || {
+      TitleAr: pageSlug.charAt(0).toUpperCase() + pageSlug.slice(1),
+      TitleEn: pageSlug.charAt(0).toUpperCase() + pageSlug.slice(1),
+      DescriptionAr: `صفحة ${pageSlug}`,
+      DescriptionEn: `${pageSlug} page`,
+      KeywordsAr: pageSlug,
+      KeywordsEn: pageSlug,
+      Author: "الموقع",
+      AuthorEn: "Website",
+      Robots: "index, follow",
+      RobotsEn: "index, follow",
+      "og:title": pageSlug.charAt(0).toUpperCase() + pageSlug.slice(1),
+      "og:description": `صفحة ${pageSlug}`,
+      "og:keywords": pageSlug,
+      "og:author": "الموقع",
+      "og:robots": "index, follow",
+      "og:url": "",
+      "og:image": "",
+      "og:type": "website",
+      "og:locale": "ar",
+      "og:locale:alternate": "en",
+      "og:site_name": "الموقع",
+      "og:image:width": null,
+      "og:image:height": null,
+      "og:image:type": null,
+      "og:image:alt": pageSlug.charAt(0).toUpperCase() + pageSlug.slice(1)
+    };
+  };
+
   // إنشاء قائمة الصفحات المتاحة من الـ backend مع دمج WebsiteLayout
   const availablePages = useMemo(() => {
     const pages = [{ slug: "", name: "Homepage", path: "" }];
@@ -1059,41 +1232,42 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             );
           }
 
+          // التحقق من وجود بيانات SEO
+          const hasSeoData = seoData && (seoData.TitleAr || seoData.TitleEn || seoData.DescriptionAr || seoData.DescriptionEn);
+
           // إنشاء كائن الصفحة مع دمج البيانات
           const pageData = {
             slug: pageSlug,
             name: pageName,
             path: `/${pageSlug}`,
-            // إضافة بيانات SEO إذا كانت موجودة
-            ...(seoData && {
-              seo: {
-                TitleAr: seoData.TitleAr,
-                TitleEn: seoData.TitleEn,
-                DescriptionAr: seoData.DescriptionAr,
-                DescriptionEn: seoData.DescriptionEn,
-                KeywordsAr: seoData.KeywordsAr,
-                KeywordsEn: seoData.KeywordsEn,
-                Author: seoData.Author,
-                AuthorEn: seoData.AuthorEn,
-                Robots: seoData.Robots,
-                RobotsEn: seoData.RobotsEn,
-                "og:title": seoData["og:title"],
-                "og:description": seoData["og:description"],
-                "og:keywords": seoData["og:keywords"],
-                "og:author": seoData["og:author"],
-                "og:robots": seoData["og:robots"],
-                "og:url": seoData["og:url"],
-                "og:image": seoData["og:image"],
-                "og:type": seoData["og:type"],
-                "og:locale": seoData["og:locale"],
-                "og:locale:alternate": seoData["og:locale:alternate"],
-                "og:site_name": seoData["og:site_name"],
-                "og:image:width": seoData["og:image:width"],
-                "og:image:height": seoData["og:image:height"],
-                "og:image:type": seoData["og:image:type"],
-                "og:image:alt": seoData["og:image:alt"],
-              }
-            })
+            // إضافة بيانات SEO إذا كانت موجودة، وإلا إضافة البيانات الافتراضية
+            seo: hasSeoData ? {
+              TitleAr: seoData.TitleAr,
+              TitleEn: seoData.TitleEn,
+              DescriptionAr: seoData.DescriptionAr,
+              DescriptionEn: seoData.DescriptionEn,
+              KeywordsAr: seoData.KeywordsAr,
+              KeywordsEn: seoData.KeywordsEn,
+              Author: seoData.Author,
+              AuthorEn: seoData.AuthorEn,
+              Robots: seoData.Robots,
+              RobotsEn: seoData.RobotsEn,
+              "og:title": seoData["og:title"],
+              "og:description": seoData["og:description"],
+              "og:keywords": seoData["og:keywords"],
+              "og:author": seoData["og:author"],
+              "og:robots": seoData["og:robots"],
+              "og:url": seoData["og:url"],
+              "og:image": seoData["og:image"],
+              "og:type": seoData["og:type"],
+              "og:locale": seoData["og:locale"],
+              "og:locale:alternate": seoData["og:locale:alternate"],
+              "og:site_name": seoData["og:site_name"],
+              "og:image:width": seoData["og:image:width"],
+              "og:image:height": seoData["og:image:height"],
+              "og:image:type": seoData["og:image:type"],
+              "og:image:alt": seoData["og:image:alt"],
+            } : getDefaultSeoData(pageSlug)
           };
 
           pages.push(pageData);
@@ -1114,29 +1288,15 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       }
     });
 
-    // إضافة الصفحات الافتراضية فقط إذا كانت componentSettings فارغة
-    const defaultPages = [
-      { slug: "for-rent", name: "For-rent", path: "/for-rent" },
-      { slug: "for-sale", name: "For-sale", path: "/for-sale" },
-      { slug: "about-us", name: "About-us", path: "/about-us" },
-      { slug: "Contact-us", name: "Contact-us", path: "/contact-us" },
-    ];
+    console.log("🔍 tenantData WebsiteLayout:", websiteLayout?.metaTags?.pages);
+    console.log("🔍 editorStore WebsiteLayout:", editorWebsiteLayout);
 
-    // إضافة الصفحات الافتراضية فقط إذا كانت componentSettings فارغة أو غير موجودة
-    const hasComponentSettings =
-      componentSettings && Object.keys(componentSettings).length > 0;
-
-    if (!hasComponentSettings) {
-      defaultPages.forEach((defaultPage) => {
-        pages.push(defaultPage);
-      });
-    }
 
     // Console log لعرض availablePages بعد الـ merge
     console.log("🔍 availablePages after merge:", pages);
     
     return pages;
-  }, [tenantData, recentlyAddedPages]);
+  }, [tenantData, recentlyAddedPages, editorWebsiteLayout]);
 
   // دالة لإضافة صفحة جديدة إلى القائمة المحلية
   const addPageToLocalList = (pageSlug: string) => {
@@ -1409,6 +1569,291 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
           setPageComponentsForPage(pageSlug, components);
         },
       );
+    }
+  }, [tenantData]);
+
+  // إضافة بيانات افتراضية للصفحات المحددة إذا لم تكن موجودة في WebsiteLayout
+  useEffect(() => {
+    if (!tenantData) return;
+
+    const { addPageToWebsiteLayout } = useEditorStore.getState();
+    
+    // الصفحات المحددة مع بياناتها الافتراضية
+    const defaultPages = [
+      {
+        path: "/",
+        TitleAr: "الصفحة الرئيسية",
+        TitleEn: "Homepage",
+        DescriptionAr: "مرحباً بكم في موقعنا - الصفحة الرئيسية",
+        DescriptionEn: "Welcome to our website - Homepage",
+        KeywordsAr: "الرئيسية, الموقع, الصفحة الرئيسية",
+        KeywordsEn: "homepage, main, website",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "الصفحة الرئيسية",
+        "og:description": "مرحباً بكم في موقعنا",
+        "og:keywords": "الرئيسية, الموقع",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "الصفحة الرئيسية"
+      },
+      {
+        path: "/create-request",
+        TitleAr: "إنشاء طلب",
+        TitleEn: "Create Request",
+        DescriptionAr: "إنشاء طلب جديد للحصول على الخدمات",
+        DescriptionEn: "Create a new request to get our services",
+        KeywordsAr: "إنشاء طلب, خدمات, طلب جديد",
+        KeywordsEn: "create request, services, new request",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "إنشاء طلب",
+        "og:description": "إنشاء طلب جديد للحصول على الخدمات",
+        "og:keywords": "إنشاء طلب, خدمات",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "إنشاء طلب"
+      },
+      {
+        path: "/for-rent",
+        TitleAr: "للإيجار",
+        TitleEn: "For Rent",
+        DescriptionAr: "عقارات متاحة للإيجار",
+        DescriptionEn: "Properties available for rent",
+        KeywordsAr: "للإيجار, عقارات, شقق, منازل",
+        KeywordsEn: "for rent, properties, apartments, houses",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "للإيجار",
+        "og:description": "عقارات متاحة للإيجار",
+        "og:keywords": "للإيجار, عقارات",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "للإيجار"
+      },
+      {
+        path: "/for-sale",
+        TitleAr: "للبيع",
+        TitleEn: "For Sale",
+        DescriptionAr: "عقارات متاحة للبيع",
+        DescriptionEn: "Properties available for sale",
+        KeywordsAr: "للبيع, عقارات, شقق, منازل",
+        KeywordsEn: "for sale, properties, apartments, houses",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "للبيع",
+        "og:description": "عقارات متاحة للبيع",
+        "og:keywords": "للبيع, عقارات",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "للبيع"
+      },
+      {
+        path: "/projects",
+        TitleAr: "المشاريع",
+        TitleEn: "Projects",
+        DescriptionAr: "مشاريعنا العقارية المتميزة",
+        DescriptionEn: "Our distinguished real estate projects",
+        KeywordsAr: "مشاريع, عقارية, تطوير, بناء",
+        KeywordsEn: "projects, real estate, development, construction",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "المشاريع",
+        "og:description": "مشاريعنا العقارية المتميزة",
+        "og:keywords": "مشاريع, عقارية",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "المشاريع"
+      },
+      {
+        path: "/contact-us",
+        TitleAr: "اتصل بنا",
+        TitleEn: "Contact Us",
+        DescriptionAr: "تواصل معنا للحصول على المساعدة",
+        DescriptionEn: "Contact us for assistance",
+        KeywordsAr: "اتصل بنا, تواصل, مساعدة, خدمة العملاء",
+        KeywordsEn: "contact us, communication, help, customer service",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "اتصل بنا",
+        "og:description": "تواصل معنا للحصول على المساعدة",
+        "og:keywords": "اتصل بنا, تواصل",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "اتصل بنا"
+      },
+      {
+        path: "/about-us",
+        TitleAr: "من نحن",
+        TitleEn: "About Us",
+        DescriptionAr: "تعرف على شركتنا وخدماتنا",
+        DescriptionEn: "Learn about our company and services",
+        KeywordsAr: "من نحن, شركة, خدمات, معلومات",
+        KeywordsEn: "about us, company, services, information",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "من نحن",
+        "og:description": "تعرف على شركتنا وخدماتنا",
+        "og:keywords": "من نحن, شركة",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "من نحن"
+      },
+      {
+        path: "/about",
+        TitleAr: "حول",
+        TitleEn: "About",
+        DescriptionAr: "معلومات حول شركتنا",
+        DescriptionEn: "Information about our company",
+        KeywordsAr: "حول, معلومات, شركة",
+        KeywordsEn: "about, information, company",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "حول",
+        "og:description": "معلومات حول شركتنا",
+        "og:keywords": "حول, معلومات",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "حول"
+      },
+      {
+        path: "/contact",
+        TitleAr: "تواصل",
+        TitleEn: "Contact",
+        DescriptionAr: "تواصل معنا",
+        DescriptionEn: "Contact us",
+        KeywordsAr: "تواصل, اتصال, مساعدة",
+        KeywordsEn: "contact, communication, help",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "تواصل",
+        "og:description": "تواصل معنا",
+        "og:keywords": "تواصل, اتصال",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "تواصل"
+      }
+    ];
+
+    // التحقق من كل صفحة بشكل منفصل
+    const existingPages = tenantData.WebsiteLayout?.metaTags?.pages || [];
+    const existingPaths = existingPages.map((page: any) => page.path);
+    
+    // إضافة الصفحات المفقودة
+    const addedPages: string[] = [];
+    defaultPages.forEach(defaultPage => {
+      if (!existingPaths.includes(defaultPage.path)) {
+        console.log(`🔧 Adding default data for page: ${defaultPage.path}`);
+        addPageToWebsiteLayout(defaultPage);
+        addedPages.push(defaultPage.path);
+      } else {
+        console.log(`ℹ️ Page ${defaultPage.path} already exists in WebsiteLayout`);
+      }
+    });
+    
+    if (addedPages.length > 0) {
+      console.log(`✅ Added default data for ${addedPages.length} pages:`, addedPages);
+    } else {
+      console.log(`ℹ️ All default pages already exist in WebsiteLayout`);
     }
   }, [tenantData]);
 
