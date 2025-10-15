@@ -30,16 +30,11 @@ import {
 import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
 
 const loadComponent = (section: string, componentName: string) => {
-  console.log("📄 TenantPageWrapper - loadComponent called with:", {
-    section,
-    componentName,
-  });
   if (!componentName) return null;
   const match = componentName?.match(/^(.*?)(\d+)$/);
   if (!match) return null;
   const baseName = match[1];
   const number = match[2];
-  console.log("📄 TenantPageWrapper - Parsed component:", { baseName, number });
 
   // استخدام القائمة المركزية للحصول على مسارات الأقسام
   const sectionPath = getSectionPath(section) || section;
@@ -78,7 +73,6 @@ const loadComponent = (section: string, componentName: string) => {
 
   // جميع المكونات الآن مستقلة في مجلدات خاصة بها
   const fullPath = `${subPath}/${componentName}`;
-  console.log("📄 TenantPageWrapper - Loading component from path:", fullPath);
 
   return lazy(() =>
     import(`@/components/tenant/${fullPath}`).catch(() => ({
@@ -96,19 +90,12 @@ export default function TenantPageWrapper({
   tenantId,
   slug,
 }: TenantPageWrapperProps) {
-  console.log("📄 TenantPageWrapper - Component rendered");
 
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const setTenantId = useTenantStore((s) => s.setTenantId);
 
-  console.log("📄 TenantPageWrapper - Initial state:", {
-    tenantId,
-    slug,
-    hasTenantData: !!tenantData,
-    loadingTenantData,
-  });
 
   // Set tenantId in store when component mounts
   useEffect(() => {
@@ -125,7 +112,6 @@ export default function TenantPageWrapper({
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
     if (tenantId && !tenantData && !loadingTenantData) {
-      console.log("📄 TenantPageWrapper - Fetching tenant data for:", tenantId);
 
       // محاولة تحميل البيانات من cache أولاً
       const loadData = async () => {
@@ -133,17 +119,9 @@ export default function TenantPageWrapper({
           const cachedData = await preloadTenantData(tenantId);
           if (cachedData) {
             // إذا كانت البيانات موجودة في cache، استخدمها مباشرة
-            console.log(
-              "📄 TenantPageWrapper - Using cached data for:",
-              tenantId,
-            );
             return;
           }
         } catch (error) {
-          console.warn(
-            "📄 TenantPageWrapper - Cache failed, fetching from API:",
-            error,
-          );
         }
 
         // إذا لم تكن البيانات في cache، جلبها من API
@@ -178,7 +156,6 @@ export default function TenantPageWrapper({
       slug &&
       tenantData.componentSettings[slug]
     ) {
-      console.log("📄 TenantPageWrapper - Using componentSettings for:", slug);
       const pageSettings = tenantData.componentSettings[slug];
 
       // تحويل componentSettings إلى قائمة مكونات
@@ -191,16 +168,11 @@ export default function TenantPageWrapper({
         }))
         .sort((a, b) => (a.position || 0) - (b.position || 0));
 
-      console.log(
-        "📄 TenantPageWrapper - Components from componentSettings:",
-        components,
-      );
       return components;
     }
 
     // استخدام البيانات الافتراضية من PAGE_DEFINITIONS
     if (slug && (PAGE_DEFINITIONS as any)[slug]) {
-      console.log("📄 TenantPageWrapper - Using default components for:", slug);
       const defaultPageData = (PAGE_DEFINITIONS as any)[slug];
       const components = Object.entries(defaultPageData)
         .map(([id, component]: [string, any]) => ({
@@ -211,14 +183,9 @@ export default function TenantPageWrapper({
         }))
         .sort((a, b) => (a.position || 0) - (b.position || 0));
 
-      console.log(
-        "📄 TenantPageWrapper - Components from default:",
-        components,
-      );
       return components;
     }
 
-    console.log("📄 TenantPageWrapper - No components found for:", slug);
     return [];
   }, [tenantData?.componentSettings, slug]);
 
@@ -325,10 +292,6 @@ export default function TenantPageWrapper({
             filteredComponentsList.map((comp: any) => {
               const Cmp = loadComponent(slug as string, comp.componentName);
               if (!Cmp) {
-                console.log(
-                  "❌ Page - Component not found:",
-                  comp.componentName,
-                );
                 return <Fragment key={comp.id} />;
               }
 

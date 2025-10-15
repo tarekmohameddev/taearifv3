@@ -751,6 +751,141 @@ const tenantComponentData = getTenantComponentData();
 
 هذا النظام يضمن أن المكونات تعمل بكفاءة عالية مع إمكانية التخصيص الكامل للبيانات والعرض.
 
+# WebsiteLayout و Meta Tags (تحديث جديد)
+
+## نظرة عامة
+
+تمت إضافة كيان عام على مستوى الموقع يسمى `WebsiteLayout` لإدارة بيانات الـ Meta Tags لكل صفحة. يتم جلب هذا الكيان من الـ backend ضمن استجابة `getTenant` ويُخزّن داخل `editorStore` ليصبح متاحاً أثناء التحرير والبناء.
+
+- مكان التخزين في الـ editor store: `WebsiteLayout.metaTags.pages`
+- كل عنصر داخل `pages` يمثل صفحة بمسار `path` وحقول SEO وOpen Graph مرافقة.
+
+## شكل البيانات القادم من الـ backend
+
+يصل الحقل ضمن `getTenant` بالشكل التالي (مثال يعكس البنية):
+
+```json
+{
+  "WebsiteLayout": {
+    "metaTags": {
+      "pages": [
+        {
+          "path": "/",
+          "TitleAr": "الصفحة الرئيسية",
+          "TitleEn": "Homepage",
+          "DescriptionAr": "مرحباً بكم في موقعنا - الصفحة الرئيسية",
+          "DescriptionEn": "Welcome to our website - Homepage",
+          "KeywordsAr": "الرئيسية, الموقع, الصفحة الرئيسية",
+          "KeywordsEn": "homepage, main, website",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "الصفحة الرئيسية",
+          "og:description": "مرحباً بكم في موقعنا",
+          "og:keywords": "الرئيسية, الموقع",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "الصفحة الرئيسية"
+        }
+      ]
+    }
+  }
+}
+```
+
+ملاحظات:
+- الحقول مثل `og:image:width/height/type` قد تكون `null` وتُعامل كاختيارية.
+- الحقل `path` هو المعرّف المنطقي للصفحة لربط الميتا بالمسار.
+
+## كيف تُحمّل داخل الـ Editor Store
+
+يتم تعيين `WebsiteLayout` بعد الجلب مباشرة داخل `tenantStore`:
+
+```356:361:context-liveeditor/tenantStore.jsx
+      if (
+        data.WebsiteLayout &&
+        data.WebsiteLayout.metaTags &&
+        data.WebsiteLayout.metaTags.pages
+      ) {
+        editorStore.setWebsiteLayout(data.WebsiteLayout);
+      }
+```
+
+ويُعرّف الـ `editorStore` البنية ودوال الإدارة:
+
+```133:168:context-liveeditor/editorStore.ts
+  // WebsiteLayout - Meta tags and SEO data
+  WebsiteLayout: {
+    metaTags: {
+      pages: Array<{
+        TitleAr: string;
+        TitleEn: string;
+        DescriptionAr: string;
+        DescriptionEn: string;
+        KeywordsAr: string;
+        KeywordsEn: string;
+        Author: string;
+        AuthorEn: string;
+        Robots: string;
+        RobotsEn: string;
+        "og:title": string;
+        "og:description": string;
+        "og:keywords": string;
+        "og:author": string;
+        "og:robots": string;
+        "og:url": string;
+        "og:image": string;
+        "og:type": string;
+        "og:locale": string;
+        "og:locale:alternate": string;
+        "og:site_name": string;
+        "og:image:width": string;
+        "og:image:height": string;
+        "og:image:type": string;
+        "og:image:alt": string;
+        path: string;
+      }>;
+    };
+  };
+```
+
+ودوال التعديل:
+
+```2080:2095:context-liveeditor/editorStore.ts
+  // WebsiteLayout functions
+  setWebsiteLayout: (data) =>
+    set((state) => ({
+      WebsiteLayout: data,
+    })),
+
+  addPageToWebsiteLayout: (pageData) =>
+    set((state) => ({
+      WebsiteLayout: {
+        ...state.WebsiteLayout,
+        metaTags: {
+          ...state.WebsiteLayout.metaTags,
+          pages: [...state.WebsiteLayout.metaTags.pages, pageData],
+        },
+      },
+    })),
+```
+
+## التكامل مع الكاشينج
+
+- `WebsiteLayout` كيان عالمي مستقل عن حالات المكونات (لا يدخل ضمن `componentStates`).
+- يجري تحديثه فورياً داخل المحرر مثل بقية الحالات، مع بقاء أولوية دمج بيانات المكوّنات كما هي.
+- يُستخدم عند توليد الصفحات لضبط العناوين، الأوصاف، الكلمات المفتاحية وحقول Open Graph.
+
 ---
 
 # Advanced Component Functions: halfTextHalfImageFunctions.ts

@@ -1,3 +1,4 @@
+"use client";
 import { create } from "zustand";
 import { serialize as serializeCookie } from "cookie";
 import axiosInstance, { unlockAxios } from "@/lib/axiosInstance";
