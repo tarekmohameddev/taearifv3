@@ -1061,6 +1061,33 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
         "og:image:type": null,
         "og:image:alt": "الصفحة الرئيسية"
       },
+      "": {
+        TitleAr: "الصفحة الرئيسية",
+        TitleEn: "Homepage",
+        DescriptionAr: "مرحباً بكم في موقعنا - الصفحة الرئيسية",
+        DescriptionEn: "Welcome to our website - Homepage",
+        KeywordsAr: "الرئيسية, الموقع, الصفحة الرئيسية",
+        KeywordsEn: "homepage, main, website",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "الصفحة الرئيسية",
+        "og:description": "مرحباً بكم في موقعنا",
+        "og:keywords": "الرئيسية, الموقع",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "الصفحة الرئيسية"
+      },
       "create-request": {
         TitleAr: "إنشاء طلب",
         TitleEn: "Create Request",
@@ -1202,7 +1229,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
 
   // إنشاء قائمة الصفحات المتاحة من الـ backend مع دمج WebsiteLayout
   const availablePages = useMemo(() => {
-    const pages = [{ slug: "", name: "Homepage", path: "" }];
+    const pages: any[] = [];
 
     // تحويل componentSettings إلى object عادي إذا كان Map
     const componentSettings =
@@ -1291,6 +1318,16 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
     console.log("🔍 tenantData WebsiteLayout:", websiteLayout?.metaTags?.pages);
     console.log("🔍 editorStore WebsiteLayout:", editorWebsiteLayout);
 
+    // إضافة الصفحة الرئيسية في النهاية مع البيانات الافتراضية
+    const homepageExists = pages.some((page) => page.slug === "" || page.path === "");
+    if (!homepageExists) {
+      pages.unshift({
+        slug: "",
+        name: "Homepage",
+        path: "",
+        seo: getDefaultSeoData("")
+      });
+    }
 
     // Console log لعرض availablePages بعد الـ merge
     console.log("🔍 availablePages after merge:", pages);
@@ -1882,22 +1919,118 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               </h1>
               <span className="ml-2 text-sm text-gray-500">({tenantId})</span>
             </div>
-            {/* Desktop Pages Navigation - Hidden on screens < 1100px */}
-            <div className="hidden xl:ml-6 xl:flex xl:space-x-8">
-              {availablePages.map((page) => (
-                <Link
-                  key={page.slug || "homepage"}
-                  href={`${basePath}${page.path}`}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    currentPath === page.path
-                      ? "border-blue-500 text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                  }`}
-                >
-                  {getPageTitle(page)}
-                </Link>
-              ))}
-            </div>
+            {/* Desktop Pages Navigation - Show as links if less than 5 pages, otherwise show dropdown */}
+            {availablePages.length < 5 ? (
+              <div className="hidden xl:ml-6 xl:flex xl:space-x-8">
+                {availablePages.map((page) => (
+                  <Link
+                    key={page.slug || "homepage"}
+                    href={`${basePath}${page.path}`}
+                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                      currentPath === page.path
+                        ? "border-blue-500 text-gray-900"
+                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    }`}
+                  >
+                    {getPageTitle(page)}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="hidden xl:ml-6 xl:flex items-center">
+                <div className="relative pages-dropdown-container">
+                  <button
+                    onClick={() => setIsPagesDropdownOpen(!isPagesDropdownOpen)}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                    aria-expanded={isPagesDropdownOpen}
+                    aria-haspopup="true"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    </svg>
+                    {t("editor.pages")}
+                    <svg
+                      className="w-4 h-4 ml-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Pages Dropdown Menu */}
+                  {isPagesDropdownOpen && (
+                    <div className="absolute mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                      <div className="px-3 py-2">
+                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                          {t("editor.pages")}
+                        </h3>
+                        <div className="space-y-1">
+                          {availablePages.map((page) => (
+                            <Link
+                              key={page.slug || "homepage"}
+                              href={`${basePath}${page.path}`}
+                              onClick={() => setIsPagesDropdownOpen(false)}
+                              className={`flex items-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${
+                                currentPath === page.path
+                                  ? "bg-blue-50 text-blue-700 border border-blue-200"
+                                  : "text-gray-700 hover:bg-gray-50"
+                              }`}
+                            >
+                              <svg
+                                className="w-4 h-4 mr-3 flex-shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
+                              </svg>
+                              <span className="truncate">{getPageTitle(page)}</span>
+                              {currentPath === page.path && (
+                                <svg
+                                  className="w-4 h-4 ml-auto text-blue-600"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Mobile Pages Dropdown - Visible on screens < 1100px */}
             <div className="xl:hidden flex items-center mx-2">
