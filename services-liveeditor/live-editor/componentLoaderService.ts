@@ -44,7 +44,6 @@ export const loadComponent = (section: string, componentName: string) => {
 
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
-    console.error("Invalid component type:", baseName);
 
     // استخدام fallback للمكونات غير المعروفة
     const fallbackPath = "hero"; // استخدام hero كـ fallback
