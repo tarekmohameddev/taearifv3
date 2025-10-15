@@ -23,6 +23,7 @@
   },
   "editor": {
     "title": "Live Website Editor",
+    "pages": "Pages",
     "components": "Components",
     "settings": "Settings",
     "preview": "Preview Open Page",

@@ -89,6 +89,24 @@ function AddPageDialog({
   const router = useRouter();
   const { locale } = useEditorLocale();
 
+  // دالة لحساب عنوان الصفحة حسب اللغة
+  const getPageTitle = (page: any) => {
+    // إذا كانت الصفحة باللغة العربية
+    if (locale === 'ar' && page.seo?.TitleAr) {
+      return page.seo.TitleAr;
+    }
+    // إذا كانت الصفحة باللغة الإنجليزية
+    if (locale === 'en' && page.seo?.TitleEn) {
+      return page.seo.TitleEn;
+    }
+    // إذا لم تكن هناك بيانات SEO، استخدم page.name
+    if (page.name) {
+      return page.name;
+    }
+    // إذا لم يكن هناك page.name، استخدم page.slug
+    return page.slug || 'Homepage';
+  };
+
   // التأكد من وجود tenantId من userData.username
   const tenantId = userData?.username;
 
@@ -909,12 +927,31 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
     userData,
   } = useAuthStore();
   const router = useRouter();
+  const { locale } = useEditorLocale();
   const [recentlyAddedPages, setRecentlyAddedPages] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
   const [isAddPageDialogOpen, setIsAddPageDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  
+  // دالة لحساب عنوان الصفحة حسب اللغة
+  const getPageTitle = (page: any) => {
+    // إذا كانت الصفحة باللغة العربية
+    if (locale === 'ar' && page.seo?.TitleAr) {
+      return page.seo.TitleAr;
+    }
+    // إذا كانت الصفحة باللغة الإنجليزية
+    if (locale === 'en' && page.seo?.TitleEn) {
+      return page.seo.TitleEn;
+    }
+    // إذا لم تكن هناك بيانات SEO، استخدم page.name
+    if (page.name) {
+      return page.name;
+    }
+    // إذا لم يكن هناك page.name، استخدم page.slug
+    return page.slug || 'Homepage';
+  };
   const [formData, setFormData] = useState({
     slug: "",
     // Basic Meta Tags
@@ -990,35 +1027,78 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
   const { fetchTenantData, tenantData, loadingTenantData, error } =
     useTenantStore();
 
-  // إنشاء قائمة الصفحات المتاحة من الـ backend
+  // إنشاء قائمة الصفحات المتاحة من الـ backend مع دمج WebsiteLayout
   const availablePages = useMemo(() => {
     const pages = [{ slug: "", name: "Homepage", path: "" }];
 
-    // إضافة الصفحات من الـ backend إذا كانت موجودة
-    if (tenantData?.componentSettings) {
-      // تحويل componentSettings إلى object عادي إذا كان Map
-      const componentSettings =
-        tenantData.componentSettings instanceof Map
-          ? Object.fromEntries(tenantData.componentSettings)
-          : tenantData.componentSettings;
+    // تحويل componentSettings إلى object عادي إذا كان Map
+    const componentSettings =
+      tenantData?.componentSettings instanceof Map
+        ? Object.fromEntries(tenantData.componentSettings)
+        : tenantData?.componentSettings;
 
-      if (componentSettings && typeof componentSettings === "object") {
-        const componentSettingsKeys = Object.keys(componentSettings);
+    // تحويل WebsiteLayout إلى object عادي إذا كان Map
+    const websiteLayout =
+      tenantData?.WebsiteLayout instanceof Map
+        ? Object.fromEntries(tenantData.WebsiteLayout)
+        : tenantData?.WebsiteLayout;
 
-        componentSettingsKeys.forEach((pageSlug) => {
-          if (pageSlug !== "homepage") {
-            const pageName =
-              pageSlug.charAt(0).toUpperCase() + pageSlug.slice(1);
-            pages.push({
-              slug: pageSlug,
-              name: pageName,
-              path: `/${pageSlug}`,
-            });
+    // إضافة الصفحات من componentSettings مع دمج WebsiteLayout
+    if (componentSettings && typeof componentSettings === "object") {
+      const componentSettingsKeys = Object.keys(componentSettings);
+
+      componentSettingsKeys.forEach((pageSlug) => {
+        if (pageSlug !== "homepage") {
+          const pageName = pageSlug.charAt(0).toUpperCase() + pageSlug.slice(1);
+          
+          // البحث عن بيانات SEO للصفحة في WebsiteLayout
+          let seoData = null;
+          if (websiteLayout?.metaTags?.pages) {
+            seoData = websiteLayout.metaTags.pages.find(
+              (page: any) => page.path === `/${pageSlug}` || page.path === pageSlug
+            );
           }
-        });
-      } else {
-      }
-    } else {
+
+          // إنشاء كائن الصفحة مع دمج البيانات
+          const pageData = {
+            slug: pageSlug,
+            name: pageName,
+            path: `/${pageSlug}`,
+            // إضافة بيانات SEO إذا كانت موجودة
+            ...(seoData && {
+              seo: {
+                TitleAr: seoData.TitleAr,
+                TitleEn: seoData.TitleEn,
+                DescriptionAr: seoData.DescriptionAr,
+                DescriptionEn: seoData.DescriptionEn,
+                KeywordsAr: seoData.KeywordsAr,
+                KeywordsEn: seoData.KeywordsEn,
+                Author: seoData.Author,
+                AuthorEn: seoData.AuthorEn,
+                Robots: seoData.Robots,
+                RobotsEn: seoData.RobotsEn,
+                "og:title": seoData["og:title"],
+                "og:description": seoData["og:description"],
+                "og:keywords": seoData["og:keywords"],
+                "og:author": seoData["og:author"],
+                "og:robots": seoData["og:robots"],
+                "og:url": seoData["og:url"],
+                "og:image": seoData["og:image"],
+                "og:type": seoData["og:type"],
+                "og:locale": seoData["og:locale"],
+                "og:locale:alternate": seoData["og:locale:alternate"],
+                "og:site_name": seoData["og:site_name"],
+                "og:image:width": seoData["og:image:width"],
+                "og:image:height": seoData["og:image:height"],
+                "og:image:type": seoData["og:image:type"],
+                "og:image:alt": seoData["og:image:alt"],
+              }
+            })
+          };
+
+          pages.push(pageData);
+        }
+      });
     }
 
     // إضافة الصفحات المضافة حديثاً
@@ -1042,12 +1122,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       { slug: "Contact-us", name: "Contact-us", path: "/contact-us" },
     ];
 
-    // تحويل componentSettings للاستخدام في التحقق
-    const componentSettings =
-      tenantData?.componentSettings instanceof Map
-        ? Object.fromEntries(tenantData.componentSettings)
-        : tenantData?.componentSettings;
-
     // إضافة الصفحات الافتراضية فقط إذا كانت componentSettings فارغة أو غير موجودة
     const hasComponentSettings =
       componentSettings && Object.keys(componentSettings).length > 0;
@@ -1056,9 +1130,11 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       defaultPages.forEach((defaultPage) => {
         pages.push(defaultPage);
       });
-    } else {
     }
 
+    // Console log لعرض availablePages بعد الـ merge
+    console.log("🔍 availablePages after merge:", pages);
+    
     return pages;
   }, [tenantData, recentlyAddedPages]);
 
@@ -1373,7 +1449,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   }`}
                 >
-                  {page.name}
+                  {getPageTitle(page)}
                 </Link>
               ))}
             </div>
@@ -1448,7 +1524,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                               />
                             </svg>
-                            <span className="truncate">{page.name}</span>
+                            <span className="truncate">{getPageTitle(page)}</span>
                             {currentPath === page.path && (
                               <svg
                                 className="w-4 h-4 ml-auto text-blue-600"
@@ -1794,7 +1870,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                               />
                             </svg>
-                            <span className="truncate">{page.name}</span>
+                            <span className="truncate">{getPageTitle(page)}</span>
                             {currentPath === page.path && (
                               <svg
                                 className="w-4 h-4 ml-auto text-blue-600"
