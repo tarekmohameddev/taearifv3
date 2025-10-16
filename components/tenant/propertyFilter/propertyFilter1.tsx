@@ -75,13 +75,6 @@ export default function PropertyFilter({
   const actualTenantId = content?.tenantId || tenantId || currentTenantId;
   const actualStaticPropertyTypes = content?.propertyTypes || staticPropertyTypes;
 
-  console.log("PropertyFilter props:", {
-    content,
-    actualPropertyTypesSource,
-    actualPropertyTypesApiUrl,
-    actualTenantId,
-    actualStaticPropertyTypes: actualStaticPropertyTypes?.length
-  });
 
   // دالة لجلب أنواع العقارات من API أو استخدام القائمة الثابتة
   const fetchPropertyTypes = async () => {
@@ -192,14 +185,15 @@ export default function PropertyFilter({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // لا حاجة لـ router.push لأن store سيتولى تحديث البيانات
-    // store سيقوم تلقائياً بجلب البيانات الجديدة من API
+    // جلب البيانات من API عند الضغط على submit
+    const { fetchProperties } = usePropertiesStore.getState();
+    fetchProperties(1);
   };
 
   const handleTypeSelect = (type: string) => {
     setPropertyType(type);
     setIsDropdownOpen(false);
-    // store سيقوم تلقائياً بجلب البيانات الجديدة من API
+    // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
   };
 
   return (
@@ -215,7 +209,7 @@ export default function PropertyFilter({
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              // store سيقوم تلقائياً بجلب البيانات الجديدة من API
+              // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
             }}
             className="w-full h-full outline-none pr-2 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border-0 focus-visible:ring-0"
             name="search"
@@ -292,7 +286,7 @@ export default function PropertyFilter({
               if (Number.isNaN(n)) return;
               const finalPrice = String(n >= 0 ? n : 0);
               setPrice(finalPrice);
-              // store سيقوم تلقائياً بجلب البيانات الجديدة من API
+              // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
             }}
             className="w-full h-full outline-none pr-2 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border-0 focus-visible:ring-0"
             type="number"

@@ -138,23 +138,17 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
       setSearch: (search) => {
         set({ search });
-        // Clear existing data before fetching new data
-        set({ allProperties: [], filteredProperties: [] });
-        get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
+        // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
       },
 
       setPropertyType: (type) => {
         set({ propertyType: type });
-        // Clear existing data before fetching new data
-        set({ allProperties: [], filteredProperties: [] });
-        get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
+        // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
       },
 
       setPrice: (price) => {
         set({ price });
-        // Clear existing data before fetching new data
-        set({ allProperties: [], filteredProperties: [] });
-        get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
+        // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
       },
 
       // Pagination Actions

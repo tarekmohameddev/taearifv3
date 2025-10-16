@@ -1503,7 +1503,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                             </div>
                           </div>
                           <figure className="relative flex-[60%] py-4 rounded-lg overflow-hidden w-full h-full">
-                            <div className="bg-white mt-3 absolute w-36 h-7 md:w-29 lg:w-40 xl:w-46 md:h-9 flex items-center justify-between px-3 top-4 md:top-5 lg:top-4 right-2 rounded-md">
+                            <div className="bg-white mt-3 absolute w-fit h-7 gap-x-5 md:h-9 flex items-center justify-between px-3 top-4 md:top-5 lg:top-4 right-2 rounded-md">
                               <div className="flex flex-row items-center justify-center gap-x-1">
                                 <EyeIcon className="w-4 h-4 text-gray-600" />
                                 <p className="text-sm md:text-base font-bold text-gray-600">
