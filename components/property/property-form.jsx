@@ -2008,6 +2008,20 @@ export default function PropertyForm({ mode }) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                       <PropertyCounter
+                        label="غرف النوم"
+                        value={formData.bedrooms}
+                        onChange={(value) =>
+                          handleCounterChange("bedrooms", value)
+                        }
+                      />
+                      <PropertyCounter
+                        label="غرف الحمام"
+                        value={formData.bathrooms}
+                        onChange={(value) =>
+                          handleCounterChange("bathrooms", value)
+                        }
+                      />
+                      <PropertyCounter
                         label="الغرف"
                         value={formData.rooms}
                         onChange={(value) =>
