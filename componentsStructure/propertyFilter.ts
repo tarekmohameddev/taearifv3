@@ -56,7 +56,13 @@ export const propertyFilterStructure: ComponentStructure = {
               key: "propertyTypes",
               label: "Property Types List",
               type: "array",
-              itemType: "text",
+              of: [
+                {
+                  key: "value",
+                  label: "Property Type",
+                  type: "text",
+                }
+              ],
               condition: {
                 field: "content.propertyTypesSource",
                 value: "static",
@@ -66,6 +72,17 @@ export const propertyFilterStructure: ComponentStructure = {
               key: "propertyTypesApiUrl",
               label: "Property Types API URL",
               type: "text",
+              placeholder: "https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct",
+              condition: {
+                field: "content.propertyTypesSource",
+                value: "dynamic",
+              },
+            },
+            {
+              key: "tenantId",
+              label: "Tenant ID",
+              type: "text",
+              placeholder: "Enter tenant ID",
               condition: {
                 field: "content.propertyTypesSource",
                 value: "dynamic",
@@ -371,6 +388,17 @@ export const propertyFilterStructure: ComponentStructure = {
           key: "content.propertyTypesApiUrl",
           label: "Property Types API URL",
           type: "text",
+          placeholder: "https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct",
+          condition: {
+            field: "content.propertyTypesSource",
+            value: "dynamic",
+          },
+        },
+        {
+          key: "content.tenantId",
+          label: "Tenant ID",
+          type: "text",
+          placeholder: "Enter tenant ID",
           condition: {
             field: "content.propertyTypesSource",
             value: "dynamic",

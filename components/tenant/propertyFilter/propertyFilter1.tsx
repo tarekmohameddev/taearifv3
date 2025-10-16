@@ -5,8 +5,10 @@ import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePropertiesStore } from "@/store/propertiesStore";
+import { useTenantId } from "@/hooks/useTenantId";
 
-const propertyTypes = [
+// القائمة الافتراضية لأنواع العقارات (تُستخدم كـ fallback)
+const defaultPropertyTypes = [
   "مزرعة",
   "دور",
   "ارض سكن",
@@ -20,19 +22,143 @@ const propertyTypes = [
   "أرض تجارية",
 ];
 
-interface PropertyFilterProps {
-  className?: string;
+interface PropertyType {
+  id: number;
+  name: string;
 }
 
-export default function PropertyFilter({ className }: PropertyFilterProps) {
+interface PropertyFilterProps {
+  className?: string;
+  propertyTypesSource?: "static" | "dynamic";
+  propertyTypes?: string[];
+  propertyTypesApiUrl?: string;
+  tenantId?: string;
+  searchPlaceholder?: string;
+  propertyTypePlaceholder?: string;
+  pricePlaceholder?: string;
+  searchButtonText?: string;
+  noResultsText?: string;
+}
+
+export default function PropertyFilter({ 
+  className,
+  propertyTypesSource = "static",
+  propertyTypes: staticPropertyTypes = defaultPropertyTypes,
+  propertyTypesApiUrl,
+  tenantId,
+  searchPlaceholder = "أدخل المدينة أو المنطقة",
+  propertyTypePlaceholder = "نوع العقار",
+  pricePlaceholder = "السعر",
+  searchButtonText = "بحث",
+  noResultsText = "لم يتم العثور على نتائج.",
+  content, // البيانات من backend
+  ...props
+}: PropertyFilterProps & { content?: any }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Store state
   const { search, propertyType, price, setSearch, setPropertyType, setPrice } =
     usePropertiesStore();
 
+  // Tenant ID hook
+  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [filteredTypes, setFilteredTypes] = useState(propertyTypes);
+  const [propertyTypes, setPropertyTypes] = useState<string[]>([]);
+  const [filteredTypes, setFilteredTypes] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // استخراج البيانات من content إذا كانت متاحة
+  const actualPropertyTypesSource = content?.propertyTypesSource || propertyTypesSource;
+  const actualPropertyTypesApiUrl = content?.propertyTypesApiUrl || propertyTypesApiUrl;
+  const actualTenantId = content?.tenantId || tenantId || currentTenantId;
+  const actualStaticPropertyTypes = content?.propertyTypes || staticPropertyTypes;
+
+  console.log("PropertyFilter props:", {
+    content,
+    actualPropertyTypesSource,
+    actualPropertyTypesApiUrl,
+    actualTenantId,
+    actualStaticPropertyTypes: actualStaticPropertyTypes?.length
+  });
+
+  // دالة لجلب أنواع العقارات من API أو استخدام القائمة الثابتة
+  const fetchPropertyTypes = async () => {
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (actualPropertyTypesSource === "dynamic" && actualPropertyTypesApiUrl && actualTenantId) {
+        // جلب البيانات من API
+        const apiUrl = actualPropertyTypesApiUrl.replace(/\{[^}]*\}/g, actualTenantId);
+        
+        const response = await fetch(apiUrl);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && Array.isArray(data.data)) {
+          const types = data.data.map((item: PropertyType) => item.name);
+          setPropertyTypes(types);
+          setFilteredTypes(types);
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } else if (actualPropertyTypesSource === "static" && actualStaticPropertyTypes?.length > 0) {
+        // استخدام القائمة الثابتة
+        setPropertyTypes(actualStaticPropertyTypes);
+        setFilteredTypes(actualStaticPropertyTypes);
+      } else {
+        // استخدام القائمة الافتراضية كـ fallback
+        setPropertyTypes(defaultPropertyTypes);
+        setFilteredTypes(defaultPropertyTypes);
+      }
+    } catch (err) {
+      console.error("Error fetching property types:", err);
+      setError(err instanceof Error ? err.message : "حدث خطأ في جلب أنواع العقارات");
+      // في حالة الخطأ، استخدم القائمة الافتراضية
+      setPropertyTypes(defaultPropertyTypes);
+      setFilteredTypes(defaultPropertyTypes);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // جلب البيانات عند تحميل المكون
+  useEffect(() => {
+    // لا نجلب البيانات إذا كان tenantId لا يزال يتم تحميله
+    if (actualPropertyTypesSource === "dynamic" && tenantLoading) {
+      return;
+    }
+    fetchPropertyTypes();
+  }, [actualPropertyTypesSource, actualPropertyTypesApiUrl, actualTenantId, tenantLoading]);
+
+  // تحديث البيانات عند تغيير currentTenantId
+  useEffect(() => {
+    if (currentTenantId && actualPropertyTypesSource === "dynamic") {
+      fetchPropertyTypes();
+    }
+  }, [currentTenantId]);
+
+  // تحديث البيانات عند تغيير content
+  useEffect(() => {
+    if (content) {
+      fetchPropertyTypes();
+    }
+  }, [content]);
+
+  // تحديث البيانات عند تغيير staticPropertyTypes
+  useEffect(() => {
+    if (actualPropertyTypesSource === "static" && actualStaticPropertyTypes?.length > 0) {
+      setPropertyTypes(actualStaticPropertyTypes);
+      setFilteredTypes(actualStaticPropertyTypes);
+    }
+  }, [actualStaticPropertyTypes, actualPropertyTypesSource]);
 
   // تحديث الفلتر عند تغيير البحث
   useEffect(() => {
@@ -45,7 +171,7 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
     } else {
       setFilteredTypes(propertyTypes);
     }
-  }, [propertyType]);
+  }, [propertyType, propertyTypes]);
 
   // إغلاق الـ dropdown عند النقر خارجه
   useEffect(() => {
@@ -67,11 +193,13 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // لا حاجة لـ router.push لأن store سيتولى تحديث البيانات
+    // store سيقوم تلقائياً بجلب البيانات الجديدة من API
   };
 
   const handleTypeSelect = (type: string) => {
     setPropertyType(type);
     setIsDropdownOpen(false);
+    // store سيقوم تلقائياً بجلب البيانات الجديدة من API
   };
 
   return (
@@ -83,9 +211,12 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
         {/* البحث عن المدينة */}
         <div className="py-2 w-full md:w-[32.32%] relative flex items-center justify-center border border-gray-200 h-12 md:h-14 rounded-[10px]">
           <Input
-            placeholder="أدخل المدينة أو المنطقة"
+            placeholder={searchPlaceholder}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              // store سيقوم تلقائياً بجلب البيانات الجديدة من API
+            }}
             className="w-full h-full outline-none pr-2 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border-0 focus-visible:ring-0"
             name="search"
           />
@@ -96,7 +227,7 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
           <div className="w-full h-full relative">
             <div className="relative">
               <Input
-                placeholder="نوع العقار"
+                placeholder={propertyTypePlaceholder}
                 value={propertyType}
                 onChange={(e) => {
                   setPropertyType(e.target.value);
@@ -114,7 +245,19 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
             {/* Dropdown */}
             {isDropdownOpen && (
               <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-[10px] mt-1 max-h-60 overflow-y-auto shadow-lg">
-                {filteredTypes.length > 0 ? (
+                {loading ? (
+                  <div className="px-4 py-3 text-gray-500 text-sm md:text-base text-center">
+                    جاري التحميل...
+                  </div>
+                ) : error ? (
+                  <div className="px-4 py-3 text-red-500 text-sm md:text-base text-center">
+                    {error}
+                  </div>
+                ) : propertyTypes.length === 0 ? (
+                  <div className="px-4 py-3 text-gray-500 text-sm md:text-base text-center">
+                    لا توجد أنواع عقارات متاحة
+                  </div>
+                ) : filteredTypes.length > 0 ? (
                   filteredTypes.map((type, index) => (
                     <div
                       key={index}
@@ -126,7 +269,7 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
                   ))
                 ) : (
                   <div className="px-4 py-3 text-gray-500 text-sm md:text-base">
-                    لم يتم العثور على نتائج.
+                    {noResultsText}
                   </div>
                 )}
               </div>
@@ -137,7 +280,7 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
         {/* السعر */}
         <div className="w-full md:w-[23.86%] h-12 relative flex items-center justify-center py-2 border border-gray-200 md:h-14 rounded-[10px]">
           <Input
-            placeholder="السعر"
+            placeholder={pricePlaceholder}
             value={price}
             onChange={(e) => {
               const v = e.target.value;
@@ -147,7 +290,9 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
               }
               const n = Number(v);
               if (Number.isNaN(n)) return;
-              setPrice(String(n >= 0 ? n : 0));
+              const finalPrice = String(n >= 0 ? n : 0);
+              setPrice(finalPrice);
+              // store سيقوم تلقائياً بجلب البيانات الجديدة من API
             }}
             className="w-full h-full outline-none pr-2 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border-0 focus-visible:ring-0"
             type="number"
@@ -163,7 +308,7 @@ export default function PropertyFilter({ className }: PropertyFilterProps) {
             type="submit"
             className="text-xs xs:text-base md:text-lg flex items-center justify-center w-full h-12 md:h-14 text-white bg-emerald-600 hover:bg-emerald-700 rounded-[10px]"
           >
-            بحث
+            {searchButtonText}
           </Button>
         </div>
       </form>

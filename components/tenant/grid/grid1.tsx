@@ -56,6 +56,11 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     (state) => state.filteredProperties,
   );
   const storeLoading = usePropertiesStore((state) => state.loading);
+  
+  // Filter state from store
+  const search = usePropertiesStore((state) => state.search);
+  const propertyType = usePropertiesStore((state) => state.propertyType);
+  const price = usePropertiesStore((state) => state.price);
 
   // Subscribe to editor store updates for this component variant
   const ensureComponentVariant = useEditorStore(
@@ -306,7 +311,6 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   // Fetch properties on component mount and when API URL, pathname, or transactionType changes
   useEffect(() => {
     // Always prioritize the configured apiUrl from dataSource
-    console.log("mergedData",mergedData)
     const apiUrl = mergedData.dataSource?.apiUrl;
     const useApiData = mergedData.dataSource?.enabled !== false;
 
@@ -334,16 +338,15 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   // Use API data if enabled, otherwise use static data
   const useApiData = mergedData.dataSource?.enabled !== false;
-  console.log("useApiData",useApiData)
-  console.log("filteredProperties",filteredProperties)
-  console.log("apiProperties",apiProperties)
-  console.log("mergedData.items",mergedData.items)
-  console.log("mergedData.properties",mergedData.properties)
   
-  // Always use API data when enabled, ignore store data completely
-  const properties = useApiData
-    ? apiProperties
-    : mergedData.items || mergedData.properties || [];
+  // Always prioritize store data (filteredProperties) over API data
+  // This ensures that when API returns empty results, we show empty state
+  const properties = useApiData && currentTenantId
+    ? filteredProperties  // Always use store data when API is enabled
+    : useApiData
+      ? apiProperties
+      : mergedData.items || mergedData.properties || [];
+
 
   // Check if component should be visible
   if (!mergedData.visible) {
@@ -463,6 +466,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
               <p className="text-sm text-gray-600">
                 تم العثور على {properties.length} عقار
                 {properties.length !== 1 ? "ات" : ""}
+                {filteredProperties.length > 0 && (
+                  <span className="text-xs text-gray-500 block mt-1">
+                    {search && `البحث: "${search}"`}
+                    {propertyType && ` • النوع: "${propertyType}"`}
+                    {price && ` • السعر: حتى ${price}`}
+                  </span>
+                )}
               </p>
             </div>
             <div
@@ -516,11 +526,34 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
             <p className="text-lg text-gray-600 font-medium">
               {mergedData.content?.emptyMessage ||
                 mergedData.emptyMessage ||
-                "لا توجد عقارات متاحة حالياً"}
+                "لا توجد عقارات بهذه الفلاتر"}
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              يرجى المحاولة مرة أخرى لاحقاً
+              جرب تغيير الفلاتر أو البحث عن شيء آخر
             </p>
+            {/* عرض الفلاتر النشطة */}
+            {(search || propertyType || price) && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600 mb-2">الفلاتر النشطة:</p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {search && (
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                      البحث: "{search}"
+                    </span>
+                  )}
+                  {propertyType && (
+                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                      النوع: "{propertyType}"
+                    </span>
+                  )}
+                  {price && (
+                    <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">
+                      السعر: حتى {price}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

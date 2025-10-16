@@ -127,38 +127,38 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
       // Actions
       setTransactionType: (type) => {
-        console.log("Store: setTransactionType to", type);
         set({ transactionType: type });
         get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
       },
 
       setActiveFilter: (filter) => {
-        console.log("Store: setActiveFilter to", filter);
         set({ activeFilter: filter });
         get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
       },
 
       setSearch: (search) => {
-        console.log("Store: setSearch to", search);
         set({ search });
+        // Clear existing data before fetching new data
+        set({ allProperties: [], filteredProperties: [] });
         get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
       },
 
       setPropertyType: (type) => {
-        console.log("Store: setPropertyType to", type);
         set({ propertyType: type });
+        // Clear existing data before fetching new data
+        set({ allProperties: [], filteredProperties: [] });
         get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
       },
 
       setPrice: (price) => {
-        console.log("Store: setPrice to", price);
         set({ price });
+        // Clear existing data before fetching new data
+        set({ allProperties: [], filteredProperties: [] });
         get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
       },
 
       // Pagination Actions
       setCurrentPage: (page) => {
-        console.log("Store: setCurrentPage to", page);
         get().fetchProperties(page);
       },
 
@@ -178,7 +178,6 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
       // API Actions
       setTenantId: (tenantId) => {
-        console.log("Store: setTenantId to", tenantId);
         set({ tenantId });
         // إذا تم تعيين tenantId وكان هناك فلاتر، جلب البيانات
         if (tenantId) {
@@ -188,11 +187,9 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
       fetchProperties: async (page = 1) => {
         const state = get();
-        console.log("Store: fetchProperties called with page:", page);
 
         // منع الـ duplicate calls
         if (state.loading) {
-          console.log("Store: Already loading, skipping fetchProperties");
           return;
         }
 
@@ -201,9 +198,6 @@ export const usePropertiesStore = create<PropertiesStore>()(
         try {
           // الحصول على tenantId من الـ store
           if (!state.tenantId) {
-            console.log(
-              "Store: No tenant ID available, skipping fetchProperties",
-            );
             set({ loading: false });
             return;
           }
@@ -232,11 +226,9 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
           const url = `/v1/tenant-website/${tenantId}/properties?${params.toString()}`;
 
-          console.log("Store: Fetching properties from URL:", url);
 
           const response = await axiosInstance.get(url);
 
-          console.log("Store: API Response:", response.data);
 
           const result: PropertiesResponse = response.data;
 
@@ -248,19 +240,26 @@ export const usePropertiesStore = create<PropertiesStore>()(
               total: result.pagination.total,
               pagination: result.pagination,
             });
-            console.log(
-              "Store: Properties loaded:",
-              result.properties.length,
-              "items for page",
-              page,
-            );
           } else {
-            throw new Error("Failed to fetch properties");
+            // Handle empty results - clear the store
+            set({
+              allProperties: [],
+              filteredProperties: [],
+              loading: false,
+              total: 0,
+              pagination: result.pagination || {
+                total: 0,
+                per_page: 20,
+                current_page: 1,
+                last_page: 1,
+                from: 0,
+                to: 0,
+              },
+            });
           }
         } catch (err) {
           const errorMessage =
             err instanceof Error ? err.message : "Unknown error occurred";
-          console.error("Store: Error fetching properties:", err);
           set({
             error: errorMessage,
             loading: false,
@@ -270,11 +269,9 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
       fetchAllProperties: async () => {
         const state = get();
-        console.log("Store: fetchAllProperties called");
 
         // منع الـ duplicate calls
         if (state.loading) {
-          console.log("Store: Already loading, skipping fetchAllProperties");
           return;
         }
 
@@ -283,9 +280,6 @@ export const usePropertiesStore = create<PropertiesStore>()(
         try {
           // الحصول على tenantId من الـ store
           if (!state.tenantId) {
-            console.log(
-              "Store: No tenant ID available, skipping fetchAllProperties",
-            );
             set({ loading: false });
             return;
           }
@@ -295,11 +289,9 @@ export const usePropertiesStore = create<PropertiesStore>()(
           // جلب جميع العقارات من الـ API الجديد
           const url = `/v1/tenant-website/${tenantId}/properties`;
 
-          console.log("Store: Fetching all properties from URL:", url);
 
           const response = await axiosInstance.get(url);
 
-          console.log("Store: API Response:", response.data);
 
           const result: PropertiesResponse = response.data;
 
@@ -309,11 +301,6 @@ export const usePropertiesStore = create<PropertiesStore>()(
               loading: false,
               total: result.pagination.total,
             });
-            console.log(
-              "Store: All properties saved:",
-              result.properties.length,
-              "items",
-            );
 
             // تطبيق الفلاتر الحالية على البيانات الجديدة
             get().applyFilters();
@@ -323,7 +310,6 @@ export const usePropertiesStore = create<PropertiesStore>()(
         } catch (err) {
           const errorMessage =
             err instanceof Error ? err.message : "Unknown error occurred";
-          console.error("Store: Error fetching properties:", err);
           set({
             error: errorMessage,
             loading: false,
@@ -332,7 +318,6 @@ export const usePropertiesStore = create<PropertiesStore>()(
       },
 
       clearFilters: () => {
-        console.log("Store: clearFilters called");
         set({
           activeFilter: "all",
           search: "",
@@ -345,14 +330,6 @@ export const usePropertiesStore = create<PropertiesStore>()(
       // Local Filtering
       applyFilters: () => {
         const state = get();
-        console.log("Store: applyFilters called with state:", {
-          transactionType: state.transactionType,
-          activeFilter: state.activeFilter,
-          search: state.search,
-          propertyType: state.propertyType,
-          price: state.price,
-          allPropertiesCount: state.allProperties.length,
-        });
 
         let filtered = [...state.allProperties];
 
@@ -420,12 +397,6 @@ export const usePropertiesStore = create<PropertiesStore>()(
           }
         }
 
-        console.log(
-          "Store: Filtered properties:",
-          filtered.length,
-          "out of",
-          state.allProperties.length,
-        );
 
         set({
           filteredProperties: filtered,

@@ -602,7 +602,7 @@
         }
       },
       {
-        "id": "85b51aac-3d5c-4d5c-8f80-ee7108b0ac1c",
+        "id": "651a5sdadasssd511d65a1sd65as1d1",
         "type": "propertyFilter",
         "name": "PropertyFilter",
         "componentName": "propertyFilter1",
@@ -619,11 +619,15 @@
           "settings": {
             "enabled": true,
             "layout": "default"
+          },
+          "content": {
+            "propertyTypesSource": "dynamic",
+            "propertyTypesApiUrl": "https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct"
           }
         },
         "position": 1,
         "layout": {
-          "row": 0,
+          "row": 1,
           "col": 0,
           "span": 2
         }
@@ -966,7 +970,7 @@
         }
       },
       {
-        "id": "387f5313-ab58-43e4-a081-c2c66b765340",
+        "id": "1fd5s41fsa5f15asf6sdf1sda51f",
         "type": "propertyFilter",
         "name": "PropertyFilter",
         "componentName": "propertyFilter1",
@@ -983,11 +987,15 @@
           "settings": {
             "enabled": true,
             "layout": "default"
+          },
+          "content": {
+            "propertyTypesSource": "dynamic",
+            "propertyTypesApiUrl": "https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct"
           }
         },
         "position": 1,
         "layout": {
-          "row": 0,
+          "row": 1,
           "col": 0,
           "span": 2
         }
