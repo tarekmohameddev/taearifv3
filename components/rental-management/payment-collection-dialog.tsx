@@ -158,6 +158,19 @@ export function PaymentCollectionDialog() {
   >([]);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
+  // Cleanup effect to fix pointer-events issue
+  useEffect(() => {
+    if (!isPaymentCollectionDialogOpen) {
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === "none") {
+          body.style.pointerEvents = "";
+        }
+      }, 100);
+    }
+  }, [isPaymentCollectionDialogOpen]);
+
   // Fetch payment collection data when dialog opens
   useEffect(() => {
     if (

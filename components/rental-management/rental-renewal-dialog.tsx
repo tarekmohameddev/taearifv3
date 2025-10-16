@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,19 @@ export function RenewalDialog({
   loading,
 }: RenewalDialogProps) {
   if (!isOpen || !rental) return null;
+
+  // Cleanup effect to fix pointer-events issue
+  useEffect(() => {
+    if (!isOpen) {
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === "none") {
+          body.style.pointerEvents = "";
+        }
+      }, 100);
+    }
+  }, [isOpen]);
 
   // Function to calculate payment amounts based on contract type, duration, and payment frequency
   const calculatePaymentAmount = () => {

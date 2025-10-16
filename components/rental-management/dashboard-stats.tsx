@@ -117,6 +117,19 @@ function OngoingRentalsDialog() {
     closeOngoingRentalsDialog,
   } = useRentalDashboardStore();
 
+  // Cleanup effect to fix pointer-events issue
+  useEffect(() => {
+    if (!isOngoingRentalsDialogOpen) {
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === "none") {
+          body.style.pointerEvents = "";
+        }
+      }, 100);
+    }
+  }, [isOngoingRentalsDialogOpen]);
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "غير محدد";
     try {
@@ -305,6 +318,19 @@ function ExpiringContractsDialog() {
     isExpiringContractsDialogOpen,
     closeExpiringContractsDialog,
   } = useRentalDashboardStore();
+
+  // Cleanup effect to fix pointer-events issue
+  useEffect(() => {
+    if (!isExpiringContractsDialogOpen) {
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === "none") {
+          body.style.pointerEvents = "";
+        }
+      }, 100);
+    }
+  }, [isExpiringContractsDialogOpen]);
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "غير محدد";
@@ -704,6 +730,19 @@ function PaymentsDueDialog() {
     closePaymentsDueDialog,
   } = useRentalDashboardStore();
 
+  // Cleanup effect to fix pointer-events issue
+  useEffect(() => {
+    if (!isPaymentsDueDialogOpen) {
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === "none") {
+          body.style.pointerEvents = "";
+        }
+      }, 100);
+    }
+  }, [isPaymentsDueDialogOpen]);
+
   const formatCurrency = (
     amount: number | string,
     currency: string = "SAR",
@@ -928,6 +967,19 @@ function PaymentsOverdueDialog() {
     closePaymentsOverdueDialog,
   } = useRentalDashboardStore();
 
+  // Cleanup effect to fix pointer-events issue
+  useEffect(() => {
+    if (!isPaymentsOverdueDialogOpen) {
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === "none") {
+          body.style.pointerEvents = "";
+        }
+      }, 100);
+    }
+  }, [isPaymentsOverdueDialogOpen]);
+
   const formatCurrency = (amount: string | null, currency: string = "SAR") => {
     if (!amount) return "غير محدد";
     try {
@@ -1094,6 +1146,19 @@ function MaintenanceOpenDialog() {
     isMaintenanceOpenDialogOpen,
     closeMaintenanceOpenDialog,
   } = useRentalDashboardStore();
+
+  // Cleanup effect to fix pointer-events issue
+  useEffect(() => {
+    if (!isMaintenanceOpenDialogOpen) {
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === "none") {
+          body.style.pointerEvents = "";
+        }
+      }, 100);
+    }
+  }, [isMaintenanceOpenDialogOpen]);
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "غير محدد";
@@ -1298,6 +1363,19 @@ function MaintenanceInProgressDialog() {
     isMaintenanceInProgressDialogOpen,
     closeMaintenanceInProgressDialog,
   } = useRentalDashboardStore();
+
+  // Cleanup effect to fix pointer-events issue
+  useEffect(() => {
+    if (!isMaintenanceInProgressDialogOpen) {
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === "none") {
+          body.style.pointerEvents = "";
+        }
+      }, 100);
+    }
+  }, [isMaintenanceInProgressDialogOpen]);
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "غير محدد";

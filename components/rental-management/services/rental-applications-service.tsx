@@ -186,6 +186,39 @@ export function RentalApplicationsService({
   });
   const [renewalLoading, setRenewalLoading] = useState(false);
 
+  // Cleanup effect to fix pointer-events issue for all dialogs
+  useEffect(() => {
+    const dialogs = [
+      rentalApplications.isRentalDetailsDialogOpen,
+      rentalApplications.isPaymentCollectionDialogOpen,
+      rentalApplications.isRentalWhatsAppDialogOpen,
+      isStatusChangeDialogOpen,
+      isRenewalDialogOpen,
+      rentalApplications.isDeleteDialogOpen,
+      rentalApplications.isEditRentalDialogOpen,
+    ];
+    
+    const anyDialogOpen = dialogs.some(dialog => dialog);
+    
+    if (!anyDialogOpen) {
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === "none") {
+          body.style.pointerEvents = "";
+        }
+      }, 100);
+    }
+  }, [
+    rentalApplications.isRentalDetailsDialogOpen,
+    rentalApplications.isPaymentCollectionDialogOpen,
+    rentalApplications.isRentalWhatsAppDialogOpen,
+    isStatusChangeDialogOpen,
+    isRenewalDialogOpen,
+    rentalApplications.isDeleteDialogOpen,
+    rentalApplications.isEditRentalDialogOpen,
+  ]);
+
   // Function to open renewal dialog
   const openRenewalDialog = (rental: any) => {
     setSelectedRentalForRenewal(rental);

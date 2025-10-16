@@ -71,6 +71,19 @@ export function RentalWhatsAppDialog({
   );
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Cleanup effect to fix pointer-events issue
+  useEffect(() => {
+    if (!isOpen) {
+      // Fix pointer-events issue by removing the style attribute
+      setTimeout(() => {
+        const body = document.body;
+        if (body.style.pointerEvents === "none") {
+          body.style.pointerEvents = "";
+        }
+      }, 100);
+    }
+  }, [isOpen]);
+
   // جلب قنوات التسويق عند فتح الـ dialog
   useEffect(() => {
     if (isOpen) {
