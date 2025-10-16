@@ -44,17 +44,27 @@ import axiosInstance from "@/lib/axiosInstance";
 interface Role {
   id: number;
   name: string;
+  name_ar?: string;
+  name_en?: string;
   guard_name: string;
   team_id: number;
   created_at: string;
   updated_at: string;
-  permissions_list?: string[];
+  permissions_list?: PermissionItem[];
   permissions?: Permission[];
+}
+
+interface PermissionItem {
+  name: string;
+  name_ar: string;
+  name_en: string;
 }
 
 interface Permission {
   id: number;
   name: string;
+  name_ar?: string;
+  name_en?: string;
   guard_name: string;
   team_id: number;
   created_at: string;
@@ -129,9 +139,10 @@ export default function RolesPage() {
   // Filter roles based on search query
   const filteredRoles = rolesTabData.filter(
     (role) =>
-      role.name.toLowerCase().includes(rolesSearchQuery.toLowerCase()) ||
+      (role.name_ar || role.name).toLowerCase().includes(rolesSearchQuery.toLowerCase()) ||
       role.permissions_list?.some((permission) =>
-        permission.toLowerCase().includes(rolesSearchQuery.toLowerCase()),
+        permission.name.toLowerCase().includes(rolesSearchQuery.toLowerCase()) ||
+        permission.name_ar.toLowerCase().includes(rolesSearchQuery.toLowerCase()),
       ),
   );
 
@@ -194,13 +205,13 @@ export default function RolesPage() {
   // Handle edit role
   const handleEditRole = (role: Role) => {
     setSelectedRole(role);
-    setEditRoleFormData({ name: role.name });
+    setEditRoleFormData({ name: role.name_ar || role.name });
 
     // Convert permissions list to object format
     const permissionsObj: Record<string, boolean> = {};
     if (role.permissions_list) {
       role.permissions_list.forEach((permission) => {
-        permissionsObj[permission] = true;
+        permissionsObj[permission.name] = true;
       });
     }
     setEditSelectedRolePermissions(permissionsObj);
@@ -285,16 +296,28 @@ export default function RolesPage() {
   // Translate permission name
   const translatePermission = (permission: string): string => {
     const translations: Record<string, string> = {
-      "view employees": "عرض الموظفين",
-      "create employees": "إنشاء موظفين",
-      "edit employees": "تعديل الموظفين",
-      "delete employees": "حذف الموظفين",
-      "view roles": "عرض الأدوار",
-      "create roles": "إنشاء أدوار",
-      "edit roles": "تعديل الأدوار",
-      "delete roles": "حذف الأدوار",
-      "view permissions": "عرض الصلاحيات",
-      "assign permissions": "تعيين الصلاحيات",
+      "properties.view": "عرض العقارات",
+      "properties.create": "إنشاء عقارات",
+      "properties.edit": "تعديل العقارات",
+      "properties.delete": "حذف العقارات",
+      "projects.view": "عرض المشاريع",
+      "projects.create": "إنشاء مشاريع",
+      "projects.edit": "تعديل المشاريع",
+      "projects.delete": "حذف المشاريع",
+      "customers.view": "عرض العملاء",
+      "customers.create": "إنشاء عملاء",
+      "customers.edit": "تعديل العملاء",
+      "customers.delete": "حذف العملاء",
+      "employees.view": "عرض الموظفين",
+      "employees.create": "إنشاء موظفين",
+      "employees.edit": "تعديل الموظفين",
+      "employees.delete": "حذف الموظفين",
+      "roles.view": "عرض الأدوار",
+      "roles.create": "إنشاء أدوار",
+      "roles.edit": "تعديل الأدوار",
+      "roles.delete": "حذف الأدوار",
+      "permissions.view": "عرض الصلاحيات",
+      "permissions.assign": "تعيين الصلاحيات",
     };
     return translations[permission.toLowerCase()] || permission;
   };
@@ -487,7 +510,7 @@ export default function RolesPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Edit className="h-5 w-5" />
-                  تعديل الدور: {selectedRole?.name}
+                  تعديل الدور: {selectedRole?.name_ar || selectedRole?.name}
                 </CardTitle>
                 <CardDescription>
                   قم بتعديل اسم الدور أو الصلاحيات المخصصة له
@@ -575,7 +598,7 @@ export default function RolesPage() {
                                           htmlFor={`edit-permission-${permission.id}`}
                                           className="text-sm text-gray-700 cursor-pointer"
                                         >
-                                          {translatePermission(permission.name)}
+                                          {permission.name_ar || translatePermission(permission.name)}
                                         </Label>
                                       </div>
                                     ))
@@ -683,7 +706,7 @@ export default function RolesPage() {
                               </div>
                               <div>
                                 <h3 className="text-lg font-semibold text-black capitalize">
-                                  {role.name}
+                                  {role.name_ar || role.name}
                                 </h3>
                                 <p className="text-sm text-gray-600">
                                   {role.permissions_list?.length || 0} صلاحية
@@ -751,7 +774,7 @@ export default function RolesPage() {
                         <div className="p-4 sm:p-6">
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                             {role.permissions_list?.map(
-                              (permission: string, index: number) => (
+                              (permission: PermissionItem, index: number) => (
                                 <div
                                   key={index}
                                   className="group border border-gray-200 rounded-lg p-3 hover:border-black hover:shadow-md transition-all duration-200"
@@ -762,7 +785,7 @@ export default function RolesPage() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
-                                        {translatePermission(permission)}
+                                        {permission.name_ar || translatePermission(permission.name)}
                                       </h4>
                                     </div>
                                   </div>
@@ -817,7 +840,7 @@ export default function RolesPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Eye className="h-5 w-5" />
-                  تفاصيل الدور: {selectedRole.name}
+                  تفاصيل الدور: {selectedRole.name_ar || selectedRole.name}
                 </CardTitle>
                 <CardDescription>عرض تفاصيل الدور وصلاحياته</CardDescription>
               </CardHeader>
@@ -854,7 +877,7 @@ export default function RolesPage() {
                         </div>
                         <div>
                           <h3 className="text-2xl font-bold text-black capitalize">
-                            {roleDetails.name}
+                            {roleDetails.name_ar || roleDetails.name}
                           </h3>
                           <p className="text-gray-600">
                             معرف الدور: {roleDetails.id}
@@ -914,7 +937,7 @@ export default function RolesPage() {
                       roleDetails.permissions_list.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                           {roleDetails.permissions_list.map(
-                            (permission: string, index: number) => (
+                            (permission: PermissionItem, index: number) => (
                               <div
                                 key={index}
                                 className="group border border-gray-200 rounded-lg p-4 hover:border-black hover:shadow-md transition-all duration-200"
@@ -925,7 +948,7 @@ export default function RolesPage() {
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <h5 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
-                                      {translatePermission(permission)}
+                                      {permission.name_ar || translatePermission(permission.name)}
                                     </h5>
                                   </div>
                                 </div>
@@ -1046,7 +1069,7 @@ export default function RolesPage() {
                                       htmlFor={`role-permission-${groupName}-${index}`}
                                       className="text-gray-700 cursor-pointer flex-1"
                                     >
-                                      {translatePermission(permission.name)}
+                                      {permission.name_ar || translatePermission(permission.name)}
                                     </Label>
                                   </div>
                                 ),
@@ -1208,7 +1231,7 @@ export default function RolesPage() {
                                       htmlFor={`edit-role-permission-${groupName}-${index}`}
                                       className="text-gray-700 cursor-pointer flex-1"
                                     >
-                                      {translatePermission(permission.name)}
+                                      {permission.name_ar || translatePermission(permission.name)}
                                     </Label>
                                   </div>
                                 ),
@@ -1306,7 +1329,7 @@ export default function RolesPage() {
                   </div>
                   <div>
                     <h4 className="font-medium text-red-800">
-                      {roleToDelete.name}
+                      {roleToDelete.name_ar || roleToDelete.name}
                     </h4>
                     <p className="text-sm text-red-600">
                       معرف الدور: {roleToDelete.id}
