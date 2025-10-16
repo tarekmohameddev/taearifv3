@@ -1369,8 +1369,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       }
     });
 
-    console.log("🔍 tenantData WebsiteLayout:", websiteLayout?.metaTags?.pages);
-    console.log("🔍 editorStore WebsiteLayout:", editorWebsiteLayout);
 
     // إضافة الصفحة الرئيسية في النهاية مع البيانات الافتراضية
     const homepageExists = pages.some((page) => page.slug === "" || page.path === "");
