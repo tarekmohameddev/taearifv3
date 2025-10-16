@@ -107,7 +107,12 @@ export function RenewalDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-4xl max-h-[95vh] overflow-y-auto sm:w-full">
+      <DialogContent 
+        className="w-[95vw] max-w-4xl max-h-[95vh] overflow-y-auto sm:w-full"
+        style={{
+          pointerEvents: isOpen ? 'auto' : 'none'
+        }}
+      >
         <DialogHeader className="pb-4">
           <DialogTitle className="text-lg sm:text-xl font-bold text-gray-900">
             تجديد عقد الإيجار

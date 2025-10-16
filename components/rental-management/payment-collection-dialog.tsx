@@ -788,6 +788,9 @@ export function PaymentCollectionDialog() {
       <DialogContent
         className="w-[95vw] max-w-7xl max-h-[95vh] overflow-y-auto text-right p-2 sm:p-4 md:p-6"
         dir="rtl"
+        style={{
+          pointerEvents: isPaymentCollectionDialogOpen ? 'auto' : 'none'
+        }}
       >
         <DialogHeader className="space-y-2 sm:space-y-4 text-right">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
@@ -2285,6 +2288,9 @@ export function PaymentCollectionDialog() {
           <DialogContent
             className="w-[95vw] max-w-4xl max-h-[95vh] overflow-y-auto text-right p-2 sm:p-4 md:p-6"
             dir="rtl"
+            style={{
+              pointerEvents: isConfirmDialogOpen ? 'auto' : 'none'
+            }}
           >
             <DialogHeader className="space-y-2 sm:space-y-4 text-right">
               <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 text-right flex items-center gap-3">

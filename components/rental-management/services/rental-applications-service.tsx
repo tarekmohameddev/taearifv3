@@ -1167,6 +1167,9 @@ export function RentalApplicationsService({
         <DialogContent
           className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto text-right"
           dir="rtl"
+          style={{
+            pointerEvents: !!selectedRental ? 'auto' : 'none'
+          }}
         >
           <DialogHeader>
             <DialogTitle className="text-right" dir="rtl">
@@ -1450,7 +1453,12 @@ export function RentalApplicationsService({
           setRentalApplications({ isEditRentalDialogOpen: false })
         }
       >
-        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+        <DialogContent 
+          className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto"
+          style={{
+            pointerEvents: isEditRentalDialogOpen ? 'auto' : 'none'
+          }}
+        >
           <DialogHeader>
             <DialogTitle>تعديل طلب الإيجار</DialogTitle>
             <DialogDescription>تعديل تفاصيل طلب الإيجار</DialogDescription>
@@ -1480,7 +1488,12 @@ export function RentalApplicationsService({
           setRentalApplications({ isDeleteDialogOpen: false })
         }
       >
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent 
+          className="sm:max-w-[500px]"
+          style={{
+            pointerEvents: isDeleteDialogOpen ? 'auto' : 'none'
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="text-red-600 flex items-center gap-2">
               <AlertCircle className="h-5 w-5" />

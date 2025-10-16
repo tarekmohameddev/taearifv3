@@ -151,6 +151,9 @@ function OngoingRentalsDialog() {
       <DialogContent
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
+        style={{
+          pointerEvents: isOngoingRentalsDialogOpen ? 'auto' : 'none'
+        }}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -333,6 +336,9 @@ function ExpiringContractsDialog() {
       <DialogContent
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
+        style={{
+          pointerEvents: isExpiringContractsDialogOpen ? 'auto' : 'none'
+        }}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -746,6 +752,9 @@ function PaymentsDueDialog() {
       <DialogContent
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
+        style={{
+          pointerEvents: isPaymentsDueDialogOpen ? 'auto' : 'none'
+        }}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -961,6 +970,9 @@ function PaymentsOverdueDialog() {
       <DialogContent
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
+        style={{
+          pointerEvents: isPaymentsOverdueDialogOpen ? 'auto' : 'none'
+        }}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -1126,6 +1138,9 @@ function MaintenanceOpenDialog() {
       <DialogContent
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
+        style={{
+          pointerEvents: isMaintenanceOpenDialogOpen ? 'auto' : 'none'
+        }}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -1327,6 +1342,9 @@ function MaintenanceInProgressDialog() {
       <DialogContent
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
+        style={{
+          pointerEvents: isMaintenanceInProgressDialogOpen ? 'auto' : 'none'
+        }}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

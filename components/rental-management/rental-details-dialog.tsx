@@ -532,6 +532,9 @@ export function RentalDetailsDialog() {
         <DialogContent
           className="w-[95vw] max-w-6xl max-h-[95vh] overflow-y-auto text-right p-2 sm:p-4 md:p-6"
           dir="rtl"
+          style={{
+            pointerEvents: isRentalDetailsDialogOpen ? 'auto' : 'none'
+          }}
         >
           <DialogHeader className="space-y-2 sm:space-y-4 text-right">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
@@ -1428,7 +1431,12 @@ export function RentalDetailsDialog() {
         open={isAddExpenseDialogOpen}
         onOpenChange={setIsAddExpenseDialogOpen}
       >
-        <DialogContent className="max-w-md">
+        <DialogContent 
+          className="max-w-md"
+          style={{
+            pointerEvents: isAddExpenseDialogOpen ? 'auto' : 'none'
+          }}
+        >
           <DialogHeader>
             <DialogTitle>إضافة مصروف جديد</DialogTitle>
           </DialogHeader>
@@ -1591,7 +1599,12 @@ export function RentalDetailsDialog() {
         open={isDeleteExpenseDialogOpen}
         onOpenChange={setIsDeleteExpenseDialogOpen}
       >
-        <DialogContent className="max-w-md">
+        <DialogContent 
+          className="max-w-md"
+          style={{
+            pointerEvents: isDeleteExpenseDialogOpen ? 'auto' : 'none'
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="text-red-600">
               تأكيد حذف المصروف
