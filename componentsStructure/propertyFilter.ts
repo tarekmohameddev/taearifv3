@@ -43,10 +43,33 @@ export const propertyFilterStructure: ComponentStructure = {
               type: "text",
             },
             {
+              key: "propertyTypesSource",
+              label: "Property Types Source",
+              type: "select",
+              options: [
+                { label: "Static List", value: "static" },
+                { label: "Dynamic API", value: "dynamic" },
+              ],
+              defaultValue: "dynamic",
+            },
+            {
               key: "propertyTypes",
               label: "Property Types List",
               type: "array",
               itemType: "text",
+              condition: {
+                field: "content.propertyTypesSource",
+                value: "static",
+              },
+            },
+            {
+              key: "propertyTypesApiUrl",
+              label: "Property Types API URL",
+              type: "text",
+              condition: {
+                field: "content.propertyTypesSource",
+                value: "dynamic",
+              },
             },
           ],
         },
@@ -326,9 +349,32 @@ export const propertyFilterStructure: ComponentStructure = {
           type: "text",
         },
         {
+          key: "content.propertyTypesSource",
+          label: "Property Types Source",
+          type: "select",
+          options: [
+            { label: "Static List", value: "static" },
+            { label: "Dynamic API", value: "dynamic" },
+          ],
+          defaultValue: "dynamic",
+        },
+        {
           key: "content.propertyTypes",
           label: "Property Types List",
           type: "array",
+          condition: {
+            field: "content.propertyTypesSource",
+            value: "static",
+          },
+        },
+        {
+          key: "content.propertyTypesApiUrl",
+          label: "Property Types API URL",
+          type: "text",
+          condition: {
+            field: "content.propertyTypesSource",
+            value: "dynamic",
+          },
         },
       ],
     },

@@ -6,6 +6,8 @@ import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import PropertyDetail1 from "@/components/tenant/property/PropertyDetail1";
+import GA4Provider from "@/components/GA4Provider";
+import { trackPropertyView } from "@/lib/ga4-tracking";
 
 interface PropertyPageWrapperProps {
   tenantId: string | null;
@@ -35,9 +37,17 @@ export default function PropertyPageWrapper({
     }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
 
+  // Track property view
+  useEffect(() => {
+    if (tenantId && propertySlug) {
+      trackPropertyView(tenantId, propertySlug);
+    }
+  }, [tenantId, propertySlug]);
+
   return (
-    <I18nProvider>
-      <div className="min-h-screen flex flex-col" dir="rtl">
+    <GA4Provider tenantId={tenantId}>
+      <I18nProvider>
+        <div className="min-h-screen flex flex-col" dir="rtl">
         <StaticHeader1 />
         <main className="flex-1">
           <PropertyDetail1 propertySlug={propertySlug} />
@@ -45,5 +55,6 @@ export default function PropertyPageWrapper({
         <StaticFooter1 />
       </div>
     </I18nProvider>
+    </GA4Provider>
   );
 }

@@ -28,6 +28,7 @@ import {
   ContactCardsSkeleton1,
 } from "@/components/skeleton";
 import { I18nProvider } from "@/components/providers/I18nProvider";
+import GA4Provider from "@/components/GA4Provider";
 import { LanguageSwitcher } from "@/components/tenant/LanguageSwitcher";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
@@ -324,8 +325,9 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
   );
 
   return (
-    <I18nProvider>
-      <div className="min-h-screen flex flex-col" dir="rtl">
+    <GA4Provider tenantId={tenantId}>
+      <I18nProvider>
+        <div className="min-h-screen flex flex-col" dir="rtl">
         {/* Header from globalComponentsData */}
         <div className="relative">
           <StaticHeader1 />
@@ -384,5 +386,6 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
         <StaticFooter1 />
       </div>
     </I18nProvider>
+    </GA4Provider>
   );
 }

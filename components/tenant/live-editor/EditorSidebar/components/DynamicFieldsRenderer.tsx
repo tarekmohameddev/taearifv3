@@ -342,6 +342,14 @@ export function DynamicFieldsRenderer({
     const normalizedPath = normalizePath(path);
     const value = getValueByPath(normalizedPath);
 
+    // دعم الـ conditional rendering
+    if (def.condition) {
+      const conditionFieldValue = getValueByPath(def.condition.field);
+      if (conditionFieldValue !== def.condition.value) {
+        return null; // لا تعرض الحقل إذا لم تتحقق الشروط
+      }
+    }
+
     switch (def.type) {
       case "array": {
         return (

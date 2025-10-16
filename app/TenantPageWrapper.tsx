@@ -28,6 +28,7 @@ import {
   getCenterWrapperStyles,
 } from "@/lib/ComponentsInCenter";
 import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
+import GA4Provider from "@/components/GA4Provider";
 
 const loadComponent = (section: string, componentName: string) => {
   if (!componentName) return null;
@@ -274,8 +275,9 @@ export default function TenantPageWrapper({
   });
 
   return (
-    <I18nProvider>
-      <div className="min-h-screen flex flex-col" dir="rtl">
+    <GA4Provider tenantId={tenantId}>
+      <I18nProvider>
+        <div className="min-h-screen flex flex-col" dir="rtl">
         {/* Header with i18n support */}
         <div className="relative">
           <StaticHeader1 />
@@ -338,5 +340,6 @@ export default function TenantPageWrapper({
         <StaticFooter1 />
       </div>
     </I18nProvider>
+    </GA4Provider>
   );
 }

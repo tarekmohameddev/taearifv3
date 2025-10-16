@@ -19,6 +19,10 @@ export interface FieldDefinitionBase {
   options?: { label: string; value: string }[]; // for select
   defaultValue?: any; // default value for the field
   description?: string; // description for the field
+  condition?: {
+    field: string; // path to the field to check
+    value: any; // value that should match for the field to be shown
+  };
 }
 
 export interface ObjectFieldDefinition extends FieldDefinitionBase {

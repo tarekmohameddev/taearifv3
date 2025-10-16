@@ -6,6 +6,8 @@ import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import ProjectDetail from "@/components/project-detail";
+import GA4Provider from "@/components/GA4Provider";
+import { trackProjectView } from "@/lib/ga4-tracking";
 
 interface ProjectPageWrapperProps {
   tenantId: string | null;
@@ -35,9 +37,17 @@ export default function ProjectPageWrapper({
     }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
 
+  // Track project view
+  useEffect(() => {
+    if (tenantId && projectSlug) {
+      trackProjectView(tenantId, projectSlug);
+    }
+  }, [tenantId, projectSlug]);
+
   return (
-    <I18nProvider>
-      <div className="min-h-screen flex flex-col" dir="rtl">
+    <GA4Provider tenantId={tenantId}>
+      <I18nProvider>
+        <div className="min-h-screen flex flex-col" dir="rtl">
         <StaticHeader1 />
         <main className="flex-1">
           <ProjectDetail projectSlug={projectSlug} />
@@ -45,5 +55,6 @@ export default function ProjectPageWrapper({
         <StaticFooter1 />
       </div>
     </I18nProvider>
+    </GA4Provider>
   );
 }
