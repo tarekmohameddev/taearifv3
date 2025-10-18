@@ -151,13 +151,16 @@ export function DailyFollowupService() {
     getStatusText,
     goToPage,
     nextPage,
-    prevPage
+    prevPage,
+    validateCurrentPage
   } = useDailyFollowupStore();
 
   // جلب البيانات
   const fetchPaymentData = async () => {
     if (userData?.token) {
       await fetchDailyFollowupData();
+      // التحقق من صحة الصفحة الحالية بعد جلب البيانات
+      validateCurrentPage();
     }
   };
 

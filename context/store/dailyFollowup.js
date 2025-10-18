@@ -31,12 +31,12 @@ const useDailyFollowupStore = create((set, get) => ({
   setError: (error) => set({ error }),
   
   // تحديث الفلاتر
-  setSearchTerm: (searchTerm) => set({ searchTerm }),
-  setStatusFilter: (statusFilter) => set({ statusFilter }),
-  setBuildingFilter: (buildingFilter) => set({ buildingFilter }),
-  setDateFilter: (dateFilter) => set({ dateFilter }),
+  setSearchTerm: (searchTerm) => set({ searchTerm, currentPage: 1 }),
+  setStatusFilter: (statusFilter) => set({ statusFilter, currentPage: 1 }),
+  setBuildingFilter: (buildingFilter) => set({ buildingFilter, currentPage: 1 }),
+  setDateFilter: (dateFilter) => set({ dateFilter, currentPage: 1 }),
   setCurrentPage: (currentPage) => set({ currentPage }),
-  setItemsPerPage: (itemsPerPage) => set({ itemsPerPage }),
+  setItemsPerPage: (itemsPerPage) => set({ itemsPerPage, currentPage: 1 }),
   
   // جلب البيانات من API
   fetchDailyFollowupData: async (params = {}) => {
@@ -96,14 +96,19 @@ const useDailyFollowupStore = create((set, get) => ({
           }
         });
         
+        const newTotalPages = pagination.last_page || 0;
+        const currentState = get();
+        
         set({
           paymentData: data,
           summaryData: summary,
           buildings: Array.from(uniqueBuildings.values()),
           pagination: pagination,
           filters: filters,
-          totalPages: pagination.last_page || 0,
+          totalPages: newTotalPages,
           totalRecords: pagination.total || 0,
+          // إعادة تعيين currentPage إلى 1 إذا كان أكبر من totalPages الجديد
+          currentPage: currentState.currentPage > newTotalPages ? 1 : currentState.currentPage,
           loading: false
         });
         
@@ -131,7 +136,11 @@ const useDailyFollowupStore = create((set, get) => ({
   }),
   
   // Pagination Actions
-  goToPage: (page) => set({ currentPage: page }),
+  goToPage: (page) => {
+    const state = get();
+    const validPage = Math.max(1, Math.min(page, state.totalPages));
+    set({ currentPage: validPage });
+  },
   nextPage: () => {
     const state = get();
     if (state.currentPage < state.totalPages) {
@@ -142,6 +151,14 @@ const useDailyFollowupStore = create((set, get) => ({
     const state = get();
     if (state.currentPage > 1) {
       set({ currentPage: state.currentPage - 1 });
+    }
+  },
+  
+  // التحقق من صحة الصفحة الحالية
+  validateCurrentPage: () => {
+    const state = get();
+    if (state.currentPage > state.totalPages && state.totalPages > 0) {
+      set({ currentPage: 1 });
     }
   },
   
