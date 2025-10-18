@@ -1587,6 +1587,7 @@ function MaintenanceInProgressDialog() {
 // المكون الرئيسي
 export function RentalDashboardStats() {
   const {
+    dashboardData,
     counts,
     rentalAmounts,
     ongoingRentals,
@@ -1797,7 +1798,7 @@ export function RentalDashboardStats() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">
-                  عدد العقارات المؤجرة
+                  عدد العقارات المتاحة (قابلة للإيجار)
                 </p>
                 {loading ? (
                   <div className="flex items-center space-x-2">
@@ -1806,7 +1807,7 @@ export function RentalDashboardStats() {
                   </div>
                 ) : (
                   <p className="text-2xl font-bold text-gray-900">
-                    {rentalAmounts.rented_properties_count}
+                    {dashboardData?.property_stats?.available_properties }
                   </p>
                 )}
               </div>

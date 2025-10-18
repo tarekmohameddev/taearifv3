@@ -70,6 +70,34 @@ const ensureLeadingSlash = (pathLike: string): string => {
   return pathLike.startsWith("/") ? pathLike : `/${pathLike}`;
 };
 
+// Valid OpenGraph types according to the specification
+const VALID_OPENGRAPH_TYPES = [
+  "website",
+  "article", 
+  "book",
+  "profile",
+  "music.song",
+  "music.album",
+  "music.playlist",
+  "music.radio_station",
+  "video.movie",
+  "video.episode",
+  "video.tv_show",
+  "video.other"
+];
+
+const validateOpenGraphType = (type: string | null | undefined): string => {
+  if (!type || typeof type !== "string") return "website";
+  
+  // Check if it's a valid OpenGraph type
+  if (VALID_OPENGRAPH_TYPES.includes(type)) {
+    return type;
+  }
+  
+  // If it's not valid, return default
+  return "website";
+};
+
 const normalizeSlugToPath = (slug: string): string => {
   if (!slug || slug === "homepage" || slug === "home") return "/";
   return ensureLeadingSlash(slug);
@@ -140,7 +168,7 @@ export function getMetaForSlug(
       robots: (match["og:robots"] as string) || match.Robots || match.RobotsEn || "index, follow",
       url: (match["og:url"] as string | null) ?? null,
       image: (match["og:image"] as string | null) ?? null,
-      type: (match["og:type"] as string | null) ?? "website",
+      type: validateOpenGraphType(match["og:type"]),
       locale: (match["og:locale"] as string | null) ?? "ar",
       localeAlternate: (match["og:locale:alternate"] as string | null) ?? "en",
       siteName: (match["og:site_name"] as string | null) ?? "",
