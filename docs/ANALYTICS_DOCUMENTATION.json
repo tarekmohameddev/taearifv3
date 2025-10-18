@@ -1,0 +1,865 @@
+{
+  "title": "Analytics System Documentation",
+  "version": "1.0",
+  "lastUpdated": "December 2024",
+  "description": "Complete documentation for GA4 and GTM implementation in the multi-tenant website builder",
+  
+  "overview": {
+    "purpose": "Track user interactions across tenant websites with custom dimensions and event tracking",
+    "components": [
+      "GA4Provider - React wrapper for GA4 initialization",
+      "GTMProvider - Google Tag Manager integration", 
+      "ga4-tracking.ts - Core GA4 tracking functions",
+      "gtm.ts - GTM utility functions",
+      "middleware.ts - Subdomain detection and tenant routing"
+    ]
+  },
+
+  "ga4": {
+    "description": "Google Analytics 4 implementation for multi-tenant tracking",
+    "configuration": {
+      "environmentVariables": {
+        "NEXT_PUBLIC_GA4_ID": "Primary GA4 measurement ID (G-WTN83NMVW1)",
+        "NEXT_PUBLIC_GA4_LEGACY_ID": "Legacy GA4 measurement ID (G-RVFKM2F9ZN)",
+        "NEXT_PUBLIC_PRODUCTION_DOMAIN": "Production domain for tenant subdomains (mandhoor.com)",
+        "NEXT_PUBLIC_API_URL": "Local development API URL (http://localhost:3000)"
+      },
+      "dataStream": {
+        "websiteUrl": "https://mandhoor.com",
+        "streamName": "Multi-Tenant Websites",
+        "enhancedMeasurement": "Enabled for all options"
+      },
+      "customDimensions": {
+        "dimension1": {
+          "name": "Tenant ID",
+          "scope": "Event",
+          "parameter": "tenant_id"
+        }
+      }
+    },
+    "tracking": {
+      "trackedDomains": [
+        "tenant1.mandhoor.com",
+        "tenant2.mandhoor.com", 
+        "localhost (development)"
+      ],
+      "excludedDomains": [
+        "www.mandhoor.com",
+        "mandhoor.com"
+      ],
+      "events": {
+        "pageView": {
+          "description": "Automatic page view tracking",
+          "parameters": ["tenant_id", "page_path", "page_title"]
+        },
+        "propertyView": {
+          "description": "Real estate property page views",
+          "parameters": ["tenant_id", "property_slug", "page_path"]
+        },
+        "projectView": {
+          "description": "Real estate project page views", 
+          "parameters": ["tenant_id", "project_slug", "page_path"]
+        },
+        "contactForm": {
+          "description": "Contact form submissions",
+          "parameters": ["tenant_id", "page_path"]
+        },
+        "search": {
+          "description": "User search queries",
+          "parameters": ["tenant_id", "search_term", "page_path"]
+        }
+      }
+    },
+    "implementation": {
+      "files": {
+        "GA4Provider.tsx": "React component wrapper for GA4 initialization",
+        "ga4-tracking.ts": "Core tracking functions and utilities"
+      },
+      "usage": {
+        "basic": "<GA4Provider tenantId={tenantId}><YourComponent /></GA4Provider>",
+        "automatic": "Automatic initialization and page view tracking",
+        "manual": "Manual event tracking with trackPageView(), trackPropertyView(), etc."
+      }
+    },
+    "ga4TrackingFile": {
+      "file": "lib/ga4-tracking.ts",
+      "description": "Core GA4 tracking implementation that sends tenant data to GA4",
+      "tenantDataFlow": {
+        "description": "How tenant data is sent to GA4",
+        "process": [
+          "1. Domain detection and tenant ID extraction",
+          "2. GA4 initialization with tenant context",
+          "3. Event tracking with tenant data",
+          "4. Data transmission to GA4"
+        ]
+      },
+      "domainDetection": {
+        "function": "shouldTrackDomain(domain: string)",
+        "purpose": "Determines if a domain should be tracked by GA4",
+        "logic": {
+          "excludedDomains": [
+            "www.mandhoor.com",
+            "mandhoor.com"
+          ],
+          "trackedDomains": [
+            "*.mandhoor.com (tenant subdomains)",
+            "localhost (development)"
+          ],
+          "environmentBased": {
+            "production": "Tracks domains ending with .mandhoor.com",
+            "development": "Tracks localhost domains"
+          }
+        },
+        "consoleLogs": [
+          "🔍 GA4: Checking domain: [domain]",
+          "✅ GA4: Tenant subdomain (production): [domain]",
+          "❌ GA4: Main domain excluded: [domain]"
+        ]
+      },
+      "tenantIdExtraction": {
+        "function": "getTenantIdFromDomain(domain: string)",
+        "purpose": "Extracts tenant ID from subdomain",
+        "examples": {
+          "production": "hey.mandhoor.com → hey",
+          "development": "hey.localhost:3000 → hey"
+        },
+        "logic": {
+          "production": "domain.replace('.mandhoor.com', '')",
+          "development": "domain.split('.').first part"
+        },
+        "consoleLogs": [
+          "🔍 GA4: Getting tenant ID from domain: [domain]",
+          "✅ GA4: Tenant ID (production): [tenantId]",
+          "❌ GA4: No tenant ID found"
+        ]
+      },
+      "ga4Initialization": {
+        "function": "initializeGA4()",
+        "purpose": "Initializes GA4 with tenant-specific configuration",
+        "process": [
+          "1. Check domain tracking eligibility",
+          "2. Initialize dataLayer and gtag function",
+          "3. Load GA4 script asynchronously",
+          "4. Configure GA4 with tenant settings"
+        ],
+        "configuration": {
+          "customDimensions": {
+            "dimension1": "tenant_id"
+          },
+          "cookieDomain": ".mandhoor.com",
+          "transportType": "beacon"
+        },
+        "consoleLogs": [
+          "🚀 GA4: Starting initialization with ID: [ga4Id]",
+          "✅ GA4: Script loaded successfully",
+          "✅ GA4: Configuration complete"
+        ]
+      },
+      "tenantDataTransmission": {
+        "description": "How tenant data is sent to GA4",
+        "methods": {
+          "trackPageView": {
+            "function": "trackPageView(tenantId: string, pagePath: string)",
+            "purpose": "Sends page view event with tenant data to GA4",
+            "dataSent": {
+              "event": "page_view",
+              "tenant_id": "Extracted from subdomain",
+              "page_path": "Current page path",
+              "page_title": "Document title"
+            },
+            "ga4Event": "window.gtag('event', 'page_view', { tenant_id, page_path, page_title })"
+          },
+          "trackPropertyView": {
+            "function": "trackPropertyView(tenantId: string, propertySlug: string)",
+            "purpose": "Sends property view event with tenant data to GA4",
+            "dataSent": {
+              "event": "property_view",
+              "tenant_id": "Extracted from subdomain",
+              "property_slug": "Property identifier",
+              "page_path": "/property/[slug]"
+            },
+            "ga4Event": "window.gtag('event', 'property_view', { tenant_id, property_slug, page_path })"
+          },
+          "trackProjectView": {
+            "function": "trackProjectView(tenantId: string, projectSlug: string)",
+            "purpose": "Sends project view event with tenant data to GA4",
+            "dataSent": {
+              "event": "project_view",
+              "tenant_id": "Extracted from subdomain",
+              "project_slug": "Project identifier",
+              "page_path": "/project/[slug]"
+            },
+            "ga4Event": "window.gtag('event', 'project_view', { tenant_id, project_slug, page_path })"
+          },
+          "trackContactForm": {
+            "function": "trackContactForm(tenantId: string)",
+            "purpose": "Sends contact form submission event with tenant data to GA4",
+            "dataSent": {
+              "event": "contact_form_submit",
+              "tenant_id": "Extracted from subdomain",
+              "page_path": "Current page path"
+            },
+            "ga4Event": "window.gtag('event', 'contact_form_submit', { tenant_id, page_path })"
+          },
+          "trackSearch": {
+            "function": "trackSearch(tenantId: string, searchTerm: string)",
+            "purpose": "Sends search event with tenant data to GA4",
+            "dataSent": {
+              "event": "search",
+              "tenant_id": "Extracted from subdomain",
+              "search_term": "User search query",
+              "page_path": "Current page path"
+            },
+            "ga4Event": "window.gtag('event', 'search', { tenant_id, search_term, page_path })"
+          }
+        }
+      },
+      "tenantContextManagement": {
+        "function": "setTenantContext(tenantId: string, username: string)",
+        "purpose": "Sets tenant context in window object for global access",
+        "dataStored": {
+          "window.tenantContext": {
+            "username": "Tenant username",
+            "tenantId": "Tenant identifier"
+          }
+        }
+      },
+      "errorHandling": {
+        "ga4Readiness": {
+          "function": "isGA4Ready()",
+          "purpose": "Checks if GA4 is ready before sending events",
+          "checks": [
+            "window.gtag exists",
+            "window.dataLayer exists",
+            "gtag is a function"
+          ]
+        },
+        "retryMechanism": {
+          "description": "Automatic retry if GA4 is not ready",
+          "process": "setTimeout(() => trackEvent(), 100)",
+          "maxRetries": "Infinite (until GA4 is ready)"
+        },
+        "consoleLogs": [
+          "⚠️ GA4: Not ready yet, retrying in 100ms",
+          "🚀 GA4: Tracking [event] with tenant data"
+        ]
+      },
+      "dataFlowExample": {
+        "scenario": "User visits hey.mandhoor.com/ar/property/123",
+        "steps": [
+          "1. shouldTrackDomain('hey.mandhoor.com') → true",
+          "2. getTenantIdFromDomain('hey.mandhoor.com') → 'hey'",
+          "3. initializeGA4() → Loads GA4 script with tenant config",
+          "4. trackPropertyView('hey', '123') → Sends to GA4",
+          "5. GA4 receives: { event: 'property_view', tenant_id: 'hey', property_slug: '123' }"
+        ],
+        "ga4DataReceived": {
+          "event": "property_view",
+          "tenant_id": "hey",
+          "property_slug": "123",
+          "page_path": "/property/123",
+          "custom_dimension_1": "hey"
+        }
+      },
+      "realWorldExample": {
+        "scenario": "User visits http://vcvkkokk.localhost:3000/ar/property/shk-gdyd-llaygar-1",
+        "description": "Real console output when visiting a tenant property page in development",
+        "consoleOutput": [
+          "🚀 GA4: Initializing...",
+          "🔍 GA4: Checking domain: vcvkkokk.localhost",
+          "🔍 GA4: Production domain: mandhoor.com",
+          "🚀 GA4: Starting initialization with ID: G-WTN83NMVW1",
+          "🏠 GA4: Tracking property view {",
+          "    \"tenantId\": \"vcvkkokk\",",
+          "    \"propertySlug\": \"shk-gdyd-llaygar-1\"",
+          "}",
+          "📊 GA4: Tracking page view {",
+          "    \"tenantId\": \"vcvkkokk\",",
+          "    \"pathname\": \"/ar/property/shk-gdyd-llaygar-1\",",
+          "    \"domain\": \"vcvkkokk.localhost\"",
+          "}",
+          "✅ GA4: Script loaded successfully",
+          "✅ GA4: Configuration complete",
+          "🚀 GA4: Tracking page view {",
+          "    \"tenantId\": \"vcvkkokk\",",
+          "    \"pagePath\": \"/ar/property/shk-gdyd-llaygar-1\"",
+          "}"
+        ],
+        "analysis": {
+          "domainDetection": {
+            "domain": "vcvkkokk.localhost",
+            "tenantId": "vcvkkokk",
+            "environment": "development",
+            "trackingStatus": "enabled"
+          },
+          "ga4Initialization": {
+            "ga4Id": "G-WTN83NMVW1",
+            "scriptLoading": "successful",
+            "configuration": "complete"
+          },
+          "eventTracking": {
+            "propertyView": {
+              "tenantId": "vcvkkokk",
+              "propertySlug": "shk-gdyd-llaygar-1",
+              "event": "property_view"
+            },
+            "pageView": {
+              "tenantId": "vcvkkokk",
+              "pathname": "/ar/property/shk-gdyd-llaygar-1",
+              "event": "page_view"
+            }
+          },
+          "dataSentToGA4": {
+            "propertyViewEvent": {
+              "event": "property_view",
+              "tenant_id": "vcvkkokk",
+              "property_slug": "shk-gdyd-llaygar-1",
+              "page_path": "/property/shk-gdyd-llaygar-1"
+            },
+            "pageViewEvent": {
+              "event": "page_view",
+              "tenant_id": "vcvkkokk",
+              "page_path": "/ar/property/shk-gdyd-llaygar-1",
+              "page_title": "Property title"
+            }
+          }
+        },
+        "flowExplanation": {
+          "step1": "GA4Provider detects tenantId from subdomain (vcvkkokk)",
+          "step2": "Domain validation passes (localhost in development)",
+          "step3": "GA4 initialization starts with tenant-specific ID",
+          "step4": "Property view tracking fires immediately",
+          "step5": "Page view tracking fires with tenant context",
+          "step6": "GA4 script loads successfully",
+          "step7": "GA4 configuration completes with tenant settings",
+          "step8": "Final page view tracking with complete GA4 setup"
+        },
+        "tenantDataTransmission": {
+          "tenantId": "vcvkkokk",
+          "source": "Extracted from subdomain vcvkkokk.localhost",
+          "transmissionMethod": "window.gtag() function calls",
+          "dataFormat": "JSON objects with tenant_id parameter",
+          "ga4Receives": "Both property_view and page_view events with tenant context"
+        }
+      }
+    }
+  },
+
+  "gtm": {
+    "description": "Google Tag Manager integration for advanced tracking",
+    "configuration": {
+      "containerId": "GTM-KBL37C9T",
+      "dataLayer": "Automatic initialization",
+      "events": "Custom event tracking"
+    },
+    "tracking": {
+      "events": {
+        "pageView": "Automatic page view tracking on route changes",
+        "customEvents": "Manual event tracking with trackEvent()",
+        "conversions": "Conversion tracking with trackConversion()",
+        "purchases": "E-commerce tracking with trackPurchase()",
+        "userInteractions": "Button clicks, form submissions, navigation"
+      }
+    },
+    "implementation": {
+      "files": {
+        "GTMProvider.tsx": "React component for GTM initialization",
+        "gtm.ts": "Utility functions for event tracking"
+      },
+      "usage": {
+        "basic": "<GTMProvider><YourComponent /></GTMProvider>",
+        "events": "trackEvent('event_name', { parameter: 'value' })",
+        "pageViews": "Automatic tracking on route changes"
+      }
+    }
+  },
+
+  "middleware": {
+    "description": "Subdomain detection and tenant routing middleware",
+    "configuration": {
+      "environmentVariables": {
+        "NEXT_PUBLIC_API_URL": "Local development API URL",
+        "NEXT_PUBLIC_PRODUCTION_DOMAIN": "Production domain for tenants",
+        "NODE_ENV": "Environment mode (development/production)"
+      },
+      "reservedWords": [
+        "www", "api", "admin", "app", "mail", "ftp", "blog", "shop", "store",
+        "dashboard", "live-editor", "auth", "login", "register"
+      ]
+    },
+    "functionality": {
+      "tenantDetection": {
+        "development": "tenant1.localhost:3000 → tenant1",
+        "production": "tenant1.mandhoor.com → tenant1"
+      },
+      "domainFiltering": {
+        "tracked": ["*.mandhoor.com (tenant subdomains)"],
+        "excluded": ["www.mandhoor.com", "mandhoor.com"]
+      },
+      "headers": {
+        "x-tenant-id": "Tenant identifier",
+        "x-locale": "Language locale",
+        "x-pathname": "Current page path"
+      }
+    }
+  },
+
+  "pages": {
+    "description": "Pages that use analytics tracking in the app directory",
+    "summary": {
+      "totalPages": 16,
+      "pagesWithGA4": 4,
+      "pagesWithoutGA4": 12,
+      "ga4Coverage": "25% of pages use GA4 tracking"
+    },
+    "ga4Pages": {
+      "description": "Pages that use GA4Provider for tenant website tracking",
+      "totalCount": 4,
+      "pages": [
+        {
+          "file": "app/page.tsx",
+          "path": "/",
+          "component": "HomePageWrapper",
+          "analytics": "GA4Provider with tenant tracking",
+          "description": "Homepage for tenant websites - serves as main landing page for tenant subdomains",
+          "trackingEvents": ["page_view", "tenant_context"]
+        },
+        {
+          "file": "app/[slug]/page.tsx",
+          "path": "/[slug]",
+          "component": "TenantPageWrapper",
+          "analytics": "GA4Provider with custom page tracking",
+          "description": "Custom tenant pages with dynamic content - serves any custom page for tenant websites",
+          "trackingEvents": ["page_view", "tenant_context", "custom_page_view"]
+        },
+        {
+          "file": "app/property/[id]/page.tsx",
+          "path": "/property/[id]",
+          "component": "PropertyPageWrapper",
+          "analytics": "GA4Provider with property view tracking",
+          "description": "Property detail pages with real estate tracking - tracks property views and interactions",
+          "trackingEvents": ["page_view", "property_view", "tenant_context"]
+        },
+        {
+          "file": "app/project/[id]/page.tsx",
+          "path": "/project/[id]",
+          "component": "ProjectPageWrapper",
+          "analytics": "GA4Provider with project view tracking",
+          "description": "Project detail pages with development tracking - tracks project views and interactions",
+          "trackingEvents": ["page_view", "project_view", "tenant_context"]
+        }
+      ]
+    },
+    "gtmPages": {
+      "description": "Pages that use GTMProvider for admin and public page tracking",
+      "totalCount": 12,
+      "implementation": {
+        "globalGTM": {
+          "file": "app/layout.tsx",
+          "description": "Global GTM implementation for allowed pages",
+          "allowedPages": [
+            "/dashboard",
+            "/live-editor", 
+            "/login",
+            "/register",
+            "/",
+            "/about-us",
+            "/solutions",
+            "/updates",
+            "/landing"
+          ],
+          "condition": "Only loads when no tenantId (not tenant subdomains)"
+        },
+        "dashboardGTM": {
+          "file": "app/dashboard/layout.tsx",
+          "description": "GTMProvider wrapper for all dashboard pages",
+          "containerId": "GTM-KBL37C9T",
+          "coverage": "All dashboard pages"
+        }
+      },
+      "categories": {
+        "dashboardPages": {
+          "description": "All dashboard pages with GTM tracking",
+          "totalCount": 59,
+          "pages": [
+            {
+              "path": "/dashboard",
+              "analytics": "GTMProvider (dashboard layout)",
+              "description": "Main dashboard page"
+            },
+            {
+              "path": "/dashboard/analytics",
+              "analytics": "GTMProvider (dashboard layout)",
+              "description": "Analytics dashboard"
+            },
+            {
+              "path": "/dashboard/properties",
+              "analytics": "GTMProvider (dashboard layout)",
+              "description": "Properties management"
+            },
+            {
+              "path": "/dashboard/projects",
+              "analytics": "GTMProvider (dashboard layout)",
+              "description": "Projects management"
+            },
+            {
+              "path": "/dashboard/crm",
+              "analytics": "GTMProvider (dashboard layout)",
+              "description": "CRM system"
+            },
+            {
+              "path": "/dashboard/marketing",
+              "analytics": "GTMProvider (dashboard layout)",
+              "description": "Marketing tools"
+            },
+            {
+              "path": "/dashboard/settings",
+              "analytics": "GTMProvider (dashboard layout)",
+              "description": "Settings page"
+            }
+          ],
+          "note": "All 59 dashboard pages use GTMProvider through dashboard layout"
+        },
+        "publicPages": {
+          "description": "Public pages with GTM tracking (when no tenantId)",
+          "pages": [
+            {
+              "file": "app/about-us/page.tsx",
+              "path": "/about-us",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "About us page with basic analytics"
+            },
+            {
+              "file": "app/landing/page.tsx",
+              "path": "/landing",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "Landing page with basic analytics"
+            },
+            {
+              "file": "app/updates/page.jsx",
+              "path": "/updates",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "Updates page with content analytics"
+            },
+            {
+              "file": "app/onboarding/page.tsx",
+              "path": "/onboarding",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "Onboarding page with user guidance analytics"
+            }
+          ]
+        },
+        "authPages": {
+          "description": "Authentication pages with GTM tracking",
+          "pages": [
+            {
+              "file": "app/login/page.tsx",
+              "path": "/login",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "Login page with user authentication events"
+            },
+            {
+              "file": "app/register/page.tsx",
+              "path": "/register",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "Registration page with user signup events"
+            },
+            {
+              "file": "app/forgot-password/page.tsx",
+              "path": "/forgot-password",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "Password reset page with recovery events"
+            }
+          ]
+        },
+        "oauthPages": {
+          "description": "OAuth integration pages",
+          "pages": [
+            {
+              "file": "app/oauth/token/success/page.jsx",
+              "path": "/oauth/token/success",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "OAuth token success page"
+            },
+            {
+              "file": "app/oauth/social/extra-info/page.jsx",
+              "path": "/oauth/social/extra-info",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "Social authentication extra info page"
+            }
+          ]
+        },
+        "requestPages": {
+          "description": "Property request pages",
+          "pages": [
+            {
+              "file": "app/property-requests/create/page.tsx",
+              "path": "/property-requests/create",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "Property request creation page"
+            }
+          ]
+        },
+        "liveEditorPages": {
+          "description": "Live editor pages",
+          "pages": [
+            {
+              "path": "/live-editor",
+              "analytics": "Global GTM (app/layout.tsx)",
+              "description": "Live editor with user interaction tracking"
+            }
+          ]
+        }
+      }
+    },
+    "nonAnalyticsPages": {
+      "description": "Pages that do NOT use any analytics tracking",
+      "totalCount": 0,
+      "note": "All pages in the app directory use either GA4 or GTM tracking"
+    },
+    "analyticsStrategy": {
+      "description": "Analytics strategy explanation with clear separation between GA4 and GTM",
+      "separation": {
+        "description": "CRITICAL: GA4 and GTM are completely separate and serve different purposes",
+        "ga4Scope": {
+          "description": "GA4 ONLY serves tenant subdomains (customer-facing websites)",
+          "examples": [
+            "hey.mandhoor.com/ar/",
+            "tenant1.mandhoor.com/ar/property/123",
+            "tenant2.mandhoor.com/ar/project/456"
+          ],
+          "condition": "Only when tenantId exists (detected by middleware)",
+          "excludes": [
+            "www.mandhoor.com (main domain)",
+            "mandhoor.com (main domain)",
+            "Any admin pages",
+            "Any public pages without tenantId"
+          ]
+        },
+        "gtmScope": {
+          "description": "GTM ONLY serves admin and public pages (NO tenant subdomains)",
+          "examples": [
+            "www.mandhoor.com/dashboard",
+            "www.mandhoor.com/login",
+            "www.mandhoor.com/about-us"
+          ],
+          "condition": "Only when NO tenantId exists (no subdomain detected)",
+          "excludes": [
+            "hey.mandhoor.com (tenant subdomain)",
+            "tenant1.mandhoor.com (tenant subdomain)",
+            "Any tenant subdomain"
+          ]
+        }
+      },
+      "ga4Usage": {
+        "purpose": "GA4 is used EXCLUSIVELY for customer-facing tenant websites",
+        "target": "End users visiting tenant subdomains (hey.mandhoor.com, tenant1.mandhoor.com, etc.)",
+        "tracking": "Property views, project views, tenant-specific interactions",
+        "implementation": "GA4Provider wrapper in tenant page components",
+        "condition": "tenantId must exist (subdomain detected by middleware)"
+      },
+      "gtmUsage": {
+        "purpose": "GTM is used EXCLUSIVELY for admin and public pages",
+        "target": "Internal users, admin dashboard, public pages (NO tenant subdomains)",
+        "tracking": "User authentication, admin interactions, public page views",
+        "implementation": "GTMProvider in app/layout.tsx and app/dashboard/layout.tsx",
+        "condition": "NO tenantId (no subdomain detected by middleware)"
+      },
+      "coverage": {
+        "tenantWebsites": "100% GA4 coverage for tenant subdomains (NO GTM)",
+        "adminInterface": "100% GTM coverage for admin pages (NO GA4)",
+        "publicPages": "GTM coverage for public pages when no tenantId (NO GA4)",
+        "mainDomain": "GTM coverage for www.mandhoor.com (NO GA4)"
+      },
+      "criticalNotes": {
+        "separation": "GA4 and GTM NEVER work together on the same page",
+        "tenantSubdomains": "Tenant subdomains (hey.mandhoor.com) use ONLY GA4, NEVER GTM",
+        "adminPages": "Admin pages use ONLY GTM, NEVER GA4",
+        "publicPages": "Public pages use ONLY GTM when no tenantId, NEVER GA4",
+        "mainDomain": "Main domain (www.mandhoor.com) uses ONLY GTM, NEVER GA4"
+      }
+    },
+    "tenantSubdomainClarification": {
+      "description": "CRITICAL CLARIFICATION: GTM has NO relationship with tenant subdomains",
+      "tenantSubdomains": {
+        "description": "Tenant subdomains like hey.mandhoor.com use ONLY GA4, NEVER GTM",
+        "examples": [
+          "hey.mandhoor.com/ar/",
+          "tenant1.mandhoor.com/ar/property/123",
+          "tenant2.mandhoor.com/ar/project/456",
+          "samy.mandhoor.com/ar/"
+        ],
+        "analytics": "GA4Provider ONLY",
+        "gtmStatus": "NO GTM tracking",
+        "reason": "These are customer-facing websites, not admin pages"
+      },
+      "mainDomain": {
+        "description": "Main domain www.mandhoor.com uses ONLY GTM, NEVER GA4",
+        "examples": [
+          "www.mandhoor.com/dashboard",
+          "www.mandhoor.com/login",
+          "www.mandhoor.com/about-us"
+        ],
+        "analytics": "GTMProvider ONLY",
+        "ga4Status": "NO GA4 tracking",
+        "reason": "These are admin and public pages, not tenant websites"
+      },
+      "separationLogic": {
+        "middlewareDetection": "Middleware detects tenantId from subdomain",
+        "tenantIdExists": "If tenantId exists → Use GA4Provider (NO GTM)",
+        "noTenantId": "If no tenantId → Use GTMProvider (NO GA4)",
+        "neverBoth": "GA4 and GTM NEVER work together on the same page"
+      },
+      "implementationDetails": {
+        "tenantPages": {
+          "files": [
+            "app/page.tsx → HomePageWrapper → GA4Provider",
+            "app/[slug]/page.tsx → TenantPageWrapper → GA4Provider",
+            "app/property/[id]/page.tsx → PropertyPageWrapper → GA4Provider",
+            "app/project/[id]/page.tsx → ProjectPageWrapper → GA4Provider"
+          ],
+          "analytics": "GA4Provider with tenant tracking",
+          "gtmStatus": "NO GTMProvider"
+        },
+        "adminPages": {
+          "files": [
+            "app/layout.tsx → GTMProvider (global)",
+            "app/dashboard/layout.tsx → GTMProvider (dashboard)"
+          ],
+          "analytics": "GTMProvider with admin tracking",
+          "ga4Status": "NO GA4Provider"
+        }
+      }
+    }
+  },
+
+  "setup": {
+    "environmentVariables": {
+      "required": [
+        "NODE_ENV=development",
+        "NEXT_PUBLIC_API_URL=http://localhost:3000",
+        "NEXT_PUBLIC_PRODUCTION_DOMAIN=mandhoor.com",
+        "NEXT_PUBLIC_GA4_ID=G-WTN83NMVW1",
+        "NEXT_PUBLIC_GA4_LEGACY_ID=G-RVFKM2F9ZN",
+        "NEXT_PUBLIC_Backend_URL=http://localhost:3001"
+      ]
+    },
+    "installation": {
+      "steps": [
+        "1. Create .env.local file with environment variables",
+        "2. Configure GA4 property with custom dimensions",
+        "3. Set up GTM container with appropriate tags",
+        "4. Test tracking in development environment",
+        "5. Deploy to production with proper domain configuration"
+      ]
+    }
+  },
+
+  "testing": {
+    "development": {
+      "urls": [
+        "http://tenant1.localhost:3000/ar/",
+        "http://tenant2.localhost:3000/ar/"
+      ],
+      "expected": "GA4 tracking with tenant context"
+    },
+    "production": {
+      "urls": [
+        "https://tenant1.mandhoor.com/ar/",
+        "https://tenant2.mandhoor.com/ar/"
+      ],
+      "expected": "GA4 tracking with tenant context"
+    },
+    "excluded": {
+      "urls": [
+        "https://www.mandhoor.com/",
+        "https://mandhoor.com/"
+      ],
+      "expected": "No GA4 tracking"
+    }
+  },
+
+  "debugging": {
+    "consoleMessages": {
+      "success": [
+        "🚀 GA4: Starting initialization with ID: G-WTN83NMVW1",
+        "✅ GA4: Script loaded successfully",
+        "📊 GA4: Tracking page view",
+        "🔍 Middleware: Valid tenant ID: tenant1"
+      ],
+      "excluded": [
+        "🚫 GA4: Skipping tracking for domain: www.mandhoor.com",
+        "❌ Middleware: Reserved word: www"
+      ]
+    },
+    "networkRequests": {
+      "expected": [
+        "https://www.googletagmanager.com/gtag/js?id=G-WTN83NMVW1",
+        "https://www.google-analytics.com/g/collect"
+      ]
+    },
+    "verification": {
+      "ga4Realtime": "Check Real-time → Overview in GA4 dashboard",
+      "consoleLogs": "Look for initialization and tracking messages",
+      "networkTab": "Verify GA4 script requests are successful"
+    }
+  },
+
+  "troubleshooting": {
+    "commonIssues": {
+      "ga4NotTracking": {
+        "causes": ["Ad blockers", "Browser privacy settings", "Wrong GA4 ID"],
+        "solutions": ["Disable ad blocker", "Try incognito mode", "Check GA4 configuration"]
+      },
+      "tenantNotDetected": {
+        "causes": ["Wrong subdomain format", "Reserved word used", "Environment variables"],
+        "solutions": ["Check subdomain format", "Avoid reserved words", "Verify environment variables"]
+      },
+      "dataNotAppearing": {
+        "causes": ["GA4 configuration", "Data processing delay", "Filter settings"],
+        "solutions": ["Wait 24-48 hours", "Check GA4 settings", "Verify custom dimensions"]
+      }
+    }
+  },
+
+  "performance": {
+    "optimization": {
+      "scriptLoading": "Async loading to prevent page blocking",
+      "eventBatching": "Efficient event processing",
+      "caching": "GA4 configuration caching"
+    },
+    "monitoring": {
+      "realTime": "GA4 Real-time reports",
+      "customReports": "Tenant-specific analytics",
+      "alerts": "Tracking issue notifications"
+    }
+  },
+
+  "security": {
+    "dataPrivacy": {
+      "personalData": "No personal data collection",
+      "tenantId": "Business analytics only",
+      "gdpr": "GDPR compliant implementation"
+    },
+    "accessControl": {
+      "ga4Access": "Restrict to authorized users",
+      "authentication": "Proper user authentication",
+      "monitoring": "Access log monitoring"
+    }
+  },
+
+  "maintenance": {
+    "regularTasks": [
+      "Monitor GA4 data consistency",
+      "Update tracking dependencies", 
+      "Check performance metrics",
+      "Review error logs"
+    ],
+    "updates": [
+      "GA4 ID changes",
+      "New event tracking",
+      "Custom dimension updates",
+      "Performance optimization"
+    ]
+  }
+}
