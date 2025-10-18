@@ -46,15 +46,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination2";
-import {
   Calendar,
   Clock,
   DollarSign,
@@ -145,6 +136,8 @@ export function DailyFollowupService() {
     dateFilter,
     currentPage,
     itemsPerPage,
+    totalPages,
+    totalRecords,
     setSearchTerm,
     setStatusFilter,
     setBuildingFilter,
@@ -155,7 +148,10 @@ export function DailyFollowupService() {
     formatCurrency,
     formatDate,
     getStatusColor,
-    getStatusText
+    getStatusText,
+    goToPage,
+    nextPage,
+    prevPage
   } = useDailyFollowupStore();
 
   // جلب البيانات
@@ -172,8 +168,74 @@ export function DailyFollowupService() {
   // فلترة البيانات
   const filteredData = getFilteredData();
 
-  // حساب إجمالي الصفحات من API response
-  const totalPages = Math.ceil(paymentData.length / itemsPerPage);
+  // Pagination Component
+  const PaginationComponent = () => {
+    if (totalPages <= 1) return null;
+
+    const getPageNumbers = () => {
+      const pages = [];
+      const maxVisible = 5;
+      const start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+      const end = Math.min(totalPages, start + maxVisible - 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      return pages;
+    };
+
+    return (
+      <div className="flex items-center justify-between mt-6" dir="rtl">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-700">
+            صفحة {currentPage} من {totalPages}
+          </span>
+          <span className="text-sm text-gray-500">
+            ({totalRecords} سجل)
+          </span>
+        </div>
+        
+        <div className="flex items-center gap-1">
+          {/* Previous Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={prevPage}
+            disabled={currentPage === 1}
+            className="flex items-center gap-1"
+          >
+            <ArrowRight className="h-4 w-4" />
+            السابق
+          </Button>
+
+          {/* Page Numbers */}
+          {getPageNumbers().map((page) => (
+            <Button
+              key={page}
+              variant={currentPage === page ? "default" : "outline"}
+              size="sm"
+              onClick={() => goToPage(page)}
+              className="min-w-[40px]"
+            >
+              {page}
+            </Button>
+          ))}
+
+          {/* Next Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={nextPage}
+            disabled={currentPage === totalPages}
+            className="flex items-center gap-1"
+          >
+            التالي
+            <ArrowRight className="h-4 w-4 rotate-180" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   if (error) {
     return (
@@ -404,38 +466,7 @@ export function DailyFollowupService() {
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-              
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
+      <PaginationComponent />
 
       {/* Dialogs will be added here */}
     </div>

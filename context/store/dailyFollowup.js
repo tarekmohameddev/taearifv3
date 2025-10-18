@@ -23,6 +23,8 @@ const useDailyFollowupStore = create((set, get) => ({
   // Pagination
   currentPage: 1,
   itemsPerPage: 10,
+  totalPages: 0,
+  totalRecords: 0,
   
   // Actions
   setLoading: (loading) => set({ loading }),
@@ -100,6 +102,8 @@ const useDailyFollowupStore = create((set, get) => ({
           buildings: Array.from(uniqueBuildings.values()),
           pagination: pagination,
           filters: filters,
+          totalPages: pagination.last_page || 0,
+          totalRecords: pagination.total || 0,
           loading: false
         });
         
@@ -125,6 +129,21 @@ const useDailyFollowupStore = create((set, get) => ({
     dateFilter: 'today',
     currentPage: 1
   }),
+  
+  // Pagination Actions
+  goToPage: (page) => set({ currentPage: page }),
+  nextPage: () => {
+    const state = get();
+    if (state.currentPage < state.totalPages) {
+      set({ currentPage: state.currentPage + 1 });
+    }
+  },
+  prevPage: () => {
+    const state = get();
+    if (state.currentPage > 1) {
+      set({ currentPage: state.currentPage - 1 });
+    }
+  },
   
   // تصفية البيانات محلياً
   getFilteredData: () => {
