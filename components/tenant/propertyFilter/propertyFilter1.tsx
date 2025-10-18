@@ -40,7 +40,7 @@ interface PropertyFilterProps {
   noResultsText?: string;
 }
 
-export default function PropertyFilter({ 
+export default function PropertyFilter({
   className,
   propertyTypesSource = "static",
   propertyTypes: staticPropertyTypes = defaultPropertyTypes,
@@ -70,31 +70,39 @@ export default function PropertyFilter({
   const [error, setError] = useState<string | null>(null);
 
   // استخراج البيانات من content إذا كانت متاحة
-  const actualPropertyTypesSource = content?.propertyTypesSource || propertyTypesSource;
-  const actualPropertyTypesApiUrl = content?.propertyTypesApiUrl || propertyTypesApiUrl;
+  const actualPropertyTypesSource =
+    content?.propertyTypesSource || propertyTypesSource;
+  const actualPropertyTypesApiUrl =
+    content?.propertyTypesApiUrl || propertyTypesApiUrl;
   const actualTenantId = content?.tenantId || tenantId || currentTenantId;
-  const actualStaticPropertyTypes = content?.propertyTypes || staticPropertyTypes;
-
+  const actualStaticPropertyTypes =
+    content?.propertyTypes || staticPropertyTypes;
 
   // دالة لجلب أنواع العقارات من API أو استخدام القائمة الثابتة
   const fetchPropertyTypes = async () => {
-
     setLoading(true);
     setError(null);
 
     try {
-      if (actualPropertyTypesSource === "dynamic" && actualPropertyTypesApiUrl && actualTenantId) {
+      if (
+        actualPropertyTypesSource === "dynamic" &&
+        actualPropertyTypesApiUrl &&
+        actualTenantId
+      ) {
         // جلب البيانات من API
-        const apiUrl = actualPropertyTypesApiUrl.replace(/\{[^}]*\}/g, actualTenantId);
-        
+        const apiUrl = actualPropertyTypesApiUrl.replace(
+          /\{[^}]*\}/g,
+          actualTenantId,
+        );
+
         const response = await fetch(apiUrl);
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.success && Array.isArray(data.data)) {
           const types = data.data.map((item: PropertyType) => item.name);
           setPropertyTypes(types);
@@ -102,7 +110,10 @@ export default function PropertyFilter({
         } else {
           throw new Error("Invalid response format");
         }
-      } else if (actualPropertyTypesSource === "static" && actualStaticPropertyTypes?.length > 0) {
+      } else if (
+        actualPropertyTypesSource === "static" &&
+        actualStaticPropertyTypes?.length > 0
+      ) {
         // استخدام القائمة الثابتة
         setPropertyTypes(actualStaticPropertyTypes);
         setFilteredTypes(actualStaticPropertyTypes);
@@ -113,7 +124,9 @@ export default function PropertyFilter({
       }
     } catch (err) {
       console.error("Error fetching property types:", err);
-      setError(err instanceof Error ? err.message : "حدث خطأ في جلب أنواع العقارات");
+      setError(
+        err instanceof Error ? err.message : "حدث خطأ في جلب أنواع العقارات",
+      );
       // في حالة الخطأ، استخدم القائمة الافتراضية
       setPropertyTypes(defaultPropertyTypes);
       setFilteredTypes(defaultPropertyTypes);
@@ -129,7 +142,12 @@ export default function PropertyFilter({
       return;
     }
     fetchPropertyTypes();
-  }, [actualPropertyTypesSource, actualPropertyTypesApiUrl, actualTenantId, tenantLoading]);
+  }, [
+    actualPropertyTypesSource,
+    actualPropertyTypesApiUrl,
+    actualTenantId,
+    tenantLoading,
+  ]);
 
   // تحديث البيانات عند تغيير currentTenantId
   useEffect(() => {
@@ -147,7 +165,10 @@ export default function PropertyFilter({
 
   // تحديث البيانات عند تغيير staticPropertyTypes
   useEffect(() => {
-    if (actualPropertyTypesSource === "static" && actualStaticPropertyTypes?.length > 0) {
+    if (
+      actualPropertyTypesSource === "static" &&
+      actualStaticPropertyTypes?.length > 0
+    ) {
       setPropertyTypes(actualStaticPropertyTypes);
       setFilteredTypes(actualStaticPropertyTypes);
     }

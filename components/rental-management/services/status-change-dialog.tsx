@@ -86,10 +86,10 @@ export function StatusChangeDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
+      <DialogContent
         className="max-w-md"
         style={{
-          pointerEvents: isOpen ? 'auto' : 'none'
+          pointerEvents: isOpen ? "auto" : "none",
         }}
       >
         <DialogHeader>

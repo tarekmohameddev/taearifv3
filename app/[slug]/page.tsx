@@ -74,9 +74,13 @@ export async function generateMetadata({
               url: String(meta.og.image),
               alt: meta.og.imageAlt || undefined,
               width:
-                meta.og.imageWidth != null ? Number(meta.og.imageWidth) : undefined,
+                meta.og.imageWidth != null
+                  ? Number(meta.og.imageWidth)
+                  : undefined,
               height:
-                meta.og.imageHeight != null ? Number(meta.og.imageHeight) : undefined,
+                meta.og.imageHeight != null
+                  ? Number(meta.og.imageHeight)
+                  : undefined,
               type: meta.og.imageType || undefined,
             },
           ]

@@ -56,7 +56,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     (state) => state.filteredProperties,
   );
   const storeLoading = usePropertiesStore((state) => state.loading);
-  
+
   // Filter state from store
   const search = usePropertiesStore((state) => state.search);
   const propertyType = usePropertiesStore((state) => state.propertyType);
@@ -168,7 +168,11 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     let convertedUrl = url.replace("{{tenantID}}", tenantId);
 
     // Add purpose parameter if not already in URL
-    if (purpose && !convertedUrl.includes("purpose=") && !convertedUrl.includes("/projects")) {
+    if (
+      purpose &&
+      !convertedUrl.includes("purpose=") &&
+      !convertedUrl.includes("/projects")
+    ) {
       const separator = convertedUrl.includes("?") ? "&" : "?";
       convertedUrl += `${separator}purpose=${purpose}`;
     }
@@ -315,8 +319,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     const useApiData = mergedData.dataSource?.enabled !== false;
 
     // Always use API when enabled and apiUrl is configured
-    const shouldUseOwnApi =
-      useApiData && currentTenantId && apiUrl;
+    const shouldUseOwnApi = useApiData && currentTenantId && apiUrl;
 
     if (shouldUseOwnApi) {
       // Clear existing data before fetching new data
@@ -338,15 +341,15 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   // Use API data if enabled, otherwise use static data
   const useApiData = mergedData.dataSource?.enabled !== false;
-  
+
   // Always prioritize store data (filteredProperties) over API data
   // This ensures that when API returns empty results, we show empty state
-  const properties = useApiData && currentTenantId
-    ? filteredProperties  // Always use store data when API is enabled
-    : useApiData
-      ? apiProperties
-      : mergedData.items || mergedData.properties || [];
-
+  const properties =
+    useApiData && currentTenantId
+      ? filteredProperties // Always use store data when API is enabled
+      : useApiData
+        ? apiProperties
+        : mergedData.items || mergedData.properties || [];
 
   // Check if component should be visible
   if (!mergedData.visible) {

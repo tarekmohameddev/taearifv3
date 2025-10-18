@@ -49,15 +49,15 @@ export default function ProjectPageWrapper({
     <GTMProvider>
       <GA4Provider tenantId={tenantId}>
         <I18nProvider>
-        <div className="min-h-screen flex flex-col" dir="rtl">
-        <StaticHeader1 />
-        <main className="flex-1">
-          <ProjectDetail projectSlug={projectSlug} />
-        </main>
-        <StaticFooter1 />
-      </div>
-    </I18nProvider>
-    </GA4Provider>
+          <div className="min-h-screen flex flex-col" dir="rtl">
+            <StaticHeader1 />
+            <main className="flex-1">
+              <ProjectDetail projectSlug={projectSlug} />
+            </main>
+            <StaticFooter1 />
+          </div>
+        </I18nProvider>
+      </GA4Provider>
     </GTMProvider>
   );
 }

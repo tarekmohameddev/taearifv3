@@ -220,9 +220,7 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
           const url = `/v1/tenant-website/${tenantId}/properties?${params.toString()}`;
 
-
           const response = await axiosInstance.get(url);
-
 
           const result: PropertiesResponse = response.data;
 
@@ -283,9 +281,7 @@ export const usePropertiesStore = create<PropertiesStore>()(
           // جلب جميع العقارات من الـ API الجديد
           const url = `/v1/tenant-website/${tenantId}/properties`;
 
-
           const response = await axiosInstance.get(url);
-
 
           const result: PropertiesResponse = response.data;
 
@@ -390,7 +386,6 @@ export const usePropertiesStore = create<PropertiesStore>()(
             });
           }
         }
-
 
         set({
           filteredProperties: filtered,

@@ -92,12 +92,10 @@ export default function TenantPageWrapper({
   tenantId,
   slug,
 }: TenantPageWrapperProps) {
-
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const setTenantId = useTenantStore((s) => s.setTenantId);
-
 
   // Set tenantId in store when component mounts
   useEffect(() => {
@@ -114,7 +112,6 @@ export default function TenantPageWrapper({
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
     if (tenantId && !tenantData && !loadingTenantData) {
-
       // محاولة تحميل البيانات من cache أولاً
       const loadData = async () => {
         try {
@@ -123,8 +120,7 @@ export default function TenantPageWrapper({
             // إذا كانت البيانات موجودة في cache، استخدمها مباشرة
             return;
           }
-        } catch (error) {
-        }
+        } catch (error) {}
 
         // إذا لم تكن البيانات في cache، جلبها من API
         fetchTenantData(tenantId);
@@ -279,70 +275,72 @@ export default function TenantPageWrapper({
     <GTMProvider>
       <GA4Provider tenantId={tenantId}>
         <I18nProvider>
-        <div className="min-h-screen flex flex-col" dir="rtl">
-        {/* Header with i18n support */}
-        <div className="relative">
-          <StaticHeader1 />
-          {/* لا اريد ازالة هذا  , فقط اريده ككومنت */}
-          {/* <div className="absolute top-4 right-4 z-50"> 
+          <div className="min-h-screen flex flex-col" dir="rtl">
+            {/* Header with i18n support */}
+            <div className="relative">
+              <StaticHeader1 />
+              {/* لا اريد ازالة هذا  , فقط اريده ككومنت */}
+              {/* <div className="absolute top-4 right-4 z-50"> 
             <LanguageDropdown />
           </div> */}
-        </div>
+            </div>
 
-        {/* Page Content */}
-        <main className="flex-1">
-          {Array.isArray(filteredComponentsList) &&
-          filteredComponentsList.length > 0 ? (
-            filteredComponentsList.map((comp: any) => {
-              const Cmp = loadComponent(slug as string, comp.componentName);
-              if (!Cmp) {
-                return <Fragment key={comp.id} />;
-              }
-
-              // التحقق من ما إذا كان المكون يحتاج للتوسيط
-              const centerWrapperClasses = getCenterWrapperClasses(
-                comp.componentName,
-              );
-              const centerWrapperStyles = getCenterWrapperStyles(
-                comp.componentName,
-              );
-
-              const componentElement = (
-                <Suspense
-                  key={comp.id}
-                  fallback={
-                    <SkeletonLoader componentName={comp.componentName} />
+            {/* Page Content */}
+            <main className="flex-1">
+              {Array.isArray(filteredComponentsList) &&
+              filteredComponentsList.length > 0 ? (
+                filteredComponentsList.map((comp: any) => {
+                  const Cmp = loadComponent(slug as string, comp.componentName);
+                  if (!Cmp) {
+                    return <Fragment key={comp.id} />;
                   }
-                >
-                  <Cmp {...(comp.data as any)} useStore variant={comp.id} />
-                </Suspense>
-              );
 
-              // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات والستايل المناسب
-              if (shouldCenterComponent(comp.componentName)) {
-                return (
-                  <div
-                    key={comp.id}
-                    className={centerWrapperClasses}
-                    style={centerWrapperStyles as React.CSSProperties}
-                  >
-                    {componentElement}
-                  </div>
-                );
-              }
+                  // التحقق من ما إذا كان المكون يحتاج للتوسيط
+                  const centerWrapperClasses = getCenterWrapperClasses(
+                    comp.componentName,
+                  );
+                  const centerWrapperStyles = getCenterWrapperStyles(
+                    comp.componentName,
+                  );
 
-              return componentElement;
-            })
-          ) : (
-            <div className="p-8 text-center text-gray-500">No components</div>
-          )}
-        </main>
+                  const componentElement = (
+                    <Suspense
+                      key={comp.id}
+                      fallback={
+                        <SkeletonLoader componentName={comp.componentName} />
+                      }
+                    >
+                      <Cmp {...(comp.data as any)} useStore variant={comp.id} />
+                    </Suspense>
+                  );
 
-        {/* Footer with i18n support */}
-        <StaticFooter1 />
-      </div>
-    </I18nProvider>
-    </GA4Provider>
+                  // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات والستايل المناسب
+                  if (shouldCenterComponent(comp.componentName)) {
+                    return (
+                      <div
+                        key={comp.id}
+                        className={centerWrapperClasses}
+                        style={centerWrapperStyles as React.CSSProperties}
+                      >
+                        {componentElement}
+                      </div>
+                    );
+                  }
+
+                  return componentElement;
+                })
+              ) : (
+                <div className="p-8 text-center text-gray-500">
+                  No components
+                </div>
+              )}
+            </main>
+
+            {/* Footer with i18n support */}
+            <StaticFooter1 />
+          </div>
+        </I18nProvider>
+      </GA4Provider>
     </GTMProvider>
   );
 }

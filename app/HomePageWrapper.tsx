@@ -329,66 +329,68 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
     <GTMProvider>
       <GA4Provider tenantId={tenantId}>
         <I18nProvider>
-        <div className="min-h-screen flex flex-col" dir="rtl">
-        {/* Header from globalComponentsData */}
-        <div className="relative">
-          <StaticHeader1 />
-        </div>
+          <div className="min-h-screen flex flex-col" dir="rtl">
+            {/* Header from globalComponentsData */}
+            <div className="relative">
+              <StaticHeader1 />
+            </div>
 
-        {/* Page Content */}
-        <main className="flex-1">
-          {Array.isArray(filteredComponentsList) &&
-          filteredComponentsList.length > 0 ? (
-            filteredComponentsList.map((comp: any) => {
-              const Cmp = loadComponent("homepage", comp.componentName);
-              if (!Cmp) {
-                return <Fragment key={comp.id} />;
-              }
-
-              // التحقق من ما إذا كان المكون يحتاج للتوسيط
-              const centerWrapperClasses = getCenterWrapperClasses(
-                comp.componentName,
-              );
-              const centerWrapperStyles = getCenterWrapperStyles(
-                comp.componentName,
-              );
-
-              const componentElement = (
-                <Suspense
-                  key={comp.id}
-                  fallback={
-                    <SkeletonLoader componentName={comp.componentName} />
+            {/* Page Content */}
+            <main className="flex-1">
+              {Array.isArray(filteredComponentsList) &&
+              filteredComponentsList.length > 0 ? (
+                filteredComponentsList.map((comp: any) => {
+                  const Cmp = loadComponent("homepage", comp.componentName);
+                  if (!Cmp) {
+                    return <Fragment key={comp.id} />;
                   }
-                >
-                  <Cmp {...(comp.data as any)} useStore variant={comp.id} />
-                </Suspense>
-              );
 
-              // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات والستايل المناسب
-              if (shouldCenterComponent(comp.componentName)) {
-                return (
-                  <div
-                    key={comp.id}
-                    className={centerWrapperClasses}
-                    style={centerWrapperStyles as React.CSSProperties}
-                  >
-                    {componentElement}
-                  </div>
-                );
-              }
+                  // التحقق من ما إذا كان المكون يحتاج للتوسيط
+                  const centerWrapperClasses = getCenterWrapperClasses(
+                    comp.componentName,
+                  );
+                  const centerWrapperStyles = getCenterWrapperStyles(
+                    comp.componentName,
+                  );
 
-              return componentElement;
-            })
-          ) : (
-            <div className="p-8 text-center text-gray-500">No components</div>
-          )}
-        </main>
+                  const componentElement = (
+                    <Suspense
+                      key={comp.id}
+                      fallback={
+                        <SkeletonLoader componentName={comp.componentName} />
+                      }
+                    >
+                      <Cmp {...(comp.data as any)} useStore variant={comp.id} />
+                    </Suspense>
+                  );
 
-        {/* Footer from globalComponentsData */}
-        <StaticFooter1 />
-      </div>
-    </I18nProvider>
-    </GA4Provider>
+                  // إذا كان المكون يحتاج للتوسيط، لفه في div مع الكلاسات والستايل المناسب
+                  if (shouldCenterComponent(comp.componentName)) {
+                    return (
+                      <div
+                        key={comp.id}
+                        className={centerWrapperClasses}
+                        style={centerWrapperStyles as React.CSSProperties}
+                      >
+                        {componentElement}
+                      </div>
+                    );
+                  }
+
+                  return componentElement;
+                })
+              ) : (
+                <div className="p-8 text-center text-gray-500">
+                  No components
+                </div>
+              )}
+            </main>
+
+            {/* Footer from globalComponentsData */}
+            <StaticFooter1 />
+          </div>
+        </I18nProvider>
+      </GA4Provider>
     </GTMProvider>
   );
 }

@@ -30,7 +30,8 @@ function removeLocaleFromPathname(pathname: string) {
 
 function getTenantIdFromHost(host: string): string | null {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+  const productionDomain =
+    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
   const isDevelopment = process.env.NODE_ENV === "development";
 
   // Extract domain from API URL for local development
@@ -51,28 +52,34 @@ function getTenantIdFromHost(host: string): string | null {
     "live-editor",
     "auth",
     "login",
-    "register"
+    "register",
   ];
 
-  console.log('🔍 Middleware: Checking host:', host);
-  console.log('🔍 Middleware: Local domain:', localDomain);
-  console.log('🔍 Middleware: Production domain:', productionDomain);
-  console.log('🔍 Middleware: Is development:', isDevelopment);
-  console.log('🔍 Middleware: NODE_ENV:', process.env.NODE_ENV);
+  console.log("🔍 Middleware: Checking host:", host);
+  console.log("🔍 Middleware: Local domain:", localDomain);
+  console.log("🔍 Middleware: Production domain:", productionDomain);
+  console.log("🔍 Middleware: Is development:", isDevelopment);
+  console.log("🔍 Middleware: NODE_ENV:", process.env.NODE_ENV);
 
   // For localhost development: tenant1.localhost:3000 -> tenant1
   if (isDevelopment && host.includes(localDomain)) {
     const parts = host.split(".");
     if (parts.length > 1 && parts[0] !== localDomain) {
       const potentialTenantId = parts[0];
-      console.log('🔍 Middleware: Potential tenant ID (local):', potentialTenantId);
-      
+      console.log(
+        "🔍 Middleware: Potential tenant ID (local):",
+        potentialTenantId,
+      );
+
       // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
       if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
-        console.log('✅ Middleware: Valid tenant ID (local):', potentialTenantId);
+        console.log(
+          "✅ Middleware: Valid tenant ID (local):",
+          potentialTenantId,
+        );
         return potentialTenantId;
       } else {
-        console.log('❌ Middleware: Reserved word (local):', potentialTenantId);
+        console.log("❌ Middleware: Reserved word (local):", potentialTenantId);
       }
     }
   }
@@ -82,19 +89,28 @@ function getTenantIdFromHost(host: string): string | null {
     const parts = host.split(".");
     if (parts.length > 2) {
       const potentialTenantId = parts[0];
-      console.log('🔍 Middleware: Potential tenant ID (production):', potentialTenantId);
-      
+      console.log(
+        "🔍 Middleware: Potential tenant ID (production):",
+        potentialTenantId,
+      );
+
       // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
       if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
-        console.log('✅ Middleware: Valid tenant ID (production):', potentialTenantId);
+        console.log(
+          "✅ Middleware: Valid tenant ID (production):",
+          potentialTenantId,
+        );
         return potentialTenantId;
       } else {
-        console.log('❌ Middleware: Reserved word (production):', potentialTenantId);
+        console.log(
+          "❌ Middleware: Reserved word (production):",
+          potentialTenantId,
+        );
       }
     }
   }
 
-  console.log('❌ Middleware: No valid tenant ID found');
+  console.log("❌ Middleware: No valid tenant ID found");
   return null;
 }
 
@@ -240,10 +256,10 @@ export function middleware(request: NextRequest) {
 
   // Set tenantId header if found
   if (tenantId) {
-    console.log('✅ Middleware: Setting tenant ID header:', tenantId);
+    console.log("✅ Middleware: Setting tenant ID header:", tenantId);
     response.headers.set("x-tenant-id", tenantId);
   } else {
-    console.log('❌ Middleware: No tenant ID found for host:', host);
+    console.log("❌ Middleware: No tenant ID found for host:", host);
   }
 
   return response;

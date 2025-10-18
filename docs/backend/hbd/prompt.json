@@ -8,13 +8,13 @@
     "status": true,
     "data": {
       "range_days": 7,
-    "counts": {
-      "ongoing_rentals": 26,
-      "expiring_contracts_next_7d": 0,
-      "payments_due_next_7d": 0,
-      "payments_overdue": 0,
-      "maintenance_open": 2,
-      "maintenance_in_progress": 0
+      "counts": {
+        "ongoing_rentals": 26,
+        "expiring_contracts_next_7d": 0,
+        "payments_due_next_7d": 0,
+        "payments_overdue": 0,
+        "maintenance_open": 2,
+        "maintenance_in_progress": 0
       },
       "property_stats": {},
       "contract_stats": {},
@@ -51,9 +51,9 @@
         "maintenance_in_progress": 0
       },
       "new_counts_structure": {
-      "ongoing_rentals": 26,
-      "expiring_contracts_next_7d": 0,
-      "payments_due_next_7d": 0,
+        "ongoing_rentals": 26,
+        "expiring_contracts_next_7d": 0,
+        "payments_due_next_7d": 0,
         "payments_due_next_month": 0,
         "payments_overdue": 0,
         "maintenance_open": 2,
@@ -138,7 +138,7 @@
               "status": "active"
             },
             "payment_details": {
-              "amount": 5000.00,
+              "amount": 5000.0,
               "due_date": "2025-11-15",
               "currency": "SAR",
               "payment_type": "monthly_rent",
@@ -181,12 +181,12 @@
               "start_date": "2024-10-15",
               "end_date": "2025-10-15",
               "status": "active",
-              "monthly_rent": 5000.00,
-              "security_deposit": 10000.00,
+              "monthly_rent": 5000.0,
+              "security_deposit": 10000.0,
               "contract_duration_months": 12
             },
             "rental_details": {
-              "rental_amount": 5000.00,
+              "rental_amount": 5000.0,
               "currency": "SAR",
               "payment_frequency": "monthly",
               "next_payment_due": "2025-10-15"
@@ -227,12 +227,12 @@
               "start_date": "2024-11-15",
               "end_date": "2025-11-15",
               "status": "active",
-              "monthly_rent": 6000.00,
-              "security_deposit": 12000.00,
+              "monthly_rent": 6000.0,
+              "security_deposit": 12000.0,
               "contract_duration_months": 12
             },
             "rental_details": {
-              "rental_amount": 6000.00,
+              "rental_amount": 6000.0,
               "currency": "SAR",
               "payment_frequency": "monthly",
               "next_payment_due": "2025-11-15"
@@ -280,7 +280,7 @@
               "status": "active"
             },
             "payment_details": {
-              "amount": 7000.00,
+              "amount": 7000.0,
               "due_date": "2025-10-15",
               "currency": "SAR",
               "payment_type": "monthly_rent",
@@ -333,20 +333,20 @@
                 "start_date": "2024-09-01",
                 "end_date": "2025-09-01",
                 "status": "active",
-                "monthly_rent": 8000.00,
-                "security_deposit": 16000.00
+                "monthly_rent": 8000.0,
+                "security_deposit": 16000.0
               },
               "payment_details": {
-                "amount": 8000.00,
+                "amount": 8000.0,
                 "due_date": "2025-09-01",
                 "currency": "SAR",
                 "payment_type": "monthly_rent",
                 "payment_status": "overdue",
                 "days_overdue": 45,
-                "overdue_penalty": 400.00
+                "overdue_penalty": 400.0
               },
               "rental_details": {
-                "rental_amount": 8000.00,
+                "rental_amount": 8000.0,
                 "currency": "SAR",
                 "payment_frequency": "monthly"
               }
@@ -374,20 +374,20 @@
                 "start_date": "2024-10-01",
                 "end_date": "2025-10-01",
                 "status": "active",
-                "monthly_rent": 12000.00,
-                "security_deposit": 24000.00
+                "monthly_rent": 12000.0,
+                "security_deposit": 24000.0
               },
               "payment_details": {
-                "amount": 12000.00,
+                "amount": 12000.0,
                 "due_date": "2025-10-01",
                 "currency": "SAR",
                 "payment_type": "monthly_rent",
                 "payment_status": "overdue",
                 "days_overdue": 15,
-                "overdue_penalty": 600.00
+                "overdue_penalty": 600.0
               },
               "rental_details": {
-                "rental_amount": 12000.00,
+                "rental_amount": 12000.0,
                 "currency": "SAR",
                 "payment_frequency": "monthly"
               }
@@ -423,9 +423,9 @@
         "payments_due_next_7d": 0,
         "payments_due_current_month": 0,
         "payments_due_next_month": 0,
-      "payments_overdue": 0,
-      "maintenance_open": 2,
-      "maintenance_in_progress": 0
+        "payments_overdue": 0,
+        "maintenance_open": 2,
+        "maintenance_in_progress": 0
       },
       "payments_due_next_month_details": {
         "month": "November 2025",

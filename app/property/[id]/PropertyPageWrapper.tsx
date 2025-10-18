@@ -25,20 +25,21 @@ export default function PropertyPageWrapper({
   const setTenantId = useTenantStore((s) => s.setTenantId);
 
   // Add immediate console log to verify component is loading
-  console.log('🏠 PropertyPageWrapper: Component loaded!', {
+  console.log("🏠 PropertyPageWrapper: Component loaded!", {
     tenantId,
     propertySlug,
-    hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
-    timestamp: new Date().toISOString()
+    hostname:
+      typeof window !== "undefined" ? window.location.hostname : "server",
+    timestamp: new Date().toISOString(),
   });
 
   // Set tenantId in store when component mounts
   useEffect(() => {
-    console.log('🏠 PropertyPageWrapper: Setting tenant ID', { tenantId });
+    console.log("🏠 PropertyPageWrapper: Setting tenant ID", { tenantId });
     if (tenantId) {
       setTenantId(tenantId);
     } else {
-      console.log('❌ PropertyPageWrapper: No tenant ID provided!');
+      console.log("❌ PropertyPageWrapper: No tenant ID provided!");
     }
   }, [tenantId, setTenantId]);
 
@@ -56,21 +57,23 @@ export default function PropertyPageWrapper({
     }
   }, [tenantId, propertySlug]);
 
-  console.log('🏠 PropertyPageWrapper: Rendering with GA4Provider', { tenantId });
+  console.log("🏠 PropertyPageWrapper: Rendering with GA4Provider", {
+    tenantId,
+  });
 
   return (
     <GTMProvider>
       <GA4Provider tenantId={tenantId}>
         <I18nProvider>
-        <div className="min-h-screen flex flex-col" dir="rtl">
-        <StaticHeader1 />
-        <main className="flex-1">
-          <PropertyDetail1 propertySlug={propertySlug} />
-        </main>
-        <StaticFooter1 />
-      </div>
-    </I18nProvider>
-    </GA4Provider>
+          <div className="min-h-screen flex flex-col" dir="rtl">
+            <StaticHeader1 />
+            <main className="flex-1">
+              <PropertyDetail1 propertySlug={propertySlug} />
+            </main>
+            <StaticFooter1 />
+          </div>
+        </I18nProvider>
+      </GA4Provider>
     </GTMProvider>
   );
 }

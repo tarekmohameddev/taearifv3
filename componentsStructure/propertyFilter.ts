@@ -61,7 +61,7 @@ export const propertyFilterStructure: ComponentStructure = {
                   key: "value",
                   label: "Property Type",
                   type: "text",
-                }
+                },
               ],
               condition: {
                 field: "content.propertyTypesSource",
@@ -72,7 +72,8 @@ export const propertyFilterStructure: ComponentStructure = {
               key: "propertyTypesApiUrl",
               label: "Property Types API URL",
               type: "text",
-              placeholder: "https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct",
+              placeholder:
+                "https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct",
               condition: {
                 field: "content.propertyTypesSource",
                 value: "dynamic",
@@ -388,7 +389,8 @@ export const propertyFilterStructure: ComponentStructure = {
           key: "content.propertyTypesApiUrl",
           label: "Property Types API URL",
           type: "text",
-          placeholder: "https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct",
+          placeholder:
+            "https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct",
           condition: {
             field: "content.propertyTypesSource",
             value: "dynamic",

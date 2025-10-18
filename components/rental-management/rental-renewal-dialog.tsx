@@ -121,10 +121,10 @@ export function RenewalDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
+      <DialogContent
         className="w-[95vw] max-w-4xl max-h-[95vh] overflow-y-auto sm:w-full"
         style={{
-          pointerEvents: isOpen ? 'auto' : 'none'
+          pointerEvents: isOpen ? "auto" : "none",
         }}
       >
         <DialogHeader className="pb-4">

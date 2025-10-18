@@ -7,7 +7,7 @@ export default function PropertyFilterExample() {
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Property Filter Examples</h2>
-      
+
       {/* مثال 1: استخدام API */}
       <div className="mb-8">
         <h3 className="text-lg font-semibold mb-2">Dynamic API Example</h3>
@@ -28,13 +28,7 @@ export default function PropertyFilterExample() {
         <h3 className="text-lg font-semibold mb-2">Static List Example</h3>
         <PropertyFilter
           propertyTypesSource="static"
-          propertyTypes={[
-            "فيلا",
-            "شقة",
-            "أرض",
-            "مزرعة",
-            "محل تجاري"
-          ]}
+          propertyTypes={["فيلا", "شقة", "أرض", "مزرعة", "محل تجاري"]}
           searchPlaceholder="ابحث عن المنطقة"
           propertyTypePlaceholder="نوع العقار"
           pricePlaceholder="السعر"

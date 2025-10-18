@@ -802,7 +802,7 @@ export function PaymentCollectionDialog() {
         className="w-[95vw] max-w-7xl max-h-[95vh] overflow-y-auto text-right p-2 sm:p-4 md:p-6"
         dir="rtl"
         style={{
-          pointerEvents: isPaymentCollectionDialogOpen ? 'auto' : 'none'
+          pointerEvents: isPaymentCollectionDialogOpen ? "auto" : "none",
         }}
       >
         <DialogHeader className="space-y-2 sm:space-y-4 text-right">
@@ -2302,7 +2302,7 @@ export function PaymentCollectionDialog() {
             className="w-[95vw] max-w-4xl max-h-[95vh] overflow-y-auto text-right p-2 sm:p-4 md:p-6"
             dir="rtl"
             style={{
-              pointerEvents: isConfirmDialogOpen ? 'auto' : 'none'
+              pointerEvents: isConfirmDialogOpen ? "auto" : "none",
             }}
           >
             <DialogHeader className="space-y-2 sm:space-y-4 text-right">

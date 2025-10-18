@@ -73,7 +73,7 @@ const ensureLeadingSlash = (pathLike: string): string => {
 // Valid OpenGraph types according to the specification
 const VALID_OPENGRAPH_TYPES = [
   "website",
-  "article", 
+  "article",
   "book",
   "profile",
   "music.song",
@@ -83,17 +83,17 @@ const VALID_OPENGRAPH_TYPES = [
   "video.movie",
   "video.episode",
   "video.tv_show",
-  "video.other"
+  "video.other",
 ];
 
 const validateOpenGraphType = (type: string | null | undefined): string => {
   if (!type || typeof type !== "string") return "website";
-  
+
   // Check if it's a valid OpenGraph type
   if (VALID_OPENGRAPH_TYPES.includes(type)) {
     return type;
   }
-  
+
   // If it's not valid, return default
   return "website";
 };
@@ -160,12 +160,25 @@ export function getMetaForSlug(
     robotsAr: match.Robots || "index, follow",
     robotsEn: match.RobotsEn || "index, follow",
     og: {
-      title: (match["og:title"] as string) || match.TitleAr || match.TitleEn || "",
+      title:
+        (match["og:title"] as string) || match.TitleAr || match.TitleEn || "",
       description:
-        (match["og:description"] as string) || match.DescriptionAr || match.DescriptionEn || "",
-      keywords: (match["og:keywords"] as string) || match.KeywordsAr || match.KeywordsEn || "",
-      author: (match["og:author"] as string) || match.Author || match.AuthorEn || "",
-      robots: (match["og:robots"] as string) || match.Robots || match.RobotsEn || "index, follow",
+        (match["og:description"] as string) ||
+        match.DescriptionAr ||
+        match.DescriptionEn ||
+        "",
+      keywords:
+        (match["og:keywords"] as string) ||
+        match.KeywordsAr ||
+        match.KeywordsEn ||
+        "",
+      author:
+        (match["og:author"] as string) || match.Author || match.AuthorEn || "",
+      robots:
+        (match["og:robots"] as string) ||
+        match.Robots ||
+        match.RobotsEn ||
+        "index, follow",
       url: (match["og:url"] as string | null) ?? null,
       image: (match["og:image"] as string | null) ?? null,
       type: validateOpenGraphType(match["og:type"]),
@@ -196,7 +209,8 @@ export async function getWebsiteLayoutFromTenantStore(): Promise<WebsiteLayout |
     }
     const state = useTenantStore.getState();
     const tenantData = state?.tenantData || null;
-    const websiteLayout: WebsiteLayout | null = tenantData?.WebsiteLayout || null;
+    const websiteLayout: WebsiteLayout | null =
+      tenantData?.WebsiteLayout || null;
     return websiteLayout;
   } catch (_err) {
     return null;
@@ -206,7 +220,9 @@ export async function getWebsiteLayoutFromTenantStore(): Promise<WebsiteLayout |
 /**
  * Convenience helper: get meta for a slug by reading WebsiteLayout from tenantStore.
  */
-export async function getMetaForSlugFromStore(slug: string): Promise<NormalizedMeta> {
+export async function getMetaForSlugFromStore(
+  slug: string,
+): Promise<NormalizedMeta> {
   const websiteLayout = await getWebsiteLayoutFromTenantStore();
   console.log("websiteLayout", websiteLayout);
   return getMetaForSlug(websiteLayout, slug);
@@ -244,7 +260,9 @@ export async function getMetaForSlugServer(
   slug: string,
   tenantIdOrWebsiteName: string,
 ): Promise<NormalizedMeta> {
-  const websiteLayout = await getWebsiteLayoutFromBackend(tenantIdOrWebsiteName);
+  const websiteLayout = await getWebsiteLayoutFromBackend(
+    tenantIdOrWebsiteName,
+  );
   return getMetaForSlug(websiteLayout, slug);
 }
 
@@ -252,7 +270,10 @@ export async function getMetaForSlugServer(
  * Create a flat list of meta tag descriptors suitable for rendering in a <head> manager
  * (Client code can map these to <meta>, <link> tags, etc.)
  */
-export function toHeadDescriptors(meta: NormalizedMeta, locale: "ar" | "en" = "ar") {
+export function toHeadDescriptors(
+  meta: NormalizedMeta,
+  locale: "ar" | "en" = "ar",
+) {
   const title = locale === "ar" ? meta.titleAr : meta.titleEn;
   const description = locale === "ar" ? meta.descriptionAr : meta.descriptionEn;
   const keywords = locale === "ar" ? meta.keywordsAr : meta.keywordsEn;
@@ -265,31 +286,48 @@ export function toHeadDescriptors(meta: NormalizedMeta, locale: "ar" | "en" = "a
   if (keywords) tags.push({ name: "keywords", content: keywords });
   if (robots) tags.push({ name: "robots", content: robots });
 
-  if (meta.og.title) tags.push({ property: "og:title", content: meta.og.title });
+  if (meta.og.title)
+    tags.push({ property: "og:title", content: meta.og.title });
   if (meta.og.description)
     tags.push({ property: "og:description", content: meta.og.description });
   if (meta.og.keywords)
     tags.push({ property: "og:keywords", content: meta.og.keywords });
-  if (meta.og.author) tags.push({ property: "og:author", content: meta.og.author });
-  if (meta.og.robots) tags.push({ property: "og:robots", content: meta.og.robots });
-  if (meta.og.url) tags.push({ property: "og:url", content: String(meta.og.url) });
-  if (meta.og.image) tags.push({ property: "og:image", content: String(meta.og.image) });
-  if (meta.og.type) tags.push({ property: "og:type", content: String(meta.og.type) });
-  if (meta.og.locale) tags.push({ property: "og:locale", content: String(meta.og.locale) });
+  if (meta.og.author)
+    tags.push({ property: "og:author", content: meta.og.author });
+  if (meta.og.robots)
+    tags.push({ property: "og:robots", content: meta.og.robots });
+  if (meta.og.url)
+    tags.push({ property: "og:url", content: String(meta.og.url) });
+  if (meta.og.image)
+    tags.push({ property: "og:image", content: String(meta.og.image) });
+  if (meta.og.type)
+    tags.push({ property: "og:type", content: String(meta.og.type) });
+  if (meta.og.locale)
+    tags.push({ property: "og:locale", content: String(meta.og.locale) });
   if (meta.og.localeAlternate)
-    tags.push({ property: "og:locale:alternate", content: String(meta.og.localeAlternate) });
+    tags.push({
+      property: "og:locale:alternate",
+      content: String(meta.og.localeAlternate),
+    });
   if (meta.og.siteName)
     tags.push({ property: "og:site_name", content: String(meta.og.siteName) });
   if (meta.og.imageWidth != null)
-    tags.push({ property: "og:image:width", content: String(meta.og.imageWidth) });
+    tags.push({
+      property: "og:image:width",
+      content: String(meta.og.imageWidth),
+    });
   if (meta.og.imageHeight != null)
-    tags.push({ property: "og:image:height", content: String(meta.og.imageHeight) });
+    tags.push({
+      property: "og:image:height",
+      content: String(meta.og.imageHeight),
+    });
   if (meta.og.imageType)
-    tags.push({ property: "og:image:type", content: String(meta.og.imageType) });
+    tags.push({
+      property: "og:image:type",
+      content: String(meta.og.imageType),
+    });
   if (meta.og.imageAlt)
     tags.push({ property: "og:image:alt", content: String(meta.og.imageAlt) });
 
   return tags;
 }
-
-

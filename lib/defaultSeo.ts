@@ -232,11 +232,9 @@ const defaultData: Record<string, DefaultSeo> = {
   "contact-us": {
     TitleAr: "اتصل بنا",
     TitleEn: "Contact Us",
-    DescriptionAr:
-      "تواصل معنا للحصول على المساعدة والاستفسارات حول العقارات",
+    DescriptionAr: "تواصل معنا للحصول على المساعدة والاستفسارات حول العقارات",
     DescriptionEn: "Contact us for assistance and inquiries about real estate",
-    KeywordsAr:
-      "اتصل بنا, تواصل, مساعدة, خدمة العملاء, عقارات",
+    KeywordsAr: "اتصل بنا, تواصل, مساعدة, خدمة العملاء, عقارات",
     KeywordsEn:
       "contact us, communication, help, customer service, real estate",
     Author: "الموقع",
@@ -262,7 +260,8 @@ const defaultData: Record<string, DefaultSeo> = {
 };
 
 export function getDefaultSeoData(slug: string): DefaultSeo {
-  const isHome = !slug || slug === "/" || slug === "homepage" || slug === "home";
+  const isHome =
+    !slug || slug === "/" || slug === "homepage" || slug === "home";
   const name = humanize(slug);
 
   // Use static defaults when available
@@ -320,7 +319,8 @@ export function getDefaultSeoData(slug: string): DefaultSeo {
     const titleAr = "تفاصيل المشروع";
     const titleEn = "Project Details";
     const descAr = "اكتشف تفاصيل هذا المشروع العقاري ومراحله ومواصفاته";
-    const descEn = "Discover this real estate project's details, phases and specs";
+    const descEn =
+      "Discover this real estate project's details, phases and specs";
     const keywordsAr = "مشروع, تفاصيل المشروع, تطوير, عقارات";
     const keywordsEn = "project, project details, development, real estate";
 
@@ -392,5 +392,3 @@ export function getDefaultSeoData(slug: string): DefaultSeo {
     "og:image:alt": titleAr,
   };
 }
-
-

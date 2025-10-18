@@ -197,9 +197,9 @@ export function RentalApplicationsService({
       rentalApplications.isDeleteDialogOpen,
       rentalApplications.isEditRentalDialogOpen,
     ];
-    
-    const anyDialogOpen = dialogs.some(dialog => dialog);
-    
+
+    const anyDialogOpen = dialogs.some((dialog) => dialog);
+
     if (!anyDialogOpen) {
       // Fix pointer-events issue by removing the style attribute
       setTimeout(() => {
@@ -1201,7 +1201,7 @@ export function RentalApplicationsService({
           className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto text-right"
           dir="rtl"
           style={{
-            pointerEvents: !!selectedRental ? 'auto' : 'none'
+            pointerEvents: !!selectedRental ? "auto" : "none",
           }}
         >
           <DialogHeader>
@@ -1486,10 +1486,10 @@ export function RentalApplicationsService({
           setRentalApplications({ isEditRentalDialogOpen: false })
         }
       >
-        <DialogContent 
+        <DialogContent
           className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto"
           style={{
-            pointerEvents: isEditRentalDialogOpen ? 'auto' : 'none'
+            pointerEvents: isEditRentalDialogOpen ? "auto" : "none",
           }}
         >
           <DialogHeader>
@@ -1521,10 +1521,10 @@ export function RentalApplicationsService({
           setRentalApplications({ isDeleteDialogOpen: false })
         }
       >
-        <DialogContent 
+        <DialogContent
           className="sm:max-w-[500px]"
           style={{
-            pointerEvents: isDeleteDialogOpen ? 'auto' : 'none'
+            pointerEvents: isDeleteDialogOpen ? "auto" : "none",
           }}
         >
           <DialogHeader>

@@ -7,10 +7,12 @@ This guide explains how to configure Google Analytics 4 (GA4) for a multi-tenant
 ## Domain Structure
 
 ### Main Domain (Not Tracked)
+
 - `www.mandhoor.com` ❌
 - `mandhoor.com` ❌
 
 ### Tenant Subdomains (Tracked)
+
 - `vcvkkokk.mandhoor.com` ✅
 - `anotherTenant.mandhoor.com` ✅
 - `hey.mandhoor.com` ✅
@@ -45,7 +47,7 @@ This guide explains how to configure Google Analytics 4 (GA4) for a multi-tenant
 2. Create filter:
    - **Filter name**: `Exclude Main Domain`
    - **Filter type**: Internal traffic
-   - **Filter conditions**: 
+   - **Filter conditions**:
      - Hostname equals `www.mandhoor.com`
      - Hostname equals `mandhoor.com`
 
@@ -56,20 +58,20 @@ This guide explains how to configure Google Analytics 4 (GA4) for a multi-tenant
 ```typescript
 const shouldTrackDomain = (domain: string): boolean => {
   // Don't track main domain
-  if (domain === 'www.mandhoor.com' || domain === 'mandhoor.com') {
+  if (domain === "www.mandhoor.com" || domain === "mandhoor.com") {
     return false;
   }
-  
+
   // Track tenant subdomains
-  if (domain.endsWith('.mandhoor.com')) {
+  if (domain.endsWith(".mandhoor.com")) {
     return true;
   }
-  
+
   // Track localhost for development
-  if (domain === 'localhost' || domain.includes('localhost')) {
+  if (domain === "localhost" || domain.includes("localhost")) {
     return true;
   }
-  
+
   return false;
 };
 ```
@@ -77,14 +79,14 @@ const shouldTrackDomain = (domain: string): boolean => {
 ### 2. GA4 Configuration
 
 ```typescript
-window.gtag('config', ga4Id, {
+window.gtag("config", ga4Id, {
   custom_map: {
-    'dimension1': 'tenant_id'
+    dimension1: "tenant_id",
   },
   // Set cookie domain for wildcard
-  cookie_domain: '.mandhoor.com',
+  cookie_domain: ".mandhoor.com",
   // Set transport type
-  transport_type: 'beacon'
+  transport_type: "beacon",
 });
 ```
 
@@ -92,10 +94,10 @@ window.gtag('config', ga4Id, {
 
 ```typescript
 // Track page view with tenant context
-window.gtag('event', 'page_view', {
+window.gtag("event", "page_view", {
   tenant_id: tenantId,
   page_path: pagePath,
-  page_title: document.title
+  page_title: document.title,
 });
 ```
 
@@ -104,6 +106,7 @@ window.gtag('event', 'page_view', {
 ### 1. Test Tenant Subdomains
 
 Visit these URLs and check GA4 Real-time:
+
 - `https://vcvkkokk.mandhoor.com/ar/`
 - `https://anotherTenant.mandhoor.com/ar/`
 - `https://hey.mandhoor.com/ar/`
@@ -113,6 +116,7 @@ Visit these URLs and check GA4 Real-time:
 ### 2. Test Main Domain
 
 Visit these URLs and check GA4 Real-time:
+
 - `https://www.mandhoor.com/`
 - `https://mandhoor.com/`
 
@@ -123,6 +127,7 @@ Visit these URLs and check GA4 Real-time:
 Open Developer Tools → Console and look for:
 
 **Tenant Subdomains**:
+
 ```
 🚀 GA4: Starting initialization with ID: G-WTN83NMVW1
 ✅ GA4: Script loaded successfully
@@ -130,6 +135,7 @@ Open Developer Tools → Console and look for:
 ```
 
 **Main Domain**:
+
 ```
 🚫 GA4: Skipping tracking for domain: www.mandhoor.com
 ```
@@ -165,16 +171,16 @@ Open Developer Tools → Console and look for:
 ### 1. Cross-Domain Tracking
 
 ```typescript
-window.gtag('config', ga4Id, {
+window.gtag("config", ga4Id, {
   custom_map: {
-    'dimension1': 'tenant_id'
+    dimension1: "tenant_id",
   },
-  cookie_domain: '.mandhoor.com',
-  transport_type: 'beacon',
+  cookie_domain: ".mandhoor.com",
+  transport_type: "beacon",
   // Enable cross-domain tracking
   linker: {
-    domains: ['*.mandhoor.com']
-  }
+    domains: ["*.mandhoor.com"],
+  },
 });
 ```
 
@@ -182,16 +188,18 @@ window.gtag('config', ga4Id, {
 
 ```typescript
 // Track property views as e-commerce events
-window.gtag('event', 'view_item', {
-  currency: 'USD',
+window.gtag("event", "view_item", {
+  currency: "USD",
   value: propertyPrice,
-  items: [{
-    item_id: propertyId,
-    item_name: propertyName,
-    category: 'Real Estate',
-    quantity: 1,
-    price: propertyPrice
-  }]
+  items: [
+    {
+      item_id: propertyId,
+      item_name: propertyName,
+      category: "Real Estate",
+      quantity: 1,
+      price: propertyPrice,
+    },
+  ],
 });
 ```
 
@@ -199,10 +207,10 @@ window.gtag('event', 'view_item', {
 
 ```typescript
 // Track user journey across tenants
-window.gtag('event', 'tenant_switch', {
+window.gtag("event", "tenant_switch", {
   tenant_id: newTenantId,
   previous_tenant: previousTenantId,
-  page_path: window.location.pathname
+  page_path: window.location.pathname,
 });
 ```
 
@@ -249,19 +257,19 @@ window.gtag('event', 'tenant_switch', {
 
 ```javascript
 // Check domain tracking
-console.log('Domain tracking:', shouldTrackDomain(window.location.hostname));
+console.log("Domain tracking:", shouldTrackDomain(window.location.hostname));
 
 // Check GA4 status
-console.log('GA4 Status:', {
+console.log("GA4 Status:", {
   dataLayer: window.dataLayer,
   gtag: typeof window.gtag,
-  domain: window.location.hostname
+  domain: window.location.hostname,
 });
 
 // Manual event test
-window.gtag('event', 'test_event', {
-  tenant_id: 'test-tenant',
-  test_parameter: 'test_value'
+window.gtag("event", "test_event", {
+  tenant_id: "test-tenant",
+  test_parameter: "test_value",
 });
 ```
 

@@ -804,6 +804,7 @@ const tenantComponentData = getTenantComponentData();
 ```
 
 ملاحظات:
+
 - الحقول مثل `og:image:width/height/type` قد تكون `null` وتُعامل كاختيارية.
 - الحقل `path` هو المعرّف المنطقي للصفحة لربط الميتا بالمسار.
 

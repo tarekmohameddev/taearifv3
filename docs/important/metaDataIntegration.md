@@ -5,6 +5,7 @@
 ---
 
 ### نظرة عامة سريعة
+
 - يتم توليد الـ metadata ديناميكياً في `app/page.tsx` عبر `generateMetadata()` اعتماداً على:
   - معرف المستأجر `tenantId` القادم من الهيدر `x-tenant-id`.
   - المسار/السلَج `x-pathname` لتحديد الصفحة.
@@ -16,7 +17,9 @@
 ---
 
 ### تدفّق العمل في `app/page.tsx`
+
 - إبقاء الصفحة ديناميكية حتى أثناء SSR:
+
 ```7:11:app/page.tsx
 // إبقاء الصفحة dynamic لتتمكن من التحقق من tenantId
 export const dynamic = "force-dynamic";
@@ -26,6 +29,7 @@ export async function generateMetadata() {
 ```
 
 - قراءة القيم من الهيدر أثناء SSR وتحديد السلوك:
+
 ```12:19:app/page.tsx
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
@@ -37,6 +41,7 @@ export async function generateMetadata() {
 ```
 
 - الحصول على الميتا من الخادم، ثم السقوط للبيانات الافتراضية إن لزم:
+
 ```20:54:app/page.tsx
   // على السيرفر: لا يمكن الاعتماد على الستور، اجلب WebsiteLayout من الـ backend
   // جلب الميتا من السيرفر، وإن لم تتوفر WebsiteLayout استخدم الافتراضي
@@ -76,6 +81,7 @@ export async function generateMetadata() {
 ```
 
 - اختيار `title` و`description` حسب اللغة، وبناء كائن `openGraph` بأمان:
+
 ```55:95:app/page.tsx
   const title =
     locale === "ar"
@@ -120,6 +126,7 @@ export async function generateMetadata() {
 ```
 
 - سلوك عرض الصفحة نفسها حسب وجود `tenantId`:
+
 ```97:107:app/page.tsx
 export default async function HomePage() {
   const headersList = await headers();
@@ -137,7 +144,9 @@ export default async function HomePage() {
 ---
 
 ### أدوات الميتا في `lib/metaTags.ts`
+
 - نموذج البيانات وأنواعها، مع قيم افتراضية منطقية:
+
 ```78:106:lib/metaTags.ts
 const defaultNormalizedMeta: NormalizedMeta = {
   titleAr: "",
@@ -171,6 +180,7 @@ const defaultNormalizedMeta: NormalizedMeta = {
 ```
 
 - استخراج الميتا لسلَج معيّن من `WebsiteLayout`:
+
 ```111:153:lib/metaTags.ts
 export function getMetaForSlug(
   websiteLayout: WebsiteLayout | null | undefined,
@@ -182,6 +192,7 @@ export function getMetaForSlug(
 ```
 
 - استخدام الخادم: جلب `WebsiteLayout` ثم استخراج الميتا:
+
 ```215:221:lib/metaTags.ts
 export async function getMetaForSlugServer(
   slug: string,
@@ -193,6 +204,7 @@ export async function getMetaForSlugServer(
 ```
 
 - تحويل كائن الميتا إلى قائمة وسوم يمكن رسمها داخل `<head>` عند الحاجة على العميل:
+
 ```227:265:lib/metaTags.ts
 export function toHeadDescriptors(meta: NormalizedMeta, locale: "ar" | "en" = "ar") {
   // يعيد Array من { name? , property?, content } لتسهيل رسم الوسوم
@@ -200,13 +212,16 @@ export function toHeadDescriptors(meta: NormalizedMeta, locale: "ar" | "en" = "a
 ```
 
 ملاحظات:
+
 - توجد دوال إضافية للقراءة من Zustand Store على العميل بشكل آمن (Dynamic Import) عندما نحتاج ذلك على الواجهة.
 - في الـ SSR/metadata تم تجنب الاعتماد على الستور والاكتفاء بالـ backend.
 
 ---
 
 ### البيانات الافتراضية في `lib/defaultSeo.ts`
+
 - يحتوي على مولّد بيانات افتراضية بحسب المسار، مع قاموس صفحات معروفة:
+
 ```264:276:lib/defaultSeo.ts
 export function getDefaultSeoData(slug: string): DefaultSeo {
   const isHome = !slug || slug === "/" || slug === "homepage" || slug === "home";
@@ -224,6 +239,7 @@ export function getDefaultSeoData(slug: string): DefaultSeo {
 ```
 
 - عند عدم وجود تعريف ثابت، يتم توليد قيم افتراضية معقولة:
+
 ```289:316:lib/defaultSeo.ts
   return {
     TitleAr: titleAr,
@@ -258,12 +274,14 @@ export function getDefaultSeoData(slug: string): DefaultSeo {
 ---
 
 ### كيف تختار القيم بين العربية والإنجليزية؟
+
 - في `generateMetadata()` يتم تحديد `title` و`description` وفق اللغة (`ar` أو `en`).
 - يتم استخدام القيم المخصصة إن وجدت، وإلا يسقط إلى الأصلية أو الافتراضية.
 
 ---
 
 ### ملاحظات تنفيذية
+
 - حقول `openGraph.images` تُملأ فقط عند توفر صورة، مع تحويل القياسات الرقمية إلى `Number(...)` بشكل آمن.
 - حقول نصية اختيارية تُعاد كـ `undefined` عندما لا تتوفر حتى لا تُنشئ وسوم فارغة.
 - عند غياب `tenantId` ترجع ميتا فارغة لتستخدم الصفحة الرسمية العامة قيمها الخاصة.
@@ -271,12 +289,14 @@ export function getDefaultSeoData(slug: string): DefaultSeo {
 ---
 
 ### استخدامات إضافية
+
 - عند الرغبة برسم الميتا يدوياً على الواجهة، يمكن استخدام `toHeadDescriptors(meta, locale)` لتحويل الكائن إلى قائمة وسوم قابلة للرسم.
 - عند الحاجة للقراءة من Store على العميل (خارج سياق SSR)، وفّرت الدالة `getMetaForSlugFromStore(slug)`، لكن لا تُستخدم داخل `generateMetadata()`.
 
 ---
 
 ### خلاصة
+
 - الميتا تُبنى بهذا الترتيب: مخصّص من الخادم (إن وجد) ثم افتراضي من `defaultSeo`.
 - اللغة تضبط حقول العنوان والوصف فقط، بينما حقول Open Graph تُؤخذ من المصدر المفضّل مع Fallbacks.
 - تم التأكد من أن الكود آمن على الخادم ولا يعتمد على Zustand أثناء SSR/metadata.

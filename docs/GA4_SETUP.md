@@ -16,14 +16,17 @@ NEXT_PUBLIC_Backend_URL=http://localhost:3001
 ## التحديثات المطبقة
 
 ### 1. ملف `lib/ga4-tracking.ts`
+
 - ✅ تم تحديث `initializeGA4()` لاستخدام `process.env.NEXT_PUBLIC_GA4_ID`
 - ✅ القيمة الافتراضية: `G-WTN83NMVW1`
 
 ### 2. ملف `components/GTMProvider.tsx`
+
 - ✅ تم تحديث GA4 script URL لاستخدام متغير البيئة
 - ✅ تم تحديث gtag config لاستخدام متغير البيئة
 
 ### 3. الملفات التي تستخدم GA4Provider
+
 - ✅ `app/HomePageWrapper.tsx`
 - ✅ `app/TenantPageWrapper.tsx`
 - ✅ `app/property/[id]/PropertyPageWrapper.tsx`

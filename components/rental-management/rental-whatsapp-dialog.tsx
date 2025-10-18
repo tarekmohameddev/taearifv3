@@ -152,7 +152,7 @@ export function RentalWhatsAppDialog({
         className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto bg-white border-0 shadow-2xl"
         dir="rtl"
         style={{
-          pointerEvents: isOpen ? 'auto' : 'none'
+          pointerEvents: isOpen ? "auto" : "none",
         }}
       >
         <DialogHeader className="space-y-3 pb-6 border-b border-gray-100">

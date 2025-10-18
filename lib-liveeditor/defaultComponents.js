@@ -3690,7 +3690,7 @@ export const PAGE_DEFINITIONS = {
     },
   },
   projects: {
-    "component": {
+    component: {
       type: "grid",
       name: "Grid",
       componentName: "grid1",
@@ -3698,35 +3698,36 @@ export const PAGE_DEFINITIONS = {
         visible: true,
         texts: {
           title: "المشاريع العقارية",
-          subtitle: "اكتشف مشاريعنا العقارية المتميزة"
+          subtitle: "اكتشف مشاريعنا العقارية المتميزة",
         },
         colors: {
           background: "#FFFFFF",
-          textColor: "#1F2937"
+          textColor: "#1F2937",
         },
         settings: {
           enabled: true,
-          layout: "default"
+          layout: "default",
         },
         id: "component",
         type: "unknown",
         variant: "e4a27bd8-6911-482d-9e5d-82923f264aca",
         useStore: true,
         dataSource: {
-          apiUrl: "/v1/tenant-website/{{tenantID}}/projects?featured=1&limit=10",
-          enabled: true
+          apiUrl:
+            "/v1/tenant-website/{{tenantID}}/projects?featured=1&limit=10",
+          enabled: true,
         },
         cardSettings: {
-          theme: "card3"
-        }
+          theme: "card3",
+        },
       },
       position: 0,
       layout: {
         row: 0,
         col: 0,
-        span: 2
-      }
-    }
+        span: 2,
+      },
+    },
   },
 };
 

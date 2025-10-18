@@ -61,7 +61,6 @@ export async function generateMetadata() {
       ? meta.descriptionAr || meta.descriptionEn || undefined
       : meta.descriptionEn || meta.descriptionAr || undefined;
 
-
   return {
     title,
     description,

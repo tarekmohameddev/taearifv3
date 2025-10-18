@@ -139,10 +139,17 @@ export default function RolesPage() {
   // Filter roles based on search query
   const filteredRoles = rolesTabData.filter(
     (role) =>
-      (role.name_ar || role.name).toLowerCase().includes(rolesSearchQuery.toLowerCase()) ||
-      role.permissions_list?.some((permission) =>
-        permission.name.toLowerCase().includes(rolesSearchQuery.toLowerCase()) ||
-        permission.name_ar.toLowerCase().includes(rolesSearchQuery.toLowerCase()),
+      (role.name_ar || role.name)
+        .toLowerCase()
+        .includes(rolesSearchQuery.toLowerCase()) ||
+      role.permissions_list?.some(
+        (permission) =>
+          permission.name
+            .toLowerCase()
+            .includes(rolesSearchQuery.toLowerCase()) ||
+          permission.name_ar
+            .toLowerCase()
+            .includes(rolesSearchQuery.toLowerCase()),
       ),
   );
 
@@ -598,7 +605,10 @@ export default function RolesPage() {
                                           htmlFor={`edit-permission-${permission.id}`}
                                           className="text-sm text-gray-700 cursor-pointer"
                                         >
-                                          {permission.name_ar || translatePermission(permission.name)}
+                                          {permission.name_ar ||
+                                            translatePermission(
+                                              permission.name,
+                                            )}
                                         </Label>
                                       </div>
                                     ))
@@ -785,7 +795,8 @@ export default function RolesPage() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
-                                        {permission.name_ar || translatePermission(permission.name)}
+                                        {permission.name_ar ||
+                                          translatePermission(permission.name)}
                                       </h4>
                                     </div>
                                   </div>
@@ -948,7 +959,8 @@ export default function RolesPage() {
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <h5 className="font-medium text-gray-900 group-hover:text-black transition-colors truncate">
-                                      {permission.name_ar || translatePermission(permission.name)}
+                                      {permission.name_ar ||
+                                        translatePermission(permission.name)}
                                     </h5>
                                   </div>
                                 </div>
@@ -1069,7 +1081,8 @@ export default function RolesPage() {
                                       htmlFor={`role-permission-${groupName}-${index}`}
                                       className="text-gray-700 cursor-pointer flex-1"
                                     >
-                                      {permission.name_ar || translatePermission(permission.name)}
+                                      {permission.name_ar ||
+                                        translatePermission(permission.name)}
                                     </Label>
                                   </div>
                                 ),
@@ -1231,7 +1244,8 @@ export default function RolesPage() {
                                       htmlFor={`edit-role-permission-${groupName}-${index}`}
                                       className="text-gray-700 cursor-pointer flex-1"
                                     >
-                                      {permission.name_ar || translatePermission(permission.name)}
+                                      {permission.name_ar ||
+                                        translatePermission(permission.name)}
                                     </Label>
                                   </div>
                                 ),

@@ -3,12 +3,12 @@
   "version": "1.0",
   "lastUpdated": "December 2024",
   "description": "Complete documentation for GA4 and GTM implementation in the multi-tenant website builder",
-  
+
   "overview": {
     "purpose": "Track user interactions across tenant websites with custom dimensions and event tracking",
     "components": [
       "GA4Provider - React wrapper for GA4 initialization",
-      "GTMProvider - Google Tag Manager integration", 
+      "GTMProvider - Google Tag Manager integration",
       "ga4-tracking.ts - Core GA4 tracking functions",
       "gtm.ts - GTM utility functions",
       "middleware.ts - Subdomain detection and tenant routing"
@@ -40,13 +40,10 @@
     "tracking": {
       "trackedDomains": [
         "tenant1.mandhoor.com",
-        "tenant2.mandhoor.com", 
+        "tenant2.mandhoor.com",
         "localhost (development)"
       ],
-      "excludedDomains": [
-        "www.mandhoor.com",
-        "mandhoor.com"
-      ],
+      "excludedDomains": ["www.mandhoor.com", "mandhoor.com"],
       "events": {
         "pageView": {
           "description": "Automatic page view tracking",
@@ -57,7 +54,7 @@
           "parameters": ["tenant_id", "property_slug", "page_path"]
         },
         "projectView": {
-          "description": "Real estate project page views", 
+          "description": "Real estate project page views",
           "parameters": ["tenant_id", "project_slug", "page_path"]
         },
         "contactForm": {
@@ -97,10 +94,7 @@
         "function": "shouldTrackDomain(domain: string)",
         "purpose": "Determines if a domain should be tracked by GA4",
         "logic": {
-          "excludedDomains": [
-            "www.mandhoor.com",
-            "mandhoor.com"
-          ],
+          "excludedDomains": ["www.mandhoor.com", "mandhoor.com"],
           "trackedDomains": [
             "*.mandhoor.com (tenant subdomains)",
             "localhost (development)"
@@ -383,8 +377,20 @@
         "NODE_ENV": "Environment mode (development/production)"
       },
       "reservedWords": [
-        "www", "api", "admin", "app", "mail", "ftp", "blog", "shop", "store",
-        "dashboard", "live-editor", "auth", "login", "register"
+        "www",
+        "api",
+        "admin",
+        "app",
+        "mail",
+        "ftp",
+        "blog",
+        "shop",
+        "store",
+        "dashboard",
+        "live-editor",
+        "auth",
+        "login",
+        "register"
       ]
     },
     "functionality": {
@@ -459,7 +465,7 @@
           "description": "Global GTM implementation for allowed pages",
           "allowedPages": [
             "/dashboard",
-            "/live-editor", 
+            "/live-editor",
             "/login",
             "/register",
             "/",
@@ -771,10 +777,7 @@
       "expected": "GA4 tracking with tenant context"
     },
     "excluded": {
-      "urls": [
-        "https://www.mandhoor.com/",
-        "https://mandhoor.com/"
-      ],
+      "urls": ["https://www.mandhoor.com/", "https://mandhoor.com/"],
       "expected": "No GA4 tracking"
     }
   },
@@ -809,15 +812,35 @@
     "commonIssues": {
       "ga4NotTracking": {
         "causes": ["Ad blockers", "Browser privacy settings", "Wrong GA4 ID"],
-        "solutions": ["Disable ad blocker", "Try incognito mode", "Check GA4 configuration"]
+        "solutions": [
+          "Disable ad blocker",
+          "Try incognito mode",
+          "Check GA4 configuration"
+        ]
       },
       "tenantNotDetected": {
-        "causes": ["Wrong subdomain format", "Reserved word used", "Environment variables"],
-        "solutions": ["Check subdomain format", "Avoid reserved words", "Verify environment variables"]
+        "causes": [
+          "Wrong subdomain format",
+          "Reserved word used",
+          "Environment variables"
+        ],
+        "solutions": [
+          "Check subdomain format",
+          "Avoid reserved words",
+          "Verify environment variables"
+        ]
       },
       "dataNotAppearing": {
-        "causes": ["GA4 configuration", "Data processing delay", "Filter settings"],
-        "solutions": ["Wait 24-48 hours", "Check GA4 settings", "Verify custom dimensions"]
+        "causes": [
+          "GA4 configuration",
+          "Data processing delay",
+          "Filter settings"
+        ],
+        "solutions": [
+          "Wait 24-48 hours",
+          "Check GA4 settings",
+          "Verify custom dimensions"
+        ]
       }
     }
   },
@@ -851,7 +874,7 @@
   "maintenance": {
     "regularTasks": [
       "Monitor GA4 data consistency",
-      "Update tracking dependencies", 
+      "Update tracking dependencies",
       "Check performance metrics",
       "Review error logs"
     ],

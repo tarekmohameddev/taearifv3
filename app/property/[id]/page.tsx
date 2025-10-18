@@ -5,11 +5,7 @@ import PropertyPageWrapper from "./PropertyPageWrapper";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}) {
+export async function generateMetadata({ params }: { params: { id: string } }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const locale = headersList.get("x-locale") || "ar";
@@ -74,9 +70,13 @@ export async function generateMetadata({
               url: String(meta.og.image),
               alt: meta.og.imageAlt || undefined,
               width:
-                meta.og.imageWidth != null ? Number(meta.og.imageWidth) : undefined,
+                meta.og.imageWidth != null
+                  ? Number(meta.og.imageWidth)
+                  : undefined,
               height:
-                meta.og.imageHeight != null ? Number(meta.og.imageHeight) : undefined,
+                meta.og.imageHeight != null
+                  ? Number(meta.og.imageHeight)
+                  : undefined,
               type: meta.og.imageType || undefined,
             },
           ]
@@ -97,14 +97,14 @@ export default async function PropertyPage({
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
 
-  console.log('🏠 PropertyPage: Server component loaded', {
+  console.log("🏠 PropertyPage: Server component loaded", {
     tenantId,
     propertyId: params.id,
     headers: {
-      'x-tenant-id': tenantId,
-      'x-locale': headersList.get("x-locale"),
-      'x-pathname': headersList.get("x-pathname")
-    }
+      "x-tenant-id": tenantId,
+      "x-locale": headersList.get("x-locale"),
+      "x-pathname": headersList.get("x-pathname"),
+    },
   });
 
   return <PropertyPageWrapper tenantId={tenantId} propertySlug={params.id} />;

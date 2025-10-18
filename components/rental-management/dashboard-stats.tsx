@@ -165,7 +165,7 @@ function OngoingRentalsDialog() {
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
         style={{
-          pointerEvents: isOngoingRentalsDialogOpen ? 'auto' : 'none'
+          pointerEvents: isOngoingRentalsDialogOpen ? "auto" : "none",
         }}
       >
         <DialogHeader>
@@ -363,7 +363,7 @@ function ExpiringContractsDialog() {
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
         style={{
-          pointerEvents: isExpiringContractsDialogOpen ? 'auto' : 'none'
+          pointerEvents: isExpiringContractsDialogOpen ? "auto" : "none",
         }}
       >
         <DialogHeader>
@@ -792,7 +792,7 @@ function PaymentsDueDialog() {
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
         style={{
-          pointerEvents: isPaymentsDueDialogOpen ? 'auto' : 'none'
+          pointerEvents: isPaymentsDueDialogOpen ? "auto" : "none",
         }}
       >
         <DialogHeader>
@@ -1023,7 +1023,7 @@ function PaymentsOverdueDialog() {
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
         style={{
-          pointerEvents: isPaymentsOverdueDialogOpen ? 'auto' : 'none'
+          pointerEvents: isPaymentsOverdueDialogOpen ? "auto" : "none",
         }}
       >
         <DialogHeader>
@@ -1204,7 +1204,7 @@ function MaintenanceOpenDialog() {
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
         style={{
-          pointerEvents: isMaintenanceOpenDialogOpen ? 'auto' : 'none'
+          pointerEvents: isMaintenanceOpenDialogOpen ? "auto" : "none",
         }}
       >
         <DialogHeader>
@@ -1421,7 +1421,7 @@ function MaintenanceInProgressDialog() {
         className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto"
         dir="rtl"
         style={{
-          pointerEvents: isMaintenanceInProgressDialogOpen ? 'auto' : 'none'
+          pointerEvents: isMaintenanceInProgressDialogOpen ? "auto" : "none",
         }}
       >
         <DialogHeader>
@@ -1807,7 +1807,7 @@ export function RentalDashboardStats() {
                   </div>
                 ) : (
                   <p className="text-2xl font-bold text-gray-900">
-                    {dashboardData?.property_stats?.available_properties }
+                    {dashboardData?.property_stats?.available_properties}
                   </p>
                 )}
               </div>

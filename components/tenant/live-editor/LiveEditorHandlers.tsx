@@ -96,7 +96,8 @@ export function useLiveEditorHandlers(state: any) {
   const confirmDeletePage = () => {
     if (
       state.deletePageConfirmation === "I am sure I want to delete this page" ||
-      state.deletePageConfirmation === "أنا متأكد من أنني أريد حذف هذه الصفحة" ||
+      state.deletePageConfirmation ===
+        "أنا متأكد من أنني أريد حذف هذه الصفحة" ||
       state.deletePageConfirmation === "أنا متأكد"
     ) {
       // Remove page from editorStore

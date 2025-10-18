@@ -1,6 +1,7 @@
 # GA4 Wildcard Domain Solutions
 
 ## Problem
+
 GA4 doesn't support wildcard domains (`*.mandhoor.com`) directly in Data Stream configuration.
 
 ## Solutions
@@ -8,17 +9,20 @@ GA4 doesn't support wildcard domains (`*.mandhoor.com`) directly in Data Stream 
 ### Solution 1: Use Main Domain (Recommended)
 
 **GA4 Data Stream Configuration:**
+
 ```
 Website URL: https://mandhoor.com
 Stream name: Multi-Tenant Websites
 ```
 
 **How it works:**
+
 - GA4 tracks all subdomains automatically
 - Code filters out main domain tracking
 - Tenant ID extracted from subdomain
 
 **Advantages:**
+
 - ✅ Simple setup
 - ✅ Automatic subdomain tracking
 - ✅ No domain limitations
@@ -27,6 +31,7 @@ Stream name: Multi-Tenant Websites
 ### Solution 2: Multiple Data Streams
 
 **Create separate streams for each tenant:**
+
 ```
 Stream 1: https://vcvkkokk.mandhoor.com
 Stream 2: https://anotherTenant.mandhoor.com
@@ -35,11 +40,13 @@ Stream 4: https://samy.mandhoor.com
 ```
 
 **Advantages:**
+
 - ✅ Separate tracking per tenant
 - ✅ Individual reporting
 - ✅ Tenant-specific configurations
 
 **Disadvantages:**
+
 - ❌ Complex setup
 - ❌ Manual tenant addition
 - ❌ Multiple GA4 properties needed
@@ -47,6 +54,7 @@ Stream 4: https://samy.mandhoor.com
 ### Solution 3: Single Property with Filters
 
 **GA4 Configuration:**
+
 ```
 Website URL: https://mandhoor.com
 Data Filters: Exclude main domain
@@ -54,19 +62,20 @@ Custom Dimensions: Tenant ID
 ```
 
 **Code Implementation:**
+
 ```typescript
 // Track only tenant subdomains
 const shouldTrackDomain = (domain: string): boolean => {
   // Don't track main domain
-  if (domain === 'www.mandhoor.com' || domain === 'mandhoor.com') {
+  if (domain === "www.mandhoor.com" || domain === "mandhoor.com") {
     return false;
   }
-  
+
   // Track tenant subdomains
-  if (domain.endsWith('.mandhoor.com')) {
+  if (domain.endsWith(".mandhoor.com")) {
     return true;
   }
-  
+
   return false;
 };
 ```
@@ -93,10 +102,11 @@ const shouldTrackDomain = (domain: string): boolean => {
 ### Step 2: Code Implementation
 
 **Domain Detection:**
+
 ```typescript
 const getTenantIdFromDomain = (domain: string): string | null => {
-  if (domain.endsWith('.mandhoor.com')) {
-    const subdomain = domain.replace('.mandhoor.com', '');
+  if (domain.endsWith(".mandhoor.com")) {
+    const subdomain = domain.replace(".mandhoor.com", "");
     return subdomain;
   }
   return null;
@@ -104,34 +114,38 @@ const getTenantIdFromDomain = (domain: string): string | null => {
 ```
 
 **GA4 Configuration:**
+
 ```typescript
-window.gtag('config', ga4Id, {
+window.gtag("config", ga4Id, {
   custom_map: {
-    'dimension1': 'tenant_id'
+    dimension1: "tenant_id",
   },
-  cookie_domain: '.mandhoor.com',
-  transport_type: 'beacon'
+  cookie_domain: ".mandhoor.com",
+  transport_type: "beacon",
 });
 ```
 
 **Event Tracking:**
+
 ```typescript
-window.gtag('event', 'page_view', {
+window.gtag("event", "page_view", {
   tenant_id: tenantId,
   page_path: pagePath,
-  page_title: document.title
+  page_title: document.title,
 });
 ```
 
 ### Step 3: Testing
 
 **Test URLs:**
+
 - ✅ `https://vcvkkokk.mandhoor.com/ar/` - Should track
 - ✅ `https://anotherTenant.mandhoor.com/ar/` - Should track
 - ❌ `https://www.mandhoor.com/` - Should not track
 - ❌ `https://mandhoor.com/` - Should not track
 
 **Console Messages:**
+
 ```
 🚀 GA4: Starting initialization with ID: G-WTN83NMVW1
 ✅ GA4: Script loaded successfully
@@ -143,15 +157,15 @@ window.gtag('event', 'page_view', {
 ### Cross-Domain Tracking
 
 ```typescript
-window.gtag('config', ga4Id, {
+window.gtag("config", ga4Id, {
   custom_map: {
-    'dimension1': 'tenant_id'
+    dimension1: "tenant_id",
   },
-  cookie_domain: '.mandhoor.com',
-  transport_type: 'beacon',
+  cookie_domain: ".mandhoor.com",
+  transport_type: "beacon",
   linker: {
-    domains: ['*.mandhoor.com']
-  }
+    domains: ["*.mandhoor.com"],
+  },
 });
 ```
 
@@ -159,16 +173,18 @@ window.gtag('config', ga4Id, {
 
 ```typescript
 // Track property views as e-commerce
-window.gtag('event', 'view_item', {
-  currency: 'USD',
+window.gtag("event", "view_item", {
+  currency: "USD",
   value: propertyPrice,
-  items: [{
-    item_id: propertyId,
-    item_name: propertyName,
-    category: 'Real Estate',
-    quantity: 1,
-    price: propertyPrice
-  }]
+  items: [
+    {
+      item_id: propertyId,
+      item_name: propertyName,
+      category: "Real Estate",
+      quantity: 1,
+      price: propertyPrice,
+    },
+  ],
 });
 ```
 
@@ -176,10 +192,10 @@ window.gtag('event', 'view_item', {
 
 ```typescript
 // Track user journey across tenants
-window.gtag('event', 'tenant_switch', {
+window.gtag("event", "tenant_switch", {
   tenant_id: newTenantId,
   previous_tenant: previousTenantId,
-  page_path: window.location.pathname
+  page_path: window.location.pathname,
 });
 ```
 
@@ -193,12 +209,13 @@ window.gtag('event', 'tenant_switch', {
    - Verify main domain is excluded
 
 2. **Console Verification:**
+
    ```javascript
    // Check domain tracking
-   console.log('Domain tracking:', shouldTrackDomain(window.location.hostname));
-   
+   console.log("Domain tracking:", shouldTrackDomain(window.location.hostname));
+
    // Check tenant ID
-   console.log('Tenant ID:', getTenantIdFromDomain(window.location.hostname));
+   console.log("Tenant ID:", getTenantIdFromDomain(window.location.hostname));
    ```
 
 3. **Network Verification:**
@@ -209,6 +226,7 @@ window.gtag('event', 'tenant_switch', {
 ### Custom Reports
 
 **Create tenant-specific reports:**
+
 1. Go to Explore → Free form
 2. Add dimensions: Page path, Custom dimension 1 (Tenant ID)
 3. Add metrics: Event count, Users
@@ -217,6 +235,7 @@ window.gtag('event', 'tenant_switch', {
 ### Alerts
 
 **Set up monitoring:**
+
 1. Go to Configure → Alerts
 2. Create alert for tracking issues
 3. Monitor data quality
@@ -245,35 +264,38 @@ window.gtag('event', 'tenant_switch', {
 
 ```javascript
 // Check domain tracking
-console.log('Domain tracking:', shouldTrackDomain(window.location.hostname));
+console.log("Domain tracking:", shouldTrackDomain(window.location.hostname));
 
 // Check GA4 status
-console.log('GA4 Status:', {
+console.log("GA4 Status:", {
   dataLayer: window.dataLayer,
   gtag: typeof window.gtag,
-  domain: window.location.hostname
+  domain: window.location.hostname,
 });
 
 // Manual event test
-window.gtag('event', 'test_event', {
-  tenant_id: 'test-tenant',
-  test_parameter: 'test_value'
+window.gtag("event", "test_event", {
+  tenant_id: "test-tenant",
+  test_parameter: "test_value",
 });
 ```
 
 ## Performance Optimization
 
 ### Script Loading
+
 - Async script loading
 - No blocking of page rendering
 - Efficient event processing
 
 ### Event Batching
+
 - Batch events for efficiency
 - Reduce network requests
 - Optimize data transmission
 
 ### Caching
+
 - Cache GA4 configuration
 - Optimize script loading
 - Reduce initialization time

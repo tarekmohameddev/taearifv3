@@ -48,9 +48,12 @@ const DialogContent = React.forwardRef<
     // Listen for dialog state changes
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'data-state') {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "data-state"
+        ) {
           const target = mutation.target as HTMLElement;
-          if (target.getAttribute('data-state') === 'closed') {
+          if (target.getAttribute("data-state") === "closed") {
             handlePointerEventsCleanup();
           }
         }
@@ -58,9 +61,12 @@ const DialogContent = React.forwardRef<
     });
 
     // Start observing the dialog content
-    const dialogElement = document.querySelector('[data-radix-dialog-content]');
+    const dialogElement = document.querySelector("[data-radix-dialog-content]");
     if (dialogElement) {
-      observer.observe(dialogElement, { attributes: true, attributeFilter: ['data-state'] });
+      observer.observe(dialogElement, {
+        attributes: true,
+        attributeFilter: ["data-state"],
+      });
     }
 
     return () => {

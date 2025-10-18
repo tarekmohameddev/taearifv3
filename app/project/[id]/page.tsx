@@ -5,11 +5,7 @@ import ProjectPageWrapper from "./ProjectPageWrapper";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}) {
+export async function generateMetadata({ params }: { params: { id: string } }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const locale = headersList.get("x-locale") || "ar";
@@ -74,9 +70,13 @@ export async function generateMetadata({
               url: String(meta.og.image),
               alt: meta.og.imageAlt || undefined,
               width:
-                meta.og.imageWidth != null ? Number(meta.og.imageWidth) : undefined,
+                meta.og.imageWidth != null
+                  ? Number(meta.og.imageWidth)
+                  : undefined,
               height:
-                meta.og.imageHeight != null ? Number(meta.og.imageHeight) : undefined,
+                meta.og.imageHeight != null
+                  ? Number(meta.og.imageHeight)
+                  : undefined,
               type: meta.og.imageType || undefined,
             },
           ]

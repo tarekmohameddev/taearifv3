@@ -533,7 +533,7 @@ export function RentalDetailsDialog() {
           className="w-[95vw] max-w-6xl max-h-[95vh] overflow-y-auto text-right p-2 sm:p-4 md:p-6"
           dir="rtl"
           style={{
-            pointerEvents: isRentalDetailsDialogOpen ? 'auto' : 'none'
+            pointerEvents: isRentalDetailsDialogOpen ? "auto" : "none",
           }}
         >
           <DialogHeader className="space-y-2 sm:space-y-4 text-right">
@@ -1431,10 +1431,10 @@ export function RentalDetailsDialog() {
         open={isAddExpenseDialogOpen}
         onOpenChange={setIsAddExpenseDialogOpen}
       >
-        <DialogContent 
+        <DialogContent
           className="max-w-md"
           style={{
-            pointerEvents: isAddExpenseDialogOpen ? 'auto' : 'none'
+            pointerEvents: isAddExpenseDialogOpen ? "auto" : "none",
           }}
         >
           <DialogHeader>
@@ -1599,10 +1599,10 @@ export function RentalDetailsDialog() {
         open={isDeleteExpenseDialogOpen}
         onOpenChange={setIsDeleteExpenseDialogOpen}
       >
-        <DialogContent 
+        <DialogContent
           className="max-w-md"
           style={{
-            pointerEvents: isDeleteExpenseDialogOpen ? 'auto' : 'none'
+            pointerEvents: isDeleteExpenseDialogOpen ? "auto" : "none",
           }}
         >
           <DialogHeader>
