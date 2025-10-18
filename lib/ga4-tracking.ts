@@ -16,6 +16,15 @@ declare global {
 export const initializeGA4 = () => {
   const ga4Id = process.env.NEXT_PUBLIC_GA4_ID || 'G-WTN83NMVW1';
   
+  // Check if we should track this domain
+  const currentDomain = window.location.hostname;
+  const shouldTrack = shouldTrackDomain(currentDomain);
+  
+  if (!shouldTrack) {
+    console.log('🚫 GA4: Skipping tracking for domain:', currentDomain);
+    return;
+  }
+  
   console.log('🚀 GA4: Starting initialization with ID:', ga4Id);
   
   // Initialize dataLayer and gtag first
@@ -36,7 +45,11 @@ export const initializeGA4 = () => {
     window.gtag('config', ga4Id, {
       custom_map: {
         'dimension1': 'tenant_id'
-      }
+      },
+      // Set cookie domain for wildcard
+      cookie_domain: '.mandhoor.com',
+      // Set transport type
+      transport_type: 'beacon'
     });
     console.log('✅ GA4: Configuration complete');
   };
@@ -46,6 +59,74 @@ export const initializeGA4 = () => {
   };
   
   document.head.appendChild(script);
+};
+
+// Check if domain should be tracked
+const shouldTrackDomain = (domain: string): boolean => {
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'mandhoor.com';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Extract local domain from API URL
+  const localDomain = new URL(apiUrl).hostname;
+  
+  console.log('🔍 GA4: Checking domain:', domain);
+  console.log('🔍 GA4: Production domain:', productionDomain);
+  console.log('🔍 GA4: Local domain:', localDomain);
+  console.log('🔍 GA4: Is development:', isDevelopment);
+  
+  // Don't track main domain
+  if (domain === `www.${productionDomain}` || domain === productionDomain) {
+    console.log('❌ GA4: Main domain excluded:', domain);
+    return false;
+  }
+  
+  // Track tenant subdomains in production
+  if (!isDevelopment && domain.endsWith(`.${productionDomain}`)) {
+    console.log('✅ GA4: Tenant subdomain (production):', domain);
+    return true;
+  }
+  
+  // Track localhost for development
+  if (isDevelopment && (domain === localDomain || domain.includes(localDomain))) {
+    console.log('✅ GA4: Local domain (development):', domain);
+    return true;
+  }
+  
+  console.log('❌ GA4: Domain not tracked:', domain);
+  return false;
+};
+
+// Get tenant ID from subdomain
+const getTenantIdFromDomain = (domain: string): string | null => {
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'mandhoor.com';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Extract local domain from API URL
+  const localDomain = new URL(apiUrl).hostname;
+  
+  console.log('🔍 GA4: Getting tenant ID from domain:', domain);
+  
+  // For production: tenant1.mandhoor.com -> tenant1
+  if (!isDevelopment && domain.endsWith(`.${productionDomain}`)) {
+    const subdomain = domain.replace(`.${productionDomain}`, '');
+    console.log('✅ GA4: Tenant ID (production):', subdomain);
+    return subdomain;
+  }
+  
+  // For development: tenant1.localhost -> tenant1
+  if (isDevelopment && domain.includes(localDomain)) {
+    const parts = domain.split('.');
+    if (parts.length > 1 && parts[0] !== localDomain) {
+      const subdomain = parts[0];
+      console.log('✅ GA4: Tenant ID (development):', subdomain);
+      return subdomain;
+    }
+  }
+  
+  console.log('❌ GA4: No tenant ID found');
+  return null;
 };
 
 // Check if GA4 is ready

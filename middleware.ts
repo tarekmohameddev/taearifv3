@@ -29,10 +29,12 @@ function removeLocaleFromPathname(pathname: string) {
 }
 
 function getTenantIdFromHost(host: string): string | null {
-  const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
-  const productionDomain =
-    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "mandhoor.com";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "mandhoor.com";
   const isDevelopment = process.env.NODE_ENV === "development";
+
+  // Extract domain from API URL for local development
+  const localDomain = new URL(apiUrl).hostname;
 
   // قائمة بالكلمات المحجوزة التي لا يجب أن تكون tenantId
   const reservedWords = [
@@ -45,36 +47,53 @@ function getTenantIdFromHost(host: string): string | null {
     "blog",
     "shop",
     "store",
+    "dashboard",
+    "live-editor",
+    "auth",
+    "login",
+    "register"
   ];
 
+  console.log('🔍 Middleware: Checking host:', host);
+  console.log('🔍 Middleware: Local domain:', localDomain);
+  console.log('🔍 Middleware: Production domain:', productionDomain);
+  console.log('🔍 Middleware: Is development:', isDevelopment);
+
   // For localhost development: tenant1.localhost:3000 -> tenant1
-  if (host.includes(localDomain)) {
+  if (isDevelopment && host.includes(localDomain)) {
     const parts = host.split(".");
     if (parts.length > 1 && parts[0] !== localDomain) {
       const potentialTenantId = parts[0];
+      console.log('🔍 Middleware: Potential tenant ID (local):', potentialTenantId);
+      
       // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
       if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
+        console.log('✅ Middleware: Valid tenant ID (local):', potentialTenantId);
         return potentialTenantId;
+      } else {
+        console.log('❌ Middleware: Reserved word (local):', potentialTenantId);
       }
     }
   }
 
   // For production: tenant1.mandhoor.com -> tenant1
-  // تحقق من أن الـ host يحتوي على mandhoor.com أو taearif.com
-  if (
-    !isDevelopment &&
-    (host.includes("mandhoor.com") || host.includes("taearif.com"))
-  ) {
+  if (!isDevelopment && host.includes(productionDomain)) {
     const parts = host.split(".");
     if (parts.length > 2) {
       const potentialTenantId = parts[0];
+      console.log('🔍 Middleware: Potential tenant ID (production):', potentialTenantId);
+      
       // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
       if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
+        console.log('✅ Middleware: Valid tenant ID (production):', potentialTenantId);
         return potentialTenantId;
+      } else {
+        console.log('❌ Middleware: Reserved word (production):', potentialTenantId);
       }
     }
   }
 
+  console.log('❌ Middleware: No valid tenant ID found');
   return null;
 }
 

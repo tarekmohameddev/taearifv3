@@ -13,6 +13,15 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    // Check if we should track this domain
+    const currentDomain = window.location.hostname;
+    const shouldTrack = shouldTrackDomain(currentDomain);
+    
+    if (!shouldTrack) {
+      console.log('🚫 GA4: Skipping tracking for domain:', currentDomain);
+      return;
+    }
+    
     // Initialize GA4 only once
     if (!isInitialized) {
       console.log('🚀 GA4: Initializing...');
@@ -22,18 +31,81 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
   }, [isInitialized]);
 
   useEffect(() => {
+    // Get tenant ID from domain or props
+    const currentDomain = window.location.hostname;
+    const domainTenantId = getTenantIdFromDomain(currentDomain);
+    const finalTenantId = tenantId || domainTenantId;
+    
     // Track page view when pathname or tenantId changes
-    if (tenantId && pathname && isInitialized) {
-      console.log('📊 GA4: Tracking page view', { tenantId, pathname });
+    if (finalTenantId && pathname && isInitialized) {
+      console.log('📊 GA4: Tracking page view', { 
+        tenantId: finalTenantId, 
+        pathname,
+        domain: currentDomain 
+      });
       // Set tenant context
-      setTenantContext(tenantId, tenantId);
+      setTenantContext(finalTenantId, finalTenantId);
       
       // Track page view with a small delay to ensure GA4 is ready
       setTimeout(() => {
-        trackPageView(tenantId, pathname);
+        trackPageView(finalTenantId, pathname);
       }, 500);
     }
   }, [tenantId, pathname, isInitialized]);
 
   return <>{children}</>;
 }
+
+// Check if domain should be tracked
+const shouldTrackDomain = (domain: string): boolean => {
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'mandhoor.com';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Extract local domain from API URL
+  const localDomain = new URL(apiUrl).hostname;
+  
+  // Don't track main domain
+  if (domain === `www.${productionDomain}` || domain === productionDomain) {
+    return false;
+  }
+  
+  // Track tenant subdomains in production
+  if (!isDevelopment && domain.endsWith(`.${productionDomain}`)) {
+    return true;
+  }
+  
+  // Track localhost for development
+  if (isDevelopment && (domain === localDomain || domain.includes(localDomain))) {
+    return true;
+  }
+  
+  return false;
+};
+
+// Get tenant ID from subdomain
+const getTenantIdFromDomain = (domain: string): string | null => {
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'mandhoor.com';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Extract local domain from API URL
+  const localDomain = new URL(apiUrl).hostname;
+  
+  // For production: tenant1.mandhoor.com -> tenant1
+  if (!isDevelopment && domain.endsWith(`.${productionDomain}`)) {
+    const subdomain = domain.replace(`.${productionDomain}`, '');
+    return subdomain;
+  }
+  
+  // For development: tenant1.localhost -> tenant1
+  if (isDevelopment && domain.includes(localDomain)) {
+    const parts = domain.split('.');
+    if (parts.length > 1 && parts[0] !== localDomain) {
+      const subdomain = parts[0];
+      return subdomain;
+    }
+  }
+  
+  return null;
+};
