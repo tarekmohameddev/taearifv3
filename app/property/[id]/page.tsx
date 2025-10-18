@@ -97,5 +97,15 @@ export default async function PropertyPage({
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
 
+  console.log('🏠 PropertyPage: Server component loaded', {
+    tenantId,
+    propertyId: params.id,
+    headers: {
+      'x-tenant-id': tenantId,
+      'x-locale': headersList.get("x-locale"),
+      'x-pathname': headersList.get("x-pathname")
+    }
+  });
+
   return <PropertyPageWrapper tenantId={tenantId} propertySlug={params.id} />;
 }
