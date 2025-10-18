@@ -69,6 +69,7 @@ const shouldTrackDomain = (domain: string): boolean => {
   console.log('🔍 GA4: Production domain:', productionDomain);
   console.log('🔍 GA4: Local domain:', localDomain);
   console.log('🔍 GA4: Is development:', isDevelopment);
+  console.log('🔍 GA4: NODE_ENV:', process.env.NODE_ENV);
   
   // Don't track main domain
   if (domain === `www.${productionDomain}` || domain === productionDomain) {
@@ -76,8 +77,8 @@ const shouldTrackDomain = (domain: string): boolean => {
     return false;
   }
   
-  // Track tenant subdomains in production
-  if (!isDevelopment && domain.endsWith(`.${productionDomain}`)) {
+  // Track tenant subdomains in production (vcvkkokk.mandhoor.com)
+  if (domain.endsWith(`.${productionDomain}`)) {
     console.log('✅ GA4: Tenant subdomain (production):', domain);
     return true;
   }
@@ -104,7 +105,7 @@ const getTenantIdFromDomain = (domain: string): string | null => {
   console.log('🔍 GA4: Getting tenant ID from domain:', domain);
   
   // For production: tenant1.mandhoor.com -> tenant1
-  if (!isDevelopment && domain.endsWith(`.${productionDomain}`)) {
+  if (domain.endsWith(`.${productionDomain}`)) {
     const subdomain = domain.replace(`.${productionDomain}`, '');
     console.log('✅ GA4: Tenant ID (production):', subdomain);
     return subdomain;
