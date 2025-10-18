@@ -7,6 +7,7 @@ import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import PropertyDetail1 from "@/components/tenant/property/PropertyDetail1";
 import GA4Provider from "@/components/GA4Provider";
+import GTMProvider from "@/components/GTMProvider";
 import { trackPropertyView } from "@/lib/ga4-tracking";
 
 interface PropertyPageWrapperProps {
@@ -58,8 +59,9 @@ export default function PropertyPageWrapper({
   console.log('🏠 PropertyPageWrapper: Rendering with GA4Provider', { tenantId });
 
   return (
-    <GA4Provider tenantId={tenantId}>
-      <I18nProvider>
+    <GTMProvider>
+      <GA4Provider tenantId={tenantId}>
+        <I18nProvider>
         <div className="min-h-screen flex flex-col" dir="rtl">
         <StaticHeader1 />
         <main className="flex-1">
@@ -69,5 +71,6 @@ export default function PropertyPageWrapper({
       </div>
     </I18nProvider>
     </GA4Provider>
+    </GTMProvider>
   );
 }

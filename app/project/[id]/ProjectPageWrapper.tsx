@@ -7,6 +7,7 @@ import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import ProjectDetail from "@/components/project-detail";
 import GA4Provider from "@/components/GA4Provider";
+import GTMProvider from "@/components/GTMProvider";
 import { trackProjectView } from "@/lib/ga4-tracking";
 
 interface ProjectPageWrapperProps {
@@ -45,8 +46,9 @@ export default function ProjectPageWrapper({
   }, [tenantId, projectSlug]);
 
   return (
-    <GA4Provider tenantId={tenantId}>
-      <I18nProvider>
+    <GTMProvider>
+      <GA4Provider tenantId={tenantId}>
+        <I18nProvider>
         <div className="min-h-screen flex flex-col" dir="rtl">
         <StaticHeader1 />
         <main className="flex-1">
@@ -56,5 +58,6 @@ export default function ProjectPageWrapper({
       </div>
     </I18nProvider>
     </GA4Provider>
+    </GTMProvider>
   );
 }

@@ -25,7 +25,6 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
     
     // Force console output in production
     console.warn('🚨 GA4Provider: FORCED LOG - Component loaded!');
-    console.error('🚨 GA4Provider: FORCED ERROR - Component loaded!');
     
     // Send debug info to server
     fetch('/api/debug', {

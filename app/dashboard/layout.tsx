@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
-import { GTMProvider } from "@/components/GTMProvider";
+import GTMProvider from "@/components/GTMProvider2";
 import PermissionWrapper from "@/components/PermissionWrapper";
 
 /*

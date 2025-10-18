@@ -29,6 +29,7 @@ import {
 } from "@/lib/ComponentsInCenter";
 import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
 import GA4Provider from "@/components/GA4Provider";
+import GTMProvider from "@/components/GTMProvider";
 
 const loadComponent = (section: string, componentName: string) => {
   if (!componentName) return null;
@@ -275,8 +276,9 @@ export default function TenantPageWrapper({
   });
 
   return (
-    <GA4Provider tenantId={tenantId}>
-      <I18nProvider>
+    <GTMProvider>
+      <GA4Provider tenantId={tenantId}>
+        <I18nProvider>
         <div className="min-h-screen flex flex-col" dir="rtl">
         {/* Header with i18n support */}
         <div className="relative">
@@ -341,5 +343,6 @@ export default function TenantPageWrapper({
       </div>
     </I18nProvider>
     </GA4Provider>
+    </GTMProvider>
   );
 }
