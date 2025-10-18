@@ -13,12 +13,32 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Add immediate console log to verify component is loading
-  console.log('🔥 GA4Provider: Component loaded!', {
-    tenantId,
-    pathname,
-    hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
-    timestamp: new Date().toISOString()
-  });
+  if (typeof window !== 'undefined') {
+    console.log('🔥 GA4Provider: Component loaded!', {
+      tenantId,
+      pathname,
+      hostname: window.location.hostname,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      url: window.location.href
+    });
+    
+    // Force console output in production
+    console.warn('🚨 GA4Provider: FORCED LOG - Component loaded!');
+    console.error('🚨 GA4Provider: FORCED ERROR - Component loaded!');
+    
+    // Send debug info to server
+    fetch('/api/debug', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'GA4Provider',
+        tenantId,
+        hostname: window.location.hostname,
+        timestamp: new Date().toISOString()
+      })
+    }).catch(() => {}); // Ignore errors
+  }
 
   useEffect(() => {
     // Check if we should track this domain
@@ -75,6 +95,38 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
       }, 500);
     }
   }, [tenantId, pathname, isInitialized]);
+
+  // Add visual debugging in production
+  if (typeof window !== 'undefined') {
+    // Create a visible debug element
+    const debugElement = document.createElement('div');
+    debugElement.id = 'ga4-debug';
+    debugElement.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: red;
+      color: white;
+      padding: 10px;
+      z-index: 9999;
+      font-size: 12px;
+      border-radius: 5px;
+    `;
+    debugElement.innerHTML = `GA4: ${tenantId || 'NO TENANT'}`;
+    
+    // Remove existing debug element
+    const existing = document.getElementById('ga4-debug');
+    if (existing) existing.remove();
+    
+    // Add new debug element
+    document.body.appendChild(debugElement);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+      const element = document.getElementById('ga4-debug');
+      if (element) element.remove();
+    }, 5000);
+  }
 
   return <>{children}</>;
 }
