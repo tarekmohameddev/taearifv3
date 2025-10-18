@@ -44,7 +44,7 @@ export function GTMProvider({ children }: GTMProviderProps) {
     <>
       {/* GA4 Script */}
       <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-RVFKM2F9ZN"
+        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_ID || 'G-WTN83NMVW1'}`}
         strategy="afterInteractive"
       />
       <Script id="gtag-init" strategy="afterInteractive">
@@ -53,7 +53,7 @@ export function GTMProvider({ children }: GTMProviderProps) {
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           
-          gtag('config', 'G-RVFKM2F9ZN', {
+          gtag('config', '${process.env.NEXT_PUBLIC_GA4_ID || 'G-WTN83NMVW1'}', {
             'custom_map': {
               'dimension1': 'tenant_id'
             },
