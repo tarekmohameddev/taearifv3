@@ -1,74 +1,46 @@
 "use client";
-import Script from "next/script";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEffect } from "react";
+
+import { useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import Script from 'next/script';
+import { initDataLayer, trackPageView } from '@/lib/gtm';
 
 interface GTMProviderProps {
   children: React.ReactNode;
 }
 
-export function GTMProvider({ children }: GTMProviderProps) {
-  const tenantData = useTenantStore((s: any) => s.tenantData);
-  const tenantId = useTenantStore((s: any) => s.tenantId);
+export default function GTMProvider({ children }: GTMProviderProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Track page views when tenant data changes
+  // Initialize dataLayer
   useEffect(() => {
-    if (typeof window !== "undefined" && window.gtag && tenantId) {
-      // Track page view with tenant context
-      window.gtag("event", "page_view", {
-        tenant_id: tenantId,
-        page_path: window.location.pathname,
-        page_title: document.title,
-      });
-    }
-  }, [tenantId, tenantData]);
+    initDataLayer();
+  }, []);
 
-  // Track property views specifically
+  // Track page views on route changes
   useEffect(() => {
-    if (typeof window !== "undefined" && window.gtag && tenantId) {
-      const path = window.location.pathname;
-      
-      // Track property page views
-      if (path.includes("/property/") || path.includes("/project/")) {
-        const propertyId = path.split("/").pop();
-        window.gtag("event", "property_view", {
-          tenant_id: tenantId,
-          property_id: propertyId,
-          page_path: path,
-        });
-      }
-    }
-  }, [tenantId]);
+    const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '');
+    trackPageView(url);
+  }, [pathname, searchParams]);
 
   return (
     <>
-      {/* GA4 Script */}
+      {/* Google Tag Manager Script */}
       <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_ID || 'G-WTN83NMVW1'}`}
+        id="gtm-script"
         strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-KBL37C9T');
+          `,
+        }}
       />
-      <Script id="gtag-init" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          
-          gtag('config', '${process.env.NEXT_PUBLIC_GA4_ID || 'G-WTN83NMVW1'}', {
-            'custom_map': {
-              'dimension1': 'tenant_id'
-            },
-            'tenant_id': '${tenantId || 'unknown'}'
-          });
-        `}
-      </Script>
       {children}
     </>
   );
-}
-
-// Extend Window interface for gtag
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-  }
 }

@@ -8,7 +8,7 @@ declare global {
 }
 
 // Initialize GTM dataLayer if not already initialized
-const initializeGTM = () => {
+export const initDataLayer = () => {
   if (typeof window !== "undefined") {
     window.dataLayer = window.dataLayer || [];
     window.gtag =
@@ -18,6 +18,8 @@ const initializeGTM = () => {
       };
   }
 };
+
+const initializeGTM = initDataLayer;
 
 // Track custom events
 export const trackEvent = (
