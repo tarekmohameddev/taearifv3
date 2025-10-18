@@ -16,7 +16,50 @@ export const initDataLayer = () => {
       function () {
         window.dataLayer.push(arguments);
       };
+    
+    // Initialize GA4 with tenant configuration
+    const ga4Id = process.env.NEXT_PUBLIC_GA4_ID || 'G-RVFKM2F9ZN';
+    const tenantId = getTenantIdFromCurrentDomain();
+    
+    if (tenantId) {
+      window.gtag('js', new Date());
+      window.gtag('config', ga4Id, {
+        'custom_map': {
+          'dimension1': 'tenant_id'
+        },
+        'tenant_id': tenantId
+      });
+      console.log(`GA4 tenant_id = ${tenantId}`);
+    }
   }
+};
+
+// Get tenant ID from current domain
+const getTenantIdFromCurrentDomain = (): string | null => {
+  if (typeof window === "undefined") return null;
+  
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'taearif.com';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Extract local domain from API URL
+  const localDomain = new URL(apiUrl).hostname;
+  const currentDomain = window.location.hostname;
+  
+  // For production: tenant1.taearif.com -> tenant1
+  if (!isDevelopment && currentDomain.endsWith(`.${productionDomain}`)) {
+    return currentDomain.replace(`.${productionDomain}`, '');
+  }
+  
+  // For development: tenant1.localhost -> tenant1
+  if (isDevelopment && currentDomain.includes(localDomain)) {
+    const parts = currentDomain.split('.');
+    if (parts.length > 1 && parts[0] !== localDomain) {
+      return parts[0];
+    }
+  }
+  
+  return null;
 };
 
 const initializeGTM = initDataLayer;
@@ -38,7 +81,8 @@ export const trackPageView = (pagePath: string, pageTitle?: string) => {
   initializeGTM();
 
   if (typeof window !== "undefined" && window.gtag) {
-    window.gtag("config", "GTM-KBL37C9T", {
+    const gtmId = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-KS62NNTG';
+    window.gtag("config", gtmId, {
       page_path: pagePath,
       page_title: pageTitle || document.title,
     });

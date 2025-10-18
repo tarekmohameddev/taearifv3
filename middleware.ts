@@ -30,7 +30,7 @@ function removeLocaleFromPathname(pathname: string) {
 
 function getTenantIdFromHost(host: string): string | null {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "mandhoor.com";
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
   const isDevelopment = process.env.NODE_ENV === "development";
 
   // Extract domain from API URL for local development

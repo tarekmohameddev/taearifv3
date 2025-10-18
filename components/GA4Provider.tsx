@@ -102,7 +102,7 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
 
 // Check if domain should be tracked
 const shouldTrackDomain = (domain: string): boolean => {
-  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'mandhoor.com';
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'taearif.com';
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
   const isDevelopment = process.env.NODE_ENV === 'development';
   
@@ -139,7 +139,7 @@ const shouldTrackDomain = (domain: string): boolean => {
 
 // Get tenant ID from subdomain
 const getTenantIdFromDomain = (domain: string): string | null => {
-  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'mandhoor.com';
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'taearif.com';
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
   const isDevelopment = process.env.NODE_ENV === 'development';
   
