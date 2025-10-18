@@ -17,7 +17,7 @@ export const initializeGA4 = () => {
   const ga4Id =
     process.env.NEXT_PUBLIC_GA4_ID ||
     process.env.GOOGLE_ANALYTICS_PROPERTY_ID ||
-    "G-RVFKM2F9ZN";
+    "G-WTN83NMVW1";
 
   // Check if we should track this domain
   const currentDomain = window.location.hostname;
