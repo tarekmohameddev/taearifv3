@@ -803,6 +803,14 @@ export function RentalApplicationsService({
             <Calendar className="h-4 w-4" />
             المتابعة اليومية
           </Button>
+            <Button
+              onClick={() => router.push("/dashboard/rental-management/contracts")}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              العقود
+            </Button>
         </div>
       </div>
 
