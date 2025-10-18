@@ -12,10 +12,25 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
   const pathname = usePathname();
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // Add immediate console log to verify component is loading
+  console.log('🔥 GA4Provider: Component loaded!', {
+    tenantId,
+    pathname,
+    hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
+    timestamp: new Date().toISOString()
+  });
+
   useEffect(() => {
     // Check if we should track this domain
     const currentDomain = window.location.hostname;
     const shouldTrack = shouldTrackDomain(currentDomain);
+    
+    console.log('🔍 GA4Provider: useEffect triggered', {
+      currentDomain,
+      shouldTrack,
+      isInitialized,
+      tenantId
+    });
     
     if (!shouldTrack) {
       console.log('🚫 GA4: Skipping tracking for domain:', currentDomain);
@@ -35,6 +50,14 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
     const currentDomain = window.location.hostname;
     const domainTenantId = getTenantIdFromDomain(currentDomain);
     const finalTenantId = tenantId || domainTenantId;
+    
+    console.log('📊 GA4Provider: Page tracking useEffect', {
+      currentDomain,
+      domainTenantId,
+      finalTenantId,
+      pathname,
+      isInitialized
+    });
     
     // Track page view when pathname or tenantId changes
     if (finalTenantId && pathname && isInitialized) {

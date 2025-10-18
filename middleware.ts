@@ -58,6 +58,7 @@ function getTenantIdFromHost(host: string): string | null {
   console.log('🔍 Middleware: Local domain:', localDomain);
   console.log('🔍 Middleware: Production domain:', productionDomain);
   console.log('🔍 Middleware: Is development:', isDevelopment);
+  console.log('🔍 Middleware: NODE_ENV:', process.env.NODE_ENV);
 
   // For localhost development: tenant1.localhost:3000 -> tenant1
   if (isDevelopment && host.includes(localDomain)) {
@@ -239,7 +240,10 @@ export function middleware(request: NextRequest) {
 
   // Set tenantId header if found
   if (tenantId) {
+    console.log('✅ Middleware: Setting tenant ID header:', tenantId);
     response.headers.set("x-tenant-id", tenantId);
+  } else {
+    console.log('❌ Middleware: No tenant ID found for host:', host);
   }
 
   return response;
