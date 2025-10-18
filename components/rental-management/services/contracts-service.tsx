@@ -290,9 +290,10 @@ export function ContractsService() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">جميع الحالات</SelectItem>
-                  <SelectItem value="green">مدفوع</SelectItem>
-                  <SelectItem value="yellow">مستحق</SelectItem>
-                  <SelectItem value="red">متأخر</SelectItem>
+                  <SelectItem value="paid">مدفوع</SelectItem>
+                  <SelectItem value="pending">مستحق</SelectItem>
+                  <SelectItem value="overdue">متأخر</SelectItem>
+                  <SelectItem value="not_due">غير مستحق</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -319,11 +320,11 @@ export function ContractsService() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">جميع المباني</SelectItem>
-                  {buildings.map((building) => (
-                    <SelectItem key={building.id} value={building.id}>
-                      {building.name}
-                    </SelectItem>
-                  ))}
+                         {buildings.map((building: any) => (
+                           <SelectItem key={building.id} value={building.id}>
+                             {building.name}
+                           </SelectItem>
+                         ))}
                 </SelectContent>
               </Select>
             </div>
@@ -362,23 +363,26 @@ export function ContractsService() {
                       المبنى
                     </th>
                     <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                      المبلغ المستحق
+                      مبلغ الإيجار
                     </th>
                     <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                      تاريخ الاستحقاق
+                      طريقة الإيجار
                     </th>
                     <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                      الحالة
+                      تاريخ البدء
                     </th>
                     <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                      المتأخرات
+                      حالة العقد
+                    </th>
+                    <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                      حالة الدفع
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {loading ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center">
+                      <td colSpan={8} className="px-6 py-12 text-center">
                         <div className="flex items-center justify-center">
                           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
                           <span className="mr-2 text-gray-500">جاري التحميل...</span>
@@ -387,7 +391,7 @@ export function ContractsService() {
                     </tr>
                   ) : filteredData.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center">
+                      <td colSpan={8} className="px-6 py-12 text-center">
                         <div className="text-center">
                           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                           <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -400,8 +404,9 @@ export function ContractsService() {
                       </td>
                     </tr>
                   ) : (
-                    filteredData.map((item, index) => (
+                    filteredData.map((item: any, index: number) => (
                       <tr key={`${item.contract_id}-${index}`} className="hover:bg-gray-50 transition-colors">
+                        {/* المستأجر */}
                         <td className="px-6 py-4">
                           <div className="flex items-center space-x-3 space-x-reverse">
                             <Avatar className="h-10 w-10">
@@ -421,6 +426,7 @@ export function ContractsService() {
                             </div>
                           </div>
                         </td>
+                        {/* الوحدة */}
                         <td className="px-6 py-4">
                           <div>
                             <div className="font-medium text-gray-900">
@@ -432,46 +438,63 @@ export function ContractsService() {
                             </div>
                           </div>
                         </td>
+                        {/* المبنى */}
                         <td className="px-6 py-4">
                           <div>
                             <div className="font-medium text-gray-900">
                               {item.building?.building_name || "غير محدد"}
                             </div>
                             <div className="text-sm text-gray-500">
-                              {item.project?.project_name || "غير محدد"}
+                              {item.building?.building_address || "غير محدد"}
                             </div>
                           </div>
                         </td>
+                        {/* مبلغ الإيجار */}
                         <td className="px-6 py-4">
                           <div className="text-sm font-medium text-gray-900">
                             {formatCurrency(item.rent_amount || 0)}
                           </div>
+                          <div className="text-xs text-gray-500">
+                            {item.currency || "SAR"}
+                          </div>
                         </td>
+                        {/* طريقة الإيجار */}
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900">
+                            {item.rental_method === "Monthly" ? "شهري" :
+                             item.rental_method === "Quarterly" ? "ربعي" :
+                             item.rental_method === "Semi-Annual" ? "نصف سنوي" :
+                             item.rental_method === "Annual" ? "سنوي" :
+                             item.rental_method || "غير محدد"}
+                          </div>
+                        </td>
+                        {/* تاريخ البدء */}
                         <td className="px-6 py-4">
                           <div className="text-sm text-gray-900">
                             {formatDate(item.lease_term?.start_date || "")}
                           </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="space-y-1">
-                            <Badge className={getContractStatusColor(item.contract_status)}>
-                              {getContractStatusText(item.contract_status)}
-                            </Badge>
-                            <Badge className={getPaymentStatusColor(item.payment_status_color)}>
-                              {getPaymentStatusText(item.payment_status_color)}
-                            </Badge>
+                          <div className="text-xs text-gray-500">
+                            انتهاء: {formatDate(item.lease_term?.end_date || "")}
                           </div>
                         </td>
+                        {/* حالة العقد */}
                         <td className="px-6 py-4">
-                          <div className="text-sm">
-                            {item.payment_details?.remaining_amount > 0 ? (
-                              <span className="text-red-600 font-medium">
-                                {formatCurrency(item.payment_details?.remaining_amount || 0)}
-                              </span>
-                            ) : (
-                              <span className="text-green-600">لا توجد متأخرات</span>
-                            )}
-                          </div>
+                          <Badge className={getContractStatusColor(item.contract_status)}>
+                            {getContractStatusText(item.contract_status)}
+                          </Badge>
+                        </td>
+                        {/* حالة الدفع */}
+                        <td className="px-6 py-4">
+                          <Badge className={getPaymentStatusColor(item.payment_status)}>
+                            {getPaymentStatusText(item.payment_status)}
+                          </Badge>
+                          {item.payment_details?.message && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              {item.payment_details.message === "Payment not due yet" 
+                                ? "غير مستحق الآن" 
+                                : item.payment_details.message}
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))
