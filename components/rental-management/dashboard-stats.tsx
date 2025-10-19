@@ -2555,7 +2555,7 @@ export function RentalDashboardStats() {
         <DialogContent className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto" dir="rtl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-purple-600" />
+              <FileText className="h-5 w-5 text-slate-700" />
               إدارة العقود
             </DialogTitle>
             <DialogDescription>
@@ -2569,8 +2569,8 @@ export function RentalDashboardStats() {
               onClick={() => setActiveContractsTab('active')}
               className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
                 activeContractsTab === 'active'
-                  ? 'bg-white text-purple-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-slate-800 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               العقود النشطة ({dashboardData?.contract_stats?.active_contracts || 0})
@@ -2579,8 +2579,8 @@ export function RentalDashboardStats() {
               onClick={() => setActiveContractsTab('expired')}
               className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
                 activeContractsTab === 'expired'
-                  ? 'bg-white text-purple-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-slate-800 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               العقود المنتهية الصلاحية ({dashboardData?.contract_stats?.expired_contracts || 0})
@@ -2589,8 +2589,8 @@ export function RentalDashboardStats() {
               onClick={() => setActiveContractsTab('terminated')}
               className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
                 activeContractsTab === 'terminated'
-                  ? 'bg-white text-purple-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-slate-800 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               العقود المنتهية ({dashboardData?.contract_stats?.terminated_contracts || 0})
@@ -2605,30 +2605,16 @@ export function RentalDashboardStats() {
                   العقود النشطة
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                  <Card className="border-l-4 border-l-green-500">
+                  <Card className="border-l-4 border-l-emerald-500">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-gray-600">إجمالي العقود النشطة</p>
-                          <p className="text-2xl font-bold text-green-600">
+                          <p className="text-sm font-medium text-slate-600">إجمالي العقود النشطة</p>
+                          <p className="text-2xl font-bold text-emerald-700">
                             {dashboardData?.contract_stats?.active_contracts || 0}
                           </p>
                         </div>
-                        <CheckCircle className="h-8 w-8 text-green-600" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="border-l-4 border-l-purple-500">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">إجمالي قيمة العقود</p>
-                          <p className="text-2xl font-bold text-purple-600">
-                            {formatCurrency(dashboardData?.yearly_overview?.summary?.total_contract_value || 0)}
-                          </p>
-                        </div>
-                        <DollarSign className="h-8 w-8 text-purple-600" />
+                        <CheckCircle className="h-8 w-8 text-emerald-600" />
                       </div>
                     </CardContent>
                   </Card>
@@ -2637,12 +2623,26 @@ export function RentalDashboardStats() {
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-gray-600">متوسط مدة العقد</p>
-                          <p className="text-2xl font-bold text-blue-600">
+                          <p className="text-sm font-medium text-slate-600">إجمالي قيمة العقود</p>
+                          <p className="text-2xl font-bold text-blue-700">
+                            {formatCurrency(dashboardData?.yearly_overview?.summary?.total_contract_value || 0)}
+                          </p>
+                        </div>
+                        <DollarSign className="h-8 w-8 text-blue-600" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border-l-4 border-l-indigo-500">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-slate-600">متوسط مدة العقد</p>
+                          <p className="text-2xl font-bold text-indigo-700">
                             {dashboardData?.contract_stats?.average_contract_duration_days || 0} يوم
                           </p>
                         </div>
-                        <Calendar className="h-8 w-8 text-blue-600" />
+                        <Calendar className="h-8 w-8 text-indigo-600" />
                       </div>
                     </CardContent>
                   </Card>
@@ -2654,19 +2654,19 @@ export function RentalDashboardStats() {
                     <div className="bg-gray-50 rounded-lg p-4">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-gray-600">إجمالي العقود:</span>
-                        <span className="text-sm font-semibold text-purple-600">
+                        <span className="text-sm font-semibold text-slate-700">
                           {dashboardData?.contract_stats?.total_contracts || 0}
                         </span>
                       </div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-gray-600">العقود النشطة:</span>
-                        <span className="text-sm font-semibold text-green-600">
+                        <span className="text-sm font-semibold text-emerald-600">
                           {dashboardData?.contract_stats?.active_contracts || 0}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">نسبة النشاط:</span>
-                        <span className="text-sm font-bold text-blue-600">
+                        <span className="text-sm font-bold text-indigo-600">
                           {dashboardData?.contract_stats?.total_contracts > 0 ? 
                             Math.round((dashboardData.contract_stats.active_contracts / dashboardData.contract_stats.total_contracts) * 100) : 0}%
                         </span>
@@ -2676,19 +2676,19 @@ export function RentalDashboardStats() {
                     <div className="bg-gray-50 rounded-lg p-4">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-gray-600">إجمالي القيمة المتوقعة:</span>
-                        <span className="text-sm font-semibold text-green-600">
+                        <span className="text-sm font-semibold text-blue-600">
                           {formatCurrency(dashboardData?.yearly_overview?.summary?.total_expected || 0)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-gray-600">المبلغ المجمع:</span>
-                        <span className="text-sm font-semibold text-blue-600">
+                        <span className="text-sm font-semibold text-emerald-600">
                           {formatCurrency(dashboardData?.yearly_overview?.summary?.total_collected || 0)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">معدل التحصيل:</span>
-                        <span className="text-sm font-bold text-purple-600">
+                        <span className="text-sm font-bold text-indigo-600">
                           {dashboardData?.yearly_overview?.summary?.collection_rate || 0}%
                         </span>
                       </div>
@@ -2716,16 +2716,16 @@ export function RentalDashboardStats() {
                 ) : (
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Card className="border-l-4 border-l-orange-500">
+                      <Card className="border-l-4 border-l-amber-500">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-sm font-medium text-gray-600">عدد العقود المنتهية الصلاحية</p>
-                              <p className="text-2xl font-bold text-orange-600">
+                              <p className="text-sm font-medium text-slate-600">عدد العقود المنتهية الصلاحية</p>
+                              <p className="text-2xl font-bold text-amber-700">
                                 {dashboardData?.contract_stats?.expired_contracts || 0}
                               </p>
                             </div>
-                            <AlertTriangle className="h-8 w-8 text-orange-600" />
+                            <AlertTriangle className="h-8 w-8 text-amber-600" />
                           </div>
                         </CardContent>
                       </Card>
@@ -2753,16 +2753,16 @@ export function RentalDashboardStats() {
                 ) : (
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Card className="border-l-4 border-l-red-500">
+                      <Card className="border-l-4 border-l-rose-500">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-sm font-medium text-gray-600">عدد العقود المنتهية</p>
-                              <p className="text-2xl font-bold text-red-600">
+                              <p className="text-sm font-medium text-slate-600">عدد العقود المنتهية</p>
+                              <p className="text-2xl font-bold text-rose-700">
                                 {dashboardData?.contract_stats?.terminated_contracts || 0}
                               </p>
                             </div>
-                            <XCircle className="h-8 w-8 text-red-600" />
+                            <XCircle className="h-8 w-8 text-rose-600" />
                           </div>
                         </CardContent>
                       </Card>
