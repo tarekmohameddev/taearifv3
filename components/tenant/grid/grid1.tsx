@@ -351,6 +351,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         ? apiProperties
         : mergedData.items || mergedData.properties || [];
 
+
   // Check if component should be visible
   if (!mergedData.visible) {
     return null;

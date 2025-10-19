@@ -66,15 +66,21 @@ interface PropertiesStore {
   // Filter State
   transactionType: "rent" | "sale";
   activeFilter: FilterType;
-  search: string;
+  search: string; // للعرض فقط
+  cityId: string; // إضافة cityId للفلتر
+  district: string; // إضافة district للفلتر
   propertyType: string;
+  categoryId: string; // إضافة categoryId للفلتر
   price: string;
 
   // Actions
   setTransactionType: (type: "rent" | "sale") => void;
   setActiveFilter: (filter: FilterType) => void;
   setSearch: (search: string) => void;
+  setCityId: (cityId: string) => void; // إضافة setCityId
+  setDistrict: (district: string) => void; // إضافة setDistrict
   setPropertyType: (type: string) => void;
+  setCategoryId: (categoryId: string) => void; // إضافة setCategoryId
   setPrice: (price: string) => void;
 
   // Pagination Actions
@@ -122,18 +128,21 @@ export const usePropertiesStore = create<PropertiesStore>()(
       transactionType: "rent",
       activeFilter: "all",
       search: "",
+      cityId: "", // إضافة cityId للـ initial state
+      district: "", // إضافة district للـ initial state
       propertyType: "",
+      categoryId: "", // إضافة categoryId للـ initial state
       price: "",
 
       // Actions
       setTransactionType: (type) => {
         set({ transactionType: type });
-        get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
+        // لا تقم بالجلب تلقائياً؛ يتم الجلب عند الضغط على زر البحث
       },
 
       setActiveFilter: (filter) => {
         set({ activeFilter: filter });
-        get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
+        // لا تقم بالجلب تلقائياً؛ يتم الجلب عند الضغط على زر البحث
       },
 
       setSearch: (search) => {
@@ -141,8 +150,23 @@ export const usePropertiesStore = create<PropertiesStore>()(
         // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
       },
 
+      setCityId: (cityId) => {
+        set({ cityId });
+        // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
+      },
+
+      setDistrict: (district) => {
+        set({ district });
+        // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
+      },
+
       setPropertyType: (type) => {
         set({ propertyType: type });
+        // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
+      },
+
+      setCategoryId: (categoryId) => {
+        set({ categoryId });
         // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
       },
 
@@ -172,8 +196,9 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
       // API Actions
       setTenantId: (tenantId) => {
+        console.log("setTenantId called with:", tenantId);
         set({ tenantId });
-        // إذا تم تعيين tenantId وكان هناك فلاتر، جلب البيانات
+        // جلب البيانات تلقائياً عند تعيين tenantId
         if (tenantId) {
           get().fetchProperties(1);
         }
@@ -181,9 +206,11 @@ export const usePropertiesStore = create<PropertiesStore>()(
 
       fetchProperties: async (page = 1) => {
         const state = get();
+        console.log("fetchProperties called with page:", page, "tenantId:", state.tenantId);
 
         // منع الـ duplicate calls
         if (state.loading) {
+          console.log("fetchProperties: Already loading, skipping");
           return;
         }
 
@@ -208,21 +235,45 @@ export const usePropertiesStore = create<PropertiesStore>()(
           if (state.activeFilter && state.activeFilter !== "all") {
             params.append("status", state.activeFilter);
           }
-          if (state.propertyType) {
-            params.append("type", state.propertyType);
+          if (state.categoryId) {
+            params.append("category_id", state.categoryId);
           }
-          if (state.search) {
-            params.append("search", state.search);
+          if (state.cityId) {
+            params.append("city_id", state.cityId);
+          }
+          if (state.district) {
+            params.append("state_id", state.district);
           }
           if (state.price) {
             params.append("max_price", state.price);
           }
 
           const url = `/v1/tenant-website/${tenantId}/properties?${params.toString()}`;
+          
+          // Debug: طباعة الـ parameters المرسلة
+          console.log("Properties API Request Parameters:", {
+            tenantId,
+            transactionType: state.transactionType,
+            activeFilter: state.activeFilter,
+            categoryId: state.categoryId,
+            cityId: state.cityId,
+            district: state.district,
+            search: state.search,
+            price: state.price,
+            url: url
+          });
 
           const response = await axiosInstance.get(url);
 
           const result: PropertiesResponse = response.data;
+          
+          // Debug: طباعة الـ response
+          console.log("Properties API Response:", {
+            hasProperties: !!result.properties,
+            propertiesCount: result.properties?.length || 0,
+            pagination: result.pagination,
+            fullResponse: result
+          });
 
           if (result.properties) {
             set({
@@ -231,6 +282,14 @@ export const usePropertiesStore = create<PropertiesStore>()(
               loading: false,
               total: result.pagination.total,
               pagination: result.pagination,
+            });
+            
+            // Debug: طباعة الـ state بعد الحفظ
+            console.log("Properties saved to store:", {
+              allPropertiesCount: result.properties.length,
+              filteredPropertiesCount: result.properties.length,
+              total: result.pagination.total,
+              pagination: result.pagination
             });
           } else {
             // Handle empty results - clear the store
@@ -311,10 +370,13 @@ export const usePropertiesStore = create<PropertiesStore>()(
         set({
           activeFilter: "all",
           search: "",
+          cityId: "", // إضافة cityId للـ clearFilters
+          district: "", // إضافة district للـ clearFilters
           propertyType: "",
+          categoryId: "", // إضافة categoryId للـ clearFilters
           price: "",
         });
-        get().fetchProperties(1); // إعادة جلب البيانات من الصفحة الأولى
+        // لا تقم بالجلب تلقائياً؛ يتم الجلب عند الضغط على زر البحث
       },
 
       // Local Filtering
@@ -352,8 +414,11 @@ export const usePropertiesStore = create<PropertiesStore>()(
           });
         }
 
-        // فلترة حسب نوع العقار
-        if (state.propertyType) {
+        // فلترة حسب نوع العقار (استخدام categoryId إذا كان متوفراً، وإلا استخدام propertyType للتوافق العكسي)
+        if (state.categoryId) {
+          // هنا يمكن إضافة فلترة حسب categoryId إذا كان متوفراً في بيانات العقار
+          // filtered = filtered.filter((property) => property.category_id === state.categoryId);
+        } else if (state.propertyType) {
           filtered = filtered.filter((property) =>
             property.type
               .toLowerCase()

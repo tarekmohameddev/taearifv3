@@ -27,6 +27,16 @@ interface PropertyType {
   name: string;
 }
 
+interface CityOption {
+  id: string | number;
+  name: string;
+}
+
+interface DistrictOption {
+  id: string | number;
+  name: string;
+}
+
 interface PropertyFilterProps {
   className?: string;
   propertyTypesSource?: "static" | "dynamic";
@@ -57,15 +67,15 @@ export default function PropertyFilter({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Store state
-  const { search, propertyType, price, setSearch, setPropertyType, setPrice } =
+  const { search, cityId, district, propertyType, categoryId, price, setSearch, setCityId, setDistrict, setPropertyType, setCategoryId, setPrice } =
     usePropertiesStore();
 
   // Tenant ID hook
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [propertyTypes, setPropertyTypes] = useState<string[]>([]);
-  const [filteredTypes, setFilteredTypes] = useState<string[]>([]);
+  const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]); // تغيير إلى PropertyType[]
+  const [filteredTypes, setFilteredTypes] = useState<PropertyType[]>([]); // تغيير إلى PropertyType[]
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,6 +87,93 @@ export default function PropertyFilter({
   const actualTenantId = content?.tenantId || tenantId || currentTenantId;
   const actualStaticPropertyTypes =
     content?.propertyTypes || staticPropertyTypes;
+
+  // Cities state fetched from external API
+  const [cityOptions, setCityOptions] = useState<CityOption[]>([]);
+  const [cityLoading, setCityLoading] = useState<boolean>(false);
+  const [cityError, setCityError] = useState<string | null>(null);
+
+  // Districts state fetched from external API
+  const [districtOptions, setDistrictOptions] = useState<DistrictOption[]>([]);
+  const [districtLoading, setDistrictLoading] = useState<boolean>(false);
+  const [districtError, setDistrictError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCities = async () => {
+      try {
+        setCityLoading(true);
+        setCityError(null);
+        const res = await fetch("https://nzl-backend.com/api/cities?country_id=1");
+        if (!res.ok) throw new Error(`Failed to load cities: ${res.status}`);
+        const data = await res.json();
+        const list: CityOption[] = Array.isArray(data?.data)
+          ? data.data.map((c: any) => ({ id: c.id, name: c.name_ar || c.name_en || String(c.id) }))
+          : [];
+        if (isMounted) setCityOptions(list);
+      } catch (e: any) {
+        if (isMounted) setCityError(e?.message || "تعذر تحميل المدن");
+      } finally {
+        if (isMounted) setCityLoading(false);
+      }
+    };
+    fetchCities();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // جلب الأحياء عند اختيار مدينة
+  useEffect(() => {
+    let isMounted = true;
+    const fetchDistricts = async () => {
+      if (!search) {
+        setDistrictOptions([]);
+        setDistrict("");
+        return;
+      }
+
+      try {
+        setDistrictLoading(true);
+        setDistrictError(null);
+        
+        // البحث عن city_id للمدينة المختارة
+        const selectedCity = cityOptions.find(city => city.name === search);
+        if (!selectedCity) {
+          setDistrictOptions([]);
+          setDistrict("");
+          setCityId("");
+          return;
+        }
+
+        const res = await fetch(`https://nzl-backend.com/api/districts?city_id=${selectedCity.id}`);
+        if (!res.ok) throw new Error(`Failed to load districts: ${res.status}`);
+        const data = await res.json();
+        const list: DistrictOption[] = Array.isArray(data?.data)
+          ? data.data.map((d: any) => ({ id: d.id, name: d.name_ar || d.name_en || String(d.id) }))
+          : [];
+        if (isMounted) {
+          setDistrictOptions(list);
+          setDistrict(""); // مسح الحي المختار عند تغيير المدينة
+          setCityId(selectedCity.id.toString()); // حفظ city_id
+        }
+      } catch (e: any) {
+        if (isMounted) setDistrictError(e?.message || "تعذر تحميل الأحياء");
+      } finally {
+        if (isMounted) setDistrictLoading(false);
+      }
+    };
+    fetchDistricts();
+    return () => {
+      isMounted = false;
+    };
+  }, [search, cityOptions]);
+
+  const cityDropdownRef = useRef<HTMLDivElement>(null);
+  const [isCityOpen, setIsCityOpen] = useState(false);
+
+  const districtDropdownRef = useRef<HTMLDivElement>(null);
+  const [isDistrictOpen, setIsDistrictOpen] = useState(false);
 
   // دالة لجلب أنواع العقارات من API أو استخدام القائمة الثابتة
   const fetchPropertyTypes = async () => {
@@ -104,9 +201,9 @@ export default function PropertyFilter({
         const data = await response.json();
 
         if (data.success && Array.isArray(data.data)) {
-          const types = data.data.map((item: PropertyType) => item.name);
-          setPropertyTypes(types);
-          setFilteredTypes(types);
+          // استخدام البيانات كاملة مع الـ IDs
+          setPropertyTypes(data.data);
+          setFilteredTypes(data.data);
         } else {
           throw new Error("Invalid response format");
         }
@@ -114,22 +211,34 @@ export default function PropertyFilter({
         actualPropertyTypesSource === "static" &&
         actualStaticPropertyTypes?.length > 0
       ) {
-        // استخدام القائمة الثابتة
-        setPropertyTypes(actualStaticPropertyTypes);
-        setFilteredTypes(actualStaticPropertyTypes);
+        // استخدام القائمة الثابتة - تحويل إلى PropertyType format
+        const staticTypes = actualStaticPropertyTypes.map((name: string, index: number) => ({
+          id: index + 1,
+          name: name
+        }));
+        setPropertyTypes(staticTypes);
+        setFilteredTypes(staticTypes);
       } else {
-        // استخدام القائمة الافتراضية كـ fallback
-        setPropertyTypes(defaultPropertyTypes);
-        setFilteredTypes(defaultPropertyTypes);
+        // استخدام القائمة الافتراضية كـ fallback - تحويل إلى PropertyType format
+        const defaultTypes = defaultPropertyTypes.map((name: string, index: number) => ({
+          id: index + 1,
+          name: name
+        }));
+        setPropertyTypes(defaultTypes);
+        setFilteredTypes(defaultTypes);
       }
     } catch (err) {
       console.error("Error fetching property types:", err);
       setError(
         err instanceof Error ? err.message : "حدث خطأ في جلب أنواع العقارات",
       );
-      // في حالة الخطأ، استخدم القائمة الافتراضية
-      setPropertyTypes(defaultPropertyTypes);
-      setFilteredTypes(defaultPropertyTypes);
+      // في حالة الخطأ، استخدم القائمة الافتراضية - تحويل إلى PropertyType format
+      const defaultTypes = defaultPropertyTypes.map((name: string, index: number) => ({
+        id: index + 1,
+        name: name
+      }));
+      setPropertyTypes(defaultTypes);
+      setFilteredTypes(defaultTypes);
     } finally {
       setLoading(false);
     }
@@ -169,23 +278,20 @@ export default function PropertyFilter({
       actualPropertyTypesSource === "static" &&
       actualStaticPropertyTypes?.length > 0
     ) {
-      setPropertyTypes(actualStaticPropertyTypes);
-      setFilteredTypes(actualStaticPropertyTypes);
+      // تحويل إلى PropertyType format
+      const staticTypes = actualStaticPropertyTypes.map((name: string, index: number) => ({
+        id: index + 1,
+        name: name
+      }));
+      setPropertyTypes(staticTypes);
+      setFilteredTypes(staticTypes);
     }
   }, [actualStaticPropertyTypes, actualPropertyTypesSource]);
 
-  // تحديث الفلتر عند تغيير البحث
+  // تحديث الفلتر عند تغيير propertyTypes
   useEffect(() => {
-    if (propertyType) {
-      setFilteredTypes(
-        propertyTypes.filter((type) =>
-          type.toLowerCase().includes(propertyType.toLowerCase()),
-        ),
-      );
-    } else {
-      setFilteredTypes(propertyTypes);
-    }
-  }, [propertyType, propertyTypes]);
+    setFilteredTypes(propertyTypes);
+  }, [propertyTypes]);
 
   // إغلاق الـ dropdown عند النقر خارجه
   useEffect(() => {
@@ -195,6 +301,18 @@ export default function PropertyFilter({
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsDropdownOpen(false);
+      }
+      if (
+        cityDropdownRef.current &&
+        !cityDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsCityOpen(false);
+      }
+      if (
+        districtDropdownRef.current &&
+        !districtDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDistrictOpen(false);
       }
     }
 
@@ -211,8 +329,10 @@ export default function PropertyFilter({
     fetchProperties(1);
   };
 
-  const handleTypeSelect = (type: string) => {
-    setPropertyType(type);
+  const handleTypeSelect = (type: PropertyType) => {
+    setPropertyType(type.name); // حفظ الاسم للعرض
+    setCategoryId(type.id.toString()); // حفظ الـ ID للـ API
+    console.log("Property type selected:", { name: type.name, id: type.id }); // Debug
     setIsDropdownOpen(false);
     // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
   };
@@ -224,72 +344,130 @@ export default function PropertyFilter({
         className="grid grid-cols-1 xs:grid-cols-2 md:flex flex-col md:flex-row mt-4 bg-white rounded-[10px] gap-x-5 md:gap-x-5 gap-y-4 p-4 "
       >
         {/* البحث عن المدينة */}
-        <div className="py-2 w-full md:w-[32.32%] relative flex items-center justify-center border border-gray-200 h-12 md:h-14 rounded-[10px]">
-          <Input
-            placeholder={searchPlaceholder}
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
-            }}
-            className="w-full h-full outline-none pr-2 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border-0 focus-visible:ring-0"
-            name="search"
-          />
+        <div className="py-2 w-full md:w-[32.32%] relative flex items-center justify-center border border-gray-200 h-12 md:h-14 rounded-[10px]" ref={cityDropdownRef}>
+          <div
+            className="w-full h-full flex items-center justify-between px-2 cursor-pointer select-none"
+            onClick={() => setIsCityOpen((p) => !p)}
+            aria-haspopup="listbox"
+            aria-expanded={isCityOpen}
+          >
+            <span className="text-gray-900 text-xs xs:text-base md:text-lg">
+              {search || searchPlaceholder}
+            </span>
+            <ChevronDown className="w-5 h-5 text-gray-400" />
+          </div>
+          {isCityOpen && (
+            <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-[10px] mt-1 max-h-60 overflow-y-auto shadow-lg">
+              {cityLoading ? (
+                <div className="px-4 py-3 text-gray-500 text-sm md:text-base text-center">جاري تحميل المدن...</div>
+              ) : cityError ? (
+                <div className="px-4 py-3 text-red-500 text-sm md:text-base text-center">{cityError}</div>
+              ) : cityOptions.length === 0 ? (
+                <div className="px-4 py-3 text-gray-500 text-sm md:text-base text-center">لا توجد مدن متاحة</div>
+              ) : (
+                cityOptions.map((c) => (
+                  <div
+                    key={String(c.id)}
+                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-sm md:text-base"
+                    role="option"
+                    onClick={() => {
+                      setSearch(c.name);
+                      setIsCityOpen(false);
+                    }}
+                  >
+                    {c.name}
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* الحي السكني */}
+        <div className="py-2 w-full md:w-[23.86%] relative flex items-center justify-center border border-gray-200 h-12 md:h-14 rounded-[10px]" ref={districtDropdownRef}>
+          <div
+            className={`w-full h-full flex items-center justify-between px-2 cursor-pointer select-none ${!search ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => search && setIsDistrictOpen((p) => !p)}
+            aria-haspopup="listbox"
+            aria-expanded={isDistrictOpen}
+          >
+            <span className="text-gray-900 text-xs xs:text-base md:text-lg">
+              {district ? districtOptions.find(d => d.id.toString() === district)?.name || district : "اختر الحي السكني"}
+            </span>
+            <ChevronDown className="w-5 h-5 text-gray-400" />
+          </div>
+          {isDistrictOpen && search && (
+            <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-[10px] mt-1 max-h-60 overflow-y-auto shadow-lg">
+              {districtLoading ? (
+                <div className="px-4 py-3 text-gray-500 text-sm md:text-base text-center">جاري تحميل الأحياء...</div>
+              ) : districtError ? (
+                <div className="px-4 py-3 text-red-500 text-sm md:text-base text-center">{districtError}</div>
+              ) : districtOptions.length === 0 ? (
+                <div className="px-4 py-3 text-gray-500 text-sm md:text-base text-center">لا توجد أحياء متاحة</div>
+              ) : (
+                districtOptions.map((d) => (
+                  <div
+                    key={String(d.id)}
+                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-sm md:text-base"
+                    role="option"
+                    onClick={() => {
+                      setDistrict(d.id.toString()); // حفظ state_id بدلاً من الاسم
+                      setIsDistrictOpen(false);
+                    }}
+                  >
+                    {d.name}
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
         {/* نوع العقار */}
-        <div className="h-full relative w-full md:w-[23.86%]" ref={dropdownRef}>
-          <div className="w-full h-full relative">
-            <div className="relative">
-              <Input
-                placeholder={propertyTypePlaceholder}
-                value={propertyType}
-                onChange={(e) => {
-                  setPropertyType(e.target.value);
-                  setIsDropdownOpen(true);
-                }}
-                onFocus={() => setIsDropdownOpen(true)}
-                className="w-full h-12 md:h-14 outline-none pr-10 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border border-gray-200 rounded-[10px] focus-visible:ring-0"
-                name="propertyType"
-              />
-              <div className="absolute left-2 md:left-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <ChevronDown className="w-5 h-5 text-gray-400" />
-              </div>
-            </div>
-
-            {/* Dropdown */}
-            {isDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-[10px] mt-1 max-h-60 overflow-y-auto shadow-lg">
-                {loading ? (
-                  <div className="px-4 py-3 text-gray-500 text-sm md:text-base text-center">
-                    جاري التحميل...
-                  </div>
-                ) : error ? (
-                  <div className="px-4 py-3 text-red-500 text-sm md:text-base text-center">
-                    {error}
-                  </div>
-                ) : propertyTypes.length === 0 ? (
-                  <div className="px-4 py-3 text-gray-500 text-sm md:text-base text-center">
-                    لا توجد أنواع عقارات متاحة
-                  </div>
-                ) : filteredTypes.length > 0 ? (
-                  filteredTypes.map((type, index) => (
-                    <div
-                      key={index}
-                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-sm md:text-base"
-                      onClick={() => handleTypeSelect(type)}
-                    >
-                      {type}
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-4 py-3 text-gray-500 text-sm md:text-base">
-                    {noResultsText}
-                  </div>
-                )}
-              </div>
-            )}
+        <div className="py-2 w-full md:w-[23.86%] relative flex items-center justify-center border border-gray-200 h-12 md:h-14 rounded-[10px]" ref={dropdownRef}>
+          <div
+            className="w-full h-full flex items-center justify-between px-2 cursor-pointer select-none"
+            onClick={() => setIsDropdownOpen((p) => !p)}
+            aria-haspopup="listbox"
+            aria-expanded={isDropdownOpen}
+          >
+            <span className="text-gray-900 text-xs xs:text-base md:text-lg">
+              {propertyType || propertyTypePlaceholder}
+            </span>
+            <ChevronDown className="w-5 h-5 text-gray-400" />
           </div>
+          {isDropdownOpen && (
+            <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-[10px] mt-1 max-h-60 overflow-y-auto shadow-lg">
+              {loading ? (
+                <div className="px-4 py-3 text-gray-500 text-sm md:text-base text-center">
+                  جاري التحميل...
+                </div>
+              ) : error ? (
+                <div className="px-4 py-3 text-red-500 text-sm md:text-base text-center">
+                  {error}
+                </div>
+              ) : propertyTypes.length === 0 ? (
+                <div className="px-4 py-3 text-gray-500 text-sm md:text-base text-center">
+                  لا توجد أنواع عقارات متاحة
+                </div>
+              ) : filteredTypes.length > 0 ? (
+                filteredTypes.map((type) => (
+                  <div
+                    key={type.id}
+                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-sm md:text-base"
+                    role="option"
+                    onClick={() => handleTypeSelect(type)}
+                  >
+                    {type.name}
+                  </div>
+                ))
+              ) : (
+                <div className="px-4 py-3 text-gray-500 text-sm md:text-base">
+                  {noResultsText}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* السعر */}
