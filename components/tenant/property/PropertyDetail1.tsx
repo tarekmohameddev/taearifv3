@@ -840,7 +840,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 </p>
               </div>
 
-              {property.area && parseFloat(property.area) > 0 && (
+              {property.area && parseFloat(property.area) > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <RulerIcon className="w-4 h-4 text-emerald-600" />
@@ -852,7 +852,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.area} م²
                   </p>
                 </div>
-              )}
+              ) : null}
 
               <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                 <div className="flex flex-row gap-x-2">
@@ -866,7 +866,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 </p>
               </div>
 
-              {property.payment_method && (
+              {property.payment_method ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <CreditCardIcon className="w-4 h-4 text-emerald-600" />
@@ -884,9 +884,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                           : property.payment_method}
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.pricePerMeter && (
+              {property.pricePerMeter ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <img
@@ -906,9 +906,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.pricePerMeter}
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.building_age && (
+              {property.building_age ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <CalendarDaysIcon className="w-4 h-4 text-emerald-600" />
@@ -920,9 +920,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.building_age} سنة
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.floors && (
+              {property.floors ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <LayersIcon className="w-4 h-4 text-emerald-600" />
@@ -934,9 +934,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.floors} طابق
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.floor_number && (
+              {property.floor_number ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <ArrowUpDownIcon className="w-4 h-4 text-emerald-600" />
@@ -948,9 +948,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     الطابق {property.floor_number}
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.bedrooms > 0 && (
+              {property.bedrooms > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <BedIcon className="w-4 h-4 text-emerald-600" />
@@ -962,9 +962,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.bedrooms} غرفة
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.bathrooms && property.bathrooms > 0 && (
+              {property.bathrooms && property.bathrooms > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <BathIcon className="w-4 h-4 text-emerald-600" />
@@ -976,9 +976,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.bathrooms} حمام
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.kitchen && property.kitchen > 0 && (
+              {property.kitchen && property.kitchen > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <ChefHatIcon className="w-4 h-4 text-emerald-600" />
@@ -990,9 +990,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.kitchen} مطبخ
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.living_room && property.living_room > 0 && (
+              {property.living_room && property.living_room > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <SofaIcon className="w-4 h-4 text-emerald-600" />
@@ -1004,9 +1004,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.living_room} صالة
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.majlis && property.majlis > 0 && (
+              {property.majlis && property.majlis > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <UsersIcon className="w-4 h-4 text-emerald-600" />
@@ -1018,9 +1018,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.majlis} مجلس
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.dining_room && property.dining_room > 0 && (
+              {property.dining_room && property.dining_room > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <UtensilsIcon className="w-4 h-4 text-emerald-600" />
@@ -1032,9 +1032,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.dining_room} غرفة طعام
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.maid_room && property.maid_room > 0 && (
+              {property.maid_room && property.maid_room > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <UserIcon className="w-4 h-4 text-emerald-600" />
@@ -1046,9 +1046,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.maid_room} غرفة خادمة
                   </p>
                 </div>
-              )}
+              ) : null  }
 
-              {property.driver_room && property.driver_room > 0 && (
+              {property.driver_room && property.driver_room > 0 ?(
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <CarIcon className="w-4 h-4 text-emerald-600" />
@@ -1060,9 +1060,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.driver_room} غرفة سائق
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.storage_room && property.storage_room > 0 && (
+              {property.storage_room && property.storage_room > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <PackageIcon className="w-4 h-4 text-emerald-600" />
@@ -1074,9 +1074,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.storage_room} مخزن
                   </p>
                 </div>
-              )}
+              ) : null    }
 
-              {property.basement && property.basement > 0 && (
+              {property.basement && property.basement > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <Layers className="w-4 h-4 text-emerald-600" />
@@ -1088,9 +1088,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.basement} قبو
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.swimming_pool && property.swimming_pool > 0 && (
+              {property.swimming_pool && property.swimming_pool > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <WavesIcon className="w-4 h-4 text-emerald-600" />
@@ -1102,9 +1102,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.swimming_pool} مسبح
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.balcony && property.balcony > 0 && (
+              {property.balcony && property.balcony > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <SquareIcon className="w-4 h-4 text-emerald-600" />
@@ -1116,9 +1116,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.balcony} شرفة
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.garden && property.garden > 0 && (
+              {property.garden && property.garden > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <TreePineIcon className="w-4 h-4 text-emerald-600" />
@@ -1130,9 +1130,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.garden} حديقة
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.elevator && property.elevator > 0 && (
+              {property.elevator && property.elevator > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <ArrowUpDown className="w-4 h-4 text-emerald-600" />
@@ -1144,9 +1144,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.elevator} مصعد
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.private_parking && property.private_parking > 0 && (
+              {property.private_parking && property.private_parking > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <ParkingCircleIcon className="w-4 h-4 text-emerald-600" />
@@ -1158,9 +1158,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.private_parking} موقف
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              {property.length && property.width && (
+              {property.length && property.width ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
                     <RulerIcon className="w-4 h-4 text-emerald-600" />
@@ -1172,11 +1172,11 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     {property.length} × {property.width} م
                   </p>
                 </div>
-              )}
+              ) : null}
 
               {property.location &&
                 ((property.location.lat && property.location.lng) ||
-                  property.location.address) && (
+                  property.location.address) ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <MapPinIcon className="w-4 h-4 text-emerald-600" />
@@ -1196,7 +1196,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       </span>
                     )}
                   </div>
-                )}
+                ) : null}
             </div>
             {/* وصف العقار */}
             <div>
@@ -1211,7 +1211,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             </div>
 
             {/* الأسئلة الشائعة */}
-            {property.faqs && property.faqs.length > 0 && (
+            {property.faqs && property.faqs.length > 0 ? (
               <div className="mb-8 md:mb-18">
                 <div className="flex flex-col justify-center items-start gap-y-6 md:gap-y-8">
                   <h3 className="text-gray-600 font-bold text-xl leading-6 lg:text-2xl lg:leading-7">
@@ -1257,7 +1257,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   </div>
                 </div>
               </div>
-            )}
+            ) : null}
 
             {/* نموذج الحجز */}
             {/* انه مخفي فقط الان ولا اريد ازالته */}
@@ -1390,6 +1390,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
           {/* العمود الثاني - الصور والعقارات المشابهة ونموذج الحجز */}
           <div className="lg:col-span-1 space-y-8">
+              {property.floor_planning_image &&
+                  property.floor_planning_image.length > 0 ? (
             <div>
               <div className="flex flex-col gap-y-6">
                 {/* مخططات الأرضية */}
@@ -1446,9 +1448,9 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   )}
               </div>
             </div>
-
+                  ) : null}
             {/* خريطة الموقع */}
-            {property.location && property.location.lat && property.location.lng && (
+            {property.location && property.location.lat && property.location.lng ? (
               <div className="mb-8">
                 <h3 className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
                   موقع العقار
@@ -1477,11 +1479,11 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   </a>
                 </div>
               </div>
-            )}
+            ) : null}
             
 
             {/* عقارات مشابهة */}
-            {loadingSimilar && (
+            {loadingSimilar ? (
             <div>
               <div className="flex-1">
                 <div>
@@ -1659,7 +1661,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 </div>
               </div>
             </div>
-            )}
+            ) : null}
           </div>
         </div>
 
