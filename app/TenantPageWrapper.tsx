@@ -22,6 +22,7 @@ import {
   HalfTextHalfImageSkeleton1,
   ContactCardsSkeleton1,
 } from "@/components/skeleton";
+import { HeaderSkeleton } from "@/components/skeleton/HeaderSkeleton";
 import {
   shouldCenterComponent,
   getCenterWrapperClasses,
@@ -245,6 +246,7 @@ export default function TenantPageWrapper({
     return (
       <I18nProvider>
         <div className="min-h-screen flex flex-col" dir="rtl">
+          
           {/* Header Skeleton */}
           <StaticHeaderSkeleton1 />
 
@@ -278,7 +280,7 @@ export default function TenantPageWrapper({
           <div className="min-h-screen flex flex-col" dir="rtl">
             {/* Header with i18n support */}
             <div className="relative">
-              <StaticHeader1 />
+              <StaticHeader1 overrideData={{}} />
               {/* لا اريد ازالة هذا  , فقط اريده ككومنت */}
               {/* <div className="absolute top-4 right-4 z-50"> 
             <LanguageDropdown />

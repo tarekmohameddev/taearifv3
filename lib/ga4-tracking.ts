@@ -28,7 +28,6 @@ export const initializeGA4 = () => {
     return;
   }
 
-  console.log("🚀 GA4: Starting initialization with ID:", ga4Id);
 
   // Initialize dataLayer and gtag first
   window.dataLayer = window.dataLayer || [];
@@ -74,20 +73,14 @@ const shouldTrackDomain = (domain: string): boolean => {
   // Extract local domain from API URL
   const localDomain = new URL(apiUrl).hostname;
 
-  console.log("🔍 GA4: Checking domain:", domain);
-  console.log("🔍 GA4: Production domain:", productionDomain);
-  console.log("🔍 GA4: Local domain:", localDomain);
-  console.log("🔍 GA4: Is development:", isDevelopment);
 
   // Don't track main domain
   if (domain === `www.${productionDomain}` || domain === productionDomain) {
-    console.log("❌ GA4: Main domain excluded:", domain);
     return false;
   }
 
   // Track tenant subdomains in production
   if (!isDevelopment && domain.endsWith(`.${productionDomain}`)) {
-    console.log("✅ GA4: Tenant subdomain (production):", domain);
     return true;
   }
 
@@ -96,11 +89,9 @@ const shouldTrackDomain = (domain: string): boolean => {
     isDevelopment &&
     (domain === localDomain || domain.includes(localDomain))
   ) {
-    console.log("✅ GA4: Local domain (development):", domain);
     return true;
   }
 
-  console.log("❌ GA4: Domain not tracked:", domain);
   return false;
 };
 
@@ -114,12 +105,10 @@ const getTenantIdFromDomain = (domain: string): string | null => {
   // Extract local domain from API URL
   const localDomain = new URL(apiUrl).hostname;
 
-  console.log("🔍 GA4: Getting tenant ID from domain:", domain);
 
   // For production: tenant1.mandhoor.com -> tenant1
   if (!isDevelopment && domain.endsWith(`.${productionDomain}`)) {
     const subdomain = domain.replace(`.${productionDomain}`, "");
-    console.log("✅ GA4: Tenant ID (production):", subdomain);
     return subdomain;
   }
 
@@ -128,12 +117,10 @@ const getTenantIdFromDomain = (domain: string): string | null => {
     const parts = domain.split(".");
     if (parts.length > 1 && parts[0] !== localDomain) {
       const subdomain = parts[0];
-      console.log("✅ GA4: Tenant ID (development):", subdomain);
       return subdomain;
     }
   }
 
-  console.log("❌ GA4: No tenant ID found");
   return null;
 };
 
@@ -150,7 +137,6 @@ const isGA4Ready = (): boolean => {
 // Track page view
 export const trackPageView = (tenantId: string, pagePath: string) => {
   if (isGA4Ready()) {
-    console.log("🚀 GA4: Tracking page view", { tenantId, pagePath });
     window.gtag("event", "page_view", {
       tenant_id: tenantId,
       page_path: pagePath,
@@ -165,7 +151,6 @@ export const trackPageView = (tenantId: string, pagePath: string) => {
 // Track property view
 export const trackPropertyView = (tenantId: string, propertySlug: string) => {
   if (isGA4Ready()) {
-    console.log("🏠 GA4: Tracking property view", { tenantId, propertySlug });
     window.gtag("event", "property_view", {
       tenant_id: tenantId,
       property_slug: propertySlug,
@@ -180,7 +165,6 @@ export const trackPropertyView = (tenantId: string, propertySlug: string) => {
 // Track project view
 export const trackProjectView = (tenantId: string, projectSlug: string) => {
   if (isGA4Ready()) {
-    console.log("🏗️ GA4: Tracking project view", { tenantId, projectSlug });
     window.gtag("event", "project_view", {
       tenant_id: tenantId,
       project_slug: projectSlug,

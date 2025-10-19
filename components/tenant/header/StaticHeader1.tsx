@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { getDefaultHeaderData as getDefaultHeaderDataFromFunctions } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
-
+import HeaderSkeleton from "@/components/skeleton/header/StaticHeaderSkeleton1";
 // Function to generate random ID
 const generateRandomId = (): string => {
   const chars =
@@ -184,6 +184,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
+  const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
 
   // Get global components data from tenantData
@@ -203,6 +204,13 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
 
   // Merge data with priority: overrideData > globalHeaderData > default
   const [mergedData, setMergedData] = useState(() => {
+    // إذا كان tenantId موجود ولكن tenantData غير موجودة، لا نستخدم الـ default data
+    // أو إذا كان التحميل جارياً
+    // أو إذا لم يكن tenantId موجوداً بعد (حالة البداية)
+    if ((tenantId && !tenantData) || loadingTenantData || !tenantId) {
+      return null;
+    }
+
     // Deep merge function for nested objects
     const deepMerge = (target: any, source: any): any => {
       if (!source || typeof source !== "object") return target || source;
@@ -269,6 +277,11 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
 
   // Update mergedData whenever dependencies change
   useEffect(() => {
+    // إذا كان tenantId موجود ولكن tenantData غير موجودة، أو إذا كان التحميل جارياً، أو إذا لم يكن tenantId موجوداً، لا نحدث الـ mergedData
+    if ((tenantId && !tenantData) || loadingTenantData || !tenantId) {
+      return;
+    }
+
     // Deep merge function for nested objects
     const deepMerge = (target: any, source: any): any => {
       if (!source || typeof source !== "object") return target || source;
@@ -338,6 +351,9 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
     globalHeaderData,
     tenantGlobalHeaderData,
     overrideData,
+    tenantId,
+    tenantData,
+    loadingTenantData,
   ]);
 
   // Monitor globalHeaderData changes
@@ -366,8 +382,24 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
 
   // Generate dynamic styles with CSS custom properties for responsive heights
   const headerStyles = useMemo(
-    () =>
-      ({
+    () => {
+      // إذا كانت mergedData null، استخدم القيم الافتراضية
+      if (!mergedData) {
+        return {
+          position: "sticky" as const,
+          top: "0px",
+          zIndex: 50,
+          background: "#ffffff",
+          opacity: "0.8",
+          height: "96px",
+          borderBottom: "1px solid #e5e7eb",
+          "--header-height-desktop": "96px",
+          "--header-height-tablet": "80px",
+          "--header-height-mobile": "64px",
+        } as React.CSSProperties;
+      }
+
+      return {
         position: mergedData.position?.type || "sticky",
         top: `${mergedData.position?.top || 0}px`,
         zIndex: mergedData.position?.zIndex || 50,
@@ -385,7 +417,8 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
         "--header-height-desktop": `${mergedData.height?.desktop || 96}px`,
         "--header-height-tablet": `${mergedData.height?.tablet || 80}px`,
         "--header-height-mobile": `${mergedData.height?.mobile || 64}px`,
-      }) as React.CSSProperties,
+      } as React.CSSProperties;
+    },
     [mergedData],
   );
 
@@ -401,19 +434,48 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
   }, []);
 
   const logoStyles = useMemo(
-    () => ({
-      fontFamily: mergedData.logo?.font?.family || "Tajawal",
-      fontWeight: mergedData.logo?.font?.weight || "600",
-      fontSize: `${mergedData.logo?.font?.size || 24}px`,
-      color:
-        mergedData.colors?.text || mergedData.styling?.textColor || "#1f2937",
-    }),
+    () => {
+      // إذا كانت mergedData null، استخدم القيم الافتراضية
+      if (!mergedData) {
+        return {
+          fontFamily: "Tajawal",
+          fontWeight: "600",
+          fontSize: "24px",
+          color: "#1f2937",
+        };
+      }
+
+      return {
+        fontFamily: mergedData.logo?.font?.family || "Tajawal",
+        fontWeight: mergedData.logo?.font?.weight || "600",
+        fontSize: `${mergedData.logo?.font?.size || 24}px`,
+        color:
+          mergedData.colors?.text || mergedData.styling?.textColor || "#1f2937",
+      };
+    },
     [mergedData],
   );
 
+  // Show skeleton loading if tenantId exists but tenantData is not available, or if mergedData is null, or if loading
+  // أو إذا كانت mergedData تحتوي على الـ default data فقط (بدون بيانات حقيقية)
+  const hasRealData = tenantData || (globalHeaderData && Object.keys(globalHeaderData).length > 0) || (tenantGlobalHeaderData && Object.keys(tenantGlobalHeaderData).length > 0);
+  const isDefaultData = mergedData?.logo?.text === "مكتب دليل الجواء" && !hasRealData;
+  
+
+  // منطق أكثر صرامة: إذا كان tenantId موجود ولكن tenantData غير موجودة، أو إذا كان التحميل جارياً
+  // أو إذا كانت البيانات الافتراضية موجودة بدون بيانات حقيقية
+  if ((tenantId && !tenantData) || loadingTenantData || isDefaultData) {
+    return <HeaderSkeleton />;
+  }
+
   // Don't render if not visible
-  if (!mergedData.visible) {
-    return null;
+  if (!mergedData || !mergedData.visible) {
+    return <HeaderSkeleton />;
+  }
+
+  // إذا كانت mergedData null، لا نعرض أي شيء (يجب أن يظهر skeleton loading بدلاً من ذلك)
+  if (!mergedData) {
+    return <HeaderSkeleton />;
   }
 
   return (

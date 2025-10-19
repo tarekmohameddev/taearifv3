@@ -25,21 +25,12 @@ export default function PropertyPageWrapper({
   const setTenantId = useTenantStore((s) => s.setTenantId);
 
   // Add immediate console log to verify component is loading
-  console.log("🏠 PropertyPageWrapper: Component loaded!", {
-    tenantId,
-    propertySlug,
-    hostname:
-      typeof window !== "undefined" ? window.location.hostname : "server",
-    timestamp: new Date().toISOString(),
-  });
 
   // Set tenantId in store when component mounts
   useEffect(() => {
-    console.log("🏠 PropertyPageWrapper: Setting tenant ID", { tenantId });
     if (tenantId) {
       setTenantId(tenantId);
     } else {
-      console.log("❌ PropertyPageWrapper: No tenant ID provided!");
     }
   }, [tenantId, setTenantId]);
 
@@ -57,9 +48,6 @@ export default function PropertyPageWrapper({
     }
   }, [tenantId, propertySlug]);
 
-  console.log("🏠 PropertyPageWrapper: Rendering with GA4Provider", {
-    tenantId,
-  });
 
   return (
     <GTMProvider>

@@ -325,7 +325,6 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
         setPropertyError("العقار غير موجود");
       }
     } catch (error) {
-      console.error("PropertyDetail: Error fetching property:", error);
       setPropertyError("حدث خطأ في تحميل بيانات العقار");
     } finally {
       setLoadingProperty(false);

@@ -15,6 +15,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { useEffect, useMemo, useCallback } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { StaticFooterSkeleton } from "@/components/skeleton/footer/StaticFooterSkeleton";
 
 // Define footer data type
 type FooterData = {
@@ -242,6 +243,7 @@ export default function StaticFooter({
 } = {}) {
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
+  const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
@@ -284,6 +286,11 @@ export default function StaticFooter({
 
   // Merge data with priority: overrideData > currentStoreData > storeData > tenantGlobalFooterData > globalFooterData > default
   const mergedData = useMemo(() => {
+    // إذا كان tenantId موجود ولكن tenantData غير موجودة، أو إذا كان التحميل جارياً، أو إذا لم يكن tenantId موجوداً، لا نستخدم الـ default data
+    if ((tenantId && !tenantData) || loadingTenantData || !tenantId) {
+      return null;
+    }
+
     const result = {
       ...defaultData,
       ...globalFooterData, // globalFooterData from editorStore
@@ -324,13 +331,30 @@ export default function StaticFooter({
     storeData,
     currentStoreData,
     overrideData,
+    tenantId,
+    tenantData,
+    loadingTenantData,
   ]);
 
-  // Debug logging for data sources
+  // Show skeleton loading if tenantId exists but tenantData is not available, or if mergedData is null, or if loading
+  // أو إذا كانت mergedData تحتوي على الـ default data فقط (بدون بيانات حقيقية)
+  const hasRealData = tenantData || (globalFooterData && Object.keys(globalFooterData).length > 0) || (tenantGlobalFooterData && Object.keys(tenantGlobalFooterData).length > 0);
+  const isDefaultData = mergedData?.content?.companyName === "مكتب دليل الجواء العقاري" && !hasRealData;
+  
+  // منطق أكثر صرامة: إذا كان tenantId موجود ولكن tenantData غير موجودة، أو إذا كان التحميل جارياً
+  // أو إذا كانت البيانات الافتراضية موجودة بدون بيانات حقيقية
+  if ((tenantId && !tenantData) || loadingTenantData || isDefaultData) {
+    return <StaticFooterSkeleton />;
+  }
+
+  // إذا كانت mergedData null، لا نعرض أي شيء (يجب أن يظهر skeleton loading بدلاً من ذلك)
+  if (!mergedData) {
+    return <StaticFooterSkeleton />;
+  }
 
   // Don't render if not visible
-  if (!mergedData.visible) {
-    return null;
+  if (!mergedData || !mergedData.visible) {
+    return <StaticFooterSkeleton />;
   }
 
   const getBackgroundStyle = () => {

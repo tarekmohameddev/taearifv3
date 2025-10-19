@@ -20,6 +20,8 @@ import CtaValuationSkeleton1 from "./ctaValuation/CtaValuationSkeleton1";
 import ContactMapSectionSkeleton1 from "./contactMapSection/ContactMapSectionSkeleton1";
 import WhyChooseUsSkeleton1 from "./whyChooseUs/WhyChooseUsSkeleton1";
 import ContactCardsSkeleton1 from "./contactCards/ContactCardsSkeleton1";
+import { HeaderSkeleton } from "./HeaderSkeleton";
+import { StaticFooterSkeleton } from "./footer/StaticFooterSkeleton";
 
 // Default Skeleton Component
 const DefaultSkeleton = () => (
@@ -103,6 +105,10 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
         return <WhyChooseUsSkeleton1 />;
       case "contactCards1":
         return <ContactCardsSkeleton1 />;
+      case "headerSkeleton":
+        return <HeaderSkeleton />;
+      case "footerSkeleton":
+        return <StaticFooterSkeleton />;
       default:
         return <DefaultSkeleton />;
     }
