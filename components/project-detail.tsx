@@ -688,7 +688,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
               {/* تفاصيل المشروع في شبكة */}
               <div className="grid grid-cols-2 gap-y-6 lg:gap-y-10">
                 {/* عنوان المشروع */}
-                {project.address && project.address.trim() !== "" && (
+                {project.address && project.address.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <MapPinIcon className="w-4 h-4 text-emerald-600" />
@@ -700,10 +700,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       {project.address}
                     </p>
                   </div>
-                )}
+                ) : null}
 
                 {/* المطور */}
-                {project.developer && project.developer.trim() !== "" && (
+                {project.developer && project.developer.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <BuildingIcon className="w-4 h-4 text-emerald-600" />
@@ -715,10 +715,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       {project.developer}
                     </p>
                   </div>
-                )}
+                  ) : null}
 
                 {/* عدد الوحدات */}
-                {project.units && project.units > 0 && (
+                {project.units && project.units > 0 ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <HomeIcon className="w-4 h-4 text-emerald-600" />
@@ -730,11 +730,11 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       {project.units} وحدة
                     </p>
                   </div>
-                )}
+                ) : null}
 
                 {/* تاريخ التسليم */}
                 {project.completionDate &&
-                  project.completionDate.trim() !== "" && (
+                  project.completionDate.trim() !== "" ? (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
                         <CalendarIcon className="w-4 h-4 text-emerald-600" />
@@ -748,11 +748,11 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                         )}
                       </p>
                     </div>
-                  )}
+                  ) : null}
 
                 {/* حالة الإكمال */}
                 {project.completeStatus &&
-                  project.completeStatus.trim() !== "" && (
+                  project.completeStatus.trim() !== "" ? (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
                         <WrenchIcon className="w-4 h-4 text-emerald-600" />
@@ -766,12 +766,12 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           : "قيد الإنشاء"}
                       </p>
                     </div>
-                  )}
+                  ) : null}
 
                 {/* السعر الأدنى */}
                 {project.minPrice &&
                   project.minPrice.trim() !== "" &&
-                  parseFloat(project.minPrice) > 0 && (
+                  parseFloat(project.minPrice) > 0 ? (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
                         <img
@@ -791,7 +791,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                         {project.minPrice} ريال
                       </p>
                     </div>
-                  )}
+                  ) : null}
 
                 {/* السعر الأعلى */}
                 {project.maxPrice &&
@@ -819,7 +819,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   )}
 
                 {/* فيديو المشروع */}
-                {project.videoUrl && project.videoUrl.trim() !== "" && (
+                {project.videoUrl && project.videoUrl.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <PlayIcon className="w-4 h-4 text-emerald-600" />
@@ -836,7 +836,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       مشاهدة الفيديو
                     </a>
                   </div>
-                )}
+                ) : null}
 
                 {/* الموقع */}
                 {project.location &&
@@ -865,7 +865,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   )}
 
                 {/* تاريخ الإنشاء */}
-                {project.createdAt && project.createdAt.trim() !== "" && (
+                {project.createdAt && project.createdAt.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <CalendarIcon className="w-4 h-4 text-emerald-600" />
@@ -877,10 +877,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       {new Date(project.createdAt).toLocaleDateString("ar-US")}
                     </p>
                   </div>
-                )}
+                ) : null}
 
                 {/* تاريخ التحديث */}
-                {project.updatedAt && project.updatedAt.trim() !== "" && (
+                {project.updatedAt && project.updatedAt.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <ClockIcon className="w-4 h-4 text-emerald-600" />
@@ -892,10 +892,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       {new Date(project.updatedAt).toLocaleDateString("ar-US")}
                     </p>
                   </div>
-                )}
+                ) : null}
 
                 {/* المرافق */}
-                {project.amenities && project.amenities.length > 0 && (
+                {project.amenities && project.amenities.length > 0 ? (
                   <div className="col-span-2">
                     <div className="flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
@@ -916,11 +916,11 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       </div>
                     </div>
                   </div>
-                )}
+                ) : null}
 
                 {/* المواصفات */}
                 {project.specifications &&
-                  project.specifications.length > 0 && (
+                  project.specifications.length > 0 ? (
                     <div className="col-span-2">
                       <div className="flex flex-row gap-x-2 md:gap-x-6">
                         <div className="flex flex-row gap-x-2">
@@ -943,10 +943,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                         </div>
                       </div>
                     </div>
-                  )}
+                  ) : null}
 
                 {/* الأنواع */}
-                {project.types && project.types.length > 0 && (
+                {project.types && project.types.length > 0 ? (
                   <div className="col-span-2">
                     <div className="flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
@@ -969,9 +969,9 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       </div>
                     </div>
                   </div>
-                )}
+                ) : null}
 
-                {project.features && project.features.length > 0 && (
+                {project.features && project.features.length > 0 ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <div className="w-4 h-4 bg-emerald-600 rounded"></div>
@@ -983,9 +983,9 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       {project.features.join(", ")}
                     </p>
                   </div>
-                )}
+                ) : null}
 
-                {project.status && (
+                {project.status ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <div className="w-4 h-4 bg-emerald-600 rounded"></div>
@@ -997,9 +997,9 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       {project.status === "available" ? "متاح" : project.status}
                     </p>
                   </div>
-                )}
+                ) : null}
 
-                {project.createdAt && (
+                {project.createdAt ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <CalendarDaysIcon className="w-4 h-4 text-emerald-600" />
@@ -1011,7 +1011,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       {new Date(project.createdAt).toLocaleDateString("ar-US")}
                     </p>
                   </div>
-                )}
+                ) : null}
               </div>
             </div>
           </div>
@@ -1151,6 +1151,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
         {/* القسم السفلي */}
         <div className="flex flex-col md:flex-row gap-x-6 gap-y-8">
           {/* المشاريع المشابهة */}
+          {loadingSimilar ? (
           <div className="flex-1">
             <div>
               <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
@@ -1445,6 +1446,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
               </div>
             </div>
           </div>
+          ) : null}
         </div>
       </div>
 
