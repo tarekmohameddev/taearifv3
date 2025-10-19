@@ -1034,7 +1034,67 @@ export function RentalApplicationsService({
                   {/* مدة الإيجار */}
                   <td className="px-6 py-5">
                     <div className="text-sm font-semibold text-gray-900">
-                      {getSafeValue(rental.rental_period_months, "غير محدد")}{" "}
+                      {(() => {
+                        // استخدام duration_days من lease_term إذا كان متوفراً
+                        if (rental.lease_term?.duration_days && rental.lease_term.duration_days > 0) {
+                          // تحويل الأيام إلى شهور (متوسط 30.44 يوم في الشهر)
+                          const months = Math.round(rental.lease_term.duration_days / 30.44);
+                          return Math.max(1, months); // على الأقل شهر واحد
+                        }
+                        
+                        // حساب من start_date و end_date إذا كانت متوفرة
+                        if (rental.lease_term?.start_date && rental.lease_term?.end_date) {
+                          const startDate = new Date(rental.lease_term.start_date);
+                          const endDate = new Date(rental.lease_term.end_date);
+                          
+                          // حساب الفرق بالشهور بدقة
+                          const yearDiff = endDate.getFullYear() - startDate.getFullYear();
+                          const monthDiff = endDate.getMonth() - startDate.getMonth();
+                          const totalMonths = yearDiff * 12 + monthDiff;
+                          
+                          return Math.max(1, totalMonths); // على الأقل شهر واحد
+                        }
+                        
+                        // استخدام rental_period_months إذا كان متوفراً
+                        if (rental.rental_period_months && rental.rental_period_months > 0) {
+                          return rental.rental_period_months;
+                        }
+                        
+                        // قيمة افتراضية بناءً على rental_method_code
+                        if (rental.rental_method_code) {
+                          switch (rental.rental_method_code) {
+                            case 'monthly':
+                              return 12;
+                            case 'quarterly':
+                              return 12;
+                            case 'semi_annual':
+                              return 12;
+                            case 'annual':
+                              return 12;
+                            default:
+                              return 12;
+                          }
+                        }
+                        
+                        // قيمة افتراضية بناءً على paying_plan
+                        if (rental.paying_plan) {
+                          switch (rental.paying_plan) {
+                            case 'monthly':
+                              return 12;
+                            case 'quarterly':
+                              return 12;
+                            case 'semi_annual':
+                              return 12;
+                            case 'annual':
+                              return 12;
+                            default:
+                              return 12;
+                          }
+                        }
+                        
+                        // قيمة افتراضية ثابتة
+                        return 12;
+                      })()}{" "}
                       شهر
                     </div>
                     <div className="text-xs text-gray-500">
