@@ -1197,17 +1197,6 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   </div>
                 ) : null}
             </div>
-            {/* وصف العقار */}
-            <div>
-              <div className="flex flex-col justify-center items-start gap-y-6 md:gap-y-8">
-                <h3 className="text-gray-600 font-bold text-xl leading-6 lg:text-2xl lg:leading-7">
-                  وصف العقار
-                </h3>
-                <p className="text-gray-600 font-normal text-sm leading-6 md:text-base md:leading-7">
-                  {property.description || "لا يوجد وصف مفصل متاح لهذا العقار"}
-                </p>
-              </div>
-            </div>
 
             {/* الأسئلة الشائعة */}
             {property.faqs && property.faqs.length > 0 ? (
