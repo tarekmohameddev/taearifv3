@@ -286,8 +286,8 @@ export default function StaticFooter({
 
   // Merge data with priority: overrideData > currentStoreData > storeData > tenantGlobalFooterData > globalFooterData > default
   const mergedData = useMemo(() => {
-    // إذا كان tenantId موجود ولكن tenantData غير موجودة، أو إذا كان التحميل جارياً، أو إذا لم يكن tenantId موجوداً، لا نستخدم الـ default data
-    if ((tenantId && !tenantData) || loadingTenantData || !tenantId) {
+    // إذا كان التحميل جارياً فقط، لا نستخدم الـ default data
+    if (loadingTenantData) {
       return null;
     }
 
@@ -336,14 +336,10 @@ export default function StaticFooter({
     loadingTenantData,
   ]);
 
-  // Show skeleton loading if tenantId exists but tenantData is not available, or if mergedData is null, or if loading
-  // أو إذا كانت mergedData تحتوي على الـ default data فقط (بدون بيانات حقيقية)
-  const hasRealData = tenantData || (globalFooterData && Object.keys(globalFooterData).length > 0) || (tenantGlobalFooterData && Object.keys(tenantGlobalFooterData).length > 0);
-  const isDefaultData = mergedData?.content?.companyName === "مكتب دليل الجواء العقاري" && !hasRealData;
+  // منطق مبسط: عرض skeleton loading فقط عند الضرورة القصوى
+  const shouldShowSkeleton = loadingTenantData || !mergedData;
   
-  // منطق أكثر صرامة: إذا كان tenantId موجود ولكن tenantData غير موجودة، أو إذا كان التحميل جارياً
-  // أو إذا كانت البيانات الافتراضية موجودة بدون بيانات حقيقية
-  if ((tenantId && !tenantData) || loadingTenantData || isDefaultData) {
+  if (shouldShowSkeleton) {
     return <StaticFooterSkeleton />;
   }
 
@@ -352,9 +348,9 @@ export default function StaticFooter({
     return <StaticFooterSkeleton />;
   }
 
-  // Don't render if not visible
-  if (!mergedData || !mergedData.visible) {
-    return <StaticFooterSkeleton />;
+  // إذا كان المكون غير مرئي، لا نعرض skeleton loading بل نعرض لا شيء
+  if (!mergedData.visible) {
+    return null;
   }
 
   const getBackgroundStyle = () => {

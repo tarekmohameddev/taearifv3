@@ -204,10 +204,8 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
 
   // Merge data with priority: overrideData > globalHeaderData > default
   const [mergedData, setMergedData] = useState(() => {
-    // إذا كان tenantId موجود ولكن tenantData غير موجودة، لا نستخدم الـ default data
-    // أو إذا كان التحميل جارياً
-    // أو إذا لم يكن tenantId موجوداً بعد (حالة البداية)
-    if ((tenantId && !tenantData) || loadingTenantData || !tenantId) {
+    // إذا كان التحميل جارياً فقط، لا نستخدم الـ default data
+    if (loadingTenantData) {
       return null;
     }
 
@@ -277,8 +275,8 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
 
   // Update mergedData whenever dependencies change
   useEffect(() => {
-    // إذا كان tenantId موجود ولكن tenantData غير موجودة، أو إذا كان التحميل جارياً، أو إذا لم يكن tenantId موجوداً، لا نحدث الـ mergedData
-    if ((tenantId && !tenantData) || loadingTenantData || !tenantId) {
+    // إذا كان التحميل جارياً فقط، لا نحدث الـ mergedData
+    if (loadingTenantData) {
       return;
     }
 
@@ -456,26 +454,24 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
     [mergedData],
   );
 
-  // Show skeleton loading if tenantId exists but tenantData is not available, or if mergedData is null, or if loading
-  // أو إذا كانت mergedData تحتوي على الـ default data فقط (بدون بيانات حقيقية)
-  const hasRealData = tenantData || (globalHeaderData && Object.keys(globalHeaderData).length > 0) || (tenantGlobalHeaderData && Object.keys(tenantGlobalHeaderData).length > 0);
-  const isDefaultData = mergedData?.logo?.text === "مكتب دليل الجواء" && !hasRealData;
+  // منطق مبسط: عرض skeleton loading فقط عند الضرورة القصوى
+  const shouldShowSkeleton = loadingTenantData || !mergedData;
   
-
-  // منطق أكثر صرامة: إذا كان tenantId موجود ولكن tenantData غير موجودة، أو إذا كان التحميل جارياً
-  // أو إذا كانت البيانات الافتراضية موجودة بدون بيانات حقيقية
-  if ((tenantId && !tenantData) || loadingTenantData || isDefaultData) {
+  if (shouldShowSkeleton) {
     return <HeaderSkeleton />;
   }
+  
+  // إذا كانت mergedData موجودة وصالحة، اعرض المكون حتى لو كانت البيانات افتراضية
+  // لأن المستخدم قد يكون قد قام بتخصيص البيانات الافتراضية
 
   // Don't render if not visible
-  if (!mergedData || !mergedData.visible) {
-    return <HeaderSkeleton />;
-  }
-
-  // إذا كانت mergedData null، لا نعرض أي شيء (يجب أن يظهر skeleton loading بدلاً من ذلك)
   if (!mergedData) {
     return <HeaderSkeleton />;
+  }
+  
+  // إذا كان المكون غير مرئي، لا نعرض skeleton loading بل نعرض لا شيء
+  if (!mergedData.visible) {
+    return null;
   }
 
   return (
