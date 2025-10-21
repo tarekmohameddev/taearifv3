@@ -129,21 +129,21 @@ export default function PropertyCard3({
           />
 
           {/* Status Badge - Top Left */}
-          {showStatus && property.status && (
+          {showStatus && property.status ? (
             <div className="absolute top-4 left-4">
               <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
                 {property.status}
               </span>
             </div>
-          )}
+          ) : null}
 
           {/* Views Counter - Top Right */}
-          {showViews && (
+          {showViews ? (
             <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-lg flex items-center gap-1 text-sm backdrop-blur-sm">
               <Eye className="w-4 h-4" />
               <span>{property.views}</span>
             </div>
-          )}
+          ) : null}
 
           {/* Content Overlay - Bottom */}
           <div
@@ -166,32 +166,32 @@ export default function PropertyCard3({
             </div>
 
             {/* Property Details */}
-            {showDetails && (
+            {showDetails ? (
               <div className="flex items-center gap-4 mb-4">
-                {property.bedrooms && (
+                {property.bedrooms ? (
                   <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
                     <Bed className="w-4 h-4" />
                     <span className="text-sm font-medium">
                       {property.bedrooms}
                     </span>
                   </div>
-                )}
-                {property.bathrooms && (
+                ) : null}
+                {property.bathrooms ? (
                   <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
                     <Bath className="w-4 h-4" />
                     <span className="text-sm font-medium">
                       {property.bathrooms}
                     </span>
                   </div>
-                )}
-                {property.area && (
+                ) : null}
+                {property.area ? (
                   <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
                     <Square className="w-4 h-4" />
                     <span className="text-sm font-medium">{property.area}</span>
                   </div>
-                )}
+                ) : null}
               </div>
-            )}
+            ) : null}
 
             {/* Price and Action */}
             {/* its only hidden for now , i dont want to delete it */}
@@ -224,7 +224,7 @@ export default function PropertyCard3({
       )}
 
       {/* Fallback content when image is hidden */}
-      {!showImage && (
+      {!showImage ? (
         <div
           className="p-6 overflow-hidden"
           style={{
@@ -238,28 +238,28 @@ export default function PropertyCard3({
           </h3>
           <p className="text-gray-600 text-sm mb-4">{property.district}</p>
 
-          {showDetails && (
+          {showDetails ? (
             <div className="flex items-center gap-4 mb-4 text-gray-600">
-              {property.bedrooms && (
+              {property.bedrooms ? (
                 <div className="flex items-center gap-1">
                   <Bed className="w-4 h-4" />
                   <span className="text-sm">{property.bedrooms}</span>
                 </div>
-              )}
-              {property.bathrooms && (
+              ) : null}
+              {property.bathrooms ? (
                 <div className="flex items-center gap-1">
                   <Bath className="w-4 h-4" />
                   <span className="text-sm">{property.bathrooms}</span>
                 </div>
-              )}
-              {property.area && (
+              ) : null}
+              {property.area ? (
                 <div className="flex items-center gap-1">
                   <Square className="w-4 h-4" />
                   <span className="text-sm">{property.area}</span>
                 </div>
-              )}
+              ) : null}
             </div>
-          )}
+          ) : null}
 
           {/* its only hidden for now , i dont want to delete it */}
           {/* {showPrice && (
@@ -286,7 +286,7 @@ export default function PropertyCard3({
             </div>
           )} */}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
