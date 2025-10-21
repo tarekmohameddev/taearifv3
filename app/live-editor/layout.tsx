@@ -1980,7 +1980,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
 
   return (
     <nav
-      className="bg-white border-b-[1.5px] border-red-300 sticky top-0 z-[9999]"
+      className="bg-white border-b-[1.5px] border-red-300 sticky top-0 z-[51]"
       dir="ltr"
     >
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-1">

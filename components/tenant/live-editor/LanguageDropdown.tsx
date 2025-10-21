@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu2";
 import { Globe, Check } from "lucide-react";
 import {
   locales,
@@ -111,7 +111,7 @@ export function LanguageDropdown() {
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" style={{ zIndex: 999999 }}>
+      <DropdownMenuContent align="start" className="z-[9999]" style={{ zIndex: 999999 }}>
         {locales.map((locale) => (
           <DropdownMenuItem
             key={locale}
