@@ -426,6 +426,11 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     return null;
   }
 
+  // Hide entire section if no properties
+  if (properties.length == 0) {
+    return null;
+  }
+
   // Show loading state while tenant is loading
   if (tenantLoading) {
     return (

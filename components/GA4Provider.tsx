@@ -18,20 +18,8 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
 
   // Add immediate console log to verify component is loading
   if (typeof window !== "undefined") {
+console.log("GA4Provider", tenantId);
 
-    // Force console output in production
-
-    // Send debug info to server
-    fetch("/api/debug", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "GA4Provider",
-        tenantId,
-        hostname: window.location.hostname,
-        timestamp: new Date().toISOString(),
-      }),
-    }).catch(() => {}); // Ignore errors
   }
 
   useEffect(() => {
