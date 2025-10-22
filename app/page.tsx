@@ -96,11 +96,12 @@ export async function generateMetadata() {
 export default async function HomePage() {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
+  const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
 
-  // إذا لم يكن هناك subdomain (tenantId)، اعرض صفحة تعاريف الرسمية
+  // إذا لم يكن هناك tenantId، اعرض صفحة تعاريف الرسمية
   if (!tenantId) {
     return <TaearifLandingPage />;
   }
 
-  return <HomePageWrapper tenantId={tenantId} />;
+  return <HomePageWrapper tenantId={tenantId} domainType={domainType} />;
 }

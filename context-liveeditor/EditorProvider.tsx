@@ -11,6 +11,7 @@ import axiosInstance from "@/lib/axiosInstance";
 export function EditorProvider({ children }: { children: ReactNode }) {
   const { showDialog, closeDialog, openSaveDialogFn } = useEditorStore();
   const { userData } = useAuthStore();
+  // tenantId يمكن أن يكون subdomain (tenant1) أو custom domain (hey.com)
   const tenantId = userData?.username;
 
   const confirmSave = async () => {

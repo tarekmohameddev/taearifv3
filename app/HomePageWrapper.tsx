@@ -102,9 +102,10 @@ const loadComponent = (section: string, componentName: string) => {
 
 interface HomePageWrapperProps {
   tenantId: string | null;
+  domainType?: "subdomain" | "custom" | null;
 }
 
-export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
+export default function HomePageWrapper({ tenantId, domainType = "subdomain" }: HomePageWrapperProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -131,8 +132,9 @@ export default function HomePageWrapper({ tenantId }: HomePageWrapperProps) {
       setTenantId(tenantId);
       isInitializedRef.current = true;
       lastTenantIdRef.current = tenantId;
+      console.log(`🏠 HomePageWrapper: Setting tenant ID: ${tenantId} (${domainType} domain)`);
     }
-  }, [tenantId]);
+  }, [tenantId, domainType]);
 
   // تنظيف cache المنتهية الصلاحية عند تحميل المكون
   useEffect(() => {

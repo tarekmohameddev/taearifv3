@@ -97,10 +97,11 @@ export default async function AboutUs({
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
+  const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
 
   // إذا كان هناك tenantId، اعرض صفحة tenant-specific
   if (tenantId) {
-    return <TenantPageWrapper tenantId={tenantId} slug={"about-us"} />;
+    return <TenantPageWrapper tenantId={tenantId} slug={"about-us"} domainType={domainType} />;
   }
 
   // إذا لم يكن هناك tenantId، اعرض صفحة الموقع الرئيسي

@@ -292,6 +292,9 @@ const useTenantStore = create((set) => ({
 
     set({ loadingTenantData: true, error: null });
     try {
+      // إرسال websiteName كـ tenantId للـ API
+      // في حالة Custom Domain: websiteName = "hey.com"
+      // في حالة Subdomain: websiteName = "tenant1"
       const response = await axiosInstance.post(
         "/v1/tenant-website/getTenant",
         { websiteName },

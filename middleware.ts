@@ -28,14 +28,42 @@ function removeLocaleFromPathname(pathname: string) {
   return pathname;
 }
 
+// دالة للتحقق من Custom Domain
+async function getTenantIdFromCustomDomain(host: string): Promise<string | null> {
+  try {
+    // استدعاء Backend API للتحقق من Custom Domain
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    const response = await fetch(`${apiUrl}/v1/tenant-website/getTenant`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ websiteName: host }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data && Object.keys(data).length > 0) {
+        console.log("✅ Middleware: Custom domain found:", host, "->", host);
+        return host; // إرجاع الـ host نفسه كـ tenantId للـ Custom Domain
+      }
+    }
+  } catch (error) {
+    console.log("🔍 Middleware: Custom domain check failed:", error);
+  }
+  
+  return null;
+}
+
 function getTenantIdFromHost(host: string): string | null {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
   const productionDomain =
     process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+  const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
   const isDevelopment = process.env.NODE_ENV === "development";
 
   // Extract domain from API URL for local development
-  const localDomain = new URL(apiUrl).hostname;
+  const apiHostname = new URL(apiUrl).hostname;
 
   // قائمة بالكلمات المحجوزة التي لا يجب أن تكون tenantId
   const reservedWords = [
@@ -84,28 +112,36 @@ function getTenantIdFromHost(host: string): string | null {
     }
   }
 
-  // For production: tenant1.mandhoor.com -> tenant1
+  // For production: tenant1.taearif.com -> tenant1
+  // التحقق من أن الـ subdomain صحيح (يجب أن يكون لـ productionDomain فقط)
   if (!isDevelopment && host.includes(productionDomain)) {
     const parts = host.split(".");
     if (parts.length > 2) {
       const potentialTenantId = parts[0];
-      console.log(
-        "🔍 Middleware: Potential tenant ID (production):",
-        potentialTenantId,
-      );
+      const domainPart = parts.slice(1).join(".");
+      
+      // التحقق من أن الـ domain هو productionDomain بالضبط
+      if (domainPart === productionDomain) {
+        console.log(
+          "🔍 Middleware: Potential tenant ID (production):",
+          potentialTenantId,
+        );
 
-      // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
-      if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
-        console.log(
-          "✅ Middleware: Valid tenant ID (production):",
-          potentialTenantId,
-        );
-        return potentialTenantId;
+        // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
+        if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
+          console.log(
+            "✅ Middleware: Valid tenant ID (production):",
+            potentialTenantId,
+          );
+          return potentialTenantId;
+        } else {
+          console.log(
+            "❌ Middleware: Reserved word (production):",
+            potentialTenantId,
+          );
+        }
       } else {
-        console.log(
-          "❌ Middleware: Reserved word (production):",
-          potentialTenantId,
-        );
+        console.log("❌ Middleware: Invalid subdomain - not for production domain:", domainPart);
       }
     }
   }
@@ -114,7 +150,7 @@ function getTenantIdFromHost(host: string): string | null {
   return null;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const host = request.headers.get("host") || "";
 
@@ -125,8 +161,48 @@ export function middleware(request: NextRequest) {
     url: request.url
   });
 
-  // Extract tenantId from subdomain
-  const tenantId = getTenantIdFromHost(host);
+  // قائمة الصفحات التي يجب أن تكون على الدومين الأساسي فقط
+  const systemPages = [
+    "/dashboard",
+    "/live-editor", 
+    "/login",
+    "/oauth",
+    "/onboarding",
+    "/register",
+    "/updates",
+    "/solutions",
+    "/landing",
+    "/about-us"
+  ];
+
+  // التحقق من أن الصفحات النظامية على الدومين الأساسي
+  const isSystemPage = systemPages.some(page => pathname.startsWith(page));
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+  const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
+  const isDevelopment = process.env.NODE_ENV === "development";
+  
+  // التحقق من أن الصفحة على الدومين الأساسي
+  const isOnBaseDomain = isDevelopment 
+    ? host === localDomain || host === `${localDomain}:3000`
+    : host === productionDomain || host === `www.${productionDomain}`;
+
+  if (isSystemPage && !isOnBaseDomain) {
+    // إعادة توجيه الصفحات النظامية إلى الدومين الأساسي
+    const baseUrl = isDevelopment 
+      ? `http://${localDomain}:3000${pathname}`
+      : `https://${productionDomain}${pathname}`;
+    
+    console.log("🔄 Middleware: Redirecting system page to base domain:", baseUrl);
+    return NextResponse.redirect(baseUrl);
+  }
+
+  // Extract tenantId from subdomain or custom domain
+  let tenantId = getTenantIdFromHost(host);
+  
+  // إذا لم يتم العثور على tenantId من subdomain، تحقق من Custom Domain
+  if (!tenantId) {
+    tenantId = await getTenantIdFromCustomDomain(host);
+  }
 
   // Skip middleware for API routes, static files, and Next.js internals
   if (
@@ -294,6 +370,7 @@ export function middleware(request: NextRequest) {
   if (tenantId) {
     console.log("✅ Middleware: Setting tenant ID header:", tenantId);
     response.headers.set("x-tenant-id", tenantId);
+    response.headers.set("x-domain-type", host.includes(process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com") ? "subdomain" : "custom");
   } else {
     console.log("❌ Middleware: No tenant ID found for host:", host);
   }

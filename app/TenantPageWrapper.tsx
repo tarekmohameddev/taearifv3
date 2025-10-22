@@ -87,11 +87,13 @@ const loadComponent = (section: string, componentName: string) => {
 interface TenantPageWrapperProps {
   tenantId: string | null;
   slug: string;
+  domainType?: "subdomain" | "custom";
 }
 
 export default function TenantPageWrapper({
   tenantId,
   slug,
+  domainType = "subdomain",
 }: TenantPageWrapperProps) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
@@ -102,8 +104,9 @@ export default function TenantPageWrapper({
   useEffect(() => {
     if (tenantId) {
       setTenantId(tenantId);
+      console.log(`🏢 TenantPageWrapper: Setting tenant ID: ${tenantId} (${domainType} domain)`);
     }
-  }, [tenantId, setTenantId]);
+  }, [tenantId, setTenantId, domainType]);
 
   // تنظيف cache المنتهية الصلاحية عند تحميل المكون
   useEffect(() => {
