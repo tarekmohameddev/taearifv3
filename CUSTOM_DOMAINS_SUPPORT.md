@@ -100,7 +100,7 @@ https://hey.com/about-us -> ✅ مسموح (custom domain)
 
 1. **التحقق من الصفحات النظامية**: يتحقق من أن الصفحات النظامية على الدومين الأساسي
 2. **التحقق من Subdomain أولاً**: يحاول النظام أولاً استخراج `tenantId` من الـ subdomain
-3. **التحقق من Custom Domain**: إذا لم يجد subdomain، يتحقق من الـ Custom Domain عبر Backend API
+3. **التحقق من Custom Domain**: إذا لم يجد subdomain، يتحقق من الـ Custom Domain محلياً (بدون API call)
 4. **التحقق من tenantId في app/page.tsx**: إذا كان هناك tenantId (subdomain أو custom domain)، يعرض HomePageWrapper
 5. **إضافة Headers**: يضيف النظام headers إضافية:
    - `x-tenant-id`: معرف الـ tenant (subdomain أو custom domain)
@@ -129,14 +129,14 @@ CREATE TABLE custom_domains (
 // إذا لم يكن، فهو Subdomain
 ```
 
-3. **تحديث middleware.ts**:
+3. **تحديث middleware.ts** (محلياً للسرعة):
 ```typescript
-// تحديث getTenantIdFromCustomDomain() للاتصال بـ Backend API الحقيقي
-const response = await fetch(`${apiUrl}/v1/tenant-website/getTenant`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ websiteName: host }),
-});
+// getTenantIdFromCustomDomain() يعمل محلياً بدون API call للسرعة
+function getTenantIdFromCustomDomain(host: string): string | null {
+  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
+  if (!isCustomDomain) return null;
+  return host; // إرجاع الـ host نفسه كـ tenantId
+}
 ```
 
 ## أمثلة على الاستخدام

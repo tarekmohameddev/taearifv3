@@ -12,6 +12,7 @@
 - ✅ إضافة منطق تقسيم الصفحات حسب نوع الدومين
 - ✅ إضافة التحقق من Custom Domain (يحتوي على .com, .net, .org, إلخ)
 - ✅ إضافة منطق لاعتبار Custom Domain محتمل إذا لم يتم العثور عليه في Backend
+- ✅ إزالة API calls من middleware للسرعة (يعمل محلياً)
 
 ### 3. **تحديث `context-liveeditor/tenantStore.jsx`**
 - ✅ إضافة تعليقات توضيحية للـ API calls

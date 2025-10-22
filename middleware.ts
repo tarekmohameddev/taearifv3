@@ -28,8 +28,8 @@ function removeLocaleFromPathname(pathname: string) {
   return pathname;
 }
 
-// دالة للتحقق من Custom Domain
-async function getTenantIdFromCustomDomain(host: string): Promise<string | null> {
+// دالة للتحقق من Custom Domain (بدون API call للسرعة)
+function getTenantIdFromCustomDomain(host: string): string | null {
   // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
   const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
   
@@ -38,29 +38,9 @@ async function getTenantIdFromCustomDomain(host: string): Promise<string | null>
     return null;
   }
 
-  try {
-    // استدعاء Backend API للتحقق من Custom Domain
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-    const response = await fetch(`${apiUrl}/v1/tenant-website/getTenant`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ websiteName: host }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data && Object.keys(data).length > 0) {
-        console.log("✅ Middleware: Custom domain found:", host, "->", host);
-        return host; // إرجاع الـ host نفسه كـ tenantId للـ Custom Domain
-      }
-    }
-  } catch (error) {
-    console.log("🔍 Middleware: Custom domain check failed:", error);
-  }
-  
-  return null;
+  // إرجاع الـ host نفسه كـ tenantId للـ Custom Domain (بدون API call)
+  console.log("✅ Middleware: Custom domain detected:", host);
+  return host;
 }
 
 function getTenantIdFromHost(host: string): string | null {
@@ -158,7 +138,7 @@ function getTenantIdFromHost(host: string): string | null {
   return null;
 }
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const host = request.headers.get("host") || "";
 
@@ -209,17 +189,11 @@ export async function middleware(request: NextRequest) {
   
   // إذا لم يتم العثور على tenantId من subdomain، تحقق من Custom Domain
   if (!tenantId) {
-    tenantId = await getTenantIdFromCustomDomain(host);
+    tenantId = getTenantIdFromCustomDomain(host);
   }
 
   // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
   const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
-  
-  // إذا كان custom domain ولم يتم العثور على tenantId، اعتبره custom domain محتمل
-  if (isCustomDomain && !tenantId) {
-    console.log("🔍 Middleware: Treating as potential custom domain:", host);
-    tenantId = host;
-  }
 
   // Skip middleware for API routes, static files, and Next.js internals
   if (
