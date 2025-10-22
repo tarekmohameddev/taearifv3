@@ -15,6 +15,8 @@
 - ✅ إزالة API calls من middleware للسرعة (يعمل محلياً)
 - ✅ إزالة إعادة التوجيه للصفحات النظامية من Custom Domains
 - ✅ دعم جميع الصفحات النظامية كصفحات tenant للـ Custom Domains
+- ✅ إصلاح مشكلة الدومين الأساسي (www.mandhoor.com) يعتبر custom domain
+- ✅ إضافة التحقق من الدومين الأساسي قبل اعتبار الـ host كـ custom domain
 - ✅ إضافة التحقق من الدومين في Dashboard Layout
 - ✅ دعم Dashboard كصفحة tenant للـ Custom Domains
 - ✅ عرض TenantPageWrapper للـ Custom Domains

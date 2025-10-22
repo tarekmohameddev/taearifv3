@@ -111,13 +111,14 @@ https://hey.com/about-us -> ✅ مسموح (custom domain)
 ## آلية التحقق
 
 1. **التحقق من نوع الدومين**: يتحقق من نوع الدومين (أساسي أم tenant)
-2. **معالجة Custom Domain**: إذا كان custom domain، اعتبر جميع الصفحات كصفحات tenant
-3. **التحقق من Subdomain أولاً**: يحاول النظام أولاً استخراج `tenantId` من الـ subdomain
-4. **التحقق من Custom Domain**: إذا لم يجد subdomain، يتحقق من الـ Custom Domain محلياً (بدون API call)
-5. **التحقق من tenantId في app/page.tsx**: إذا كان هناك tenantId (subdomain أو custom domain)، يعرض HomePageWrapper
-6. **استخدام tenantData.username في useTenantId**: يأخذ `tenantId` من `response.data.username` من API response
-7. **التحقق من Dashboard Layout**: يتحقق من نوع الدومين ويعرض Dashboard العادي أو TenantPageWrapper
-8. **إضافة Headers**: يضيف النظام headers إضافية:
+2. **التحقق من الدومين الأساسي**: يتحقق من أن الـ host ليس الدومين الأساسي قبل اعتباره custom domain
+3. **معالجة Custom Domain**: إذا كان custom domain، اعتبر جميع الصفحات كصفحات tenant
+4. **التحقق من Subdomain أولاً**: يحاول النظام أولاً استخراج `tenantId` من الـ subdomain
+5. **التحقق من Custom Domain**: إذا لم يجد subdomain، يتحقق من الـ Custom Domain محلياً (بدون API call)
+6. **التحقق من tenantId في app/page.tsx**: إذا كان هناك tenantId (subdomain أو custom domain)، يعرض HomePageWrapper
+7. **استخدام tenantData.username في useTenantId**: يأخذ `tenantId` من `response.data.username` من API response
+8. **التحقق من Dashboard Layout**: يتحقق من نوع الدومين ويعرض Dashboard العادي أو TenantPageWrapper
+9. **إضافة Headers**: يضيف النظام headers إضافية:
    - `x-tenant-id`: معرف الـ tenant (subdomain أو custom domain)
    - `x-domain-type`: نوع الـ domain ("subdomain" أو "custom")
 

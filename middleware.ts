@@ -30,6 +30,21 @@ function removeLocaleFromPathname(pathname: string) {
 
 // دالة للتحقق من Custom Domain (بدون API call للسرعة)
 function getTenantIdFromCustomDomain(host: string): string | null {
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+  const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
+  const isDevelopment = process.env.NODE_ENV === "development";
+  
+  // التحقق من أن المستخدم على الدومين الأساسي
+  const isOnBaseDomain = isDevelopment 
+    ? host === localDomain || host === `${localDomain}:3000`
+    : host === productionDomain || host === `www.${productionDomain}`;
+  
+  // إذا كان الدومين الأساسي، لا نعتبره custom domain
+  if (isOnBaseDomain) {
+    console.log("🔍 Middleware: Host is base domain, not custom domain:", host);
+    return null;
+  }
+  
   // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
   const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
   
@@ -174,8 +189,10 @@ export function middleware(request: NextRequest) {
     ? host === localDomain || host === `${localDomain}:3000`
     : host === productionDomain || host === `www.${productionDomain}`;
 
-  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
-  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
+  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ) 
+  // لكن ليس الدومين الأساسي
+  const hasCustomDomainExtension = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
+  const isCustomDomain = hasCustomDomainExtension && !isOnBaseDomain;
 
   // إذا كان custom domain، اعتبر جميع الصفحات (بما في ذلك النظامية) كصفحات tenant
   if (isCustomDomain) {
