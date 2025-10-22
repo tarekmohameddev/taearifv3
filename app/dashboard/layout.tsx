@@ -68,7 +68,7 @@ export default function DashboardLayout({
           : `https://${productionDomain}/dashboard`;
         
         console.log("🔄 Dashboard Layout: Redirecting from custom domain to base domain:", baseUrl);
-        window.location.href = baseUrl;
+        // window.location.href = baseUrl;
         return;
       }
       
