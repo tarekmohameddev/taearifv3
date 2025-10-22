@@ -118,6 +118,13 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const host = request.headers.get("host") || "";
 
+  // DEBUG: Log all requests
+  console.log("🔍 Middleware Debug - Request:", {
+    pathname,
+    host,
+    url: request.url
+  });
+
   // Extract tenantId from subdomain
   const tenantId = getTenantIdFromHost(host);
 
@@ -155,55 +162,58 @@ export function middleware(request: NextRequest) {
 
   /*
    * ========================================
-   * AUTO-REDIRECT TO ARABIC LOCALE (EXCEPT LIVE-EDITOR)
+   * AUTO-REDIRECT TO ARABIC LOCALE (EXCEPT LIVE-EDITOR) - DISABLED
    * ========================================
    *
-   * This section handles automatic redirection of all pages to Arabic locale,
+   * This section has been disabled to allow English pages to be accessible.
+   * Previously, it handled automatic redirection of all pages to Arabic locale,
    * except for the live-editor page.
    *
-   * PURPOSE:
+   * PURPOSE (PREVIOUSLY):
    * - Force all pages to use Arabic locale (ar) regardless of the original URL
    * - Ensures consistent RTL experience across all sections
    * - Prevents users from accessing pages in English locale
    * - Excludes live-editor page from this redirection
    *
-   * HOW IT WORKS:
+   * HOW IT WORKED (PREVIOUSLY):
    * 1. Detects if the current path is an English page (starts with /en)
    * 2. Checks if the page is NOT live-editor
    * 3. If both conditions are true, redirects to the same path with Arabic locale
    *
-   * AFFECTED PAGES:
+   * AFFECTED PAGES (PREVIOUSLY):
    * - /en/* -> /ar/* (except /en/live-editor)
    * - All pages except live-editor
    *
-   * LIVE-EDITOR HANDLING:
-   * - /en/live-editor -> stays in English (no redirect)
-   * - /live-editor (no locale) -> redirects to: /ar/live-editor
-   * - Arabic is the default locale for live-editor when no locale is specified
+   * CURRENT BEHAVIOR:
+   * - English pages are now accessible without redirection
+   * - Users can access both Arabic and English versions
+   * - Live-editor continues to work in both languages
    *
    * MODIFICATION NOTES:
-   * - To disable this feature: Comment out the entire redirect section
+   * - This feature has been disabled by commenting out the redirect logic
+   * - To re-enable: Uncomment the redirect section below
    * - To change target locale: Replace "ar" with desired locale code
    * - To modify live-editor default: Change liveEditorDefaultLocale variable
    *
-   * EXAMPLE:
-   * User visits: /en/dashboard/analytics -> redirects to: /ar/dashboard/analytics
+   * EXAMPLE (CURRENT):
+   * User visits: /en/dashboard/analytics -> stays: /en/dashboard/analytics
    * User visits: /en/live-editor -> stays: /en/live-editor
    * User visits: /live-editor -> redirects to: /ar/live-editor
    */
 
+  // DISABLED: Auto-redirect from English to Arabic
   // Check if this is an English page and NOT live-editor
-  const isEnglishPage = pathname.startsWith("/en/");
-  const isLiveEditor = pathname.startsWith("/en/live-editor");
+  // const isEnglishPage = pathname.startsWith("/en/");
+  // const isLiveEditor = pathname.startsWith("/en/live-editor");
 
-  if (isEnglishPage && !isLiveEditor) {
-    // Extract the path without locale
-    const pathWithoutLocale = pathname.replace("/en", "");
-
-    // Redirect to Arabic version of the page
-    const newUrl = new URL(`/ar${pathWithoutLocale}`, request.url);
-    return NextResponse.redirect(newUrl);
-  }
+  // if (isEnglishPage && !isLiveEditor) {
+  //   // Extract the path without locale
+  //   const pathWithoutLocale = pathname.replace("/en", "");
+  //
+  //   // Redirect to Arabic version of the page
+  //   const newUrl = new URL(`/ar${pathWithoutLocale}`, request.url);
+  //   return NextResponse.redirect(newUrl);
+  // }
 
   // No special handling needed for /en/live-editor - let it stay in English
 
@@ -212,14 +222,40 @@ export function middleware(request: NextRequest) {
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
+  console.log("🔍 Middleware Debug - Locale Check:", {
+    pathname,
+    pathnameHasLocale,
+    tenantId,
+    host
+  });
+
   // If no locale in pathname, redirect to appropriate default locale
+  // BUT ONLY if there's a tenantId (subdomain) OR if it's a dashboard page
   if (!pathnameHasLocale) {
     // Use Arabic as default for live-editor, English for other pages
     const locale = pathname.startsWith("/live-editor")
       ? liveEditorDefaultLocale
       : defaultLocale;
-    const newUrl = new URL(`/${locale}${pathname}`, request.url);
-    return NextResponse.redirect(newUrl);
+    
+    // Only redirect if there's a tenantId (subdomain) OR if it's a dashboard page
+    const shouldRedirect = tenantId || pathname.startsWith("/dashboard") || pathname.startsWith("/login") || pathname.startsWith("/register");
+    
+    console.log("🔍 Middleware Debug - Redirect Decision:", {
+      pathname,
+      locale,
+      tenantId,
+      shouldRedirect,
+      reason: tenantId ? "Has tenantId (subdomain)" : pathname.startsWith("/dashboard") ? "Dashboard page" : pathname.startsWith("/login") ? "Login page" : pathname.startsWith("/register") ? "Register page" : "No redirect reason"
+    });
+
+    if (shouldRedirect) {
+      const newUrl = new URL(`/${locale}${pathname}`, request.url);
+      console.log("🔄 Middleware Debug - Redirecting:", {
+        from: request.url,
+        to: newUrl.toString()
+      });
+      return NextResponse.redirect(newUrl);
+    }
   }
 
   // Extract locale and remove it from pathname for routing

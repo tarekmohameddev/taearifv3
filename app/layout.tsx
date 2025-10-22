@@ -16,14 +16,31 @@ export default async function RootLayout({
   const tenantId = headersList.get("x-tenant-id");
   const pathname = headersList.get("x-pathname") || "";
   const locale = headersList.get("x-locale") || "";
+  
+  // تحديد الصفحات التي تحتاج dir ديناميكي
+  const landingPages = [
+    "/", // الصفحة الرئيسية
+    "/solutions",
+    "/updates", 
+    "/landing",
+    "/about-us"
+  ];
+  
+  const isLandingPage = landingPages.includes(pathname);
+  
+  // تحديد dir بناءً على اللغة للصفحات المحددة فقط
+  const dir = isLandingPage ? (locale === "ar" ? "rtl" : "ltr") : "rtl";
 
-  // إعادة التوجيه من الإنجليزية إلى العربية (استثناء live-editor)
+  // إعادة التوجيه من الإنجليزية إلى العربية (استثناء live-editor وصفحات landing)
+  const isLiveEditorPage = pathname === "/live-editor" || pathname.startsWith("/live-editor/");
+
   if (
     locale === "en" &&
-    pathname !== "/live-editor" &&
-    !pathname.startsWith("/live-editor/")
+    !isLiveEditorPage &&
+    !isLandingPage
   ) {
-    redirect(`/ar${pathname}`);
+    const redirectUrl = `/ar${pathname}`;
+    redirect(redirectUrl);
   }
 
   // تحديد الصفحات المسموح بها لـ GTM و Clarity
@@ -96,7 +113,7 @@ export default async function RootLayout({
   });
 
   return (
-    <html lang="ar" dir="ltr" className="light" suppressHydrationWarning>
+    <html lang="ar" dir={dir} className="light" suppressHydrationWarning>
       <head>
         {/* Font preloading for better performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

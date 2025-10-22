@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { getMetaForSlugFromStore, getMetaForSlugServer } from "@/lib/metaTags";
 import { getDefaultSeoData } from "@/lib/defaultSeo";
 import HomePageWrapper from "./HomePageWrapper";
-import TaearifLandingPageSimple from "../components/TaearifLandingPageSimple";
+import TaearifLandingPage from "../components/landing/homepage/TaearifLandingPage";
 
 // إبقاء الصفحة dynamic لتتمكن من التحقق من tenantId
 export const dynamic = "force-dynamic";
@@ -99,7 +99,7 @@ export default async function HomePage() {
 
   // إذا لم يكن هناك subdomain (tenantId)، اعرض صفحة تعاريف الرسمية
   if (!tenantId) {
-    return <TaearifLandingPageSimple />;
+    return <TaearifLandingPage />;
   }
 
   return <HomePageWrapper tenantId={tenantId} />;
