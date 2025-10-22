@@ -13,10 +13,11 @@
 - ✅ إضافة التحقق من Custom Domain (يحتوي على .com, .net, .org, إلخ)
 - ✅ إضافة منطق لاعتبار Custom Domain محتمل إذا لم يتم العثور عليه في Backend
 - ✅ إزالة API calls من middleware للسرعة (يعمل محلياً)
-- ✅ إضافة التحقق من Custom Domain للصفحات النظامية
-- ✅ إعادة توجيه الصفحات النظامية من Custom Domain إلى الدومين الأساسي
+- ✅ إزالة إعادة التوجيه للصفحات النظامية من Custom Domains
+- ✅ دعم جميع الصفحات النظامية كصفحات tenant للـ Custom Domains
 - ✅ إضافة التحقق من الدومين في Dashboard Layout
-- ✅ منع الوصول للـ Dashboard من Custom Domains
+- ✅ دعم Dashboard كصفحة tenant للـ Custom Domains
+- ✅ عرض TenantPageWrapper للـ Custom Domains
 
 ### 3. **تحديث `context-liveeditor/tenantStore.jsx`**
 - ✅ إضافة تعليقات توضيحية للـ API calls
@@ -79,16 +80,21 @@ app/page.tsx: tenantId = "actual-tenant-id" -> HomePageWrapper
 
 ### **إعادة التوجيه:**
 ```
-https://hey.com/dashboard -> https://taearif.com/dashboard
-https://hey.com/live-editor -> https://taearif.com/live-editor
-https://hey.com/login -> https://taearif.com/login
 https://tenant1.taearif.com/live-editor -> https://taearif.com/live-editor
+```
+
+### **Custom Domain - جميع الصفحات:**
+```
+https://hey.com/dashboard -> ✅ TenantPageWrapper (صفحة tenant)
+https://hey.com/live-editor -> ✅ TenantPageWrapper (صفحة tenant)
+https://hey.com/login -> ✅ TenantPageWrapper (صفحة tenant)
 ```
 
 ### **Dashboard Layout Protection:**
 ```
-https://liraksa.com/dashboard -> إعادة توجيه إلى https://taearif.com/dashboard
-https://liraksa.com/en/dashboard -> إعادة توجيه إلى https://taearif.com/dashboard
+https://taearif.com/dashboard -> ✅ Dashboard العادي (لوحة تحكم المشروع)
+https://liraksa.com/dashboard -> ✅ TenantPageWrapper (صفحة tenant)
+https://liraksa.com/en/dashboard -> ✅ TenantPageWrapper (صفحة tenant)
 ```
 
 ### **Custom Domain - صفحات المستخدم النهائي:**

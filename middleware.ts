@@ -177,19 +177,9 @@ export function middleware(request: NextRequest) {
   // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
   const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
 
-  // إذا كان custom domain وأي صفحة نظامية، إعادة توجيه إلى الدومين الأساسي
-  if (isCustomDomain && isSystemPage) {
-    const baseUrl = isDevelopment 
-      ? `http://${localDomain}:3000${pathname}`
-      : `https://${productionDomain}${pathname}`;
-    
-    console.log("🔄 Middleware: Redirecting system page from custom domain to base domain:", baseUrl);
-    return NextResponse.redirect(baseUrl);
-  }
-
-  // إذا كان custom domain، كل شيء بعد الـ slash يعتبر تبع الموقع المخصص
+  // إذا كان custom domain، اعتبر جميع الصفحات (بما في ذلك النظامية) كصفحات tenant
   if (isCustomDomain) {
-    console.log("🔍 Middleware: Custom domain detected, treating all paths as tenant-specific:", host);
+    console.log("🔍 Middleware: Custom domain detected, treating all pages (including system pages) as tenant-specific:", host);
     // لا نحتاج لإعادة توجيه، فقط نمرر للخطوة التالية
   }
 

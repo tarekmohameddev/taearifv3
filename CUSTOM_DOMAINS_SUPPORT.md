@@ -58,10 +58,10 @@
 - إضافة أولوية للـ `tenantData.username` من API response
 
 ### 9. `app/dashboard/layout.tsx`
-- إضافة التحقق من الدومين الأساسي
-- إعادة توجيه Custom Domains إلى الدومين الأساسي
-- منع الوصول للـ Dashboard من Custom Domains
-- إضافة رسائل خطأ واضحة للمستخدمين
+- إضافة التحقق من نوع الدومين (أساسي أم tenant)
+- عرض Dashboard العادي للدومين الأساسي
+- عرض TenantPageWrapper للـ Custom Domains
+- دعم Dashboard كصفحة tenant للـ Custom Domains
 
 ## كيفية العمل
 
@@ -110,13 +110,13 @@ https://hey.com/about-us -> ✅ مسموح (custom domain)
 
 ## آلية التحقق
 
-1. **التحقق من الصفحات النظامية**: يتحقق من أن الصفحات النظامية على الدومين الأساسي
-2. **التحقق من Custom Domain**: إذا كان custom domain وأي صفحة نظامية، إعادة توجيه إلى الدومين الأساسي
+1. **التحقق من نوع الدومين**: يتحقق من نوع الدومين (أساسي أم tenant)
+2. **معالجة Custom Domain**: إذا كان custom domain، اعتبر جميع الصفحات كصفحات tenant
 3. **التحقق من Subdomain أولاً**: يحاول النظام أولاً استخراج `tenantId` من الـ subdomain
 4. **التحقق من Custom Domain**: إذا لم يجد subdomain، يتحقق من الـ Custom Domain محلياً (بدون API call)
 5. **التحقق من tenantId في app/page.tsx**: إذا كان هناك tenantId (subdomain أو custom domain)، يعرض HomePageWrapper
 6. **استخدام tenantData.username في useTenantId**: يأخذ `tenantId` من `response.data.username` من API response
-7. **التحقق من Dashboard Layout**: يتحقق من أن المستخدم على الدومين الأساسي قبل عرض Dashboard
+7. **التحقق من Dashboard Layout**: يتحقق من نوع الدومين ويعرض Dashboard العادي أو TenantPageWrapper
 8. **إضافة Headers**: يضيف النظام headers إضافية:
    - `x-tenant-id`: معرف الـ tenant (subdomain أو custom domain)
    - `x-domain-type`: نوع الـ domain ("subdomain" أو "custom")
@@ -173,19 +173,31 @@ https://hey.com/
 -> app/page.tsx: tenantId = "hey.com" -> HomePageWrapper
 ```
 
-### الصفحات النظامية (إعادة توجيه)
+### الصفحات النظامية (سلوك مختلف)
 ```
-https://hey.com/dashboard
--> ❌ إعادة توجيه إلى: https://taearif.com/dashboard
+https://taearif.com/live-editor
+-> ✅ Live Editor العادي (أداة التحرير الأساسية)
+
+https://taearif.com/login
+-> ✅ Login العادي (صفحة تسجيل الدخول الأساسية)
 
 https://hey.com/live-editor
--> ❌ إعادة توجيه إلى: https://taearif.com/live-editor
+-> ✅ TenantPageWrapper (صفحة tenant)
 
 https://hey.com/login
--> ❌ إعادة توجيه إلى: https://taearif.com/login
+-> ✅ TenantPageWrapper (صفحة tenant)
 
 https://company1.taearif.com/live-editor
 -> ❌ إعادة توجيه إلى: https://taearif.com/live-editor
+```
+
+### Dashboard - سلوك مختلف
+```
+https://taearif.com/dashboard
+-> ✅ Dashboard العادي (لوحة تحكم المشروع)
+
+https://hey.com/dashboard
+-> ✅ TenantPageWrapper (صفحة tenant)
 ```
 
 ### Custom Domain - صفحات المستخدم النهائي

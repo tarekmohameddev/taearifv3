@@ -43,7 +43,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const [isValidDomain, setIsValidDomain] = useState<boolean | null>(null);
 
-  // التحقق من أن المستخدم على الدومين الأساسي
+  // التحقق من نوع الدومين
   useEffect(() => {
     const checkDomain = () => {
       if (typeof window === "undefined") return;
@@ -62,17 +62,22 @@ export default function DashboardLayout({
       const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(hostname);
       
       if (isCustomDomain && !isOnBaseDomain) {
-        // إذا كان custom domain، إعادة توجيه إلى الدومين الأساسي
-        const baseUrl = isDevelopment 
-          ? `http://${localDomain}:3000/dashboard`
-          : `https://${productionDomain}/dashboard`;
-        
-        console.log("🔄 Dashboard Layout: Redirecting from custom domain to base domain:", baseUrl);
-        // window.location.href = baseUrl;
+        // إذا كان custom domain، اعتبره tenant domain
+        console.log("🏢 Dashboard Layout: Custom domain detected, treating as tenant domain:", hostname);
+        setIsValidDomain(false); // false يعني أنه tenant domain
         return;
       }
       
-      setIsValidDomain(isOnBaseDomain);
+      // إذا كان الدومين الأساسي، اعرض Dashboard العادي
+      if (isOnBaseDomain) {
+        console.log("🏠 Dashboard Layout: Base domain detected, showing main dashboard");
+        setIsValidDomain(true); // true يعني أنه الدومين الأساسي
+        return;
+      }
+      
+      // إذا لم يكن أي منهما، اعتبره غير صالح
+      console.log("❌ Dashboard Layout: Unknown domain type:", hostname);
+      setIsValidDomain(false);
     };
 
     checkDomain();
@@ -122,19 +127,11 @@ export default function DashboardLayout({
     );
   }
 
-  // إذا لم يكن على الدومين الأساسي، لا نعرض المحتوى
-  if (!isValidDomain) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center bg-gray-50"
-        dir="rtl"
-      >
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">غير مسموح</h1>
-          <p className="text-gray-600">لا يمكن الوصول للوحة التحكم من هذا الدومين</p>
-        </div>
-      </div>
-    );
+  // إذا كان tenant domain (custom domain)، اعرض TenantPageWrapper
+  if (isValidDomain === false) {
+    // استيراد TenantPageWrapper ديناميكياً
+    const TenantPageWrapper = require('@/app/TenantPageWrapper').default;
+    return <TenantPageWrapper />;
   }
 
   return (
