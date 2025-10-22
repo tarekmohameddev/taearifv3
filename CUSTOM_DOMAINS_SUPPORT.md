@@ -51,6 +51,12 @@
 - تحديث التعليقات لدعم النظام الجديد
 - توضيح أن tenantId يمكن أن يكون subdomain أو custom domain
 
+### 8. `hooks/useTenantId.ts`
+- إضافة دعم للـ Custom Domains
+- إضافة استيراد `useTenantStore` للحصول على `tenantData.username`
+- تحديث `extractTenantFromHostname` لدعم الـ Custom Domains
+- إضافة أولوية للـ `tenantData.username` من API response
+
 ## كيفية العمل
 
 ### 1. Subdomain (النظام القديم)
@@ -102,7 +108,8 @@ https://hey.com/about-us -> ✅ مسموح (custom domain)
 2. **التحقق من Subdomain أولاً**: يحاول النظام أولاً استخراج `tenantId` من الـ subdomain
 3. **التحقق من Custom Domain**: إذا لم يجد subdomain، يتحقق من الـ Custom Domain محلياً (بدون API call)
 4. **التحقق من tenantId في app/page.tsx**: إذا كان هناك tenantId (subdomain أو custom domain)، يعرض HomePageWrapper
-5. **إضافة Headers**: يضيف النظام headers إضافية:
+5. **استخدام tenantData.username في useTenantId**: يأخذ `tenantId` من `response.data.username` من API response
+6. **إضافة Headers**: يضيف النظام headers إضافية:
    - `x-tenant-id`: معرف الـ tenant (subdomain أو custom domain)
    - `x-domain-type`: نوع الـ domain ("subdomain" أو "custom")
 

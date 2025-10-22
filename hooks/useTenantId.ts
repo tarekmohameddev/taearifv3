@@ -2,15 +2,24 @@
 
 import { useEffect, useState } from "react";
 import useAuthStore from "@/context/AuthContext";
+import useTenantStore from "@/context-liveeditor/tenantStore";
 
 export function useTenantId() {
   const [tenantId, setTenantId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { userData } = useAuthStore();
+  const tenantData = useTenantStore((s) => s.tenantData);
 
   useEffect(() => {
     const getTenantId = () => {
-      // 1. محاولة الحصول على tenantId من الـ headers (middleware)
+      // 1. محاولة الحصول على tenantId من tenantData (من API response)
+      if (tenantData?.username) {
+        setTenantId(tenantData.username);
+        setIsLoading(false);
+        return;
+      }
+
+      // 2. محاولة الحصول على tenantId من الـ headers (middleware)
       if (typeof window !== "undefined") {
         // في الـ client side، يمكننا الحصول على tenantId من الـ URL
         const hostname = window.location.hostname;
@@ -23,25 +32,26 @@ export function useTenantId() {
         }
       }
 
-      // 2. محاولة الحصول على tenantId من userData
+      // 3. محاولة الحصول على tenantId من userData
       if (userData?.username) {
         setTenantId(userData.username);
         setIsLoading(false);
         return;
       }
 
-      // 3. إذا لم نجد tenantId، نبقى في حالة loading
+      // 4. إذا لم نجد tenantId، نبقى في حالة loading
       setIsLoading(true);
     };
 
     getTenantId();
-  }, [userData]);
+  }, [userData, tenantData]);
 
   return { tenantId, isLoading };
 }
 
 function extractTenantFromHostname(hostname: string): string | null {
   const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
   const isDevelopment = process.env.NODE_ENV === "development";
 
   // قائمة بالكلمات المحجوزة
@@ -57,6 +67,14 @@ function extractTenantFromHostname(hostname: string): string | null {
     "store",
   ];
 
+  // التحقق من Custom Domain (يحتوي على .com, .net, .org, إلخ)
+  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(hostname);
+  
+  if (isCustomDomain) {
+    // إذا كان Custom Domain، إرجاع الـ hostname نفسه
+    return hostname;
+  }
+
   // For localhost development: tenant1.localhost -> tenant1
   if (hostname.includes(localDomain)) {
     const parts = hostname.split(".");
@@ -68,11 +86,8 @@ function extractTenantFromHostname(hostname: string): string | null {
     }
   }
 
-  // For production: tenant1.mandhoor.com or tenant1.taearif.com -> tenant1
-  if (
-    !isDevelopment &&
-    (hostname.includes("mandhoor.com") || hostname.includes("taearif.com"))
-  ) {
+  // For production: tenant1.taearif.com -> tenant1
+  if (!isDevelopment && hostname.includes(productionDomain)) {
     const parts = hostname.split(".");
     if (parts.length > 2) {
       const potentialTenantId = parts[0];

@@ -33,7 +33,13 @@
 
 جميعها تم تحديثها لتمرير `domainType` إلى `TenantPageWrapper`.
 
-### 6. **تحديث التوثيق**
+### 6. **تحديث `hooks/useTenantId.ts`**
+- ✅ إضافة دعم للـ Custom Domains
+- ✅ إضافة استيراد `useTenantStore` للحصول على `tenantData.username`
+- ✅ تحديث `extractTenantFromHostname` لدعم الـ Custom Domains
+- ✅ إضافة أولوية للـ `tenantData.username` من API response
+
+### 7. **تحديث التوثيق**
 - ✅ تحديث `CUSTOM_DOMAINS_SUPPORT.md`
 - ✅ إضافة أمثلة على الاستخدام
 - ✅ إضافة تعليمات الإعداد
@@ -62,7 +68,9 @@ API Request: { websiteName: "tenant1" }
 ```
 hey.com -> tenantId: "hey.com"
 API Request: { websiteName: "hey.com" }
-app/page.tsx: tenantId = "hey.com" -> HomePageWrapper
+API Response: { username: "actual-tenant-id" }
+useTenantId: tenantId = "actual-tenant-id" (من response.data.username)
+app/page.tsx: tenantId = "actual-tenant-id" -> HomePageWrapper
 ```
 
 ### **إعادة التوجيه:**
