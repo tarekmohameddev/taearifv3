@@ -15,6 +15,8 @@
 - ✅ إزالة API calls من middleware للسرعة (يعمل محلياً)
 - ✅ إضافة التحقق من Custom Domain للصفحات النظامية
 - ✅ إعادة توجيه الصفحات النظامية من Custom Domain إلى الدومين الأساسي
+- ✅ إضافة التحقق من الدومين في Dashboard Layout
+- ✅ منع الوصول للـ Dashboard من Custom Domains
 
 ### 3. **تحديث `context-liveeditor/tenantStore.jsx`**
 - ✅ إضافة تعليقات توضيحية للـ API calls
@@ -81,6 +83,12 @@ https://hey.com/dashboard -> https://taearif.com/dashboard
 https://hey.com/live-editor -> https://taearif.com/live-editor
 https://hey.com/login -> https://taearif.com/login
 https://tenant1.taearif.com/live-editor -> https://taearif.com/live-editor
+```
+
+### **Dashboard Layout Protection:**
+```
+https://liraksa.com/dashboard -> إعادة توجيه إلى https://taearif.com/dashboard
+https://liraksa.com/en/dashboard -> إعادة توجيه إلى https://taearif.com/dashboard
 ```
 
 ### **Custom Domain - صفحات المستخدم النهائي:**

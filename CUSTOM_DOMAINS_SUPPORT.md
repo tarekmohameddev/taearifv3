@@ -57,6 +57,12 @@
 - تحديث `extractTenantFromHostname` لدعم الـ Custom Domains
 - إضافة أولوية للـ `tenantData.username` من API response
 
+### 9. `app/dashboard/layout.tsx`
+- إضافة التحقق من الدومين الأساسي
+- إعادة توجيه Custom Domains إلى الدومين الأساسي
+- منع الوصول للـ Dashboard من Custom Domains
+- إضافة رسائل خطأ واضحة للمستخدمين
+
 ## كيفية العمل
 
 ### 1. Subdomain (النظام القديم)
@@ -110,7 +116,8 @@ https://hey.com/about-us -> ✅ مسموح (custom domain)
 4. **التحقق من Custom Domain**: إذا لم يجد subdomain، يتحقق من الـ Custom Domain محلياً (بدون API call)
 5. **التحقق من tenantId في app/page.tsx**: إذا كان هناك tenantId (subdomain أو custom domain)، يعرض HomePageWrapper
 6. **استخدام tenantData.username في useTenantId**: يأخذ `tenantId` من `response.data.username` من API response
-7. **إضافة Headers**: يضيف النظام headers إضافية:
+7. **التحقق من Dashboard Layout**: يتحقق من أن المستخدم على الدومين الأساسي قبل عرض Dashboard
+8. **إضافة Headers**: يضيف النظام headers إضافية:
    - `x-tenant-id`: معرف الـ tenant (subdomain أو custom domain)
    - `x-domain-type`: نوع الـ domain ("subdomain" أو "custom")
 
