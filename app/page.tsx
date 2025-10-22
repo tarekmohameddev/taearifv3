@@ -97,11 +97,17 @@ export default async function HomePage() {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
+  const host = headersList.get("host") || "";
 
+  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
+  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
+  
   // إذا لم يكن هناك tenantId، اعرض صفحة تعاريف الرسمية
   if (!tenantId) {
     return <TaearifLandingPage />;
   }
 
+  // إذا كان هناك tenantId (subdomain أو custom domain)، اعرض HomePageWrapper
+  // isCustomDomain يمكن استخدامه للتحقق من نوع الـ domain إذا لزم الأمر
   return <HomePageWrapper tenantId={tenantId} domainType={domainType} />;
 }

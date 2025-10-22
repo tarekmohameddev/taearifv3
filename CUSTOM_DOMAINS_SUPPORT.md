@@ -65,6 +65,20 @@ hey.com -> tenantId: "hey.com" (إرسال الـ domain نفسه كـ tenantId)
 example.com -> tenantId: "example.com" (إرسال الـ domain نفسه كـ tenantId)
 ```
 
+### 3. التحقق من Custom Domain
+```
+// في app/page.tsx
+const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
+
+// إذا لم يكن هناك tenantId، اعرض TaearifLandingPage
+if (!tenantId) {
+  return <TaearifLandingPage />;
+}
+
+// إذا كان هناك tenantId (subdomain أو custom domain)، اعرض HomePageWrapper
+return <HomePageWrapper tenantId={tenantId} domainType={domainType} />;
+```
+
 ### 3. تقسيم الصفحات حسب نوع الدومين
 
 #### الصفحات النظامية (على الدومين الأساسي فقط):
@@ -87,7 +101,8 @@ https://hey.com/about-us -> ✅ مسموح (custom domain)
 1. **التحقق من الصفحات النظامية**: يتحقق من أن الصفحات النظامية على الدومين الأساسي
 2. **التحقق من Subdomain أولاً**: يحاول النظام أولاً استخراج `tenantId` من الـ subdomain
 3. **التحقق من Custom Domain**: إذا لم يجد subdomain، يتحقق من الـ Custom Domain عبر Backend API
-4. **إضافة Headers**: يضيف النظام headers إضافية:
+4. **التحقق من tenantId في app/page.tsx**: إذا كان هناك tenantId (subdomain أو custom domain)، يعرض HomePageWrapper
+5. **إضافة Headers**: يضيف النظام headers إضافية:
    - `x-tenant-id`: معرف الـ tenant (subdomain أو custom domain)
    - `x-domain-type`: نوع الـ domain ("subdomain" أو "custom")
 
@@ -140,6 +155,7 @@ https://hey.com/
 -> tenantId: "hey.com"
 -> domainType: "custom"
 -> API Request: { websiteName: "hey.com" }
+-> app/page.tsx: tenantId = "hey.com" -> HomePageWrapper
 ```
 
 ### الصفحات النظامية (إعادة توجيه)

@@ -30,6 +30,14 @@ function removeLocaleFromPathname(pathname: string) {
 
 // دالة للتحقق من Custom Domain
 async function getTenantIdFromCustomDomain(host: string): Promise<string | null> {
+  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
+  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
+  
+  if (!isCustomDomain) {
+    console.log("🔍 Middleware: Host is not a custom domain:", host);
+    return null;
+  }
+
   try {
     // استدعاء Backend API للتحقق من Custom Domain
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
@@ -204,6 +212,15 @@ export async function middleware(request: NextRequest) {
     tenantId = await getTenantIdFromCustomDomain(host);
   }
 
+  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
+  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
+  
+  // إذا كان custom domain ولم يتم العثور على tenantId، اعتبره custom domain محتمل
+  if (isCustomDomain && !tenantId) {
+    console.log("🔍 Middleware: Treating as potential custom domain:", host);
+    tenantId = host;
+  }
+
   // Skip middleware for API routes, static files, and Next.js internals
   if (
     pathname.startsWith("/api/") ||
@@ -370,7 +387,12 @@ export async function middleware(request: NextRequest) {
   if (tenantId) {
     console.log("✅ Middleware: Setting tenant ID header:", tenantId);
     response.headers.set("x-tenant-id", tenantId);
-    response.headers.set("x-domain-type", host.includes(process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com") ? "subdomain" : "custom");
+    
+    // تحديد نوع الـ domain
+    const domainType = isCustomDomain ? "custom" : "subdomain";
+    response.headers.set("x-domain-type", domainType);
+    
+    console.log("✅ Middleware: Domain type:", domainType);
   } else {
     console.log("❌ Middleware: No tenant ID found for host:", host);
   }

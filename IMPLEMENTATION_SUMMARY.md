@@ -10,6 +10,8 @@
 - ✅ إضافة إعادة توجيه للصفحات النظامية إلى الدومين الأساسي
 - ✅ تحديث `getTenantIdFromCustomDomain()` للاتصال بـ Backend API
 - ✅ إضافة منطق تقسيم الصفحات حسب نوع الدومين
+- ✅ إضافة التحقق من Custom Domain (يحتوي على .com, .net, .org, إلخ)
+- ✅ إضافة منطق لاعتبار Custom Domain محتمل إذا لم يتم العثور عليه في Backend
 
 ### 3. **تحديث `context-liveeditor/tenantStore.jsx`**
 - ✅ إضافة تعليقات توضيحية للـ API calls
@@ -20,7 +22,7 @@
 - ✅ توضيح أن tenantId يمكن أن يكون subdomain أو custom domain
 
 ### 5. **تحديث ملفات الصفحات**
-- ✅ `app/page.tsx`
+- ✅ `app/page.tsx` - إضافة التحقق من Custom Domain
 - ✅ `app/TenantPageWrapper.tsx`
 - ✅ `app/HomePageWrapper.tsx`
 - ✅ `app/solutions/page.tsx`
@@ -59,6 +61,7 @@ API Request: { websiteName: "tenant1" }
 ```
 hey.com -> tenantId: "hey.com"
 API Request: { websiteName: "hey.com" }
+app/page.tsx: tenantId = "hey.com" -> HomePageWrapper
 ```
 
 ### **إعادة التوجيه:**
