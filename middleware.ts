@@ -174,14 +174,23 @@ export function middleware(request: NextRequest) {
     ? host === localDomain || host === `${localDomain}:3000`
     : host === productionDomain || host === `www.${productionDomain}`;
 
-  if (isSystemPage && !isOnBaseDomain) {
-    // إعادة توجيه الصفحات النظامية إلى الدومين الأساسي
+  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
+  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
+
+  // إذا كان custom domain وأي صفحة نظامية، إعادة توجيه إلى الدومين الأساسي
+  if (isCustomDomain && isSystemPage) {
     const baseUrl = isDevelopment 
       ? `http://${localDomain}:3000${pathname}`
       : `https://${productionDomain}${pathname}`;
     
-    console.log("🔄 Middleware: Redirecting system page to base domain:", baseUrl);
+    console.log("🔄 Middleware: Redirecting system page from custom domain to base domain:", baseUrl);
     return NextResponse.redirect(baseUrl);
+  }
+
+  // إذا كان custom domain، كل شيء بعد الـ slash يعتبر تبع الموقع المخصص
+  if (isCustomDomain) {
+    console.log("🔍 Middleware: Custom domain detected, treating all paths as tenant-specific:", host);
+    // لا نحتاج لإعادة توجيه، فقط نمرر للخطوة التالية
   }
 
   // Extract tenantId from subdomain or custom domain
@@ -191,9 +200,6 @@ export function middleware(request: NextRequest) {
   if (!tenantId) {
     tenantId = getTenantIdFromCustomDomain(host);
   }
-
-  // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
-  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(host);
 
   // Skip middleware for API routes, static files, and Next.js internals
   if (

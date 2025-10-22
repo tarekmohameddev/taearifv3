@@ -105,11 +105,12 @@ https://hey.com/about-us -> ✅ مسموح (custom domain)
 ## آلية التحقق
 
 1. **التحقق من الصفحات النظامية**: يتحقق من أن الصفحات النظامية على الدومين الأساسي
-2. **التحقق من Subdomain أولاً**: يحاول النظام أولاً استخراج `tenantId` من الـ subdomain
-3. **التحقق من Custom Domain**: إذا لم يجد subdomain، يتحقق من الـ Custom Domain محلياً (بدون API call)
-4. **التحقق من tenantId في app/page.tsx**: إذا كان هناك tenantId (subdomain أو custom domain)، يعرض HomePageWrapper
-5. **استخدام tenantData.username في useTenantId**: يأخذ `tenantId` من `response.data.username` من API response
-6. **إضافة Headers**: يضيف النظام headers إضافية:
+2. **التحقق من Custom Domain**: إذا كان custom domain وأي صفحة نظامية، إعادة توجيه إلى الدومين الأساسي
+3. **التحقق من Subdomain أولاً**: يحاول النظام أولاً استخراج `tenantId` من الـ subdomain
+4. **التحقق من Custom Domain**: إذا لم يجد subdomain، يتحقق من الـ Custom Domain محلياً (بدون API call)
+5. **التحقق من tenantId في app/page.tsx**: إذا كان هناك tenantId (subdomain أو custom domain)، يعرض HomePageWrapper
+6. **استخدام tenantData.username في useTenantId**: يأخذ `tenantId` من `response.data.username` من API response
+7. **إضافة Headers**: يضيف النظام headers إضافية:
    - `x-tenant-id`: معرف الـ tenant (subdomain أو custom domain)
    - `x-domain-type`: نوع الـ domain ("subdomain" أو "custom")
 
@@ -170,8 +171,26 @@ https://hey.com/
 https://hey.com/dashboard
 -> ❌ إعادة توجيه إلى: https://taearif.com/dashboard
 
+https://hey.com/live-editor
+-> ❌ إعادة توجيه إلى: https://taearif.com/live-editor
+
+https://hey.com/login
+-> ❌ إعادة توجيه إلى: https://taearif.com/login
+
 https://company1.taearif.com/live-editor
 -> ❌ إعادة توجيه إلى: https://taearif.com/live-editor
+```
+
+### Custom Domain - صفحات المستخدم النهائي
+```
+https://hey.com/
+-> ✅ مسموح (صفحة المستخدم النهائي)
+
+https://hey.com/about-us
+-> ✅ مسموح (صفحة المستخدم النهائي)
+
+https://hey.com/contact-us
+-> ✅ مسموح (صفحة المستخدم النهائي)
 ```
 
 ## الفوائد

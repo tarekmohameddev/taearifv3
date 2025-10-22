@@ -13,6 +13,8 @@
 - ✅ إضافة التحقق من Custom Domain (يحتوي على .com, .net, .org, إلخ)
 - ✅ إضافة منطق لاعتبار Custom Domain محتمل إذا لم يتم العثور عليه في Backend
 - ✅ إزالة API calls من middleware للسرعة (يعمل محلياً)
+- ✅ إضافة التحقق من Custom Domain للصفحات النظامية
+- ✅ إعادة توجيه الصفحات النظامية من Custom Domain إلى الدومين الأساسي
 
 ### 3. **تحديث `context-liveeditor/tenantStore.jsx`**
 - ✅ إضافة تعليقات توضيحية للـ API calls
@@ -76,7 +78,16 @@ app/page.tsx: tenantId = "actual-tenant-id" -> HomePageWrapper
 ### **إعادة التوجيه:**
 ```
 https://hey.com/dashboard -> https://taearif.com/dashboard
+https://hey.com/live-editor -> https://taearif.com/live-editor
+https://hey.com/login -> https://taearif.com/login
 https://tenant1.taearif.com/live-editor -> https://taearif.com/live-editor
+```
+
+### **Custom Domain - صفحات المستخدم النهائي:**
+```
+https://hey.com/ -> ✅ مسموح (صفحة المستخدم النهائي)
+https://hey.com/about-us -> ✅ مسموح (صفحة المستخدم النهائي)
+https://hey.com/contact-us -> ✅ مسموح (صفحة المستخدم النهائي)
 ```
 
 ## 🚀 **الخطوات التالية:**
