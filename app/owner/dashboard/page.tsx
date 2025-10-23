@@ -140,12 +140,6 @@ export default function OwnerDashboard() {
     checkAuthAndLoad();
   }, []); // إزالة dependencies لتجنب إعادة التشغيل المتكررة
 
-  // useEffect لمراقبة تغييرات tenantData وعرضها في console
-  useEffect(() => {
-    if (tenantData) {
-      console.log("Tenant Data from getTenant API:", tenantData);
-    }
-  }, [tenantData]);
 
   const fetchDashboardData = useCallback(async () => {
     // منع إعادة استدعاء API إذا كانت البيانات محملة بالفعل
@@ -223,7 +217,7 @@ export default function OwnerDashboard() {
                 لوحة تحكم المالك
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 gap-x-4">
               <span className="text-sm text-gray-700">
                 مرحباً، {ownerData?.first_name} {ownerData?.last_name}
               </span>
@@ -259,7 +253,7 @@ export default function OwnerDashboard() {
 
           {/* Statistics Cards */}
           {dashboardData?.summary_cards && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">إجمالي العقارات</CardTitle>
@@ -315,20 +309,20 @@ export default function OwnerDashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>العقار</TableHead>
-                      <TableHead>المشروع</TableHead>
-                      <TableHead>الإيجار المستحق</TableHead>
-                      <TableHead>الإيجار المتأخر</TableHead>
-                      <TableHead>تاريخ الاستحقاق</TableHead>
-                      <TableHead>آخر دفع</TableHead>
-                      <TableHead>الحالة</TableHead>
+                      <TableHead className="text-right">العقار</TableHead>
+                      <TableHead className="text-right">المشروع</TableHead>
+                      <TableHead className="text-right">الإيجار المستحق</TableHead>
+                      <TableHead className="text-right">الإيجار المتأخر</TableHead>
+                      <TableHead className="text-right">تاريخ الاستحقاق</TableHead>
+                      <TableHead className="text-right">آخر دفع</TableHead>
+                      <TableHead className="text-right">الحالة</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {dashboardData.properties_table.map((item: any, index: number) => (
                       <TableRow key={index}>
                         <TableCell>
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-3 gap-x-3 ">
                             {item.property.image_url && (
                               <img 
                                 src={item.property.image_url} 

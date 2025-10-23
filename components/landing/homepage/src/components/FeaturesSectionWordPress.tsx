@@ -38,25 +38,6 @@ export default function FeaturesSectionWordPress() {
               <span className="whitespace"> </span>
               <span>
                 <span className="ui-e-headline-text ui-e-headline-highlighted relative z-10 text-[#17BD37]">للعقارات</span>
-                <span className="uicore-svg-wrapper">
-                  <svg 
-                    className="absolute -bottom-10 left-0 w-full h-[25rem] text-[#FF8C24]" 
-                    viewBox="0 0 500 150" 
-                    preserveAspectRatio="none"
-                  >
-                    <path 
-                      d="M15.2,133.3L15.2,133.3c121.9-7.6,244-9.9,366.1-6.8c34.6,0.9,69.1,2.3,103.7,4" 
-                      stroke="currentColor" 
-                      strokeWidth="9" 
-                      fill="none"
-                      className={`transition-all duration-2000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-                      style={{
-                        strokeDasharray: isVisible ? '1500 1500' : '0 1500',
-                        transition: 'stroke-dasharray 2s cubic-bezier(0.29, 1.11, 0.74, 1.04)'
-                      }}
-                    />
-                  </svg>
-                </span>
               </span>
               <span className="whitespace"> </span>
             </span>

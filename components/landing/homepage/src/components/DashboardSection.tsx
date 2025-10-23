@@ -63,7 +63,7 @@ export default function DashboardSection() {
                <motion.img
                  src="https://test.kingbellsa.com/wp-content/uploads/2025/10/Smart-Home-App-Hero-Image-3.webp"
                  alt="Smart Home App 2"
-                 className="w-40 h-20 sm:w-56 sm:h-28 md:w-48 md:h-24 lg:w-70 lg:h-32 object-cover rounded-lg shadow-lg"
+                 className="w-[280px] h-auto scale-100  object-cover rounded-lg shadow-lg"
                  whileHover={{ 
                    scale: 1.05, 
                    y: -5,

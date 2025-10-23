@@ -16,7 +16,7 @@ export function authenticateOwnerToken(req, res, next) {
 
     try {
       // Verify JWT token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key");
+      const decoded = jwt.verify(token, process.env.SECRET_KEY || "your-secret-key");
       
       // Set owner data in request
       req.owner = {
