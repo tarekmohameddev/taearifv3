@@ -117,6 +117,7 @@ interface Property {
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
+import useTenantStore from "@/context-liveeditor/tenantStore";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -290,6 +291,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
   // Tenant ID hook
   const { tenantId, isLoading: tenantLoading } = useTenantId();
+
+  // Get tenant data from store
+  const { tenantData, loadingTenantData } = useTenantStore();
+
+  // Get logo image from tenantData with fallback (only after loading is complete)
+  const logoImage = loadingTenantData 
+    ? null // لا تعرض شيئاً أثناء التحميل
+    : (tenantData?.globalComponentsData?.header?.logo?.image || `${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`);
 
   // Property data state
   const [property, setProperty] = useState<Property | null>(null);
@@ -760,17 +769,19 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     </div>
                   </div>
                 )}
-                <div className="absolute bottom-2 right-2 opacity-80">
-                  <div className="w-24 h-fit bg-white/20 rounded flex items-center justify-center">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-                      alt="تعاريف العقارية"
-                      width={160}
-                      height={80}
-                      className="object-contain"
-                    />
+                {logoImage && (
+                  <div className="absolute bottom-2 right-2 opacity-80">
+                    <div className="w-24 h-fit bg-white/20 rounded flex items-center justify-center">
+                      <Image
+                        src={logoImage}
+                        alt="تعاريف العقارية"
+                        width={160}
+                        height={80}
+                        className="object-contain"
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* نص توضيحي - يظهر فقط عند وجود صور إضافية */}
@@ -798,17 +809,19 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                           }`}
                           onClick={() => handleThumbnailClick(imageSrc, index)}
                         />
-                        <div className="absolute bottom-2 right-2 opacity-80">
-                          <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-                            <Image
-                              src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-                              alt="تعاريف العقارية"
-                              width={160}
-                              height={80}
-                              className="object-contain"
-                            />
+                        {logoImage && (
+                          <div className="absolute bottom-2 right-2 opacity-80">
+                            <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                              <Image
+                                src={logoImage}
+                                alt="تعاريف العقارية"
+                                width={160}
+                                height={80}
+                                className="object-contain"
+                              />
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     ))}
                   space={16}
@@ -1547,17 +1560,19 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               fill
                               className="w-full h-full object-cover rounded-lg overflow-hidden relative -z-10"
                             />
-                            <div className="absolute bottom-2 right-2 opacity-50">
-                              <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-                                <Image
-                                  src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-                                  alt="تعاريف العقارية"
-                                  width={160}
-                                  height={80}
-                                  className="object-contain"
-                                />
+                            {logoImage && (
+                              <div className="absolute bottom-2 right-2 opacity-50">
+                                <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                                  <Image
+                                    src={logoImage}
+                                    alt="تعاريف العقارية"
+                                    width={160}
+                                    height={80}
+                                    className="object-contain"
+                                  />
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </figure>
                         </Link>
                       ))
@@ -1607,17 +1622,19 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                                     height={600}
                                     className="w-full h-full object-cover"
                                   />
-                                  <div className="absolute bottom-2 right-2 opacity-50">
-                                    <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-                                      <Image
-                                        src={`${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`}
-                                        alt="تعاريف العقارية"
-                                        width={160}
-                                        height={80}
-                                        className="object-contain"
-                                      />
+                                  {logoImage && (
+                                    <div className="absolute bottom-2 right-2 opacity-50">
+                                      <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                                        <Image
+                                          src={logoImage}
+                                          alt="تعاريف العقارية"
+                                          width={160}
+                                          height={80}
+                                          className="object-contain"
+                                        />
+                                      </div>
                                     </div>
-                                  </div>
+                                  )}
                                 </figure>
                                 <p className="text-gray-800 pt-4 text-base md:text-lg xl:text-xl font-normal leading-5 xl:leading-6 text-ellipsis overflow-hidden">
                                   {similarProperty.title}
