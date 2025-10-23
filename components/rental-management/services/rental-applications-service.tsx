@@ -811,6 +811,14 @@ export function RentalApplicationsService({
               <FileText className="h-4 w-4" />
               العقود
             </Button>
+            <Button
+              onClick={() => router.push("/dashboard/rental-management/owners")}
+              variant="outline"
+              className="flex items-center gap-2 left-0"
+            >
+              <FileText className="h-4 w-4" />
+              إدارة الملاك
+            </Button>
         </div>
       </div>
 

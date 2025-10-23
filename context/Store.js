@@ -28,6 +28,7 @@ const useStore = create((set, get) => {
     ...require("./store/purchaseManagement")(set, get),
     ...require("./store/matchingPage")(set, get),
     ...require("./store/marketingDashboard")(set, get),
+    ...require("./store/rentalOwnerDashboardPage")(set, get),
     ...require("./store/userAuth")(set),
   };
 });
