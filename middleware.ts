@@ -359,6 +359,17 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // Check for owner authentication on owner pages
+  if (pathnameWithoutLocale.startsWith("/owner/") && !pathnameWithoutLocale.startsWith("/owner/login") && !pathnameWithoutLocale.startsWith("/owner/register")) {
+    const ownerToken = request.cookies.get("owner_token")?.value;
+    
+    if (!ownerToken) {
+      console.log("🔒 Middleware: No owner token found, redirecting to login");
+      const loginUrl = new URL(`/${locale}/owner/login`, request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   // Rewrite the URL to remove the locale prefix
   const url = request.nextUrl.clone();
   url.pathname = pathnameWithoutLocale;
