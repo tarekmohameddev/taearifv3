@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 
 const Footer = () => {
   return (
@@ -25,7 +26,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <a 
-              href="#home" 
+              href="/#home" 
               className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   الصفحة الرئيسية
                 </a>
@@ -38,14 +39,14 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#about"  className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                <a href="/#about"  className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   نبذة عنا
                 </a>
               </li>
               <li>
-                <a href="/privacy-policy" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                <Link href="/privacy-policy" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   سياسة الخصوصية وسرية المعلومات
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

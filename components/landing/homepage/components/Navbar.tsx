@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import useAuthStore from '@/context/AuthContext';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { UserIslogged, logout } = useAuthStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,24 +52,45 @@ export default function Navbar() {
 
           {/* Auth Buttons - Hidden on mobile */}
           <div className="hidden lg:flex items-center gap-x-5">
-            <button 
-              className="relative text-sm font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 cursor-pointer group"
-            >
-              تسجيل
-              <span className="absolute bottom-[-5px] right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </button>
-            <button 
-              className="relative text-sm font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 cursor-pointer group"
-            >
-              تسجيل دخول
-              <span className="absolute bottom-[-5px] right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </button>
-            <button 
-              className="relative text-sm font-medium text-black hover:text-red-600 transition-colors duration-300 cursor-pointer group"
-            >
-              تسجيل خروج
-              <span className="absolute bottom-[-5px] right-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </button>
+            {/* Show when logged in */}
+            {UserIslogged && (
+              <>
+                <Link 
+                  href="/dashboard"
+                  className="relative text-sm font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 cursor-pointer group"
+                >
+                  لوحة التحكم
+                  <span className="absolute bottom-[-5px] right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                </Link>
+                <button 
+                  onClick={() => logout()}
+                  className="relative text-sm font-medium text-black hover:text-red-600 transition-colors duration-300 cursor-pointer group"
+                >
+                  تسجيل خروج
+                  <span className="absolute bottom-[-5px] right-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                </button>
+              </>
+            )}
+            
+            {/* Show when not logged in */}
+            {!UserIslogged && (
+              <>
+                <Link 
+                  href="/register"
+                  className="relative text-sm font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 cursor-pointer group"
+                >
+                  تسجيل
+                  <span className="absolute bottom-[-5px] right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                </Link>
+                <Link 
+                  href="/login"
+                  className="relative text-sm font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 cursor-pointer group"
+                >
+                  تسجيل دخول
+                  <span className="absolute bottom-[-5px] right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Center - Logo */}
@@ -163,27 +187,51 @@ export default function Navbar() {
               {/* Mobile Auth Buttons */}
               <div className="px-6 py-6 border-t">
                 <div className="flex flex-col items-center space-y-6">
-                  <button 
-                    className="relative text-lg font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 cursor-pointer group"
-                    onClick={toggleMobileMenu}
-                  >
-                    تسجيل
-                    <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-                  </button>
-                  <button 
-                    className="relative text-lg font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 cursor-pointer group"
-                    onClick={toggleMobileMenu}
-                  >
-                    تسجيل دخول
-                    <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-                  </button>
-                  <button 
-                    className="relative text-lg font-medium text-black hover:text-red-600 transition-colors duration-300 cursor-pointer group"
-                    onClick={toggleMobileMenu}
-                  >
-                    تسجيل خروج
-                    <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-                  </button>
+                  {/* Show when logged in */}
+                  {UserIslogged && (
+                    <>
+                      <Link 
+                        href="/dashboard"
+                        className="relative text-lg font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 cursor-pointer group"
+                        onClick={toggleMobileMenu}
+                      >
+                        لوحة التحكم
+                        <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                      </Link>
+                      <button 
+                        className="relative text-lg font-medium text-black hover:text-red-600 transition-colors duration-300 cursor-pointer group"
+                        onClick={() => {
+                          logout();
+                          toggleMobileMenu();
+                        }}
+                      >
+                        تسجيل خروج
+                        <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                      </button>
+                    </>
+                  )}
+                  
+                  {/* Show when not logged in */}
+                  {!UserIslogged && (
+                    <>
+                      <Link 
+                        href="/register"
+                        className="relative text-lg font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 cursor-pointer group"
+                        onClick={toggleMobileMenu}
+                      >
+                        تسجيل
+                        <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                      </Link>
+                      <Link 
+                        href="/login"
+                        className="relative text-lg font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 cursor-pointer group"
+                        onClick={toggleMobileMenu}
+                      >
+                        تسجيل دخول
+                        <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

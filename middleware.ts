@@ -310,22 +310,19 @@ export function middleware(request: NextRequest) {
   });
 
   // If no locale in pathname, redirect to appropriate default locale
-  // BUT ONLY if there's a tenantId (subdomain) OR if it's a dashboard page
   if (!pathnameHasLocale) {
-    // Use Arabic as default for live-editor, English for other pages
-    const locale = pathname.startsWith("/live-editor")
-      ? liveEditorDefaultLocale
-      : defaultLocale;
+    // Use Arabic as default for all pages
+    const locale = "ar";
     
-    // Only redirect if there's a tenantId (subdomain) OR if it's a dashboard page
-    const shouldRedirect = tenantId || pathname.startsWith("/dashboard") || pathname.startsWith("/login") || pathname.startsWith("/register");
+    // Redirect for all pages that don't have locale (including homepage, solutions, etc.)
+    const shouldRedirect = true;
     
     console.log("🔍 Middleware Debug - Redirect Decision:", {
       pathname,
       locale,
       tenantId,
       shouldRedirect,
-      reason: tenantId ? "Has tenantId (subdomain)" : pathname.startsWith("/dashboard") ? "Dashboard page" : pathname.startsWith("/login") ? "Login page" : pathname.startsWith("/register") ? "Register page" : "No redirect reason"
+      reason: "All pages without locale should redirect to add locale"
     });
 
     if (shouldRedirect) {
