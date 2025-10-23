@@ -11,7 +11,7 @@ const Footer = () => {
           {/* Logo Column */}
           <div className="hidden md:block">
             <Image
-              src="logo.svg"
+              src="/logo.svg"
               alt="Taearif Logo"
               width={246}
               height={59}
@@ -33,7 +33,7 @@ const Footer = () => {
               </li>
               <li>
                 <a 
-                    href="#pricing"           
+                    href="/#pricing"           
                 className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   الباقات
                 </a>
@@ -83,7 +83,7 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-4 text-gray-900">عنواننا</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                <a className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   سعد بن أبي وقاص، الرياض المملكة العربية السعودية
                 </a>
               </li>
