@@ -62,7 +62,9 @@ import {
   CheckCircle2,
   X,
   Lock,
+  ArrowRight,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import useStore from "@/context/Store";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -96,6 +98,8 @@ interface Owner {
 }
 
 export function OwnersPage() {
+  const router = useRouter();
+  
   const {
     rentalOwnerDashboard,
     setRentalOwnerDashboard,
@@ -595,7 +599,7 @@ export function OwnersPage() {
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <Users className="h-8 w-8" />
@@ -605,13 +609,23 @@ export function OwnersPage() {
             إدارة وعرض معلومات الملاك في النظام
           </p>
         </div>
-        <Button
-          onClick={openCreateOwnerDialog}
-          className="gap-2"
-        >
-          <Plus className="h-5 w-5" />
-          إضافة مالك جديد
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() => router.push("/dashboard/rental-management")}
+            variant="outline"
+            className="gap-2"
+          >
+            <ArrowRight className="h-5 w-5" />
+            العودة لإدارة الايجارات
+          </Button>
+          <Button
+            onClick={openCreateOwnerDialog}
+            className="gap-2"
+          >
+            <Plus className="h-5 w-5" />
+            إضافة مالك جديد
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filter */}

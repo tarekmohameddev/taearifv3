@@ -787,7 +787,7 @@ export function RentalApplicationsService({
     <div className="space-y-6">
       {/* Header and Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button
             onClick={() => router.push("/dashboard/rental-management/create")}
             className="bg-gray-700 hover:bg-gray-800"
@@ -811,14 +811,17 @@ export function RentalApplicationsService({
               <FileText className="h-4 w-4" />
               العقود
             </Button>
-            <Button
-              onClick={() => router.push("/dashboard/rental-management/owners")}
-              variant="outline"
-              className="flex items-center gap-2 left-0"
-            >
-              <FileText className="h-4 w-4" />
-              إدارة الملاك
-            </Button>
+        </div>
+        
+        {/* زر إدارة الملاك منفصل على اليسار */}
+        <div>
+          <Button
+            onClick={() => router.push("/dashboard/rental-management/owners")}
+            className="flex items-center gap-2 bg-black hover:bg-gray-900"
+          >
+            <Users className="h-4 w-4" />
+            إدارة الملاك
+          </Button>
         </div>
       </div>
 
