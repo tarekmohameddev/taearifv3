@@ -108,28 +108,28 @@ export default function Navbar() {
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex items-center gap-x-5">
             <a 
-              href="#home" 
+              href="/#home" 
               className="relative text-black hover:text-[#ff8c24] transition-colors duration-300 group"
             >
               الصفحة الرئيسية
               <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
             </a>
             <a 
-              href="#about" 
+              href="/#about" 
               className="relative text-black hover:text-[#ff8c24] transition-colors duration-300 group"
             >
               نبذة عن
               <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
             </a>
             <a 
-              href="#pricing" 
+              href="/#pricing" 
               className="relative text-black hover:text-[#ff8c24] transition-colors duration-300 group"
             >
               الباقات
               <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
             </a>
             <a 
-              href="#features" 
+              href="/#features" 
               className="relative text-black hover:text-[#ff8c24] transition-colors duration-300 group"
             >
               الميزات
@@ -154,28 +154,28 @@ export default function Navbar() {
               <div className="flex-1 flex items-center justify-center">
                 <nav className="space-y-8 text-center  ">
                   <a 
-                    href="#" 
+                    href="/#home" 
                     className="block text-2xl font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 py-4"
                     onClick={toggleMobileMenu}
                   >
                     الصفحة الرئيسية
                   </a>
                   <a 
-                    href="#" 
+                    href="/#about" 
                     className="block text-2xl font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 py-4"
                     onClick={toggleMobileMenu}
                   >
                     نبذة عن
                   </a>
                   <a 
-                    href="#" 
+                    href="/#pricing" 
                     className="block text-2xl font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 py-4"
                     onClick={toggleMobileMenu}
                   >
                     الباقات
                   </a>
                   <a 
-                    href="#" 
+                    href="/#features" 
                     className="block text-2xl font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 py-4"
                     onClick={toggleMobileMenu}
                   >
