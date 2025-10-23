@@ -8,34 +8,36 @@ export default function TaearifTypesCards() {
   const cards = [
     {
       id: 1,
-      title: "تعاريف للوكلاء",
-      subtitle: "مثالي للأفراد الذين يرغبون في الاحتراف.",
-      description: "أنشئ موقعك الإلكتروني الخاص بعقاراتك، وقم بإدارة قوائم عقاراتك، وابدأ البيع بشكل أسرع - دون عناء الترميز.",
+      title: "موقع إلكتروني احترافي",
+      subtitle: "إنشاء موقع إلكتروني احترافي",
+      description: "عرّف عملاءك بعقاراتك من خلال موقع احترافي باسمك يعرض كل عروضك بسهولة وجاذبية.",
       icon: Building,
       bgColor: "bg-[#ff7b58]",
       iconColor: "text-orange-600",
-      iconBg: "bg-orange-100"
+      iconBg: "bg-orange-100",
+      image: "/online-service-card-2.png"
     },
     {
       id: 2,
-      title: "تعاريف للمكاتب",
-      subtitle: "مثالي للفرق والمكاتب العقارية.",
-      description: "إدارة متقدمة للفرق، تقارير شاملة، وتكامل مع أنظمة أخرى لتحسين إنتاجية مكتبك العقاري.",
+      title: "الربط بالذكاء الصناعي",
+      subtitle: "الربط بين العروض والطلبات بالذكاء الصناعي",
+      description: "طابق عروضك العقارية مع طلبات العملاء تلقائيًا بالذكاء الصناعي، ووصل للعميل المناسب في الوقت المناسب بسهولة ودقّة.",
       icon: Users,
       bgColor: "bg-[#00b4a5]",
       iconColor: "text-green-600",
-      iconBg: "bg-green-100"
+      iconBg: "bg-green-100",
+      image: "/online-service-card-2.png"
     },
     {
       id: 3,
-      title: "تعاريف للمطورين",
-      subtitle: "مثالي للمطورين العقاريين الكبار.",
-      description: "حلول متقدمة للتطوير العقاري، إدارة المشاريع الكبيرة، وأدوات تحليل متطورة لاتخاذ القرارات.",
+      title: "واتساب ذكي",
+      subtitle: "الواتساب بالذكاء الصناعي",
+      description: "فعّل واتسابك ليعمل عنك — يرد تلقائيًا على استفسارات العملاء ويقدّم تفاصيل العقارات بدقّة وسرعة على مدار الساعة.",
       icon: Briefcase,
-
       bgColor: "bg-[#3e7cf7]",
       iconColor: "text-blue-600",
-      iconBg: "bg-blue-100"
+      iconBg: "bg-blue-100",
+      image: "/online-service-card-2.png"
     }
   ];
 
@@ -56,7 +58,7 @@ export default function TaearifTypesCards() {
             transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
             viewport={{ once: true, margin: "-100px" }}
           >
-          مصممة تناسب طريقة شغلك أيًّا كانت.
+          تعاريف تجمع لك كل أدواتك في مكان واحد
           </motion.h2>
           <motion.p 
             className="text-xl text-gray-600 max-w-3xl mx-auto"
@@ -65,7 +67,7 @@ export default function TaearifTypesCards() {
             transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
             viewport={{ once: true, margin: "-100px" }}
           >
-          تعاريف مصمّمة على مقاس شغلك — سواء كنت مسوّق لحالك، مكتب عقاري كامل، أو مطوّر كبير تدير مشاريعك.
+          من موقع إلكتروني احترافي، إلى ربط تلقائي بين العروض والطلبات، وصولًا إلى واتساب ذكي يرد على عملائك بالذكاء الصناعي.
           </motion.p>
         </motion.div>
         
@@ -169,7 +171,7 @@ export default function TaearifTypesCards() {
                      transition={{ duration: 0.4, ease: "easeOut" }}
                    >
                      <Image
-                       src="/online-service-card-2.png"
+                       src={card.image}
                        alt={card.title}
                        width={1000}
                        height={150}

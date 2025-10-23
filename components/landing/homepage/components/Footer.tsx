@@ -6,52 +6,52 @@ const Footer = () => {
   return (
     <footer className="bg-white text-gray-900 pt-8 transform animate-slideUp ">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 ">
           {/* Logo Column */}
           <div className="hidden md:block">
             <Image
-              src="https://test.kingbellsa.com/wp-content/uploads/2025/10/Asset-1.svg"
+              src="logo.svg"
               alt="Taearif Logo"
               width={246}
               height={59}
               className="w-auto h-14"
             />
           </div>
-
+          <div>
+          </div>
           {/* Links Column */}
           <div>
             <h4 className="text-lg font-semibold mb-4 text-gray-900">الروابط</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                <a 
+              href="#home" 
+              className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   الصفحة الرئيسية
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                <a 
+                    href="#pricing"           
+                className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   الباقات
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                <a href="#about"  className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   نبذة عنا
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
-                  الوظائف
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
-                  اتصل بنا
+                <a href="/privacy-policy" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                  سياسة الخصوصية وسرية المعلومات
                 </a>
               </li>
             </ul>
           </div>
 
           {/* Help & Support Column */}
-          <div>
+          {/* <div>
             <h4 className="text-lg font-semibold mb-4 text-gray-900">المساعدة والدعم</h4>
             <ul className="space-y-2">
               <li>
@@ -75,7 +75,7 @@ const Footer = () => {
                 </a>
               </li>
             </ul>
-          </div>
+          </div> */}
 
           {/* Contact Column */}
           <div>

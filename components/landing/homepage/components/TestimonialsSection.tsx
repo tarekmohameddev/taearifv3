@@ -139,11 +139,11 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Read more button */}
-        <div className="text-center mt-4">
+        {/* <div className="text-center mt-4">
           <button className="bg-[#FF8C24] text-white px-8 py-3 rounded-lg font-medium hover:bg-[#E67E22] transition-colors">
             قراءة المزيد
           </button>
-        </div>
+        </div> */}
       </div>
     </section>
   );

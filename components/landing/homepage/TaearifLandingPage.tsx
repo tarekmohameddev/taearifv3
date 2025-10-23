@@ -1,18 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Navbar from './src/components/Navbar';
-import HeroSection from './src/components/HeroSection';
-import TaearifTypesCards from './src/components/TaearifTypesCards';
-import TeamSection from './src/components/TeamSection';
-import DashboardSection from './src/components/DashboardSection';
-import PricingSection from './src/components/PricingSection';
-import ClientsSection from './src/components/ClientsSection';
-import FeaturesSectionWordPress from './src/components/FeaturesSectionWordPress';
-import TestimonialsSection from './src/components/TestimonialsSection';
-import WhyUsSection from './src/components/WhyUsSection';
-import MobileAppSection from './src/components/MobileAppSection';
-import Footer from './src/components/Footer';
+import Navbar from './components/Navbar';
+import HeroSection from './components/HeroSection';
+import TaearifTypesCards from './components/TaearifTypesCards';
+import TeamSection from './components/TeamSection';
+import DashboardSection from './components/DashboardSection';
+import PricingSection from './components/PricingSection';
+import ClientsSection from './components/ClientsSection';
+import FeaturesSectionWordPress from './components/FeaturesSectionWordPress';
+import TestimonialsSection from './components/TestimonialsSection';
+import WhyUsSection from './components/WhyUsSection';
+import MobileAppSection from './components/MobileAppSection';
+import Footer from './components/Footer';
 
 export default function TaearifLandingPage() {
   const [dir, setDir] = useState('rtl'); // افتراضي RTL
@@ -27,18 +27,36 @@ export default function TaearifLandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen" dir={dir}>
+    <div className="min-h-screen">
       <Navbar />
-      <HeroSection />
-      <TaearifTypesCards />
-      <TeamSection />
-      <DashboardSection />
-      <PricingSection />
-      <ClientsSection />
-      <FeaturesSectionWordPress />
-      <TestimonialsSection />
-      <WhyUsSection />
-      <MobileAppSection />
+      <section id="home">
+        <HeroSection />
+      </section>
+      <section id="features">
+        <TaearifTypesCards />
+      </section>
+      {/* <TeamSection /> */}
+      <section id="dashboard">
+        <DashboardSection />
+      </section>
+      <section id="pricing">
+        <PricingSection />
+      </section>
+      <section id="clients">
+        <ClientsSection />
+      </section>
+      <section id="features-details">
+        <FeaturesSectionWordPress />
+      </section>
+      <section id="testimonials">
+        <TestimonialsSection />
+      </section>
+      <section id="about">
+        <WhyUsSection />
+      </section>
+      <section id="mobile">
+        <MobileAppSection />
+      </section>
       <Footer />
     </div>
   );

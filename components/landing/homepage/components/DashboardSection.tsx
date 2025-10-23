@@ -78,17 +78,17 @@ export default function DashboardSection() {
             <div className="max-w-4xl mx-auto text-center">
                {/* Main Heading */}
                <h1 className="text-4xl lg:text-6xl font-bold text-black mb-8 leading-tight">
-                 قم بإدارة كامل{' '}
-                 <span className="text-[#17BD37]">الأعمال التجارية العقارية</span>
+                 كل أعمالك العقارية في{' '}
+                 <span className="text-[#17BD37]">لوحة تحكم واحدة</span>
                </h1>
 
               {/* Description */}
               <p className="text-xl text-[#6E6E75] mb-8 leading-relaxed max-w-3xl mx-auto">
-                الداشبورد في تعاريف يعطيك تحكم كامل — من العقارات والعملاء إلى الصفقات والرسائل — كل شي في نظام ذكي مؤتمت يشتغل عنك، مو عليك.
+                من إدارة العقارات والعملاء إلى الصفقات والرسائل — نظام ذكي يشتغل عنك، مو عليك.
               </p>
 
               {/* Rating */}
-              <div className="flex items-center justify-center gap-2 mb-4">
+              {/* <div className="flex items-center justify-center gap-2 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
@@ -100,12 +100,12 @@ export default function DashboardSection() {
                   </svg>
                 ))}
                 <span className="text-2xl font-bold text-black ml-2">4.9</span>
-              </div>
+              </div> */}
 
               {/* Trust Text */}
-              <p className="text-sm text-[#6E6E75]">
+              {/* <p className="text-sm text-[#6E6E75]">
                 مجرب من المحترفين العقاريين بكل مناطق السعودية.
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
