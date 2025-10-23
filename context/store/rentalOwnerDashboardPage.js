@@ -148,7 +148,8 @@ module.exports = (set, get) => ({
         },
       });
       
-      const properties = response.data.data.properties || response.data.data || [];
+      // البيانات موجودة في response.data.data.data (array من العقارات)
+      const properties = response.data.data.data || response.data.data.properties || response.data.data || [];
       
       set((state) => ({
         rentalOwnerDashboard: {
@@ -322,10 +323,13 @@ module.exports = (set, get) => ({
 
   // Remove property from owner rental
   removePropertyFromOwner: async (ownerRentalId, propertyId) => {
+    console.log("Store: removePropertyFromOwner called with:", ownerRentalId, propertyId);
     try {
       const response = await axiosInstance.delete(
         `/v1/user/owner-rentals/${ownerRentalId}/properties/${propertyId}`
       );
+      
+      console.log("Store: API response:", response.data);
 
       if (response.data.success) {
         // Remove property from the assigned properties list
@@ -343,6 +347,8 @@ module.exports = (set, get) => ({
 
         return { success: true, data: response.data };
       }
+      
+      return { success: false, error: "Unknown error" };
     } catch (error) {
       console.error("Error removing property from owner:", error);
       return {

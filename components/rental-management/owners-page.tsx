@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
@@ -157,6 +158,9 @@ export function OwnersPage() {
   // View Assigned Properties Dialog State
   const [isViewPropertiesDialogOpen, setIsViewPropertiesDialogOpen] = useState(false);
   const [selectedOwnerForView, setSelectedOwnerForView] = useState<Owner | null>(null);
+  const [isRemovePropertyDialogOpen, setIsRemovePropertyDialogOpen] = useState(false);
+  const [selectedPropertyForRemove, setSelectedPropertyForRemove] = useState<number | null>(null);
+  const [removingProperty, setRemovingProperty] = useState(false);
   
   // Delete Owner Dialog State
   const [isDeleteOwnerDialogOpen, setIsDeleteOwnerDialogOpen] = useState(false);
@@ -439,24 +443,48 @@ export function OwnersPage() {
     }
   };
 
-  // Handle remove property from owner
-  const handleRemoveProperty = async (propertyId: number) => {
-    if (!selectedOwnerForView) return;
+  // Open remove property dialog
+  const openRemovePropertyDialog = (propertyId: number) => {
+    setSelectedPropertyForRemove(propertyId);
+    setIsRemovePropertyDialogOpen(true);
+  };
 
-    if (!confirm("هل أنت متأكد من إلغاء ربط هذا العقار بالمالك؟")) {
+  // Close remove property dialog
+  const closeRemovePropertyDialog = () => {
+    setIsRemovePropertyDialogOpen(false);
+    setSelectedPropertyForRemove(null);
+  };
+
+  // Handle remove property from owner
+  const handleRemoveProperty = async () => {
+    console.log("handleRemoveProperty called");
+    console.log("selectedOwnerForView:", selectedOwnerForView);
+    console.log("selectedPropertyForRemove:", selectedPropertyForRemove);
+    
+    if (!selectedOwnerForView || !selectedPropertyForRemove) {
+      console.log("Missing required data");
       return;
     }
 
-    const result = await removePropertyFromOwner(selectedOwnerForView.id, propertyId);
+    setRemovingProperty(true);
+    console.log("Calling removePropertyFromOwner...");
+    const result = await removePropertyFromOwner(selectedOwnerForView.id, selectedPropertyForRemove);
+    console.log("Result:", result);
+    setRemovingProperty(false);
 
     if (result.success) {
       toast.success("تم إلغاء ربط العقار بنجاح");
+      closeRemovePropertyDialog();
       // Refresh if no properties left on current page
       if (assignedProperties.length === 1 && assignedPropertiesPagination && assignedPropertiesPagination.current_page > 1) {
         fetchAssignedProperties(selectedOwnerForView.id, assignedPropertiesPagination.current_page - 1, 15);
+      } else if (selectedOwnerForView) {
+        // Refresh current page
+        fetchAssignedProperties(selectedOwnerForView.id, assignedPropertiesPagination?.current_page || 1, 15);
       }
     } else {
       toast.error(result.error || "حدث خطأ أثناء إلغاء ربط العقار");
+      closeRemovePropertyDialog();
     }
   };
 
@@ -1487,24 +1515,47 @@ export function OwnersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* View Assigned Properties Dialog */}
-      <Dialog open={isViewPropertiesDialogOpen} onOpenChange={closeViewPropertiesDialog}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto" dir="rtl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              <ListChecks className="h-6 w-6" />
-              العقارات المرتبطة
-            </DialogTitle>
-            <DialogDescription>
-              {selectedOwnerForView && (
-                <span>
-                  عرض العقارات المرتبطة بـ <strong>{selectedOwnerForView.name}</strong>
-                </span>
-              )}
-            </DialogDescription>
-          </DialogHeader>
+      {/* View Assigned Properties Dialog - Custom HTML with Portal */}
+      {isViewPropertiesDialogOpen && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 9998 }}
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) {
+              closeViewPropertiesDialog();
+            }
+          }}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto"
+            dir="rtl"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-900">
+                    <ListChecks className="h-6 w-6" />
+                    العقارات المرتبطة
+                  </h2>
+                  {selectedOwnerForView && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      عرض العقارات المرتبطة بـ <strong>{selectedOwnerForView.name}</strong>
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={closeViewPropertiesDialog}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
 
-          <div className="space-y-4">
+            {/* Content */}
+            <div className="p-6 space-y-4">
             {loadingAssignedProperties ? (
               <div className="flex items-center justify-center py-20">
                 <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
@@ -1516,9 +1567,12 @@ export function OwnersPage() {
                   حدث خطأ
                 </h3>
                 <p className="text-gray-500 mb-4">{assignedPropertiesError}</p>
-                <Button onClick={() => selectedOwnerForView && fetchAssignedProperties(selectedOwnerForView.id, 1, 15)}>
+                <button
+                  onClick={() => selectedOwnerForView && fetchAssignedProperties(selectedOwnerForView.id, 1, 15)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+                >
                   إعادة المحاولة
-                </Button>
+                </button>
               </div>
             ) : assignedProperties.length === 0 ? (
               <div className="text-center py-20">
@@ -1535,8 +1589,8 @@ export function OwnersPage() {
                 {/* Properties Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {assignedProperties.map((property: any) => (
-                    <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                      <CardContent className="p-0">
+                    <div key={property.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-white">
+                      <div className="p-0">
                         {/* Property Image */}
                         {property.featured_image_url && (
                           <div className="relative h-48 w-full">
@@ -1546,20 +1600,20 @@ export function OwnersPage() {
                               className="w-full h-full object-cover"
                             />
                             {property.featured && (
-                              <Badge className="absolute top-2 right-2 bg-yellow-500">
+                              <span className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-semibold px-2 py-1 rounded">
                                 مميز
-                              </Badge>
+                              </span>
                             )}
                             {property.property_status && (
-                              <Badge
-                                className={`absolute top-2 left-2 ${
+                              <span
+                                className={`absolute top-2 left-2 text-white text-xs font-semibold px-2 py-1 rounded ${
                                   property.property_status === "available"
                                     ? "bg-green-500"
                                     : "bg-gray-500"
                                 }`}
                               >
                                 {property.property_status === "available" ? "متاح" : property.property_status}
-                              </Badge>
+                              </span>
                             )}
                           </div>
                         )}
@@ -1583,9 +1637,9 @@ export function OwnersPage() {
                                 {property.price} ريال
                               </span>
                               {property.purpose && (
-                                <Badge variant="outline">
+                                <span className="border border-gray-300 text-gray-700 text-xs font-semibold px-2 py-1 rounded">
                                   {property.purpose === "rent" ? "للإيجار" : "للبيع"}
-                                </Badge>
+                                </span>
                               )}
                             </div>
                           )}
@@ -1633,109 +1687,112 @@ export function OwnersPage() {
                           )}
 
                           {/* Remove Button */}
-                          <Button
-                            onClick={() => handleRemoveProperty(property.id)}
-                            variant="outline"
-                            size="sm"
-                            className="w-full mt-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          <button
+                            type="button"
+                            onClick={() => openRemovePropertyDialog(property.id)}
+                            className="w-full mt-2 px-3 py-2 border border-red-300 rounded-md text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors font-medium flex items-center justify-center gap-2"
                           >
-                            <X className="h-4 w-4 ml-2" />
+                            <X className="h-4 w-4" />
                             إلغاء الربط
-                          </Button>
+                          </button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   ))}
                 </div>
 
                 {/* Pagination */}
                 {assignedPropertiesPagination && assignedPropertiesPagination.last_page > 1 && (
                   <div className="border-t border-gray-100 pt-4 mt-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-4">
                       <div className="text-sm text-gray-700">
                         عرض {assignedPropertiesPagination.from} إلى {assignedPropertiesPagination.to} من أصل{" "}
                         {assignedPropertiesPagination.total} عقار
                       </div>
-                      <Pagination>
-                        <PaginationContent>
-                          {assignedPropertiesPagination.current_page > 1 && (
-                            <PaginationItem>
-                              <PaginationPrevious
-                                onClick={() =>
-                                  handleAssignedPropertiesPageChange(assignedPropertiesPagination.current_page - 1)
-                                }
-                                className="cursor-pointer"
-                              />
-                            </PaginationItem>
-                          )}
+                      <div className="flex items-center gap-1">
+                        {assignedPropertiesPagination.current_page > 1 && (
+                          <button
+                            onClick={() => handleAssignedPropertiesPageChange(assignedPropertiesPagination.current_page - 1)}
+                            className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            السابق
+                          </button>
+                        )}
 
-                          {Array.from({ length: assignedPropertiesPagination.last_page }, (_, i) => i + 1)
-                            .filter((page) => {
-                              const current = assignedPropertiesPagination.current_page;
+                        {Array.from({ length: assignedPropertiesPagination.last_page }, (_, i) => i + 1)
+                          .filter((page) => {
+                            const current = assignedPropertiesPagination.current_page;
+                            return (
+                              page === 1 ||
+                              page === assignedPropertiesPagination.last_page ||
+                              (page >= current - 1 && page <= current + 1)
+                            );
+                          })
+                          .map((page, index, array) => {
+                            if (index > 0 && page - array[index - 1] > 1) {
                               return (
-                                page === 1 ||
-                                page === assignedPropertiesPagination.last_page ||
-                                (page >= current - 1 && page <= current + 1)
-                              );
-                            })
-                            .map((page, index, array) => {
-                              if (index > 0 && page - array[index - 1] > 1) {
-                                return (
-                                  <>
-                                    <PaginationItem key={`ellipsis-${page}`}>
-                                      <span className="px-2">...</span>
-                                    </PaginationItem>
-                                    <PaginationItem key={page}>
-                                      <PaginationLink
-                                        onClick={() => handleAssignedPropertiesPageChange(page)}
-                                        isActive={page === assignedPropertiesPagination.current_page}
-                                        className="cursor-pointer"
-                                      >
-                                        {page}
-                                      </PaginationLink>
-                                    </PaginationItem>
-                                  </>
-                                );
-                              }
-                              return (
-                                <PaginationItem key={page}>
-                                  <PaginationLink
+                                <span key={`group-${page}`} className="flex items-center gap-1">
+                                  <span className="px-2">...</span>
+                                  <button
                                     onClick={() => handleAssignedPropertiesPageChange(page)}
-                                    isActive={page === assignedPropertiesPagination.current_page}
-                                    className="cursor-pointer"
+                                    className={`px-3 py-1 border rounded-md text-sm font-medium transition-colors ${
+                                      page === assignedPropertiesPagination.current_page
+                                        ? "bg-blue-600 text-white border-blue-600"
+                                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    }`}
                                   >
                                     {page}
-                                  </PaginationLink>
-                                </PaginationItem>
+                                  </button>
+                                </span>
                               );
-                            })}
+                            }
+                            return (
+                              <button
+                                key={page}
+                                onClick={() => handleAssignedPropertiesPageChange(page)}
+                                className={`px-3 py-1 border rounded-md text-sm font-medium transition-colors ${
+                                  page === assignedPropertiesPagination.current_page
+                                    ? "bg-blue-600 text-white border-blue-600"
+                                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            );
+                          })}
 
-                          {assignedPropertiesPagination.current_page < assignedPropertiesPagination.last_page && (
-                            <PaginationItem>
-                              <PaginationNext
-                                onClick={() =>
-                                  handleAssignedPropertiesPageChange(assignedPropertiesPagination.current_page + 1)
-                                }
-                                className="cursor-pointer"
-                              />
-                            </PaginationItem>
-                          )}
-                        </PaginationContent>
-                      </Pagination>
+                        {assignedPropertiesPagination.current_page < assignedPropertiesPagination.last_page && (
+                          <button
+                            onClick={() => handleAssignedPropertiesPageChange(assignedPropertiesPagination.current_page + 1)}
+                            className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            التالي
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
               </>
             )}
-          </div>
+            </div>
 
-          <DialogFooter>
-            <Button onClick={closeViewPropertiesDialog} variant="outline">
-              إغلاق
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            {/* Footer */}
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6">
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={closeViewPropertiesDialog}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                >
+                  إغلاق
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Create Owner Dialog */}
       <Dialog open={isCreateOwnerDialogOpen} onOpenChange={closeCreateOwnerDialog}>
@@ -1906,6 +1963,90 @@ export function OwnersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Remove Property Confirmation Dialog - Custom HTML with Portal */}
+      {isRemovePropertyDialogOpen && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 9999 }}
+          onMouseDown={(e) => {
+            console.log("Backdrop clicked");
+            if (e.target === e.currentTarget) {
+              closeRemovePropertyDialog();
+            }
+          }}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+            dir="rtl"
+            onMouseDown={(e) => {
+              console.log("Dialog content clicked");
+              e.stopPropagation();
+            }}
+          >
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-6 w-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">تأكيد إلغاء الربط</h3>
+                <p className="text-sm text-gray-500">هذا الإجراء سيقوم بإلغاء ربط العقار</p>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="mb-6">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-gray-700 text-center">
+                  هل أنت متأكد من إلغاء ربط هذا العقار بالمالك؟
+                </p>
+              </div>
+            </div>
+
+            {/* Footer Buttons */}
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log("Cancel button clicked");
+                  closeRemovePropertyDialog();
+                }}
+                disabled={removingProperty}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                إلغاء
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log("Confirm button clicked");
+                  handleRemoveProperty();
+                }}
+                disabled={removingProperty}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-600"
+              >
+                {removingProperty ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    جاري الإلغاء...
+                  </>
+                ) : (
+                  <>
+                    <X className="h-4 w-4" />
+                    تأكيد الإلغاء
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Delete Owner Confirmation Dialog */}
       <Dialog open={isDeleteOwnerDialogOpen} onOpenChange={closeDeleteOwnerDialog}>
