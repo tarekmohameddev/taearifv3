@@ -2,22 +2,17 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Home, Flag } from 'lucide-react';
 
 export default function HeroSection() {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <section className="relative max-h-fit rounded-3xl overflow-hidden" style={{
-      borderTop: '32px solid white',
-      borderLeft: '32px solid white', 
-      borderRight: '32px solid white',
-      borderTopLeftRadius: '1.5rem',
-      borderTopRightRadius: '1.5rem'
-    }}>
+    <section className="relative max-h-fit rounded-3xl overflow-hidden border-white border-t-[14px] border-l-[14px] border-r-[14px] sm:border-t-[14px] sm:border-l-[14px] sm:border-r-[14px] md:border-t-[16px] md:border-l-[16px] md:border-r-[16px] lg:border-t-[32px] lg:border-l-[32px] lg:border-r-[32px] rounded-tl-none rounded-tr-none sm:rounded-tl-lg sm:rounded-tr-lg lg:rounded-tl-3xl lg:rounded-tr-3xl">
 
         
-        <div className="relative z-10 flex items-center bg-[#d7f7ec] max-h-fit pt-[9rem] rounded-2xl">
+        <div className="relative z-10 flex items-center bg-[#d7f7ec] max-h-fit pt-20 sm:pt-28 lg:pt-[9rem] rounded-2xl">
                 {/* Background image with dark overlay */}
                 <img
   src="/bghero.webp"
@@ -51,21 +46,23 @@ export default function HeroSection() {
                 
                 {/* Button with icon */}
                 <div className="flex items-center gap-4">
-                  <button 
-                    className="relative bg-black text-white px-8 py-4 rounded-lg font-medium transition-colors duration-300 hover:bg-[#FA8923] overflow-hidden flex items-center gap-3"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                  >
-                    <span className={`block transition-all duration-300 ${isHovered ? '-translate-y-full  opacity-0' : 'translate-y-0'}`}>
-                    جرب الآن مجاناً لمدة 7 ايام
-                    </span>
-                    <span className={`block transition-transform duration-300 ${isHovered ? 'translate-y-0 ' : 'translate-y-full '} absolute top-0 left-4 w-full h-full flex items-center justify-center gap-3`}>
-                    جرب الآن مجاناً لمدة 7 ايام
-                    </span>
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                    </svg>
-                  </button>
+                  <Link href="/register">
+                    <button 
+                      className="relative bg-black text-white px-8 py-4 rounded-lg font-medium transition-colors duration-300 hover:bg-[#FA8923] overflow-hidden flex items-center gap-3"
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
+                    >
+                      <span className={`block transition-all duration-300 ${isHovered ? '-translate-y-full  opacity-0' : 'translate-y-0'}`}>
+                      جرب الآن مجاناً لمدة 7 ايام
+                      </span>
+                      <span className={`block transition-transform duration-300 ${isHovered ? 'translate-y-0 ' : 'translate-y-full '} absolute top-0 left-4 w-full h-full flex items-center justify-center gap-3`}>
+                      جرب الآن مجاناً لمدة 7 ايام
+                      </span>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                      </svg>
+                    </button>
+                  </Link>
                 </div>
                 
                 {/* Trust text */}

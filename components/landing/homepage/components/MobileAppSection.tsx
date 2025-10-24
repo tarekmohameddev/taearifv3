@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 const MobileAppSection = () => {
@@ -19,9 +20,9 @@ const MobileAppSection = () => {
           transition={{ duration: 1, ease: "easeOut" }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          <div className="flex flex-row pr-10 pt-10">
+          <div className="flex flex-col sm:flex-row p-5 sm:pr-10 pt-10">
             {/* Left Half - Content */}
-            <div className="space-y-6 sm:space-y-8 lg:space-y-10 order-1 w-1/2">
+            <div className="space-y-6 sm:space-y-8 lg:space-y-10 order-1 sm:w-1/2">
               {/* Title */}
               <motion.h2
                 className="text-2xl sm:text-2xl md:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight "
@@ -53,25 +54,29 @@ const MobileAppSection = () => {
                 transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
                 viewport={{ once: true, margin: "-100px" }}
               >
-                <motion.button
-                  className="bg-black text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:bg-gray-800 hover:shadow-lg hover:scale-105"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  جرب مجاناً الأن
-                </motion.button>
-                <motion.button
-                  className="bg-white text-black border-2 border-black px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:bg-black hover:text-white hover:shadow-lg hover:scale-105"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  تحدث مع المبيعات
-                </motion.button>
+                <Link href="/register">
+                  <motion.button
+                    className="bg-black text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:bg-gray-800 hover:shadow-lg hover:scale-105"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    جرب مجاناً الأن
+                  </motion.button>
+                </Link>
+                <a href="https://wa.me/966592960339" target="_blank" rel="noopener noreferrer">
+                  <motion.button
+                    className="bg-white text-black border-2 border-black px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:bg-black hover:text-white hover:shadow-lg hover:scale-105"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    تحدث مع المبيعات
+                  </motion.button>
+                </a>
               </motion.div>
             </div>
 
             {/* Right Half - Mobile Screenshots */}
-            <div className="flex flex-col sm:flex-row bottom-0 lg:flex-col xl:flex-row gap-4 sm:gap-6 justify-center -mb-6 sm:-mb-8 lg:-mb-10 order-2 w-1/2">
+            <div className="flex flex-row bottom-0 lg:flex-col xl:flex-row gap-4 sm:gap-6 justify-center -mb-6 sm:-mb-8 lg:-mb-10 order-2 sm:w-1/2">
               {/* First Mobile Screen */}
               <motion.div
                 className="w-48 sm:w-56 md:w-64 lg:w-48 xl:w-56 h-auto"
