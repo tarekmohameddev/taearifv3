@@ -78,11 +78,35 @@ export function LoginPage() {
       general: "",
     }));
   };
-  // مراقبة جاهزية ReCAPTCHA
+  // مراقبة جاهزية ReCAPTCHA مع إعادة المحاولة
   useEffect(() => {
-    if (executeRecaptcha) {
-      setRecaptchaReady(true);
-    }
+    let retryCount = 0;
+    const maxRetries = 10;
+    
+    const checkRecaptcha = () => {
+      if (executeRecaptcha) {
+        setRecaptchaReady(true);
+        return true;
+      }
+      return false;
+    };
+
+    // محاولة فورية
+    if (checkRecaptcha()) return;
+
+    // إعادة المحاولة كل 500ms
+    const interval = setInterval(() => {
+      retryCount++;
+      
+      if (checkRecaptcha()) {
+        clearInterval(interval);
+      } else if (retryCount >= maxRetries) {
+        clearInterval(interval);
+        console.warn('ReCAPTCHA failed to load after multiple retries');
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
   }, [executeRecaptcha]);
 
   useEffect(() => {
