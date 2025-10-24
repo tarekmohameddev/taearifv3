@@ -188,7 +188,7 @@ export default async function RootLayout({
         >
           <Toaster />
           {shouldLoadReCaptcha ? (
-            <ReCaptchaWrapper>
+            <ReCaptchaWrapper key={pathname}>
               <ClientLayout>{children}</ClientLayout>
             </ReCaptchaWrapper>
           ) : (
