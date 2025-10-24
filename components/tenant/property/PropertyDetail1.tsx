@@ -1450,6 +1450,46 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               </div>
             </div>
                   ) : null}
+            
+            {/* فيديو العقار */}
+            {property.video_url && (
+              <div className="mb-8">
+                <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                  فيديو العقار
+                </h3>
+                <div className="w-full rounded-lg overflow-hidden shadow-lg">
+                  <video
+                    controls
+                    className="w-full h-auto"
+                    poster={property.video_image || undefined}
+                  >
+                    <source src={property.video_url} type="video/mp4" />
+                    متصفحك لا يدعم عرض الفيديو.
+                  </video>
+                </div>
+              </div>
+            )}
+
+            {/* الجولة الافتراضية */}
+            {property.virtual_tour && (
+              <div className="mb-8">
+                <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                  جولة افتراضية
+                </h3>
+                <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg">
+                  <iframe
+                    src={property.virtual_tour}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    title="جولة افتراضية للعقار"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* خريطة الموقع */}
             {property.location && property.location.lat && property.location.lng ? (
               <div className="mb-8">
