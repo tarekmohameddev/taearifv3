@@ -22,8 +22,9 @@ import useAuthStore from "@/context/AuthContext";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { signIn, getSession } from "next-auth/react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
+import { LoginPageWithReCaptcha } from "./LoginPageWithReCaptcha";
 
-export function LoginPage() {
+function LoginPageContent() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const router = useRouter();
 
@@ -1201,5 +1202,14 @@ export function LoginPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+// Component الرئيسي مع ReCAPTCHA Wrapper المحلي
+export function LoginPage() {
+  return (
+    <LoginPageWithReCaptcha>
+      <LoginPageContent />
+    </LoginPageWithReCaptcha>
   );
 }
