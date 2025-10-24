@@ -729,9 +729,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     }}
                   />
                 </p>
-                <p className="text-gray-600 text-sm leading-6 font-normal md:text-base lg:text-xl lg:leading-7">
-                  {property.description || "لا يوجد وصف متاح لهذا العقار"}
-                </p>
+                <p className="text-gray-600 text-sm leading-6 font-normal md:text-base lg:text-xl lg:leading-7 whitespace-pre-line">
+  {property.description || "لا يوجد وصف متاح لهذا العقار"}
+</p>
+
               </div>
             </div>
           </div>
