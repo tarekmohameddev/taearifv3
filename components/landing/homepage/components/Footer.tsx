@@ -25,23 +25,23 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-4 text-gray-900">الروابط</h4>
             <ul className="space-y-2">
               <li>
-                <a 
+                <Link 
               href="/#home" 
               className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   الصفحة الرئيسية
-                </a>
+                </Link>
               </li>
               <li>
-                <a 
+                <Link 
                     href="/#pricing"           
                 className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   الباقات
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/#about"  className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                <Link href="/#about"  className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
                   نبذة عنا
-                </a>
+                </Link>
               </li>
               <li>
                 <Link href="/privacy-policy" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">

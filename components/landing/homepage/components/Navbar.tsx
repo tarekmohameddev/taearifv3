@@ -107,34 +107,34 @@ export default function Navbar() {
 
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex items-center gap-x-5">
-            <a 
+            <Link 
               href="/#home" 
               className="relative text-black hover:text-[#ff8c24] transition-colors duration-300 group"
             >
               الصفحة الرئيسية
               <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/#about" 
               className="relative text-black hover:text-[#ff8c24] transition-colors duration-300 group"
             >
               نبذة عن
               <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/#pricing" 
               className="relative text-black hover:text-[#ff8c24] transition-colors duration-300 group"
             >
               الباقات
               <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/#features" 
               className="relative text-black hover:text-[#ff8c24] transition-colors duration-300 group"
             >
               الميزات
               <span className="absolute bottom-0 right-0 w-0 h-0.5 bg-[#ff8c24] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </a>
+            </Link>
           </div>
 
           {/* Placeholder for mobile menu button alignment */}
@@ -153,34 +153,34 @@ export default function Navbar() {
               {/* Mobile Navigation Links - Full Width Centered */}
               <div className="flex-1 flex items-center justify-center">
                 <nav className="space-y-8 text-center  ">
-                  <a 
+                  <Link 
                     href="/#home" 
                     className="block text-2xl font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 py-4"
                     onClick={toggleMobileMenu}
                   >
                     الصفحة الرئيسية
-                  </a>
-                  <a 
+                  </Link>
+                  <Link 
                     href="/#about" 
                     className="block text-2xl font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 py-4"
                     onClick={toggleMobileMenu}
                   >
                     نبذة عن
-                  </a>
-                  <a 
+                  </Link>
+                  <Link 
                     href="/#pricing" 
                     className="block text-2xl font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 py-4"
                     onClick={toggleMobileMenu}
                   >
                     الباقات
-                  </a>
-                  <a 
+                  </Link>
+                  <Link 
                     href="/#features" 
                     className="block text-2xl font-medium text-black hover:text-[#ff8c24] transition-colors duration-300 py-4"
                     onClick={toggleMobileMenu}
                   >
                     الميزات
-                  </a>
+                  </Link>
                 </nav>
               </div>
 
