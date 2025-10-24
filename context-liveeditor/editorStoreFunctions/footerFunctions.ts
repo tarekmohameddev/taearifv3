@@ -55,7 +55,7 @@ export const getDefaultFooterData = (): ComponentData => ({
       address: "المملكة العربية السعودية",
       phone1: "0000",
       phone2: "0000",
-      email: "guidealjwa22@gmail.com",
+      email: "info@example.com",
     },
     socialMedia: {
       enabled: true,
