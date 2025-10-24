@@ -69,19 +69,94 @@ export default function Loading() {
   // التحقق من وجود tenantId
   useEffect(() => {
     const checkTenantId = () => {
-      // التحقق من subdomain في hostname
       const hostname = window.location.hostname;
-      const isLocalhost = hostname.includes("localhost");
-      const hasSubdomain =
-        hostname.split(".").length > 2 ||
-        (isLocalhost && hostname.split(".").length > 1);
-
-      // التحقق من localStorage أو cookies
-      const hasStoredTenantId =
-        localStorage.getItem("tenantId") ||
-        document.cookie.includes("tenantId");
-
-      setHasTenantId(hasSubdomain || !!hasStoredTenantId);
+      const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+      const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
+      const isDevelopment = process.env.NODE_ENV === "development";
+      
+      // قائمة الكلمات المحجوزة (نفس middleware)
+      const reservedWords = [
+        "www", "api", "admin", "app", "mail", "ftp", "blog", 
+        "shop", "store", "dashboard", "live-editor", "auth", 
+        "login", "register"
+      ];
+      
+      if (process.env.NODE_ENV === "development") {
+        console.log("🔍 Loading.tsx - Checking hostname:", hostname);
+      }
+      
+      // 1️⃣ التحقق من أنه الدومين الأساسي
+      const isOnBaseDomain = isDevelopment 
+        ? hostname === localDomain || hostname === `${localDomain}:3000`
+        : hostname === productionDomain || hostname === `www.${productionDomain}`;
+      
+      if (isOnBaseDomain) {
+        if (process.env.NODE_ENV === "development") {
+          console.log("❌ Loading.tsx - Base domain, no tenant");
+        }
+        setHasTenantId(false);
+        return;
+      }
+      
+      // 2️⃣ التحقق من Subdomain (tenant1.taearif.com)
+      if (hostname.includes(productionDomain) || hostname.includes(localDomain)) {
+        const parts = hostname.split(".");
+        
+        // للتطوير: tenant1.localhost
+        if (isDevelopment && hostname.includes(localDomain)) {
+          if (parts.length > 1 && parts[0] !== localDomain) {
+            const potentialTenantId = parts[0];
+            if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
+              if (process.env.NODE_ENV === "development") {
+                console.log("✅ Loading.tsx - Valid subdomain (local):", potentialTenantId);
+              }
+              setHasTenantId(true);
+              return;
+            }
+          }
+        }
+        
+        // للإنتاج: tenant1.taearif.com
+        if (!isDevelopment && hostname.includes(productionDomain)) {
+          if (parts.length > 2) {
+            const potentialTenantId = parts[0];
+            const domainPart = parts.slice(1).join(".");
+            
+            // التأكد من أن domain part هو بالضبط productionDomain
+            if (domainPart === productionDomain) {
+              if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
+                if (process.env.NODE_ENV === "development") {
+                  console.log("✅ Loading.tsx - Valid subdomain (prod):", potentialTenantId);
+                }
+                setHasTenantId(true);
+                return;
+              }
+            }
+          }
+        }
+      }
+      
+      // 3️⃣ التحقق من Custom Domain (أي domain مختلف تماماً)
+      const hasCustomDomainExtension = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(hostname);
+      
+      if (hasCustomDomainExtension) {
+        // إذا وصلنا هنا، يعني الـ hostname:
+        // - ليس base domain (www.taearif.com أو taearif.com)
+        // - ليس subdomain صالح من taearif.com
+        // - له extension صحيح (.com, .net, ...)
+        // ✅ إذن هو Custom Domain!
+        if (process.env.NODE_ENV === "development") {
+          console.log("✅ Loading.tsx - Custom domain detected:", hostname);
+        }
+        setHasTenantId(true);
+        return;
+      }
+      
+      // ❌ لا يوجد tenant
+      if (process.env.NODE_ENV === "development") {
+        console.log("❌ Loading.tsx - No tenant found");
+      }
+      setHasTenantId(false);
     };
 
     checkTenantId();
