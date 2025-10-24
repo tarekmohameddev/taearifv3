@@ -452,7 +452,7 @@ export function SettingsPage() {
               value={activeTab}
               onValueChange={setActiveTab}
             >
-              <TabsList className="grid grid-cols-3 w-full">
+              <TabsList className="grid grid-cols-2 w-full">
                 <TabsTrigger
                   value="domains"
                   className="flex gap-1 items-center"
@@ -467,10 +467,10 @@ export function SettingsPage() {
                   <CreditCardIcon className="h-4 w-4" />
                   <span>الاشتراك</span>
                 </TabsTrigger>
-                <TabsTrigger value="themes" className="flex gap-1 items-center">
+                {/* <TabsTrigger value="themes" className="flex gap-1 items-center">
                   <Palette className="h-4 w-4" />
                   <span>الثيمات</span>
-                </TabsTrigger>
+                </TabsTrigger> */}
               </TabsList>
 
               <TabsContent value="domains" className="space-y-4 pt-4">
@@ -1059,7 +1059,7 @@ export function SettingsPage() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="themes" className="space-y-4 pt-4">
+              {/* <TabsContent value="themes" className="space-y-4 pt-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-4">
                   <div>
                     <h2 className="text-xl font-semibold text-right">
@@ -1177,7 +1177,7 @@ export function SettingsPage() {
                     ))
                   )}
                 </div>
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
           </div>
         </main>
