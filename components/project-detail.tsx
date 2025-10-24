@@ -680,9 +680,11 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                     ) : null}
                   </p>
                 ) : null}
-                <p className="text-gray-600 text-sm leading-6 font-normal md:text-base lg:text-xl lg:leading-7">
+
+                <p className="text-gray-600 text-sm leading-6 font-normal md:text-base lg:text-xl lg:leading-7 whitespace-pre-line">
                   {project.description || "لا يوجد وصف متاح لهذا المشروع"}
-                </p>
+</p>
+
               </div>
 
               {/* تفاصيل المشروع في شبكة */}
