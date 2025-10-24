@@ -2,7 +2,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "@/app/globals.css";
 import ClientLayout from "./ClientLayout";
 import { Toaster } from "react-hot-toast";
-import { ReCaptchaWrapper } from "@/components/ReCaptchaWrapper";
+import { DynamicReCaptcha } from "@/components/DynamicReCaptcha";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Script from "next/script";
@@ -188,9 +188,9 @@ export default async function RootLayout({
         >
           <Toaster />
           {shouldLoadReCaptcha ? (
-            <ReCaptchaWrapper>
+            <DynamicReCaptcha>
               <ClientLayout>{children}</ClientLayout>
-            </ReCaptchaWrapper>
+            </DynamicReCaptcha>
           ) : (
             <ClientLayout>{children}</ClientLayout>
           )}
