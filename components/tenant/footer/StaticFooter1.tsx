@@ -160,7 +160,7 @@ const getDefaultFooterData = (): FooterData => ({
       enabled: true,
       name: "مكتب دليل الجواء",
       description:
-        "دليل الجواء العقاري يقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
+        "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
       tagline: "للخدمات العقارية",
       logo: "",
     },
@@ -178,9 +178,9 @@ const getDefaultFooterData = (): FooterData => ({
     contactInfo: {
       enabled: true,
       title: "معلومات التواصل",
-      address: "المملكة العربية السعودية - القصيم",
-      phone1: "0533150222",
-      phone2: "0537180774",
+      address: "المملكة العربية السعودية",
+      phone1: "0000",
+      phone2: "0000",
       email: "guidealjwa22@gmail.com",
     },
     socialMedia: {
@@ -491,12 +491,12 @@ export default function StaticFooter({
                   fontSize: `var(--${mergedData.styling.typography.titleSize})`,
                 }}
               >
-                عن المكتب
+              عنا
               </h4>
               <p
                 className={`text-${mergedData.styling.typography.bodySize} font-${mergedData.styling.typography.bodyWeight} leading-7 text-white/90`}
               >
-                {mergedData.content.companyInfo.description}
+                {mergedData.content.companyInfo.description?.replace('دليل الجواء العقاري يقدم', 'نقدم')}
               </p>
             </div>
           )}
@@ -548,7 +548,7 @@ export default function StaticFooter({
                   <span
                     className={`text-${mergedData.styling.typography.bodySize} text-white/90`}
                   >
-                    {mergedData.content.contactInfo.address}
+                    {mergedData.content.contactInfo.address?.replace('المملكة العربية السعودية - القصيم', 'المملكة العربية السعودية')}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">

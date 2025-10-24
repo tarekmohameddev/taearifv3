@@ -77,7 +77,7 @@ export const getDefaultContactMapSectionData = (): ComponentData => ({
   map: {
     enabled: true,
     title: "موقعنا",
-    address: "المملكة العربية السعودية - القصيم",
+    address: "المملكة العربية السعودية",
     coordinates: {
       lat: 26.326,
       lng: 43.975,

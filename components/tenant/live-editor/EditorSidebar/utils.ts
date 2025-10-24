@@ -456,7 +456,7 @@ export const createDefaultData = (
             },
             content: {
               type: "text",
-              text: "المملكة العربية السعودية - القصيم",
+              text: "المملكة العربية السعودية",
               style: {
                 size: {
                   mobile: "text-[16px]",
@@ -581,8 +581,8 @@ export const createDefaultData = (
                   href: "tel:0535150222",
                 },
                 {
-                  text: "0537180774",
-                  href: "tel:0537180774",
+                  text: "0000",
+                  href: "tel:0000",
                 },
               ],
               style: {
@@ -655,7 +655,7 @@ export const createDefaultData = (
             enabled: true,
             name: "مكتب دليل الجواء",
             description:
-              "دليل الجواء العقاري يقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
+              "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
             tagline: "للخدمات العقارية",
             logo: "",
           },
@@ -673,9 +673,9 @@ export const createDefaultData = (
           contactInfo: {
             enabled: true,
             title: "معلومات التواصل",
-            address: "المملكة العربية السعودية - القصيم",
-            phone1: "0533150222",
-            phone2: "0537180774",
+            address: "المملكة العربية السعودية",
+            phone1: "0000",
+            phone2: "0000",
             email: "guidealjwa22@gmail.com",
           },
           socialMedia: {

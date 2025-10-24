@@ -110,7 +110,7 @@ const getDefaultContactCardsData = () => ({
       },
       content: {
         type: "text",
-        text: "المملكة العربية السعودية - القصيم",
+        text: "المملكة العربية السعودية",
         style: {
           size: {
             mobile: "text-[16px]",
@@ -235,8 +235,8 @@ const getDefaultContactCardsData = () => ({
             href: "tel:0535150222",
           },
           {
-            text: "0537180774",
-            href: "tel:0537180774",
+            text: "0000",
+            href: "tel:0000",
           },
         ],
         style: {
