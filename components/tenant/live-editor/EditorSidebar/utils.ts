@@ -188,7 +188,7 @@ export const createDefaultData = (
         logo: {
           type: "image+text",
           image: "https://dalel-lovat.vercel.app/images/logo.svg",
-          text: "مكتب دليل الجواء",
+          text: "الشركة العقارية",
           font: {
             family: "Tajawal",
             size: 24,
@@ -653,7 +653,7 @@ export const createDefaultData = (
         content: {
           companyInfo: {
             enabled: true,
-            name: "مكتب دليل الجواء",
+            name: "الشركة العقارية",
             description:
               "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
             tagline: "للخدمات العقارية",
@@ -708,7 +708,7 @@ export const createDefaultData = (
         footerBottom: {
           enabled: true,
           copyright:
-            "© 2024 مكتب دليل الجواء للخدمات العقارية. جميع الحقوق محفوظة.",
+            "© 2024 الشركة العقارية للخدمات العقارية. جميع الحقوق محفوظة.",
           legalLinks: [
             { text: "سياسة الخصوصية", url: "/privacy" },
             { text: "الشروط والأحكام", url: "/terms" },

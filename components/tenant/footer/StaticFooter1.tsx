@@ -158,7 +158,7 @@ const getDefaultFooterData = (): FooterData => ({
   content: {
     companyInfo: {
       enabled: true,
-      name: "مكتب دليل الجواء",
+      name: "اسم الشركة",
       description:
         "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
       tagline: "للخدمات العقارية",
@@ -197,7 +197,7 @@ const getDefaultFooterData = (): FooterData => ({
   },
   footerBottom: {
     enabled: true,
-    copyright: "© 2024 مكتب دليل الجواء للخدمات العقارية. جميع الحقوق محفوظة.",
+    copyright: "© 2024 الشركة العقارية للخدمات العقارية. جميع الحقوق محفوظة.",
     legalLinks: [
       { text: "سياسة الخصوصية", url: "/privacy" },
       { text: "الشروط والأحكام", url: "/terms" },

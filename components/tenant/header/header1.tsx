@@ -50,7 +50,7 @@ const getDefaultHeaderData = () => ({
   logo: {
     type: "image+text",
     image: "https://dalel-lovat.vercel.app/images/logo.svg",
-    text: "مكتب دليل الجواء",
+    text: "الشركة العقارية",
     font: {
       family: "Tajawal",
       size: 24,
@@ -477,7 +477,7 @@ const Header1 = (props: HeaderProps = {}) => {
               <span style={logoStyles}>
                 {mergedData.logo?.text ||
                   tenantData?.websiteName ||
-                  "مكتب دليل الجواء"}
+                  "الشركة العقارية"}
               </span>
             )}
           </Link>
@@ -641,7 +641,7 @@ const Header1 = (props: HeaderProps = {}) => {
                       >
                         {mergedData.logo?.text ||
                           tenantData?.websiteName ||
-                          "مكتب دليل الجواء"}
+                          "الشركة العقارية"}
                       </span>
                     </div>
                   )}

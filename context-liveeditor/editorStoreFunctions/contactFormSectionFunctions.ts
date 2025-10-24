@@ -26,7 +26,7 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
       {
         href: "https://facebook.com",
         alt: "facebook",
-        text: "مكتب دليل الجواء التلقائي",
+        text: "الشركة العقارية التلقائي",
         icon: {
           size: "24",
           color: "#1f2937",
@@ -40,7 +40,7 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
       {
         href: "https://x.com",
         alt: "x",
-        text: "مكتب دليل الجواء التلقائي",
+        text: "الشركة العقارية التلقائي",
         icon: {
           size: "24",
           color: "#1f2937",
@@ -54,7 +54,7 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
       {
         href: "https://www.instagram.com/guide__aljiwa?igsh=MWY1amdsaGlhZm1xOA==",
         alt: "instagram",
-        text: "مكتب دليل الجواء التلقائي",
+        text: "الشركة العقارية التلقائي",
         icon: {
           size: "24",
           color: "#1f2937",
@@ -68,7 +68,7 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
       {
         href: "https://linkedin.com",
         alt: "linkedin",
-        text: "مكتب دليل الجواء التلقائي",
+        text: "الشركة العقارية التلقائي",
         icon: {
           size: "24",
           color: "#1f2937",
@@ -82,7 +82,7 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
       {
         href: "https://wa.me/966537120774",
         alt: "whatsapp",
-        text: "مكتب دليل الجواء التلقائي",
+        text: "الشركة العقارية التلقائي",
         icon: {
           size: "24",
           color: "#1f2937",
