@@ -553,10 +553,10 @@ const OnboardingPage: React.FC = () => {
             </div>
 
             {/* Color Selection */}
-            <div className="space-y-4">
+            {/* لا اريد ازالته ابدا ولكن هو مخفي بشكل مؤقت */}
+            {/* <div className="space-y-4">
               <Label className="text-foreground">ألوان الموقع</Label>
 
-              {/* Predefined Palettes */}
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 {COLOR_PALETTES.map((palette, index) => (
                   <div
@@ -586,7 +586,6 @@ const OnboardingPage: React.FC = () => {
                 ))}
               </div>
 
-              {/* Custom Colors */}
               <div className="border-t border-border pt-4">
                 <p className="text-sm text-muted-foreground mb-3">
                   أو اختر ألوانك المخصصة:
@@ -624,7 +623,7 @@ const OnboardingPage: React.FC = () => {
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Error Messages */}
             {uploadError && (
