@@ -17,3 +17,4 @@ export default async function Page() {
   // إذا كان هناك tenantId، فهذا موقع خاص بـ tenant (مثل Shopify)
   return <HomePageWrapper tenantId={tenantId} />;
 }
+
