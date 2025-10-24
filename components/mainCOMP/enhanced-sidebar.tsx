@@ -15,6 +15,25 @@ import {
 import useAuthStore from "@/context/AuthContext";
 import useStore from "@/context/Store";
 
+// Hook لمراقبة ارتفاع الشاشة
+const useScreenHeight = () => {
+  const [isShortScreen, setIsShortScreen] = useState(false);
+  const [isVeryShortScreen, setIsVeryShortScreen] = useState(false);
+
+  useEffect(() => {
+    const checkHeight = () => {
+      setIsShortScreen(window.innerHeight < 720);
+      setIsVeryShortScreen(window.innerHeight < 1000);
+    };
+
+    checkHeight();
+    window.addEventListener("resize", checkHeight);
+    return () => window.removeEventListener("resize", checkHeight);
+  }, []);
+
+  return { isShortScreen, isVeryShortScreen };
+};
+
 interface EnhancedSidebarProps {
   activeTab?: string;
   setActiveTab?: (tab: string) => void;
@@ -30,6 +49,7 @@ export function EnhancedSidebar({
   const [internalActiveTab, setInternalActiveTab] = useState<string>(
     activeTab || "dashboard",
   );
+  const { isShortScreen, isVeryShortScreen } = useScreenHeight();
 
   const { sidebarData, fetchSideMenus } = useStore();
   const { mainNavItems, loading, error } = sidebarData;
@@ -136,9 +156,11 @@ export function EnhancedSidebar({
                 {!isCollapsed && (
                   <div className="flex flex-col items-start ml-3">
                     <span className="text-sm font-medium">{item.label}</span>
-                    <span className="text-xs text-muted-foreground hidden md:inline-block">
-                      {item.description}
-                    </span>
+                    {!isShortScreen && (
+                      <span className="text-xs text-muted-foreground hidden md:inline-block">
+                        {item.description}
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
@@ -173,9 +195,11 @@ export function EnhancedSidebar({
                 {!isCollapsed && (
                   <div className="flex flex-col items-start">
                     <span className="text-sm font-medium">{item.label}</span>
-                    <span className="text-xs text-muted-foreground hidden md:inline-block">
-                      {item.description}
-                    </span>
+                    {!isShortScreen && (
+                      <span className="text-xs text-muted-foreground hidden md:inline-block">
+                        {item.description}
+                      </span>
+                    )}
                   </div>
                 )}
               </Link>
@@ -203,8 +227,8 @@ export function EnhancedSidebar({
     const userData = useAuthStore.getState().userData;
 
     return (
-      <div className="flex h-full flex-col gap-2">
-        <div className="flex h-14 items-center border-b px-4 md:h-[60px]">
+      <div className="flex h-full flex-col gap-2 overflow-hidden">
+        <div className="flex h-14 items-center border-b px-4 md:h-[60px] flex-shrink-0">
           <div className="flex flex-col w-full">
             <span className="text-lg font-semibold truncate">
               {userData?.company_name}
@@ -217,7 +241,7 @@ export function EnhancedSidebar({
           </div>
         </div>
 
-        <div className="px-3">
+        <div className="px-3 flex-shrink-0">
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -285,7 +309,10 @@ export function EnhancedSidebar({
           </TooltipProvider>
         </div>
 
-        <div className="flex-1 py-2 px-1">
+        <div className={cn(
+          "flex-1 py-2 px-1 overflow-y-auto overflow-x-hidden min-h-0",
+          isVeryShortScreen && "hide-scrollbar"
+        )}>
           {error && (
             <div className="px-3 py-2">
               <span className="text-sm text-red-500">{error}</span>
