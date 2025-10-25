@@ -233,15 +233,10 @@ export const CustomerTable = ({
                   <TableCell>
                     <div className="space-y-1">
                       {/* Email */}
-                      {customer.email ? (
+                      {customer.email && (
                         <div className="flex items-center text-sm">
                           <Mail className="ml-2 h-3 w-3 text-blue-600" />
                           <span className="font-medium">{customer.email}</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Mail className="ml-2 h-3 w-3" />
-                          <span className="italic">لا يوجد بريد إلكتروني</span>
                         </div>
                       )}
 

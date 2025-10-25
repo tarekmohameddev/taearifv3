@@ -39,7 +39,10 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
 
     const currentDomain = window.location.hostname;
     const domainTenantId = getTenantIdFromDomain(currentDomain);
-    const finalTenantId = tenantId || domainTenantId;
+    
+    // Use tenantId if it's a valid string, otherwise use domainTenantId
+    // This prevents empty strings from being used
+    const finalTenantId = (tenantId && tenantId.trim() !== '') ? tenantId : domainTenantId;
 
     console.log('🔍 GA4Provider tracking:', {
       tenantId,
@@ -49,7 +52,13 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
       isInitialized,
     });
 
-    if (finalTenantId && pathname && isInitialized) {
+    // Only track if we have a valid tenant ID (not empty, not null, not 'www')
+    const isValidTenantId = finalTenantId && 
+                           finalTenantId.trim() !== '' && 
+                           finalTenantId !== 'www' &&
+                           finalTenantId !== '(not set)';
+
+    if (isValidTenantId && pathname && isInitialized) {
       // Set tenant context
       setTenantContext(finalTenantId, finalTenantId);
 
@@ -62,6 +71,7 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
         finalTenantId,
         pathname,
         isInitialized,
+        isValidTenantId,
       });
     }
   }, [tenantId, pathname, isInitialized]);
@@ -81,11 +91,18 @@ const shouldTrackDomain = (domain: string): boolean => {
 
   // Don't track main domain
   if (domain === `www.${productionDomain}` || domain === productionDomain) {
+    console.log('🚫 Skipping tracking for main domain:', domain);
     return false;
   }
 
   // Track tenant subdomains in production (e.g., lira.taearif.com)
+  // But NOT www.taearif.com
   if (domain.endsWith(`.${productionDomain}`)) {
+    const subdomain = domain.replace(`.${productionDomain}`, '');
+    if (subdomain === 'www') {
+      console.log('🚫 Skipping tracking for www subdomain');
+      return false;
+    }
     return true;
   }
 
@@ -113,7 +130,14 @@ const getTenantIdFromDomain = (domain: string): string | null => {
   // For production: lira.taearif.com -> lira
   if (domain.endsWith(`.${productionDomain}`)) {
     const subdomain = domain.replace(`.${productionDomain}`, "");
-    console.log('🌐 Extracted tenant from production domain:', subdomain);
+    
+    // Exclude 'www' and empty subdomains - not valid tenants
+    if (!subdomain || subdomain.trim() === '' || subdomain === 'www') {
+      console.warn('Skipping invalid subdomain (not a tenant):', subdomain);
+      return null;
+    }
+    
+    console.log('Extracted tenant from production domain:', subdomain);
     return subdomain;
   }
 
@@ -122,11 +146,18 @@ const getTenantIdFromDomain = (domain: string): string | null => {
     const parts = domain.split(".");
     if (parts.length > 1 && parts[0] !== localDomain) {
       const subdomain = parts[0];
-      console.log('🌐 Extracted tenant from dev domain:', subdomain);
+      
+      // Exclude 'www' and empty subdomains in development too
+      if (!subdomain || subdomain.trim() === '' || subdomain === 'www') {
+        console.warn('Skipping invalid subdomain (not a tenant):', subdomain);
+        return null;
+      }
+      
+      console.log('Extracted tenant from dev domain:', subdomain);
       return subdomain;
     }
   }
 
-  console.warn('⚠️ Could not extract tenant from domain:', domain);
+  console.warn('Could not extract tenant from domain:', domain);
   return null;
 };

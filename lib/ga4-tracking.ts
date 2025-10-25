@@ -43,6 +43,12 @@ export function initializeGA4(): void {
 export function setTenantContext(tenantId: string, username: string): void {
   if (typeof window === 'undefined' || !window.gtag) return;
 
+  // Validate tenant_id before setting context
+  if (!tenantId || tenantId.trim() === '' || tenantId === 'www') {
+    console.warn('⚠️ Invalid tenant_id, skipping context setting:', tenantId);
+    return;
+  }
+
   // Set user properties (optional)
   window.gtag('set', 'user_properties', {
     tenant_id: tenantId,
@@ -59,6 +65,12 @@ export function setTenantContext(tenantId: string, username: string): void {
 export function trackPageView(tenantId: string, pagePath: string): void {
   if (typeof window === 'undefined' || !window.gtag) {
     console.warn('⚠️ gtag not available');
+    return;
+  }
+
+  // Validate tenant_id before tracking
+  if (!tenantId || tenantId.trim() === '' || tenantId === 'www') {
+    console.warn('⚠️ Invalid tenant_id, skipping tracking:', tenantId);
     return;
   }
 
@@ -80,6 +92,12 @@ export function trackPageView(tenantId: string, pagePath: string): void {
 export function trackPropertyView(tenantId: string, propertySlug: string): void {
   if (typeof window === 'undefined' || !window.gtag) return;
 
+  // Validate tenant_id before tracking
+  if (!tenantId || tenantId.trim() === '' || tenantId === 'www') {
+    console.warn('⚠️ Invalid tenant_id, skipping property view tracking:', tenantId);
+    return;
+  }
+
   window.gtag('event', 'view_property', {
     property_slug: propertySlug,
     tenant_id: tenantId,  // ← Also include tenant_id in custom events
@@ -100,6 +118,12 @@ export function trackEvent(
   eventParams?: Record<string, any>
 ): void {
   if (typeof window === 'undefined' || !window.gtag) return;
+
+  // Validate tenant_id before tracking
+  if (!tenantId || tenantId.trim() === '' || tenantId === 'www') {
+    console.warn('⚠️ Invalid tenant_id, skipping event tracking:', tenantId);
+    return;
+  }
 
   window.gtag('event', eventName, {
     ...eventParams,
