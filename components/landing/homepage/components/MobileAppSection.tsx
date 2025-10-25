@@ -20,7 +20,7 @@ const MobileAppSection = () => {
           transition={{ duration: 1, ease: "easeOut" }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          <div className="flex flex-col sm:flex-row p-5 sm:pr-10 pt-10">
+          <div className="flex flex-col md:flex-row p-5 sm:pr-10 pt-10">
             {/* Left Half - Content */}
             <div className="space-y-6 sm:space-y-8 lg:space-y-10 order-1 sm:w-1/2">
               {/* Title */}
@@ -76,7 +76,7 @@ const MobileAppSection = () => {
             </div>
 
             {/* Right Half - Mobile Screenshots */}
-            <div className="flex flex-row bottom-0 lg:flex-col xl:flex-row gap-4 sm:gap-6 justify-center -mb-6 sm:-mb-8 lg:-mb-10 order-2 sm:w-1/2">
+            <div className="flex flex-row bottom-0 gap-4 sm:gap-6 justify-center -mb-16 sm:-mb-20 lg:-mb-20 order-2 sm:w-1/2">
               {/* First Mobile Screen */}
               <motion.div
                 className="w-48 sm:w-56 md:w-64 lg:w-48 xl:w-56 h-auto"
@@ -91,7 +91,7 @@ const MobileAppSection = () => {
                 }}
               >
                 <Image
-                  src="https://test.kingbellsa.com/wp-content/uploads/2025/10/mobile-app-screen-1.webp"
+                  src="/images/landingPage/phones/2-phone.png"
                   alt="Mobile App Screen 1"
                   width={900}
                   height={1438}
@@ -101,7 +101,7 @@ const MobileAppSection = () => {
 
               {/* Second Mobile Screen */}
               <motion.div
-                className="w-48 sm:w-56 md:w-64 lg:w-48 xl:w-56 h-auto"
+                className="w-48 sm:w-56 md:w-64 lg:w-48 xl:w-56 h-auto -bottom-[10rem]"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 1.0, ease: "easeOut" }}
@@ -113,7 +113,7 @@ const MobileAppSection = () => {
                 }}
               >
                 <Image
-                  src="https://test.kingbellsa.com/wp-content/uploads/2025/10/mobile-app-screen-2.webp"
+                  src="/images/landingPage/phones/1-phone.png"
                   alt="Mobile App Screen 2"
                   width={900}
                   height={1438}
