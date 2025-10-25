@@ -18,6 +18,7 @@ type Property = {
   area?: string;
   type?: string;
   transactionType?: string;
+  transactionType_en?: string;
   image: string;
   status?: string;
   createdAt?: string;
@@ -57,7 +58,28 @@ export function PropertyCard({
   }
 
   const isUnavailable =
-    p.status?.toLowerCase() === "rented" || p.status?.toLowerCase() === "sold";
+    p.status?.toLowerCase() === "rented" || 
+    p.status?.toLowerCase() === "sold" ||
+    p.status?.toLowerCase() === "unavailable";
+
+  // تحديد النص المناسب للحالة
+  const getStatusText = () => {
+    const status = p.status?.toLowerCase();
+    const transactionType = p.transactionType_en?.toLowerCase();
+    
+    // إذا كان unavailable، نحدد النص حسب نوع المعاملة
+    if (status === "unavailable") {
+      if (transactionType === "sale") return "مُباع";
+      if (transactionType === "rent") return "تم تأجيره";
+      return "غير متاحة";
+    }
+    
+    // الحالات الأخرى
+    if (status === "rented") return "تم تأجيره";
+    if (status === "sold") return "مُباع";
+    
+    return "غير متاحة";
+  };
 
   const handleClick = () => {
     if (!isUnavailable && tenantId) {
@@ -130,15 +152,15 @@ export function PropertyCard({
             {/* Overlay للعقارات غير المتاحة */}
             {isUnavailable && showStatus && (
               <div
-                aria-label="غير متاحة"
-                className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/30"
+                aria-label={getStatusText()}
+                className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/70"
                 style={{ pointerEvents: "none" }}
               >
                 <span
-                  className="rounded-lg bg-white/90 px-4 py-2 text-sm font-bold text-gray-800"
+                  className="rounded-lg  px-4 py-2 text-2xl sm:text-4xl font-bold text-white"
                   style={{ pointerEvents: "none" }}
                 >
-                  غير متاحة
+                  {getStatusText()}
                 </span>
               </div>
             )}
