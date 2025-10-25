@@ -1175,7 +1175,7 @@ function PropertyCard({
   const router = useRouter();
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden" dir="rtl">
       <div className="relative">
         <div className="aspect-[16/9] w-full overflow-hidden">
           <img
@@ -1189,12 +1189,12 @@ function PropertyCard({
           />
         </div>
         {property.featured && (
-          <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
+          <div className="absolute right-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
             مميز
           </div>
         )}
         <div
-          className={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-medium ${
+          className={`absolute left-2 top-2 rounded-md px-2 py-1 text-xs font-medium ${
             property.status === "منشور"
               ? "bg-green-500 text-white"
               : "bg-amber-500 text-white"
@@ -1204,23 +1204,23 @@ function PropertyCard({
         </div>
       </div>
       <CardHeader className="p-4">
-        <div className="flex flex-row-reverse items-start justify-between">
+        <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="whitespace-nowrap">
+            <CardTitle className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents[0].title).length > 20 ? 'text-sm ' : ''}`}>
               {property.title || property.contents[0].title}
             </CardTitle>
-            <CardDescription className="text-sm text-muted-foreground flex flex-row-reverse items-center gap-1">
+            <CardDescription className="text-sm text-muted-foreground flex items-center gap-1">
               <MapPin className="h-3 w-3" />
               {property.address || property.contents[0].address}
             </CardDescription>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="-ml-2">
+              <Button variant="ghost" size="icon" className="-mr-2">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
+            <DropdownMenuContent align="end">
               {/* ترتيب العقار في الرئيسية */}
               {property.featured && (
                 <DropdownMenuItem
@@ -1229,7 +1229,7 @@ function PropertyCard({
                     setReorderPopup({ open: true, type: "featured" });
                   }}
                 >
-                  <Grid3X3 className="mr-2 h-4 w-4" />
+                  <Grid3X3 className="ml-2 h-4 w-4" />
                   ترتيب العقار في الرئيسية
                 </DropdownMenuItem>
               )}
@@ -1240,7 +1240,7 @@ function PropertyCard({
                   setReorderPopup({ open: true, type: "normal" });
                 }}
               >
-                <List className="mr-2 h-4 w-4" />
+                <List className="ml-2 h-4 w-4" />
                 ترتيب العقار في الوحدات
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -1248,7 +1248,7 @@ function PropertyCard({
                   router.push("/dashboard/properties/" + property.id + "/edit")
                 }
               >
-                <Edit className="mr-2 h-4 w-4" />
+                <Edit className="ml-2 h-4 w-4" />
                 تعديل
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -1260,7 +1260,7 @@ function PropertyCard({
                   window.open(url, "_blank");
                 }}
               >
-                <ExternalLink className="mr-2 h-4 w-4" />
+                <ExternalLink className="ml-2 h-4 w-4" />
                 معاينة
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -1269,33 +1269,33 @@ function PropertyCard({
                   window.open(url, "_blank");
                 }}
               >
-                <Activity className="mr-2 h-4 w-4" />
+                <Activity className="ml-2 h-4 w-4" />
                 سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onDuplicate(property)}>
-                <Copy className="mr-2 h-4 w-4" />
+                <Copy className="ml-2 h-4 w-4" />
                 مضاعفة
               </DropdownMenuItem>
               {property.status === "مسودة" ? (
                 <DropdownMenuItem onClick={() => onToggleStatus(property)}>
-                  <ExternalLink className="mr-2 h-4 w-4" />
+                  <ExternalLink className="ml-2 h-4 w-4" />
                   نشر
                 </DropdownMenuItem>
               ) : (
                 <DropdownMenuItem onClick={() => onToggleStatus(property)}>
-                  <Edit className="mr-2 h-4 w-4" />
+                  <Edit className="ml-2 h-4 w-4" />
                   إلغاء النشر
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem onClick={() => onShare(property)}>
-                <Share2 className="mr-2 h-4 w-4" />
+                <Share2 className="ml-2 h-4 w-4" />
                 شارك
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
                 onClick={() => onDelete(property.id)}
               >
-                <Trash2 className="mr-2 h-4 w-4" />
+                <Trash2 className="ml-2 h-4 w-4" />
                 حذف العقار
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -1303,7 +1303,7 @@ function PropertyCard({
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
-        <div className="text-lg font-semibold flex flex-row-reverse gap-1">
+        <div className="text-lg font-semibold flex gap-1">
           {property.transaction_type === "sale" ||
           property.purpose === "sale" ? (
             <>
@@ -1323,7 +1323,7 @@ function PropertyCard({
                 className="w-5 h-5 filter brightness-0 contrast-100"
               />
               {getPaymentMethodText(property.payment_method) && (
-                <span>{getPaymentMethodText(property.payment_method)}/</span>
+                <span>/{getPaymentMethodText(property.payment_method)}</span>
               )}
             </>
           )}
@@ -1331,20 +1331,20 @@ function PropertyCard({
         <div className="grid grid-cols-3 gap-2 text-sm ">
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">مشاهدات</span>
-            <span className="font-medium flex flex-row-reverse items-center gap-1">
+            <span className="font-medium flex items-center gap-1">
               <Eye className="h-3 w-3" /> {property.visits || 0}
             </span>
           </div>
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">غرفة</span>
-            <span className="font-medium flex flex-row-reverse items-center gap-1">
+            <span className="font-medium flex items-center gap-1">
               <Bed className="h-3 w-3" />
               {property.beds || 0}
             </span>
           </div>
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">حمام</span>
-            <span className="font-medium flex flex-row-reverse items-center gap-1">
+            <span className="font-medium flex items-center gap-1">
               <Bath className="h-3 w-3" /> {property.bath || 0}
             </span>
           </div>
@@ -1371,7 +1371,7 @@ function PropertyCard({
           ) : null}
         </div>
       </CardContent>
-      <CardFooter className="flex flex-row-reverse gap-2 p-4 pt-0">
+      <CardFooter className="flex gap-2 p-4 pt-0">
         <Button
           variant="outline"
           size="sm"
