@@ -8,66 +8,17 @@ export default function TestimonialsSection() {
   const testimonials = [
     {
       id: 1,
-      text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
-      name: "خالد المطيري",
-      title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
+      text: "بصراحة تعاريف سهّلت علي كل شيء! سويت موقعي بنفسي بدون ما أحتاج مصمم ولا مبرمج. الخدمة سهلة وسريعة ودعمهم ما يقصر أبد.",
+      name: "عبدالإله القحطاني",
+      title: "",
+      avatar: "male"
     },
     {
       id: 2,
-      text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
-      name: "خالد المطيري",
-      title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
-    },
-    {
-      id: 3,
-      text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
-      name: "خالد المطيري",
-      title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
-    },
-    {
-      id: 4,
-      text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
-      name: "خالد المطيري",
-      title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
-    },
-    {
-      id: 5,
-      text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
-      name: "خالد المطيري",
-      title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
-    },
-    {
-      id: 6,
-      text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
-      name: "خالد المطيري",
-      title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
-    },
-    {
-      id: 7,
-      text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
-      name: "خالد المطيري",
-      title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
-    },
-    {
-      id: 8,
-      text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
-      name: "خالد المطيري",
-      title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
-    },
-    {
-      id: 9,
-      text: "قبل استخدام برنامج تعارف، كنا نتعامل مع القوائم والعملاء يدويًا من خلال جداول البيانات ومجموعات واتساب.",
-      name: "خالد المطيري",
-      title: "مؤسس شركة التميز",
-      image: "https://test.kingbellsa.com/wp-content/uploads/2025/10/istockphoto-1394149742-612x612-1.jpg"
+      text: "مرّة حبيت تجربتي مع تعاريف! واجهتهم واضحة وكل شي بسيط، خلال وقت قصير كان موقعي جاهز وشكله احترافي. أنصح أي أحد يجربهم.",
+      name: "بدور العجيان",
+      title: "",
+      avatar: "female"
     }
   ];
 
@@ -107,7 +58,7 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Testimonials grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {testimonials.map((testimonial, index) => (
             <div
               key={testimonial.id}
@@ -120,18 +71,20 @@ export default function TestimonialsSection() {
 
               {/* Author info */}
               <div className="flex items-center gap-4">
-                <img
-                  src={testimonial.image}
-                  alt={testimonial.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                  {/* Avatar Icon */}
+                  <svg 
+                    className="w-8 h-8 text-gray-400" 
+                    fill="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
                 <div className="text-right">
                   <h5 className="text-lg font-bold text-black">
                     {testimonial.name}
                   </h5>
-                  <p className="text-sm text-gray-600">
-                    {testimonial.title}
-                  </p>
                 </div>
               </div>
             </div>
