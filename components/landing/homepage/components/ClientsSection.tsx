@@ -73,15 +73,15 @@ export default function ClientsSection() {
 
         {/* Client logos grid */}
         <div
-          className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 transition-all duration-1000 ${
+          className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
           {/* Client Logo 1 */}
           <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-300 group">
             <img
-              src="https://test.kingbellsa.com/wp-content/uploads/2025/10/CONIHPaMkJAwXTJZpwMdjOrsI.avif"
-              alt="Client Logo"
+              src="/images/landingPage/1.png"
+              alt="Client Logo 1"
               className="max-w-full h-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
             />
           </div>
@@ -89,8 +89,8 @@ export default function ClientsSection() {
           {/* Client Logo 2 */}
           <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-300 group">
             <img
-              src="https://test.kingbellsa.com/wp-content/uploads/2025/10/CONIHPaMkJAwXTJZpwMdjOrsI.avif"
-              alt="Client Logo"
+              src="/images/landingPage/2.png"
+              alt="Client Logo 2"
               className="max-w-full h-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
             />
           </div>
@@ -98,8 +98,8 @@ export default function ClientsSection() {
           {/* Client Logo 3 */}
           <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-300 group">
             <img
-              src="https://test.kingbellsa.com/wp-content/uploads/2025/10/rAaOoySvHapmMACFBVbB83Gst8.avif"
-              alt="Client Logo"
+              src="/images/landingPage/3.png"
+              alt="Client Logo 3"
               className="max-w-full h-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
             />
           </div>
@@ -107,8 +107,8 @@ export default function ClientsSection() {
           {/* Client Logo 4 */}
           <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-300 group">
             <img
-              src="https://test.kingbellsa.com/wp-content/uploads/2025/10/CONIHPaMkJAwXTJZpwMdjOrsI.avif"
-              alt="Client Logo"
+              src="/images/landingPage/6.png"
+              alt="Client Logo 4"
               className="max-w-full h-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
             />
           </div>
@@ -116,8 +116,17 @@ export default function ClientsSection() {
           {/* Client Logo 5 */}
           <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-300 group">
             <img
-              src="https://test.kingbellsa.com/wp-content/uploads/2025/10/MEnBBT41qnvJTTfBYGzppuYwg.avif"
-              alt="Client Logo"
+              src="/images/landingPage/5.png"
+              alt="Client Logo 5"
+              className="max-w-full h-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+            />
+          </div>
+
+          {/* Client Logo 6 */}
+          <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-300 group">
+            <img
+              src="/images/landingPage/4.png"
+              alt="Client Logo 6"
               className="max-w-full h-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
             />
           </div>
