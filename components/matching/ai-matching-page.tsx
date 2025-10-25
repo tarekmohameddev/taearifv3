@@ -767,59 +767,50 @@ export function AIMatchingPage() {
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <div className="font-semibold">{selectedRequest.customerName}</div>
-                                <div className="text-sm text-muted-foreground">{selectedRequest.customerPhone}</div>
+                                <div className="font-semibold">{selectedMatch?.request?.fullName || selectedRequest.customerName}</div>
+                                <div className="text-sm text-muted-foreground">{selectedMatch?.request?.phone || selectedRequest.customerPhone}</div>
                               </div>
                             </div>
                             <div className="grid grid-cols-2 gap-3 pt-2">
                               <div>
-                                <div className="text-xs text-muted-foreground">النوع المطلوب</div>
-                                <div className="font-medium">{selectedRequest.propertyType}</div>
+                                <div className="text-xs text-muted-foreground">المنطقة</div>
+                                <div className="font-medium">{selectedMatch?.request?.region || "غير محدد"}</div>
                               </div>
                               <div>
-                                <div className="text-xs text-muted-foreground">الموقع المفضل</div>
-                                <div className="font-medium">{selectedRequest.location}</div>
+                                <div className="text-xs text-muted-foreground">نوع العقار</div>
+                                <div className="font-medium">{selectedMatch?.request?.propertyType || "غير محدد"}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-muted-foreground">المساحة المطلوبة</div>
+                                <div className="font-medium text-sm">
+                                  {selectedMatch?.request?.areaFrom?.toLocaleString() || "0"} -{" "}
+                                  {selectedMatch?.request?.areaTo?.toLocaleString() || "0"} م²
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-muted-foreground">طريقة الشراء</div>
+                                <div className="font-medium">{selectedMatch?.request?.purchaseMethod || "غير محدد"}</div>
                               </div>
                               <div>
                                 <div className="text-xs text-muted-foreground">الميزانية</div>
                                 <div className="font-medium text-sm">
-                                  {selectedRequest.budget.min.toLocaleString()} -{" "}
-                                  {selectedRequest.budget.max.toLocaleString()}
+                                  {selectedMatch?.request?.budgetFrom?.toLocaleString() || "0"} -{" "}
+                                  {selectedMatch?.request?.budgetTo?.toLocaleString() || "0"} ريال
                                 </div>
                               </div>
                               <div>
-                                <div className="text-xs text-muted-foreground">الأولوية</div>
-                                <Badge variant="outline">{selectedRequest.priority}</Badge>
-                              </div>
-                              <div>
-                                <div className="text-xs text-muted-foreground">غرف النوم</div>
-                                <div className="font-medium">
-                                  {selectedRequest.bedrooms.min} - {selectedRequest.bedrooms.max}
-                                </div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-muted-foreground">الحمامات</div>
-                                <div className="font-medium">
-                                  {selectedRequest.bathrooms.min} - {selectedRequest.bathrooms.max}
-                                </div>
-                              </div>
-                              <div className="col-span-2">
-                                <div className="text-xs text-muted-foreground">المساحة المطلوبة</div>
-                                <div className="font-medium">
-                                  {selectedRequest.size.min} - {selectedRequest.size.max} م²
-                                </div>
+                                <div className="text-xs text-muted-foreground">هدف الشراء</div>
+                                <div className="font-medium">{selectedMatch?.request?.purchaseGoal || "غير محدد"}</div>
                               </div>
                             </div>
-                            <div>
-                              <div className="text-xs text-muted-foreground mb-2">المميزات المطلوبة</div>
-                              <div className="flex flex-wrap gap-1">
-                                {selectedRequest.features.map((feature: string, idx: number) => (
-                                  <Badge key={idx} variant="outline" className="text-xs">
-                                    {feature}
-                                  </Badge>
-                                ))}
+                            {selectedMatch?.request?.notes && (
+                              <div>
+                                <div className="text-xs text-muted-foreground mb-2">ملاحظات</div>
+                                <div className="text-sm bg-gray-50 p-2 rounded-lg">
+                                  {selectedMatch.request.notes}
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </CardContent>
                         </Card>
                       </div>
