@@ -185,6 +185,134 @@ export const inputs2Structure: ComponentStructure = {
             },
           ],
         },
+
+        // ========================================
+        // FIELD REQUIRED CONTROLS
+        // ========================================
+        {
+          key: "fieldRequired",
+          label: "Field Required Controls",
+          type: "object",
+          description: "Control which fields are required for form submission",
+          fields: [
+            // Property Information Fields
+            {
+              key: "propertyType",
+              label: "Property Type Required",
+              type: "boolean",
+              defaultValue: true,
+              description: "Toggle to make property type field required",
+            },
+            {
+              key: "propertyCategory",
+              label: "Property Category Required",
+              type: "boolean",
+              defaultValue: true,
+              description: "Toggle to make property category field required",
+            },
+            {
+              key: "city",
+              label: "City Required",
+              type: "boolean",
+              defaultValue: true,
+              description: "Toggle to make city field required",
+            },
+            {
+              key: "district",
+              label: "District Required",
+              type: "boolean",
+              defaultValue: true,
+              description: "Toggle to make district field required",
+            },
+            {
+              key: "areaFrom",
+              label: "Area From Required",
+              type: "boolean",
+              defaultValue: false,
+              description: "Toggle to make area from field required",
+            },
+            {
+              key: "areaTo",
+              label: "Area To Required",
+              type: "boolean",
+              defaultValue: false,
+              description: "Toggle to make area to field required",
+            },
+            // Budget & Payment Fields
+            {
+              key: "purchaseMethod",
+              label: "Purchase Method Required",
+              type: "boolean",
+              defaultValue: true,
+              description: "Toggle to make purchase method field required",
+            },
+            {
+              key: "budgetFrom",
+              label: "Budget From Required",
+              type: "boolean",
+              defaultValue: true,
+              description: "Toggle to make budget from field required",
+            },
+            {
+              key: "budgetTo",
+              label: "Budget To Required",
+              type: "boolean",
+              defaultValue: false,
+              description: "Toggle to make budget to field required",
+            },
+            // Additional Details Fields
+            {
+              key: "seriousness",
+              label: "Seriousness Required",
+              type: "boolean",
+              defaultValue: false,
+              description: "Toggle to make seriousness field required",
+            },
+            {
+              key: "purchaseGoal",
+              label: "Purchase Goal Required",
+              type: "boolean",
+              defaultValue: false,
+              description: "Toggle to make purchase goal field required",
+            },
+            {
+              key: "similarOffers",
+              label: "Similar Offers Required",
+              type: "boolean",
+              defaultValue: false,
+              description: "Toggle to make similar offers field required",
+            },
+            // Contact Information Fields
+            {
+              key: "fullName",
+              label: "Full Name Required",
+              type: "boolean",
+              defaultValue: true,
+              description: "Toggle to make full name field required",
+            },
+            {
+              key: "phone",
+              label: "Phone Required",
+              type: "boolean",
+              defaultValue: true,
+              description: "Toggle to make phone field required",
+            },
+            {
+              key: "whatsapp",
+              label: "WhatsApp Required",
+              type: "boolean",
+              defaultValue: false,
+              description: "Toggle to make WhatsApp field required",
+            },
+            {
+              key: "notes",
+              label: "Notes Required",
+              type: "boolean",
+              defaultValue: false,
+              description: "Toggle to make notes field required",
+            },
+          ],
+        },
       ],
     },
   ],

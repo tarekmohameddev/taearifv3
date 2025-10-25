@@ -2203,6 +2203,10 @@ export function translateLabel(
       "components_structure.inputs2.card_visibility_controls",
     "🎯 Field Visibility Controls":
       "components_structure.inputs2.field_visibility_controls",
+    "Field Required Controls":
+      "components_structure.inputs2.field_required_controls",
+    "Control which fields are required for form submission":
+      "components_structure.inputs2.control_required_fields_description",
     "Show Property Information Card":
       "components_structure.inputs2.show_property_info_card",
     "Show Budget & Payment Card":
@@ -2234,6 +2238,59 @@ export function translateLabel(
     "Show Phone Field": "components_structure.inputs2.show_phone_field",
     "Show WhatsApp Field": "components_structure.inputs2.show_whatsapp_field",
     "Show Notes Field": "components_structure.inputs2.show_notes_field",
+    "Property Type Required":
+      "components_structure.inputs2.property_type_required",
+    "Property Category Required":
+      "components_structure.inputs2.property_category_required",
+    "City Required": "components_structure.inputs2.city_required",
+    "District Required": "components_structure.inputs2.district_required",
+    "Area From Required": "components_structure.inputs2.area_from_required",
+    "Area To Required": "components_structure.inputs2.area_to_required",
+    "Purchase Method Required":
+      "components_structure.inputs2.purchase_method_required",
+    "Budget From Required": "components_structure.inputs2.budget_from_required",
+    "Budget To Required": "components_structure.inputs2.budget_to_required",
+    "Seriousness Required": "components_structure.inputs2.seriousness_required",
+    "Purchase Goal Required":
+      "components_structure.inputs2.purchase_goal_required",
+    "Similar Offers Required":
+      "components_structure.inputs2.similar_offers_required",
+    "Full Name Required": "components_structure.inputs2.full_name_required",
+    "Phone Required": "components_structure.inputs2.phone_required",
+    "WhatsApp Required": "components_structure.inputs2.whatsapp_required",
+    "Notes Required": "components_structure.inputs2.notes_required",
+    "Toggle to make property type field required":
+      "components_structure.inputs2.toggle_property_type_required",
+    "Toggle to make property category field required":
+      "components_structure.inputs2.toggle_property_category_required",
+    "Toggle to make city field required":
+      "components_structure.inputs2.toggle_city_required",
+    "Toggle to make district field required":
+      "components_structure.inputs2.toggle_district_required",
+    "Toggle to make area from field required":
+      "components_structure.inputs2.toggle_area_from_required",
+    "Toggle to make area to field required":
+      "components_structure.inputs2.toggle_area_to_required",
+    "Toggle to make purchase method field required":
+      "components_structure.inputs2.toggle_purchase_method_required",
+    "Toggle to make budget from field required":
+      "components_structure.inputs2.toggle_budget_from_required",
+    "Toggle to make budget to field required":
+      "components_structure.inputs2.toggle_budget_to_required",
+    "Toggle to make seriousness field required":
+      "components_structure.inputs2.toggle_seriousness_required",
+    "Toggle to make purchase goal field required":
+      "components_structure.inputs2.toggle_purchase_goal_required",
+    "Toggle to make similar offers field required":
+      "components_structure.inputs2.toggle_similar_offers_required",
+    "Toggle to make full name field required":
+      "components_structure.inputs2.toggle_full_name_required",
+    "Toggle to make phone field required":
+      "components_structure.inputs2.toggle_phone_required",
+    "Toggle to make WhatsApp field required":
+      "components_structure.inputs2.toggle_whatsapp_required",
+    "Toggle to make notes field required":
+      "components_structure.inputs2.toggle_notes_required",
 
     // Inputs specific labels
     "Layout Settings": "components_structure.inputs.layout_settings",

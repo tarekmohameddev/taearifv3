@@ -412,19 +412,23 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
   // Get default data as base (99% of the data) - memoized
   const defaultData = useMemo(() => getDefaultInputs2Data(), []);
 
-  // Only get visibility controls from store/tenant data (1% of the data) - memoized
+  // Only get visibility and required controls from store/tenant data (1% of the data) - memoized
   const visibilityControls = useMemo(
     () => ({
       cardVisibility:
         mergedData.cardVisibility || defaultData.cardVisibility || {},
       fieldVisibility:
         mergedData.fieldVisibility || defaultData.fieldVisibility || {},
+      fieldRequired:
+        mergedData.fieldRequired || defaultData.fieldRequired || {},
     }),
     [
       mergedData.cardVisibility,
       mergedData.fieldVisibility,
+      mergedData.fieldRequired,
       defaultData.cardVisibility,
       defaultData.fieldVisibility,
+      defaultData.fieldRequired,
     ],
   );
 
@@ -564,7 +568,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     return fieldIdMapping[fieldId] || fieldId;
   }, []);
 
-  // Filter cards and fields based on visibility controls (1% control)
+  // Filter cards and fields based on visibility controls and apply required controls (1% control)
   const safeCards = useMemo(() => {
     if (!cards || !Array.isArray(cards) || cards.length === 0) {
       return [];
@@ -601,14 +605,25 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
 
             return isFieldVisible;
           })
-          .map((field: any) => ({
-            ...field,
-            id: field.id || generateRandomId("field"),
-          })),
+          .map((field: any) => {
+            // Apply required control from fieldRequired
+            const fieldId = field.id;
+            const fieldRequiredKey = getFieldVisibilityKey(fieldId); // Use same mapping
+            const isFieldRequired =
+              visibilityControls.fieldRequired[fieldRequiredKey] !== undefined
+                ? visibilityControls.fieldRequired[fieldRequiredKey]
+                : field.required; // Fallback to default required value
+
+            return {
+              ...field,
+              id: field.id || generateRandomId("field"),
+              required: isFieldRequired,
+            };
+          }),
       }));
 
     return processedCards;
-  }, [cards, visibilityControls]);
+  }, [cards, visibilityControls, getFieldVisibilityKey, getCardVisibilityKey]);
 
   // Use theme from mergedData
   const safeTheme = theme || getDefaultInputs2Data().theme;
@@ -1049,35 +1064,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
         // Create the JSON data in the exact format you specified
         const jsonFormData = mapFormDataToJsonFormat(formData);
 
-        console.log("=== FORM SUBMISSION DATA ===");
-        console.log("📊 Raw form data (flat):", formData);
-        console.log("📋 JSON Format Data:", jsonFormData);
-        console.log(
-          "📄 JSON String (exact format you requested):",
-          JSON.stringify(jsonFormData, null, 2),
-        );
 
-        // Display the exact format you specified
-        console.log("=== EXACT JSON FORMAT ===");
-        console.log(JSON.stringify(jsonFormData));
-
-        // Show tenant_username specifically
-        console.log(
-          "🏢 Tenant Username:",
-          jsonFormData.tenant_username || "Not found",
-        );
-
-        // Show data types for validation
-        console.log("=== DATA TYPES VALIDATION ===");
-        console.log("🔢 Integer fields:", {
-          districts_id: typeof jsonFormData.districts_id,
-          area_from: typeof jsonFormData.area_from,
-          area_to: typeof jsonFormData.area_to,
-        });
-        console.log("✅ Boolean fields:", {
-          wants_similar_offers: typeof jsonFormData.wants_similar_offers,
-          contact_on_whatsapp: typeof jsonFormData.contact_on_whatsapp,
-        });
 
         // Send data to API endpoint
         if (apiEndpoint && apiEndpoint.trim() !== "") {
