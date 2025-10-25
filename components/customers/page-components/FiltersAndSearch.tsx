@@ -238,13 +238,13 @@ export const FiltersAndSearch = ({
   // Loading state for filters
   if (loadingFilters) {
     return (
-      <div className="flex items-center justify-between p-4">
-        <div className="h-10 w-[300px] bg-gray-200 rounded-md animate-pulse" />
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 p-4">
+        <div className="h-10 w-full lg:w-[300px] bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse" />
+        <div className="flex flex-wrap items-center gap-2">
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="h-10 w-[120px] bg-gray-200 rounded-md animate-pulse"
+              className="h-10 w-full sm:w-[140px] lg:w-[120px] bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse"
             />
           ))}
         </div>
@@ -253,8 +253,9 @@ export const FiltersAndSearch = ({
   }
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="relative">
+    <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+      {/* Search Box */}
+      <div className="relative w-full lg:w-auto">
         {isSearching ? (
           <Loader2 className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground animate-spin" />
         ) : (
@@ -263,18 +264,20 @@ export const FiltersAndSearch = ({
         <Input
           type="search"
           placeholder="البحث في العملاء..."
-          className="pr-8 w-[300px]"
+          className="pr-8 w-full lg:w-[300px]"
           value={searchTerm}
           onChange={(e) => handleSearchChange(e.target.value)}
         />
       </div>
-      <div className="flex items-center gap-2">
+      
+      {/* Filter Buttons */}
+      <div className="flex flex-wrap items-center gap-2">
         {/* Type Filter */}
         <Select
           value={filterType}
           onValueChange={(value) => handleFilterChange("type", value)}
         >
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-full sm:w-[140px] lg:w-[120px]">
             <SelectValue placeholder="النوع" />
           </SelectTrigger>
           <SelectContent>
@@ -292,7 +295,7 @@ export const FiltersAndSearch = ({
           value={filterCity}
           onValueChange={(value) => handleFilterChange("city", value)}
         >
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-full sm:w-[140px] lg:w-[120px]">
             <SelectValue placeholder="المدينة" />
           </SelectTrigger>
           <SelectContent>
@@ -311,7 +314,7 @@ export const FiltersAndSearch = ({
           onValueChange={(value) => handleFilterChange("district", value)}
           disabled={filterCity === "all"} // Disable if no city is selected
         >
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-full sm:w-[140px] lg:w-[120px]">
             <SelectValue placeholder="الحي" />
           </SelectTrigger>
           <SelectContent>
@@ -329,7 +332,7 @@ export const FiltersAndSearch = ({
           value={filterPriority}
           onValueChange={(value) => handleFilterChange("priority", value)}
         >
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-full sm:w-[140px] lg:w-[120px]">
             <SelectValue placeholder="الأولوية" />
           </SelectTrigger>
           <SelectContent>
@@ -349,6 +352,7 @@ export const FiltersAndSearch = ({
           size="icon"
           onClick={handleResetFilters}
           disabled={!hasActiveFilters()} // Disable if no filters are active
+          className="flex-shrink-0"
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
