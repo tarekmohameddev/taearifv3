@@ -49,28 +49,6 @@ export default function DashboardSection() {
                />
              </motion.div>
 
-             <motion.div 
-               className="absolute bottom-8 sm:bottom-4 md:bottom-6 lg:bottom-10 left-4 sm:left-6 md:left-8 lg:left-10"
-               initial={{ opacity: 0, x: -100, scale: 0.8 }}
-               whileInView={{ opacity: 1, x: 0, scale: 1 }}
-               transition={{ 
-                 duration: 1.2, 
-                 delay: 1,
-                 ease: [0.16, 1, 0.3, 1]
-               }}
-               viewport={{ once: true, margin: "-50px" }}
-             >
-               <motion.img
-                 src="https://test.kingbellsa.com/wp-content/uploads/2025/10/Smart-Home-App-Hero-Image-3.webp"
-                 alt="Smart Home App 2"
-                 className="w-[280px] h-auto scale-100  object-cover rounded-lg shadow-lg"
-                 whileHover={{ 
-                   scale: 1.05, 
-                   y: -5,
-                   transition: { duration: 0.3, ease: "easeOut" }
-                 }}
-               />
-             </motion.div>
           </div>
 
           {/* Content Overlay */}
