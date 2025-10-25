@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
@@ -16,45 +17,52 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
   const pathname = usePathname();
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Add immediate console log to verify component is loading
-  if (typeof window !== "undefined") {
-console.log("GA4Provider", tenantId);
-
-  }
-
+  // Initialize GA4 only once
   useEffect(() => {
-    // Check if we should track this domain
-    const currentDomain = window.location.hostname;
+    const currentDomain = typeof window !== 'undefined' ? window.location.hostname : '';
     const shouldTrack = shouldTrackDomain(currentDomain);
 
-
     if (!shouldTrack) {
+      console.log('🚫 Skipping GA4 tracking for domain:', currentDomain);
       return;
     }
 
-    // Initialize GA4 only once
     if (!isInitialized) {
       initializeGA4();
       setIsInitialized(true);
     }
   }, [isInitialized]);
 
+  // Track page views with tenant_id
   useEffect(() => {
-    // Get tenant ID from domain or props
+    if (typeof window === 'undefined') return;
+
     const currentDomain = window.location.hostname;
     const domainTenantId = getTenantIdFromDomain(currentDomain);
     const finalTenantId = tenantId || domainTenantId;
 
+    console.log('🔍 GA4Provider tracking:', {
+      tenantId,
+      domainTenantId,
+      finalTenantId,
+      pathname,
+      isInitialized,
+    });
 
-    // Track page view when pathname or tenantId changes
     if (finalTenantId && pathname && isInitialized) {
       // Set tenant context
       setTenantContext(finalTenantId, finalTenantId);
 
-      // Track page view with a small delay to ensure GA4 is ready
+      // Track page view with tenant_id as event parameter
       setTimeout(() => {
         trackPageView(finalTenantId, pathname);
       }, 500);
+    } else {
+      console.warn('⚠️ Missing required data for tracking:', {
+        finalTenantId,
+        pathname,
+        isInitialized,
+      });
     }
   }, [tenantId, pathname, isInitialized]);
 
@@ -71,13 +79,12 @@ const shouldTrackDomain = (domain: string): boolean => {
   // Extract local domain from API URL
   const localDomain = new URL(apiUrl).hostname;
 
-
   // Don't track main domain
   if (domain === `www.${productionDomain}` || domain === productionDomain) {
     return false;
   }
 
-  // Track tenant subdomains in production (vcvkkokk.mandhoor.com)
+  // Track tenant subdomains in production (e.g., lira.taearif.com)
   if (domain.endsWith(`.${productionDomain}`)) {
     return true;
   }
@@ -103,21 +110,23 @@ const getTenantIdFromDomain = (domain: string): string | null => {
   // Extract local domain from API URL
   const localDomain = new URL(apiUrl).hostname;
 
-
-  // For production: tenant1.mandhoor.com -> tenant1
+  // For production: lira.taearif.com -> lira
   if (domain.endsWith(`.${productionDomain}`)) {
     const subdomain = domain.replace(`.${productionDomain}`, "");
+    console.log('🌐 Extracted tenant from production domain:', subdomain);
     return subdomain;
   }
 
-  // For development: tenant1.localhost -> tenant1
+  // For development: lira.localhost -> lira
   if (isDevelopment && domain.includes(localDomain)) {
     const parts = domain.split(".");
     if (parts.length > 1 && parts[0] !== localDomain) {
       const subdomain = parts[0];
+      console.log('🌐 Extracted tenant from dev domain:', subdomain);
       return subdomain;
     }
   }
 
+  console.warn('⚠️ Could not extract tenant from domain:', domain);
   return null;
 };
