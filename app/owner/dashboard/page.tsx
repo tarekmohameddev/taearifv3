@@ -158,7 +158,7 @@ export default function OwnerDashboard() {
       }
 
       console.log("Fetching dashboard data...");
-      const response = await fetch("https://taearif.com/api/v1/owner-rental/dashboard", {
+      const response = await fetch("https://api.taearif.com/api/v1/owner-rental/dashboard", {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,

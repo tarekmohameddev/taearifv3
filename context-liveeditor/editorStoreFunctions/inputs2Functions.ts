@@ -46,7 +46,7 @@ export const getDefaultInputs2Data = (): ComponentData => ({
     hoverColor: "#067a55",
     borderRadius: "8px",
     padding: "12px 24px",
-    apiEndpoint: "https://taearif.com/api/v1/property-requests/public",
+    apiEndpoint: "https://api.taearif.com/api/v1/property-requests/public",
   },
   cardsLayout: {
     columns: "1",

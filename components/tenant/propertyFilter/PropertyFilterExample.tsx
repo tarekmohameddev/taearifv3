@@ -13,7 +13,7 @@ export default function PropertyFilterExample() {
         <h3 className="text-lg font-semibold mb-2">Dynamic API Example</h3>
         <PropertyFilter
           propertyTypesSource="dynamic"
-          propertyTypesApiUrl="https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct"
+          propertyTypesApiUrl="https://api.taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct"
           tenantId="your-tenant-id-here"
           searchPlaceholder="ابحث عن المدينة"
           propertyTypePlaceholder="اختر نوع العقار"

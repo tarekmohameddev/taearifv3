@@ -48,7 +48,7 @@
             "hoverColor": "#067a55",
             "borderRadius": "8px",
             "padding": "12px 24px",
-            "apiEndpoint": "https://taearif.com/api/v1/property-requests/public"
+            "apiEndpoint": "https://api.taearif.com/api/v1/property-requests/public"
           },
           "cardsLayout": {
             "columns": "1",
@@ -622,7 +622,7 @@
           },
           "content": {
             "propertyTypesSource": "dynamic",
-            "propertyTypesApiUrl": "https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct"
+            "propertyTypesApiUrl": "https://api.taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct"
           }
         },
         "position": 1,
@@ -990,7 +990,7 @@
           },
           "content": {
             "propertyTypesSource": "dynamic",
-            "propertyTypesApiUrl": "https://taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct"
+            "propertyTypesApiUrl": "https://api.taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct"
           }
         },
         "position": 1,

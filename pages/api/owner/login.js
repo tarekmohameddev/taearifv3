@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     }
 
     // Call external API
-    const response = await axios.post("https://taearif.com/api/v1/owner-rental/login", {
+    const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/login", {
       email,
       password,
     });

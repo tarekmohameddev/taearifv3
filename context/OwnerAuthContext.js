@@ -26,7 +26,7 @@ const useOwnerAuthStore = create((set, get) => ({
     set({ isLoading: true, errorLogin: null });
 
     try {
-      const response = await axios.post("https://taearif.com/api/v1/owner-rental/login", {
+      const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/login", {
         email,
         password,
       });
@@ -101,7 +101,7 @@ const useOwnerAuthStore = create((set, get) => ({
     set({ isLoading: true, errorRegister: null });
 
     try {
-      const response = await axios.post("https://taearif.com/api/v1/owner-rental/register", {
+      const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/register", {
         email,
         password,
         first_name: firstName,
@@ -324,7 +324,7 @@ export const OwnerAuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setLoading(true);
-      const response = await axios.post("https://taearif.com/api/v1/owner-rental/login", {
+      const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/login", {
         email,
         password,
       });
@@ -372,7 +372,7 @@ export const OwnerAuthProvider = ({ children }) => {
   const register = async (email, password, firstName, lastName, phone) => {
     try {
       setLoading(true);
-      const response = await axios.post("https://taearif.com/api/v1/owner-rental/register", {
+      const response = await axios.post("https://api.taearif.com/api/v1/owner-rental/register", {
         email,
         password,
         first_name: firstName,
