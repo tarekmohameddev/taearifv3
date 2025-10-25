@@ -54,8 +54,6 @@ export const CustomerTable = ({
   sortField,
   sortDirection,
   handleSort,
-  setSelectedCustomer,
-  setShowCustomerDialog,
   openEditDialog,
   handleDelete,
   formData,
@@ -435,8 +433,7 @@ export const CustomerTable = ({
                         size="icon"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedCustomer(customer);
-                          setShowCustomerDialog(true);
+                          handleRowClick(customer.id);
                         }}
                       >
                         <Eye className="h-4 w-4" />

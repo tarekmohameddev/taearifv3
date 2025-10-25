@@ -13,7 +13,6 @@ import { CustomerTypeDistribution } from "./page-components/CustomerTypeDistribu
 import { FiltersAndSearch } from "./page-components/FiltersAndSearch";
 import { CustomerTable } from "./page-components/CustomerTable";
 import { CrmLinkCard } from "./page-components/CrmLinkCard";
-import { CustomerDetailDialog } from "./page-components/CustomerDetailDialog";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
 import useAuthStore from "@/context/AuthContext";
 
@@ -105,13 +104,9 @@ const customers: Customer[] = [
 
 export default function CustomersPage() {
   const [activeTab, setActiveTab] = useState("customers");
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null,
-  );
   const [selectedCustomers, setSelectedCustomers] = useState<number[]>([]);
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
-  const [showCustomerDialog, setShowCustomerDialog] = useState(false);
   const [showAddCustomerDialog, setShowAddCustomerDialog] = useState(false);
   const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false);
   const [showStageDialog, setShowStageDialog] = useState(false);
@@ -666,8 +661,6 @@ export default function CustomersPage() {
               sortField={sortField}
               sortDirection={sortDirection}
               handleSort={handleSort}
-              setSelectedCustomer={setSelectedCustomer}
-              setShowCustomerDialog={setShowCustomerDialog}
               openEditDialog={openEditDialog}
               handleDelete={handleDelete}
               formData={formData}
@@ -690,13 +683,6 @@ export default function CustomersPage() {
 
             {/* CRM Link */}
             <CrmLinkCard />
-
-            {/* Customer Detail Dialog */}
-            <CustomerDetailDialog
-              showCustomerDialog={showCustomerDialog}
-              setShowCustomerDialog={setShowCustomerDialog}
-              selectedCustomer={selectedCustomer}
-            />
           </div>
         </main>
       </div>
