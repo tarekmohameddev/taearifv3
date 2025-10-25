@@ -1,5 +1,21 @@
 "use client";
 
+/**
+ * Loading Component Logic:
+ * This component checks the hostname to determine if it's a tenant site or the main Taearif platform.
+ * 1. Base Domain (www.taearif.com or taearif.com): Shows blank white page (no tenant).
+ * 2. Subdomain (tenant1.taearif.com): Shows loading skeletons (tenant site).
+ * 3. Custom Domain (example.com): Shows loading skeletons (tenant site with custom domain).
+ * 4. Reserved subdomains (www, api, dashboard, etc.): Treated as non-tenant, shows blank page.
+ * 
+ * منطق مكون التحميل:
+ * يتحقق هذا المكون من اسم النطاق (hostname) لتحديد ما إذا كان موقع عميل أم منصة تعاريف الرئيسية.
+ * ١. النطاق الأساسي (www.taearif.com أو taearif.com): يعرض صفحة بيضاء فارغة (ليس عميل).
+ * ٢. نطاق فرعي (tenant1.taearif.com): يعرض هياكل التحميل (موقع عميل).
+ * ٣. نطاق مخصص (example.com): يعرض هياكل التحميل (موقع عميل بنطاق مخصص).
+ * ٤. النطاقات الفرعية المحجوزة (www, api, dashboard, إلخ): تعامل كغير عميل، يعرض صفحة فارغة.
+ */
+
 import { usePathname } from "next/navigation";
 import {
   StaticHeaderSkeleton1,
