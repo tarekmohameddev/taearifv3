@@ -15,7 +15,7 @@ export default function TaearifTypesCards() {
       bgColor: "bg-[#ff7b58]",
       iconColor: "text-orange-600",
       iconBg: "bg-orange-100",
-      image: "/online-service-card-2.png"
+      image: "/images/landingPage/section2/3-1.png"
     },
     {
       id: 2,
@@ -26,7 +26,7 @@ export default function TaearifTypesCards() {
       bgColor: "bg-[#00b4a5]",
       iconColor: "text-green-600",
       iconBg: "bg-green-100",
-      image: "/online-service-card-2.png"
+      image: "/images/landingPage/section2/2-1.png"
     },
     {
       id: 3,
@@ -37,7 +37,7 @@ export default function TaearifTypesCards() {
       bgColor: "bg-[#3e7cf7]",
       iconColor: "text-blue-600",
       iconBg: "bg-blue-100",
-      image: "/online-service-card-2.png"
+      image: "/images/landingPage/section2/1-3.png"
     }
   ];
 
