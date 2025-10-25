@@ -25,29 +25,6 @@ export default function DashboardSection() {
                />
              </motion.div>
 
-             {/* Floating Images */}
-             <motion.div 
-               className="absolute top-16 sm:top-24 md:top-32 lg:top-48 right-0 sm:right-6 md:right-8 lg:right-10 z-[1]"
-               initial={{ opacity: 0, x: 100, scale: 0.8 }}
-               whileInView={{ opacity: 1, x: 0, scale: 1 }}
-               transition={{ 
-                 duration: 1.2, 
-                 delay: 0.5,
-                 ease: [0.16, 1, 0.3, 1]
-               }}
-               viewport={{ once: true, margin: "-50px" }}
-             >
-               <motion.img
-                 src="https://test.kingbellsa.com/wp-content/uploads/2025/10/Smart-Home-App-Hero-Image-2.webp"
-                 alt="Smart Home App"
-                 className="w-32 h-24 scale-85 sm:scale-100 sm:w-40 sm:h-32 md:w-36 md:h-28 lg:w-48 lg:h-40 object-cover rounded-lg shadow-lg"
-                 whileHover={{ 
-                   scale: 1.05, 
-                   y: -5,
-                   transition: { duration: 0.3, ease: "easeOut" }
-                 }}
-               />
-             </motion.div>
 
           </div>
 
