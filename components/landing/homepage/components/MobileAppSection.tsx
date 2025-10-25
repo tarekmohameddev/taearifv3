@@ -20,9 +20,9 @@ const MobileAppSection = () => {
           transition={{ duration: 1, ease: "easeOut" }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          <div className="flex flex-col md:flex-row p-5 sm:pr-10 pt-10">
+          <div className="flex flex-col md:flex-row  sm:pr-10 pt-10">
             {/* Left Half - Content */}
-            <div className="space-y-6 sm:space-y-8 lg:space-y-10 order-1 sm:w-1/2">
+            <div className="space-y-6 sm:space-y-8 lg:space-y-10 order-1 sm:w-1/2 p-5">
               {/* Title */}
               <motion.h2
                 className="text-2xl sm:text-2xl md:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight "
@@ -76,10 +76,10 @@ const MobileAppSection = () => {
             </div>
 
             {/* Right Half - Mobile Screenshots */}
-            <div className="flex flex-row bottom-0 gap-4 sm:gap-6 justify-center -mb-16 sm:-mb-20 lg:-mb-20 order-2 sm:w-1/2">
+            <div className="flex flex-row items-end gap-4 sm:gap-6 justify-center order-2 md:w-1/2 md:relative -bottom- md:-bottom-10 lg:-bottom-10 xl:-bottom-10">
               {/* First Mobile Screen */}
               <motion.div
-                className="w-48 sm:w-56 md:w-64 lg:w-48 xl:w-56 h-auto"
+                className="w-40 sm:w-48 md:w-52 lg:w-48 xl:w-52"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
@@ -101,7 +101,7 @@ const MobileAppSection = () => {
 
               {/* Second Mobile Screen */}
               <motion.div
-                className="w-48 sm:w-56 md:w-64 lg:w-48 xl:w-56 h-auto -bottom-[10rem]"
+                className="w-40 sm:w-48 md:w-52 lg:w-48 xl:w-52"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 1.0, ease: "easeOut" }}
