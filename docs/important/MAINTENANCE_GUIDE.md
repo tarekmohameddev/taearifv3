@@ -809,6 +809,38 @@ LOW IMPACT, LOW URGENCY (Backlog):
 
 ## 📝 RECENT CHANGES LOG
 
+### October 26, 2025 - Hidden Monthly Subscription (Temporary)
+
+**Change Type:** UI Modification (Temporary)
+
+**Files Modified:**
+- `components/settings-page.tsx`:
+  - Line 117: Changed default billing period from "monthly" to "yearly"
+  - Line 844: Added `hidden` class to monthly billing button
+  - Added comments: "TEMPORARY HIDDEN: Monthly billing button"
+
+**Documentation Updated:**
+- `docs/important/dashboard/MODULES.md` - Added warning about temporary change
+
+**Reason:**
+- Temporarily hide monthly subscription option
+- Show only yearly plans to users
+- Code preserved for easy re-enabling in the future
+
+**Impact:**
+- ✅ Users will only see yearly subscription plans
+- ✅ Default billing period is now yearly
+- ✅ Monthly billing code preserved (not deleted)
+- ✅ Easy to revert by removing `hidden` class and changing default back to "monthly"
+
+**To Re-enable Monthly Billing:**
+1. Change line 117: `"yearly"` → `"monthly"`
+2. Remove `hidden` class from line 844
+3. Remove temporary comments
+4. Update documentation
+
+---
+
 ### October 26, 2025 - URL Query Parameters System
 
 **Feature Added:** URL-based filtering for property listing pages

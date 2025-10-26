@@ -450,7 +450,7 @@ export function PropertiesManagementPage() {
 
   const clickedONButton = async () => {
     clickedONSubButton();
-    router.push("/settings");
+    router.push("/dashboard/settings");
   };
   const fetchProperties = async (page = 1, filters = {}) => {
     // التحقق من وجود التوكن قبل إجراء الطلب

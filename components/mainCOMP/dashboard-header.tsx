@@ -75,7 +75,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
 
   const clickedONButton = async () => {
     clickedONSubButton();
-    router.push("/settings");
+    router.push("/dashboard/settings");
   };
 
   const handleLogout = async () => {
@@ -315,7 +315,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                     }
                     onClick={clickedONButton}
                   >
-                    <Link href="/settings">
+                    <Link href="/dashboard/settings">
                       {useAuthStore.getState().userData?.is_free_plan
                         ? `الباقة المجانية`
                         : useAuthStore.getState().userData?.package_title}
@@ -412,13 +412,13 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/settings">
+                    <Link href="/dashboard/settings">
                       <User className="ml-2 h-4 w-4" />
                       <span>حسابي</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/settings?tab=billing">
+                    <Link href="/dashboard/settings?tab=billing">
                       <span>الفواتير والاشتراك</span>
                     </Link>
                   </DropdownMenuItem>
@@ -453,7 +453,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                   }
                   onClick={clickedONButton}
                 >
-                  <Link href="/settings">
+                  <Link href="/dashboard/settings">
                     {useAuthStore.getState().userData?.is_free_plan
                       ? `الباقة المجانية `
                       : useAuthStore.getState().userData?.package_title}

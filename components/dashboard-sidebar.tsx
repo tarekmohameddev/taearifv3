@@ -74,7 +74,7 @@ export function DashboardSidebar({
       id: "settings",
       label: "Settings",
       icon: SettingsIcon,
-      path: "/settings",
+      path: "/dashboard/settings",
     },
     {
       id: "property-requests",

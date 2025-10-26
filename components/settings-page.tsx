@@ -112,8 +112,9 @@ export function SettingsPage() {
   const [subscriptionPlans, setSubscriptionPlans] = useState<any>({});
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
   const [allFeatures, setAllFeatures] = useState<string[]>([]);
+  // TEMPORARY: Hidden monthly billing, showing only yearly
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
-    "monthly",
+    "yearly", // Changed from "monthly" to "yearly"
   );
   const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
@@ -833,12 +834,14 @@ export function SettingsPage() {
                   </div>
 
                   {/* Toggle مذهل للتبديل بين الخطط الشهرية والسنوية */}
+                  {/* TEMPORARY: Monthly billing hidden, only yearly is shown */}
                   <div className="flex flex-col items-center gap-3">
                     <div className="relative">
                       <div className="flex items-center bg-gray-100 p-1 rounded-2xl border border-gray-300 shadow-lg">
+                        {/* TEMPORARY HIDDEN: Monthly billing button */}
                         <button
                           onClick={() => setBillingPeriod("monthly")}
-                          className={`relative px-6 py-3 rounded-xl font-medium text-sm transition-all duration-300 ease-in-out ${
+                          className={`hidden relative px-6 py-3 rounded-xl font-medium text-sm transition-all duration-300 ease-in-out ${
                             billingPeriod === "monthly"
                               ? "text-white shadow-lg"
                               : "text-gray-600 hover:text-gray-800"

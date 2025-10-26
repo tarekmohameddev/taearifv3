@@ -322,7 +322,7 @@ export function ProjectsManagementPage() {
                   >
                     إلغاء
                   </Button>
-                  <Button onClick={() => router.push("/settings")}>
+                  <Button onClick={() => router.push("/dashboard/settings")}>
                     اشتراك
                   </Button>
                 </DialogFooter>

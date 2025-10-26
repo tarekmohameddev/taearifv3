@@ -537,10 +537,23 @@ Complete reference for all 26 dashboard modules with their features, routes, and
 - Language settings
 - Theme settings
 - Subscription management
+  - **⚠️ TEMPORARY CHANGE:** Monthly billing is currently hidden
+  - Only yearly subscription plans are visible
+  - Default billing period set to "yearly"
+  - Monthly billing button hidden with `hidden` class
+  - Code preserved for future re-enabling
 - Billing information
 - API access
 
 **Triggers:** Subscription button in DashboardHeader
+
+**Recent Changes (2025-10-26):**
+- Temporarily hidden monthly subscription option
+- Set default billing period to yearly
+- Modified `components/settings-page.tsx`:
+  - Line 117: Changed default from "monthly" to "yearly"
+  - Line 844: Added `hidden` class to monthly billing button
+  - Added comments: "TEMPORARY HIDDEN: Monthly billing button"
 
 ---
 
