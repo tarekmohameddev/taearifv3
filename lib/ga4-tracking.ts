@@ -110,6 +110,29 @@ export function trackPropertyView(tenantId: string, propertySlug: string): void 
 }
 
 /**
+ * Track project view (specific event)
+ */
+export function trackProjectView(tenantId: string, projectSlug: string): void {
+  if (typeof window === 'undefined' || !window.gtag) return;
+
+  // Validate tenant_id before tracking
+  if (!tenantId || tenantId.trim() === '' || tenantId === 'www') {
+    console.warn('⚠️ Invalid tenant_id, skipping project view tracking:', tenantId);
+    return;
+  }
+
+  window.gtag('event', 'view_project', {
+    project_slug: projectSlug,
+    tenant_id: tenantId,
+  });
+
+  console.log('🏢 Project view tracked:', {
+    slug: projectSlug,
+    tenant_id: tenantId,
+  });
+}
+
+/**
  * Track custom event with tenant_id
  */
 export function trackEvent(

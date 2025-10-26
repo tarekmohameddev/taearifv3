@@ -23,7 +23,7 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
     const shouldTrack = shouldTrackDomain(currentDomain);
 
     if (!shouldTrack) {
-      console.log('🚫 Skipping GA4 tracking for domain:', currentDomain);
+      console.log('Skipping GA4 tracking for domain:', currentDomain);
       return;
     }
 
@@ -44,7 +44,7 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
     // This prevents empty strings from being used
     const finalTenantId = (tenantId && tenantId.trim() !== '') ? tenantId : domainTenantId;
 
-    console.log('🔍 GA4Provider tracking:', {
+    console.log('GA4Provider tracking:', {
       tenantId,
       domainTenantId,
       finalTenantId,
@@ -91,7 +91,7 @@ const shouldTrackDomain = (domain: string): boolean => {
 
   // Don't track main domain
   if (domain === `www.${productionDomain}` || domain === productionDomain) {
-    console.log('🚫 Skipping tracking for main domain:', domain);
+    console.log('Skipping tracking for main domain:', domain);
     return false;
   }
 
@@ -100,7 +100,7 @@ const shouldTrackDomain = (domain: string): boolean => {
   if (domain.endsWith(`.${productionDomain}`)) {
     const subdomain = domain.replace(`.${productionDomain}`, '');
     if (subdomain === 'www') {
-      console.log('🚫 Skipping tracking for www subdomain');
+      console.log('Skipping tracking for www subdomain');
       return false;
     }
     return true;
@@ -161,3 +161,4 @@ const getTenantIdFromDomain = (domain: string): string | null => {
   console.warn('Could not extract tenant from domain:', domain);
   return null;
 };
+
