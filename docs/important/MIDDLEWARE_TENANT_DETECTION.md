@@ -16,6 +16,26 @@ A **tenant** is an individual customer/organization that has their own subdomain
 
 ## Middleware Flow (`middleware.ts`)
 
+### ⚠️ Important Update (October 26, 2025)
+
+**Query Parameters Preservation:** The middleware now preserves query parameters during locale redirects.
+
+**Why Important:**
+- URL-based filtering for property listings
+- Shareable search URLs
+- Deep linking with parameters
+
+**Implementation (Line 329-331):**
+```typescript
+const searchParams = request.nextUrl.search; // Get ?key=value
+const newUrl = new URL(`/${locale}${pathname}${searchParams}`, request.url);
+return NextResponse.redirect(newUrl);
+```
+
+See `docs/important/URL_QUERY_PARAMETERS.md` for full details.
+
+---
+
 ### Step 1: Extract Host and Pathname
 ```typescript
 const pathname = request.nextUrl.pathname;

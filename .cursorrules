@@ -1,0 +1,573 @@
+# Cursor AI Rules - Website Builder Dashboard Project
+
+## 🎯 PROJECT CONTEXT
+
+This is a **Live Editor System** for building websites dynamically with a component-based architecture using Next.js, React, TypeScript, and Zustand.
+
+---
+
+## 📚 CRITICAL DOCUMENTATION - ALWAYS REFERENCE
+
+### **BEFORE ANY CODE CHANGES:**
+1. **READ** relevant documentation from `docs/important/`
+2. **UNDERSTAND** the architecture and patterns
+3. **FOLLOW** existing conventions strictly
+4. **UPDATE** documentation if implementation changes
+
+---
+
+## 📂 DOCUMENTATION HIERARCHY
+
+### **🔴 TIER 1: MUST READ FOR ANY COMPONENT WORK**
+
+```
+docs/important/components/
+├── ADD_NEW_COMPONENT.md              ← Complete guide for creating components
+├── ADD_NEW_COMPONENT_PROMPT.md       ← AI prompts for component creation
+├── FIX_COMPONENT_PROMPT.md           ← Diagnostic & repair system
+├── FIX_COMPONENT_QUICK_START.md      ← Quick repair reference
+└── README.md                         ← Component system overview
+```
+
+**RULE:** When working with components, ALWAYS reference these files first.
+
+---
+
+### **🔴 TIER 1: MUST READ FOR LIVE EDITOR WORK**
+
+```
+docs/important/liveEditor/
+├── README.md                         ← Start here for Live Editor
+├── OVERVIEW.md                       ← System overview
+├── COMPONENT_ARCHITECTURE.md         ← Component architecture deep dive
+├── STATE_MANAGEMENT.md               ← Zustand state management
+├── DATA_FLOW.md                      ← Data flow patterns
+├── QUICK_START.md                    ← Quick start guide
+├── CORE_CONCEPTS.md                  ← Core concepts
+├── COMMON_PATTERNS.md                ← Common patterns
+├── PRACTICAL_EXAMPLES.md             ← Real examples
+├── TROUBLESHOOTING.md                ← Problem solving
+└── context/
+    ├── README.md                     ← Context system overview
+    ├── COMPONENT_INTEGRATION.md      ← How components integrate
+    ├── EDITOR_STORE_FUNCTIONS.md     ← Store functions reference
+    ├── STORES_OVERVIEW.md            ← All stores explained
+    └── SUMMARY.md                    ← Quick summary
+```
+
+**RULE:** For any editorStore, context, or state changes → READ relevant docs.
+
+---
+
+### **🟡 TIER 2: REFERENCE FOR SPECIFIC FEATURES**
+
+```
+docs/important/liveEditor/editorSidebar/
+├── README.md                         ← EditorSidebar overview
+├── OVERVIEW.md                       ← System overview
+├── COMPONENTS.md                     ← Components breakdown
+├── DATA_FLOW.md                      ← Data flow in sidebar
+└── FIELD_RENDERERS.md                ← Field rendering system
+
+docs/important/dashboard/
+├── README.md                         ← Dashboard system overview
+├── CORE_INFRASTRUCTURE.md            ← Core infrastructure
+├── AUTHENTICATION.md                 ← Auth system
+├── DATA_FLOWS.md                     ← Data flows
+├── MODULES.md                        ← Module breakdown
+├── DEBUGGING.md                      ← Debugging guide
+└── RELATED_SYSTEMS.md                ← Related systems
+
+docs/important/GA4/
+├── README.md                         ← Google Analytics overview
+└── ARCHITECTURE.md                   ← GA4 architecture
+```
+
+**RULE:** Read when working on these specific systems.
+
+---
+
+### **🟢 TIER 3: SYSTEM-WIDE REFERENCES**
+
+```
+docs/important/
+├── COMPONENT_LOADING_SYSTEM.md       ← How components load
+├── componentsCachingSystem.md        ← Caching system
+├── AUTHENTICATION_SYSTEMS.md         ← Auth systems
+├── LOCALE_ROUTING_SYSTEM.md          ← Routing & locales
+├── MIDDLEWARE_TENANT_DETECTION.md    ← Tenant detection
+├── RECAPTCHA_SYSTEM.md               ← reCAPTCHA integration
+├── metaDataIntegration.md            ← SEO metadata
+├── editorSidebarTranslationSystem.md ← Translation system
+└── ifDataDoesntExistPutTheDefaultDataOnTheEditorSidebar.md
+```
+
+**RULE:** Reference when touching these specific systems.
+
+---
+
+## 🚨 CRITICAL RULES - NEVER BREAK
+
+### **1. COMPONENT SYSTEM RULES**
+
+```typescript
+// ✅ ALWAYS follow the 7-step component pattern
+// ✅ ALWAYS use 4 required functions (ensureVariant, getData, setData, updateByPath)
+// ✅ ALWAYS use uniqueId (props.id) NOT variantId
+// ✅ ALWAYS merge data: defaults → store → props
+// ✅ ALWAYS use mergedData in render, NOT props directly
+
+// ❌ NEVER skip switch cases in editorStore
+// ❌ NEVER forget to export in index files
+// ❌ NEVER use props.* directly in render
+// ❌ NEVER create component without following ADD_NEW_COMPONENT.md
+```
+
+**REFERENCE:** `docs/important/components/ADD_NEW_COMPONENT.md`
+
+---
+
+### **2. STATE MANAGEMENT RULES**
+
+```typescript
+// ✅ ALWAYS use Zustand stores correctly
+// ✅ ALWAYS update both componentStates AND pageComponentsByPage
+// ✅ ALWAYS use componentFunctions from editorStoreFunctions/
+// ✅ ALWAYS maintain state immutability
+
+// ❌ NEVER mutate state directly
+// ❌ NEVER bypass store functions
+// ❌ NEVER forget to initialize component in store
+```
+
+**REFERENCE:** `docs/important/liveEditor/STATE_MANAGEMENT.md`
+
+---
+
+### **3. INTEGRATION RULES**
+
+```typescript
+// When adding/modifying components, UPDATE ALL:
+// 1. context-liveeditor/editorStoreFunctions/{component}Functions.ts
+// 2. componentsStructure/{component}.ts
+// 3. components/tenant/{component}/{component}1.tsx
+// 4. context-liveeditor/editorStore.ts (import, state, 4 switch cases, functions)
+// 5. lib-liveeditor/ComponentsList.tsx (import, getComponents, COMPONENTS)
+// 6. componentsStructure/index.ts (export)
+// 7. context-liveeditor/editorStoreFunctions/index.ts (export)
+
+// ✅ Follow checklist in ADD_NEW_COMPONENT.md
+// ❌ Never skip integration steps
+```
+
+**REFERENCE:** `docs/important/components/ADD_NEW_COMPONENT.md` (Steps 1-9)
+
+---
+
+### **4. DOCUMENTATION MAINTENANCE RULES**
+
+```markdown
+## When you CHANGE implementation:
+
+1. CHECK: Does documentation need updating?
+2. IF YES:
+   - Update relevant docs in docs/important/
+   - Update code examples
+   - Update diagrams/flowcharts if present
+   - Add note in doc about change date
+3. ALWAYS: Keep docs in sync with code
+
+## Documentation Update Triggers:
+
+✅ Adding new component type
+✅ Changing store structure
+✅ Modifying data flow
+✅ Adding/removing functions
+✅ Changing patterns/conventions
+✅ Adding new features
+✅ Fixing major bugs that affect architecture
+✅ Changing file structure
+✅ Modifying integration points
+```
+
+**REFERENCE:** `docs/important/MAINTENANCE_GUIDE.md` (will be created)
+
+---
+
+## 🔍 BEFORE MAKING CHANGES - CHECKLIST
+
+```
+□ Read relevant documentation
+□ Understand current architecture
+□ Check existing patterns
+□ Verify no breaking changes
+□ Follow established conventions
+□ Test with multiple instances (for components)
+□ Update documentation if needed
+□ Run linter/TypeScript checks
+□ Test in Live Editor (for components)
+```
+
+---
+
+## 🛠️ COMPONENT WORK WORKFLOW
+
+### **Creating New Component:**
+```
+1. Read: @docs/important/components/ADD_NEW_COMPONENT.md
+2. Use:  @docs/important/components/ADD_NEW_COMPONENT_PROMPT.md
+3. Follow: 9-step process exactly
+4. Test: All functionality
+5. Verify: Checklist at end of guide
+```
+
+### **Fixing Existing Component:**
+```
+1. Read: @docs/important/components/FIX_COMPONENT_PROMPT.md
+2. Run: All 7 diagnostic layers
+3. Fix: Issues in priority order
+4. Verify: Post-repair checklist
+5. Update: Documentation if architecture changed
+```
+
+### **Modifying Component:**
+```
+1. Check: Current implementation
+2. Read: Component architecture docs
+3. Plan: Changes maintaining patterns
+4. Implement: Following conventions
+5. Test: Thoroughly
+6. Update: Docs if patterns changed
+```
+
+---
+
+## 📋 COMMON TASKS - QUICK REFERENCE
+
+### **Task: Add New Component "pricing"**
+```
+STEP 1: Read @docs/important/components/ADD_NEW_COMPONENT.md
+STEP 2: Use template from ADD_NEW_COMPONENT_PROMPT.md
+STEP 3: Follow 9 steps exactly
+STEP 4: Test in Live Editor
+STEP 5: Run through verification checklist
+```
+
+### **Task: Fix Broken Component "testimonials"**
+```
+STEP 1: Use @docs/important/components/FIX_COMPONENT_PROMPT.md
+STEP 2: Run 7 diagnostic layers
+STEP 3: Apply fixes in priority order
+STEP 4: Verify all fixes work
+STEP 5: Re-test in Live Editor
+```
+
+### **Task: Modify editorStore**
+```
+STEP 1: Read @docs/important/liveEditor/STATE_MANAGEMENT.md
+STEP 2: Understand current architecture
+STEP 3: Make changes following patterns
+STEP 4: Update all switch cases if needed
+STEP 5: Test all affected components
+STEP 6: Update docs if architecture changed
+```
+
+### **Task: Add Field to Component**
+```
+STEP 1: Update default data in {component}Functions.ts
+STEP 2: Add field to {component}.ts structure
+STEP 3: Use field in React component with mergedData
+STEP 4: Test in EditorSidebar
+STEP 5: Verify saves/loads correctly
+```
+
+---
+
+## 🎯 CONTEXT AWARENESS
+
+### **When User Says "fix component X":**
+```
+1. Ask which specific issue (or run full diagnostic)
+2. Reference: @docs/important/components/FIX_COMPONENT_PROMPT.md
+3. Execute: Diagnostic layers
+4. Apply: Fixes in priority order
+5. Report: Detailed results
+```
+
+### **When User Says "create component X":**
+```
+1. Ask for requirements (or use defaults)
+2. Reference: @docs/important/components/ADD_NEW_COMPONENT.md
+3. Use: ADD_NEW_COMPONENT_PROMPT.md templates
+4. Execute: All 9 steps
+5. Verify: Complete checklist
+```
+
+### **When User Says "update X":**
+```
+1. Read relevant documentation
+2. Understand current implementation
+3. Plan changes maintaining conventions
+4. Implement changes
+5. Update docs if needed
+```
+
+---
+
+## 🔄 AUTO-UPDATE PROTOCOL
+
+### **When Code Changes Are Made:**
+
+```typescript
+// AI CHECKLIST:
+
+1. DETECT what changed:
+   - Component files?
+   - Store structure?
+   - Integration points?
+   - Patterns/conventions?
+
+2. CHECK which docs are affected:
+   - Component docs?
+   - Architecture docs?
+   - Pattern docs?
+   - API reference?
+
+3. PROMPT user if docs need updating:
+   "I've changed [X]. The following docs may need updating:
+   - docs/important/[Y].md
+   - docs/important/[Z].md
+   
+   Should I update these docs to reflect the changes?"
+
+4. IF user confirms:
+   - Update relevant sections
+   - Update code examples
+   - Update diagrams if needed
+   - Add "Last Updated" date
+
+5. ALWAYS mention doc updates in completion message
+```
+
+---
+
+## 📊 FILE ORGANIZATION RULES
+
+### **Component Files:**
+```
+context-liveeditor/editorStoreFunctions/
+  └── {componentType}Functions.ts         ← 4 functions + default data
+
+componentsStructure/
+  └── {componentType}.ts                  ← Structure & fields
+
+components/tenant/{componentType}/
+  └── {componentType}1.tsx                ← React component
+```
+
+### **Store Files:**
+```
+context-liveeditor/
+  ├── editorStore.ts                      ← Main store
+  ├── tenantStore.jsx                     ← Tenant data
+  └── editorI18nStore.ts                  ← Translations
+```
+
+### **Integration Files:**
+```
+lib-liveeditor/
+  └── ComponentsList.tsx                  ← Component registry
+
+componentsStructure/
+  └── index.ts                            ← Export all structures
+
+context-liveeditor/editorStoreFunctions/
+  └── index.ts                            ← Export all functions
+```
+
+---
+
+## 🚀 PERFORMANCE RULES
+
+```typescript
+// ✅ DO:
+- Use React.memo for expensive components
+- Minimize store subscriptions
+- Use proper dependencies in useEffect
+- Implement proper cleanup
+
+// ❌ DON'T:
+- Subscribe to entire store unnecessarily
+- Create infinite render loops
+- Forget cleanup in useEffect
+- Mutate state directly
+```
+
+---
+
+## 🧪 TESTING REQUIREMENTS
+
+### **For Components:**
+```
+□ Appears in Live Editor component list
+□ Can drag and drop to canvas
+□ Renders without errors
+□ EditorSidebar opens and works
+□ All fields editable
+□ Changes update in real-time
+□ Data saves to database
+□ Data loads correctly from database
+□ Multiple instances work independently
+□ No console errors
+□ No TypeScript errors
+```
+
+### **For Store Changes:**
+```
+□ State updates correctly
+□ Re-renders triggered properly
+□ No infinite loops
+□ Data persists correctly
+□ No memory leaks
+□ Works with all components
+```
+
+---
+
+## 💬 COMMUNICATION STYLE
+
+When responding to user:
+
+```markdown
+✅ DO:
+- Reference specific documentation
+- Explain WHY following pattern
+- Show before/after comparisons
+- Provide verification steps
+- Mention if docs updated
+
+❌ DON'T:
+- Make changes without understanding docs
+- Break established patterns
+- Skip integration steps
+- Forget to update docs when needed
+- Ignore TypeScript errors
+```
+
+---
+
+## 🎓 LEARNING FROM EXAMPLES
+
+### **Good Examples to Study:**
+```
+components/tenant/hero/hero1.tsx          ← Perfect 7-step pattern
+context-liveeditor/editorStoreFunctions/heroFunctions.ts
+componentsStructure/hero.ts
+```
+
+### **Complex Examples:**
+```
+components/tenant/testimonials/testimonials1.tsx  ← Array handling
+context-liveeditor/editorStoreFunctions/contactCardsFunctions.ts  ← Extended functions
+```
+
+---
+
+## 🔗 QUICK LINKS
+
+```
+Component Creation:  docs/important/components/ADD_NEW_COMPONENT.md
+Component Repair:    docs/important/components/FIX_COMPONENT_PROMPT.md
+Architecture:        docs/important/liveEditor/COMPONENT_ARCHITECTURE.md
+State Management:    docs/important/liveEditor/STATE_MANAGEMENT.md
+Integration:         docs/important/liveEditor/context/COMPONENT_INTEGRATION.md
+All Docs Index:      docs/important/INDEX.md
+Maintenance Guide:   docs/important/MAINTENANCE_GUIDE.md
+```
+
+---
+
+## 🎯 PRIORITY RULES
+
+1. **CORRECTNESS** over speed
+2. **CONSISTENCY** over cleverness
+3. **DOCUMENTATION** is as important as code
+4. **PATTERNS** must be followed strictly
+5. **TESTING** is mandatory
+
+---
+
+## 📝 VERSION CONTROL
+
+```
+When committing changes:
+
+✅ Clear commit messages
+✅ Reference issue/task if applicable
+✅ Mention doc updates in commit
+✅ Group related changes together
+✅ Test before committing
+```
+
+---
+
+## 🎨 CODE STYLE
+
+```typescript
+// ✅ Follow existing patterns:
+- Use TypeScript properly (no any unless necessary)
+- Consistent naming (camelCase for vars, PascalCase for components)
+- Proper indentation (2 spaces)
+- Clear comments for complex logic
+- Organize imports (React → Next → External → Internal)
+
+// ❌ Don't:
+- Mix styles
+- Use inconsistent naming
+- Leave debug console.logs
+- Ignore linter warnings
+```
+
+---
+
+## 🔚 FINAL CHECKLIST
+
+Before saying "done" on any task:
+
+```
+□ Code works as expected
+□ Follows all patterns/conventions
+□ No TypeScript/linter errors
+□ No console errors
+□ Documentation updated (if needed)
+□ Tested thoroughly
+□ All integration points verified
+□ User informed of any doc updates
+```
+
+---
+
+## 📞 WHEN STUCK
+
+```
+1. Re-read relevant documentation
+2. Check similar existing implementations
+3. Look for patterns in codebase
+4. Ask user for clarification if needed
+5. Reference docs in your questions
+```
+
+---
+
+**REMEMBER:** 
+- Documentation is the **single source of truth**
+- Patterns exist for a **reason** - follow them
+- **Test thoroughly** - bugs are expensive
+- **Update docs** - future you will thank you
+
+---
+
+**END OF RULES**
+
+These rules ensure consistency, maintainability, and quality across the entire project.
+

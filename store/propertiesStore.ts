@@ -146,6 +146,7 @@ export const usePropertiesStore = create<PropertiesStore>()(
       },
 
       setSearch: (search) => {
+        console.log("🔍 [propertiesStore] setSearch called:", search);
         set({ search });
         // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
       },
@@ -161,6 +162,7 @@ export const usePropertiesStore = create<PropertiesStore>()(
       },
 
       setPropertyType: (type) => {
+        console.log("🏠 [propertiesStore] setPropertyType called:", type);
         set({ propertyType: type });
         // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
       },
@@ -171,6 +173,7 @@ export const usePropertiesStore = create<PropertiesStore>()(
       },
 
       setPrice: (price) => {
+        console.log("💰 [propertiesStore] setPrice called:", price);
         set({ price });
         // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
       },
@@ -247,6 +250,12 @@ export const usePropertiesStore = create<PropertiesStore>()(
           if (state.price) {
             params.append("max_price", state.price);
           }
+          if (state.search) {
+            params.append("search", state.search);
+          }
+          if (state.propertyType) {
+            params.append("type_id", state.propertyType);
+          }
 
           const url = `/v1/tenant-website/${tenantId}/properties?${params.toString()}`;
           
@@ -259,6 +268,7 @@ export const usePropertiesStore = create<PropertiesStore>()(
             cityId: state.cityId,
             district: state.district,
             search: state.search,
+            propertyType: state.propertyType,
             price: state.price,
             url: url
           });

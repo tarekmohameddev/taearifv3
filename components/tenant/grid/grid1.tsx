@@ -11,6 +11,7 @@ import Pagination from "@/components/ui/pagination";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import axiosInstance from "@/lib/axiosInstance";
+import { useUrlFilters } from "@/hooks-liveeditor/use-url-filters";
 
 interface PropertyGridProps {
   emptyMessage?: string;
@@ -38,9 +39,21 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   // Get current pathname
   const pathname = usePathname();
+  
+  // Debug: Log component mount and URL
+  useEffect(() => {
+    console.log("🏗️  Grid1 mounted! URL:", {
+      pathname,
+      windowSearch: typeof window !== "undefined" ? window.location.search : "N/A",
+      fullURL: typeof window !== "undefined" ? window.location.href : "N/A"
+    });
+  }, [pathname]);
 
   // Tenant ID hook
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+
+  // URL filters hook - automatically applies URL params when they change
+  useUrlFilters();
 
   // State for API data
   const [apiProperties, setApiProperties] = useState<any[]>([]);
@@ -91,6 +104,9 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       setTenantId(currentTenantId);
     }
   }, [currentTenantId, setTenantId]);
+
+  // Note: URL parameters are automatically applied by useUrlFilters hook
+  // The hook uses useEffect internally to watch searchParams changes
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore

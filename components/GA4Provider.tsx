@@ -44,13 +44,6 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
     // This prevents empty strings from being used
     const finalTenantId = (tenantId && tenantId.trim() !== '') ? tenantId : domainTenantId;
 
-    console.log('GA4Provider tracking:', {
-      tenantId,
-      domainTenantId,
-      finalTenantId,
-      pathname,
-      isInitialized,
-    });
 
     // Only track if we have a valid tenant ID (not empty, not null, not 'www')
     const isValidTenantId = finalTenantId && 

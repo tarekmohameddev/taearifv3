@@ -32,7 +32,6 @@ export const initDataLayer = () => {
         },
         tenant_id: tenantId,
       });
-      console.log(`GA4 tenant_id = ${tenantId}`);
     }
   }
 };

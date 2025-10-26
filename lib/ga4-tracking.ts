@@ -6,7 +6,7 @@ declare global {
   }
 }
 
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-RVFKM2F9ZN';
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_ID || 'G-RVFKM2F9ZN';
 
 /**
  * Initialize GA4

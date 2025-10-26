@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { usePropertiesStore } from "@/store/propertiesStore";
 
 const propertyTypes = [
   "مزرعة",
@@ -31,11 +32,14 @@ export default function PropertyFilter({
   const searchParams = useSearchParams();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Get store actions to update filters
+  const { setSearch: setStoreSearch, setPropertyType: setStorePropertyType, setPrice: setStorePrice, fetchProperties } = usePropertiesStore();
+
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [propertyType, setPropertyType] = useState(
     searchParams.get("type_id") || "",
   );
-  const [price, setPrice] = useState(searchParams.get("price") || "");
+  const [price, setPrice] = useState(searchParams.get("max_price") || searchParams.get("price") || "");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [filteredTypes, setFilteredTypes] = useState(propertyTypes);
 
@@ -77,19 +81,27 @@ export default function PropertyFilter({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Update store with filter values
+    if (search) setStoreSearch(search);
+    if (propertyType) setStorePropertyType(propertyType);
+    if (price) setStorePrice(price);
+
     const params = new URLSearchParams();
 
     if (search) params.set("search", search);
     if (propertyType) params.set("type_id", propertyType);
-    if (price) params.set("price", price);
-    params.set("transactionType", transactionType);
+    if (price) params.set("max_price", price);
 
     const queryString = params.toString();
     const url = queryString ? `?${queryString}` : "";
 
+    // Update URL
     router.push(
       `/${transactionType === "rent" ? "for-rent" : "for-sale"}${url}`,
     );
+
+    // Trigger property fetch with new filters
+    fetchProperties(1);
   };
 
   const handleTypeSelect = (type: string) => {

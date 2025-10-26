@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { getDefaultHeroData } from "@/context-liveeditor/editorStoreFunctions/heroFunctions";
+import HeroSearchForm from "./HeroSearchForm";
 
 interface HeroProps {
   visible?: boolean;
@@ -826,23 +827,23 @@ const Hero1 = (props: HeroProps = {}) => {
             </p>
           </div>
 
-          {/* Search Form for Mobile */}
+          {/* Hero Search Form for Mobile */}
           {mergedData.searchForm?.enabled && (
-            <div className="w-full max-w-md px-4 pb-8">
-              <SearchForm config={mergedData.searchForm} />
+            <div className="w-full max-w-2xl px-4 pb-8">
+              <HeroSearchForm config={mergedData.searchForm} />
             </div>
           )}
         </div>
       </div>
 
-      {/* Search Form for Desktop/Tablet */}
+      {/* Hero Search Form for Desktop/Tablet */}
       {mergedData.searchForm?.enabled && (
         <div
           className={cn(
             "pointer-events-auto absolute inset-x-0 z-10 mx-auto px-4 sm:px-6 lg:px-8 bottom-32 max-w-[1600px] hidden md:block",
           )}
         >
-          <SearchForm config={mergedData.searchForm} />
+          <HeroSearchForm config={mergedData.searchForm} />
         </div>
       )}
     </section>

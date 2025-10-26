@@ -34,6 +34,22 @@ All pages (except special cases) must have a locale prefix:
 - `/` → redirects to `/ar/`
 - `/about-us` → redirects to `/ar/about-us`
 
+### ⚠️ Important: Query Parameters Preservation
+
+**As of October 26, 2025**, the middleware has been updated to **preserve query parameters** during locale redirects.
+
+**Before Fix (Bug):**
+```
+/for-rent?purpose=rent&search=الرياض → /ar/for-rent  ❌ (params lost!)
+```
+
+**After Fix:**
+```
+/for-rent?purpose=rent&search=الرياض → /ar/for-rent?purpose=rent&search=الرياض  ✅
+```
+
+**Implementation:** See `middleware.ts` line 329-331
+
 ---
 
 ## Middleware Locale Processing
@@ -74,25 +90,37 @@ if (!pathnameHasLocale) {
   const shouldRedirect = true;
   
   if (shouldRedirect) {
-    const newUrl = new URL(`/${locale}${pathname}`, request.url);
+    // IMPORTANT: Preserve query parameters during redirect
+    const searchParams = request.nextUrl.search; // Get ?key=value
+    const newUrl = new URL(`/${locale}${pathname}${searchParams}`, request.url);
     return NextResponse.redirect(newUrl);
   }
 }
 ```
 
+**⚠️ Critical Update (October 26, 2025):**
+
+The middleware now **preserves query parameters** during locale redirects. This is essential for:
+- URL-based filtering (e.g., `/for-rent?city_id=5&max_price=5000`)
+- Shareable search URLs
+- Deep linking with parameters
+- Property listing filters
+
 **Flow:**
 ```
-User visits: /dashboard
+User visits: /for-rent?purpose=rent&search=الرياض
   ↓
 Middleware detects: No locale prefix
   ↓
-Creates redirect URL: /ar/dashboard
+Extracts query params: ?purpose=rent&search=الرياض
   ↓
-NextResponse.redirect(new URL("/ar/dashboard"))
+Creates redirect URL: /ar/for-rent?purpose=rent&search=الرياض
   ↓
-Browser redirects (URL changes in browser)
+NextResponse.redirect(newUrl)
   ↓
-New request: /ar/dashboard
+Browser redirects with params preserved ✓
+  ↓
+New request: /ar/for-rent?purpose=rent&search=الرياض
   ↓
 Middleware detects: Has locale prefix
   ↓
@@ -962,6 +990,17 @@ console.log("x-locale header:", headersList.get("x-locale"));
 **Cause:** I18nProvider not wrapping component, or locale not extracted from URL
 **Solution:** 
 - Ensure I18nProvider wraps components
+
+#### Issue 4: "Query parameters lost after redirect" (FIXED October 26, 2025)
+**Cause:** Middleware was not preserving `request.nextUrl.search` during locale redirect
+**Solution Applied:** 
+```typescript
+// In middleware.ts line 329-331
+const searchParams = request.nextUrl.search; // Preserve params
+const newUrl = new URL(`/${locale}${pathname}${searchParams}`, request.url);
+return NextResponse.redirect(newUrl);
+```
+**Impact:** URL filtering, shareable links, and deep linking now work correctly
 - Check `useClientI18n()` hook returns correct locale
 
 #### Issue 4: "Links lose locale prefix"

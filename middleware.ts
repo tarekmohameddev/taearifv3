@@ -326,10 +326,13 @@ export function middleware(request: NextRequest) {
     });
 
     if (shouldRedirect) {
-      const newUrl = new URL(`/${locale}${pathname}`, request.url);
+      // Preserve query parameters during locale redirect
+      const searchParams = request.nextUrl.search; // Get ?key=value
+      const newUrl = new URL(`/${locale}${pathname}${searchParams}`, request.url);
       console.log("🔄 Middleware Debug - Redirecting:", {
         from: request.url,
-        to: newUrl.toString()
+        to: newUrl.toString(),
+        preservedParams: searchParams
       });
       return NextResponse.redirect(newUrl);
     }
