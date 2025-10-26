@@ -187,11 +187,25 @@ export default function PropertyFilter({
         actualTenantId
       ) {
         // جلب البيانات من API
-        const apiUrl = actualPropertyTypesApiUrl.replace(
+        let apiUrl = actualPropertyTypesApiUrl.replace(
           /\{[^}]*\}/g,
           actualTenantId,
         );
 
+        // Use backend URL from environment variable
+        const backendUrl = process.env.NEXT_PUBLIC_Backend_URL || "https://api.taearif.com/api";
+        
+        // Extract path after /api from the original URL
+        // Example: https://taearif.com/api/v1/tenant-website/kkkkk/properties/categories/direct
+        // Becomes: /v1/tenant-website/kkkkk/properties/categories/direct
+        const apiMatch = apiUrl.match(/\/api(\/.*)/);
+        
+        if (apiMatch && apiMatch[1]) {
+          // Construct new URL: backend URL + path
+          apiUrl = backendUrl + apiMatch[1];
+        }
+
+        console.log("🔗 Property Types API URL:", apiUrl);
         const response = await fetch(apiUrl);
 
         if (!response.ok) {
