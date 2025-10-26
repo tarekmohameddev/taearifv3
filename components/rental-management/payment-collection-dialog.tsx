@@ -1390,11 +1390,11 @@ export function PaymentCollectionDialog() {
                         </div>
                         <div className="mt-2">
                           <img
-                            src={`https://taearif.com/${receiptImagePath}`}
+                            src={`${process.env.NEXT_PUBLIC_Backend_URLWithOutApi}/${receiptImagePath}`}
                             alt="صورة الإيصال"
                             className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
                             onClick={() => {
-                              const fullImageUrl = `https://taearif.com/${receiptImagePath}`;
+                              const fullImageUrl = `${process.env.NEXT_PUBLIC_Backend_URLWithOutApi}/${receiptImagePath}`;
                               window.open(fullImageUrl, "_blank");
                             }}
                             onError={(e) => {
@@ -1404,7 +1404,7 @@ export function PaymentCollectionDialog() {
                               );
                               console.error(
                                 "Full image URL:",
-                                `https://taearif.com/${receiptImagePath}`,
+                                `${process.env.NEXT_PUBLIC_Backend_URLWithOutApi}/${receiptImagePath}`,
                               );
                               // في حالة فشل تحميل الصورة، إعادة تعيين المسار
                               setReceiptImagePath("");

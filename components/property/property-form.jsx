@@ -961,7 +961,7 @@ export default function PropertyForm({ mode }) {
           );
           thumbnailPath =
             mode === "add"
-              ? uploadedFile.path.replace("https://taearif.com", "")
+              ? uploadedFile.path.replace(process.env.NEXT_PUBLIC_Backend_URLWithOutApi, "")
               : uploadedFile.url;
         }
 
@@ -973,7 +973,7 @@ export default function PropertyForm({ mode }) {
           galleryPaths =
             mode === "add"
               ? uploadedFiles.map((f) =>
-                  f.path.replace("https://taearif.com", ""),
+                  f.path.replace(process.env.NEXT_PUBLIC_Backend_URLWithOutApi, ""),
                 )
               : uploadedFiles.map((f) => f.url);
         }
@@ -986,7 +986,7 @@ export default function PropertyForm({ mode }) {
           floorPlansPaths =
             mode === "add"
               ? uploadedFiles.map((f) =>
-                  f.path.replace("https://taearif.com", ""),
+                  f.path.replace(process.env.NEXT_PUBLIC_Backend_URLWithOutApi, ""),
                 )
               : uploadedFiles.map((f) => f.url);
         }
