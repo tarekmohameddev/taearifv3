@@ -97,6 +97,7 @@ type ProjectImage = {
 };
 
 export default function EditProjectPage(): JSX.Element {
+  const { userData } = useAuthStore();
   const {
     projectsManagement: { projects, loading, isInitialized },
     setProjectsManagement,
@@ -525,7 +526,7 @@ export default function EditProjectPage(): JSX.Element {
 
       let featuredImagePath = "";
       if (thumbnailImage) {
-        if (!thumbnailImage.url.startsWith("https://taearif.com/")) {
+        if (!thumbnailImage.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi)) {
           const uploadResult = await uploadSingleFile(
             thumbnailImage.file,
             "project",
@@ -538,11 +539,11 @@ export default function EditProjectPage(): JSX.Element {
 
       // رفع صور المخططات الجديدة فقط
       let floorplanPaths = planImages
-        .filter((img) => img.url.startsWith("https://taearif.com/"))
+        .filter((img) => img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi))
         .map((img) => img.url);
 
       const newPlanImages = planImages.filter(
-        (img) => !img.url.startsWith("https://taearif.com/"),
+        (img) => !img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi),
       );
       if (newPlanImages.length > 0) {
         const files = newPlanImages.map((image) => image.file);
@@ -558,11 +559,11 @@ export default function EditProjectPage(): JSX.Element {
 
       // رفع صور المعرض الجديدة فقط
       let galleryPaths = galleryImages
-        .filter((img) => img.url.startsWith("https://taearif.com/"))
+        .filter((img) => img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi))
         .map((img) => img.url);
 
       const newGalleryImages = galleryImages.filter(
-        (img) => !img.url.startsWith("https://taearif.com/"),
+        (img) => !img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi),
       );
       if (newGalleryImages.length > 0) {
         const files = newGalleryImages.map((image) => image.file);
