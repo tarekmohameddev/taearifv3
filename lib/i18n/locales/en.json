@@ -42,6 +42,8 @@
     "desktop_view": "Desktop View",
     "live_preview": "Live Preview",
     "publish": "Publish",
+    "dashboard": "Dashboard",
+    "back_to_dashboard": "Back to Dashboard",
     "unpublish": "Unpublish",
     "preview_mode": "Preview Mode",
     "edit_mode": "Edit Mode",

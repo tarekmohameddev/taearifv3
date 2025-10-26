@@ -42,6 +42,8 @@
     "desktop_view": "عرض سطح المكتب",
     "live_preview": "المعاينة المباشرة",
     "publish": "نشر",
+    "dashboard": "لوحة التحكم",
+    "back_to_dashboard": "العودة إلى لوحة التحكم",
     "unpublish": "إلغاء النشر",
     "preview_mode": "وضع المعاينة",
     "edit_mode": "وضع التعديل",

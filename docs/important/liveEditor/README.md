@@ -60,6 +60,7 @@ The documentation is organized into focused files for easier navigation and unde
 - Main components summary
 - Technology stack
 - Typical user flows
+- **Navigation and Layout** (EditorNavBar with Back to Dashboard button)
 - File organization
 
 **Read this** to understand what the Live Editor is and how it works at a conceptual level.

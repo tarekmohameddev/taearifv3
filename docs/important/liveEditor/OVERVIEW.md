@@ -676,9 +676,56 @@ export const heroFunctions = {
 
 ---
 
+## Navigation and Layout
+
+### Layout Structure
+The Live Editor uses a layout wrapper (`app/live-editor/layout.tsx`) that provides:
+
+#### EditorNavBar Component
+Main navigation bar with responsive design:
+
+**Desktop View (≥ 768px)**:
+- **Back to Dashboard Button**: Located at the far left, provides navigation back to `/dashboard`
+  - Icon: Left arrow with smooth hover animation
+  - Text: Localized "Dashboard" label
+  - Hover effect: Arrow slides left on hover
+- **Editor Title**: "Live Website Editor" with tenant ID
+- **Pages Navigation**: Either dropdown (5+ pages) or inline links (< 5 pages)
+- **Action Buttons**: Save Changes, Add Page, Preview, Live Preview, Language Switcher
+
+**Mobile View (< 768px)**:
+- **Row 1**: 
+  - Back to Dashboard button (left)
+  - Editor Title (center)
+  - Spacer for balance (right)
+- **Row 2**: 
+  - Pages dropdown
+  - Save button
+  - Language switcher
+  - Actions dropdown menu
+
+**Features**:
+- Fully responsive across all breakpoints
+- Multilingual support (AR/EN) via i18n
+- Sticky positioning (`sticky top-0 z-[51]`)
+- Visual feedback for unsaved changes (pulsing Save button)
+- Smooth transitions and hover effects
+
+**Translation Keys**:
+- `editor.title`: "Live Website Editor" / "محرر الموقع المباشر"
+- `editor.dashboard`: "Dashboard" / "لوحة التحكم"
+- `editor.back_to_dashboard`: "Back to Dashboard" / "العودة إلى لوحة التحكم"
+- `editor.save_changes`: "Save Changes" / "حفظ التغييرات"
+- `editor.add_page`: "Add Page" / "إضافة صفحة"
+
+---
+
 ## File Organization
 
 ```
+app/live-editor/
+└── layout.tsx                        # Main layout wrapper with navigation
+
 components/tenant/live-editor/
 ├── LiveEditor.tsx                    # Main orchestrator
 ├── LiveEditorUI.tsx                  # UI rendering

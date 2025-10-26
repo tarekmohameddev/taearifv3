@@ -1987,6 +1987,29 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
         {/* Desktop Layout - Single Row */}
         <div className="hidden md:flex justify-between h-16">
           <div className="flex">
+            {/* Back to Dashboard Button */}
+            <Link
+              href="/dashboard"
+              className="flex-shrink-0 flex items-center px-3 py-2 mr-4 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
+            >
+              <svg
+                className="w-5 h-5 group-hover:transform group-hover:-translate-x-1 transition-transform duration-200"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              <span className="mx-2 font-medium text-xs">
+                {t("editor.dashboard")}
+              </span>
+            </Link>
+            
             <div className="flex-shrink-0 flex items-center">
               <h1 className="text-xl font-bold text-gray-900">
                 {t("editor.title")}
@@ -2442,9 +2465,31 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
 
         {/* Mobile Layout - Two Rows for screens < 820px */}
         <div className="md:hidden">
-          {/* First Row - Title */}
-          <div className="flex items-center justify-center py-3">
-            <div className="flex-shrink-0 flex items-center pb-2 relative">
+          {/* First Row - Title with Back Button */}
+          <div className="flex items-center justify-between py-3 px-2">
+            {/* Back to Dashboard Button - Mobile */}
+            <Link
+              href="/dashboard"
+              className="flex items-center px-2 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
+            >
+              <span className="ml-2 font-medium text-xs">t("editor.back_to_dashboard")</span>
+              <svg
+                className="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+            </Link>
+
+            {/* Title - Centered */}
+            <div className="flex-1 flex justify-center items-center pb-2 relative">
               <h1 className="text-lg font-bold text-gray-900">
                 {t("editor.title")}
               </h1>
@@ -2452,6 +2497,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               {/* Custom border width - يمكن تعديل العرض هنا */}
               <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[400px] h-px bg-gray-200"></div>
             </div>
+
+            {/* Spacer to balance the back button */}
+            <div className="w-9"></div>
           </div>
 
           {/* Second Row - Navigation and Actions */}
