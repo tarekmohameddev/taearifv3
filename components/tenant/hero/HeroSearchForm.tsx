@@ -212,7 +212,7 @@ export default function HeroSearchForm({ config }: HeroSearchFormProps) {
         {config.fields?.city?.enabled && (
           <div className="relative" ref={cityDropdownRef}>
             <div 
-              className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 cursor-pointer bg-white hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 bg-white cursor-pointer hover:bg-gray-50 transition-colors h-[50px]"
               onClick={() => setIsCityOpen(!isCityOpen)}
             >
               <MapPin className="size-5 text-gray-400" />
@@ -250,7 +250,7 @@ export default function HeroSearchForm({ config }: HeroSearchFormProps) {
         {/* District Dropdown (always visible, disabled when no city selected) */}
         <div className="relative" ref={districtDropdownRef}>
           <div 
-            className={`flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 bg-white transition-colors ${
+            className={`flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 bg-white transition-colors h-[50px] ${
               !cityId 
                 ? 'opacity-50 cursor-not-allowed' 
                 : 'cursor-pointer hover:bg-gray-50'
@@ -291,7 +291,7 @@ export default function HeroSearchForm({ config }: HeroSearchFormProps) {
 
         {/* Price Input */}
         {config.fields?.price?.enabled && (
-          <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 bg-white">
+          <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 bg-white h-[50px]">
             <CircleDollarSign className="size-5 text-gray-400" />
             <Input
               type="number"
