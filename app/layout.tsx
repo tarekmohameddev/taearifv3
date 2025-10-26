@@ -2,7 +2,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "@/app/globals.css";
 import ClientLayout from "./ClientLayout";
 import { Toaster } from "react-hot-toast";
-import { DynamicReCaptcha } from "@/components/DynamicReCaptcha";
+import { ClientReCaptchaLoader } from "./ClientReCaptchaLoader";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Script from "next/script";
@@ -56,61 +56,12 @@ export default async function RootLayout({
     "/landing",
   ];
 
-  // تحديد الصفحات التي يجب أن تظهر فيها ReCaptcha
-  const recaptchaPages = [
-    "/dashboard/affiliate",
-    "/dashboard/analytics",
-    "/dashboard/apps",
-    "/dashboard/blog",
-    "/dashboard/blogs",
-    "/dashboard/content",
-    "/dashboard/crm",
-    "/dashboard/customers",
-    "/dashboard/forgot-password",
-    "/dashboard/marketing",
-    "/dashboard/messages",
-    "/dashboard/projects",
-    "/dashboard/properties",
-    "/dashboard/property-requests",
-    "/dashboard/purchase-management",
-    "/dashboard/rental-management",
-    "/dashboard/reset",
-    "/dashboard/settings",
-    "/dashboard/templates",
-    "/dashboard/whatsapp-ai",
-    "/dashboard",
-    "/register",
-    "/login",
-    "/live-editor",
-    "/oauth/token/success",
-    "/oauth/social/extra-info",
-    "/onboarding",
-  ];
-
   // التحقق من أن الصفحة مسموح بها وليس هناك subdomain
   const shouldLoadAnalytics =
     !tenantId &&
     allowedPages.some(
       (page) => pathname === page || pathname.startsWith(page + "/"),
     );
-
-  // التحقق من أن الصفحة تحتاج ReCaptcha (مع مراعاة locale)
-  const shouldLoadReCaptcha = recaptchaPages.some((page) => {
-    // التحقق من المسار المباشر
-    if (pathname === page || pathname.startsWith(page + "/")) {
-      return true;
-    }
-    // التحقق من المسارات مع locale (مثل /en/live-editor, /ar/dashboard)
-    const localePattern = /^\/(en|ar)\/(.+)$/;
-    const match = pathname.match(localePattern);
-    if (match) {
-      const [, , pathWithoutLocale] = match;
-      return (
-        pathWithoutLocale === page || pathWithoutLocale.startsWith(page + "/")
-      );
-    }
-    return false;
-  });
 
   return (
     <html lang="ar" dir={dir} className="light" suppressHydrationWarning>
@@ -187,13 +138,9 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          {shouldLoadReCaptcha ? (
-            <DynamicReCaptcha>
-              <ClientLayout>{children}</ClientLayout>
-            </DynamicReCaptcha>
-          ) : (
+          <ClientReCaptchaLoader>
             <ClientLayout>{children}</ClientLayout>
-          )}
+          </ClientReCaptchaLoader>
         </ThemeProvider>
       </body>
     </html>

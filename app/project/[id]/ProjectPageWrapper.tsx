@@ -1,3 +1,4 @@
+// app\project\[id]\ProjectPageWrapper.tsx
 "use client";
 
 import { useEffect } from "react";
