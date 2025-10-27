@@ -84,7 +84,7 @@ export function AffiliateDashboardPage() {
   const affiliateData = {
     referralCode: dashboardData?.referral_code,
     affiliateLink: dashboardData?.referral_code
-      ? `https://taearif.vercel.app/register?ref=${dashboardData.referral_code}`
+      ? `https://taearif.com/register?ref=${dashboardData.referral_code}`
       : "-",
   };
   const currentBalance = {
