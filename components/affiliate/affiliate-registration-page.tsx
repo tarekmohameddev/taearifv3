@@ -53,7 +53,7 @@ export function AffiliateRegistrationPage() {
 
   useEffect(() => {
     if (data) {
-      router.push("/affiliate/dashboard");
+      router.push("/dashboard/affiliate/dashboard");
     }
   }, [data, router]);
 
@@ -142,7 +142,7 @@ export function AffiliateRegistrationPage() {
       if (res?.data?.status === "success") {
         toast.success("تم التسجيل بنجاح! سيتم تحويلك للصفحة الان.");
         setTimeout(() => {
-          router.push("/affiliate/dashboard");
+          router.push("/dashboard/affiliate/dashboard");
         }, 2000);
 
         setIsFormDisabled(true);
