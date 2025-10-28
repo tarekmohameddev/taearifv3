@@ -99,6 +99,7 @@ export function ClientReCaptchaLoader({ children }: ClientReCaptchaLoaderProps) 
     "/onboarding",
     "/forgot-password",
     "/landing",
+    "/get-started",
   ];
   
   // Determine if current page needs reCAPTCHA
@@ -172,6 +173,8 @@ const shouldLoadReCaptcha = useMemo(() => {
 - `/login` → shouldLoadReCaptcha = `true`
 - `/ar/login` → shouldLoadReCaptcha = `true` ✓ (locale removed)
 - `/en/register` → shouldLoadReCaptcha = `true` ✓
+- `/get-started` → shouldLoadReCaptcha = `true`
+- `/ar/get-started` → shouldLoadReCaptcha = `true` ✓ (locale removed)
 - `/dashboard/analytics` → shouldLoadReCaptcha = `true`
 - `/ar/dashboard/settings` → shouldLoadReCaptcha = `true` ✓
 - `/about-us` → shouldLoadReCaptcha = `false`
@@ -552,6 +555,9 @@ const token = await executeRecaptcha("reset_password");
 
 // Landing Page Register
 const token = await executeRecaptcha("register");
+
+// Get Started Page (Event Registration)
+const token = await executeRecaptcha("get_started_registration");
 ```
 
 **Why unique names?**
@@ -952,6 +958,122 @@ export function LandingPage() {
 }
 ```
 
+### Example 7: Get Started Event Registration Page
+
+**File: `components/getStartedPage/getStartedPage.tsx`**
+
+```typescript
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+
+export default function GetStartedPage() {
+  const { executeRecaptcha } = useGoogleReCaptcha();
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
+
+  // Monitor reCAPTCHA readiness with retry mechanism
+  useEffect(() => {
+    let retryCount = 0;
+    const maxRetries = 10;
+    
+    const checkRecaptcha = () => {
+      if (executeRecaptcha) {
+        setRecaptchaReady(true);
+        return true;
+      }
+      return false;
+    };
+
+    if (checkRecaptcha()) return;
+
+    const interval = setInterval(() => {
+      retryCount++;
+      
+      if (checkRecaptcha()) {
+        clearInterval(interval);
+      } else if (retryCount >= maxRetries) {
+        clearInterval(interval);
+        console.warn('reCAPTCHA failed to load after multiple retries');
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [executeRecaptcha]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Check if reCAPTCHA is available
+    if (!executeRecaptcha) {
+      setMessage('reCAPTCHA غير متاح بعد. يرجى الانتظار قليلاً والمحاولة مرة أخرى.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Execute reCAPTCHA with unique action name
+      const recaptchaToken = await executeRecaptcha('get_started_registration');
+
+      // Send request with token
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_Backend_URL}/isthara`,
+        {
+          name,
+          phone,
+          event: 'معرض بروبتك للتقنيات العقارية',
+          timestamp: new Date().toISOString(),
+          recaptcha_token: recaptchaToken
+        }
+      );
+
+      // Check for success: either response.data.success or 2xx status code
+      if (response.data.success || (response.status >= 200 && response.status < 300)) {
+        setMessage('تم التسجيل بنجاح! شكراً لك');
+        setName('');
+        setPhone('');
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error;
+        
+        if (errorMessage && /recaptcha/i.test(errorMessage)) {
+          setMessage('فشل التحقق الأمني. يرجى إعادة المحاولة أو تحديث الصفحة.');
+        } else {
+          setMessage(errorMessage || 'حدث خطأ، الرجاء المحاولة مرة أخرى');
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Show loading indicator if reCAPTCHA not ready */}
+      {!recaptchaReady && (
+        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <span>جاري تحميل التحقق الأمني...</span>
+        </div>
+      )}
+
+      {/* Input fields */}
+      
+      <button 
+        type="submit" 
+        disabled={loading || !recaptchaReady}
+      >
+        {loading ? 'جارٍ التسجيل...' : !recaptchaReady ? 'جاري التحميل...' : 'تسجيل'}
+      </button>
+    </form>
+  );
+}
+```
+
+**Key Points:**
+1. **Event-specific registration** - Used for PropTech exhibition
+2. **Status code handling** - Checks both `success` flag and 2xx status codes (200, 201)
+3. **Readiness monitoring** - 10 retries over 5 seconds
+4. **UI feedback** - Loading indicator and disabled button state
+5. **Error handling** - Specific messages for reCAPTCHA failures
+
 ---
 
 ## Backend API Integration
@@ -995,6 +1117,17 @@ POST /api/auth/verify-reset-code
   "code": "123456",
   "new_password": "newpass123",
   "new_password_confirmation": "newpass123",
+  "recaptcha_token": "03AGdBq24..."
+}
+```
+
+```json
+POST /api/isthara
+{
+  "name": "محمد أحمد",
+  "phone": "0512345678",
+  "event": "معرض بروبتك للتقنيات العقارية",
+  "timestamp": "2024-01-15T10:30:00.000Z",
   "recaptcha_token": "03AGdBq24..."
 }
 ```
@@ -1124,6 +1257,7 @@ const handleSubmit = async () => {
 | `/login` | `"login"` | ClientReCaptchaLoader + Fallback | Retry mechanism |
 | `/register` | `"register"` | ClientReCaptchaLoader | Basic implementation |
 | `/landing` | `"register"` | ClientReCaptchaLoader | Landing page registration form |
+| `/get-started` | `"get_started_registration"` | ClientReCaptchaLoader | Event registration form (PropTech exhibition) |
 | `/forgot-password` | `"forgot_password"` | ClientReCaptchaLoader | Used twice (send + resend) |
 | `/oauth/social/extra-info` | `"google_register"` | ClientReCaptchaLoader | Completes Google OAuth |
 | `/dashboard/*` | Various | ClientReCaptchaLoader | All dashboard pages |
@@ -1514,6 +1648,33 @@ try {
 </Button>
 ```
 
+### 6. Check Both Success Flag and Status Code
+
+```typescript
+// ✅ GOOD - Handles both success patterns
+if (response.data.success || (response.status >= 200 && response.status < 300)) {
+  // Success! Handle both:
+  // - APIs that return { success: true }
+  // - APIs that just return 2xx status (200, 201, etc.)
+}
+
+// ❌ BAD - Only checks success flag
+if (response.data.success) {
+  // Fails when API returns 201 without success flag
+}
+
+// ❌ BAD - Only checks status code
+if (response.status === 200) {
+  // Fails when API returns 201 or 204
+}
+```
+
+**Why Both?**
+- Different APIs have different response patterns
+- Some return `{ success: true }` with 200
+- Others just return 201 Created without body
+- Checking both ensures compatibility
+
 ---
 
 ## Debugging reCAPTCHA Issues
@@ -1737,13 +1898,14 @@ scriptProps={{
 - `/login` - Login page
 - `/register` - Registration page
 - `/landing` - Landing page with registration form
+- `/get-started` - Event registration page (PropTech exhibition)
 - `/forgot-password` - Standalone password reset
 - `/live-editor` - Live editor
 - `/oauth/token/success` - OAuth success callback
 - `/oauth/social/extra-info` - Google OAuth extra info
 - `/onboarding` - User onboarding
 
-**Total: 29 pages** with reCAPTCHA protection
+**Total: 30 pages** with reCAPTCHA protection
 
 **NOT loaded on these pages:**
 - `/` - Homepage (Taearif landing)
@@ -1762,6 +1924,7 @@ scriptProps={{
 | `google_register` | Google OAuth completion | OAuth account creation |
 | `forgot_password` | Forgot password page | Password reset request |
 | `reset_password` | Reset password page | Password reset confirmation |
+| `get_started_registration` | Get Started page | Event registration (PropTech exhibition) |
 
 ### Key Components
 
