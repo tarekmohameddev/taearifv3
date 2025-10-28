@@ -49,16 +49,50 @@ const getTenantIdFromCurrentDomain = (): string | null => {
   const localDomain = new URL(apiUrl).hostname;
   const currentDomain = window.location.hostname;
 
+  // قائمة الكلمات المحجوزة التي لا يجب أن تكون tenantId
+  const reservedWords = [
+    "www",
+    "api",
+    "admin",
+    "app",
+    "mail",
+    "ftp",
+    "blog",
+    "shop",
+    "store",
+    "dashboard",
+    "live-editor",
+    "auth",
+    "login",
+    "register",
+  ];
+
   // For production: tenant1.taearif.com -> tenant1
   if (!isDevelopment && currentDomain.endsWith(`.${productionDomain}`)) {
-    return currentDomain.replace(`.${productionDomain}`, "");
+    const subdomain = currentDomain.replace(`.${productionDomain}`, "");
+    
+    // ✅ تحقق من أن subdomain ليس من الكلمات المحجوزة
+    if (!subdomain || subdomain.trim() === '' || reservedWords.includes(subdomain.toLowerCase())) {
+      console.warn('⚠️ GTM: Invalid subdomain (reserved word or empty):', subdomain);
+      return null;
+    }
+    
+    return subdomain;
   }
 
   // For development: tenant1.localhost -> tenant1
   if (isDevelopment && currentDomain.includes(localDomain)) {
     const parts = currentDomain.split(".");
     if (parts.length > 1 && parts[0] !== localDomain) {
-      return parts[0];
+      const subdomain = parts[0];
+      
+      // ✅ تحقق من أن subdomain ليس من الكلمات المحجوزة
+      if (!subdomain || subdomain.trim() === '' || reservedWords.includes(subdomain.toLowerCase())) {
+        console.warn('⚠️ GTM: Invalid subdomain (reserved word or empty):', subdomain);
+        return null;
+      }
+      
+      return subdomain;
     }
   }
 
