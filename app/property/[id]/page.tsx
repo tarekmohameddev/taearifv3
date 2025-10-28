@@ -96,7 +96,7 @@ export default async function PropertyPage({
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
+  const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
 
-
-  return <PropertyPageWrapper tenantId={tenantId} propertySlug={params.id} />;
+  return <PropertyPageWrapper tenantId={tenantId} domainType={domainType} propertySlug={params.id} />;
 }

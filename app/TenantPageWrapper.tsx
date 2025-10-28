@@ -278,7 +278,7 @@ export default function TenantPageWrapper({
 
   return (
     <GTMProvider>
-      <GA4Provider tenantId={tenantId}>
+      <GA4Provider tenantId={tenantId} domainType={domainType}>
         <I18nProvider>
           <div className="min-h-screen flex flex-col" dir="rtl">
             {/* Header with i18n support */}

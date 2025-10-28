@@ -96,6 +96,7 @@ export default async function ProjectPage({
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
+  const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
 
-  return <ProjectPageWrapper tenantId={tenantId} projectSlug={params.id} />;
+  return <ProjectPageWrapper tenantId={tenantId} domainType={domainType} projectSlug={params.id} />;
 }

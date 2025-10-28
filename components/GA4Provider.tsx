@@ -7,15 +7,20 @@ import {
   trackPageView,
   setTenantContext,
 } from "@/lib/ga4-tracking";
+import useTenantStore from "@/context-liveeditor/tenantStore";
 
 interface GA4ProviderProps {
   tenantId: string | null;
+  domainType?: "subdomain" | "custom" | null;
   children: React.ReactNode;
 }
 
-export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
+export default function GA4Provider({ tenantId, domainType, children }: GA4ProviderProps) {
   const pathname = usePathname();
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // الحصول على username من tenantStore (للـ custom domains)
+  const tenantData = useTenantStore((s) => s.tenantData);
 
   // Initialize GA4 only once
   useEffect(() => {
@@ -42,8 +47,13 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
     
     // Use tenantId if it's a valid string, otherwise use domainTenantId
     // This prevents empty strings from being used
-    const finalTenantId = (tenantId && tenantId.trim() !== '') ? tenantId : domainTenantId;
+    let finalTenantId = (tenantId && tenantId.trim() !== '') ? tenantId : domainTenantId;
 
+    // ✅ للـ custom domains: استخدم username من API بدلاً من domain
+    if (domainType === 'custom' && tenantData?.username) {
+      finalTenantId = tenantData.username;
+      console.log('🌐 GA4: Using username from API for custom domain:', finalTenantId);
+    }
 
     // Only track if we have a valid tenant ID (not empty, not null, not 'www')
     const isValidTenantId = finalTenantId && 
@@ -65,9 +75,11 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
         pathname,
         isInitialized,
         isValidTenantId,
+        domainType,
+        tenantDataUsername: tenantData?.username,
       });
     }
-  }, [tenantId, pathname, isInitialized]);
+  }, [tenantId, pathname, isInitialized, domainType, tenantData?.username]);
 
   return <>{children}</>;
 }
@@ -104,6 +116,14 @@ const shouldTrackDomain = (domain: string): boolean => {
     isDevelopment &&
     (domain === localDomain || domain.includes(localDomain))
   ) {
+    return true;
+  }
+
+  // ✅ Track custom domains (any domain that's not the base domain)
+  // Custom domains like: liraksa.com, mybusiness.net, etc.
+  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(domain);
+  if (isCustomDomain) {
+    console.log('Tracking custom domain:', domain);
     return true;
   }
 

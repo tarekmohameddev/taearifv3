@@ -13,11 +13,13 @@ import { trackPropertyView } from "@/lib/ga4-tracking";
 
 interface PropertyPageWrapperProps {
   tenantId: string | null;
+  domainType?: "subdomain" | "custom" | null;
   propertySlug: string;
 }
 
 export default function PropertyPageWrapper({
   tenantId,
+  domainType,
   propertySlug,
 }: PropertyPageWrapperProps) {
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -45,14 +47,19 @@ export default function PropertyPageWrapper({
   // Track property view
   useEffect(() => {
     if (tenantId && propertySlug) {
-      trackPropertyView(tenantId, propertySlug);
+      // ✅ للـ custom domains: استخدم username من API
+      const finalTenantId = domainType === 'custom' && tenantData?.username 
+        ? tenantData.username 
+        : tenantId;
+      
+      trackPropertyView(finalTenantId, propertySlug);
     }
-  }, [tenantId, propertySlug]);
+  }, [tenantId, propertySlug, domainType, tenantData?.username]);
 
 
   return (
     <GTMProvider>
-      <GA4Provider tenantId={tenantId}>
+      <GA4Provider tenantId={tenantId} domainType={domainType}>
         <I18nProvider>
           <div className="min-h-screen flex flex-col" dir="rtl">
             <StaticHeader1 />

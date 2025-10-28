@@ -13,11 +13,13 @@ import { trackProjectView } from "@/lib/ga4-tracking";
 
 interface ProjectPageWrapperProps {
   tenantId: string | null;
+  domainType?: "subdomain" | "custom" | null;
   projectSlug: string;
 }
 
 export default function ProjectPageWrapper({
   tenantId,
+  domainType,
   projectSlug,
 }: ProjectPageWrapperProps) {
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -42,13 +44,18 @@ export default function ProjectPageWrapper({
   // Track project view
   useEffect(() => {
     if (tenantId && projectSlug) {
-      trackProjectView(tenantId, projectSlug);
+      // ✅ للـ custom domains: استخدم username من API
+      const finalTenantId = domainType === 'custom' && tenantData?.username 
+        ? tenantData.username 
+        : tenantId;
+      
+      trackProjectView(finalTenantId, projectSlug);
     }
-  }, [tenantId, projectSlug]);
+  }, [tenantId, projectSlug, domainType, tenantData?.username]);
 
   return (
     <GTMProvider>
-      <GA4Provider tenantId={tenantId}>
+      <GA4Provider tenantId={tenantId} domainType={domainType}>
         <I18nProvider>
           <div className="min-h-screen flex flex-col" dir="rtl">
             <StaticHeader1 />
