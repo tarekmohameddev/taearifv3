@@ -1,16 +1,50 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import axios from 'axios';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 export default function GetStartedPage() {
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
+
+  // Monitor reCAPTCHA readiness with retry mechanism
+  useEffect(() => {
+    let retryCount = 0;
+    const maxRetries = 10;
+    
+    const checkRecaptcha = () => {
+      if (executeRecaptcha) {
+        setRecaptchaReady(true);
+        return true;
+      }
+      return false;
+    };
+
+    // Immediate check
+    if (checkRecaptcha()) return;
+
+    // Retry every 500ms up to 10 times (5 seconds total)
+    const interval = setInterval(() => {
+      retryCount++;
+      
+      if (checkRecaptcha()) {
+        clearInterval(interval);
+      } else if (retryCount >= maxRetries) {
+        clearInterval(interval);
+        console.warn('reCAPTCHA failed to load after multiple retries');
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [executeRecaptcha]);
 
   const validatePhone = (phoneNumber: string) => {
     if (!phoneNumber.startsWith('05')) {
@@ -46,18 +80,30 @@ export default function GetStartedPage() {
       return;
     }
 
+    // Check if reCAPTCHA is available
+    if (!executeRecaptcha) {
+      setMessage('reCAPTCHA غير متاح بعد. يرجى الانتظار قليلاً والمحاولة مرة أخرى.');
+      return;
+    }
+
     setLoading(true);
     setMessage('');
 
     try {
-      const response = await axios.post('/api/submit', {
+      // Execute reCAPTCHA and get token
+      const recaptchaToken = await executeRecaptcha('get_started_registration');
+
+      // Send request with reCAPTCHA token
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_Backend_URL}/isthara`, {
         name,
         phone,
         event: 'معرض بروبتك للتقنيات العقارية',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        recaptcha_token: recaptchaToken
       });
 
-      if (response.data.success) {
+      // Check for success: either response.data.success or 2xx status code (200, 201, etc.)
+      if (response.data.success || (response.status >= 200 && response.status < 300)) {
         setMessage('تم التسجيل بنجاح! شكراً لك');
         setName('');
         setPhone('');
@@ -66,7 +112,18 @@ export default function GetStartedPage() {
         setMessage(response.data.error || 'حدث خطأ، الرجاء المحاولة مرة أخرى');
       }
     } catch (error) {
-      setMessage('حدث خطأ، الرجاء المحاولة مرة أخرى');
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error;
+        
+        // Handle specific reCAPTCHA errors
+        if (errorMessage && /recaptcha/i.test(errorMessage)) {
+          setMessage('فشل التحقق الأمني. يرجى إعادة المحاولة أو تحديث الصفحة.');
+        } else {
+          setMessage(errorMessage || 'حدث خطأ، الرجاء المحاولة مرة أخرى');
+        }
+      } else {
+        setMessage('حدث خطأ، الرجاء المحاولة مرة أخرى');
+      }
     } finally {
       setLoading(false);
     }
@@ -117,6 +174,17 @@ export default function GetStartedPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto space-y-4 sm:space-y-6" dir="rtl">
+          {/* reCAPTCHA Loading Indicator */}
+          {!recaptchaReady && (
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-2">
+              <svg className="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span className="text-blue-700 text-sm">جاري تحميل التحقق الأمني...</span>
+            </div>
+          )}
+
           {/* Name Input */}
           <div className="w-full">
             <label htmlFor="name" className="block text-right text-base sm:text-lg font-semibold mb-2 text-gray-800">
@@ -161,10 +229,10 @@ export default function GetStartedPage() {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white font-bold py-3 sm:py-4 px-6 rounded-lg text-base sm:text-lg transition-colors duration-200 shadow-lg"
+            disabled={loading || !recaptchaReady}
+            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 sm:py-4 px-6 rounded-lg text-base sm:text-lg transition-colors duration-200 shadow-lg"
           >
-            {loading ? 'جارٍ التسجيل...' : 'تسجيل'}
+            {loading ? 'جارٍ التسجيل...' : !recaptchaReady ? 'جاري التحميل...' : 'تسجيل'}
           </button>
 
           {/* Message */}

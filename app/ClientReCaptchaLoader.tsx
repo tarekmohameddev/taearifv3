@@ -42,6 +42,7 @@ export function ClientReCaptchaLoader({ children }: ClientReCaptchaLoaderProps) 
     "/onboarding",
     "/forgot-password",
     "/landing",
+    "/get-started",
   ];
   
   // Determine if current page needs reCAPTCHA
