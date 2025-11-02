@@ -174,7 +174,7 @@ export default function SolutionsHeader() {
 
           <div className="mt-auto flex flex-col gap-4">
             <a
-              href="https://app.taearif.com"
+              href="https://taearif.com"
               className="btn btn-outline w-full py-3"
             >
               تسجيل الدخول

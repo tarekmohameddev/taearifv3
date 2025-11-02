@@ -792,7 +792,7 @@ export const CustomerTable = ({
                           <div className="flex-1">
                             <p className="text-sm text-gray-500 dark:text-gray-400">النوع</p>
                             <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.type}
+                              {customerDetails.customer.type?.name || customerDetails.customer.type}
                             </p>
                           </div>
                         </div>
@@ -807,7 +807,7 @@ export const CustomerTable = ({
                           <div className="flex-1">
                             <p className="text-sm text-gray-500 dark:text-gray-400">المرحلة</p>
                             <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.stage}
+                              {customerDetails.customer.stage?.name || customerDetails.customer.stage}
                             </p>
                           </div>
                         </div>
@@ -822,7 +822,7 @@ export const CustomerTable = ({
                           <div className="flex-1">
                             <p className="text-sm text-gray-500 dark:text-gray-400">الأولوية</p>
                             <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.priority}
+                              {customerDetails.customer.priority?.name || customerDetails.customer.priority}
                             </p>
                           </div>
                         </div>

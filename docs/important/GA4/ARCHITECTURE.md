@@ -198,16 +198,25 @@ export default function HomePageWrapper({ tenantId, domainType }) {
 - Automatically track page views on route changes
 - Validate tenant IDs before tracking
 - Set tenant context for all events
+- **[NEW]** Handle custom domains by using `username` from API
 
 **Key Features**:
 - **One-Time Initialization**: Uses `useState` to ensure GA4 script loads only once
 - **Domain Filtering**: Skips tracking for base domain (`www.taearif.com`, `taearif.com`)
+- **Custom Domain Support**: Tracks custom domains (e.g., `liraksa.com`)
 - **Tenant ID Fallback**: If `tenantId` prop is empty, extracts from domain
+- **API Integration**: Subscribes to `tenantStore` to get `username` for custom domains
+- **Smart tenant_id Selection**: Uses `username` from API for custom domains, subdomain for others
 - **Validation Layer**: Multiple checks to prevent invalid tenant IDs
 - **Automatic Page View Tracking**: Triggers on `pathname` change
 - **Delayed Tracking**: 500ms timeout to ensure GTM loads first
 
-**Full Code Analysis**:
+**Updated Props** (December 2024):
+- `tenantId: string | null` - Tenant identifier from middleware
+- `domainType?: "subdomain" | "custom" | null` - **[NEW]** Domain type for smart routing
+- `children: React.ReactNode` - Child components
+
+**Full Code Analysis (Updated December 2024)**:
 
 ```typescript
 // components/GA4Provider.tsx
@@ -220,15 +229,20 @@ import {
   trackPageView,
   setTenantContext,
 } from "@/lib/ga4-tracking";
+import useTenantStore from "@/context-liveeditor/tenantStore";  // ← NEW
 
 interface GA4ProviderProps {
   tenantId: string | null;
+  domainType?: "subdomain" | "custom" | null;  // ← NEW
   children: React.ReactNode;
 }
 
-export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
+export default function GA4Provider({ tenantId, domainType, children }: GA4ProviderProps) {
   const pathname = usePathname();
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // ← NEW: Get username from tenantStore for custom domains
+  const tenantData = useTenantStore((s) => s.tenantData);
 
   // ═══════════════════════════════════════════════════════════════
   // INITIALIZATION EFFECT - Runs only once
@@ -252,6 +266,7 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
 
   // ═══════════════════════════════════════════════════════════════
   // PAGE VIEW TRACKING EFFECT - Runs on route change
+  // UPDATED: Now handles custom domains with username from API
   // ═══════════════════════════════════════════════════════════════
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -260,15 +275,13 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
     const domainTenantId = getTenantIdFromDomain(currentDomain);
     
     // Fallback: Use tenantId prop if valid, else extract from domain
-    const finalTenantId = (tenantId && tenantId.trim() !== '') ? tenantId : domainTenantId;
+    let finalTenantId = (tenantId && tenantId.trim() !== '') ? tenantId : domainTenantId;
 
-    console.log('GA4Provider tracking:', {
-      tenantId,
-      domainTenantId,
-      finalTenantId,
-      pathname,
-      isInitialized,
-    });
+    // ✅ NEW: For custom domains, use username from API instead of domain
+    if (domainType === 'custom' && tenantData?.username) {
+      finalTenantId = tenantData.username;
+      console.log('🌐 GA4: Using username from API for custom domain:', finalTenantId);
+    }
 
     // Validate tenant ID
     const isValidTenantId = finalTenantId && 
@@ -290,9 +303,11 @@ export default function GA4Provider({ tenantId, children }: GA4ProviderProps) {
         pathname,
         isInitialized,
         isValidTenantId,
+        domainType,  // ← NEW
+        tenantDataUsername: tenantData?.username,  // ← NEW
       });
     }
-  }, [tenantId, pathname, isInitialized]);
+  }, [tenantId, pathname, isInitialized, domainType, tenantData?.username]);  // ← UPDATED dependencies
 
   return <>{children}</>;
 }
@@ -325,6 +340,14 @@ const shouldTrackDomain = (domain: string): boolean => {
 
   // Track localhost for development
   if (isDevelopment && (domain === localDomain || domain.includes(localDomain))) {
+    return true;
+  }
+
+  // ✅ NEW: Track custom domains (any domain that's not the base domain)
+  // Custom domains like: liraksa.com, mybusiness.net, etc.
+  const isCustomDomain = /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(domain);
+  if (isCustomDomain) {
+    console.log('Tracking custom domain:', domain);
     return true;
   }
 
@@ -380,7 +403,7 @@ const getTenantIdFromDomain = (domain: string): string | null => {
 
 1. **Why Two Effects?**
    - **First Effect** (`[isInitialized]`): Loads GA4 script once, checks domain validity
-   - **Second Effect** (`[tenantId, pathname, isInitialized]`): Tracks page views on navigation
+   - **Second Effect** (`[tenantId, pathname, isInitialized, domainType, tenantData?.username]`): Tracks page views on navigation
 
 2. **Why `setTimeout(500)`?**
    - Ensures GTM script loads before GA4 fires events
@@ -393,6 +416,17 @@ const getTenantIdFromDomain = (domain: string): string | null => {
 4. **Why Skip 'www'?**
    - `www.taearif.com` is the base domain, not a tenant
    - Prevents polluting GA4 with non-tenant traffic
+
+5. **[NEW] Why Use username from API for Custom Domains?** (December 2024)
+   - **Problem**: Custom domains like `liraksa.com` would send full domain as `tenant_id`
+   - **Solution**: Fetch tenant data, use `username` field (e.g., `"lira"`) 
+   - **Benefit**: Consistent `tenant_id` regardless of domain type (subdomain vs custom)
+   - **Example**: Both `lira.taearif.com` and `liraksa.com` send `tenant_id: "lira"`
+
+6. **[NEW] How Custom Domain Detection Works?**
+   - `shouldTrackDomain()` now includes regex for custom TLDs (.com, .net, etc.)
+   - Any valid custom domain triggers tracking
+   - GA4Provider checks `domainType === 'custom'` to use API username
 
 ---
 
@@ -981,6 +1015,132 @@ STEP 7: Google Analytics Processing
 
 ---
 
+---
+
+## Custom Domain Integration (Added December 2024)
+
+### Complete Flow for Custom Domains
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ User visits Custom Domain: liraksa.com/ar                       │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 1: Middleware Detection                                    │
+│  - host = "liraksa.com"                                          │
+│  - getTenantIdFromHost() → null (no subdomain)                  │
+│  - getTenantIdFromCustomDomain() → "liraksa.com" ✅             │
+│  - Sets headers:                                                │
+│    x-tenant-id: "liraksa.com"                                   │
+│    x-domain-type: "custom"  ← CRITICAL                          │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 2: Server Component                                        │
+│  - Reads headers: tenantId="liraksa.com", domainType="custom"  │
+│  - Passes both to wrapper                                       │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 3: Wrapper Component (e.g., HomePageWrapper)              │
+│  - Calls: fetchTenantData("liraksa.com")                       │
+│  - API Request: POST /v1/tenant-website/getTenant              │
+│    Body: { websiteName: "liraksa.com" }                        │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 4: API Response                                            │
+│  {                                                               │
+│    username: "lira",  ← This is what we need!                   │
+│    globalComponentsData: {...},                                 │
+│    componentSettings: {...},                                    │
+│    ...                                                           │
+│  }                                                               │
+│  - Stored in tenantStore: tenantData.username = "lira"         │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 5: GA4Provider Logic                                       │
+│  - tenantId prop = "liraksa.com"                                │
+│  - domainType = "custom"                                        │
+│  - tenantData.username = "lira" (from tenantStore)              │
+│  - Condition Check:                                             │
+│    if (domainType === 'custom' && tenantData?.username)        │
+│      finalTenantId = tenantData.username  ✅                    │
+│  - Result: finalTenantId = "lira"                               │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 6: GA4 Event Sent                                          │
+│  Event: page_view                                                │
+│  Parameters:                                                     │
+│    page_path: "/ar"                                             │
+│    tenant_id: "lira"  ✅✅✅                                     │
+│                                                                  │
+│  Network Request:                                                │
+│  https://www.google-analytics.com/g/collect?                    │
+│    v=2&en=page_view&ep.tenant_id=lira                           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Comparison Table
+
+| Domain Type | Example | Middleware tenantId | API Called? | API username | GA4 tenant_id |
+|-------------|---------|---------------------|-------------|--------------|---------------|
+| **Base Domain** | `www.taearif.com` | `null` | ❌ No | - | - (No tracking) |
+| **Subdomain** | `lira.taearif.com` | `"lira"` | ✅ Yes | `"lira"` | `"lira"` (from middleware) |
+| **Custom Domain** | `liraksa.com` | `"liraksa.com"` | ✅ Yes | `"lira"` | **`"lira"`** (from API) ✅ |
+
+### Key Files Modified
+
+1. **`components/GA4Provider.tsx`**
+   - Added `domainType` prop
+   - Added `useTenantStore` subscription
+   - Added custom domain logic: `if (domainType === 'custom' && tenantData?.username)`
+
+2. **`app/HomePageWrapper.tsx`**
+   - Passes `domainType` to GA4Provider
+
+3. **`app/TenantPageWrapper.tsx`**
+   - Passes `domainType` to GA4Provider
+
+4. **`app/property/[id]/PropertyPageWrapper.tsx`**
+   - Passes `domainType` to GA4Provider
+   - Uses username for `trackPropertyView()`
+
+5. **`app/project/[id]/ProjectPageWrapper.tsx`**
+   - Passes `domainType` to GA4Provider
+   - Uses username for `trackProjectView()`
+
+### Console Logs for Debugging
+
+When visiting a custom domain, you should see:
+
+```
+✅ Middleware: Custom domain detected: liraksa.com
+✅ Middleware: Setting tenant ID header: liraksa.com
+✅ Middleware: Domain type: custom
+Tracking custom domain: liraksa.com
+🌐 GA4: Using username from API for custom domain: lira
+📊 Page view tracked: { path: "/ar", tenant_id: "lira" }
+```
+
+### Benefits
+
+1. **Consistent Tracking**: Same `tenant_id` for subdomain and custom domain
+2. **Clean Data**: No full domain names in GA4 reports
+3. **Accurate Analytics**: All tenant traffic unified under single ID
+4. **Scalable**: Works for any custom domain configuration
+
+---
+
 ## Next Steps
 
 - **For Tracking Implementation**: See [TRACKING_AND_EVENTS.md](./TRACKING_AND_EVENTS.md)
@@ -990,6 +1150,6 @@ STEP 7: Google Analytics Processing
 
 ---
 
-**Last Updated**: December 2024  
-**Version**: 2.0
+**Last Updated**: December 28, 2024  
+**Version**: 2.1 (Added Custom Domain Support)
 

@@ -224,7 +224,7 @@ export default function SharedHeader({ activePage = "" }: SharedHeaderProps) {
             </nav>
             <div className="mt-auto flex flex-col gap-4">
               <a
-                href="https://app.taearif.com"
+                href="https://taearif.com"
                 className="w-full py-3 px-4 border-2 border-gray-200 bg-transparent text-black rounded-lg hover:bg-black hover:text-white transition-colors text-center"
               >
                 تسجيل الدخول

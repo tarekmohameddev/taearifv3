@@ -20,6 +20,8 @@ The GA4 Analytics System is designed to track user interactions across a **multi
 - **Server-Side Tenant Detection**: Uses Next.js middleware headers to extract tenant information
 - **Client-Side Tracking**: All GA4 events are fired from client components
 - **Validation Layer**: Multiple checks to prevent invalid tenant IDs (empty, 'www', null)
+- **Custom Domain Support**: For custom domains, uses `username` from API instead of full domain name
+- **API Integration**: Fetches tenant data via `getTenant` API to retrieve accurate `username`
 
 ---
 
@@ -163,16 +165,31 @@ Start with → **[BEST_PRACTICES.md](./BEST_PRACTICES.md)**
 
 **Solution**:
 1. **Middleware Detection**: Extract `tenant_id` from subdomain/custom domain
-2. **Header Injection**: Pass `tenant_id` via `x-tenant-id` header
-3. **Client-Side Validation**: Verify and track with `tenant_id` parameter
-4. **GA4 Segmentation**: Filter reports by `tenant_id` custom dimension
+2. **Header Injection**: Pass `tenant_id` via `x-tenant-id` and `x-domain-type` headers
+3. **API Data Fetching**: For custom domains, fetch tenant data via `getTenant` API
+4. **Username Extraction**: Use `username` from API response as `tenant_id` for custom domains
+5. **Client-Side Validation**: Verify and track with accurate `tenant_id` parameter
+6. **GA4 Segmentation**: Filter reports by `tenant_id` custom dimension
+
+**Custom Domain Handling** (Added: December 2024):
+- **Subdomain** (`lira.taearif.com`): Uses subdomain name (`"lira"`) directly
+- **Custom Domain** (`liraksa.com`): Fetches and uses `username` (`"lira"`) from API
+- **Reason**: Ensures consistent `tenant_id` regardless of domain type
 
 ### Tracking Flow
 
 ```
 User Visit → Middleware (detect tenant) → Server Component (read headers) 
-→ Client Wrapper (inject providers) → GA4Provider (initialize & track) 
+→ Client Wrapper (inject providers) → [Custom Domain? → Fetch getTenant API → Extract username]
+→ GA4Provider (initialize & track with username for custom domains) 
 → Google Analytics 4 (collect with tenant_id)
+```
+
+**New Flow for Custom Domains**:
+```
+Custom Domain (liraksa.com) → Middleware: tenantId="liraksa.com", domainType="custom"
+→ Wrapper calls: fetchTenantData("liraksa.com") → API returns: { username: "lira", ... }
+→ GA4Provider: domainType === 'custom' → Use username="lira" → GA4: tenant_id="lira" ✅
 ```
 
 ### Event Types
@@ -189,14 +206,27 @@ User Visit → Middleware (detect tenant) → Server Component (read headers)
 
 ## Contact & Maintenance
 
-**Last Updated**: December 2024  
-**Version**: 2.0 (Split Documentation)  
+**Last Updated**: December 28, 2024  
+**Version**: 2.1 (Added Custom Domain Support)  
 **Maintained By**: Development Team
 
+### Recent Changes (December 2024)
+
+**Custom Domain Integration**:
+- ✅ Added support for using `username` from API for custom domains
+- ✅ GA4Provider now accepts `domainType` prop
+- ✅ Consistent `tenant_id` across subdomain and custom domain
+- ✅ Updated all wrappers to pass `domainType`
+- ✅ Added validation to prevent sending full domain names
+
+**Example**:
+- Before: `liraksa.com` → GA4 `tenant_id: "liraksa.com"`
+- After: `liraksa.com` → API fetch → GA4 `tenant_id: "lira"` ✅
+
 For issues or questions about GA4 tracking:
-1. Check console logs first
-2. Verify network requests in DevTools
-3. Review appropriate documentation file
+1. Check console logs first (look for "🌐 GA4: Using username from API")
+2. Verify network requests in DevTools (`ep.tenant_id` parameter)
+3. Review appropriate documentation file (especially ARCHITECTURE.md for custom domain flow)
 4. Check GA4 real-time reports
 5. Review related middleware documentation
 

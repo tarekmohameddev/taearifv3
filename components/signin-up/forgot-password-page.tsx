@@ -314,7 +314,7 @@ export function ForgotPasswordPage() {
         setShowCodeForm(true);
 
         // إنشاء رابط إعادة التعيين
-        const resetUrl = `app.taearif.com/reset?code=${data.code_for_testing || data.code}`;
+        const resetUrl = `taearif.com/reset?code=${data.code_for_testing || data.code}`;
         setResetUrl(resetUrl);
       }
     } catch (error) {
