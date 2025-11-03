@@ -127,8 +127,8 @@ export default function EditProjectPage(): JSX.Element {
     featured: false,
     latitude: 25.2048,
     longitude: 55.2708,
-    minPrice: "",
-    maxPrice: "",
+    minprice: "",
+    maxprice: "",
   });
 
   const [thumbnailImage, setThumbnailImage] = useState<ProjectImage | null>(
@@ -188,8 +188,8 @@ export default function EditProjectPage(): JSX.Element {
             featured: projectData.featured,
             latitude: projectData.latitude,
             longitude: projectData.longitude,
-            minPrice: projectData.min_price,
-            maxPrice: projectData.max_price,
+            minprice: projectData.min_price?.toString?.() ?? `${projectData.min_price}`,
+            maxprice: projectData.max_price?.toString?.() ?? `${projectData.max_price}`,
           });
 
           // معالجة المرافق
@@ -507,18 +507,9 @@ export default function EditProjectPage(): JSX.Element {
     setSubmitError(null);
 
     try {
-      let minPrice = 0;
-      let maxPrice = 0;
-      if (newProject.price.includes("-")) {
-        const [min, max] = newProject.price
-          .split("-")
-          .map((val) => parseFloat(val.trim()));
-        minPrice = min;
-        maxPrice = max;
-      } else {
-        minPrice = parseFloat(newProject.price) || 0;
-        maxPrice = minPrice;
-      }
+      // استخدام حقول الحد الأدنى والأعلى للسعر بدلاً من تحليل price
+      const minPrice = parseFloat(newProject.minprice as unknown as string) || 0;
+      const maxPrice = parseFloat(newProject.maxprice as unknown as string) || minPrice;
 
       const formattedDate = newProject.completion_date
         ? new Date(newProject.completion_date).toISOString().split("T")[0]
@@ -871,18 +862,27 @@ export default function EditProjectPage(): JSX.Element {
                 {/* الصف الثاني من الحقول */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
-                    <Label htmlFor="price">السعر الابتدائي</Label>
+                    <Label htmlFor="minprice">اقل سعر</Label>
                     <Input
-                      id="price"
-                      placeholder="من $750,000"
-                      value={newProject.price}
+                      id="minprice"
+                      placeholder="مثال: 750000"
+                      value={newProject.minprice}
                       onChange={handleInputChange}
-                      className={formErrors.price ? "border-red-500" : ""}
                     />
-                    {formErrors.price && (
-                      <p className="text-xs text-red-500">{formErrors.price}</p>
-                    )}
                   </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="maxprice">اعلى سعر</Label>
+                    <Input
+                      id="maxprice"
+                      placeholder="مثال: 1200000"
+                      value={newProject.maxprice}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                {/* الصف الثالث من الحقول */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="units">عدد الوحدات</Label>
                     <Input
@@ -893,10 +893,6 @@ export default function EditProjectPage(): JSX.Element {
                       onChange={handleInputChange}
                     />
                   </div>
-                </div>
-
-                {/* الصف الثالث من الحقول */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="complete_status">الحالة</Label>
                     <Select
@@ -922,6 +918,10 @@ export default function EditProjectPage(): JSX.Element {
                       </p>
                     )}
                   </div>
+                </div>
+
+                {/* الصف الرابع - المطور و Featured switch */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="completion_date">تاريخ الإنجاز</Label>
                     <Input
@@ -939,10 +939,6 @@ export default function EditProjectPage(): JSX.Element {
                       </p>
                     )}
                   </div>
-                </div>
-
-                {/* الصف الرابع - المطور و Featured switch */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="developer">المطور</Label>
                     <Input
@@ -958,56 +954,61 @@ export default function EditProjectPage(): JSX.Element {
                       </p>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2 h-10 self-end">
-                    <Switch
-                      id="featured"
-                      checked={newProject.featured}
-                      onCheckedChange={handleSwitchChange}
-                    />
-                    <Label htmlFor="featured" className="mr-2">
-                      عرض هذا المشروع في الصفحة الرئيسية
-                    </Label>
-                  </div>
                 </div>
 
                 {/* حقل المرافق - منفصل تماماً */}
                 <div className="space-y-4">
-                  {/* حقل إدخال المرافق */}
-                  <div className="space-y-2">
-                    <Label htmlFor="amenityInput" className="text-foreground">
-                      المرافق
-                    </Label>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Input
-                        id="amenityInput"
-                        placeholder="أدخل مرفق (مثل: حمام سباحة)"
-                        value={currentAmenity}
-                        onChange={(e) => setCurrentAmenity(e.target.value)}
-                        onKeyPress={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            addAmenity();
-                          }
-                        }}
-                        className="flex-1 bg-background border-input text-foreground placeholder:text-muted-foreground"
-                      />
-                      <Button
-                        type="button"
-                        onClick={addAmenity}
-                        disabled={!currentAmenity.trim()}
-                        className="w-full sm:w-auto"
-                        variant="secondary"
-                      >
-                        <Plus className="h-4 w-4 ml-2 sm:ml-0 sm:mr-2" />
-                        <span className="sm:hidden">إضافة مرفق</span>
-                        <span className="hidden sm:inline">إضافة</span>
-                      </Button>
+                  {/* قسم المرافق وعرض المشروع - كلاهما 50% */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* حقل إدخال المرافق */}
+                    <div className="space-y-2">
+                      <Label htmlFor="amenityInput" className="text-foreground">
+                        المرافق
+                      </Label>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <Input
+                          id="amenityInput"
+                          placeholder="أدخل مرفق (مثل: حمام سباحة)"
+                          value={currentAmenity}
+                          onChange={(e) => setCurrentAmenity(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addAmenity();
+                            }
+                          }}
+                          className="flex-1 bg-background border-input text-foreground placeholder:text-muted-foreground"
+                        />
+                        <Button
+                          type="button"
+                          onClick={addAmenity}
+                          disabled={!currentAmenity.trim()}
+                          className="w-full sm:w-auto"
+                          variant="secondary"
+                        >
+                          <Plus className="h-4 w-4 ml-2 sm:ml-0 sm:mr-2" />
+                          <span className="sm:hidden">إضافة مرفق</span>
+                          <span className="hidden sm:inline">إضافة</span>
+                        </Button>
+                      </div>
+                      {formErrors?.amenities && (
+                        <p className="text-sm text-destructive">
+                          {formErrors.amenities}
+                        </p>
+                      )}
                     </div>
-                    {formErrors?.amenities && (
-                      <p className="text-sm text-destructive">
-                        {formErrors.amenities}
-                      </p>
-                    )}
+
+                    {/* قسم عرض المشروع في الصفحة الرئيسية */}
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="featured"
+                        checked={newProject.featured}
+                        onCheckedChange={handleSwitchChange}
+                      />
+                      <Label htmlFor="featured" className="mr-2">
+                        عرض هذا المشروع في الصفحة الرئيسية
+                      </Label>
+                    </div>
                   </div>
 
                   {/* عرض المرافق المضافة */}
