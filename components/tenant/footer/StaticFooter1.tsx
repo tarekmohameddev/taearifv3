@@ -11,7 +11,7 @@ import {
   Instagram,
   Linkedin,
 } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp, FaSnapchat, FaTiktok } from "react-icons/fa";
 import { useEffect, useMemo, useCallback } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
@@ -393,6 +393,8 @@ export default function StaticFooter({
       Instagram: Instagram,
       Twitter: Twitter,
       Facebook: Facebook,
+      Snapchat: FaSnapchat,
+      Tiktok: FaTiktok,
     };
     return iconMap[iconName] || MapPin;
   };
