@@ -188,7 +188,18 @@ export const footerStructure: ComponentStructure = {
                   itemLabel: "Platform",
                   of: [
                     { key: "name", label: "Platform Name", type: "text" },
-                    { key: "icon", label: "Icon", type: "text" },
+                    {
+                      key: "icon",
+                      label: "Icon",
+                      type: "select",
+                      options: [
+                        { label: "واتساب", value: "FaWhatsapp" },
+                        { label: "لينكد إن", value: "Linkedin" },
+                        { label: "إنستغرام", value: "Instagram" },
+                        { label: "تويتر", value: "Twitter" },
+                        { label: "فيسبوك", value: "Facebook" },
+                      ],
+                    },
                     { key: "url", label: "URL", type: "text" },
                     { key: "color", label: "Hover Color", type: "color" },
                   ],
@@ -392,7 +403,18 @@ export const footerStructure: ComponentStructure = {
                   itemLabel: "Platform",
                   of: [
                     { key: "name", label: "Platform Name", type: "text" },
-                    { key: "icon", label: "Icon", type: "text" },
+                    {
+                      key: "icon",
+                      label: "Icon",
+                      type: "select",
+                      options: [
+                        { label: "واتساب", value: "FaWhatsapp" },
+                        { label: "لينكد إن", value: "Linkedin" },
+                        { label: "إنستغرام", value: "Instagram" },
+                        { label: "تويتر", value: "Twitter" },
+                        { label: "فيسبوك", value: "Facebook" },
+                      ],
+                    },
                     { key: "url", label: "URL", type: "text" },
                     { key: "color", label: "Hover Color", type: "color" },
                   ],
