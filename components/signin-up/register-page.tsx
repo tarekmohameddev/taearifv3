@@ -295,8 +295,8 @@ export function RegisterPage() {
           });
           setFormSubmitted(true);
           setTimeout(() => {
-            router.push("/onboarding");
-          }, 1500);
+            router.push("/register/thank-you");
+          }, 800);
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -392,7 +392,7 @@ export function RegisterPage() {
               تم إنشاء الحساب بنجاح!
             </h3>
             <p className="text-muted-foreground mb-4">
-              سيتم تحويلك إلى لوحة التحكم خلال لحظات...
+              سيتم تحويلك إلى صفحة &quot;شكراً للتسجيل&quot; خلال لحظات...
             </p>
             <div className="w-16 h-1 bg-muted rounded-full mx-auto relative overflow-hidden">
               <div className="absolute top-0 right-0 h-full bg-green-500 animate-progress"></div>
