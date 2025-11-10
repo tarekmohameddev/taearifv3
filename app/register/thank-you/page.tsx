@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle2, Clock3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const REDIRECT_PATH = "/dashboard";
+const REDIRECT_PATH = "/onboarding";
 const REDIRECT_DELAY_SECONDS = 10;
 
 export default function RegisterThankYouPage() {
@@ -73,7 +73,7 @@ export default function RegisterThankYouPage() {
               href={REDIRECT_PATH}
               className="text-primary font-semibold hover:underline"
             >
-              /dashboard
+              /onboarding
             </Link>
           </div>
         </div>
