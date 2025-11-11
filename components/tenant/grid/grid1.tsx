@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { PropertyCard } from "@/components/tenant/cards/card1";
 import PropertyCard2 from "@/components/tenant/cards/card2";
@@ -69,6 +69,12 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     (state) => state.filteredProperties,
   );
   const storeLoading = usePropertiesStore((state) => state.loading);
+  const pagination = usePropertiesStore((state) => state.pagination);
+  const setCurrentPage = usePropertiesStore((state) => state.setCurrentPage);
+  const goToNextPage = usePropertiesStore((state) => state.goToNextPage);
+  const goToPreviousPage = usePropertiesStore(
+    (state) => state.goToPreviousPage,
+  );
 
   // Filter state from store
   const search = usePropertiesStore((state) => state.search);
@@ -358,6 +364,29 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   // Use API data if enabled, otherwise use static data
   const useApiData = mergedData.dataSource?.enabled !== false;
 
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (page !== pagination.current_page) {
+        setCurrentPage(page);
+      }
+    },
+    [pagination.current_page, setCurrentPage],
+  );
+
+  const handleNextPage = useCallback(() => {
+    goToNextPage();
+  }, [goToNextPage]);
+
+  const handlePreviousPage = useCallback(() => {
+    goToPreviousPage();
+  }, [goToPreviousPage]);
+
+  const shouldRenderPagination =
+    useApiData &&
+    currentTenantId &&
+    pagination.last_page > 1 &&
+    (filteredProperties.length > 0 || pagination.total > pagination.per_page);
+
   // Always prioritize store data (filteredProperties) over API data
   // This ensures that when API returns empty results, we show empty state
   const properties =
@@ -525,6 +554,24 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
                 );
               })}
             </div>
+            {shouldRenderPagination && (
+              <div className="mt-8">
+                <Pagination
+                  currentPage={pagination.current_page || 1}
+                  totalPages={pagination.last_page || 1}
+                  onPageChange={handlePageChange}
+                  onNextPage={handleNextPage}
+                  onPreviousPage={handlePreviousPage}
+                  totalItems={pagination.total || properties.length}
+                  itemsPerPage={
+                    pagination.per_page ||
+                    Math.max(properties.length, 1)
+                  }
+                  showingFrom={pagination.from || 0}
+                  showingTo={pagination.to || properties.length}
+                />
+              </div>
+            )}
           </>
         ) : (
           <div className="text-center py-12">
