@@ -1084,7 +1084,7 @@ export function PropertiesManagementPage() {
                             <ChevronDown className="-ml-1" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                        <DropdownMenuContent className="max-h-[15rem] overflow-y-auto">
                           {(() => {
                             // تحديد العدد بناءً على نوع الترتيب
                             let itemCount =
