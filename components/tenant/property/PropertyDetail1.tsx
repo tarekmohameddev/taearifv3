@@ -54,6 +54,7 @@ interface Property {
   area?: string;
   type: string;
   transactionType: string;
+  transactionType_en?: string;
   image: string;
   status?: string;
   description?: string;
@@ -140,6 +141,27 @@ import SwiperCarousel from "@/components/ui/swiper-carousel2";
 interface PropertyDetailProps {
   propertySlug: string;
 }
+
+const getTransactionTypeLabel = (
+  transactionType?: string | null,
+  transactionTypeEn?: string | null,
+) => {
+  const normalized = transactionType?.trim().toLowerCase();
+  const normalizedEn = transactionTypeEn?.trim().toLowerCase();
+
+  if (
+    normalizedEn === "rent" ||
+    normalizedEn === "lease" ||
+    normalized === "rent" ||
+    normalized === "للإيجار" ||
+    normalized?.includes("إيجار") ||
+    normalized?.includes("ايجار")
+  ) {
+    return "للإيجار";
+  }
+
+  return "للبيع";
+};
 
 export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -687,6 +709,11 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
     );
   }
 
+  const transactionTypeLabel = getTransactionTypeLabel(
+    property.transactionType,
+    property.transactionType_en,
+  );
+
   return (
     <section className="py-12">
       <div className="max-w-7xl mx-auto px-4">
@@ -697,7 +724,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {/* العنوان ونوع العرض */}
               <div className="flex flex-row items-center justify-between">
                 <h1 className="font-bold text-xs xs:text-sm leading-4 rounded-md text-white bg-emerald-600 w-20 h-8 flex items-center justify-center md:text-xl lg:text-2xl md:w-28 md:h-11">
-                  {property.transactionType === "rent" ? "للإيجار" : "للبيع"}
+                  {transactionTypeLabel}
                 </h1>
                 <div className="sharesocials flex flex-row gap-x-6" dir="ltr">
                   <button
@@ -849,7 +876,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   </p>
                 </div>
                 <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                  {property.transactionType === "rent" ? "للإيجار" : "للبيع"}
+                  {transactionTypeLabel}
                 </p>
               </div>
 
