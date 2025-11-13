@@ -757,10 +757,13 @@ export default function PropertyForm({ mode }) {
       const file = files[0];
       if (!file.type.startsWith("image/")) {
         toast.error("يرجى تحميل ملفات صور فقط (JPG, PNG, GIF)");
+        e.target.value = ""; // Reset input
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("يجب أن يكون حجم الملف أقل من 5 ميجابايت");
+      // التحقق من حجم الصورة فوراً عند اختيارها
+      if (file.size >= 10 * 1024 * 1024) {
+        toast.error("حجم الصورة كبير جداً. الحد الأقصى المسموح به هو 10 ميجابايت");
+        e.target.value = ""; // Reset input
         return;
       }
       setImages((prev) => ({ ...prev, thumbnail: file }));
@@ -768,14 +771,25 @@ export default function PropertyForm({ mode }) {
         ...prev,
         thumbnail: URL.createObjectURL(file),
       }));
+      // Clear thumbnail error when image is uploaded
+      if (errors.thumbnail) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.thumbnail;
+          return newErrors;
+        });
+      }
     } else if (type === "deedImage") {
       const file = files[0];
       if (!file.type.startsWith("image/")) {
         toast.error("يرجى تحميل ملفات صور فقط (JPG, PNG, GIF)");
+        e.target.value = ""; // Reset input
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("يجب أن يكون حجم الملف أقل من 5 ميجابايت");
+      // التحقق من حجم الصورة فوراً عند اختيارها
+      if (file.size >= 10 * 1024 * 1024) {
+        toast.error("حجم الصورة كبير جداً. الحد الأقصى المسموح به هو 10 ميجابايت");
+        e.target.value = ""; // Reset input
         return;
       }
       setImages((prev) => ({ ...prev, deedImage: file }));
@@ -789,17 +803,16 @@ export default function PropertyForm({ mode }) {
 
       if (!file.type.startsWith("video/")) {
         toast.error("يجب أن يكون الفيديو بصيغة MP4 أو MOV أو AVI فقط");
+        e.target.value = ""; // Reset input
         return;
       }
 
-      // Get video size limit from user's package
-      const videoSizeLimit =
-        useAuthStore.getState().userData?.membership?.package
-          ?.video_size_limit || 50;
-      const maxSizeInBytes = videoSizeLimit * 1024 * 1024; // Convert MB to bytes
+      // التحقق من حجم الفيديو فوراً عند اختياره - الحد الأقصى 50 ميجابايت
+      const maxVideoSizeInBytes = 50 * 1024 * 1024; // 50 MB in bytes
 
-      if (file.size > maxSizeInBytes) {
-        toast.error(`يجب أن يكون حجم الملف أقل من ${videoSizeLimit} ميجابايت`);
+      if (file.size >= maxVideoSizeInBytes) {
+        toast.error("حجم الفيديو كبير جداً. الحد الأقصى المسموح به هو 50 ميجابايت");
+        e.target.value = ""; // Reset input
         return;
       }
 
@@ -814,6 +827,7 @@ export default function PropertyForm({ mode }) {
         if (duration > 300) {
           // 5 دقائق = 300 ثانية
           toast.error("يجب أن يكون طول الفيديو أقل من 5 دقائق");
+          e.target.value = ""; // Reset input
           return;
         }
 
@@ -821,19 +835,30 @@ export default function PropertyForm({ mode }) {
         setVideoPreview(URL.createObjectURL(file));
       };
 
+      video.onerror = () => {
+        toast.error("حدث خطأ أثناء تحميل الفيديو");
+        e.target.value = ""; // Reset input
+      };
+
       video.src = URL.createObjectURL(file);
     } else {
+      // التحقق من حجم كل صورة فوراً عند اختيارها
       const validFiles = Array.from(files).filter((file) => {
         if (!file.type.startsWith("image/")) {
           toast.error("يجب أن تكون الصور بصيغة JPG أو PNG أو GIF فقط");
           return false;
         }
-        if (file.size > 5 * 1024 * 1024) {
-          toast.error("يجب أن يكون حجم الملف أقل من 5 ميجابايت");
+        if (file.size >= 10 * 1024 * 1024) {
+          toast.error("حجم الصورة كبير جداً. الحد الأقصى المسموح به هو 10 ميجابايت");
           return false;
         }
         return true;
       });
+      
+      // إعادة تعيين input إذا تم رفض أي صورة
+      if (validFiles.length !== files.length) {
+        e.target.value = ""; // Reset input
+      }
       setImages((prev) => ({
         ...prev,
         [type]: [...prev[type], ...validFiles],
@@ -923,6 +948,8 @@ export default function PropertyForm({ mode }) {
 
     if (!formData.title) newErrors.title = "اسم العقار مطلوب";
     if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
+    if (!formData.purpose) newErrors.purpose = "نوع القائمة مطلوب";
+    if (!formData.category) newErrors.category = "فئة العقار مطلوبة";
     if (mode === "add" && !images.thumbnail)
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
     if (mode === "edit" && !previews.thumbnail && !images.thumbnail)
@@ -1231,7 +1258,7 @@ export default function PropertyForm({ mode }) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title">اسم العقار</Label>
+                    <Label htmlFor="title">اسم العقار <span className="text-red-500">*</span></Label>
                     <Input
                       id="title"
                       name="title"
@@ -1246,7 +1273,7 @@ export default function PropertyForm({ mode }) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description">وصف العقار</Label>
+                    <Label htmlFor="description">وصف العقار <span className="text-red-500">*</span></Label>
                     <Textarea
                       id="description"
                       name="description"
@@ -1264,7 +1291,7 @@ export default function PropertyForm({ mode }) {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="address">العنوان</Label>
+                      <Label htmlFor="address">العنوان <span className="text-red-500">*</span></Label>
                       <Input
                         id="address"
                         name="address"
@@ -1382,7 +1409,7 @@ export default function PropertyForm({ mode }) {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="purpose">نوع القائمة</Label>
+                      <Label htmlFor="purpose">نوع القائمة <span className="text-red-500">*</span></Label>
                       <Select
                         name="purpose"
                         value={formData.purpose}
@@ -1413,13 +1440,20 @@ export default function PropertyForm({ mode }) {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="category">فئة العقار</Label>
+                      <Label htmlFor="category">فئة العقار <span className="text-red-500">*</span></Label>
                       <Select
                         name="category"
                         value={formData.category}
-                        onValueChange={(value) =>
-                          setFormData((prev) => ({ ...prev, category: value }))
-                        }
+                        onValueChange={(value) => {
+                          setFormData((prev) => ({ ...prev, category: value }));
+                          if (errors.category) {
+                            setErrors((prev) => {
+                              const newErrors = { ...prev };
+                              delete newErrors.category;
+                              return newErrors;
+                            });
+                          }
+                        }}
                       >
                         <SelectTrigger
                           id="category"
@@ -2201,7 +2235,7 @@ export default function PropertyForm({ mode }) {
                         </Button>
                         <p className="text-sm text-muted-foreground">
                           يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم
-                          الملف هو 5 ميجابايت.
+                          الملف هو 10 ميجابايت.
                         </p>
                         {errors.deedImage && (
                           <p className="text-xs text-red-500">
@@ -2214,11 +2248,11 @@ export default function PropertyForm({ mode }) {
                 </CardContent>
               </Card>
 
-              <Card className="">
+              <Card className={errors.thumbnail ? "border-red-500 border-2" : ""}>
                 <CardHeader>
                   <CardTitle>صورة العقار الرئيسية</CardTitle>
                   <CardDescription>
-                    قم بتحميل صورة رئيسية تمثل العقار
+                    قم بتحميل صورة رئيسية تمثل العقار <span className="text-red-500">*</span>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -2271,7 +2305,7 @@ export default function PropertyForm({ mode }) {
                       </Button>
                       <p className="text-sm text-muted-foreground">
                         يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف
-                        هو 5 ميجابايت.
+                        هو 10 ميجابايت.
                       </p>
                       {errors.thumbnail && (
                         <p className="text-xs text-red-500">
@@ -2429,10 +2463,7 @@ export default function PropertyForm({ mode }) {
                     )}
                     <p className="text-sm text-muted-foreground">
                       يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى لحجم
-                      الملف هو{" "}
-                      {useAuthStore.getState().userData?.membership?.package
-                        ?.video_size_limit || 50}{" "}
-                      ميجابايت والحد الأقصى للطول هو 5 دقائق.
+                      الملف هو 50 ميجابايت والحد الأقصى للطول هو 5 دقائق.
                     </p>
                   </div>
                 </CardContent>
