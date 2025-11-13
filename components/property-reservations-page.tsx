@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react"
 import axiosInstance from "@/lib/axiosInstance"
-import { useTenantId } from "@/hooks/useTenantId"
 import {
   Home,
   MapPin,
@@ -16,8 +15,6 @@ import {
   Search,
   Filter,
   ArrowUpDown,
-  Plus,
-  TrendingUp,
   BarChart3,
   Download,
   File,
@@ -85,7 +82,6 @@ export function PropertyReservationsPage() {
     pending: 0,
     accepted: 0,
     rejected: 0,
-    acceptanceRate: 0,
     totalRevenue: 0,
     byType: { rent: 0, buy: 0 },
     byMonth: [] as Array<{ month: string; reservations: number }>,
@@ -106,20 +102,6 @@ export function PropertyReservationsPage() {
   const [confirmPayment, setConfirmPayment] = useState(false)
   const [messageText, setMessageText] = useState("")
   const [detailTab, setDetailTab] = useState("overview")
-
-  // Create reservation popup states
-  const [showCreatePopup, setShowCreatePopup] = useState(false)
-  const [createLoading, setCreateLoading] = useState(false)
-  const [createFormData, setCreateFormData] = useState({
-    propertySlug: "",
-    customerName: "",
-    customerPhone: "",
-    desiredDate: "",
-    message: "",
-  })
-
-  // Get tenantId
-  const { tenantId } = useTenantId()
 
   // Fetch reservations from API
   const fetchReservations = useCallback(async () => {
@@ -148,7 +130,6 @@ export function PropertyReservationsPage() {
             pending: response.data.data.stats.pending || 0,
             accepted: response.data.data.stats.accepted || 0,
             rejected: response.data.data.stats.rejected || 0,
-            acceptanceRate: response.data.data.stats.acceptanceRate || 0,
             totalRevenue: response.data.data.stats.totalRevenue || 0,
             byType: response.data.data.stats.byType || { rent: 0, buy: 0 },
             byMonth: response.data.data.stats.byMonth || [],
@@ -174,7 +155,6 @@ export function PropertyReservationsPage() {
           pending: response.data.data.pending || 0,
           accepted: response.data.data.accepted || 0,
           rejected: response.data.data.rejected || 0,
-          acceptanceRate: response.data.data.acceptanceRate || 0,
           totalRevenue: response.data.data.totalRevenue || 0,
           byType: response.data.data.byType || { rent: 0, buy: 0 },
           byMonth: response.data.data.byMonth || [],
@@ -200,84 +180,6 @@ export function PropertyReservationsPage() {
       setError(err.response?.data?.message || "حدث خطأ أثناء جلب تفاصيل الحجز")
     }
   }, [])
-
-  // Create new reservation
-  const handleCreateReservation = async () => {
-    if (!tenantId) {
-      setError("لم يتم العثور على معرف المستأجر")
-      return
-    }
-
-    // Validation
-    if (!createFormData.propertySlug.trim()) {
-      setError("يرجى إدخال معرف العقار")
-      return
-    }
-    if (!createFormData.customerName.trim()) {
-      setError("يرجى إدخال اسم العميل")
-      return
-    }
-    if (!createFormData.customerPhone.trim()) {
-      setError("يرجى إدخال رقم الهاتف")
-      return
-    }
-
-    // Validate phone format (basic)
-    const phoneRegex = /^\+?\d{7,15}$/
-    if (!phoneRegex.test(createFormData.customerPhone.replace(/\s/g, ""))) {
-      setError("يرجى إدخال رقم هاتف صحيح (مثال: +966501234567)")
-      return
-    }
-
-    setCreateLoading(true)
-    setError(null)
-
-    try {
-      const payload: any = {
-        propertySlug: createFormData.propertySlug.trim(),
-        customerName: createFormData.customerName.trim(),
-        customerPhone: createFormData.customerPhone.trim(),
-      }
-
-      if (createFormData.desiredDate) {
-        payload.desiredDate = createFormData.desiredDate
-      }
-      if (createFormData.message.trim()) {
-        payload.message = createFormData.message.trim()
-      }
-
-      const response = await axiosInstance.post(
-        `/api/v1/tenant-website/${tenantId}/reservations`,
-        payload,
-      )
-
-      if (response.data.success) {
-        // Reset form
-        setCreateFormData({
-          propertySlug: "",
-          customerName: "",
-          customerPhone: "",
-          desiredDate: "",
-          message: "",
-        })
-        setShowCreatePopup(false)
-        // Refresh reservations list
-        await fetchReservations()
-        await fetchReservationsStats()
-      }
-    } catch (err: any) {
-      console.error("Error creating reservation:", err)
-      setError(
-        err.response?.data?.message ||
-          err.response?.data?.errors?.propertySlug?.[0] ||
-          err.response?.data?.errors?.customerName?.[0] ||
-          err.response?.data?.errors?.customerPhone?.[0] ||
-          "حدث خطأ أثناء إنشاء الحجز",
-      )
-    } finally {
-      setCreateLoading(false)
-    }
-  }
 
   // Load data on mount
   useEffect(() => {
@@ -560,7 +462,6 @@ export function PropertyReservationsPage() {
   const totalPending = stats.pending
   const totalAccepted = stats.accepted
   const totalRejected = stats.rejected
-  const acceptanceRate = stats.acceptanceRate
   const totalRevenue = stats.totalRevenue
 
   const chartData = {
@@ -888,19 +789,12 @@ export function PropertyReservationsPage() {
                   </div>
                 )}
               </div>
-              <Button
-                className="gap-2 text-xs"
-                size="sm"
-                onClick={() => setShowCreatePopup(true)}
-              >
-                <Plus className="h-3 w-3 sm:h-4 sm:w-4" /> حجز جديد
-              </Button>
             </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 auto-rows-max">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 auto-rows-max">
           <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200">
             <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex items-center justify-between gap-2">
@@ -938,20 +832,6 @@ export function PropertyReservationsPage() {
                 </div>
                 <div className="p-2 bg-green-200 rounded-lg flex-shrink-0">
                   <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-700" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-            <CardContent className="p-3 sm:p-4 md:p-6">
-              <div className="flex items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-xs font-medium text-blue-700 truncate">نسبة القبول</p>
-                  <p className="text-xl sm:text-2xl font-bold text-blue-900 mt-1">{acceptanceRate}%</p>
-                </div>
-                <div className="p-2 bg-blue-200 rounded-lg flex-shrink-0">
-                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-700" />
                 </div>
               </div>
             </CardContent>
@@ -1489,296 +1369,6 @@ export function PropertyReservationsPage() {
             </div>
           </DialogContent>
         </Dialog>
-
-        {/* Create Reservation Popup - Simple Custom Popup */}
-        {showCreatePopup && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              margin: 0,
-              padding: "20px",
-              boxSizing: "border-box",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1000,
-            }}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
-                setShowCreatePopup(false)
-              }
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                borderRadius: "8px",
-                padding: "24px",
-                width: "100%",
-                maxWidth: "500px",
-                maxHeight: "90vh",
-                overflowY: "auto",
-                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              {/* Header */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "20px",
-                  paddingBottom: "16px",
-                  borderBottom: "1px solid #e5e7eb",
-                }}
-              >
-                <h2 style={{ fontSize: "20px", fontWeight: "bold", margin: 0 }}>
-                  إنشاء حجز جديد
-                </h2>
-                <button
-                  onClick={() => setShowCreatePopup(false)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    fontSize: "24px",
-                    cursor: "pointer",
-                    color: "#6b7280",
-                    padding: "0",
-                    width: "30px",
-                    height: "30px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-
-              {/* Form */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                {/* Property Slug */}
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "6px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#374151",
-                    }}
-                  >
-                    معرف العقار (Property Slug) <span style={{ color: "red" }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={createFormData.propertySlug}
-                    onChange={(e) =>
-                      setCreateFormData({ ...createFormData, propertySlug: e.target.value })
-                    }
-                    placeholder="مثال: astdyo-mothth-hy-alaaard-rkm-19-1"
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "6px",
-                      fontSize: "14px",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
-
-                {/* Customer Name */}
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "6px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#374151",
-                    }}
-                  >
-                    اسم العميل <span style={{ color: "red" }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={createFormData.customerName}
-                    onChange={(e) =>
-                      setCreateFormData({ ...createFormData, customerName: e.target.value })
-                    }
-                    placeholder="أدخل اسم العميل"
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "6px",
-                      fontSize: "14px",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
-
-                {/* Customer Phone */}
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "6px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#374151",
-                    }}
-                  >
-                    رقم الهاتف <span style={{ color: "red" }}>*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    value={createFormData.customerPhone}
-                    onChange={(e) =>
-                      setCreateFormData({ ...createFormData, customerPhone: e.target.value })
-                    }
-                    placeholder="+966501234567"
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "6px",
-                      fontSize: "14px",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                  <p style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>
-                    استخدم التنسيق الدولي (مثال: +966501234567)
-                  </p>
-                </div>
-
-                {/* Desired Date */}
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "6px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#374151",
-                    }}
-                  >
-                    التاريخ المطلوب (اختياري)
-                  </label>
-                  <input
-                    type="date"
-                    value={createFormData.desiredDate}
-                    onChange={(e) =>
-                      setCreateFormData({ ...createFormData, desiredDate: e.target.value })
-                    }
-                    min={new Date().toISOString().split("T")[0]}
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "6px",
-                      fontSize: "14px",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
-
-                {/* Message */}
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "6px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#374151",
-                    }}
-                  >
-                    الرسالة (اختياري)
-                  </label>
-                  <textarea
-                    value={createFormData.message}
-                    onChange={(e) =>
-                      setCreateFormData({ ...createFormData, message: e.target.value })
-                    }
-                    placeholder="أدخل رسالة أو ملاحظات..."
-                    rows={4}
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "6px",
-                      fontSize: "14px",
-                      boxSizing: "border-box",
-                      resize: "vertical",
-                      fontFamily: "inherit",
-                    }}
-                  />
-                </div>
-
-                {/* Buttons */}
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "12px",
-                    marginTop: "8px",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <button
-                    onClick={() => {
-                      setShowCreatePopup(false)
-                      setCreateFormData({
-                        propertySlug: "",
-                        customerName: "",
-                        customerPhone: "",
-                        desiredDate: "",
-                        message: "",
-                      })
-                      setError(null)
-                    }}
-                    disabled={createLoading}
-                    style={{
-                      padding: "10px 20px",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "6px",
-                      backgroundColor: "white",
-                      color: "#374151",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      cursor: createLoading ? "not-allowed" : "pointer",
-                      opacity: createLoading ? 0.6 : 1,
-                    }}
-                  >
-                    إلغاء
-                  </button>
-                  <button
-                    onClick={handleCreateReservation}
-                    disabled={createLoading}
-                    style={{
-                      padding: "10px 20px",
-                      border: "none",
-                      borderRadius: "6px",
-                      backgroundColor: createLoading ? "#9ca3af" : "#000000",
-                      color: "white",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      cursor: createLoading ? "not-allowed" : "pointer",
-                    }}
-                  >
-                    {createLoading ? "جاري الإنشاء..." : "إنشاء الحجز"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
