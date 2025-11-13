@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   CalendarIcon,
   ClockIcon,
@@ -180,6 +181,19 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
   const [copySuccess, setCopySuccess] = useState(false);
   const [expandedFaqs, setExpandedFaqs] = useState<Set<number>>(new Set());
 
+  // Reservation states
+  const [showReservationForm, setShowReservationForm] = useState(false);
+  const [reservationLoading, setReservationLoading] = useState(false);
+  const [reservationError, setReservationError] = useState<string | null>(null);
+  const [reservationSuccess, setReservationSuccess] = useState(false);
+  const [dateError, setDateError] = useState<string | null>(null);
+  const [reservationForm, setReservationForm] = useState({
+    customerName: "",
+    customerPhone: "",
+    desiredDate: "",
+    message: "",
+  });
+
   // Function to toggle FAQ expansion
   const toggleFaq = (faqId: number) => {
     setExpandedFaqs((prev) => {
@@ -313,6 +327,126 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
   // Tenant ID hook
   const { tenantId, isLoading: tenantLoading } = useTenantId();
+
+  // Handle create reservation
+  const handleCreateReservation = async () => {
+    if (!tenantId) {
+      setReservationError("لم يتم العثور على معرف المستأجر");
+      return;
+    }
+
+    if (!property?.slug) {
+      setReservationError("لم يتم العثور على معرف العقار");
+      return;
+    }
+
+    // Validation
+    if (!reservationForm.customerName.trim()) {
+      setReservationError("يرجى إدخال اسمك");
+      return;
+    }
+
+    if (!reservationForm.customerPhone.trim()) {
+      setReservationError("يرجى إدخال رقم الهاتف");
+      return;
+    }
+
+    // Validate phone format
+    const phoneRegex = /^\+?\d{7,15}$/;
+    if (!phoneRegex.test(reservationForm.customerPhone.replace(/\s/g, ""))) {
+      setReservationError("يرجى إدخال رقم هاتف صحيح (مثال: +966501234567)");
+      return;
+    }
+
+    // Validate desiredDate if provided
+    if (reservationForm.desiredDate) {
+      const selectedDate = new Date(reservationForm.desiredDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day
+      selectedDate.setHours(0, 0, 0, 0); // Reset time to start of day
+
+      if (selectedDate < today) {
+        setDateError("التاريخ المفضل يجب أن يكون تاريخ اليوم أو بعده");
+        setReservationError("التاريخ المفضل يجب أن يكون تاريخ اليوم أو بعده");
+        return;
+      }
+    }
+
+    // Check if there's a date error (from real-time validation)
+    if (dateError) {
+      setReservationError(dateError);
+      return;
+    }
+
+    setReservationLoading(true);
+    setReservationError(null);
+    setReservationSuccess(false);
+
+    try {
+      const payload: any = {
+        propertySlug: property.slug,
+        customerName: reservationForm.customerName.trim(),
+        customerPhone: reservationForm.customerPhone.trim(),
+      };
+
+      if (reservationForm.desiredDate) {
+        payload.desiredDate = reservationForm.desiredDate;
+      }
+      if (reservationForm.message.trim()) {
+        payload.message = reservationForm.message.trim();
+      }
+
+      const response = await axiosInstance.post(
+        `/api/v1/tenant-website/${tenantId}/reservations`,
+        payload,
+      );
+
+      if (response.data.success) {
+        setReservationSuccess(true);
+        // Reset form
+        setReservationForm({
+          customerName: "",
+          customerPhone: "",
+          desiredDate: "",
+          message: "",
+        });
+        setDateError(null);
+        // Hide form after 2 seconds
+        setTimeout(() => {
+          setShowReservationForm(false);
+          setReservationSuccess(false);
+        }, 2000);
+      }
+    } catch (err: any) {
+      console.error("Error creating reservation:", err);
+      
+      // Handle validation errors from backend
+      if (err.response?.data?.errors) {
+        const errors = err.response.data.errors;
+        // Priority: desiredDate > customerName > customerPhone > message
+        const errorMessage =
+          errors.desiredDate?.[0] ||
+          errors.customerName?.[0] ||
+          errors.customerPhone?.[0] ||
+          errors.message?.[0] ||
+          err.response?.data?.message ||
+          "حدث خطأ أثناء إرسال طلب الحجز. يرجى المحاولة مرة أخرى";
+        setReservationError(errorMessage);
+        
+        // If the error is about desiredDate, also set dateError
+        if (errors.desiredDate?.[0]) {
+          setDateError(errors.desiredDate[0]);
+        }
+      } else {
+        setReservationError(
+          err.response?.data?.message ||
+            "حدث خطأ أثناء إرسال طلب الحجز. يرجى المحاولة مرة أخرى",
+        );
+      }
+    } finally {
+      setReservationLoading(false);
+    }
+  };
 
   // Get tenant data from store
   const { tenantData, loadingTenantData } = useTenantStore();
@@ -757,9 +891,195 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   />
                 </p>
                 <p className="text-gray-600 text-sm leading-6 font-normal md:text-base lg:text-xl lg:leading-7 whitespace-pre-line">
-  {property.description || "لا يوجد وصف متاح لهذا العقار"}
-</p>
+                  {property.description || "لا يوجد وصف متاح لهذا العقار"}
+                </p>
 
+                {/* احجز الآن Button & Form */}
+                <div className="mt-6 space-y-4">
+                  <button
+                    onClick={() => {
+                      setShowReservationForm(!showReservationForm);
+                      setReservationError(null);
+                      setReservationSuccess(false);
+                      setDateError(null);
+                    }}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 text-base md:text-lg shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <span>احجز الآن</span>
+                    <svg
+                      className={`w-5 h-5 transition-transform duration-200 ${
+                        showReservationForm ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Reservation Form - Dropdown */}
+                  <AnimatePresence>
+                    {showReservationForm && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.6, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <motion.div
+                          initial={{ y: -20 }}
+                          animate={{ y: 0 }}
+                          exit={{ y: -20 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                          className="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-6 space-y-4"
+                        >
+                        {/* Success Message */}
+                        {reservationSuccess && (
+                          <div className="p-3 bg-green-100 border border-green-400 rounded-lg text-green-800 text-sm text-center">
+                            ✅ تم إرسال طلب الحجز بنجاح! سنتواصل معك قريباً.
+                          </div>
+                        )}
+
+                        {/* Error Message */}
+                        {reservationError && !reservationSuccess && (
+                          <div className="p-3 bg-red-100 border border-red-400 rounded-lg text-red-800 text-sm text-center">
+                            {reservationError}
+                          </div>
+                        )}
+
+                        {/* Form */}
+                        {!reservationSuccess && (
+                          <div className="space-y-4">
+                            {/* Customer Name */}
+                            <div>
+                              <label className="block mb-2 text-sm font-medium text-gray-700">
+                                الاسم <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={reservationForm.customerName}
+                                onChange={(e) =>
+                                  setReservationForm({
+                                    ...reservationForm,
+                                    customerName: e.target.value,
+                                  })
+                                }
+                                placeholder="أدخل اسمك"
+                                disabled={reservationLoading}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 text-sm md:text-base"
+                              />
+                            </div>
+
+                            {/* Customer Phone */}
+                            <div>
+                              <label className="block mb-2 text-sm font-medium text-gray-700">
+                                رقم الهاتف <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="tel"
+                                value={reservationForm.customerPhone}
+                                onChange={(e) =>
+                                  setReservationForm({
+                                    ...reservationForm,
+                                    customerPhone: e.target.value,
+                                  })
+                                }
+                                placeholder="+966501234567"
+                                disabled={reservationLoading}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 text-sm md:text-base"
+                              />
+                              <p className="mt-1 text-xs text-gray-500">
+                                مثال: +966501234567
+                              </p>
+                            </div>
+
+                            {/* Desired Date */}
+                            <div>
+                              <label className="block mb-2 text-sm font-medium text-gray-700">
+                                التاريخ المفضل (اختياري)
+                              </label>
+                              <input
+                                type="date"
+                                value={reservationForm.desiredDate}
+                                onChange={(e) => {
+                                  const selectedDate = e.target.value;
+                                  setReservationForm({
+                                    ...reservationForm,
+                                    desiredDate: selectedDate,
+                                  });
+                                  
+                                  // Real-time validation
+                                  if (selectedDate) {
+                                    const date = new Date(selectedDate);
+                                    const today = new Date();
+                                    today.setHours(0, 0, 0, 0);
+                                    date.setHours(0, 0, 0, 0);
+                                    
+                                    if (date < today) {
+                                      setDateError("التاريخ المفضل يجب أن يكون تاريخ اليوم أو بعده");
+                                    } else {
+                                      setDateError(null);
+                                      setReservationError(null);
+                                    }
+                                  } else {
+                                    setDateError(null);
+                                  }
+                                }}
+                                min={new Date().toISOString().split("T")[0]}
+                                disabled={reservationLoading}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 text-sm md:text-base ${
+                                  dateError
+                                    ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                                    : "border-gray-300"
+                                }`}
+                              />
+                              {dateError && (
+                                <p className="mt-1 text-xs text-red-600">{dateError}</p>
+                              )}
+                            </div>
+
+                            {/* Message */}
+                            <div>
+                              <label className="block mb-2 text-sm font-medium text-gray-700">
+                                ملاحظات (اختياري)
+                              </label>
+                              <textarea
+                                value={reservationForm.message}
+                                onChange={(e) =>
+                                  setReservationForm({
+                                    ...reservationForm,
+                                    message: e.target.value,
+                                  })
+                                }
+                                placeholder="أدخل أي ملاحظات أو استفسارات..."
+                                rows={3}
+                                disabled={reservationLoading}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 resize-vertical text-sm md:text-base"
+                              />
+                            </div>
+
+                            {/* Submit Button */}
+                            <button
+                              onClick={handleCreateReservation}
+                              disabled={reservationLoading}
+                              className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-sm md:text-base"
+                            >
+                              {reservationLoading ? "جاري الإرسال..." : "إرسال طلب الحجز"}
+                            </button>
+                          </div>
+                        )}
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </div>
@@ -1858,5 +2178,5 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
         </DialogContent>
       </Dialog>
     </section>
-  );
-}
+    );
+  }

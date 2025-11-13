@@ -23,6 +23,10 @@ import {
   Eye,
   Building2,
   Building,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -93,6 +97,16 @@ export function PropertyReservationsPage() {
   const [filterCustomerTier, setFilterCustomerTier] = useState<string>("all")
   const [sortBy, setSortBy] = useState<"date" | "price" | "name">("date")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [perPage, setPerPage] = useState(10)
+  const [pagination, setPagination] = useState({
+    total: 0,
+    lastPage: 1,
+    from: 0,
+    to: 0,
+  })
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
   const [showDetailDialog, setShowDetailDialog] = useState(false)
   const [showActionDialog, setShowActionDialog] = useState(false)
@@ -114,14 +128,25 @@ export function PropertyReservationsPage() {
       if (searchQuery) params.append("search", searchQuery)
       params.append("sort_by", sortBy)
       params.append("sort_order", sortOrder)
-      params.append("page", "1")
-      params.append("per_page", "100")
+      params.append("page", currentPage.toString())
+      params.append("per_page", perPage.toString())
 
       const response = await axiosInstance.get(`/api/v1/reservations?${params.toString()}`)
 
       if (response.data.success && response.data.data) {
         const reservationsData = response.data.data.reservations || []
         setReservations(reservationsData)
+
+        // Update pagination from response
+        if (response.data.data.pagination) {
+          const paginationData = response.data.data.pagination
+          setPagination({
+            total: paginationData.total || 0,
+            lastPage: paginationData.last_page || 1,
+            from: paginationData.from || 0,
+            to: paginationData.to || 0,
+          })
+        }
 
         // Update stats if available in response
         if (response.data.data.stats) {
@@ -142,6 +167,11 @@ export function PropertyReservationsPage() {
     } finally {
       setLoading(false)
     }
+  }, [filterType, searchQuery, sortBy, sortOrder, currentPage, perPage])
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1)
   }, [filterType, searchQuery, sortBy, sortOrder])
 
   // Fetch stats from API
@@ -370,8 +400,8 @@ export function PropertyReservationsPage() {
     const date = new Date(dateString)
     const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"]
     const dayName = days[date.getDay()]
-    const dateFormatted = date.toLocaleDateString("ar-SA")
-    const time = date.toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit", hour12: true })
+    const dateFormatted = date.toLocaleDateString("ar-US")
+    const time = date.toLocaleTimeString("ar-US", { hour: "2-digit", minute: "2-digit", hour12: true })
     return `${dayName} ${dateFormatted} - ${time}`
   }
 
@@ -502,7 +532,7 @@ export function PropertyReservationsPage() {
               return { month: item.month, reservations: item.reservations || 0 }
             }
             return {
-              month: monthDate.toLocaleDateString("ar-SA", { month: "long" }),
+              month: monthDate.toLocaleDateString("ar-US", { month: "long" }),
               reservations: item.reservations || 0,
             }
           } catch {
@@ -989,7 +1019,26 @@ export function PropertyReservationsPage() {
 
           <TabsContent value="pending" className="space-y-4 mt-4">
             {pendingReservations.length > 0 ? (
-              <ReservationsTable reservations={pendingReservations} />
+              <>
+                <ReservationsTable reservations={pendingReservations} />
+                {/* Pagination */}
+                {pagination.lastPage > 1 && (
+                  <ReservationsPagination
+                    currentPage={currentPage}
+                    lastPage={pagination.lastPage}
+                    total={pagination.total}
+                    perPage={perPage}
+                    from={pagination.from}
+                    to={pagination.to}
+                    onPageChange={(page) => {
+                      setCurrentPage(page)
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }}
+                    onPerPageChange={setPerPage}
+                    loading={loading}
+                  />
+                )}
+              </>
             ) : (
               <Card>
                 <CardContent className="p-6 sm:p-8 text-center">
@@ -1002,7 +1051,26 @@ export function PropertyReservationsPage() {
 
           <TabsContent value="accepted" className="space-y-4 mt-4">
             {acceptedReservations.length > 0 ? (
-              <ReservationsTable reservations={acceptedReservations} />
+              <>
+                <ReservationsTable reservations={acceptedReservations} />
+                {/* Pagination */}
+                {pagination.lastPage > 1 && (
+                  <ReservationsPagination
+                    currentPage={currentPage}
+                    lastPage={pagination.lastPage}
+                    total={pagination.total}
+                    perPage={perPage}
+                    from={pagination.from}
+                    to={pagination.to}
+                    onPageChange={(page) => {
+                      setCurrentPage(page)
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }}
+                    onPerPageChange={setPerPage}
+                    loading={loading}
+                  />
+                )}
+              </>
             ) : (
               <Card>
                 <CardContent className="p-6 sm:p-8 text-center">
@@ -1015,7 +1083,26 @@ export function PropertyReservationsPage() {
 
           <TabsContent value="rejected" className="space-y-4 mt-4">
             {rejectedReservations.length > 0 ? (
-              <ReservationsTable reservations={rejectedReservations} />
+              <>
+                <ReservationsTable reservations={rejectedReservations} />
+                {/* Pagination */}
+                {pagination.lastPage > 1 && (
+                  <ReservationsPagination
+                    currentPage={currentPage}
+                    lastPage={pagination.lastPage}
+                    total={pagination.total}
+                    perPage={perPage}
+                    from={pagination.from}
+                    to={pagination.to}
+                    onPageChange={(page) => {
+                      setCurrentPage(page)
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }}
+                    onPerPageChange={setPerPage}
+                    loading={loading}
+                  />
+                )}
+              </>
             ) : (
               <Card>
                 <CardContent className="p-6 sm:p-8 text-center">
@@ -1371,5 +1458,190 @@ export function PropertyReservationsPage() {
         </Dialog>
       </div>
     </div>
+  )
+}
+
+// Pagination Component
+interface ReservationsPaginationProps {
+  currentPage: number
+  lastPage: number
+  total: number
+  perPage: number
+  from: number
+  to: number
+  onPageChange: (page: number) => void
+  onPerPageChange: (perPage: number) => void
+  loading?: boolean
+}
+
+function ReservationsPagination({
+  currentPage,
+  lastPage,
+  total,
+  perPage,
+  from,
+  to,
+  onPageChange,
+  onPerPageChange,
+  loading = false,
+}: ReservationsPaginationProps) {
+  // Generate page numbers to show
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = []
+    const maxVisiblePages = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5 // Less pages on mobile
+
+    if (lastPage <= maxVisiblePages) {
+      // Show all pages if total pages is less than max visible
+      for (let i = 1; i <= lastPage; i++) {
+        pages.push(i)
+      }
+    } else {
+      // Always show first page
+      pages.push(1)
+
+      // Calculate start and end
+      let start = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2))
+      let end = Math.min(lastPage - 1, currentPage + Math.floor(maxVisiblePages / 2))
+
+      // Adjust if near start
+      if (currentPage <= Math.floor(maxVisiblePages / 2) + 1) {
+        end = Math.min(maxVisiblePages, lastPage - 1)
+        start = 2
+      }
+
+      // Adjust if near end
+      if (currentPage > lastPage - Math.floor(maxVisiblePages / 2)) {
+        start = Math.max(2, lastPage - maxVisiblePages + 1)
+        end = lastPage - 1
+      }
+
+      // Add ellipsis after first page if needed
+      if (start > 2) {
+        pages.push("...")
+      }
+
+      // Add page numbers
+      for (let i = start; i <= end; i++) {
+        pages.push(i)
+      }
+
+      // Add ellipsis before last page if needed
+      if (end < lastPage - 1) {
+        pages.push("...")
+      }
+
+      // Always show last page
+      if (lastPage > 1) {
+        pages.push(lastPage)
+      }
+    }
+
+    return pages
+  }
+
+  const pageNumbers = getPageNumbers()
+
+  return (
+    <Card className="mt-4">
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+          {/* Results info */}
+          <div className="text-xs sm:text-sm text-muted-foreground text-center sm:text-right">
+            عرض {from} إلى {to} من {total} حجز
+          </div>
+
+          {/* Pagination controls */}
+          <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-center">
+            {/* Per page selector - hidden on mobile */}
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">عدد النتائج:</span>
+              <Select value={perPage.toString()} onValueChange={(value) => onPerPageChange(Number(value))}>
+                <SelectTrigger className="h-8 w-20 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Divider - hidden on mobile */}
+            <div className="hidden sm:block w-px h-6 bg-border" />
+
+            {/* First page - hidden on mobile */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(1)}
+              disabled={currentPage === 1 || loading}
+              className="hidden sm:flex h-8 w-8 p-0"
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </Button>
+
+            {/* Previous page */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage === 1 || loading}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+
+            {/* Page numbers */}
+            <div className="flex items-center gap-1">
+              {pageNumbers.map((page, index) => {
+                if (page === "...") {
+                  return (
+                    <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">
+                      ...
+                    </span>
+                  )
+                }
+                return (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => onPageChange(page as number)}
+                    disabled={loading}
+                    className="h-8 w-8 p-0 text-xs sm:text-sm"
+                  >
+                    {page}
+                  </Button>
+                )
+              })}
+            </div>
+
+            {/* Next page */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={currentPage === lastPage || loading}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            {/* Last page - hidden on mobile */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(lastPage)}
+              disabled={currentPage === lastPage || loading}
+              className="hidden sm:flex h-8 w-8 p-0"
+            >
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
