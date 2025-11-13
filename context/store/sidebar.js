@@ -16,6 +16,7 @@ import {
   Link as LinkIcon,
   SquarePen,
   Sparkles,
+  CalendarCheck,
 } from "lucide-react";
 
 const getIconComponent = (iconName) => {
@@ -50,6 +51,9 @@ const getIconComponent = (iconName) => {
       return Bot;
     case "square-pen":
       return SquarePen;
+    case "calendar-check":
+    case "reservations":
+      return CalendarCheck;
     default:
       return FileText;
   }
