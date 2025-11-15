@@ -45,6 +45,7 @@ import {
   AddStageDialog,
   EditStageDialog,
   CrmSettingsDialog,
+  AddDealDialog,
 } from "./index";
 import CrmPageSkeleton from "./crm-page-skeleton";
 
@@ -260,6 +261,7 @@ export default function CrmPage() {
     showCrmSettingsDialog,
     showAddStageDialog,
     showEditStageDialog,
+    showAddDealDialog,
     showAddNoteDialog,
     showAddReminderDialog,
     showEditReminderDialog,
@@ -1072,6 +1074,15 @@ export default function CrmPage() {
             )}
             {showCrmSettingsDialog && (
               <CrmSettingsDialog onStageDeleted={removeStageFromList} />
+            )}
+            {showAddDealDialog && (
+              <AddDealDialog
+                onDealAdded={() => {
+                  dataHandler.fetchCrmData();
+                  dataHandler.fetchAppointmentsData();
+                  dataHandler.fetchRemindersData();
+                }}
+              />
             )}
             {showAppointmentDetailDialog && (
               <div>Appointment Detail Dialog</div>

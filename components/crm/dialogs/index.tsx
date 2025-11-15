@@ -8,3 +8,4 @@ export { default as AddInteractionDialog } from "./add-interaction";
 export { default as AddStageDialog } from "./add-stage";
 export { default as EditStageDialog } from "./edit-stage";
 export { default as CrmSettingsDialog } from "./crm-settings";
+export { default as AddDealDialog } from "./add-deal";

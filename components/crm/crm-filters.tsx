@@ -18,6 +18,7 @@ import {
   Bell,
   User,
   Loader2,
+  Plus,
 } from "lucide-react";
 import { PipelineStage } from "@/types/crm";
 import axiosInstance from "@/lib/axiosInstance";
@@ -64,6 +65,7 @@ export default function CrmFilters({
   onSearchResults,
 }: CrmFiltersProps) {
   const { userData } = useAuthStore();
+  const { setShowAddDealDialog } = useCrmStore();
   const [isSearching, setIsSearching] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null,
@@ -328,6 +330,15 @@ export default function CrmFilters({
           <Move className="h-4 w-4" />
           <span className="hidden sm:inline">مراحل العملاء</span>
           <span className="sm:hidden">المراحل</span>
+        </Button>
+        <Button
+          variant="default"
+          className="flex items-center gap-2"
+          onClick={() => setShowAddDealDialog(true)}
+        >
+          <Plus className="h-4 w-4" />
+          <span className="hidden sm:inline">انشاء صفقة جديدة</span>
+          <span className="sm:hidden">انشاء صفقة</span>
         </Button>
         {/* <Button
           variant={activeView === "appointments" ? "default" : "outline"}

@@ -89,6 +89,7 @@ interface CrmStore {
   showCrmSettingsDialog: boolean;
   showAddStageDialog: boolean;
   showEditStageDialog: boolean;
+  showAddDealDialog: boolean;
 
   // Selected data
   selectedCustomer: Customer | null;
@@ -103,6 +104,13 @@ interface CrmStore {
     color: string;
     iconName: string;
   };
+
+  // New deal data (from popup)
+  newDealData: {
+    customer_name?: string;
+    customer_phone?: string;
+    stage_id?: string;
+  } | null;
 
   // Actions
   setCustomers: (customers: Customer[]) => void;
@@ -140,6 +148,7 @@ interface CrmStore {
   setShowCrmSettingsDialog: (show: boolean) => void;
   setShowAddStageDialog: (show: boolean) => void;
   setShowEditStageDialog: (show: boolean) => void;
+  setShowAddDealDialog: (show: boolean) => void;
   setSelectedCustomer: (customer: Customer | null) => void;
   setSelectedAppointment: (appointment: Appointment | null) => void;
   setSelectedStage: (stage: PipelineStage | null) => void;
@@ -158,6 +167,12 @@ interface CrmStore {
       iconName: string;
     }>,
   ) => void;
+  setNewDealData: (data: {
+    customer_name?: string;
+    customer_phone?: string;
+    stage_id?: string;
+  } | null) => void;
+  clearNewDealData: () => void;
 }
 
 const useCrmStore = create<CrmStore>()(
@@ -192,6 +207,7 @@ const useCrmStore = create<CrmStore>()(
       showCrmSettingsDialog: false,
       showAddStageDialog: false,
       showEditStageDialog: false,
+      showAddDealDialog: false,
 
       // Selected data
       selectedCustomer: null,
@@ -206,6 +222,9 @@ const useCrmStore = create<CrmStore>()(
         color: "bg-blue-500",
         iconName: "Target",
       },
+
+      // New deal data
+      newDealData: null,
 
       // Actions
       setCustomers: (customers) => {
@@ -412,6 +431,7 @@ const useCrmStore = create<CrmStore>()(
       setShowCrmSettingsDialog: (show) => set({ showCrmSettingsDialog: show }),
       setShowAddStageDialog: (show) => set({ showAddStageDialog: show }),
       setShowEditStageDialog: (show) => set({ showEditStageDialog: show }),
+      setShowAddDealDialog: (show) => set({ showAddDealDialog: show }),
       setSelectedCustomer: (customer) => set({ selectedCustomer: customer }),
       setSelectedAppointment: (appointment) =>
         set({ selectedAppointment: appointment }),
@@ -422,6 +442,8 @@ const useCrmStore = create<CrmStore>()(
         const { newStage } = get();
         set({ newStage: { ...newStage, ...updates } });
       },
+      setNewDealData: (data) => set({ newDealData: data }),
+      clearNewDealData: () => set({ newDealData: null }),
     }),
     {
       name: "crm-store",
@@ -433,6 +455,7 @@ const useCrmStore = create<CrmStore>()(
         procedures: state.procedures,
         priorities: state.priorities,
         types: state.types,
+        newDealData: state.newDealData, // Include newDealData for persistence
       }),
     },
   ),
