@@ -82,129 +82,7 @@ export default function CrmFilters({
 
       setIsSearching(true);
       try {
-        // If no search query and no filters, load all customers from /crm
-        if (!query.trim() && stageId === "all" && priority === "all") {
-          const response = await axiosInstance.get("/crm");
-          const crmData = response.data;
-
-          if (crmData.status === "success") {
-            // Transform stages data
-            const transformedStages = crmData.stages_summary.map(
-              (stage: any) => ({
-                id: String(stage.stage_id),
-                name: stage.stage_name,
-                color: stage.color || "#6366f1",
-                icon: stage.icon || "Target",
-                count: stage.customer_count,
-                value: 0,
-              }),
-            );
-
-            // Add "unassigned" stage for customers without stage
-            const unassignedCustomers = crmData.stages_with_customers.flatMap(
-              (stage: any) =>
-                (stage.customers || []).filter(
-                  (customer: any) => !customer.stage_id,
-                ),
-            );
-
-            if (unassignedCustomers.length > 0) {
-              transformedStages.unshift({
-                id: "unassigned",
-                name: "غير محدد",
-                color: "#9ca3af",
-                icon: "User",
-                count: unassignedCustomers.length,
-                value: 0,
-              });
-            }
-
-            // Transform customers data to match new API response format
-            const allCustomersRaw = crmData.stages_with_customers.flatMap(
-              (stage: any) =>
-                (stage.customers || []).map((customer: any) => ({
-                  id: customer.id || customer.customer_id,
-                  user_id: customer.user_id || 0,
-                  name: customer.name || "",
-                  email: customer.email || null,
-                  note: customer.note || null,
-                  customer_type: customer.customer_type || null,
-                  priority: customer.priority || 1,
-                  stage_id: customer.stage_id || stage.stage_id || null,
-                  procedure_id: customer.procedure_id || null,
-                  city_id: customer.city_id || null,
-                  district_id: customer.district_id || null,
-                  phone_number: customer.phone_number || customer.phone || "",
-                  created_at: customer.created_at || "",
-                  updated_at: customer.updated_at || "",
-                  // Backward compatibility fields
-                  customer_id: customer.customer_id || customer.id,
-                  nameEn: customer.name || "",
-                  phone: customer.phone_number || customer.phone || "",
-                  whatsapp: customer.whatsapp || "",
-                  city: customer.city?.name_ar || customer.city || "",
-                  district: customer.district || "",
-                  assignedAgent: customer.assigned_agent || "",
-                  lastContact: customer.last_contact || "",
-                  urgency: customer.priority
-                    ? getPriorityLabel(customer.priority)
-                    : "",
-                  pipelineStage: String(stage.stage_id),
-                  dealValue: customer.deal_value || 0,
-                  probability: customer.probability || 0,
-                  avatar: customer.avatar || "",
-                  reminders: customer.reminders || [],
-                  interactions: customer.interactions || [],
-                  appointments: customer.appointments || [],
-                  notes: customer.notes || "",
-                  joinDate: customer.created_at || "",
-                  nationality: customer.nationality || "",
-                  familySize: customer.family_size || 0,
-                  leadSource: customer.lead_source || "",
-                  satisfaction: customer.satisfaction || 0,
-                  communicationPreference:
-                    customer.communication_preference || "",
-                  expectedCloseDate: customer.expected_close_date || "",
-                })),
-            );
-
-            // Filter out duplicates, preferring customers with stage_id
-            const allCustomers = allCustomersRaw.reduce(
-              (acc: any[], customer: any) => {
-                const existingCustomer = acc.find(
-                  (c) => c.id === customer.id || c.name === customer.name,
-                );
-
-                if (!existingCustomer) {
-                  acc.push(customer);
-                } else {
-                  // If current customer has stage_id and existing doesn't, replace it
-                  if (
-                    customer.stage_id !== null &&
-                    existingCustomer.stage_id === null
-                  ) {
-                    const index = acc.indexOf(existingCustomer);
-                    acc[index] = customer;
-                  }
-                  // If both have stage_id or both don't have stage_id, keep the first one
-                }
-
-                return acc;
-              },
-              [],
-            );
-
-            // Update store
-            setPipelineStages(transformedStages);
-            setCustomers(allCustomers);
-            if (onSearchResults) {
-              onSearchResults(allCustomers);
-            }
-          }
-          return;
-        }
-
-        // If there's a search query or filters, use search API
+        // Build query params for /v1/crm/requests
         const params = new URLSearchParams();
 
         if (query.trim()) {
@@ -225,38 +103,109 @@ export default function CrmFilters({
           params.append("priority", priorityMap[priority] || priority);
         }
 
-        // Add pagination and sorting parameters
-        params.append("page", "1");
-        params.append("per_page", "50");
-        params.append("sort_by", "created_at");
-        params.append("sort_dir", "desc");
+        // If no filters, get all requests
+        const url = params.toString()
+          ? `/v1/crm/requests?${params.toString()}`
+          : "/v1/crm/requests";
 
-        const response = await axiosInstance.get(
-          `/crm/customers/search?${params.toString()}`,
-        );
+        const response = await axiosInstance.get(url);
+        const crmData = response.data;
 
-        if (response.data.status === "success") {
-          const results = response.data.data.customers || [];
+        if (crmData.status === "success") {
+          const { stages, statistics } = crmData.data || {};
 
-          // Filter out duplicates, preferring customers with stage_id
-          const uniqueCustomers = results.reduce(
+          // Transform stages data from new API format
+          const transformedStages = (stages || []).map((stage: any) => ({
+            id: String(stage.id),
+            name: stage.stage_name,
+            color: stage.color || "#6366f1",
+            icon: stage.icon || "Target",
+            count: stage.requests?.length || 0,
+            value: 0,
+          }));
+
+          // Transform requests to customers format for compatibility
+          const allCustomersRaw = (stages || []).flatMap((stage: any) =>
+            (stage.requests || []).map((request: any) => {
+              const customer = request.customer || {};
+              const propertyBasic = request.property_basic || {};
+              const propertySpecs = request.property_specifications || {};
+
+              // Extract property data
+              const basicInfo = propertySpecs.basic_information || {};
+
+              return {
+                // Request data
+                id: request.id,
+                request_id: request.id,
+                user_id: request.user_id || 0,
+                stage_id: request.stage_id || stage.id,
+                property_id: request.property_id,
+                has_property: request.has_property || false,
+                property_source: request.property_source || null,
+                position: request.position || 0,
+                created_at: request.created_at || "",
+                updated_at: request.updated_at || "",
+
+                // Customer data
+                customer_id: customer.id || request.customer_id,
+                name: customer.name || "",
+                phone_number: customer.phone_number || "",
+                phone: customer.phone_number || "",
+                email: null,
+                note: null,
+                customer_type: null,
+                priority: customer.priority_id || 1,
+                priority_id: customer.priority_id || null,
+                type_id: customer.type_id || null,
+                procedure_id: null,
+                city_id: null,
+                district_id: null,
+
+                // Backward compatibility fields
+                nameEn: customer.name || "",
+                whatsapp: "",
+                city: propertyBasic.address ? propertyBasic.address.split(',')[1]?.trim() || "" : "",
+                district: "",
+                assignedAgent: "",
+                lastContact: "",
+                urgency: customer.priority_id
+                  ? getPriorityLabel(customer.priority_id)
+                  : "",
+                pipelineStage: String(request.stage_id || stage.id),
+                dealValue: propertyBasic.price
+                  ? parseFloat(propertyBasic.price)
+                  : basicInfo.price || 0,
+                probability: 0,
+                avatar: propertyBasic.featured_image || "",
+                reminders: [],
+                interactions: [],
+                appointments: [],
+                notes: "",
+                joinDate: request.created_at || "",
+                nationality: "",
+                familySize: 0,
+                leadSource: "",
+                satisfaction: 0,
+                communicationPreference: "",
+                expectedCloseDate: "",
+
+                // Property data (for compatibility)
+                property_basic: propertyBasic,
+                property_specifications: propertySpecs,
+              };
+            }),
+          );
+
+          // Filter out duplicates
+          const allCustomers = allCustomersRaw.reduce(
             (acc: any[], customer: any) => {
               const existingCustomer = acc.find(
-                (c) => c.id === customer.id || c.name === customer.name,
+                (c) => c.id === customer.id || c.request_id === customer.request_id,
               );
 
               if (!existingCustomer) {
                 acc.push(customer);
-              } else {
-                // If current customer has stage_id and existing doesn't, replace it
-                if (
-                  customer.stage_id !== null &&
-                  existingCustomer.stage_id === null
-                ) {
-                  const index = acc.indexOf(existingCustomer);
-                  acc[index] = customer;
-                }
-                // If both have stage_id or both don't have stage_id, keep the first one
               }
 
               return acc;
@@ -264,9 +213,11 @@ export default function CrmFilters({
             [],
           );
 
-          setCustomers(uniqueCustomers);
+          // Update store
+          setPipelineStages(transformedStages);
+          setCustomers(allCustomers);
           if (onSearchResults) {
-            onSearchResults(uniqueCustomers);
+            onSearchResults(allCustomers);
           }
         }
       } catch (error) {

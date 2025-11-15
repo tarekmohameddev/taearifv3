@@ -64,63 +64,82 @@ export default function DataHandler({
       onSetError(null);
 
       // Fetch CRM pipeline data
-      const crmResponse = await axiosInstance.get("/crm");
+      const crmResponse = await axiosInstance.get("/v1/crm/requests");
       const crmData = crmResponse.data;
 
       if (crmData.status === "success") {
-        // Transform stages data
-        const transformedStages = crmData.stages_summary.map((stage: any) => ({
-          id: String(stage.stage_id),
+        const { stages, statistics } = crmData.data || {};
+
+        // Transform stages data from new API format
+        const transformedStages = (stages || []).map((stage: any) => ({
+          id: String(stage.id),
           name: stage.stage_name,
           color: stage.color || "#6366f1",
           icon: stage.icon || "Target",
-          count: stage.customer_count,
+          count: stage.requests?.length || 0,
           value: 0,
         }));
 
-        // Transform customers data
-        const allCustomers = crmData.stages_with_customers.flatMap(
-          (stage: any) =>
-            (stage.customers || []).map((customer: any) => ({
-              id: customer.customer_id,
-              customer_id: customer.customer_id,
+        // Transform requests to customers format for compatibility
+        const allCustomers = (stages || []).flatMap((stage: any) =>
+          (stage.requests || []).map((request: any) => {
+            const customer = request.customer || {};
+            const propertyBasic = request.property_basic || {};
+            const propertySpecs = request.property_specifications || {};
+            const basicInfo = propertySpecs.basic_information || {};
+
+            return {
+              // Request data
+              id: request.id,
+              request_id: request.id,
+              customer_id: customer.id || request.customer_id,
+              user_id: request.user_id || 0,
+              stage_id: request.stage_id || stage.id,
+              property_id: request.property_id,
+              has_property: request.has_property || false,
+              property_source: request.property_source || null,
+              created_at: request.created_at || "",
+              updated_at: request.updated_at || "",
+
+              // Customer data
               name: customer.name || "",
               nameEn: customer.name || "",
-              email: customer.email || "",
-              phone: customer.phone || "",
-              whatsapp: customer.whatsapp || "",
-              customerType: customer.customer_type || "",
-              city: customer.city?.name_ar || customer.city || "",
-              district: customer.district || "",
-              assignedAgent: customer.assigned_agent || "",
-              lastContact: customer.last_contact || "",
-              urgency: customer.priority
-                ? getPriorityLabel(customer.priority)
-                : "",
-              pipelineStage: String(stage.stage_id),
-              stage_id: String(stage.stage_id),
-              dealValue: customer.deal_value || 0,
-              probability: customer.probability || 0,
-              avatar: customer.avatar || "",
-              reminders: customer.reminders || [],
-              interactions: customer.interactions || [],
-              appointments: customer.appointments || [],
-              notes: customer.notes || "",
-              joinDate: customer.created_at || "",
-              nationality: customer.nationality || "",
-              familySize: customer.family_size || 0,
-              leadSource: customer.lead_source || "",
-              satisfaction: customer.satisfaction || 0,
-              communicationPreference: customer.communication_preference || "",
-              expectedCloseDate: customer.expected_close_date || "",
-            })),
+              phone: customer.phone_number || "",
+              phone_number: customer.phone_number || "",
+              email: "",
+              whatsapp: "",
+              customerType: null,
+              city: propertyBasic.address ? propertyBasic.address.split(',')[1]?.trim() || "" : "",
+              district: "",
+              assignedAgent: "",
+              lastContact: "",
+              urgency: customer.priority_id ? getPriorityLabel(customer.priority_id) : "",
+              pipelineStage: String(request.stage_id || stage.id),
+              dealValue: propertyBasic.price ? parseFloat(propertyBasic.price) : basicInfo.price || 0,
+              probability: 0,
+              avatar: propertyBasic.featured_image || "",
+              reminders: [],
+              interactions: [],
+              appointments: [],
+              notes: "",
+              joinDate: request.created_at || "",
+              nationality: "",
+              familySize: 0,
+              leadSource: "",
+              satisfaction: 0,
+              communicationPreference: "",
+              expectedCloseDate: "",
+              property_basic: propertyBasic,
+              property_specifications: propertySpecs,
+            };
+          }),
         );
 
         // Update store
         onSetPipelineStages(transformedStages);
         onSetCustomers(allCustomers);
         onSetCrmData(crmData);
-        onSetTotalCustomers(crmData.total_customers || 0);
+        onSetTotalCustomers(statistics?.total_requests || allCustomers.length);
       }
     } catch (err) {
       console.error("Error fetching CRM data:", err);
@@ -150,9 +169,10 @@ export default function DataHandler({
     targetStage: string,
   ) => {
     try {
-      // API call to change customer stage
+      // customerId is actually request_id in new API format
+      // API call to change request stage
       const response = await axiosInstance.post(
-        `/crm/customers/${customerId}/change-stage`,
+        `/v1/crm/requests/${customerId}/change-stage`,
         {
           stage_id: parseInt(targetStage),
         },
@@ -160,7 +180,7 @@ export default function DataHandler({
 
       const responseData = response.data;
 
-      if (responseData.status === "success") {
+      if (responseData.status === "success" || responseData.status === true) {
         return true;
       } else {
         console.error("Failed to update customer stage:", responseData.message);

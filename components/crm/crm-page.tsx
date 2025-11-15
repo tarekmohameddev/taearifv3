@@ -322,95 +322,101 @@ export default function CrmPage() {
     fetchCrmData: async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get("/crm");
+        const response = await axiosInstance.get("/v1/crm/requests");
         const crmData = response.data;
 
         if (crmData.status === "success") {
-          // Transform stages data
-          const transformedStages = crmData.stages_summary.map(
-            (stage: any) => ({
-              id: String(stage.stage_id),
-              name: stage.stage_name,
-              color: stage.color || "#6366f1",
-              icon: stage.icon || "Target",
-              count: stage.customer_count,
-              value: 0,
-            }),
-          );
+          const { stages, statistics } = crmData.data || {};
 
-          // Add "unassigned" stage for customers without stage
-          const unassignedCustomers = crmData.stages_with_customers.flatMap(
-            (stage: any) =>
-              (stage.customers || []).filter(
-                (customer: any) => !customer.stage_id,
-              ),
-          );
+          // Transform stages data from new API format
+          const transformedStages = (stages || []).map((stage: any) => ({
+            id: String(stage.id),
+            name: stage.stage_name,
+            color: stage.color || "#6366f1",
+            icon: stage.icon || "Target",
+            count: stage.requests?.length || 0,
+            value: 0,
+          }));
 
-          if (unassignedCustomers.length > 0) {
-            transformedStages.unshift({
-              id: "unassigned",
-              name: "غير محدد",
-              color: "#9ca3af",
-              icon: "User",
-              count: unassignedCustomers.length,
-              value: 0,
-            });
-          }
+          // Transform requests to customers format for compatibility
+          const allCustomers = (stages || []).flatMap((stage: any) =>
+            (stage.requests || []).map((request: any) => {
+              const customer = request.customer || {};
+              const propertyBasic = request.property_basic || {};
+              const propertySpecs = request.property_specifications || {};
 
-          // Transform customers data to match new API response format
-          const allCustomers = crmData.stages_with_customers.flatMap(
-            (stage: any) =>
-              (stage.customers || []).map((customer: any) => ({
-                id: customer.id || customer.customer_id,
-                user_id: customer.user_id || 0,
+              // Extract property data
+              const basicInfo = propertySpecs.basic_information || {};
+              const facilities = propertySpecs.facilities || {};
+
+              return {
+                // Request data
+                id: request.id,
+                request_id: request.id,
+                user_id: request.user_id || 0,
+                stage_id: request.stage_id || stage.id,
+                property_id: request.property_id,
+                has_property: request.has_property || false,
+                property_source: request.property_source || null,
+                position: request.position || 0,
+                created_at: request.created_at || "",
+                updated_at: request.updated_at || "",
+
+                // Customer data
+                customer_id: customer.id || request.customer_id,
                 name: customer.name || "",
-                email: customer.email || null,
-                note: customer.note || null,
-                customer_type: customer.customer_type || null,
-                priority: customer.priority || 1,
-                stage_id: customer.stage_id || stage.stage_id || null,
-                procedure_id: customer.procedure_id || null,
-                city_id: customer.city_id || null,
-                district_id: customer.district_id || null,
-                phone_number: customer.phone_number || customer.phone || "",
-                created_at: customer.created_at || "",
-                updated_at: customer.updated_at || "",
+                phone_number: customer.phone_number || "",
+                phone: customer.phone_number || "",
+                email: null,
+                note: null,
+                customer_type: null,
+                priority: customer.priority_id || 1,
+                priority_id: customer.priority_id || null,
+                type_id: customer.type_id || null,
+                procedure_id: null,
+                city_id: null,
+                district_id: null,
+
                 // Backward compatibility fields
-                customer_id: customer.customer_id || customer.id,
                 nameEn: customer.name || "",
-                phone: customer.phone_number || customer.phone || "",
-                whatsapp: customer.whatsapp || "",
-                city: customer.city?.name_ar || customer.city || "",
-                district: customer.district || "",
-                assignedAgent: customer.assigned_agent || "",
-                lastContact: customer.last_contact || "",
-                urgency: customer.priority
-                  ? getPriorityLabel(customer.priority)
+                whatsapp: "",
+                city: propertyBasic.address ? propertyBasic.address.split(',')[1]?.trim() || "" : "",
+                district: "",
+                assignedAgent: "",
+                lastContact: "",
+                urgency: customer.priority_id
+                  ? getPriorityLabel(customer.priority_id)
                   : "",
-                pipelineStage: String(stage.stage_id),
-                dealValue: customer.deal_value || 0,
-                probability: customer.probability || 0,
-                avatar: customer.avatar || "",
-                reminders: customer.reminders || [],
-                interactions: customer.interactions || [],
-                appointments: customer.appointments || [],
-                notes: customer.notes || "",
-                joinDate: customer.created_at || "",
-                nationality: customer.nationality || "",
-                familySize: customer.family_size || 0,
-                leadSource: customer.lead_source || "",
-                satisfaction: customer.satisfaction || 0,
-                communicationPreference:
-                  customer.communication_preference || "",
-                expectedCloseDate: customer.expected_close_date || "",
-              })),
+                pipelineStage: String(request.stage_id || stage.id),
+                dealValue: propertyBasic.price
+                  ? parseFloat(propertyBasic.price)
+                  : basicInfo.price || 0,
+                probability: 0,
+                avatar: propertyBasic.featured_image || "",
+                reminders: [],
+                interactions: [],
+                appointments: [],
+                notes: "",
+                joinDate: request.created_at || "",
+                nationality: "",
+                familySize: 0,
+                leadSource: "",
+                satisfaction: 0,
+                communicationPreference: "",
+                expectedCloseDate: "",
+
+                // Property data (for compatibility)
+                property_basic: propertyBasic,
+                property_specifications: propertySpecs,
+              };
+            }),
           );
 
           // Update store
           setPipelineStages(transformedStages);
           setCustomers(allCustomers);
           setCrmData(crmData);
-          setTotalCustomers(crmData.total_customers || 0);
+          setTotalCustomers(statistics?.total_requests || allCustomers.length);
         }
       } catch (err) {
         console.error("Error fetching CRM data:", err);
@@ -472,8 +478,9 @@ export default function CrmPage() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
+        // customerId is actually request_id in new API format
         const response = await axiosInstance.post(
-          `/crm/customers/${customerId}/change-stage`,
+          `/v1/crm/requests/${customerId}/change-stage`,
           {
             stage_id: parseInt(stageId),
           },
@@ -484,7 +491,7 @@ export default function CrmPage() {
 
         clearTimeout(timeoutId);
 
-        if (response.data.status === "success") {
+        if (response.data.status === "success" || response.data.status === true) {
           return true;
         }
         return false;
