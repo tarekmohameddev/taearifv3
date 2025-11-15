@@ -161,9 +161,11 @@ export default function CustomerCard({
               <div className="font-medium text-sm truncate">
                 {customer.name}
               </div>
-              <div className="text-xs text-muted-foreground">
-                {customer.customer_type || "غير محدد"}
-              </div>
+              {customer.customer_type && customer.customer_type !== "غير محدد" && (
+                <div className="text-xs text-muted-foreground">
+                  {customer.customer_type}
+                </div>
+              )}
             </div>
           </div>
           <DropdownMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -297,9 +299,11 @@ export default function CustomerCard({
               <div className="font-medium text-sm truncate">
                 {customer.name}
               </div>
-              <div className="text-xs text-muted-foreground">
-                {customer.customer_type || "غير محدد"}
-              </div>
+              {customer.customer_type && customer.customer_type !== "غير محدد" && (
+                <div className="text-xs text-muted-foreground">
+                  {customer.customer_type}
+                </div>
+              )}
             </div>
           </div>
           <DropdownMenu open={tabletMenuOpen} onOpenChange={setTabletMenuOpen}>
