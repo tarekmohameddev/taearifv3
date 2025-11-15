@@ -45,6 +45,7 @@ export interface CrmCard {
   id: number;
   user_id?: number;
   card_customer_id?: number;
+  card_request_id?: number;
   card_content: string;
   card_procedure: string;
   card_project: number | null;
@@ -121,14 +122,20 @@ export function CrmActivityCard({
 
     setIsSaving(true);
     try {
-      const payload = {
-        card_customer_id: card.card_customer_id || 8, // fallback if not provided
+      const payload: any = {
         card_content: content,
         card_procedure: procedure,
         card_project: project ? parseInt(project) : null,
         card_property: property ? parseInt(property) : null,
         card_date: date ? date.toISOString() : new Date().toISOString(),
       };
+      
+      // Use card_request_id if available, otherwise use card_customer_id
+      if (card.card_request_id) {
+        payload.card_request_id = card.card_request_id;
+      } else if (card.card_customer_id) {
+        payload.card_customer_id = card.card_customer_id;
+      }
 
       const response = await axiosInstance.put(
         `/v1/crm/cards/${card.id}`,

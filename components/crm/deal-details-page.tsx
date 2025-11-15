@@ -19,10 +19,19 @@ import {
   Loader2,
   AlertCircle,
   Clock,
+  MessageSquare,
+  PlusCircle,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import {
+  CrmActivityCard,
+  CrmCard,
+  Project,
+  Property,
+} from "@/components/crm/dialogs/crm-activity-card";
+import { AddActivityForm } from "@/components/crm/dialogs/add-activity-form";
 
 interface DealDetailsData {
   request: {
@@ -106,6 +115,15 @@ export default function DealDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<DealDetailsData | null>(null);
+  
+  // States for cards/activities (from popup)
+  const [cards, setCards] = useState<CrmCard[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoadingCards, setIsLoadingCards] = useState(false);
+  const [errorCards, setErrorCards] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchDealDetails = async () => {
@@ -135,6 +153,114 @@ export default function DealDetailsPage() {
     }
   }, [dealId]);
 
+  // Fetch cards, projects, and properties (from popup)
+  useEffect(() => {
+    if (data?.request?.id) {
+      const fetchCardsData = async () => {
+        setIsLoadingCards(true);
+        setErrorCards(null);
+        try {
+          const [cardsRes, projectsRes, propertiesRes] = await Promise.all([
+            axiosInstance.get(
+              `/v1/crm/cards?card_request_id=${data.request.id}`,
+            ),
+            axiosInstance.get("/projects"),
+            axiosInstance.get("/properties"),
+          ]);
+
+          // Merge cards from API details with cards from cards endpoint
+          const cardsFromApi = Array.isArray(data.cards) ? data.cards.map((card: any): CrmCard => ({
+            id: card.id,
+            user_id: card.user_id,
+            card_customer_id: card.card_customer_id,
+            card_request_id: card.card_request_id || data.request.id,
+            card_content: card.card_content || "",
+            card_procedure: card.card_procedure || "note",
+            card_project: card.card_project ?? null,
+            card_property: card.card_property ?? null,
+            card_date: card.card_date || card.created_at || new Date().toISOString(),
+            created_at: card.created_at,
+            updated_at: card.updated_at,
+            deleted_at: card.deleted_at,
+          })) : [];
+          
+          const cardsFromEndpoint = cardsRes.data.status === "success" || cardsRes.data.status === true
+            ? (cardsRes.data.data?.cards || cardsRes.data.data || []).map((card: any): CrmCard => ({
+              id: card.id,
+              user_id: card.user_id,
+              card_customer_id: card.card_customer_id,
+              card_request_id: card.card_request_id || data.request.id,
+              card_content: card.card_content || "",
+              card_procedure: card.card_procedure || "note",
+              card_project: card.card_project ?? null,
+              card_property: card.card_property ?? null,
+              card_date: card.card_date || card.created_at || new Date().toISOString(),
+              created_at: card.created_at,
+              updated_at: card.updated_at,
+              deleted_at: card.deleted_at,
+            }))
+            : [];
+          
+          // Merge and remove duplicates based on id
+          const mergedCards = [...cardsFromApi];
+          cardsFromEndpoint.forEach((card: CrmCard) => {
+            if (!mergedCards.find((c: CrmCard) => c.id === card.id)) {
+              mergedCards.push(card);
+            }
+          });
+          
+          setCards(mergedCards);
+          
+          if (projectsRes.data.status === "success") {
+            setProjects(projectsRes.data.data?.projects || projectsRes.data.data || []);
+          }
+          if (propertiesRes.data.status === "success") {
+            setProperties(propertiesRes.data.data?.properties || propertiesRes.data.data || []);
+          }
+        } catch (err) {
+          console.error("Failed to fetch cards data:", err);
+          // Fallback to cards from API details if endpoint fails
+          const cardsFromApi = Array.isArray(data.cards) ? data.cards.map((card: any): CrmCard => ({
+            id: card.id,
+            user_id: card.user_id,
+            card_customer_id: card.card_customer_id,
+            card_request_id: card.card_request_id || data.request.id,
+            card_content: card.card_content || "",
+            card_procedure: card.card_procedure || "note",
+            card_project: card.card_project ?? null,
+            card_property: card.card_property ?? null,
+            card_date: card.card_date || card.created_at || new Date().toISOString(),
+            created_at: card.created_at,
+            updated_at: card.updated_at,
+            deleted_at: card.deleted_at,
+          })) : [];
+          setCards(cardsFromApi);
+          setErrorCards("فشل في تحميل الأنشطة والبطاقات.");
+        } finally {
+          setIsLoadingCards(false);
+        }
+      };
+      fetchCardsData();
+    } else if (data?.cards) {
+      // If no request id but cards exist in data, use them
+      const cardsFromApi = Array.isArray(data.cards) ? data.cards.map((card: any): CrmCard => ({
+        id: card.id,
+        user_id: card.user_id,
+        card_customer_id: card.card_customer_id,
+        card_request_id: card.card_request_id,
+        card_content: card.card_content || "",
+        card_procedure: card.card_procedure || "note",
+        card_project: card.card_project ?? null,
+        card_property: card.card_property ?? null,
+        card_date: card.card_date || card.created_at || new Date().toISOString(),
+        created_at: card.created_at,
+        updated_at: card.updated_at,
+        deleted_at: card.deleted_at,
+      })) : [];
+      setCards(cardsFromApi);
+    }
+  }, [data?.request?.id, data?.cards]);
+
   const formatDate = (dateString: string) => {
     if (!dateString) return "غير محدد";
     try {
@@ -156,6 +282,47 @@ export default function DealDetailsPage() {
       currency: "SAR",
       minimumFractionDigits: 0,
     }).format(amount);
+  };
+
+  // Handle add card (from popup)
+  const handleAddCard = async (cardData: any) => {
+    if (!data?.request?.id) return;
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        ...cardData,
+        card_request_id: data.request.id,
+      };
+      const response = await axiosInstance.post("/v1/crm/cards", payload);
+      if (response.data.status === true || response.data.status === "success") {
+        const newCard = response.data.data?.card || response.data.data;
+        setCards((prev) => [newCard, ...prev]);
+        setShowAddForm(false);
+      } else {
+        setErrorCards(response.data.message || "فشل في إضافة النشاط.");
+      }
+    } catch (err) {
+      console.error("Failed to add card:", err);
+      setErrorCards("حدث خطأ أثناء إضافة النشاط.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle call
+  const handleCall = () => {
+    if (customer?.phone_number) {
+      window.open(`tel:${customer.phone_number}`, "_blank");
+    }
+  };
+
+  // Handle WhatsApp
+  const handleWhatsApp = () => {
+    if (customer?.phone_number) {
+      const message = `مرحباً ${customer.name}، أتمنى أن تكون بخير.`;
+      const whatsappUrl = `https://wa.me/${customer.phone_number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, "_blank");
+    }
   };
 
   if (loading) {
@@ -202,7 +369,7 @@ export default function DealDetailsPage() {
     );
   }
 
-  const { request, customer, cards, property_specifications, property_basic, property } =
+  const { request, customer, cards: cardsFromApi, property_specifications, property_basic, property } =
     data as any;
 
   // Debug: Log to check data structure
@@ -731,43 +898,103 @@ export default function DealDetailsPage() {
               </Card>
             ) : null}
 
-            {/* البطاقات/الأنشطة */}
-            {cards && cards.length > 0 ? (
-              <Card>
-                <CardHeader>
+            {/* الأنشطة والبطاقات - من popup */}
+            <Card>
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
+                    <MessageSquare className="h-5 w-5" />
                     الأنشطة والبطاقات ({cards.length})
                   </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {cards.map((card: any) => (
-                      <Card key={card.id} className="bg-muted/50">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <p className="font-medium mb-2">{card.card_content}</p>
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                <div className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  {formatDate(card.card_date)}
-                                </div>
-                                {card.card_procedure ? (
-                                  <Badge variant="outline" className="text-xs">
-                                    {card.card_procedure}
-                                  </Badge>
-                                ) : null}
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ) : null}
+                  {customer?.phone_number ? (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        onClick={handleCall}
+                      >
+                        <Phone className="h-4 w-4" />
+                        <span className="hidden sm:inline">اتصل</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        onClick={handleWhatsApp}
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        <span className="hidden sm:inline">واتساب</span>
+                      </Button>
+                    </div>
+                  ) : null}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {!showAddForm ? (
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2"
+                      onClick={() => setShowAddForm(true)}
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                      إضافة نشاط أو ملاحظة
+                    </Button>
+                  ) : null}
+
+                  {showAddForm ? (
+                    <AddActivityForm
+                      projects={projects}
+                      properties={properties}
+                      onSubmit={handleAddCard}
+                      onCancel={() => setShowAddForm(false)}
+                      isSubmitting={isSubmitting}
+                    />
+                  ) : null}
+
+                  {isLoadingCards ? (
+                    <div className="flex items-center justify-center h-48">
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-sm text-muted-foreground">
+                          جاري تحميل الأنشطة...
+                        </p>
+                      </div>
+                    </div>
+                  ) : errorCards ? (
+                    <div className="flex flex-col items-center justify-center h-48 text-red-500">
+                      <AlertCircle className="h-8 w-8 mb-2" />
+                      <p className="text-sm text-center">{errorCards}</p>
+                    </div>
+                  ) : cards.length > 0 ? (
+                    <div className="space-y-4">
+                      {cards.map((card) => (
+                        <CrmActivityCard
+                          key={card.id}
+                          card={{ ...card, card_request_id: request?.id || card.card_request_id }}
+                          projects={projects}
+                          properties={properties}
+                          onCardUpdate={(updatedCard) => {
+                            setCards((prev) =>
+                              prev.map((c) =>
+                                c.id === updatedCard.id ? updatedCard : c,
+                              ),
+                            );
+                          }}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-48">
+                      <p className="text-sm text-muted-foreground text-center">
+                        لا توجد ملاحظات أو أنشطة لهذه الصفقة.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>
