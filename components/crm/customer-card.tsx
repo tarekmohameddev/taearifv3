@@ -381,14 +381,14 @@ export default function CustomerCard({
           )}
         </div>
 
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            <span className="truncate">
-              {customer.email || "لا يوجد بريد إلكتروني"}
-            </span>
+        {customer.email && (
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              <span className="truncate">{customer.email}</span>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex items-center justify-between">
           {getPropertyTypeLabel(customer) !== "غير محدد" && (
@@ -524,12 +524,14 @@ export default function CustomerCard({
           )}
         </div>
 
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            <span>{customer.email || "لا يوجد بريد إلكتروني"}</span>
+        {customer.email && (
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              <span>{customer.email}</span>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex items-center justify-between">
           {getPropertyTypeLabel(customer) !== "غير محدد" && (
