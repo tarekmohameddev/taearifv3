@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +58,7 @@ export default function CustomerCard({
   onAddInteraction,
   viewType,
 }: CustomerCardProps) {
+  const router = useRouter();
   const [hasDragged, setHasDragged] = useState(false);
   const [showWhatsAppDialog, setShowWhatsAppDialog] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -80,9 +82,9 @@ export default function CustomerCard({
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    // إذا لم يتم السحب، افتح تفاصيل العميل
+    // إذا لم يتم السحب، افتح صفحة تفاصيل الصفقة
     if (!hasDragged) {
-      onViewDetails(customer);
+      router.push(`/dashboard/crm/${customer.id}`);
     }
   };
 
@@ -180,7 +182,7 @@ export default function CustomerCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                onClick={() => onViewDetails(customer)}
+                onClick={() => router.push(`/dashboard/crm/${customer.id}`)}
                 onSelect={() => {}}
               >
                 <Eye className="ml-2 h-4 w-4" />
@@ -318,7 +320,7 @@ export default function CustomerCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                onClick={() => onViewDetails(customer)}
+                onClick={() => router.push(`/dashboard/crm/${customer.id}`)}
                 onSelect={() => {}}
               >
                 <Eye className="ml-2 h-4 w-4" />
@@ -448,7 +450,7 @@ export default function CustomerCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                onClick={() => onViewDetails(customer)}
+                onClick={() => router.push(`/dashboard/crm/${customer.id}`)}
                 onSelect={() => {}}
               >
                 <Eye className="ml-2 h-4 w-4" />
