@@ -102,30 +102,40 @@ export default function CustomerCard({
       setHasDragged(false);
     }, 100);
   };
-  const getPriorityColor = (priority: number) => {
-    switch (priority) {
-      case 3:
-        return "border-red-500 text-red-700";
-      case 2:
-        return "border-yellow-500 text-yellow-700";
-      case 1:
-        return "border-green-500 text-green-700";
-      default:
-        return "border-gray-500 text-gray-700";
+  const getPropertyTypeColor = (propertyType: string | null | undefined) => {
+    if (!propertyType) {
+      return "border-gray-500 text-gray-700 bg-gray-50";
     }
+    const type = propertyType.toLowerCase();
+    if (type.includes("شقة") || type.includes("apartment")) {
+      return "border-blue-500 text-blue-700 bg-blue-50";
+    }
+    if (type.includes("فيلا") || type.includes("villa")) {
+      return "border-purple-500 text-purple-700 bg-purple-50";
+    }
+    if (type.includes("أرض") || type.includes("land")) {
+      return "border-green-500 text-green-700 bg-green-50";
+    }
+    if (type.includes("محل") || type.includes("shop") || type.includes("store")) {
+      return "border-orange-500 text-orange-700 bg-orange-50";
+    }
+    if (type.includes("مكتب") || type.includes("office")) {
+      return "border-indigo-500 text-indigo-700 bg-indigo-50";
+    }
+    return "border-gray-500 text-gray-700 bg-gray-50";
   };
 
-  const getPriorityLabel = (priority: number) => {
-    switch (priority) {
-      case 3:
-        return "عالية";
-      case 2:
-        return "متوسطة";
-      case 1:
-        return "منخفضة";
-      default:
-        return "غير محدد";
+  const getPropertyTypeLabel = (customer: Customer): string => {
+    // Try property_basic.type first
+    if (customer.property_basic?.type) {
+      return customer.property_basic.type;
     }
+    // Try property_specifications.basic_information.property_type
+    if (customer.property_specifications?.basic_information?.property_type) {
+      return customer.property_specifications.basic_information.property_type;
+    }
+    // Return default if no property type found
+    return "غير محدد";
   };
 
   const renderMobileView = () => (
@@ -246,12 +256,14 @@ export default function CustomerCard({
         </div>
 
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <Badge
-            variant="outline"
-            className={`text-xs ${getPriorityColor(customer.priority)}`}
-          >
-            {getPriorityLabel(customer.priority)}
-          </Badge>
+          {getPropertyTypeLabel(customer) !== "غير محدد" && (
+            <Badge
+              variant="outline"
+              className={`text-xs ${getPropertyTypeColor(getPropertyTypeLabel(customer))}`}
+            >
+              {getPropertyTypeLabel(customer)}
+            </Badge>
+          )}
           <div className="text-xs text-muted-foreground truncate flex-1 text-left">
             {customer.note && customer.note.length > 0
               ? "لديه ملاحظات"
@@ -379,12 +391,14 @@ export default function CustomerCard({
         </div>
 
         <div className="flex items-center justify-between">
-          <Badge
-            variant="outline"
-            className={`text-xs ${getPriorityColor(customer.priority)}`}
-          >
-            {getPriorityLabel(customer.priority)}
-          </Badge>
+          {getPropertyTypeLabel(customer) !== "غير محدد" && (
+            <Badge
+              variant="outline"
+              className={`text-xs ${getPropertyTypeColor(getPropertyTypeLabel(customer))}`}
+            >
+              {getPropertyTypeLabel(customer)}
+            </Badge>
+          )}
           <div className="text-xs text-muted-foreground truncate max-w-[80px]">
             {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
           </div>
@@ -518,12 +532,14 @@ export default function CustomerCard({
         </div>
 
         <div className="flex items-center justify-between">
-          <Badge
-            variant="outline"
-            className={getPriorityColor(customer.priority)}
-          >
-            {getPriorityLabel(customer.priority)}
-          </Badge>
+          {getPropertyTypeLabel(customer) !== "غير محدد" && (
+            <Badge
+              variant="outline"
+              className={getPropertyTypeColor(getPropertyTypeLabel(customer))}
+            >
+              {getPropertyTypeLabel(customer)}
+            </Badge>
+          )}
           <div className="text-xs text-muted-foreground">
             {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
           </div>

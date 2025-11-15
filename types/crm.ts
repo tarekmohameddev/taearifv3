@@ -40,6 +40,63 @@ export interface Customer {
   expectedCloseDate?: string;
   status?: string;
   totalValue?: number;
+  property_basic?: {
+    id?: number | null;
+    title?: string | null;
+    address?: string | null;
+    price?: string | number | null;
+    pricePerMeter?: string | number | null;
+    purpose?: string | null;
+    type?: string | null;
+    beds?: number | null;
+    bath?: number | null;
+    area?: string | number | null;
+    featured_image?: string | null;
+  };
+  property_specifications?: {
+    basic_information?: {
+      address?: string | null;
+      building?: string | null;
+      price?: number | null;
+      payment_method?: string | null;
+      price_per_sqm?: number | null;
+      listing_type?: string | null;
+      property_category?: string | null;
+      project?: string | null;
+      city?: string | null;
+      district?: string | number | null;
+      area?: number | null;
+      property_type?: string | null;
+    };
+    details?: {
+      features?: any[];
+    };
+    attributes?: {
+      area_sqft?: number | null;
+      year_built?: number | null;
+    };
+    facilities?: {
+      bedrooms?: number | null;
+      bathrooms?: number | null;
+      rooms?: number | null;
+      floors?: number | null;
+      floor_number?: number | null;
+      drivers_room?: number | null;
+      maids_room?: number | null;
+      dining_room?: number | null;
+      living_room?: boolean | null;
+      majlis?: number | null;
+      storage_room?: boolean | null;
+      basement?: number | null;
+      swimming_pool?: number | null;
+      kitchen?: number | null;
+      balcony?: boolean | null;
+      garden?: number | null;
+      annex?: boolean | null;
+      elevator?: number | null;
+      parking_space?: number | null;
+    };
+  };
 }
 
 export interface PipelineStage {

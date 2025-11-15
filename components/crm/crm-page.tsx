@@ -20,6 +20,9 @@ import {
   Award,
   User,
   Shield,
+  FileText,
+  Home,
+  FileQuestion,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import {
@@ -218,6 +221,65 @@ const CrmStatisticsInline = ({
           </div>
           <div className="text-xs text-muted-foreground">
             {totalAppointments} إجمالي
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// مكون الإحصائيات للطلبات
+const CrmStatisticsCards = ({
+  statistics,
+}: {
+  statistics: {
+    total_requests: number;
+    with_property: number;
+    without_property: number;
+  } | null;
+}) => {
+  if (!statistics) {
+    return null;
+  }
+
+  return (
+    <div className="grid gap-4 mb-8 grid-cols-1 sm:grid-cols-3">
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium flex items-center">
+            <FileText className="ml-2 h-4 w-4" />
+            إجمالي الطلبات
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl sm:text-3xl font-bold">
+            {statistics.total_requests || 0}
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium flex items-center">
+            <Home className="ml-2 h-4 w-4" />
+            مع عقار
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl sm:text-3xl font-bold">
+            {statistics.with_property || 0}
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium flex items-center">
+            <FileQuestion className="ml-2 h-4 w-4" />
+            بدون عقار
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl sm:text-3xl font-bold">
+            {statistics.without_property || 0}
           </div>
         </CardContent>
       </Card>
@@ -945,14 +1007,18 @@ export default function CrmPage() {
             <CrmHeader onRefresh={handleRefresh} onSettings={handleSettings} />
 
             {/* Statistics */}
-            {/* <CrmStatisticsInline
-              totalCustomers={totalCustomers}
-              customersData={customersData}
-              pipelineStages={pipelineStages}
-              pipelineStats={pipelineStats}
-              scheduledAppointments={scheduledAppointments}
-              totalAppointments={totalAppointments}
-            /> */}
+            <CrmStatisticsCards
+              statistics={
+                crmData?.data?.statistics
+                  ? {
+                      total_requests: crmData.data.statistics.total_requests || 0,
+                      with_property: crmData.data.statistics.with_property || 0,
+                      without_property:
+                        crmData.data.statistics.without_property || 0,
+                    }
+                  : null
+              }
+            />
 
             {/* Filters */}
             <CrmFilters

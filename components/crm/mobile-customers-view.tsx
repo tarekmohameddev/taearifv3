@@ -82,30 +82,40 @@ const getStageIcon = (iconName: string) => {
   return iconMap[iconName] || Target;
 };
 
-const getPriorityColor = (priority: number) => {
-  switch (priority) {
-    case 0:
-      return "bg-gray-100 text-gray-800";
-    case 1:
-      return "bg-yellow-100 text-yellow-800";
-    case 2:
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
+const getPropertyTypeColor = (propertyType: string | null | undefined) => {
+  if (!propertyType) {
+    return "bg-gray-100 text-gray-800";
   }
+  const type = propertyType.toLowerCase();
+  if (type.includes("شقة") || type.includes("apartment")) {
+    return "bg-blue-100 text-blue-800";
+  }
+  if (type.includes("فيلا") || type.includes("villa")) {
+    return "bg-purple-100 text-purple-800";
+  }
+  if (type.includes("أرض") || type.includes("land")) {
+    return "bg-green-100 text-green-800";
+  }
+  if (type.includes("محل") || type.includes("shop") || type.includes("store")) {
+    return "bg-orange-100 text-orange-800";
+  }
+  if (type.includes("مكتب") || type.includes("office")) {
+    return "bg-indigo-100 text-indigo-800";
+  }
+  return "bg-gray-100 text-gray-800";
 };
 
-const getPriorityLabel = (priority: number) => {
-  switch (priority) {
-    case 0:
-      return "منخفضة";
-    case 1:
-      return "متوسطة";
-    case 2:
-      return "عالية";
-    default:
-      return "متوسطة";
+const getPropertyTypeLabel = (customer: Customer): string => {
+  // Try property_basic.type first
+  if (customer.property_basic?.type) {
+    return customer.property_basic.type;
   }
+  // Try property_specifications.basic_information.property_type
+  if (customer.property_specifications?.basic_information?.property_type) {
+    return customer.property_specifications.basic_information.property_type;
+  }
+  // Return default if no property type found
+  return "غير محدد";
 };
 
 export default function MobileCustomersView({
@@ -290,12 +300,14 @@ export default function MobileCustomersView({
                             "غير محدد"
                           : customer.name || "غير محدد"}
                       </h3>
-                      <Badge
-                        className={getPriorityColor(customer.priority || 1)}
-                        variant="secondary"
-                      >
-                        {getPriorityLabel(customer.priority || 1)}
-                      </Badge>
+                      {getPropertyTypeLabel(customer) !== "غير محدد" && (
+                        <Badge
+                          className={getPropertyTypeColor(getPropertyTypeLabel(customer))}
+                          variant="secondary"
+                        >
+                          {getPropertyTypeLabel(customer)}
+                        </Badge>
+                      )}
                     </div>
 
                     <div className="space-y-1 text-sm text-muted-foreground">
