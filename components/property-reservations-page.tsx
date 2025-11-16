@@ -260,6 +260,18 @@ export function PropertyReservationsPage() {
   const acceptedReservations = filteredReservations.filter((r) => r.status === "accepted")
   const rejectedReservations = filteredReservations.filter((r) => r.status === "rejected")
 
+  // Adaptive font sizing in px: decreases size as text length grows
+  const getAdaptiveFontSizePx = (text: string, options?: { base?: number; min?: number; step?: number; charsPerStep?: number }) => {
+    const t = text || ""
+    const base = options?.base ?? 16 // px
+    const min = options?.min ?? 11 // px
+    const step = options?.step ?? 1 // px decrease per step
+    const charsPerStep = options?.charsPerStep ?? 10 // characters per step
+    const steps = Math.floor(t.length / charsPerStep)
+    const size = Math.max(min, base - steps * step)
+    return size
+  }
+
   const handleSelectReservation = (id: string) => {
     const newSelected = new Set(selectedReservations)
     if (newSelected.has(id)) {
@@ -599,8 +611,16 @@ export function PropertyReservationsPage() {
                         />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">{reservation.property.title}</p>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <p
+                          className="font-medium"
+                          style={{ fontSize: `${getAdaptiveFontSizePx(reservation.property.title, { base: 16, min: 11, step: 1, charsPerStep: 10 })}px`, lineHeight: "1.25" }}
+                        >
+                          {reservation.property.title}
+                        </p>
+                        <p
+                          className="text-muted-foreground flex items-center gap-1"
+                          style={{ fontSize: `${getAdaptiveFontSizePx(reservation.property.address, { base: 13, min: 10, step: 1, charsPerStep: 12 })}px`, lineHeight: "1.2" }}
+                        >
                           <MapPin className="h-3 w-3" /> {reservation.property.address}
                         </p>
                       </div>
@@ -709,7 +729,7 @@ export function PropertyReservationsPage() {
   )
 
   return (
-    <div className="w-full min-h-screen  ">
+    <div className="w-full min-h-screen  max-w-screen">
       <div className="mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
         {/* Error Message */}
         {error && (
@@ -995,7 +1015,7 @@ export function PropertyReservationsPage() {
         )}
 
         {/* Reservations Tabs */}
-        <Tabs defaultValue="pending" className="w-full">
+        <Tabs defaultValue="pending" className="w-full max-w-screen">
           <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm h-9 sm:h-10">
             <TabsTrigger value="pending" className="text-xs sm:text-sm">
               قيد الانتظار{" "}
