@@ -243,7 +243,7 @@ export function CrmActivityCard({
             </PopoverContent>
           </Popover>
 
-          <Select value={project} onValueChange={setProject}>
+          {/* <Select value={project} onValueChange={setProject}>
             <SelectTrigger className="w-full sm:w-[110px] text-xs h-8 sm:h-9 flex-shrink-0">
               <div className="flex items-center gap-1">
                 <Briefcase className="h-3 w-3" />
@@ -273,7 +273,7 @@ export function CrmActivityCard({
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </Select> */}
 
           <Select value={procedure} onValueChange={setProcedure}>
             <SelectTrigger className="w-full sm:w-[110px] text-xs h-8 sm:h-9 flex-shrink-0">

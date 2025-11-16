@@ -124,7 +124,7 @@ export function AddActivityForm({
             </PopoverContent>
           </Popover>
 
-          <Select value={project} onValueChange={setProject}>
+          {/* <Select value={project} onValueChange={setProject}>
             <SelectTrigger className="w-[140px] text-xs h-9">
               <div className="flex items-center gap-2">
                 <Briefcase className="h-4 w-4" />
@@ -154,7 +154,7 @@ export function AddActivityForm({
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </Select> */}
 
           <Select value={procedure} onValueChange={setProcedure}>
             <SelectTrigger className="w-[140px] text-xs h-9">

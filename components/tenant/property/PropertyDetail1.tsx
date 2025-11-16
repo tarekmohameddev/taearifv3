@@ -1001,7 +1001,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                             </div>
 
                             {/* Desired Date */}
-                            <div>
+                            {/* مخفية مؤقتا , لا تمسحها للاستخدام في المستقبل */}
+                            {/* <div>
                               <label className="block mb-2 text-sm font-medium text-gray-700">
                                 التاريخ المفضل (اختياري)
                               </label>
@@ -1043,7 +1044,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               {dateError && (
                                 <p className="mt-1 text-xs text-red-600">{dateError}</p>
                               )}
-                            </div>
+                            </div> */}
 
                             {/* Message */}
                             <div>
