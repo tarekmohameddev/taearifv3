@@ -41,7 +41,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 // Added Table components
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 interface Reservation {
   id: string
@@ -558,50 +557,58 @@ export function PropertyReservationsPage() {
   // const ReservationCard = ({ reservation }: { reservation: Reservation }) => ( ... )
 
   const ReservationsTable = ({ reservations }: { reservations: Reservation[] }) => (
-    <Card>
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="">
-                <TableHead className="w-[50px]">
+    <Card className="flex max-w-full overflow-hidden" style={{ maxWidth: '100%' }}>
+      <CardContent className="p-0 max-w-full flex overflow-hidden" style={{ maxWidth: '100%' }}>
+        <div 
+          className="overflow-x-auto w-full" 
+          style={{ 
+            maxWidth: '100%', 
+            width: '100%',
+            overflowX: 'auto',
+            overflowY: 'hidden'
+          }}
+        >
+          <table className="border-collapse" style={{ minWidth: '1200px', width: '100%' }}>
+            <thead>
+              <tr className="border-b bg-muted/50">
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">
                   <Checkbox
                     checked={selectedReservations.size === reservations.length && reservations.length > 0}
                     onCheckedChange={() => handleSelectAll(reservations)}
                     className="w-5 h-5"
                   />
-                </TableHead>
-                <TableHead className="min-w-[200px]">العقار</TableHead>
-                <TableHead className="min-w-[150px]">اسم المشروع</TableHead>
-                <TableHead className="min-w-[120px]">اسم المبنى</TableHead>
-                <TableHead className="min-w-[150px]">العميل</TableHead>
-                <TableHead className="min-w-[100px]">النوع</TableHead>
-                <TableHead className="min-w-[250px]">التاريخ والوقت</TableHead>
-                <TableHead className="min-w-[100px]">السعر</TableHead>
-                <TableHead className="min-w-[100px]">الدفعة</TableHead>
-                <TableHead className="min-w-[100px]">الحالة</TableHead>
-                <TableHead className="min-w-[150px] text-center">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+                </th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">العقار</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">اسم المشروع</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">اسم المبنى</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">العميل</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">النوع</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">التاريخ والوقت</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">السعر</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">الدفعة</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">الحالة</th>
+                <th className="h-12 px-4 text-center align-middle font-medium text-muted-foreground text-sm">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
               {reservations.map((reservation) => (
-                <TableRow
+                <tr
                   key={reservation.id}
                   className={cn(
-                    "cursor-pointer hover:bg-slate-50 transition-colors",
+                    "border-b cursor-pointer hover:bg-slate-50 transition-colors",
                     selectedReservations.has(reservation.id) && "bg-blue-50",
                   )}
-                  onClick={() => handleViewDetails(reservation)} // Make the whole row clickable for details
+                  onClick={() => handleViewDetails(reservation)}
                 >
-                  <TableCell>
+                  <td className="p-4 align-middle">
                     <Checkbox
                       checked={selectedReservations.has(reservation.id)}
                       onCheckedChange={() => handleSelectReservation(reservation.id)}
-                      onClick={(e) => e.stopPropagation()} // Prevent row click when checkbox is interacted with
+                      onClick={(e) => e.stopPropagation()}
                       className="w-5 h-5"
                     />
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-4 align-middle">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                         <img
@@ -617,50 +624,44 @@ export function PropertyReservationsPage() {
                         >
                           {reservation.property.title}
                         </p>
-                        <p
-                          className="text-muted-foreground flex items-center gap-1"
-                          style={{ fontSize: `${getAdaptiveFontSizePx(reservation.property.address, { base: 13, min: 10, step: 1, charsPerStep: 12 })}px`, lineHeight: "1.2" }}
-                        >
-                          <MapPin className="h-3 w-3" /> {reservation.property.address}
-                        </p>
                       </div>
                     </div>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-4 align-middle">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{reservation.property.projectName}</span>
                     </div>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-4 align-middle">
                     <div className="flex items-center gap-2">
                       <Building className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{reservation.property.buildingName}</span>
                     </div>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-4 align-middle">
                     <div>
                       <p className="font-medium text-sm">{reservation.customer.name}</p>
                       <p className="text-xs text-muted-foreground">{reservation.customer.phone}</p>
                     </div>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-4 align-middle">
                     <Badge variant="outline" className="text-xs">
                       {getTypeLabel(reservation.type)}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-4 align-middle">
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="h-4 w-4 text-muted-foreground" />
                       <span className="whitespace-nowrap">{formatDateTime(reservation.requestDate)}</span>
                     </div>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-4 align-middle">
                     <p className="font-semibold text-sm whitespace-nowrap">
                       {reservation.property.price.toLocaleString()} ر.س
                     </p>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-4 align-middle">
                     {reservation.paymentRequired ? (
                       <div className="flex items-center gap-1">
                         <CreditCard className="h-3 w-3 text-green-600" />
@@ -671,19 +672,19 @@ export function PropertyReservationsPage() {
                     ) : (
                       <span className="text-xs text-muted-foreground">لا يوجد</span>
                     )}
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-4 align-middle">
                     <Badge variant="outline" className={`text-xs ${getStatusColor(reservation.status)}`}>
                       {getStatusLabel(reservation.status)}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-4 align-middle">
                     <div className="flex items-center justify-center gap-2">
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={(e) => {
-                          e.stopPropagation() // Prevent row click when viewing details
+                          e.stopPropagation()
                           handleViewDetails(reservation)
                         }}
                         className="h-8 px-2"
@@ -718,19 +719,19 @@ export function PropertyReservationsPage() {
                         </>
                       )}
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
       </CardContent>
     </Card>
   )
 
   return (
-    <div className="w-full min-h-screen  max-w-screen">
-      <div className="mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+    <div className="w-full min-h-screen overflow-x-hidden" style={{ maxWidth: '100vw' }}>
+      <div className="mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 space-y-6 max-w-full">
         {/* Error Message */}
         {error && (
           <Card className="bg-red-50 border-red-200">
@@ -758,7 +759,7 @@ export function PropertyReservationsPage() {
         )}
 
         {/* Header Section */}
-        <div className="space-y-2 min-w-0">
+        <div className="space-y-2 min-w-0 ">
           <div className="flex flex-col gap-4">
             <div className="min-w-0">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">حجوزات العقارات</h1>
@@ -889,17 +890,17 @@ export function PropertyReservationsPage() {
         </div>
 
         {/* Analytics Dashboard */}
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-3 sm:space-y-4 ">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
             <h3 className="font-semibold text-sm sm:text-base truncate">تقارير وتحليلات</h3>
           </div>
 
-          <Card className="overflow-hidden">
+          <Card className="">
             <CardHeader className="p-3 sm:p-4 md:p-6">
               <CardTitle className="text-xs sm:text-sm md:text-base truncate">اتجاهات الحجوزات الشهرية</CardTitle>
             </CardHeader>
-            <CardContent className="p-2 sm:p-3 md:p-6 overflow-x-auto">
+            <CardContent className="p-2 sm:p-3 md:p-6 ">
               <div className="w-full h-56 sm:h-64 md:h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData.byMonth}>
@@ -1015,7 +1016,7 @@ export function PropertyReservationsPage() {
         )}
 
         {/* Reservations Tabs */}
-        <Tabs defaultValue="pending" className="w-full max-w-screen">
+        <Tabs defaultValue="pending" className=" container">
           <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm h-9 sm:h-10">
             <TabsTrigger value="pending" className="text-xs sm:text-sm">
               قيد الانتظار{" "}
@@ -1037,7 +1038,7 @@ export function PropertyReservationsPage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="pending" className="space-y-4 mt-4">
+          <TabsContent value="pending" className="space-y-4 mt-4 sm:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl mx-auto">
             {pendingReservations.length > 0 ? (
               <>
                 <ReservationsTable reservations={pendingReservations} />
