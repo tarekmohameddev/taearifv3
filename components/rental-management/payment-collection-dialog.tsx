@@ -93,6 +93,7 @@ interface PaymentCollectionData {
       total_fees_due: number;
       total_due: number;
       total_paid: number;
+      total_collected?: number;
       total_remaining: number;
       overdue_count: number;
       paid_count: number;
@@ -158,7 +159,7 @@ export function PaymentCollectionDialog() {
   >([]);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
-  // Cleanup effect to fix pointer-events issue
+  // Cleanup effect to fix pointer-events issue and reset state
   useEffect(() => {
     if (!isPaymentCollectionDialogOpen) {
       // Fix pointer-events issue by removing the style attribute
@@ -168,6 +169,13 @@ export function PaymentCollectionDialog() {
           body.style.pointerEvents = "";
         }
       }, 100);
+      
+      // Reset state when dialog closes
+      setSelectedPayments([]);
+      setSelectedFees([]);
+      setPaymentAmount("");
+      setFullPaymentItems([]);
+      setData(null);
     }
   }, [isPaymentCollectionDialogOpen]);
 
@@ -181,6 +189,34 @@ export function PaymentCollectionDialog() {
       fetchPaymentCollectionData();
     }
   }, [isPaymentCollectionDialogOpen, selectedPaymentRentalId, userData?.token]);
+
+  // Auto-select first unpaid payment when data is loaded and dialog is open
+  useEffect(() => {
+    if (
+      isPaymentCollectionDialogOpen &&
+      data?.payment_details?.items &&
+      selectedPayments.length === 0
+    ) {
+      // Find first unpaid payment
+      const firstUnpaidPayment = data.payment_details.items.find(
+        (payment) => payment.status !== "paid"
+      );
+
+      if (firstUnpaidPayment && firstUnpaidPayment.remaining_amount > 0) {
+        const paymentData = {
+          id: firstUnpaidPayment.id,
+          sequence_no: firstUnpaidPayment.sequence_no,
+          amount: firstUnpaidPayment.rent_amount,
+          due_date: firstUnpaidPayment.due_date,
+          rent_amount: firstUnpaidPayment.rent_amount,
+        };
+
+        setSelectedPayments([paymentData]);
+        setPaymentAmount(firstUnpaidPayment.remaining_amount.toString());
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPaymentCollectionDialogOpen, data?.payment_details?.items]);
 
   // Auto-update payment type based on selections
   useEffect(() => {
@@ -623,9 +659,9 @@ export function PaymentCollectionDialog() {
         payment_date: paymentDate,
         reference: reference || `PAY-${Date.now()}`,
         notes: notes,
+        transfer_to: transferTo,
         ...(paymentMethod === "bank_transfer" && {
           bank_name: bankName,
-          transfer_to: transferTo,
         }),
         ...(receiptImagePath && {
           receipt_image_path: receiptImagePath,
@@ -875,7 +911,7 @@ export function PaymentCollectionDialog() {
                     <p className="text-sm text-gray-500 mb-1">إجمالي المدفوع</p>
                     <p className="text-lg font-bold text-gray-900">
                       {formatCurrency(
-                        data.payment_details?.summary?.total_paid || 0,
+                        data.payment_details?.summary?.total_collected || 0,
                       )}
                     </p>
                   </div>
@@ -903,240 +939,6 @@ export function PaymentCollectionDialog() {
               </CardContent>
             </Card>
 
-            {/* Payment Details */}
-            <Card className="border-2 border-gray-200 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-gray-50 to-white p-4 sm:p-6">
-                <CardTitle
-                  className="flex items-center gap-3 text-right text-lg sm:text-xl"
-                  dir="rtl"
-                >
-                  <div className="h-10 w-10 bg-gradient-to-br from-gray-800 to-gray-600 rounded-full flex items-center justify-center">
-                    <CreditCard className="h-5 w-5 text-white" />
-                  </div>
-                  تفاصيل المدفوعات
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6">
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                  {data.payment_details.items.map((payment) => {
-                    const isPaid = payment.status === "paid";
-                    const isSelected = selectedPayments.some(
-                      (p) => p.id === payment.id,
-                    );
-
-                    return (
-                      <div
-                        key={payment.id}
-                        onClick={() => !isPaid && handlePaymentSelect(payment)}
-                        className={`flex flex-col p-3 rounded-lg transition-all duration-300 gap-2 min-h-[120px] ${
-                          isPaid
-                            ? "bg-green-50 border-2 border-green-200 cursor-not-allowed opacity-75"
-                            : isSelected
-                              ? "bg-gradient-to-r from-gray-800 to-gray-600 text-white shadow-lg transform scale-[1.02] border-2 border-gray-800 cursor-pointer"
-                              : "bg-gray-50 hover:bg-gray-100 hover:shadow-md cursor-pointer"
-                        }`}
-                        dir="rtl"
-                      >
-                        {/* Header with sequence number and status */}
-                        <div
-                          className="sm:flex hidden items-center justify-between"
-                          dir="rtl"
-                        >
-                          <div
-                            className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                              isPaid
-                                ? "bg-green-500 text-white"
-                                : isSelected
-                                  ? "bg-white text-gray-800"
-                                  : "bg-gradient-to-br from-gray-800 to-gray-600 text-white"
-                            }`}
-                          >
-                            {isPaid ? "✓" : payment.sequence_no}
-                          </div>
-                          <Badge
-                            className={`${
-                              isPaid
-                                ? "bg-green-100 text-green-800 border-green-200"
-                                : isSelected
-                                  ? "bg-white/20 text-white border-white/30"
-                                  : getPaymentStatusColor(
-                                      payment.status,
-                                      payment.is_overdue,
-                                    )
-                            } border text-sm`}
-                          >
-                            {isPaid ? (
-                              <CheckCircle className="h-4 w-4 ml-1" />
-                            ) : (
-                              getPaymentStatusIcon(
-                                payment.status,
-                                payment.is_overdue,
-                              )
-                            )}
-                            <span className="mr-1">
-                              {isPaid
-                                ? "مدفوع"
-                                : getPaymentStatusText(
-                                    payment.status,
-                                    payment.is_overdue,
-                                  )}
-                            </span>
-                          </Badge>
-                        </div>
-
-                        {/* Payment title */}
-                        <div className="text-center">
-                          <p
-                            className={`text-sm font-bold ${
-                              isPaid
-                                ? "text-green-800"
-                                : isSelected
-                                  ? "text-white"
-                                  : "text-gray-900"
-                            }`}
-                          >
-                            الدفعة رقم {payment.sequence_no}
-                            {isPaid && " (مدفوعة)"}
-                          </p>
-                        </div>
-
-                        {/* Amount section */}
-                        <div className="text-center">
-                          <p
-                            className={`text-lg font-bold ${
-                              isPaid
-                                ? "text-green-800"
-                                : isSelected
-                                  ? "text-white"
-                                  : "text-gray-900"
-                            }`}
-                          >
-                            {formatCurrency(payment.rent_amount)}
-                          </p>
-                        </div>
-
-                        {/* Date and payment details */}
-                        <div className="space-y-1">
-                          <p
-                            className={`text-xs text-center ${
-                              isPaid
-                                ? "text-green-600"
-                                : isSelected
-                                  ? "text-gray-200"
-                                  : "text-gray-500"
-                            }`}
-                          >
-                            {isPaid ? "تم الدفع في: " : "مستحق في: "}
-                            {formatDate(payment.due_date)}
-                          </p>
-
-                          {isPaid ? (
-                            <p className="text-xs text-center text-green-600">
-                              مدفوع بالكامل:{" "}
-                              {formatCurrency(payment.paid_amount)}
-                            </p>
-                          ) : (
-                            <div className="space-y-1">
-                              {payment.paid_amount > 0 && (
-                                <p
-                                  className={`text-xs text-center ${
-                                    isSelected
-                                      ? "text-green-200"
-                                      : "text-green-600"
-                                  }`}
-                                >
-                                  مدفوع: {formatCurrency(payment.paid_amount)}
-                                </p>
-                              )}
-                              {payment.remaining_amount > 0 && (
-                                <p
-                                  className={`text-xs text-center ${
-                                    isSelected ? "text-red-200" : "text-red-600"
-                                  }`}
-                                >
-                                  متبقي:{" "}
-                                  {formatCurrency(payment.remaining_amount)}
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Fees Breakdown */}
-                <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-3 mt-4">
-                  {/* Individual Fee Selection */}
-                  <div className="mt-3">
-                    <h4 className="text-sm font-bold text-gray-900 mb-2 text-center">
-                      اختر الرسوم المطلوب دفعها
-                    </h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {data.available_fees?.map((fee) => {
-                        const isPaid = fee.remaining_amount === 0;
-                        const isSelected = selectedFees.some(
-                          (f) => f.type === fee.fee_type,
-                        );
-
-                        return (
-                          <button
-                            key={fee.fee_type}
-                            onClick={() =>
-                              !isPaid &&
-                              handleFeeSelect(
-                                fee.fee_type,
-                                fee.remaining_amount,
-                                translateFeeName(fee.fee_name),
-                              )
-                            }
-                            className={`p-2 rounded-lg border-2 transition-all duration-300 ${
-                              isPaid
-                                ? "bg-green-50 border-2 border-green-200 cursor-not-allowed opacity-75"
-                                : isSelected
-                                  ? "bg-gradient-to-r from-gray-800 to-gray-600 text-white border-gray-800 shadow-lg cursor-pointer"
-                                  : "bg-white text-gray-700 border-gray-300 hover:border-gray-500 hover:shadow-md cursor-pointer"
-                            }`}
-                          >
-                            <div className="text-center">
-                              <p
-                                className={`text-sm font-semibold ${
-                                  isPaid
-                                    ? "text-green-800"
-                                    : isSelected
-                                      ? "text-white"
-                                      : "text-gray-700"
-                                }`}
-                              >
-                                {translateFeeName(fee.fee_name)}
-                                {isPaid && " (مدفوعة)"}
-                              </p>
-                              <p
-                                className={`text-xs ${
-                                  isPaid
-                                    ? "text-green-600"
-                                    : isSelected
-                                      ? "text-white"
-                                      : "text-gray-700"
-                                }`}
-                              >
-                                {isPaid
-                                  ? "مدفوع بالكامل"
-                                  : formatCurrency(fee.remaining_amount)}
-                              </p>
-                              {!isPaid && (
-                                <p className="text-xs text-gray-500">متبقي</p>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Payment Type Selection */}
             {/* مختفي فقط ولا اريد ازالته */}
@@ -1282,51 +1084,49 @@ export function PaymentCollectionDialog() {
                   </div>
 
                   {paymentMethod === "bank_transfer" && (
-                    <>
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="bank-name"
-                          className="text-right block text-sm font-medium text-gray-700"
-                        >
-                          اسم البنك
-                        </Label>
-                        <Input
-                          id="bank-name"
-                          type="text"
-                          value={bankName}
-                          onChange={(e) => {
-                            setBankName(e.target.value);
-                            if (bankNameError) {
-                              setBankNameError("");
-                            }
-                          }}
-                          placeholder="مثال: البنك الأهلي السعودي"
-                          className="text-right border-2 border-gray-300 focus:border-gray-800 focus:ring-2 focus:ring-gray-200"
-                          dir="rtl"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="transfer-to"
-                          className="text-right block text-sm font-medium text-gray-700"
-                        >
-                          التحويل إلى
-                        </Label>
-                        <select
-                          id="transfer-to"
-                          value={transferTo}
-                          onChange={(e) => setTransferTo(e.target.value)}
-                          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-gray-800 focus:ring-2 focus:ring-gray-200 text-right"
-                          dir="rtl"
-                        >
-                          <option value="منصة ناجز">منصة ناجز</option>
-                          <option value="المكتب">المكتب</option>
-                          <option value="المالك">المالك</option>
-                        </select>
-                      </div>
-                    </>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="bank-name"
+                        className="text-right block text-sm font-medium text-gray-700"
+                      >
+                        اسم البنك
+                      </Label>
+                      <Input
+                        id="bank-name"
+                        type="text"
+                        value={bankName}
+                        onChange={(e) => {
+                          setBankName(e.target.value);
+                          if (bankNameError) {
+                            setBankNameError("");
+                          }
+                        }}
+                        placeholder="مثال: البنك الأهلي السعودي"
+                        className="text-right border-2 border-gray-300 focus:border-gray-800 focus:ring-2 focus:ring-gray-200"
+                        dir="rtl"
+                      />
+                    </div>
                   )}
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="transfer-to"
+                      className="text-right block text-sm font-medium text-gray-700"
+                    >
+                      التحويل إلى
+                    </Label>
+                    <select
+                      id="transfer-to"
+                      value={transferTo}
+                      onChange={(e) => setTransferTo(e.target.value)}
+                      className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-gray-800 focus:ring-2 focus:ring-gray-200 text-right"
+                      dir="rtl"
+                    >
+                      <option value="منصة ناجز">منصة ناجز</option>
+                      <option value="المكتب">المكتب</option>
+                      <option value="المالك">المالك</option>
+                    </select>
+                  </div>
 
                   <div className="space-y-2">
                     <Label className="text-right block text-sm font-medium text-gray-700">
@@ -1504,551 +1304,6 @@ export function PaymentCollectionDialog() {
               </CardHeader>
               <CardContent className="p-4 sm:p-6">
                 <div className="max-w-md mx-auto space-y-4">
-                  {/* Selected Payments Info */}
-                  {selectedPayments.length > 0 && (
-                    <div className="bg-gradient-to-r from-gray-800 to-gray-600 text-white p-4 rounded-lg mb-4 relative">
-                      <button
-                        onClick={() => {
-                          // Calculate total amount of selected payments to subtract
-                          const totalSelectedAmount = selectedPayments.reduce(
-                            (sum, p) => sum + p.amount,
-                            0,
-                          );
-                          const currentAmount = Number(paymentAmount) || 0;
-                          const newAmount = Math.max(
-                            0,
-                            currentAmount - totalSelectedAmount,
-                          );
-                          setSelectedPayments([]);
-                          setPaymentAmount(newAmount.toString());
-                        }}
-                        className="absolute top-2 left-2 text-white/70 hover:text-white transition-colors"
-                      >
-                        <XCircle className="h-5 w-5" />
-                      </button>
-                      <div className="text-center">
-                        <p className="text-lg font-bold mb-2">
-                          الدفعات المحددة ({selectedPayments.length})
-                        </p>
-                        <div className="space-y-2">
-                          {selectedPayments.map((payment) => (
-                            <div
-                              key={payment.id}
-                              className="bg-white/10 rounded-lg p-2"
-                            >
-                              <p className="text-base font-semibold">
-                                الدفعة رقم {payment.sequence_no}
-                              </p>
-                              <p className="text-sm text-gray-200">
-                                مستحق في: {formatDate(payment.due_date)}
-                              </p>
-                              <p className="text-sm text-gray-200">
-                                نوع الدفع:{" "}
-                                {paymentType === "rent"
-                                  ? "إيجار"
-                                  : paymentType === "fees"
-                                    ? "رسوم"
-                                    : "إيجار ورسوم"}
-                              </p>
-                              <p className="text-base font-bold text-green-200">
-                                {formatCurrency(payment.amount)}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-3 pt-3 border-t border-white/20">
-                          <p className="text-lg font-bold">
-                            المجموع:{" "}
-                            {formatCurrency(
-                              selectedPayments.reduce(
-                                (sum, p) => sum + p.amount,
-                                0,
-                              ),
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Selected Fees Info */}
-                  {selectedFees.length > 0 && (
-                    <div className="bg-gradient-to-r from-blue-800 to-blue-600 text-white p-4 rounded-lg mb-4 relative">
-                      <button
-                        onClick={() => {
-                          // Calculate total amount of selected fees to subtract
-                          const totalSelectedAmount = selectedFees.reduce(
-                            (sum, f) => sum + f.amount,
-                            0,
-                          );
-                          const currentAmount = Number(paymentAmount) || 0;
-                          const newAmount = Math.max(
-                            0,
-                            currentAmount - totalSelectedAmount,
-                          );
-                          setSelectedFees([]);
-                          setPaymentAmount(newAmount.toString());
-                        }}
-                        className="absolute top-2 left-2 text-white/70 hover:text-white transition-colors"
-                      >
-                        <XCircle className="h-5 w-5" />
-                      </button>
-                      <div className="text-center">
-                        <p className="text-lg font-bold mb-2">
-                          الرسوم المحددة ({selectedFees.length})
-                        </p>
-                        <div className="space-y-2">
-                          {selectedFees.map((fee) => (
-                            <div
-                              key={fee.type}
-                              className="bg-white/10 rounded-lg p-2"
-                            >
-                              <p className="text-base font-semibold">
-                                {translateFeeName(fee.label)}
-                              </p>
-                              <p className="text-base font-bold text-green-200">
-                                {formatCurrency(fee.amount)}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-3 pt-3 border-t border-white/20">
-                          <p className="text-lg font-bold">
-                            المجموع:{" "}
-                            {formatCurrency(
-                              selectedFees.reduce(
-                                (sum, f) => sum + f.amount,
-                                0,
-                              ),
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Smart Full Payment Selection Section */}
-                  {(selectedPayments.length > 0 || selectedFees.length > 0) && (
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-bold text-gray-900 text-center">
-                        أو اختر دفع كامل للمحدد
-                      </h4>
-
-                      {(() => {
-                        const distribution = getSmartPaymentDistribution();
-                        const enteredAmount = Number(paymentAmount) || 0;
-
-                        if (enteredAmount <= 0) {
-                          // Show all items as available for full payment when no amount is entered
-                          return (
-                            <>
-                              {/* Selected Payments */}
-                              {selectedPayments.length > 0 && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                  {selectedPayments.map((selectedPayment) => {
-                                    const payment =
-                                      data.payment_details.items.find(
-                                        (p) => p.id === selectedPayment.id,
-                                      );
-                                    if (!payment) return null;
-
-                                    const isFullPaymentSelected =
-                                      fullPaymentItems.some(
-                                        (item) =>
-                                          item.type === "payment" &&
-                                          item.id === payment.id,
-                                      );
-
-                                    return (
-                                      <button
-                                        key={payment.id}
-                                        onClick={() =>
-                                          handleFullPaymentSelect(payment)
-                                        }
-                                        className={`p-3 rounded-lg border-2 transition-all duration-300 text-right ${
-                                          isFullPaymentSelected
-                                            ? "bg-gradient-to-r from-green-600 to-green-500 text-white border-green-600 shadow-lg"
-                                            : "bg-white border-gray-200 hover:border-gray-400 hover:shadow-md"
-                                        }`}
-                                        dir="rtl"
-                                      >
-                                        <div className="flex justify-between items-center">
-                                          <div>
-                                            <p
-                                              className={`text-sm font-semibold ${
-                                                isFullPaymentSelected
-                                                  ? "text-white"
-                                                  : "text-gray-900"
-                                              }`}
-                                            >
-                                              الدفعة رقم {payment.sequence_no}
-                                            </p>
-                                            <p
-                                              className={`text-xs ${
-                                                isFullPaymentSelected
-                                                  ? "text-gray-200"
-                                                  : "text-gray-500"
-                                              }`}
-                                            >
-                                              {formatDate(payment.due_date)}
-                                            </p>
-                                          </div>
-                                          <div className="text-left">
-                                            <p
-                                              className={`text-sm font-bold ${
-                                                isFullPaymentSelected
-                                                  ? "text-white"
-                                                  : "text-gray-900"
-                                              }`}
-                                            >
-                                              {formatCurrency(
-                                                payment.rent_amount,
-                                              )}
-                                            </p>
-                                            <p
-                                              className={`text-xs ${
-                                                isFullPaymentSelected
-                                                  ? "text-green-200"
-                                                  : "text-green-600"
-                                              }`}
-                                            >
-                                              {isFullPaymentSelected
-                                                ? "دفع كامل ✓"
-                                                : "دفع كامل"}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              )}
-
-                              {/* Selected Fees */}
-                              {selectedFees.length > 0 && (
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                  {selectedFees.map((selectedFee) => {
-                                    const fee = data.available_fees.find(
-                                      (f) => f.fee_type === selectedFee.type,
-                                    );
-                                    if (!fee) return null;
-
-                                    const isFullPaymentSelected =
-                                      fullPaymentItems.some(
-                                        (item) =>
-                                          item.type === "fee" &&
-                                          item.id === fee.fee_type,
-                                      );
-
-                                    return (
-                                      <button
-                                        key={fee.fee_type}
-                                        onClick={() =>
-                                          handleFullFeeSelect(
-                                            fee.fee_type,
-                                            fee.remaining_amount,
-                                            translateFeeName(fee.fee_name),
-                                          )
-                                        }
-                                        className={`p-3 rounded-lg border-2 transition-all duration-300 text-right ${
-                                          isFullPaymentSelected
-                                            ? "bg-gradient-to-r from-green-600 to-green-500 text-white border-green-600 shadow-lg"
-                                            : "bg-white border-gray-200 hover:border-gray-400 hover:shadow-md"
-                                        }`}
-                                        dir="rtl"
-                                      >
-                                        <div className="text-center">
-                                          <p
-                                            className={`text-sm font-semibold ${
-                                              isFullPaymentSelected
-                                                ? "text-white"
-                                                : "text-gray-900"
-                                            }`}
-                                          >
-                                            {translateFeeName(fee.fee_name)}
-                                          </p>
-                                          <p
-                                            className={`text-sm font-bold ${
-                                              isFullPaymentSelected
-                                                ? "text-white"
-                                                : "text-gray-900"
-                                            }`}
-                                          >
-                                            {formatCurrency(
-                                              fee.remaining_amount,
-                                            )}
-                                          </p>
-                                          <p
-                                            className={`text-xs ${
-                                              isFullPaymentSelected
-                                                ? "text-green-200"
-                                                : "text-green-600"
-                                            }`}
-                                          >
-                                            {isFullPaymentSelected
-                                              ? "دفع كامل ✓"
-                                              : "دفع كامل"}
-                                          </p>
-                                        </div>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </>
-                          );
-                        }
-
-                        // Show smart distribution when amount is entered
-                        return (
-                          <>
-                            {/* Full Payment Items (from smart distribution) */}
-                            {distribution.fullPayments.length > 0 && (
-                              <div className="space-y-2">
-                                <p className="text-sm font-medium text-gray-700 text-center">
-                                  العناصر المقترحة للدفع الكامل:
-                                </p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                  {distribution.fullPayments.map(
-                                    (item, index) => {
-                                      const isFullPaymentSelected =
-                                        fullPaymentItems.some(
-                                          (fullItem) =>
-                                            fullItem.type === item.type &&
-                                            fullItem.id === item.id,
-                                        );
-
-                                      if (item.type === "payment") {
-                                        const payment =
-                                          data.payment_details.items.find(
-                                            (p) => p.id === item.id,
-                                          );
-                                        if (!payment) return null;
-
-                                        return (
-                                          <button
-                                            key={`full-${item.id}`}
-                                            onClick={() =>
-                                              handleFullPaymentSelect(payment)
-                                            }
-                                            className={`p-3 rounded-lg border-2 transition-all duration-300 text-right ${
-                                              isFullPaymentSelected
-                                                ? "bg-gradient-to-r from-green-600 to-green-500 text-white border-green-600 shadow-lg"
-                                                : "bg-gradient-to-r from-blue-100 to-blue-50 border-blue-300 hover:border-blue-400 hover:shadow-md"
-                                            }`}
-                                            dir="rtl"
-                                          >
-                                            <div className="flex justify-between items-center">
-                                              <div>
-                                                <p
-                                                  className={`text-sm font-semibold ${
-                                                    isFullPaymentSelected
-                                                      ? "text-white"
-                                                      : "text-blue-900"
-                                                  }`}
-                                                >
-                                                  الدفعة رقم {item.sequence_no}
-                                                </p>
-                                                <p
-                                                  className={`text-xs ${
-                                                    isFullPaymentSelected
-                                                      ? "text-gray-200"
-                                                      : "text-blue-700"
-                                                  }`}
-                                                >
-                                                  {formatDate(payment.due_date)}
-                                                </p>
-                                              </div>
-                                              <div className="text-left">
-                                                <p
-                                                  className={`text-sm font-bold ${
-                                                    isFullPaymentSelected
-                                                      ? "text-white"
-                                                      : "text-blue-900"
-                                                  }`}
-                                                >
-                                                  {formatCurrency(item.amount)}
-                                                </p>
-                                                <p
-                                                  className={`text-xs ${
-                                                    isFullPaymentSelected
-                                                      ? "text-green-200"
-                                                      : "text-blue-700"
-                                                  }`}
-                                                >
-                                                  {isFullPaymentSelected
-                                                    ? "دفع كامل ✓"
-                                                    : "مقترح للدفع الكامل"}
-                                                </p>
-                                              </div>
-                                            </div>
-                                          </button>
-                                        );
-                                      } else if (item.type === "fee") {
-                                        return (
-                                          <button
-                                            key={`full-${item.id}`}
-                                            onClick={() =>
-                                              handleFullFeeSelect(
-                                                item.id as string,
-                                                item.amount,
-                                                item.label || "رسوم",
-                                              )
-                                            }
-                                            className={`p-3 rounded-lg border-2 transition-all duration-300 text-right ${
-                                              isFullPaymentSelected
-                                                ? "bg-gradient-to-r from-green-600 to-green-500 text-white border-green-600 shadow-lg"
-                                                : "bg-gradient-to-r from-blue-100 to-blue-50 border-blue-300 hover:border-blue-400 hover:shadow-md"
-                                            }`}
-                                            dir="rtl"
-                                          >
-                                            <div className="text-center">
-                                              <p
-                                                className={`text-sm font-semibold ${
-                                                  isFullPaymentSelected
-                                                    ? "text-white"
-                                                    : "text-blue-900"
-                                                }`}
-                                              >
-                                                {translateFeeName(
-                                                  item.label || "رسوم",
-                                                )}
-                                              </p>
-                                              <p
-                                                className={`text-sm font-bold ${
-                                                  isFullPaymentSelected
-                                                    ? "text-white"
-                                                    : "text-blue-900"
-                                                }`}
-                                              >
-                                                {formatCurrency(item.amount)}
-                                              </p>
-                                              <p
-                                                className={`text-xs ${
-                                                  isFullPaymentSelected
-                                                    ? "text-green-200"
-                                                    : "text-blue-700"
-                                                }`}
-                                              >
-                                                {isFullPaymentSelected
-                                                  ? "دفع كامل ✓"
-                                                  : "مقترح للدفع الكامل"}
-                                              </p>
-                                            </div>
-                                          </button>
-                                        );
-                                      }
-                                      return null;
-                                    },
-                                  )}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Partial Payment Items (from smart distribution) */}
-                            {distribution.partialPayments.length > 0 && (
-                              <div className="space-y-2">
-                                <p className="text-sm font-medium text-gray-700 text-center">
-                                  العناصر المقترحة للدفع الجزئي:
-                                </p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                  {distribution.partialPayments.map(
-                                    (item, index) => {
-                                      if (item.type === "payment") {
-                                        const payment =
-                                          data.payment_details.items.find(
-                                            (p) => p.id === item.id,
-                                          );
-                                        if (!payment) return null;
-
-                                        return (
-                                          <button
-                                            key={`partial-${item.id}`}
-                                            disabled
-                                            className="p-3 rounded-lg border-2 transition-all duration-300 text-right bg-gradient-to-r from-orange-100 to-orange-50 border-orange-300 cursor-not-allowed opacity-90"
-                                            dir="rtl"
-                                          >
-                                            <div className="flex justify-between items-center">
-                                              <div>
-                                                <p className="text-sm font-semibold text-orange-900">
-                                                  الدفعة رقم {item.sequence_no}
-                                                </p>
-                                                <p className="text-xs text-orange-700">
-                                                  {formatDate(payment.due_date)}
-                                                </p>
-                                              </div>
-                                              <div className="text-left">
-                                                <p className="text-sm font-bold text-orange-900">
-                                                  {formatCurrency(
-                                                    item.partialAmount ||
-                                                      item.amount,
-                                                  )}
-                                                </p>
-                                                <p className="text-xs text-orange-700">
-                                                  دفع جزئي
-                                                </p>
-                                              </div>
-                                            </div>
-                                          </button>
-                                        );
-                                      } else if (item.type === "fee") {
-                                        return (
-                                          <button
-                                            key={`partial-${item.id}`}
-                                            disabled
-                                            className="p-3 rounded-lg border-2 transition-all duration-300 text-right bg-gradient-to-r from-orange-100 to-orange-50 border-orange-300 cursor-not-allowed opacity-90"
-                                            dir="rtl"
-                                          >
-                                            <div className="text-center">
-                                              <p className="text-sm font-semibold text-orange-900">
-                                                {translateFeeName(
-                                                  item.label || "رسوم",
-                                                )}
-                                              </p>
-                                              <p className="text-sm font-bold text-orange-900">
-                                                {formatCurrency(
-                                                  item.partialAmount ||
-                                                    item.amount,
-                                                )}
-                                              </p>
-                                              <p className="text-xs text-orange-700">
-                                                دفع جزئي
-                                              </p>
-                                            </div>
-                                          </button>
-                                        );
-                                      }
-                                      return null;
-                                    },
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
-                    </div>
-                  )}
-
-                  {selectedPayments.length === 0 &&
-                    selectedFees.length === 0 && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                        <div className="flex items-center gap-2 text-yellow-800">
-                          <AlertCircle className="h-5 w-5" />
-                          <p className="text-sm font-medium">
-                            يرجى اختيار دفعة أو أكثر من القائمة أعلاه لدفع{" "}
-                            {paymentType === "rent"
-                              ? "الإيجار"
-                              : paymentType === "fees"
-                                ? "الرسوم"
-                                : "الإيجار والرسوم"}{" "}
-                            أو اختيار الرسوم الفردية أو إدخال المبلغ يدوياً.
-                            يمكنك إدخال مبلغ جزئي للدفع الجزئي.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
                   {/* Validation Message */}
                   {getValidationMessage() && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
@@ -2069,127 +1324,12 @@ export function PaymentCollectionDialog() {
                       المبلغ المطلوب دفعه (ريال سعودي)
                     </Label>
 
-                    {/* Full Payment Amount Display */}
-                    {fullPaymentItems.length > 0 && (
-                      <div className="bg-gradient-to-r from-green-100 to-green-50 border border-green-200 rounded-lg p-3 mb-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium text-green-800">
-                            المبلغ الكامل المحدد:
-                          </span>
-                          <span className="text-lg font-bold text-green-900">
-                            {formatCurrency(getTotalFullPaymentAmount())}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Smart Payment Distribution Display */}
-                    {paymentAmount &&
-                      Number(paymentAmount) > 0 &&
-                      (selectedPayments.length > 0 ||
-                        selectedFees.length > 0) && (
-                        <div className="bg-gradient-to-r from-blue-100 to-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
-                          <h4 className="text-sm font-bold text-blue-900 mb-3 text-center">
-                            التوزيع الذكي المقترح
-                          </h4>
-                          {(() => {
-                            const distribution = getSmartPaymentDistribution();
-                            return (
-                              <div className="space-y-2">
-                                {distribution.suggestion && (
-                                  <p className="text-sm text-blue-800 text-center font-medium">
-                                    {distribution.suggestion}
-                                  </p>
-                                )}
-
-                                {distribution.fullPayments.length > 0 && (
-                                  <div className="bg-white/50 rounded-lg p-2">
-                                    <p className="text-xs font-bold text-blue-900 mb-1">
-                                      دفع كامل:
-                                    </p>
-                                    <div className="space-y-1">
-                                      {distribution.fullPayments.map(
-                                        (item, index) => (
-                                          <div
-                                            key={index}
-                                            className="flex justify-between items-center text-xs"
-                                          >
-                                            <span className="text-blue-800">
-                                              {item.type === "payment"
-                                                ? `الدفعة رقم ${item.sequence_no || "غير محدد"}`
-                                                : translateFeeName(
-                                                    item.label || "رسوم",
-                                                  )}
-                                            </span>
-                                            <span className="font-bold text-blue-900">
-                                              {formatCurrency(item.amount)}
-                                            </span>
-                                          </div>
-                                        ),
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {distribution.partialPayments.length > 0 && (
-                                  <div className="bg-white/50 rounded-lg p-2">
-                                    <p className="text-xs font-bold text-blue-900 mb-1">
-                                      دفع جزئي:
-                                    </p>
-                                    <div className="space-y-1">
-                                      {distribution.partialPayments.map(
-                                        (item, index) => (
-                                          <div
-                                            key={index}
-                                            className="flex justify-between items-center text-xs"
-                                          >
-                                            <span className="text-blue-800">
-                                              {item.type === "payment"
-                                                ? `الدفعة رقم ${item.sequence_no || "غير محدد"}`
-                                                : translateFeeName(
-                                                    item.label || "رسوم",
-                                                  )}
-                                            </span>
-                                            <span className="font-bold text-blue-900">
-                                              {item.partialAmount
-                                                ? formatCurrency(
-                                                    item.partialAmount,
-                                                  )
-                                                : "جزئي"}
-                                            </span>
-                                          </div>
-                                        ),
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {distribution.remainingAmount > 0 && (
-                                  <div className="bg-yellow-100 rounded-lg p-2">
-                                    <p className="text-xs font-bold text-yellow-800">
-                                      المبلغ المتبقي:{" "}
-                                      {formatCurrency(
-                                        distribution.remainingAmount,
-                                      )}
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      )}
-
                     <Input
                       id="payment-amount"
                       type="number"
                       value={paymentAmount}
                       onChange={(e) => setPaymentAmount(e.target.value)}
-                      placeholder={
-                        selectedPayments.length > 0 || selectedFees.length > 0
-                          ? "يمكنك تعديل المبلغ أو إدخال مبلغ جزئي"
-                          : `أدخل مبلغ ${paymentType === "rent" ? "الإيجار" : paymentType === "fees" ? "الرسوم" : "الإيجار والرسوم"} (كامل أو جزئي)...`
-                      }
+                      placeholder="أدخل المبلغ الذي تريد دفعه..."
                       className={`text-right border-2 focus:ring-2 ${
                         getValidationMessage()
                           ? "border-red-300 focus:border-red-500 focus:ring-red-200"
@@ -2198,34 +1338,14 @@ export function PaymentCollectionDialog() {
                       dir="rtl"
                     />
                   </div>
-                  <div className="text-center space-y-2">
+                  
+                  <div className="text-center">
                     <p className="text-sm text-gray-500">
                       المبلغ المتاح للدفع:{" "}
                       {formatCurrency(
                         data.payment_details?.summary?.total_remaining || 0,
                       )}
                     </p>
-                    {(selectedPayments.length > 0 ||
-                      selectedFees.length > 0) && (
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                        <p className="text-sm font-medium text-green-800">
-                          المبلغ المحدد:{" "}
-                          {formatCurrency(getTotalSelectedAmount())}
-                        </p>
-                        <p className="text-xs text-green-600">
-                          {selectedPayments.length > 0 &&
-                            `${selectedPayments.length} دفعة`}
-                          {selectedPayments.length > 0 &&
-                            selectedFees.length > 0 &&
-                            " + "}
-                          {selectedFees.length > 0 &&
-                            `${selectedFees.length} رسوم`}
-                        </p>
-                        <p className="text-xs text-blue-600 mt-1">
-                          💡 يمكنك إدخال مبلغ أقل للدفع الجزئي
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
               </CardContent>
