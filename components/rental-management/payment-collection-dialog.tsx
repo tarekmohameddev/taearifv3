@@ -544,10 +544,9 @@ export function PaymentCollectionDialog() {
   const handlePaymentSubmit = async () => {
     if (
       !selectedPaymentRentalId ||
-      ((!paymentAmount ||
-        isNaN(Number(paymentAmount)) ||
-        Number(paymentAmount) <= 0) &&
-        fullPaymentItems.length === 0)
+      !paymentAmount ||
+      isNaN(Number(paymentAmount)) ||
+      Number(paymentAmount) <= 0
     ) {
       return;
     }
@@ -564,10 +563,9 @@ export function PaymentCollectionDialog() {
   const handleConfirmPayment = async () => {
     if (
       !selectedPaymentRentalId ||
-      ((!paymentAmount ||
-        isNaN(Number(paymentAmount)) ||
-        Number(paymentAmount) <= 0) &&
-        fullPaymentItems.length === 0)
+      !paymentAmount ||
+      isNaN(Number(paymentAmount)) ||
+      Number(paymentAmount) <= 0
     ) {
       return;
     }
@@ -576,85 +574,9 @@ export function PaymentCollectionDialog() {
     setIsConfirmDialogOpen(false);
 
     try {
-      // Build payments array based on payment type and selected payments
-      const payments = [];
-
-      // Handle full payment items first
-      for (const fullItem of fullPaymentItems) {
-        if (fullItem.type === "payment") {
-          const payment = data?.payment_details.items.find(
-            (p) => p.id === fullItem.id,
-          );
-          if (payment) {
-            payments.push({
-              installment_id: payment.id,
-              payment_type: "rent",
-              amount: payment.rent_amount,
-              notes: `دفع كامل - الدفعة رقم ${payment.sequence_no}`,
-            });
-          }
-        } else if (fullItem.type === "fee") {
-          payments.push({
-            installment_id: null,
-            payment_type: fullItem.id,
-            amount: fullItem.amount,
-            notes: `دفع كامل - ${fullItem.label}`,
-          });
-        }
-      }
-
-      // Handle smart payment distribution
-      const enteredAmount = Number(paymentAmount) || 0;
-      if (enteredAmount > 0) {
-        const distribution = getSmartPaymentDistribution();
-
-        // Add full payments from smart distribution
-        for (const item of distribution.fullPayments) {
-          if (item.type === "payment") {
-            payments.push({
-              installment_id: item.id as number,
-              payment_type: "rent",
-              amount: item.amount,
-              notes: `دفع كامل - الدفعة رقم ${item.sequence_no || "غير محدد"}`,
-            });
-          } else if (item.type === "fee") {
-            payments.push({
-              installment_id: null,
-              payment_type: item.id as string,
-              amount: item.amount,
-              notes: `دفع كامل - ${item.label || "رسوم"}`,
-            });
-          }
-        }
-
-        // Add partial payments from smart distribution
-        for (const item of distribution.partialPayments) {
-          if (item.type === "payment") {
-            const amount =
-              item.partialAmount ||
-              enteredAmount * (item.amount / getTotalSelectedAmount());
-            payments.push({
-              installment_id: item.id as number,
-              payment_type: "rent",
-              amount: Math.round(amount * 100) / 100,
-              notes: `دفع جزئي - الدفعة رقم ${item.sequence_no || "غير محدد"}`,
-            });
-          } else if (item.type === "fee") {
-            const amount =
-              item.partialAmount ||
-              enteredAmount * (item.amount / getTotalSelectedAmount());
-            payments.push({
-              installment_id: null,
-              payment_type: item.id as string,
-              amount: Math.round(amount * 100) / 100,
-              notes: `دفع جزئي - ${item.label || "رسوم"}`,
-            });
-          }
-        }
-      }
-
       const requestBody = {
-        payments,
+        payments: [], // Always empty array
+        payment_amount: paymentAmount, // Send as string
         payment_method: paymentMethod,
         payment_date: paymentDate,
         reference: reference || `PAY-${Date.now()}`,
@@ -1484,8 +1406,8 @@ export function PaymentCollectionDialog() {
                           </p>
                         </div>
 
-                        {/* Full Payment Items */}
-                        {fullPaymentItems.length > 0 && (
+                        {/* Full Payment Items */} 
+                        {/* {fullPaymentItems.length > 0 && ( 
                           <div className="space-y-2">
                             <h4 className="text-md font-bold text-gray-900 text-center">
                               الدفعات الكاملة المحددة
@@ -1506,10 +1428,10 @@ export function PaymentCollectionDialog() {
                               ))}
                             </div>
                           </div>
-                        )}
+                        )} */}
 
                         {/* Smart Distribution */}
-                        {enteredAmount > 0 &&
+                        {/* {enteredAmount > 0 &&
                           (selectedPayments.length > 0 ||
                             selectedFees.length > 0) && (
                             <div className="space-y-4">
@@ -1586,7 +1508,7 @@ export function PaymentCollectionDialog() {
                                 </div>
                               )}
                             </div>
-                          )}
+                          )} */}
 
                         {/* Payment Details */}
                         <div className="bg-gray-50 rounded-lg p-4">
