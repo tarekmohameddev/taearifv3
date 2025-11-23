@@ -564,24 +564,30 @@ export const whyChooseUsStructure: ComponentStructure = {
               label: "Title Color",
               type: "color",
               placeholder: "#059669",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Title uses secondary color
             },
             {
               key: "descriptionColor",
               label: "Description Color",
               type: "color",
               placeholder: "#4b5563",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Description uses secondary color
             },
             {
               key: "borderColor",
               label: "Border Color",
               type: "color",
               placeholder: "#e5e7eb",
+              useDefaultColor: false, // Border color is usually custom
             },
             {
               key: "ringColor",
               label: "Ring Color",
               type: "color",
               placeholder: "#ecfdf5",
+              useDefaultColor: false, // Ring color is usually custom
             },
           ],
         },

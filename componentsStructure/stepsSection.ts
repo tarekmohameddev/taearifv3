@@ -191,6 +191,8 @@ export const stepsSectionStructure: ComponentStructure = {
                   label: "Color",
                   type: "color",
                   placeholder: "#047857",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Title uses secondary color
                 },
                 {
                   key: "size",
@@ -229,6 +231,8 @@ export const stepsSectionStructure: ComponentStructure = {
                   label: "Color",
                   type: "color",
                   placeholder: "#4B5563",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Description uses secondary color
                 },
                 {
                   key: "size",

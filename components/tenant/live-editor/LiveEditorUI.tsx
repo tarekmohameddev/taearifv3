@@ -868,9 +868,11 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                           key={`${component.id}-${component.forceUpdate || 0}-${selectedDevice}`}
                           componentName={component.componentName}
                           section={state.slug}
+                          componentId={component.id}
                           data={
                             {
                               ...mergedData, // ✅ استخدام البيانات المدمجة من editorStore
+                              id: component.id, // ✅ إضافة id بشكل صريح
                               useStore: true,
                               variant: component.id,
                               deviceType: selectedDevice,

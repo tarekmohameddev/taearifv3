@@ -474,7 +474,12 @@
     "no_options_available": "لا توجد خيارات متاحة",
     "current_value_debug": "القيمة الحالية: {value}",
     "options_debug": "الخيارات: {options}",
-    "path_debug": "المسار: {path}"
+    "path_debug": "المسار: {path}",
+    "use_default_color": "استخدام اللون الافتراضي",
+    "using_branding_color": "استخدام لون العلامة التجارية من الإعدادات العامة",
+    "using_custom_color": "استخدام لون مخصص",
+    "branding_color_type": "نوع لون العلامة التجارية",
+    "current_color": "اللون الحالي"
   },
   "components_structure": {
     "basic": {

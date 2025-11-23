@@ -1,4 +1,4 @@
-import { ComponentStructure } from "@/lib-liveeditor/types";
+import { ComponentStructure } from "./types";
 
 export const applicationFormStructure: ComponentStructure = {
   componentType: "applicationForm",
@@ -560,18 +560,23 @@ export const applicationFormStructure: ComponentStructure = {
               label: "Text Color",
               type: "color",
               defaultValue: "#059669",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Text uses secondary color
             },
             {
               key: "borderColor",
               label: "Border Color",
               type: "color",
               defaultValue: "#d1d5db",
+              useDefaultColor: false, // Border color is usually custom
             },
             {
               key: "focusColor",
               label: "Focus Color",
               type: "color",
               defaultValue: "#059669",
+              useDefaultColor: true,
+              globalColorType: "primary", // Focus uses primary color
             },
           ],
         },

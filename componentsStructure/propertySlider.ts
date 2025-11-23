@@ -266,9 +266,11 @@ export const propertySliderStructure: ComponentStructure = {
                 {
                   key: "color",
                   label: "Color",
-                  type: "text",
+                  type: "color",
                   defaultValue: "#1f2937",
                   description: "Title color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Title uses secondary color
                 },
               ],
             },
@@ -322,9 +324,11 @@ export const propertySliderStructure: ComponentStructure = {
                 {
                   key: "color",
                   label: "Color",
-                  type: "text",
+                  type: "color",
                   defaultValue: "#6b7280",
                   description: "Subtitle color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Subtitle uses secondary color
                 },
               ],
             },
@@ -343,16 +347,20 @@ export const propertySliderStructure: ComponentStructure = {
                 {
                   key: "color",
                   label: "Color",
-                  type: "text",
+                  type: "color",
                   defaultValue: "#059669",
                   description: "Link color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Link uses primary color
                 },
                 {
                   key: "hoverColor",
                   label: "Hover Color",
-                  type: "text",
+                  type: "color",
                   defaultValue: "#047857",
                   description: "Link hover color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Link hover uses primary color
                 },
               ],
             },

@@ -154,6 +154,8 @@ export const contactCardsStructure: ComponentStructure = {
                       key: "color",
                       label: "Color",
                       type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary", // Title uses secondary color
                     },
                     {
                       key: "lineHeight",

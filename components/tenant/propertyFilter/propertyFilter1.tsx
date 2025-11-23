@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { usePropertiesStore } from "@/store/propertiesStore";
 import { useTenantId } from "@/hooks/useTenantId";
 import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context-liveeditor/editorStore";
 
 // القائمة الافتراضية لأنواع العقارات (تُستخدم كـ fallback)
 const defaultPropertyTypes = [
@@ -49,6 +50,9 @@ interface PropertyFilterProps {
   pricePlaceholder?: string;
   searchButtonText?: string;
   noResultsText?: string;
+  useStore?: boolean;
+  id?: string;
+  variant?: string;
 }
 
 export default function PropertyFilter({
@@ -63,9 +67,29 @@ export default function PropertyFilter({
   searchButtonText = "بحث",
   noResultsText = "لم يتم العثور على نتائج.",
   content, // البيانات من backend
+  useStore = false,
+  id,
+  variant = "propertyFilter1",
   ...props
 }: PropertyFilterProps & { content?: any }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Initialize variant id early so hooks can depend on it
+  const variantId = variant || "propertyFilter1";
+  const uniqueId = id || variantId;
+
+  // Subscribe to editor store updates for this propertyFilter variant
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+  const propertyFilterStates = useEditorStore((s) => s.propertyFilterStates);
+
+  useEffect(() => {
+    if (useStore) {
+      ensureComponentVariant("propertyFilter", uniqueId, props);
+    }
+  }, [uniqueId, useStore, ensureComponentVariant]);
 
   // Store state
   const { search, cityId, district, propertyType, categoryId, price, setSearch, setCityId, setDistrict, setPropertyType, setCategoryId, setPrice } =
@@ -77,13 +101,186 @@ export default function PropertyFilter({
   // Get tenant data from store
   const { tenantData } = useTenantStore();
 
-  // Get primary color from WebsiteLayout branding (fallback to emerald-600)
+  // Get data from store or content prop with fallback logic
+  const storeData = useStore
+    ? getComponentData("propertyFilter", uniqueId) || {}
+    : {};
+  const currentStoreData = useStore
+    ? propertyFilterStates[uniqueId] || {}
+    : {};
+
+  // Debug: Log store data retrieval
+  if (useStore && uniqueId === "1") {
+    console.group("🔍 PropertyFilter Store Data Debug");
+    console.log("UniqueId:", uniqueId);
+    console.log("Id prop:", id);
+    console.log("Variant prop:", variant);
+    console.log("Use Store:", useStore);
+    console.log("Store Data from getComponentData:", storeData);
+    console.log("Current Store Data from propertyFilterStates:", currentStoreData);
+    console.log("All propertyFilterStates keys:", Object.keys(propertyFilterStates));
+    console.log("propertyFilterStates['1']:", propertyFilterStates["1"]);
+    console.log("Content prop:", content);
+    console.groupEnd();
+  }
+
+  // Merge content prop with store data (store data takes priority)
+  const mergedContent = useStore && storeData && Object.keys(storeData).length > 0
+    ? { ...content, ...storeData }
+    : content;
+
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
-  const primaryColor = 
-    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
-    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
-      ? tenantData.WebsiteLayout.branding.colors.primary
-      : "#059669"; // emerald-600 default (fallback)
+  const brandingColors = {
+    primary: 
+      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 default (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback to primary
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#059669", // fallback to primary
+  };
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (
+    fieldPath: string,
+    defaultColor: string = "#059669"
+  ): string => {
+    // Get styling data from mergedContent (which includes store data)
+    const styling = mergedContent?.styling || {};
+    
+    // Debug: Log only for searchButton.bgColor
+    const shouldDebug = fieldPath === "searchButton.bgColor";
+    if (shouldDebug) {
+      console.group(`🔍 getColor Debug for ${fieldPath}`);
+      console.log("Content:", mergedContent);
+      console.log("Styling:", styling);
+      console.log("Content Styling:", mergedContent?.styling);
+      console.log("SearchButton:", styling?.searchButton);
+      console.log("SearchButton BgColor:", styling?.searchButton?.bgColor);
+      console.log("Store Data:", storeData);
+      console.log("Use Store:", useStore);
+      console.groupEnd();
+    }
+    
+    // Navigate to the field using the path (e.g., "searchButton.bgColor")
+    const pathParts = fieldPath.split('.');
+    let fieldData = styling;
+    for (const part of pathParts) {
+      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+        fieldData = fieldData[part];
+      } else {
+        fieldData = undefined;
+        break;
+      }
+    }
+    
+    // Also check for useDefaultColor and globalColorType at the same path level
+    // These are stored separately: styling.searchButton.bgColor.useDefaultColor
+    const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
+    const globalColorTypePath = `${fieldPath}.globalColorType`;
+    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    let useDefaultColorValue = styling;
+    for (const part of useDefaultColorPathParts) {
+      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+        useDefaultColorValue = useDefaultColorValue[part];
+      } else {
+        useDefaultColorValue = undefined;
+        break;
+      }
+    }
+    
+    const globalColorTypePathParts = globalColorTypePath.split('.');
+    let globalColorTypeValue = styling;
+    for (const part of globalColorTypePathParts) {
+      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+        globalColorTypeValue = globalColorTypeValue[part];
+      } else {
+        globalColorTypeValue = undefined;
+        break;
+      }
+    }
+    
+    // Debug: Log the field data only for searchButton.bgColor
+    if (shouldDebug) {
+      console.group(`🎨 getColor for ${fieldPath}`);
+      console.log("Field Data:", fieldData);
+      console.log("Use Default Color Value:", useDefaultColorValue);
+      console.log("Global Color Type Value:", globalColorTypeValue);
+      console.log("Type:", typeof fieldData);
+      console.log("Is String:", typeof fieldData === 'string');
+      console.log("Is Object:", typeof fieldData === 'object' && fieldData !== null);
+      console.log("Styling:", styling);
+      console.log("Content:", mergedContent);
+      console.groupEnd();
+    }
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined 
+      ? useDefaultColorValue 
+      : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      // Determine default globalColorType based on field path if not set
+      let defaultGlobalColorType = "primary";
+      if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+        defaultGlobalColorType = "secondary";
+      } else if (fieldPath.includes("Button") || fieldPath.includes("button") || fieldPath.includes("hoverBgColor")) {
+        defaultGlobalColorType = "primary";
+      }
+      
+      const globalColorType = globalColorTypeValue || defaultGlobalColorType;
+      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      if (shouldDebug) {
+        console.log(`✅ Using branding color (${globalColorType}): ${brandingColor}`);
+      }
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, try to get custom color
+    // The color might be stored directly as string or in a value property of an object
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      if (shouldDebug) {
+        console.log(`✅ Using custom color (string): ${fieldData}`);
+      }
+      return fieldData;
+    }
+    
+    // If fieldData is an object, check for value property
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        if (shouldDebug) {
+          console.log(`✅ Using custom color (from value): ${fieldData.value}`);
+        }
+        return fieldData.value;
+      }
+      // If object has useDefaultColor but no value, it means the color was lost
+      // This shouldn't happen, but we'll log it for debugging
+      if (shouldDebug && fieldData.useDefaultColor === false && !fieldData.value) {
+        console.warn(`⚠️ Color object has useDefaultColor=false but no value property`);
+      }
+    }
+    
+    // Final fallback: use default branding color
+    let defaultGlobalColorType = "primary";
+    if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+      defaultGlobalColorType = "secondary";
+    }
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    if (shouldDebug) {
+      console.log(`⚠️ Using fallback branding color (${defaultGlobalColorType}): ${brandingColor}`);
+    }
+    return brandingColor;
+  };
 
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
@@ -99,7 +296,17 @@ export default function PropertyFilter({
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   };
 
-  const primaryColorHover = getDarkerColor(primaryColor, 20);
+  // Get colors for search button
+  const searchButtonBgColor = getColor("searchButton.bgColor", "#059669");
+  const searchButtonTextColor = getColor("searchButton.textColor", "#ffffff");
+  const searchButtonHoverBgColor = getColor("searchButton.hoverBgColor", getDarkerColor(searchButtonBgColor, 20));
+  
+  // Get colors for inputs
+  const inputTextColor = getColor("inputs.textColor", "#1f2937");
+  
+  // Get colors for dropdown
+  const dropdownTextColor = getColor("dropdown.textColor", "#1f2937");
+  const dropdownHoverBgColor = getColor("dropdown.hoverBgColor", "#f3f4f6");
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]); // تغيير إلى PropertyType[]
@@ -107,14 +314,14 @@ export default function PropertyFilter({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // استخراج البيانات من content إذا كانت متاحة
+  // استخراج البيانات من mergedContent إذا كانت متاحة
   const actualPropertyTypesSource =
-    content?.propertyTypesSource || propertyTypesSource;
+    mergedContent?.propertyTypesSource || propertyTypesSource;
   const actualPropertyTypesApiUrl =
-    content?.propertyTypesApiUrl || propertyTypesApiUrl;
-  const actualTenantId = content?.tenantId || tenantId || currentTenantId;
+    mergedContent?.propertyTypesApiUrl || propertyTypesApiUrl;
+  const actualTenantId = mergedContent?.tenantId || tenantId || currentTenantId;
   const actualStaticPropertyTypes =
-    content?.propertyTypes || staticPropertyTypes;
+    mergedContent?.propertyTypes || staticPropertyTypes;
 
   // Cities state fetched from external API
   const [cityOptions, setCityOptions] = useState<CityOption[]>([]);
@@ -410,7 +617,17 @@ export default function PropertyFilter({
                 cityOptions.map((c) => (
                   <div
                     key={String(c.id)}
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-sm md:text-base"
+                    className="px-4 py-3 cursor-pointer text-sm md:text-base transition-colors"
+                    style={{
+                      color: dropdownTextColor,
+                      backgroundColor: "transparent"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = dropdownHoverBgColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }}
                     role="option"
                     onClick={() => {
                       setSearch(c.name);
@@ -450,7 +667,17 @@ export default function PropertyFilter({
                 districtOptions.map((d) => (
                   <div
                     key={String(d.id)}
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-sm md:text-base"
+                    className="px-4 py-3 cursor-pointer text-sm md:text-base transition-colors"
+                    style={{
+                      color: dropdownTextColor,
+                      backgroundColor: "transparent"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = dropdownHoverBgColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }}
                     role="option"
                     onClick={() => {
                       setDistrict(d.id.toString()); // حفظ state_id بدلاً من الاسم
@@ -496,7 +723,17 @@ export default function PropertyFilter({
                 filteredTypes.map((type) => (
                   <div
                     key={type.id}
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-sm md:text-base"
+                    className="px-4 py-3 cursor-pointer text-sm md:text-base transition-colors"
+                    style={{
+                      color: dropdownTextColor,
+                      backgroundColor: "transparent"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = dropdownHoverBgColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }}
                     role="option"
                     onClick={() => handleTypeSelect(type)}
                   >
@@ -530,6 +767,7 @@ export default function PropertyFilter({
               // لا يتم جلب البيانات تلقائياً - فقط عند الضغط على submit
             }}
             className="w-full h-full outline-none pr-2 placeholder:text-gray-500 placeholder:text-xs xs:placeholder:text-base md:placeholder:text-lg placeholder:font-normal border-0 focus-visible:ring-0"
+            style={{ color: inputTextColor }}
             type="number"
             min={0}
             inputMode="numeric"
@@ -541,13 +779,16 @@ export default function PropertyFilter({
         <div className="w-full md:w-[15.18%] h-full relative">
           <Button
             type="submit"
-            className="text-xs xs:text-base md:text-lg flex items-center justify-center w-full h-12 md:h-14 text-white rounded-[10px] transition-colors"
-            style={{ backgroundColor: primaryColor }}
+            className="text-xs xs:text-base md:text-lg flex items-center justify-center w-full h-12 md:h-14 rounded-[10px] transition-colors"
+            style={{ 
+              backgroundColor: searchButtonBgColor,
+              color: searchButtonTextColor
+            }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = primaryColorHover;
+              e.currentTarget.style.backgroundColor = searchButtonHoverBgColor;
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = primaryColor;
+              e.currentTarget.style.backgroundColor = searchButtonBgColor;
             }}
           >
             {searchButtonText}

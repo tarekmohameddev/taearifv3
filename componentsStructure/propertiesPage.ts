@@ -43,22 +43,28 @@ export const propertiesPageStructure: ComponentStructure = {
             {
               key: "bgColor",
               label: "Background Color",
-              type: "text",
+              type: "text", // Keep as text for page backgrounds
             },
             {
               key: "textColor",
               label: "Text Color",
-              type: "text",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Text uses secondary color
             },
             {
               key: "titleColor",
               label: "Title Color",
-              type: "text",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Title uses secondary color
             },
             {
               key: "subtitleColor",
               label: "Subtitle Color",
-              type: "text",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Subtitle uses secondary color
             },
             {
               key: "containerMaxWidth",

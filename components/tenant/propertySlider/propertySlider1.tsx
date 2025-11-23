@@ -282,14 +282,6 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   const tenantId = useTenantStore((s) => s.tenantId);
   const router = useRouter();
 
-  // Get primary color from WebsiteLayout branding (fallback to emerald-600)
-  // emerald-600 in Tailwind = #059669
-  const primaryColor = 
-    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
-    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
-      ? tenantData.WebsiteLayout.branding.colors.primary
-      : "#059669"; // emerald-600 default (fallback)
-
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     // emerald-700 in Tailwind = #047857 (fallback)
@@ -303,8 +295,6 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   };
-
-  const primaryColorHover = getDarkerColor(primaryColor, 20);
 
   useEffect(() => {
     if (tenantId) {
@@ -358,6 +348,121 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     ...tenantComponentData,
     ...storeData,
   };
+
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const brandingColors = {
+    primary: 
+      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 default (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback to primary
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#059669", // fallback to primary
+  };
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (
+    fieldPath: string,
+    defaultColor: string = "#059669"
+  ): string => {
+    // Get styling/typography data from mergedData
+    const styling = mergedData.styling || {};
+    const typography = mergedData.typography || {};
+    
+    // Navigate to the field using the path (e.g., "typography.link.color")
+    const pathParts = fieldPath.split('.');
+    let fieldData: any = { ...styling, ...typography };
+    for (const part of pathParts) {
+      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+        fieldData = fieldData[part];
+      } else {
+        fieldData = undefined;
+        break;
+      }
+    }
+    
+    // Also check for useDefaultColor and globalColorType at the same path level
+    const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
+    const globalColorTypePath = `${fieldPath}.globalColorType`;
+    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    let useDefaultColorValue: any = { ...styling, ...typography };
+    for (const part of useDefaultColorPathParts) {
+      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+        useDefaultColorValue = useDefaultColorValue[part];
+      } else {
+        useDefaultColorValue = undefined;
+        break;
+      }
+    }
+    
+    const globalColorTypePathParts = globalColorTypePath.split('.');
+    let globalColorTypeValue: any = { ...styling, ...typography };
+    for (const part of globalColorTypePathParts) {
+      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+        globalColorTypeValue = globalColorTypeValue[part];
+      } else {
+        globalColorTypeValue = undefined;
+        break;
+      }
+    }
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined 
+      ? useDefaultColorValue 
+      : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      // Determine default globalColorType based on field path if not set
+      let defaultGlobalColorType = "primary";
+      if (fieldPath.includes("textColor") || fieldPath.includes("Text") || fieldPath.includes("title") || fieldPath.includes("subtitle")) {
+        defaultGlobalColorType = "secondary";
+      } else if (fieldPath.includes("link") || fieldPath.includes("hoverColor")) {
+        defaultGlobalColorType = "primary";
+      }
+      
+      const globalColorType = globalColorTypeValue || defaultGlobalColorType;
+      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, try to get custom color
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      return fieldData;
+    }
+    
+    // If fieldData is an object, check for value property
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        return fieldData.value;
+      }
+    }
+    
+    // Final fallback: use default branding color
+    let defaultGlobalColorType = "primary";
+    if (fieldPath.includes("textColor") || fieldPath.includes("Text") || fieldPath.includes("title") || fieldPath.includes("subtitle")) {
+      defaultGlobalColorType = "secondary";
+    }
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    return brandingColor;
+  };
+
+  // Get colors using getColor function
+  const linkColor = getColor("typography.link.color", "#059669");
+  const linkHoverColor = getColor("typography.link.hoverColor", getDarkerColor(linkColor, 20));
+  
+  // Use linkColor as primaryColor for backward compatibility
+  const primaryColor = linkColor;
+  const primaryColorHover = linkHoverColor;
 
   // Fetch properties on component mount and when API URL changes
   useEffect(() => {

@@ -106,7 +106,13 @@ export const contactFormSectionStructure: ComponentStructure = {
                       type: "text",
                       placeholder: "text-[15px] md:text-[24px]",
                     },
-                    { key: "color", label: "Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary" // Title uses secondary color
+                    },
                     {
                       key: "weight",
                       label: "Weight",
@@ -155,7 +161,13 @@ export const contactFormSectionStructure: ComponentStructure = {
                       type: "text",
                       placeholder: "24",
                     },
-                    { key: "color", label: "Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary" // Icon uses primary color
+                    },
                   ],
                 },
                 {
@@ -169,7 +181,13 @@ export const contactFormSectionStructure: ComponentStructure = {
                       type: "text",
                       placeholder: "text-[14px] md:text-[16px]",
                     },
-                    { key: "color", label: "Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary" // Text uses secondary color
+                    },
                     { key: "weight", label: "Weight", type: "text" },
                   ],
                 },
@@ -337,8 +355,20 @@ export const contactFormSectionStructure: ComponentStructure = {
                   label: "Style",
                   type: "object",
                   fields: [
-                    { key: "background", label: "Background", type: "color" },
-                    { key: "textColor", label: "Text Color", type: "color" },
+                    { 
+                      key: "background", 
+                      label: "Background", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary" // Button background uses primary color
+                    },
+                    { 
+                      key: "textColor", 
+                      label: "Text Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary" // Button text uses primary color
+                    },
                     {
                       key: "borderRadius",
                       label: "Border Radius",

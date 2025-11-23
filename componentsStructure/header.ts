@@ -82,14 +82,61 @@ export const headerStructure: ComponentStructure = {
           label: "Colors",
           type: "object",
           fields: [
-            { key: "text", label: "Text Color", type: "color" },
-            { key: "link", label: "Nav Link Color", type: "color" },
-            { key: "linkHover", label: "Nav Link Hover", type: "color" },
-            { key: "linkActive", label: "Nav Link Active", type: "color" },
-            { key: "icon", label: "Icon Color", type: "color" },
-            { key: "iconHover", label: "Icon Hover", type: "color" },
-            { key: "border", label: "Border Color", type: "color" },
-            { key: "accent", label: "Accent Color", type: "color" },
+            { 
+              key: "text", 
+              label: "Text Color", 
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary" // Text uses secondary color
+            },
+            { 
+              key: "link", 
+              label: "Nav Link Color", 
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary" // Nav link uses secondary color
+            },
+            { 
+              key: "linkHover", 
+              label: "Nav Link Hover", 
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary" // Nav link hover uses primary color
+            },
+            { 
+              key: "linkActive", 
+              label: "Nav Link Active", 
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary" // Nav link active uses primary color
+            },
+            { 
+              key: "icon", 
+              label: "Icon Color", 
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary" // Icon uses primary color
+            },
+            { 
+              key: "iconHover", 
+              label: "Icon Hover", 
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary" // Icon hover uses primary color
+            },
+            { 
+              key: "border", 
+              label: "Border Color", 
+              type: "color",
+              useDefaultColor: false // Border color is usually custom
+            },
+            { 
+              key: "accent", 
+              label: "Accent Color", 
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "accent" // Accent uses accent color
+            },
           ],
         },
         {

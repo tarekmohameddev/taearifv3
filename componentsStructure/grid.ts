@@ -106,22 +106,28 @@ export const gridStructure: ComponentStructure = {
             {
               key: "bgColor",
               label: "Background Color",
-              type: "text",
+              type: "text", // Keep as text for transparent/white backgrounds
             },
             {
               key: "textColor",
               label: "Text Color",
-              type: "text",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Text uses secondary color
             },
             {
               key: "titleColor",
               label: "Title Color",
-              type: "text",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Title uses secondary color
             },
             {
               key: "subtitleColor",
               label: "Subtitle Color",
-              type: "text",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Subtitle uses secondary color
             },
             {
               key: "gridGap",
@@ -468,9 +474,11 @@ export const gridStructure: ComponentStructure = {
                     {
                       key: "color",
                       label: "Color",
-                      type: "text",
+                      type: "color",
                       defaultValue: "#1f2937",
                       description: "Title color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary", // Title uses secondary color
                     },
                   ],
                 },
@@ -496,9 +504,11 @@ export const gridStructure: ComponentStructure = {
                     {
                       key: "color",
                       label: "Color",
-                      type: "text",
+                      type: "color",
                       defaultValue: "#059669",
                       description: "Price color",
+                      useDefaultColor: true,
+                      globalColorType: "primary", // Price uses primary color
                     },
                     {
                       key: "currency",

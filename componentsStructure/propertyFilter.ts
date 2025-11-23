@@ -131,22 +131,24 @@ export const propertyFilterStructure: ComponentStructure = {
                 {
                   key: "bgColor",
                   label: "Background Color",
-                  type: "text",
+                  type: "text", // Keep as text for input backgrounds
                 },
                 {
                   key: "borderColor",
                   label: "Border Color",
-                  type: "text",
+                  type: "text", // Keep as text for border colors
                 },
                 {
                   key: "textColor",
                   label: "Text Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Input text uses secondary color
                 },
                 {
                   key: "placeholderColor",
                   label: "Placeholder Color",
-                  type: "text",
+                  type: "text", // Keep as text for placeholder colors
                 },
                 {
                   key: "borderRadius",
@@ -178,22 +180,26 @@ export const propertyFilterStructure: ComponentStructure = {
                 {
                   key: "bgColor",
                   label: "Background Color",
-                  type: "text",
+                  type: "text", // Keep as text for dropdown backgrounds
                 },
                 {
                   key: "borderColor",
                   label: "Border Color",
-                  type: "text",
+                  type: "text", // Keep as text for border colors
                 },
                 {
                   key: "textColor",
                   label: "Text Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Dropdown text uses secondary color
                 },
                 {
                   key: "hoverBgColor",
                   label: "Hover Background Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Dropdown hover uses primary color
                 },
                 {
                   key: "borderRadius",
@@ -220,17 +226,23 @@ export const propertyFilterStructure: ComponentStructure = {
                 {
                   key: "bgColor",
                   label: "Background Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Search button background uses primary color
                 },
                 {
                   key: "textColor",
                   label: "Text Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Search button text uses primary color
                 },
                 {
                   key: "hoverBgColor",
                   label: "Hover Background Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Search button hover uses primary color
                 },
                 {
                   key: "borderRadius",

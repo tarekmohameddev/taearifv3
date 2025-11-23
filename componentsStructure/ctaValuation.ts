@@ -84,12 +84,16 @@ export const ctaValuationStructure: ComponentStructure = {
             {
               key: "buttonBgColor",
               label: "Button Background Color",
-              type: "text",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary", // Button uses primary color
             },
             {
               key: "buttonTextColor",
               label: "Button Text Color",
-              type: "text",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary", // Button text uses primary color
             },
           ],
         },

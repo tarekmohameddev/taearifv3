@@ -244,15 +244,36 @@ export const footerStructure: ComponentStructure = {
                   key: "textPrimary",
                   label: "Primary Text Color",
                   type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Primary text uses secondary color
                 },
                 {
                   key: "textSecondary",
                   label: "Secondary Text Color",
                   type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Secondary text uses secondary color
                 },
-                { key: "textMuted", label: "Muted Text Color", type: "color" },
-                { key: "accent", label: "Accent Color", type: "color" },
-                { key: "border", label: "Border Color", type: "color" },
+                { 
+                  key: "textMuted", 
+                  label: "Muted Text Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary" // Muted text uses secondary color
+                },
+                { 
+                  key: "accent", 
+                  label: "Accent Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "accent" // Accent uses accent color
+                },
+                { 
+                  key: "border", 
+                  label: "Border Color", 
+                  type: "color",
+                  useDefaultColor: false // Border color is usually custom
+                },
               ],
             },
             {
@@ -420,7 +441,13 @@ export const footerStructure: ComponentStructure = {
                       ],
                     },
                     { key: "url", label: "URL", type: "text" },
-                    { key: "color", label: "Hover Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Hover Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary" // Icon hover uses primary color
+                    },
                   ],
                 },
               ],

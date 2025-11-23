@@ -62,17 +62,23 @@ export const filterButtonsStructure: ComponentStructure = {
                 {
                   key: "bgColor",
                   label: "Background Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Button background uses primary color
                 },
                 {
                   key: "textColor",
                   label: "Text Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Button text uses primary color
                 },
                 {
                   key: "hoverBgColor",
                   label: "Hover Background Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Button hover uses primary color
                 },
                 {
                   key: "borderRadius",
@@ -99,27 +105,35 @@ export const filterButtonsStructure: ComponentStructure = {
                 {
                   key: "activeBgColor",
                   label: "Active Background Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Active button uses primary color
                 },
                 {
                   key: "activeTextColor",
                   label: "Active Text Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Active button text uses primary color
                 },
                 {
                   key: "inactiveBgColor",
                   label: "Inactive Background Color",
-                  type: "text",
+                  type: "text", // Keep as text for white/transparent backgrounds
                 },
                 {
                   key: "inactiveTextColor",
                   label: "Inactive Text Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Inactive button text uses primary color
                 },
                 {
                   key: "hoverBgColor",
                   label: "Hover Background Color",
-                  type: "text",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Hover uses primary color
                 },
                 {
                   key: "borderRadius",
@@ -154,13 +168,21 @@ export const filterButtonsStructure: ComponentStructure = {
               key: "direction",
               label: "Layout Direction",
               type: "select",
-              options: ["column", "row"],
+              options: [
+                { value: "column", label: "Column" },
+                { value: "row", label: "Row" },
+              ],
             },
             {
               key: "alignment",
               label: "Button Alignment",
               type: "select",
-              options: ["center", "start", "end", "between"],
+              options: [
+                { value: "center", label: "Center" },
+                { value: "start", label: "Start" },
+                { value: "end", label: "End" },
+                { value: "between", label: "Between" },
+              ],
             },
             {
               key: "inspectionButtonWidth",

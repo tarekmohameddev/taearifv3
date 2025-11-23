@@ -213,8 +213,14 @@ export const mapSectionStructure: ComponentStructure = {
                   key: "backgroundColor",
                   label: "Background Color",
                   type: "color",
+                  useDefaultColor: false, // Background color is usually custom
                 },
-                { key: "borderColor", label: "Border Color", type: "color" },
+                { 
+                  key: "borderColor", 
+                  label: "Border Color", 
+                  type: "color",
+                  useDefaultColor: false // Border color is usually custom
+                },
                 {
                   key: "borderRadius",
                   label: "Border Radius",
@@ -243,7 +249,12 @@ export const mapSectionStructure: ComponentStructure = {
               type: "text",
               placeholder: "0.3",
             },
-            { key: "color", label: "Overlay Color", type: "color" },
+            { 
+              key: "color", 
+              label: "Overlay Color", 
+              type: "color",
+              useDefaultColor: false // Overlay color is usually custom
+            },
             {
               key: "zIndex",
               label: "Z-Index",
@@ -281,8 +292,15 @@ export const mapSectionStructure: ComponentStructure = {
                   key: "backgroundColor",
                   label: "Background Color",
                   type: "color",
+                  useDefaultColor: false, // Content background is usually custom
                 },
-                { key: "textColor", label: "Text Color", type: "color" },
+                { 
+                  key: "textColor", 
+                  label: "Text Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary" // Text uses secondary color
+                },
                 {
                   key: "padding",
                   label: "Padding",
@@ -337,7 +355,13 @@ export const mapSectionStructure: ComponentStructure = {
                       type: "text",
                       placeholder: "600",
                     },
-                    { key: "color", label: "Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary" // Title uses secondary color
+                    },
                     {
                       key: "lineHeight",
                       label: "Line Height",
@@ -369,7 +393,13 @@ export const mapSectionStructure: ComponentStructure = {
                       type: "text",
                       placeholder: "400",
                     },
-                    { key: "color", label: "Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary" // Description uses secondary color
+                    },
                     {
                       key: "lineHeight",
                       label: "Line Height",

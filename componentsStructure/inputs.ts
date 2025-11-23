@@ -114,18 +114,24 @@ export const inputsStructure: ComponentStructure = {
               label: "Background Color",
               type: "color",
               defaultValue: "#3b82f6",
+              useDefaultColor: true,
+              globalColorType: "primary", // Button background uses primary color
             },
             {
               key: "textColor",
               label: "Text Color",
               type: "color",
               defaultValue: "#ffffff",
+              useDefaultColor: true,
+              globalColorType: "primary", // Button text uses primary color
             },
             {
               key: "hoverColor",
               label: "Hover Color",
               type: "color",
               defaultValue: "#1e40af",
+              useDefaultColor: true,
+              globalColorType: "primary", // Button hover uses primary color
             },
             {
               key: "borderRadius",
@@ -362,21 +368,28 @@ export const inputsStructure: ComponentStructure = {
                   key: "primary",
                   label: "Primary Color",
                   type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Primary uses primary color
                 },
                 {
                   key: "secondary",
                   label: "Secondary Color",
                   type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Secondary uses secondary color
                 },
                 {
                   key: "hover",
                   label: "Hover Color",
                   type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Hover uses primary color
                 },
                 {
                   key: "shadow",
                   label: "Shadow Color",
                   type: "color",
+                  useDefaultColor: false, // Shadow color is usually custom
                 },
               ],
             },

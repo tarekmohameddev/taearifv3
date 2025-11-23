@@ -114,17 +114,29 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                       key: "backgroundColor",
                       label: "Background Color",
                       type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary", // Button background uses primary color
                     },
-                    { key: "textColor", label: "Text Color", type: "color" },
+                    { 
+                      key: "textColor", 
+                      label: "Text Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary" // Button text uses primary color
+                    },
                     {
                       key: "hoverBackgroundColor",
                       label: "Hover Background",
                       type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary", // Button hover background uses primary color
                     },
                     {
                       key: "hoverTextColor",
                       label: "Hover Text Color",
                       type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary" // Button hover text uses primary color
                     },
                     { key: "width", label: "Width", type: "text" },
                     { key: "height", label: "Height", type: "text" },
@@ -151,7 +163,13 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               fields: [
                 { key: "size", label: "Size", type: "text" },
                 { key: "weight", label: "Weight", type: "text" },
-                { key: "color", label: "Color", type: "color" },
+                { 
+                  key: "color", 
+                  label: "Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary" // Subtitle uses secondary color
+                },
                 { key: "lineHeight", label: "Line Height", type: "text" },
               ],
             },
@@ -162,7 +180,13 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               fields: [
                 { key: "size", label: "Size", type: "text" },
                 { key: "weight", label: "Weight", type: "text" },
-                { key: "color", label: "Color", type: "color" },
+                { 
+                  key: "color", 
+                  label: "Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary" // Title uses secondary color
+                },
                 { key: "lineHeight", label: "Line Height", type: "text" },
               ],
             },
@@ -173,7 +197,13 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               fields: [
                 { key: "size", label: "Size", type: "text" },
                 { key: "weight", label: "Weight", type: "text" },
-                { key: "color", label: "Color", type: "color" },
+                { 
+                  key: "color", 
+                  label: "Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary" // Description uses secondary color
+                },
                 { key: "lineHeight", label: "Line Height", type: "text" },
               ],
             },
@@ -975,8 +1005,16 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                       key: "backgroundColor",
                       label: "Background Color",
                       type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary", // Button background uses primary color
                     },
-                    { key: "textColor", label: "Text Color", type: "color" },
+                    { 
+                      key: "textColor", 
+                      label: "Text Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary" // Button text uses primary color
+                    },
                     {
                       key: "borderRadius",
                       label: "Border Radius",
@@ -987,11 +1025,15 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                       key: "hoverBackgroundColor",
                       label: "Hover Background Color",
                       type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary", // Button hover background uses primary color
                     },
                     {
                       key: "hoverTextColor",
                       label: "Hover Text Color",
                       type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary" // Button hover text uses primary color
                     },
                   ],
                 },

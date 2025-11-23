@@ -23,6 +23,9 @@ export interface FieldDefinitionBase {
     field: string; // path to the field to check
     value: any; // value that should match for the field to be shown
   };
+  // For color fields: use default branding colors or custom color
+  useDefaultColor?: boolean; // default: true - use branding colors from WebsiteLayout
+  globalColorType?: "primary" | "secondary" | "accent"; // which branding color to use (primary, secondary, or accent)
 }
 
 export interface ObjectFieldDefinition extends FieldDefinitionBase {

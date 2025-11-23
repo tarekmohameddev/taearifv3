@@ -431,7 +431,8 @@ export function EditorSidebar({
 
     if (selectedComponent) {
       // Set hasChangesMade to true when save is triggered
-      console.log("🚀 Setting hasChangesMade to true in EditorSidebar");
+      console.group("🚀 EditorSidebar Save Process");
+      console.log("Setting hasChangesMade to true");
       setHasChangesMade(true);
 
       // Get store state before saving
@@ -440,16 +441,16 @@ export function EditorSidebar({
       const pageComponentsBefore =
         store.pageComponentsByPage[currentPage] || [];
 
-      console.log("🔍 EditorSidebar Save Debug:", {
-        selectedComponent,
-        currentPage,
-        pageComponentsBefore: pageComponentsBefore.length,
-        tempData,
-        storeData: store.getComponentData(
-          selectedComponent.type,
-          selectedComponent.id,
-        ),
-      });
+      console.group("🔍 Initial Save Debug");
+      console.log("Selected Component:", selectedComponent);
+      console.log("Current Page:", currentPage);
+      console.log("Page Components Before:", pageComponentsBefore.length);
+      console.log("TempData:", tempData);
+      console.log("StoreData:", store.getComponentData(
+        selectedComponent.type,
+        selectedComponent.id,
+      ));
+      console.groupEnd();
 
       // Get the latest tempData from store for global components
       const latestTempData =
@@ -528,21 +529,47 @@ export function EditorSidebar({
         (comp: any) => comp.id === selectedComponent.id,
       );
 
+      // IMPORTANT: Always use store.tempData directly (not tempData prop) to get the latest changes
+      // This ensures that all changes made via updateByPath are included
+      const actualTempData = store.tempData && Object.keys(store.tempData).length > 0
+        ? store.tempData
+        : latestTempData;
+
+      console.group("🔍 Save Debug - tempData sources");
+      console.log("Store TempData:", store.tempData);
+      console.log("TempData Prop:", tempData);
+      console.log("Latest TempData:", latestTempData);
+      console.log("Actual TempData:", actualTempData);
+      console.log("Store Data:", storeData);
+      console.log("Existing Component Data:", existingComponent?.data);
+      console.groupEnd();
+
       // Merge tempData with store data to preserve all changes
-      // Priority: tempData (latest changes) > storeData (previous changes) > existingComponent.data (old changes)
+      // Priority: actualTempData (latest changes) > storeData (previous changes) > existingComponent.data (old changes)
       const mergedData = existingComponent?.data
         ? deepMerge(
             deepMerge(existingComponent.data, storeData),
-            latestTempData,
+            actualTempData,
           )
-        : deepMerge(storeData, latestTempData);
+        : deepMerge(storeData, actualTempData);
 
-      console.log("🔧 Merge Process Debug:", {
-        existingComponentData: existingComponent?.data,
-        storeData,
-        latestTempData,
-        mergedData,
-      });
+      console.group("🔧 Merge Process Debug");
+      console.log("Existing Component Data:", existingComponent?.data);
+      console.log("Store Data:", storeData);
+      console.log("Latest TempData:", latestTempData);
+      console.log("Actual TempData:", actualTempData);
+      console.log("Merged Data:", mergedData);
+      console.group("Styling Data");
+      console.log("Styling in TempData:", actualTempData?.styling);
+      console.log("Styling in StoreData:", storeData?.styling);
+      console.log("Styling in MergedData:", mergedData?.styling);
+      console.group("Search Button Data");
+      console.log("SearchButton in TempData:", actualTempData?.styling?.searchButton);
+      console.log("SearchButton in StoreData:", storeData?.styling?.searchButton);
+      console.log("SearchButton in MergedData:", mergedData?.styling?.searchButton);
+      console.groupEnd();
+      console.groupEnd();
+      console.groupEnd();
 
       // Update the component data in the store using the merged data
       store.setComponentData(
@@ -569,25 +596,29 @@ export function EditorSidebar({
 
       // Update tempData with the merged data to keep sidebar in sync
       setTempData(mergedData);
+      
+      // Also update store.tempData to ensure consistency
+      store.setTempData(mergedData);
 
       // Log after save for regular components
       const storeAfter = useEditorStore.getState();
       const pageComponentsAfter =
         storeAfter.pageComponentsByPage[currentPage] || [];
 
-      console.log("✅ EditorSidebar Save Complete:", {
-        mergedData,
-        latestTempData,
-        storeData,
-        updatedPageComponents: updatedPageComponents.length,
-        pageComponentsAfter: pageComponentsAfter.length,
-        storeAfter: {
-          contactCardsStates: storeAfter.contactCardsStates,
-          pageComponentsByPage: storeAfter.pageComponentsByPage[currentPage],
-        },
-      });
+      console.group("✅ EditorSidebar Save Complete");
+      console.log("Merged Data:", mergedData);
+      console.log("Latest TempData:", latestTempData);
+      console.log("Store Data:", storeData);
+      console.log("Updated Page Components:", updatedPageComponents.length);
+      console.log("Page Components After:", pageComponentsAfter.length);
+      console.group("Store After");
+      console.log("Contact Cards States:", storeAfter.contactCardsStates);
+      console.log("Page Components By Page:", storeAfter.pageComponentsByPage[currentPage]);
+      console.groupEnd();
+      console.groupEnd();
 
       onClose();
+      console.groupEnd(); // Close main "🚀 EditorSidebar Save Process" group
     }
   };
 

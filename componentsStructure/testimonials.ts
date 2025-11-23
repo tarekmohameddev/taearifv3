@@ -92,7 +92,13 @@ export const testimonialsStructure: ComponentStructure = {
                   type: "text",
                   placeholder: "section-title",
                 },
-                { key: "color", label: "Color", type: "color" },
+                { 
+                  key: "color", 
+                  label: "Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary" // Title uses secondary color
+                },
                 {
                   key: "size",
                   label: "Font Size",
@@ -118,7 +124,13 @@ export const testimonialsStructure: ComponentStructure = {
                   type: "text",
                   placeholder: "section-subtitle-large",
                 },
-                { key: "color", label: "Color", type: "color" },
+                { 
+                  key: "color", 
+                  label: "Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary" // Description uses secondary color
+                },
                 {
                   key: "size",
                   label: "Font Size",
@@ -249,7 +261,13 @@ export const testimonialsStructure: ComponentStructure = {
               label: "Quote Icon",
               type: "object",
               fields: [
-                { key: "color", label: "Icon Color", type: "color" },
+                { 
+                  key: "color", 
+                  label: "Icon Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary" // Icon uses primary color
+                },
                 {
                   key: "size",
                   label: "Icon Size",
@@ -269,7 +287,13 @@ export const testimonialsStructure: ComponentStructure = {
               label: "Text Styling",
               type: "object",
               fields: [
-                { key: "color", label: "Text Color", type: "color" },
+                { 
+                  key: "color", 
+                  label: "Text Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary" // Text uses secondary color
+                },
                 {
                   key: "size",
                   label: "Font Size",
@@ -312,7 +336,13 @@ export const testimonialsStructure: ComponentStructure = {
                   label: "Customer Info",
                   type: "object",
                   fields: [
-                    { key: "nameColor", label: "Name Color", type: "color" },
+                    { 
+                      key: "nameColor", 
+                      label: "Name Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary" // Name uses secondary color
+                    },
                     {
                       key: "nameWeight",
                       label: "Name Font Weight",
@@ -323,6 +353,8 @@ export const testimonialsStructure: ComponentStructure = {
                       key: "locationColor",
                       label: "Location Color",
                       type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary" // Location uses secondary color
                     },
                   ],
                 },
@@ -335,11 +367,14 @@ export const testimonialsStructure: ComponentStructure = {
                       key: "activeColor",
                       label: "Active Star Color",
                       type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary", // Active star uses primary color
                     },
                     {
                       key: "inactiveColor",
                       label: "Inactive Star Color",
                       type: "color",
+                      useDefaultColor: false, // Inactive color is usually custom
                     },
                     {
                       key: "size",
@@ -370,7 +405,13 @@ export const testimonialsStructure: ComponentStructure = {
               type: "text",
               placeholder: "12px",
             },
-            { key: "bulletColor", label: "Bullet Color", type: "color" },
+            { 
+              key: "bulletColor", 
+              label: "Bullet Color", 
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary" // Bullet uses primary color
+            },
             {
               key: "bulletOpacity",
               label: "Bullet Opacity",
@@ -393,6 +434,8 @@ export const testimonialsStructure: ComponentStructure = {
               key: "activeBulletColor",
               label: "Active Bullet Color",
               type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary", // Active bullet uses primary color
             },
             {
               key: "activeBulletBorderRadius",

@@ -361,13 +361,22 @@ export const contactMapSectionStructure: ComponentStructure = {
                   key: "activeColor",
                   label: "Active Star Color",
                   type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Active star uses primary color
                 },
                 {
                   key: "inactiveColor",
                   label: "Inactive Star Color",
                   type: "color",
+                  useDefaultColor: false, // Inactive color is usually custom
                 },
-                { key: "hoverColor", label: "Hover Star Color", type: "color" },
+                { 
+                  key: "hoverColor", 
+                  label: "Hover Star Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary" // Hover star uses primary color
+                },
                 {
                   key: "showRatingText",
                   label: "Show Rating Text",
@@ -377,6 +386,8 @@ export const contactMapSectionStructure: ComponentStructure = {
                   key: "ratingTextColor",
                   label: "Rating Text Color",
                   type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary" // Rating text uses secondary color
                 },
               ],
             },
@@ -414,13 +425,23 @@ export const contactMapSectionStructure: ComponentStructure = {
                   key: "backgroundColor",
                   label: "Background Color",
                   type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Button background uses primary color
                 },
                 {
                   key: "hoverBackgroundColor",
                   label: "Hover Background Color",
                   type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Button hover uses primary color
                 },
-                { key: "textColor", label: "Text Color", type: "color" },
+                { 
+                  key: "textColor", 
+                  label: "Text Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary" // Button text uses primary color
+                },
                 {
                   key: "fontSize",
                   label: "Font Size",
@@ -515,7 +536,13 @@ export const contactMapSectionStructure: ComponentStructure = {
           label: "Form Labels",
           type: "object",
           fields: [
-            { key: "labelColor", label: "Label Color", type: "color" },
+            { 
+              key: "labelColor", 
+              label: "Label Color", 
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary" // Label uses secondary color
+            },
             {
               key: "labelSize",
               label: "Label Font Size",

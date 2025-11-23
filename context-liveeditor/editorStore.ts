@@ -783,6 +783,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         const key = segments[i]!;
         const nextIsIndex = !Number.isNaN(Number(segments[i + 1]));
         const existing = cursor[key];
+        const nextKey = segments[i + 1]!;
+
+        // Special handling: If we're navigating to a property of a color field (e.g., bgColor.useDefaultColor),
+        // and the existing value is a string (color hex), preserve it in a value property
+        const isColorFieldProperty = (nextKey === "useDefaultColor" || nextKey === "globalColorType") && 
+                                     typeof existing === "string" && 
+                                     existing.startsWith("#");
 
         // إذا كان existing string أو primitive value، استبدله بـ object أو array
         if (
@@ -791,7 +798,15 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           typeof existing === "number" ||
           typeof existing === "boolean"
         ) {
-          cursor[key] = nextIsIndex ? [] : {};
+          if (isColorFieldProperty) {
+            // Preserve the color value when converting to object
+            cursor[key] = { value: existing };
+            if (path.includes("styling") && path.includes("bgColor")) {
+              console.log(`🔧 Preserving color value: ${existing} in ${key}.value`);
+            }
+          } else {
+            cursor[key] = nextIsIndex ? [] : {};
+          }
         } else if (Array.isArray(existing) && !nextIsIndex) {
           cursor[key] = {};
         } else if (
@@ -804,7 +819,39 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         cursor = cursor[key];
       }
       const lastKey = segments[segments.length - 1]!;
-      cursor[lastKey] = value;
+      
+      // Special handling: If we're setting useDefaultColor or globalColorType on a color field,
+      // and the parent object has a value property (from a previous string-to-object conversion),
+      // preserve it
+      if ((lastKey === "useDefaultColor" || lastKey === "globalColorType") && 
+          cursor && 
+          typeof cursor === "object" && 
+          !Array.isArray(cursor) &&
+          cursor.value && 
+          typeof cursor.value === "string" && 
+          cursor.value.startsWith("#")) {
+        // The value property already exists, just update useDefaultColor or globalColorType
+        cursor[lastKey] = value;
+        if (path.includes("styling") && path.includes("bgColor")) {
+          console.log(`🔧 Preserving existing color value: ${cursor.value} while setting ${lastKey} to ${value}`);
+        }
+      } else {
+        cursor[lastKey] = value;
+      }
+
+      // Debug: Log the update for styling paths
+      if (path.includes("styling") || path.includes("searchButton") || path.includes("bgColor")) {
+        console.group("🔧 updateByPath Debug");
+        console.log("Path:", path);
+        console.log("Value:", value);
+        console.log("Segments:", segments);
+        console.log("New Data:", newData);
+        console.group("Styling in New Data");
+        console.log("Styling:", newData?.styling);
+        console.log("SearchButton:", newData?.styling?.searchButton);
+        console.groupEnd();
+        console.groupEnd();
+      }
 
       // Only update tempData, don't update global data until Save Changes is pressed
 
@@ -977,7 +1024,17 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       case "filterButtons":
         return filterButtonsFunctions.getData(state, variantId);
       case "propertyFilter":
-        return propertyFilterFunctions.getData(state, variantId);
+        const propertyFilterData = propertyFilterFunctions.getData(state, variantId);
+        // Debug: Log propertyFilter data retrieval
+        if (variantId === "1") {
+          console.group("🔍 getComponentData Debug for propertyFilter");
+          console.log("VariantId:", variantId);
+          console.log("PropertyFilterStates keys:", Object.keys(state.propertyFilterStates));
+          console.log("PropertyFilterStates['1']:", state.propertyFilterStates["1"]);
+          console.log("Returned Data:", propertyFilterData);
+          console.groupEnd();
+        }
+        return propertyFilterData;
       case "mapSection":
         return mapSectionFunctions.getData(state, variantId);
       case "contactCards":
@@ -1045,6 +1102,15 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "propertyFilter":
           newState = propertyFilterFunctions.setData(state, variantId, data);
+          // Debug: Log propertyFilter data save
+          if (variantId === "1") {
+            console.group("💾 setComponentData Debug for propertyFilter");
+            console.log("VariantId:", variantId);
+            console.log("Data to save:", data);
+            console.log("NewState:", newState);
+            console.log("PropertyFilterStates after save:", newState.propertyFilterStates);
+            console.groupEnd();
+          }
           break;
         case "mapSection":
           newState = mapSectionFunctions.setData(state, variantId, data);

@@ -112,7 +112,13 @@ export const heroStructure: ComponentStructure = {
                       ],
                     },
                     { key: "weight", label: "Weight", type: "text" },
-                    { key: "color", label: "Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary" // Title uses secondary color
+                    },
                     { key: "lineHeight", label: "Line Height", type: "text" },
                   ],
                 },
@@ -133,7 +139,13 @@ export const heroStructure: ComponentStructure = {
                       ],
                     },
                     { key: "weight", label: "Weight", type: "text" },
-                    { key: "color", label: "Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary" // Subtitle uses secondary color
+                    },
                   ],
                 },
               ],
@@ -432,7 +444,13 @@ export const heroStructure: ComponentStructure = {
                       ],
                     },
                     { key: "weight", label: "Weight", type: "text" },
-                    { key: "color", label: "Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary" // Title uses secondary color
+                    },
                     { key: "lineHeight", label: "Line Height", type: "text" },
                   ],
                 },
@@ -468,7 +486,13 @@ export const heroStructure: ComponentStructure = {
                       ],
                     },
                     { key: "weight", label: "Weight", type: "text" },
-                    { key: "color", label: "Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary" // Description uses secondary color
+                    },
                   ],
                 },
               ],

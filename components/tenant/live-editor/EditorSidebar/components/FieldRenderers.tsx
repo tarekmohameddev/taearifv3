@@ -12,8 +12,25 @@ export const ColorFieldRenderer: React.FC<{
   updateValue: (path: string, value: any) => void;
 }> = ({ label, path, value, updateValue }) => {
   const t = useEditorT();
-  const hasHex = typeof value === "string" && value.startsWith("#");
-  const colorValue = hasHex ? value : "#000000";
+  
+  // Ensure value is a string (handle cases where it might be an object)
+  const stringValue = typeof value === "string" ? value : (typeof value === "object" && value !== null ? (value.value || value.color || "") : String(value || ""));
+  const hasHex = typeof stringValue === "string" && stringValue.startsWith("#");
+  const colorValue = hasHex ? stringValue : "#000000";
+  
+  // Local state to track the current color value for immediate UI updates
+  const [localValue, setLocalValue] = useState(stringValue);
+  
+  // Update local value when prop value changes
+  React.useEffect(() => {
+    setLocalValue(stringValue);
+  }, [stringValue]);
+  
+  // Handle color updates
+  const handleColorChange = (newValue: string) => {
+    setLocalValue(newValue);
+    updateValue(path, newValue);
+  };
 
   return (
     <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
@@ -25,10 +42,10 @@ export const ColorFieldRenderer: React.FC<{
         <div className="relative w-16 h-16">
           <div
             className="absolute inset-0 rounded-full border-4 border-slate-200 shadow-lg transition-all duration-300 group-hover:shadow-xl group-hover:scale-110"
-            style={{ backgroundColor: hasHex ? colorValue : "transparent" }}
+            style={{ backgroundColor: (localValue && localValue.startsWith("#")) ? localValue : "transparent" }}
             title={t("editor_sidebar.pick_color")}
           >
-            {!hasHex && (
+            {!(localValue && localValue.startsWith("#")) && (
               <span className="absolute inset-0 grid place-items-center text-xs text-slate-400">
                 {t("editor_sidebar.transparent")}
               </span>
@@ -37,8 +54,8 @@ export const ColorFieldRenderer: React.FC<{
           <input
             aria-label={`Color picker for ${label}`}
             type="color"
-            value={hasHex ? colorValue : "#000000"}
-            onChange={(e) => updateValue(path, e.target.value)}
+            value={localValue && localValue.startsWith("#") ? localValue : "#000000"}
+            onChange={(e) => handleColorChange(e.target.value)}
             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
             style={{ WebkitAppearance: "none", appearance: "none" as any }}
           />
@@ -47,8 +64,8 @@ export const ColorFieldRenderer: React.FC<{
         {/* حقل النص للكود السادس عشر */}
         <input
           type="text"
-          value={value || ""}
-          onChange={(e) => updateValue(path, e.target.value)}
+          value={localValue || ""}
+          onChange={(e) => handleColorChange(e.target.value)}
           className="w-28 text-center px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-700 font-mono text-sm"
           placeholder="#FFFFFF"
         />
@@ -56,9 +73,9 @@ export const ColorFieldRenderer: React.FC<{
         {/* زر Transparent */}
         <button
           type="button"
-          onClick={() => updateValue(path, "transparent")}
+          onClick={() => handleColorChange("transparent")}
           className={`px-4 py-2 text-xs font-semibold rounded-lg border-2 transition-all duration-200 ${
-            value === "transparent" || !hasHex
+            localValue === "transparent" || !(localValue && localValue.startsWith("#"))
               ? "bg-slate-100 border-slate-400 text-slate-700 shadow-inner"
               : "bg-white border-slate-300 text-slate-600 hover:bg-slate-50 hover:border-slate-400 shadow-sm"
           }`}
@@ -70,7 +87,7 @@ export const ColorFieldRenderer: React.FC<{
         {/* زر النسخ */}
         <button
           type="button"
-          onClick={() => navigator.clipboard?.writeText(value || "")}
+          onClick={() => navigator.clipboard?.writeText(localValue || "")}
           className="group/btn p-2 rounded-lg bg-slate-100 hover:bg-blue-100 border-2 border-transparent hover:border-blue-300 transition-all duration-200"
           title={t("editor_sidebar.copy_color")}
         >
