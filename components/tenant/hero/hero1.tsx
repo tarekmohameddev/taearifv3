@@ -690,14 +690,6 @@ const Hero1 = (props: HeroProps = {}) => {
 
   // Debug: Log the data sources to help troubleshoot
   if (props.useStore) {
-    console.log("Hero1 Debug:", {
-      uniqueId,
-      storeData,
-      currentStoreData,
-      heroStates,
-      tenantComponentData,
-      foundHeroData: findHeroData(),
-    });
   }
 
   // Get default data as base (99% of the data) - memoized

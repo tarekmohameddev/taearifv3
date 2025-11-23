@@ -222,78 +222,47 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
 
         // Check if it's projects API response
         if (url.includes("/projects")) {
-          console.log("PropertySlider: Processing projects data");
           let projectsData = [];
 
           if (response.data.projects) {
             projectsData = response.data.projects;
-            console.log(
-              "PropertySlider: Found projects in response.data.projects:",
-              projectsData.length,
-            );
           } else if (Array.isArray(response.data)) {
             projectsData = response.data;
-            console.log(
-              "PropertySlider: Found projects in direct array:",
-              projectsData.length,
-            );
           } else if (response.data.data && Array.isArray(response.data.data)) {
             projectsData = response.data.data;
-            console.log(
-              "PropertySlider: Found projects in response.data.data:",
-              projectsData.length,
-            );
           }
 
           // Convert projects to property format
           if (projectsData.length > 0) {
             dataToSet = projectsData.map((project: any) => {
-              console.log("PropertySlider: Converting project:", project.title);
               return convertProjectToProperty(project);
             });
-            console.log(
-              "PropertySlider: Converted",
-              projectsData.length,
-              "projects to property format",
-            );
           } else {
-            console.log("PropertySlider: No projects data found");
             dataToSet = [];
           }
         }
         // Check if it's properties API response
         else if (response.data.properties) {
-          console.log("PropertySlider: Processing properties data");
           dataToSet = response.data.properties;
         }
         // Handle direct array response
         else if (Array.isArray(response.data)) {
-          console.log("PropertySlider: Processing direct array data");
           dataToSet = response.data;
         }
         // Handle pagination wrapper
         else if (response.data.data && Array.isArray(response.data.data)) {
-          console.log("PropertySlider: Processing paginated data");
           dataToSet = response.data.data;
         }
 
-        console.log("PropertySlider: Setting data:", dataToSet.length, "items");
         setApiProperties(dataToSet);
 
         if (response.data.pagination) {
           // Handle pagination if needed
-          console.log(
-            "PropertySlider: Pagination info:",
-            response.data.pagination,
-          );
         }
       } else {
-        console.log("PropertySlider: No data received");
         setApiProperties([]);
       }
     } catch (error) {
-      console.error("PropertySlider: Error fetching properties:", error);
-      console.error("PropertySlider: URL that failed:", apiUrl);
       // Set empty array on error
       setApiProperties([]);
     } finally {

@@ -10,6 +10,7 @@ import { EditorSidebarProps } from "./types";
 import { AVAILABLE_SECTIONS, getSectionIcon } from "./constants";
 import { createDefaultData } from "./utils";
 import { AdvancedSimpleSwitcher } from "./components/AdvancedSimpleSwitcher";
+import { BrandingSettings } from "./components/BrandingSettings";
 import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
 import { logSidebar, logUserAction } from "@/lib-liveeditor/debugLogger";
 import { getDefaultHeaderData } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
@@ -101,6 +102,8 @@ export function EditorSidebar({
     updateGlobalComponentByPath,
     setCurrentPage,
     setHasChangesMade,
+    WebsiteLayout,
+    setWebsiteLayout,
   } = useEditorStore();
 
   // Helpers to update array fields (slides, gallery) and top-level fields when needed
@@ -325,7 +328,13 @@ export function EditorSidebar({
   }, [selectedComponent, view]);
 
   // Update tempData when selectedComponent changes or when component data changes
+  // Don't clear tempData if we're in branding-settings view
   useEffect(() => {
+    // Skip if we're in branding-settings view (BrandingSettings manages its own tempData)
+    if (view === "branding-settings") {
+      return;
+    }
+
     if (selectedComponent) {
       // Use component.id as unique identifier instead of componentName
       const store = useEditorStore.getState();
@@ -363,11 +372,11 @@ export function EditorSidebar({
     } else {
       setTempData({});
     }
-  }, [selectedComponent, globalHeaderData, globalFooterData]);
+  }, [selectedComponent, globalHeaderData, globalFooterData, view]);
 
-  // Clear tempData when view changes
+  // Clear tempData when view changes (but not for branding-settings)
   useEffect(() => {
-    if (view !== "edit-component") {
+    if (view !== "edit-component" && view !== "branding-settings") {
       setTempData({});
     }
   }, [view]);
@@ -381,6 +390,45 @@ export function EditorSidebar({
   };
 
   const handleSave = () => {
+    // Handle branding-settings view
+    if (view === "branding-settings") {
+      const store = useEditorStore.getState();
+      // Get the latest tempData (which should be updated by BrandingSettings)
+      const brandingData = store.tempData || {};
+      
+      console.log("🔍 Current tempData:", brandingData);
+      console.log("🔍 Current brandingData structure:", {
+        hasColors: !!brandingData.colors,
+        primary: brandingData.colors?.primary,
+        secondary: brandingData.colors?.secondary,
+        accent: brandingData.colors?.accent,
+        mainBgColor: brandingData.mainBgColor,
+      });
+      
+      // Ensure brandingData has the correct structure
+      const finalBrandingData = {
+        colors: {
+          primary: brandingData.colors?.primary || "",
+          secondary: brandingData.colors?.secondary || "",
+          accent: brandingData.colors?.accent || "",
+        },
+        mainBgColor: brandingData.mainBgColor || "",
+      };
+      
+      // Update WebsiteLayout with branding data
+      const updatedWebsiteLayout = {
+        ...(store.WebsiteLayout || {}),
+        metaTags: store.WebsiteLayout?.metaTags || { pages: [] },
+        branding: finalBrandingData,
+      };
+      
+      console.log("💾 Saving branding data:", finalBrandingData);
+      setWebsiteLayout(updatedWebsiteLayout);
+      setHasChangesMade(true);
+      onClose();
+      return;
+    }
+
     if (selectedComponent) {
       // Set hasChangesMade to true when save is triggered
       console.log("🚀 Setting hasChangesMade to true in EditorSidebar");
@@ -756,6 +804,10 @@ export function EditorSidebar({
             </div>
           )}
 
+          {view === "branding-settings" && (
+            <BrandingSettings />
+          )}
+
           {view === "edit-component" && selectedComponent && (
             <div className="space-y-8">
               {/* Theme Selector */}
@@ -1089,6 +1141,65 @@ export function EditorSidebar({
             </div>
           )}
           {view === "add-section" && (
+            <button
+              onClick={() => setView("main")}
+              className="group w-full relative overflow-hidden px-6 py-4 bg-gradient-to-r from-slate-600 via-slate-500 to-slate-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-400 to-slate-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative flex items-center justify-center space-x-3">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
+                </svg>
+                <span>{t("editor_sidebar.back_to_settings")}</span>
+              </div>
+            </button>
+          )}
+          {view === "branding-settings" && (
+            <div className="space-y-3">
+              <button
+                onClick={handleSave}
+                className="group w-full relative overflow-hidden px-6 py-4 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative flex items-center justify-center space-x-3">
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span>{t("editor.save_changes")}</span>
+                </div>
+              </button>
+              <button
+                onClick={() => {
+                  setTempData({});
+                  onClose();
+                }}
+                className="w-full px-6 py-3 bg-slate-100 text-slate-600 font-semibold rounded-xl hover:bg-slate-200 hover:text-slate-700 transition-all duration-200"
+              >
+                {t("common.cancel")}
+              </button>
+            </div>
+          )}
+          {view === "branding-settings" && (
             <button
               onClick={() => setView("main")}
               className="group w-full relative overflow-hidden px-6 py-4 bg-gradient-to-r from-slate-600 via-slate-500 to-slate-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"

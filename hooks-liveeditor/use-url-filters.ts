@@ -38,23 +38,19 @@ export function useUrlFilters() {
    * This runs automatically when searchParams or pathname changes
    */
   useEffect(() => {
-    console.log("🔄 useUrlFilters: Effect triggered!");
     
     // Fallback: Read from window.location if searchParams is not ready
     let currentSearchParams = searchParams;
     
     if (!searchParams && typeof window !== "undefined") {
-      console.log("⚠️  searchParams is null, using window.location.search as fallback");
       const urlParams = new URLSearchParams(window.location.search);
       currentSearchParams = urlParams as any;
     }
     
     if (!currentSearchParams) {
-      console.log("⚠️  No search params available!");
       return;
     }
     
-    console.log("🔄 useUrlFilters: searchParams ready!");
     
     // Debug: log all available params
     const allParamsArray: Array<[string, string]> = [];
@@ -62,7 +58,6 @@ export function useUrlFilters() {
       allParamsArray.push([key, value]);
     });
     const allParams = Object.fromEntries(allParamsArray);
-    console.log("🌐 All URL params (raw):", allParams);
     
     const params = {
       city_id: currentSearchParams.get("city_id") || "",
@@ -74,54 +69,42 @@ export function useUrlFilters() {
     };
 
     // Log for debugging
-    console.log("📥 Reading URL params:", params);
 
     // Apply all params to store
     if (params.city_id) {
-      console.log("  ↳ Setting cityId:", params.city_id);
       setCityId(params.city_id);
     }
     if (params.state_id) {
-      console.log("  ↳ Setting district:", params.state_id);
       setDistrict(params.state_id);
     }
     if (params.max_price) {
-      console.log("  ↳ Setting price:", params.max_price);
       setPrice(params.max_price);
     }
     if (params.category_id) {
-      console.log("  ↳ Setting categoryId:", params.category_id);
       setCategoryId(params.category_id);
     }
     if (params.type_id) {
-      console.log("  ↳ Setting propertyType:", params.type_id);
       setPropertyType(params.type_id);
     }
     if (params.search) {
-      console.log("  ↳ Setting search:", params.search);
       setSearch(params.search);
     }
 
     // Determine transaction type from pathname
     if (pathname?.includes("/for-rent")) {
-      console.log("  ↳ Setting transactionType: rent");
       setTransactionType("rent");
     } else if (pathname?.includes("/for-sale")) {
-      console.log("  ↳ Setting transactionType: sale");
       setTransactionType("sale");
     }
 
     // Check if any filters are present
     const hasFilters = Object.values(params).some(value => value !== "");
 
-    console.log("📊 Has filters?", hasFilters);
 
     // Auto-trigger search if filters are present
     if (hasFilters) {
-      console.log("🔎 Auto-triggering fetchProperties...");
       fetchProperties(1);
     } else {
-      console.log("⏭️  No filters found, skipping fetch");
     }
   }, [
     searchParams,
@@ -140,7 +123,6 @@ export function useUrlFilters() {
    * Manual function to apply URL params (kept for backward compatibility)
    */
   const applyUrlParamsToStore = useCallback(() => {
-    console.log("⚠️  Manual applyUrlParamsToStore called (not needed - useEffect handles this)");
   }, []);
 
   /**
@@ -202,12 +184,7 @@ export function useUrlFilters() {
     const url: string = queryString ? `${basePath}?${queryString}` : basePath;
 
     // Log for debugging
-    console.log("🚀 Navigating with filters:", {
-      transactionType,
-      basePath,
-      url,
-      params: Object.fromEntries(params.entries())
-    });
+
 
     router.push(url);
   }, [router]);

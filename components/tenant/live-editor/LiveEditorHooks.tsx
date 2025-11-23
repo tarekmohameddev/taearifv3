@@ -42,7 +42,7 @@ export function useLiveEditorState() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarView, setSidebarView] = useState<
-    "main" | "add-section" | "edit-component"
+    "main" | "add-section" | "edit-component" | "branding-settings"
   >("main");
 
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(

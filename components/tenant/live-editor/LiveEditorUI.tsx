@@ -603,13 +603,6 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         const validation = validateComponentPositions(updatedComponents);
         setPositionValidation(validation);
 
-        if (!validation.isValid) {
-          console.warn(
-            "⚠️ Position validation failed after move:",
-            validation.issues,
-          );
-        }
-
         // تحديث position tracker
         positionTracker.recordState(updatedComponents, "enhanced-move");
 
@@ -656,17 +649,9 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         const validation = validateComponentPositions(result.updatedComponents);
         setPositionValidation(validation);
 
-        if (!validation.isValid) {
-          console.warn(
-            "⚠️ Position validation failed after move:",
-            validation.issues,
-          );
-        }
-
         // تحديث position tracker
         positionTracker.recordState(result.updatedComponents, "fallback-move");
       } else {
-        console.error("❌ Enhanced move failed");
         setDebugInfo(result.debugInfo);
       }
     },
@@ -744,13 +729,6 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
 
       const validation = validateComponentPositions(pageComponents);
       setPositionValidation(validation);
-
-      if (!validation.isValid && showDebugPanel) {
-        console.warn(
-          "⚠️ Position validation issues detected:",
-          validation.issues,
-        );
-      }
     }
   }, [pageComponents, showDebugPanel, state]);
 
@@ -844,17 +822,6 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                   ? storeData
                   : component.data;
 
-              // Debug log للتحقق من تدفق البيانات
-              console.log("🔍 Component data in LiveEditorUI:", {
-                componentId: component.id,
-                componentType: component.type,
-                componentName: component.componentName,
-                storeData: storeData ? Object.keys(storeData) : "none",
-                componentData: component.data
-                  ? Object.keys(component.data)
-                  : "none",
-                mergedDataKeys: mergedData ? Object.keys(mergedData) : "none",
-              });
 
               return (
                 <motion.div
@@ -1356,6 +1323,35 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
 
                 <button
                   onClick={() => {
+                    state.setSidebarView("branding-settings");
+                    state.setSidebarOpen(true);
+                  }}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                >
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  {t("live_editor.general_settings")}
+                </button>
+
+                <button
+                  onClick={() => {
                     state.setSidebarView("add-section");
                     state.setSidebarOpen(true);
                   }}
@@ -1545,6 +1541,35 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
               {/* Second Row - Action Buttons */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => {
+                      state.setSidebarView("branding-settings");
+                      state.setSidebarOpen(true);
+                    }}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    {t("live_editor.general_settings")}
+                  </button>
+
                   <button
                     onClick={() => {
                       state.setSidebarView("add-section");

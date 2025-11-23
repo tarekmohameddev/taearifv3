@@ -162,6 +162,14 @@ interface EditorStore {
         path: string;
       }>;
     };
+    branding?: {
+      colors: {
+        primary: string;
+        secondary: string;
+        accent: string;
+      };
+      mainBgColor: string;
+    };
   };
   setWebsiteLayout: (data: any) => void;
   addPageToWebsiteLayout: (pageData: any) => void;
