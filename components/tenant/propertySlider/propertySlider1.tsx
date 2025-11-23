@@ -91,8 +91,8 @@ const getDefaultPropertySliderData = () => ({
     },
     link: {
       fontSize: "sm",
-      color: "#059669",
-      hoverColor: "#047857",
+      color: "#059669", // Will be overridden by primaryColor in component
+      hoverColor: "#047857", // Will be overridden by primaryColorHover in component
     },
   },
   carousel: {
@@ -282,6 +282,30 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   const tenantId = useTenantStore((s) => s.tenantId);
   const router = useRouter();
 
+  // Get primary color from WebsiteLayout branding (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const primaryColor = 
+    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#059669"; // emerald-600 default (fallback)
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // emerald-700 in Tailwind = #047857 (fallback)
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  const primaryColorHover = getDarkerColor(primaryColor, 20);
+
   useEffect(() => {
     if (tenantId) {
       fetchTenantData(tenantId);
@@ -374,7 +398,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
 
   const linkStyles = {
     fontSize: mergedData.typography?.link?.fontSize || "sm",
-    color: mergedData.typography?.link?.color || "#059669",
+    color: mergedData.typography?.link?.color || primaryColor,
   };
 
   const sectionStyles = {
@@ -406,7 +430,10 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
       <section className="w-full bg-background py-14 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+            <div 
+              className="inline-block animate-spin rounded-full h-8 w-8 border-b-2"
+              style={{ borderBottomColor: primaryColor }}
+            ></div>
             <p className="text-lg text-gray-600 mt-4">
               جاري تحميل بيانات الموقع...
             </p>
@@ -501,14 +528,14 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
             </h2>
             <Link
               href={mergedData.content?.viewAllUrl || "#"}
-              className="text-emerald-700 hover:underline text-sm"
+              className="hover:underline text-sm"
               style={{
                 fontSize: mergedData.typography?.link?.fontSize || "sm",
                 color:
                   mergedData.styling?.textColor ||
                   mergedData.colors?.textColor ||
                   mergedData.typography?.link?.color ||
-                  "#059669",
+                  primaryColorHover,
               }}
             >
               {mergedData.content?.viewAllText || "عرض الكل"}
@@ -558,8 +585,11 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
             </div>
             <Link
               href={mergedData.content?.viewAllUrl || "#"}
-              className="text-emerald-700 hover:underline"
-              style={linkStyles}
+              className="hover:underline"
+              style={{
+                ...linkStyles,
+                color: mergedData.typography?.link?.color || primaryColorHover,
+              }}
             >
               {mergedData.content?.viewAllText || "عرض الكل"}
             </Link>
@@ -577,7 +607,10 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <div 
+                  className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+                  style={{ borderBottomColor: primaryColor }}
+                ></div>
                 <p className="text-gray-600">جاري تحميل العقارات...</p>
               </div>
             </div>

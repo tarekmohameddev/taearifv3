@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePropertiesStore } from "@/store/propertiesStore";
 import { useTenantId } from "@/hooks/useTenantId";
+import useTenantStore from "@/context-liveeditor/tenantStore";
 
 // القائمة الافتراضية لأنواع العقارات (تُستخدم كـ fallback)
 const defaultPropertyTypes = [
@@ -72,6 +73,33 @@ export default function PropertyFilter({
 
   // Tenant ID hook
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+
+  // Get tenant data from store
+  const { tenantData } = useTenantStore();
+
+  // Get primary color from WebsiteLayout branding (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const primaryColor = 
+    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#059669"; // emerald-600 default (fallback)
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // emerald-700 in Tailwind = #047857 (fallback)
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  const primaryColorHover = getDarkerColor(primaryColor, 20);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]); // تغيير إلى PropertyType[]
@@ -513,7 +541,14 @@ export default function PropertyFilter({
         <div className="w-full md:w-[15.18%] h-full relative">
           <Button
             type="submit"
-            className="text-xs xs:text-base md:text-lg flex items-center justify-center w-full h-12 md:h-14 text-white bg-emerald-600 hover:bg-emerald-700 rounded-[10px]"
+            className="text-xs xs:text-base md:text-lg flex items-center justify-center w-full h-12 md:h-14 text-white rounded-[10px] transition-colors"
+            style={{ backgroundColor: primaryColor }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = primaryColorHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = primaryColor;
+            }}
           >
             {searchButtonText}
           </Button>

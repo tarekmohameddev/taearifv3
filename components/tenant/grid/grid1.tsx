@@ -92,6 +92,45 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
+  // Get primary color from WebsiteLayout branding (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const primaryColor = 
+    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#059669"; // emerald-600 default (fallback)
+
+  // Helper function to create lighter color (for badges and backgrounds)
+  const getLighterColor = (hex: string, opacity: number = 0.2): string => {
+    if (!hex || !hex.startsWith('#')) return `${primaryColor}33`; // 20% opacity default
+    // Return hex color with opacity using rgba
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return `${primaryColor}33`;
+    
+    const r = parseInt(cleanHex.substr(0, 2), 16);
+    const g = parseInt(cleanHex.substr(2, 2), 16);
+    const b = parseInt(cleanHex.substr(4, 2), 16);
+    
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  };
+
+  // Helper function to create darker color for text on light backgrounds
+  const getDarkerColor = (hex: string, amount: number = 40): string => {
+    // emerald-700 in Tailwind = #047857 (fallback)
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  const primaryColorLight = getLighterColor(primaryColor, 0.15); // 15% opacity for badge backgrounds
+  const primaryColorDark = getDarkerColor(primaryColor, 40); // Darker for text on light backgrounds
+
   useEffect(() => {
     if (props.useStore) {
       ensureComponentVariant("grid", variantId, props);
@@ -408,7 +447,10 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       <section className="w-full bg-background py-8">
         <div className="mx-auto max-w-[1600px] px-4">
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+            <div 
+              className="inline-block animate-spin rounded-full h-8 w-8 border-b-2"
+              style={{ borderBottomColor: primaryColor }}
+            ></div>
             <p className="text-lg text-gray-600 mt-4">
               جاري تحميل بيانات الموقع...
             </p>
@@ -505,7 +547,10 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         {loading || storeLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <div 
+                className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+                style={{ borderBottomColor: primaryColor }}
+              ></div>
               <p className="text-gray-600">جاري تحميل العقارات...</p>
             </div>
           </div>
@@ -604,12 +649,24 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
                 <p className="text-sm text-gray-600 mb-2">الفلاتر النشطة:</p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {search && (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                    <span 
+                      className="px-2 py-1 rounded-full text-xs"
+                      style={{
+                        backgroundColor: primaryColorLight,
+                        color: primaryColorDark,
+                      }}
+                    >
                       البحث: "{search}"
                     </span>
                   )}
                   {propertyType && (
-                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                    <span 
+                      className="px-2 py-1 rounded-full text-xs"
+                      style={{
+                        backgroundColor: primaryColorLight,
+                        color: primaryColorDark,
+                      }}
+                    >
                       النوع: "{propertyType}"
                     </span>
                   )}

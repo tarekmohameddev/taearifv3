@@ -5,6 +5,7 @@ import { Eye, Bed, Bath, Square, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useTenantId } from "@/hooks/useTenantId";
+import useTenantStore from "@/context-liveeditor/tenantStore";
 
 type Property = {
   id: string;
@@ -51,6 +52,33 @@ export default function PropertyCard3({
 }: PropertyCard3Props) {
   const router = useRouter();
   const tenantId = useTenantId();
+
+  // Get tenant data from store
+  const { tenantData } = useTenantStore();
+
+  // Get primary color from WebsiteLayout branding (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const primaryColor = 
+    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#059669"; // emerald-600 default (fallback)
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // emerald-700 in Tailwind = #047857 (fallback)
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  const primaryColorHover = getDarkerColor(primaryColor, 20);
 
   // Check if property exists
   if (!property) {
@@ -131,7 +159,10 @@ export default function PropertyCard3({
           {/* Status Badge - Top Left */}
           {showStatus && property.status ? (
             <div className="absolute top-4 left-4">
-              <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+              <span 
+                className="text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg"
+                style={{ backgroundColor: primaryColor }}
+              >
                 {property.status}
               </span>
             </div>
@@ -209,7 +240,14 @@ export default function PropertyCard3({
                   )}
                 </div>
                 <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-lg"
+                  className="text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-lg"
+                  style={{ backgroundColor: primaryColor }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = primaryColorHover;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = primaryColor;
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleClick();
@@ -275,7 +313,14 @@ export default function PropertyCard3({
                 )}
               </div>
               <Button
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
+                className="text-white font-medium px-4 py-2 rounded-lg transition-colors"
+                style={{ backgroundColor: primaryColor }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = primaryColorHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = primaryColor;
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleClick();

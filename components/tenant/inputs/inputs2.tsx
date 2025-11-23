@@ -326,6 +326,45 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
+  // Get primary color from WebsiteLayout branding (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const primaryColor = 
+    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#059669"; // emerald-600 default (fallback)
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // emerald-700 in Tailwind = #047857 (fallback)
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  // Helper function to create lighter color (for hover backgrounds)
+  const getLighterColor = (hex: string, opacity: number = 0.1): string => {
+    if (!hex || !hex.startsWith('#')) return `${primaryColor}1A`; // 10% opacity default
+    // Return hex color with opacity using rgba
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return `${primaryColor}1A`;
+    
+    const r = parseInt(cleanHex.substr(0, 2), 16);
+    const g = parseInt(cleanHex.substr(2, 2), 16);
+    const b = parseInt(cleanHex.substr(4, 2), 16);
+    
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  };
+
+  const primaryColorHover = getDarkerColor(primaryColor, 20);
+  const primaryColorLight = getLighterColor(primaryColor, 0.1); // 10% opacity for hover backgrounds
+
   useEffect(() => {
     if (tenantId) {
       fetchTenantData(tenantId);
@@ -1397,9 +1436,12 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               value={formData[field.id] || ""}
               onChange={(e) => handleInputChange(field.id, e.target.value)}
               placeholder={field.placeholder || `أدخل ${field.label}`}
+              style={{
+                '--focus-ring-color': primaryColor,
+              } as React.CSSProperties}
               className={`
                 w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                focus:outline-none focus:ring-2 focus:border-transparent
                 dark:bg-gray-800 dark:border-gray-600 dark:text-white
                 ${
                   hasError
@@ -1407,6 +1449,14 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                     : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
                 }
               `}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = primaryColor;
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '';
+                e.currentTarget.style.boxShadow = '';
+              }}
               rows={4}
             />
           ) : fieldType === "select" ? (
@@ -1414,10 +1464,13 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               <select
                 value={formData[field.id] || ""}
                 onChange={(e) => handleInputChange(field.id, e.target.value)}
+                style={{
+                  '--focus-ring-color': primaryColor,
+                } as React.CSSProperties}
                 className={`
       w-full px-4 py-3 pr-12 border rounded-xl transition-all duration-300
       appearance-none
-      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+      focus:outline-none focus:ring-2 focus:border-transparent
       dark:bg-gray-800 dark:border-gray-600 dark:text-white
       ${
         hasError
@@ -1425,6 +1478,14 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
           : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
       }
     `}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = primaryColor;
+                  e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = '';
+                  e.currentTarget.style.boxShadow = '';
+                }}
               >
                 <option value="">اختر {field.label}</option>
                 {field.options && field.options.length > 0 ? (
@@ -1467,9 +1528,12 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               value={formData[field.id] || ""}
               onChange={(e) => handleInputChange(field.id, e.target.value)}
               placeholder={field.placeholder || `أدخل ${field.label}`}
+              style={{
+                '--focus-ring-color': primaryColor,
+              } as React.CSSProperties}
               className={`
                 w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                focus:outline-none focus:ring-2 focus:border-transparent
                 dark:bg-gray-800 dark:border-gray-600 dark:text-white
                 ${
                   hasError
@@ -1477,6 +1541,14 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                     : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
                 }
               `}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = primaryColor;
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '';
+                e.currentTarget.style.boxShadow = '';
+              }}
             />
           ) : fieldType === "number" ? (
             <input
@@ -1484,9 +1556,12 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               value={formData[field.id] || ""}
               onChange={(e) => handleInputChange(field.id, e.target.value)}
               placeholder={field.placeholder || `أدخل ${field.label}`}
+              style={{
+                '--focus-ring-color': primaryColor,
+              } as React.CSSProperties}
               className={`
                 w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                focus:outline-none focus:ring-2 focus:border-transparent
                 dark:bg-gray-800 dark:border-gray-600 dark:text-white
                 ${
                   hasError
@@ -1494,6 +1569,14 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                     : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
                 }
               `}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = primaryColor;
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '';
+                e.currentTarget.style.boxShadow = '';
+              }}
             />
           ) : fieldType === "date" ? (
             <input
@@ -1501,9 +1584,12 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               value={formData[field.id] || ""}
               onChange={(e) => handleInputChange(field.id, e.target.value)}
               placeholder={field.placeholder || `أدخل ${field.label}`}
+              style={{
+                '--focus-ring-color': primaryColor,
+              } as React.CSSProperties}
               className={`
                 w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                focus:outline-none focus:ring-2 focus:border-transparent
                 dark:bg-gray-800 dark:border-gray-600 dark:text-white
                 ${
                   hasError
@@ -1511,6 +1597,14 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                     : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
                 }
               `}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = primaryColor;
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '';
+                e.currentTarget.style.boxShadow = '';
+              }}
             />
           ) : fieldType === "currency" ? (
             <div className="relative">
@@ -1520,9 +1614,12 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                 value={formData[field.id] || ""}
                 onChange={(e) => handleInputChange(field.id, e.target.value)}
                 placeholder={field.placeholder || `أدخل ${field.label}`}
+                style={{
+                  '--focus-ring-color': primaryColor,
+                } as React.CSSProperties}
                 className={`
                   w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                  focus:outline-none focus:ring-2 focus:border-transparent
                   dark:bg-gray-800 dark:border-gray-600 dark:text-white
                   ${
                     hasError
@@ -1530,6 +1627,14 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                       : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
                   }
                 `}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = primaryColor;
+                  e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = '';
+                  e.currentTarget.style.boxShadow = '';
+                }}
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                 $
@@ -1543,11 +1648,30 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                 field.options.map((option, index) => (
                   <div
                     key={`${field.id}_option_${index}_${option.value}`}
-                    className={`radio-item flex items-center px-4 py-3 bg-white border-2 border-gray-300 rounded-full cursor-pointer transition-all duration-300 min-w-[120px] justify-center relative text-gray-700 hover:border-blue-400 hover:bg-blue-50 hover:transform hover:-translate-y-1 ${
+                    className={`radio-item flex items-center px-4 py-3 bg-white border-2 border-gray-300 rounded-full cursor-pointer transition-all duration-300 min-w-[120px] justify-center relative text-gray-700 hover:transform hover:-translate-y-1 ${
                       formData[field.id] === option.value
-                        ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-transparent shadow-lg"
+                        ? "text-white border-transparent shadow-lg"
                         : ""
                     }`}
+                    style={
+                      formData[field.id] === option.value
+                        ? {
+                            background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColorHover} 100%)`,
+                          }
+                        : {}
+                    }
+                    onMouseEnter={(e) => {
+                      if (formData[field.id] !== option.value) {
+                        e.currentTarget.style.borderColor = primaryColor;
+                        e.currentTarget.style.backgroundColor = primaryColorLight;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (formData[field.id] !== option.value) {
+                        e.currentTarget.style.borderColor = '';
+                        e.currentTarget.style.backgroundColor = 'white';
+                      }
+                    }}
                     onClick={() => handleInputChange(field.id, option.value)}
                   >
                     <input
@@ -1575,9 +1699,12 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               value={formData[field.id] || ""}
               onChange={(e) => handleInputChange(field.id, e.target.value)}
               placeholder={field.placeholder || `أدخل ${field.label}`}
+              style={{
+                '--focus-ring-color': primaryColor,
+              } as React.CSSProperties}
               className={`
                 w-full px-4 py-3 pr-10 border rounded-xl transition-all duration-300
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                focus:outline-none focus:ring-2 focus:border-transparent
                 dark:bg-gray-800 dark:border-gray-600 dark:text-white
                 ${
                   hasError
@@ -1585,6 +1712,14 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                     : "border-gray-300 hover:border-gray-400 dark:hover:border-gray-500"
                 }
               `}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = primaryColor;
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '';
+                e.currentTarget.style.boxShadow = '';
+              }}
             />
           )}
 
@@ -1825,7 +1960,10 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
       <section className="w-full bg-background py-8">
         <div className="mx-auto max-w-[1600px] px-4">
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+            <div 
+              className="inline-block animate-spin rounded-full h-8 w-8 border-b-2"
+              style={{ borderBottomColor: primaryColor }}
+            ></div>
             <p className="text-lg text-gray-600 mt-4">
               جاري تحميل بيانات الموقع...
             </p>
@@ -2049,7 +2187,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               disabled={isSubmitting}
               className="transition-all duration-300 flex items-center space-x-2 rtl:space-x-reverse font-bold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                backgroundColor: submitButton.backgroundColor || "#3b82f6",
+                backgroundColor: submitButton.backgroundColor || primaryColor,
                 color: submitButton.textColor || "#ffffff",
                 borderRadius: submitButton.borderRadius || "8px",
                 padding: submitButton.padding || "12px 24px",
@@ -2058,11 +2196,11 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor =
-                  submitButton.hoverColor || "#1e40af";
+                  submitButton.hoverColor || primaryColorHover;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor =
-                  submitButton.backgroundColor || "#3b82f6";
+                  submitButton.backgroundColor || primaryColor;
               }}
             >
               {isSubmitting ? (
@@ -2096,12 +2234,21 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                   transition={{ duration: 0.3 }}
                   className={`w-full max-w-md p-4 rounded-lg flex items-center space-x-2 rtl:space-x-reverse ${
                     submitStatus.type === "success"
-                      ? "bg-green-50 border border-green-200 text-green-800"
+                      ? "border text-gray-800"
                       : "bg-red-50 border border-red-200 text-red-800"
                   }`}
+                  style={
+                    submitStatus.type === "success"
+                      ? {
+                          backgroundColor: primaryColorLight,
+                          borderColor: primaryColor,
+                          color: getDarkerColor(primaryColor, 40),
+                        }
+                      : {}
+                  }
                 >
                   {submitStatus.type === "success" ? (
-                    <CheckCircle size={20} className="text-green-600" />
+                    <CheckCircle size={20} style={{ color: primaryColor }} />
                   ) : (
                     <AlertCircle size={20} className="text-red-600" />
                   )}

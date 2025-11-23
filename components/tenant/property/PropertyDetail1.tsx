@@ -456,6 +456,105 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
     ? null // لا تعرض شيئاً أثناء التحميل
     : (tenantData?.globalComponentsData?.header?.logo?.image || `${process.env.NEXT_PUBLIC_SOCKET_URL}/logo.png`);
 
+  // Get primary color from WebsiteLayout branding (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const primaryColor = 
+    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#059669"; // emerald-600 default
+  
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // emerald-700 in Tailwind = #047857
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+  
+  // Helper function to create lighter color (for skeleton loading)
+  const getLighterColor = (hex: string, opacity: number = 0.2): string => {
+    if (!hex || !hex.startsWith('#')) return `${primaryColor}33`; // 20% opacity default
+    // Return hex color with opacity using rgba
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return `${primaryColor}33`;
+    
+    const r = parseInt(cleanHex.substr(0, 2), 16);
+    const g = parseInt(cleanHex.substr(2, 2), 16);
+    const b = parseInt(cleanHex.substr(4, 2), 16);
+    
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  };
+
+  // Helper function to convert hex color to CSS filter for SVG coloring
+  // This converts any hex color to a CSS filter that can be applied to SVG images
+  const hexToFilter = (hex: string): string => {
+    if (!hex || !hex.startsWith('#')) {
+      // Default emerald-600 filter
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+    }
+    
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) {
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+    }
+
+    // Parse RGB values
+    const r = parseInt(cleanHex.substr(0, 2), 16) / 255;
+    const g = parseInt(cleanHex.substr(2, 2), 16) / 255;
+    const b = parseInt(cleanHex.substr(4, 2), 16) / 255;
+
+    // Convert RGB to HSL
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r:
+          h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+          break;
+        case g:
+          h = ((b - r) / d + 2) / 6;
+          break;
+        case b:
+          h = ((r - g) / d + 4) / 6;
+          break;
+      }
+    }
+
+    // Convert HSL to filter values
+    // First, make the image black (brightness(0) saturate(100%))
+    // Then invert to white
+    // Then apply color transformation
+    const hue = Math.round(h * 360);
+    const saturation = Math.round(s * 100);
+    const lightness = Math.round(l * 100);
+
+    // Calculate filter values
+    // This is a simplified approach - for more accuracy, we'd need complex calculations
+    // But this works well for most colors
+    const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
+    const contrast = 100 + (saturation * 0.5);
+
+    return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
+  };
+  
+  const primaryColorHover = getDarkerColor(primaryColor, 20);
+  const primaryColorLight = getLighterColor(primaryColor, 0.2); // 20% opacity for skeleton
+  const primaryColorFilter = hexToFilter(primaryColor); // CSS filter for SVG coloring
+
   // Property data state
   const [property, setProperty] = useState<Property | null>(null);
   const [loadingProperty, setLoadingProperty] = useState(true);
@@ -610,7 +709,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               <div className="flex flex-col gap-y-8 lg:gap-y-10">
                 {/* العنوان ونوع العرض - Skeleton */}
                 <div className="flex flex-row items-center justify-between">
-                  <div className="h-8 w-20 bg-emerald-200 rounded-md animate-pulse md:w-28 md:h-11"></div>
+                  <div 
+                    className="h-8 w-20 rounded-md animate-pulse md:w-28 md:h-11"
+                    style={{ backgroundColor: primaryColorLight || `${primaryColor}33` }}
+                  ></div>
                   <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
                 </div>
 
@@ -634,7 +736,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       className="flex flex-row gap-x-2 md:gap-x-6 items-center"
                     >
                       <div className="flex flex-row gap-x-2 items-center">
-                        <div className="w-4 h-4 bg-emerald-200 rounded animate-pulse"></div>
+                        <div 
+                          className="w-4 h-4 rounded animate-pulse"
+                          style={{ backgroundColor: primaryColorLight || `${primaryColor}33` }}
+                        ></div>
                         <div className="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
                       </div>
                       <div className="h-4 bg-gray-200 rounded animate-pulse w-12"></div>
@@ -688,7 +793,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
               {/* نموذج الحجز - Skeleton */}
               <div className="flex flex-col gap-y-6">
-                <div className="h-10 bg-emerald-200 rounded-md animate-pulse w-full"></div>
+                <div 
+                  className="h-10 rounded-md animate-pulse w-full"
+                  style={{ backgroundColor: primaryColorLight || `${primaryColor}33` }}
+                ></div>
                 <div className="h-4 bg-gray-200 rounded animate-pulse w-4/5"></div>
 
                 <div className="flex flex-col gap-y-6 md:gap-y-8">
@@ -714,14 +822,20 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     </div>
                   </div>
 
-                  <div className="h-12 bg-emerald-200 rounded-md animate-pulse w-[200px] mx-auto"></div>
+                  <div 
+                    className="h-12 rounded-md animate-pulse w-[200px] mx-auto"
+                    style={{ backgroundColor: primaryColorLight || `${primaryColor}33` }}
+                  ></div>
                 </div>
               </div>
             </div>
 
             {/* العقارات المشابهة - Skeleton */}
             <div className="flex-1">
-              <div className="h-10 bg-emerald-200 rounded-md animate-pulse w-full mb-8 md:h-13"></div>
+              <div 
+                className="h-10 rounded-md animate-pulse w-full mb-8 md:h-13"
+                style={{ backgroundColor: primaryColorLight || `${primaryColor}33` }}
+              ></div>
 
               {/* عرض العقارات المشابهة للديسكتوب - Skeleton */}
               <div className="hidden md:block space-y-8">
@@ -857,7 +971,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             <div className="flex flex-col gap-y-8 lg:gap-y-10">
               {/* العنوان ونوع العرض */}
               <div className="flex flex-row items-center justify-between">
-                <h1 className="font-bold text-xs xs:text-sm leading-4 rounded-md text-white bg-emerald-600 w-20 h-8 flex items-center justify-center md:text-xl lg:text-2xl md:w-28 md:h-11">
+                <h1 
+                  className="font-bold text-xs xs:text-sm leading-4 rounded-md text-white w-20 h-8 flex items-center justify-center md:text-xl lg:text-2xl md:w-28 md:h-11"
+                  style={{ backgroundColor: primaryColor }}
+                >
                   {transactionTypeLabel}
                 </h1>
                 <div className="sharesocials flex flex-row gap-x-6" dir="ltr">
@@ -878,15 +995,17 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 <p className="font-bold text-gray-600 text-xl leading-6 md:leading-7">
                   {property.title}
                 </p>
-                <p className="text-emerald-600 text-2xl leading-7 font-bold md:text-3xl lg:leading-9 flex items-center gap-2">
+                <p 
+                  className="text-2xl leading-7 font-bold md:text-3xl lg:leading-9 flex items-center gap-2"
+                  style={{ color: primaryColor }}
+                >
                   {property.price}
                   <img
                     src="/Saudi_Riyal_Symbol.svg"
                     alt="ريال سعودي"
                     className="w-6 h-6"
                     style={{
-                      filter:
-                        "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)",
+                      filter: primaryColorFilter,
                     }}
                   />
                 </p>
@@ -903,7 +1022,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       setReservationSuccess(false);
                       setDateError(null);
                     }}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 text-base md:text-lg shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    className="w-full text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 text-base md:text-lg shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    style={{ backgroundColor: primaryColor }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = primaryColorHover;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = primaryColor;
+                    }}
                   >
                     <span>احجز الآن</span>
                     <svg
@@ -942,7 +1068,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                         >
                         {/* Success Message */}
                         {reservationSuccess && (
-                          <div className="p-3 bg-green-100 border border-green-400 rounded-lg text-green-800 text-sm text-center">
+                          <div 
+                            className="p-3 border rounded-lg text-sm text-center"
+                            style={{
+                              backgroundColor: getLighterColor(primaryColor, 0.1),
+                              borderColor: primaryColor,
+                              color: getDarkerColor(primaryColor, 40),
+                            }}
+                          >
                             ✅ تم إرسال طلب الحجز بنجاح! سنتواصل معك قريباً.
                           </div>
                         )}
@@ -973,7 +1106,19 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                                 }
                                 placeholder="أدخل اسمك"
                                 disabled={reservationLoading}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 text-sm md:text-base"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none disabled:bg-gray-100 text-sm md:text-base"
+                                style={{
+                                  '--focus-ring-color': primaryColor,
+                                  '--focus-border-color': primaryColor,
+                                } as React.CSSProperties}
+                                onFocus={(e) => {
+                                  e.currentTarget.style.borderColor = primaryColor;
+                                  e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+                                }}
+                                onBlur={(e) => {
+                                  e.currentTarget.style.borderColor = '';
+                                  e.currentTarget.style.boxShadow = '';
+                                }}
                               />
                             </div>
 
@@ -993,7 +1138,19 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                                 }
                                 placeholder="+966501234567"
                                 disabled={reservationLoading}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 text-sm md:text-base"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none disabled:bg-gray-100 text-sm md:text-base"
+                                style={{
+                                  '--focus-ring-color': primaryColor,
+                                  '--focus-border-color': primaryColor,
+                                } as React.CSSProperties}
+                                onFocus={(e) => {
+                                  e.currentTarget.style.borderColor = primaryColor;
+                                  e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+                                }}
+                                onBlur={(e) => {
+                                  e.currentTarget.style.borderColor = '';
+                                  e.currentTarget.style.boxShadow = '';
+                                }}
                               />
                               <p className="mt-1 text-xs text-gray-500">
                                 مثال: +966501234567
@@ -1035,7 +1192,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                                 }}
                                 min={new Date().toISOString().split("T")[0]}
                                 disabled={reservationLoading}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 text-sm md:text-base ${
+                                className={`w-full px-4 py-2 border rounded-lg outline-none disabled:bg-gray-100 text-sm md:text-base ${
                                   dateError
                                     ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                                     : "border-gray-300"
@@ -1062,7 +1219,15 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                                 placeholder="أدخل أي ملاحظات أو استفسارات..."
                                 rows={3}
                                 disabled={reservationLoading}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none disabled:bg-gray-100 resize-vertical text-sm md:text-base"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none disabled:bg-gray-100 resize-vertical text-sm md:text-base"
+                                onFocus={(e) => {
+                                  e.currentTarget.style.borderColor = primaryColor;
+                                  e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+                                }}
+                                onBlur={(e) => {
+                                  e.currentTarget.style.borderColor = '';
+                                  e.currentTarget.style.boxShadow = '';
+                                }}
                               />
                             </div>
 
@@ -1070,7 +1235,18 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                             <button
                               onClick={handleCreateReservation}
                               disabled={reservationLoading}
-                              className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-sm md:text-base"
+                              className="w-full disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-sm md:text-base"
+                              style={{ backgroundColor: primaryColor }}
+                              onMouseEnter={(e) => {
+                                if (!e.currentTarget.disabled) {
+                                  e.currentTarget.style.backgroundColor = primaryColorHover;
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!e.currentTarget.disabled) {
+                                  e.currentTarget.style.backgroundColor = primaryColor;
+                                }
+                              }}
                             >
                               {reservationLoading ? "جاري الإرسال..." : "إرسال طلب الحجز"}
                             </button>
@@ -1153,9 +1329,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                           fill
                           className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
                             mainImage === imageSrc
-                              ? "border-emerald-500"
+                              ? ""
                               : "border-transparent"
                           }`}
+                          style={mainImage === imageSrc ? { borderColor: primaryColor, borderWidth: '2px' } : {}}
                           onClick={() => handleThumbnailClick(imageSrc, index)}
                         />
                         {logoImage && (
@@ -1191,8 +1368,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             <div className="grid grid-cols-2 gap-y-6 lg:gap-y-10">
               <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                 <div className="flex flex-row gap-x-2">
-                  <HomeIcon className="w-4 h-4 text-emerald-600" />
-                  <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                  <HomeIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                  <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                     نوع العرض:
                   </p>
                 </div>
@@ -1204,8 +1381,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.area && parseFloat(property.area) > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <RulerIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <RulerIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       المساحة:
                     </p>
                   </div>
@@ -1217,8 +1394,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
               <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                 <div className="flex flex-row gap-x-2">
-                  <BuildingIcon className="w-4 h-4 text-emerald-600" />
-                  <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                  <BuildingIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                  <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                     نوع العقار:
                   </p>
                 </div>
@@ -1230,8 +1407,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.payment_method ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <CreditCardIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <CreditCardIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       طريقة الدفع:
                     </p>
                   </div>
@@ -1255,11 +1432,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       alt="ريال سعودي"
                       className="w-4 h-4"
                       style={{
-                        filter:
-                          "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)",
+                        filter: primaryColorFilter,
                       }}
                     />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       السعر للمتر:
                     </p>
                   </div>
@@ -1272,8 +1448,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.building_age ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <CalendarDaysIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <CalendarDaysIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       عمر المبنى:
                     </p>
                   </div>
@@ -1286,8 +1462,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.floors ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <LayersIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <LayersIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       عدد الطوابق:
                     </p>
                   </div>
@@ -1300,8 +1476,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.floor_number ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <ArrowUpDownIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <ArrowUpDownIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       رقم الطابق:
                     </p>
                   </div>
@@ -1314,8 +1490,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.bedrooms > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <BedIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <BedIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       عدد الغرف:
                     </p>
                   </div>
@@ -1328,8 +1504,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.bathrooms && property.bathrooms > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <BathIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <BathIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       الحمامات:
                     </p>
                   </div>
@@ -1342,8 +1518,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.kitchen && property.kitchen > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <ChefHatIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <ChefHatIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       المطابخ:
                     </p>
                   </div>
@@ -1356,8 +1532,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.living_room && property.living_room > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <SofaIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <SofaIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       الصالات:
                     </p>
                   </div>
@@ -1370,8 +1546,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.majlis && property.majlis > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <UsersIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <UsersIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       المجالس:
                     </p>
                   </div>
@@ -1384,8 +1560,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.dining_room && property.dining_room > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <UtensilsIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <UtensilsIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       غرف الطعام:
                     </p>
                   </div>
@@ -1398,8 +1574,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.maid_room && property.maid_room > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <UserIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <UserIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       غرف الخدم:
                     </p>
                   </div>
@@ -1412,8 +1588,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.driver_room && property.driver_room > 0 ?(
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <CarIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <CarIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       غرف السائق:
                     </p>
                   </div>
@@ -1426,8 +1602,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.storage_room && property.storage_room > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <PackageIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <PackageIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       المخازن:
                     </p>
                   </div>
@@ -1440,8 +1616,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.basement && property.basement > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <Layers className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <Layers className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       القبو:
                     </p>
                   </div>
@@ -1454,8 +1630,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.swimming_pool && property.swimming_pool > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <WavesIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <WavesIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       المسبح:
                     </p>
                   </div>
@@ -1468,8 +1644,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.balcony && property.balcony > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <SquareIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <SquareIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       الشرفات:
                     </p>
                   </div>
@@ -1482,8 +1658,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.garden && property.garden > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <TreePineIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <TreePineIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       الحدائق:
                     </p>
                   </div>
@@ -1496,8 +1672,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.elevator && property.elevator > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <ArrowUpDown className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <ArrowUpDown className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       المصاعد:
                     </p>
                   </div>
@@ -1510,8 +1686,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.private_parking && property.private_parking > 0 ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <ParkingCircleIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <ParkingCircleIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       مواقف السيارات:
                     </p>
                   </div>
@@ -1524,8 +1700,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {property.length && property.width ? (
                 <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                   <div className="flex flex-row gap-x-2">
-                    <RulerIcon className="w-4 h-4 text-emerald-600" />
-                    <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                    <RulerIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                    <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                       الأبعاد:
                     </p>
                   </div>
@@ -1540,14 +1716,15 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   property.location.address) ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <MapPinIcon className="w-4 h-4 text-emerald-600" />
+                      <MapPinIcon className="w-4 h-4" style={{ color: primaryColor }} />
                     </div>
                     {property.location.lat && property.location.lng ? (
                       <a
                         href={`https://maps.google.com/?q=${property.location.lat},${property.location.lng}&entry=gps`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-bold leading-4 text-xs xs:text-sm md:text-base text-emerald-600 underline"
+                        className="font-bold leading-4 text-xs xs:text-sm md:text-base underline"
+                        style={{ color: primaryColor }}
                       >
                         عرض العنوان
                       </a>
@@ -1612,7 +1789,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             {/* نموذج الحجز */}
             {/* انه مخفي فقط الان ولا اريد ازالته */}
             {/* <div className="flex flex-col gap-y-6">
-              <h2 className="pr-4 text-white font-bold rounded-md leading-6 bg-emerald-600 w-full h-10 flex items-center justify-start">
+              <h2 
+                className="pr-4 text-white font-bold rounded-md leading-6 w-full h-10 flex items-center justify-start"
+                style={{ backgroundColor: primaryColor }}
+              >
                 احجز الآن
               </h2>
               <p className="text-sm text-gray-600 font-normal">
@@ -1679,7 +1859,13 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full justify-start text-right font-normal cursor-pointer text-base font-medium text-gray-600 rounded-lg border border-gray-300 p-2 outline-none focus:border-emerald-600 h-12"
+                          className="w-full justify-start text-right font-normal cursor-pointer text-base font-medium text-gray-600 rounded-lg border border-gray-300 p-2 outline-none h-12"
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = primaryColor;
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '';
+                          }}
                         >
                           <CalendarIcon className="ml-2 h-4 w-4" />
                           {selectedDate ? (
@@ -1712,14 +1898,20 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       <input
                         id="time"
                         required
-                        className="order-1 w-full font-medium text-gray-600 rounded-lg border border-gray-300 p-2 outline-none pr-10 focus:border-emerald-600 h-12"
+                        className="order-1 w-full font-medium text-gray-600 rounded-lg border border-gray-300 p-2 outline-none pr-10 h-12"
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = primaryColor;
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = '';
+                        }}
                         type="time"
                         value={selectedTime}
                         onChange={(e) => setSelectedTime(e.target.value)}
                         disabled={!selectedDate}
                       />
                       <div className="absolute pointer-events-none top-0 bottom-0 right-3 flex items-center order-2">
-                        <ClockIcon className="w-5 h-5 text-emerald-600" />
+                        <ClockIcon className="w-5 h-5" style={{ color: primaryColor }} />
                       </div>
                       {!selectedDate && (
                         <div className="absolute top-0 left-0 w-full h-full bg-white/70 z-10 cursor-not-allowed rounded-lg" />
@@ -1730,7 +1922,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
 
                 <button
                   type="submit"
-                  className="w-[200px] mx-auto h-12 rounded-md bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition-colors"
+                  className="w-[200px] mx-auto h-12 rounded-md text-white font-bold transition-colors"
+                  style={{ backgroundColor: primaryColor }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = primaryColorHover;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = primaryColor;
+                  }}
                 >
                   تأكيد الحجز
                 </button>
@@ -1748,7 +1947,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 {property.floor_planning_image &&
                   property.floor_planning_image.length > 0 && (
                     <div className="mt-6">
-                      <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                      <h3 
+                        className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                        style={{ backgroundColor: primaryColor }}
+                      >
                         مخططات الأرضية
                       </h3>
                       <div className="grid grid-cols-2 gap-3">
@@ -1803,7 +2005,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             {/* فيديو العقار */}
             {property.video_url && (
               <div className="mb-8">
-                <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                <h3 
+                  className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                  style={{ backgroundColor: primaryColor }}
+                >
                   فيديو العقار
                 </h3>
                 <div className="w-full rounded-lg overflow-hidden shadow-lg">
@@ -1822,7 +2027,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             {/* الجولة الافتراضية */}
             {property.virtual_tour && (
               <div className="mb-8">
-                <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                <h3 
+                  className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                  style={{ backgroundColor: primaryColor }}
+                >
                   جولة افتراضية
                 </h3>
                 <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg">
@@ -1842,7 +2050,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             {/* خريطة الموقع */}
             {property.location && property.location.lat && property.location.lng ? (
               <div className="mb-8">
-                <h3 className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                <h3 
+                  className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                  style={{ backgroundColor: primaryColor }}
+                >
                   موقع العقار
                 </h3>
                 <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg">
@@ -1862,7 +2073,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     href={`https://maps.google.com/?q=${property.location.lat},${property.location.lng}&entry=gps`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+                    style={{ backgroundColor: primaryColor }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = primaryColorHover;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = primaryColor;
+                    }}
                   >
                     <MapPinIcon className="w-4 h-4" />
                     فتح في خرائط جوجل
@@ -1877,7 +2095,10 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
             <div>
               <div className="flex-1">
                 <div>
-                  <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                  <h3 
+                  className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                  style={{ backgroundColor: primaryColor }}
+                >
                     عقارات مشابهة
                   </h3>
                   {/* عرض العقارات المشابهة للديسكتوب */}
@@ -1922,7 +2143,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                                   alt="ريال سعودي"
                                   className="w-5 h-5"
                                   style={{
-                                    filter: "brightness(0) saturate(100%)",
+                                    filter: primaryColorFilter,
                                   }}
                                 />
                               </p>
@@ -2039,11 +2260,11 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                                       alt="ريال سعودي"
                                       className="w-5 h-5"
                                       style={{
-                                        filter: "brightness(0) saturate(100%)",
+                                        filter: primaryColorFilter,
                                       }}
                                     />
                                   </p>
-                                  <p className="text-emerald-600 font-bold text-base leading-5 xl:leading-6 xl:text-lg">
+                                  <p className="font-bold text-base leading-5 xl:leading-6 xl:text-lg" style={{ color: primaryColor }}>
                                     تفاصيل
                                   </p>
                                 </div>
@@ -2156,7 +2377,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
               {/* WhatsApp */}
               <button
                 onClick={shareToWhatsApp}
-                className="flex items-center justify-center gap-2 p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                className="flex items-center justify-center gap-2 p-3 text-white rounded-lg transition-colors"
+                style={{ backgroundColor: primaryColor }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = primaryColorHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = primaryColor;
+                }}
               >
                 <MessageCircleIcon className="w-5 h-5" />
                 <span className="text-sm font-medium">واتساب</span>

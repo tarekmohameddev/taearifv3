@@ -5,6 +5,7 @@ import { Eye, Bed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useTenantId } from "@/hooks/useTenantId";
+import useTenantStore from "@/context-liveeditor/tenantStore";
 
 type Property = {
   id: string;
@@ -51,6 +52,87 @@ export function PropertyCard({
 }: PropertyCardProps) {
   const router = useRouter();
   const { tenantId } = useTenantId();
+
+  // Get tenant data from store
+  const { tenantData } = useTenantStore();
+
+  // Get primary color from WebsiteLayout branding (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const primaryColor = 
+    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#059669"; // emerald-600 default (fallback)
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // emerald-700 in Tailwind = #047857 (fallback)
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  // Helper function to convert hex color to CSS filter for SVG coloring
+  const hexToFilter = (hex: string): string => {
+    if (!hex || !hex.startsWith('#')) {
+      // Default emerald-600 filter (fallback)
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+    }
+    
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) {
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+    }
+
+    // Parse RGB values
+    const r = parseInt(cleanHex.substr(0, 2), 16) / 255;
+    const g = parseInt(cleanHex.substr(2, 2), 16) / 255;
+    const b = parseInt(cleanHex.substr(4, 2), 16) / 255;
+
+    // Convert RGB to HSL
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r:
+          h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+          break;
+        case g:
+          h = ((b - r) / d + 2) / 6;
+          break;
+        case b:
+          h = ((r - g) / d + 4) / 6;
+          break;
+      }
+    }
+
+    // Convert HSL to filter values
+    const hue = Math.round(h * 360);
+    const saturation = Math.round(s * 100);
+    const lightness = Math.round(l * 100);
+
+    // Calculate filter values
+    const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
+    const contrast = 100 + (saturation * 0.5);
+
+    return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
+  };
+
+  const primaryColorHover = getDarkerColor(primaryColor, 20);
+  const primaryColorFilter = hexToFilter(primaryColor);
 
   // Check if property exists
   if (!p) {
@@ -133,7 +215,7 @@ export function PropertyCard({
             {showDetails && (
               <div className="absolute right-3 top-3 flex items-center gap-2 rounded-lg bg-white/95 px-3 py-2 shadow-sm">
                 <div className="flex items-center gap-1">
-                  <Bed className="size-4 text-emerald-600" />
+                  <Bed className="size-4" style={{ color: primaryColor }} />
                   <span className="text-sm font-semibold text-gray-700">
                     {p.bedrooms}
                   </span>
@@ -184,15 +266,15 @@ export function PropertyCard({
                   alt="ريال سعودي"
                   className="w-5 h-5"
                   style={{
-                    filter:
-                      "brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%)",
+                    filter: primaryColorFilter,
                   }}
                 />
               </span>
               {/* زر التفاصيل على اليمين - بدون Link لتجنب التداخل */}
               <Button
                 variant="ghost"
-                className="h-auto p-0 text-emerald-700 hover:bg-transparent hover:underline"
+                className="h-auto p-0 hover:bg-transparent hover:underline"
+                style={{ color: primaryColorHover }}
               >
                 تفاصيل
               </Button>
