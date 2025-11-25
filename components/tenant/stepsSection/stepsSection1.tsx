@@ -10,12 +10,12 @@ import useTenantStore from "@/context-liveeditor/tenantStore";
 // Function to get icon URL based on type
 const getStepIconUrl = (type: string): string => {
   const iconMap: Record<string, string> = {
-    step1: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/1.svg",
-    step2: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/2.svg",
-    step3: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/3.svg",
-    step4: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/4.svg",
-    step5: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/5.svg",
-    step6: "https://dalel-lovat.vercel.app/images/MarketingStepsSection/6.svg",
+    step1: "/images/MarketingStepsSection/1.svg",
+    step2: "/images/MarketingStepsSection/2.svg",
+    step3: "/images/MarketingStepsSection/3.svg",
+    step4: "/images/MarketingStepsSection/4.svg",
+    step5: "/images/MarketingStepsSection/5.svg",
+    step6: "/images/MarketingStepsSection/6.svg",
   };
 
   return iconMap[type] || iconMap.step1;
@@ -409,17 +409,34 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
     }
     
     // Also check in background, iconStyle, titleStyle, descriptionStyle directly
-    if (!fieldData || (typeof fieldData === 'object' && !fieldData.value)) {
+    // First check styling.icon.color, then iconStyle.color
+    if (fieldPath === "icon.color") {
+      // Check styling.icon.color first (from EditorSidebar)
+      const stylingIconColor = mergedData?.styling?.icon?.color;
+      if (stylingIconColor !== undefined && stylingIconColor !== null) {
+        fieldData = stylingIconColor;
+      } else {
+        // Fallback to iconStyle.color (from default data)
+        fieldData = mergedData?.iconStyle?.color;
+      }
+    } else if (fieldPath === "background.color") {
+      // Check styling.background.color first, then background.color
+      const stylingBgColor = mergedData?.styling?.background?.color;
+      if (stylingBgColor !== undefined && stylingBgColor !== null) {
+        fieldData = stylingBgColor;
+      } else {
+        fieldData = mergedData?.background?.color;
+      }
+    } else if (fieldPath === "title.color") {
+      // Check in steps array for titleStyle.color, then styling.title.color
+      fieldData = mergedData?.steps?.[0]?.titleStyle?.color || mergedData?.styling?.title?.color;
+    } else if (fieldPath === "description.color") {
+      // Check in steps array for descriptionStyle.color, then styling.description.color
+      fieldData = mergedData?.steps?.[0]?.descriptionStyle?.color || mergedData?.styling?.description?.color;
+    } else if (!fieldData || (typeof fieldData === 'object' && !fieldData.value && !fieldData.useDefaultColor)) {
+      // For other paths, try to get from mergedData directly
       if (fieldPath === "background.color") {
         fieldData = mergedData?.background?.color;
-      } else if (fieldPath === "icon.color") {
-        fieldData = mergedData?.iconStyle?.color || mergedData?.styling?.icon?.color;
-      } else if (fieldPath === "title.color") {
-        // Check in steps array for titleStyle.color
-        fieldData = mergedData?.steps?.[0]?.titleStyle?.color || mergedData?.styling?.title?.color;
-      } else if (fieldPath === "description.color") {
-        // Check in steps array for descriptionStyle.color
-        fieldData = mergedData?.steps?.[0]?.descriptionStyle?.color || mergedData?.styling?.description?.color;
       }
     }
     
@@ -468,63 +485,57 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
 
   // Function to convert hex color to CSS filter for SVG images
   // This converts black/dark SVG images to the target color using CSS filters
-  // Formula based on: https://codepen.io/sosuke/pen/Pjoqqp
-  const getIconFilter = (targetColor: string): string => {
-    if (!targetColor || !targetColor.startsWith('#')) {
-      return "none"; // No filter for invalid colors
+  // Improved formula based on RGB to HSL conversion
+  const getIconFilter = (hex: string): string => {
+    if (!hex || !hex.startsWith('#')) {
+      // Default emerald-600 filter (fallback)
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
     }
     
-    const cleanHex = targetColor.replace('#', '');
-    if (cleanHex.length !== 6) return "none";
-    
-    // Get RGB values (0-255)
-    const r = parseInt(cleanHex.substr(0, 2), 16);
-    const g = parseInt(cleanHex.substr(2, 2), 16);
-    const b = parseInt(cleanHex.substr(4, 2), 16);
-    
-    // Normalize RGB values (0-1)
-    const rNorm = r / 255;
-    const gNorm = g / 255;
-    const bNorm = b / 255;
-    
-    // Calculate the filter values using the formula from codepen
-    // This converts black (#000000) to the target color
-    // The formula: brightness(0) saturate(100%) invert(R%) sepia(S%) saturate(S%) hue-rotate(Hdeg) brightness(B%) contrast(C%)
-    
-    // Calculate hue
-    const max = Math.max(rNorm, gNorm, bNorm);
-    const min = Math.min(rNorm, gNorm, bNorm);
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) {
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+    }
+
+    // Parse RGB values
+    const r = parseInt(cleanHex.substr(0, 2), 16) / 255;
+    const g = parseInt(cleanHex.substr(2, 2), 16) / 255;
+    const b = parseInt(cleanHex.substr(4, 2), 16) / 255;
+
+    // Convert RGB to HSL
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
     let h = 0;
-    
+    let s = 0;
+    const l = (max + min) / 2;
+
     if (max !== min) {
-      if (max === rNorm) {
-        h = ((gNorm - bNorm) / (max - min)) % 6;
-      } else if (max === gNorm) {
-        h = (bNorm - rNorm) / (max - min) + 2;
-      } else {
-        h = (rNorm - gNorm) / (max - min) + 4;
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r:
+          h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+          break;
+        case g:
+          h = ((b - r) / d + 2) / 6;
+          break;
+        case b:
+          h = ((r - g) / d + 4) / 6;
+          break;
       }
     }
-    h = Math.round(h * 60);
-    if (h < 0) h += 360;
-    
-    // Calculate saturation
-    const s = max === 0 ? 0 : ((max - min) / max) * 100;
-    
-    // Calculate brightness/lightness
-    const l = (max + min) / 2 * 100;
-    
-    // Build the filter
-    // For black to color conversion:
-    // 1. brightness(0) - makes everything black
-    // 2. invert() - inverts based on target color
-    // 3. sepia() - adds sepia tone
-    // 4. saturate() - adjusts saturation
-    // 5. hue-rotate() - rotates hue to target
-    // 6. brightness() - adjusts final brightness
-    // 7. contrast() - fine-tunes contrast
-    
-    return `brightness(0) saturate(100%) invert(${rNorm * 100}%) sepia(${s}%) saturate(${s * 2}%) hue-rotate(${h}deg) brightness(${l / 50}%) contrast(1.2)`;
+
+    // Convert HSL to filter values
+    const hue = Math.round(h * 360);
+    const saturation = Math.round(s * 100);
+    const lightness = Math.round(l * 100);
+
+    // Calculate filter values
+    const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
+    const contrast = 100 + (saturation * 0.5);
+
+    return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
   };
 
   // Don't render if not visible
@@ -538,6 +549,10 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
   const iconFilter = getIconFilter(iconColor);
   const titleColor = getColor("title.color", brandingColors.secondary);
   const descriptionColor = getColor("description.color", brandingColors.secondary);
+  // Get header title color - check styling.header.title.color first, then use titleColor
+  const headerTitleColor = mergedData?.styling?.header?.title?.color || 
+                          mergedData?.header?.title?.color || 
+                          titleColor;
 
   return (
     <section className="w-full bg-background sm:py-16 ">
@@ -553,6 +568,9 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
         <header className="mb-10">
           <h2
             className={mergedData.header?.title?.className || "section-title"}
+            style={{
+              color: headerTitleColor,
+            }}
           >
             {mergedData.header?.title?.text || "كيف يعمل النظام"}
           </h2>

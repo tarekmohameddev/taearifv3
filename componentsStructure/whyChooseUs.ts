@@ -548,6 +548,20 @@ export const whyChooseUsStructure: ComponentStructure = {
           type: "object",
           fields: [
             {
+              key: "icon",
+              label: "Icon Settings",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Icon Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Icon color uses primary color from branding
+                },
+              ],
+            },
+            {
               key: "colors",
               label: "Colors",
               type: "object",

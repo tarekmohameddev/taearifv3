@@ -38,7 +38,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       title: "المعاينة الأولية للعقار",
       desc: "زيارة العقار وتقييم حالته ومعرفة ميزاته ومراجعة التفاصيل التي تحتاج إلى توضيح.",
       image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/1.svg",
+        "/images/MarketingStepsSection/1.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
@@ -53,7 +53,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       title: "كتابة تفصيل العقار",
       desc: "وصف دقيق للممتلكات بما في ذلك الموقع، المساحة، المرافق، والحالة العامة.",
       image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/2.svg",
+        "/images/MarketingStepsSection/2.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
@@ -68,7 +68,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       title: "التصوير الاحترافي للعقار",
       desc: "الاستعانة بمصور محترف لالتقاط صور عالية الجودة مع الاهتمام بالإضاءة والزوايا.",
       image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/3.svg",
+        "/images/MarketingStepsSection/3.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
@@ -83,7 +83,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       title: "توقيع اتفاقية الوساطة والتسويق",
       desc: "توقيع عقد رسمي بينك وبين المالك لتنظيم عملية تسويق العقار وحقوق الطرفين.",
       image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/4.svg",
+        "/images/MarketingStepsSection/4.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
@@ -98,7 +98,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       title: "تصميم بوستر للعقار وإضافته لموقعنا",
       desc: "إعداد بوستر يحتوي على الصور والتفاصيل الرئيسية ونشره على موقعنا الإلكتروني.",
       image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/5.svg",
+        "/images/MarketingStepsSection/5.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
@@ -113,7 +113,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       title: "جذب العملاء المحتملين",
       desc: "استخدام وسائل الاتصال المختلفة لجذب المشترين المهتمين مثل الإعلانات.",
       image:
-        "https://dalel-lovat.vercel.app/images/MarketingStepsSection/6.svg",
+        "/images/MarketingStepsSection/6.svg",
       titleStyle: {
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",

@@ -9,12 +9,12 @@ import Image from "next/image";
 // Function to get icon URL based on type
 const getWhyChooseUsIconUrl = (type: string): string => {
   const iconMap: Record<string, string> = {
-    icon1: "https://dalel-lovat.vercel.app/images/why-choose-us/1.svg",
-    icon2: "https://dalel-lovat.vercel.app/images/why-choose-us/2.svg",
-    icon3: "https://dalel-lovat.vercel.app/images/why-choose-us/3.svg",
-    icon4: "https://dalel-lovat.vercel.app/images/why-choose-us/4.svg",
-    icon5: "https://dalel-lovat.vercel.app/images/why-choose-us/5.svg",
-    icon6: "https://dalel-lovat.vercel.app/images/why-choose-us/6.svg",
+    icon1: "/images/why-choose-us/1.png",
+    icon2: "/images/why-choose-us/2.png",
+    icon3: "/images/why-choose-us/3.png",
+    icon4: "/images/why-choose-us/4.png",
+    icon5: "/images/why-choose-us/5.png",
+    icon6: "/images/why-choose-us/6.png",
   };
 
   return iconMap[type] || iconMap.icon1;
@@ -486,12 +486,44 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
     fieldPath: string,
     defaultColor: string = "#059669"
   ): string => {
-    // Get styling data from mergedData (check both styling.colors and colors)
-    const styling = mergedData?.styling?.colors || mergedData?.colors || {};
+    // Get styling data from mergedData (check styling.icon.color, styling.colors, and colors)
+    const styling = mergedData?.styling || {};
+    
+    // Special handling for icon.color path
+    if (fieldPath === "icon.color") {
+      // Check styling.icon.color first (from EditorSidebar)
+      const stylingIconColor = styling?.icon?.color;
+      if (stylingIconColor !== undefined && stylingIconColor !== null) {
+        // If it's a string with #, return it
+        if (typeof stylingIconColor === 'string' && stylingIconColor.startsWith('#')) {
+          return stylingIconColor;
+        }
+        // If it's an object, check for value and useDefaultColor
+        if (typeof stylingIconColor === 'object' && !Array.isArray(stylingIconColor)) {
+          if (stylingIconColor.useDefaultColor === false && stylingIconColor.value && typeof stylingIconColor.value === 'string' && stylingIconColor.value.startsWith('#')) {
+            return stylingIconColor.value;
+          }
+          if (stylingIconColor.useDefaultColor !== false) {
+            // Use branding color
+            return brandingColors.primary;
+          }
+        }
+      }
+      // Fallback to iconColor from colors
+      const colorsIconColor = mergedData?.colors?.iconColor || mergedData?.styling?.colors?.iconColor;
+      if (colorsIconColor && typeof colorsIconColor === 'string' && colorsIconColor.startsWith('#')) {
+        return colorsIconColor;
+      }
+      // Final fallback to primary branding color
+      return brandingColors.primary;
+    }
+    
+    // For other paths, use existing logic
+    const colors = styling?.colors || mergedData?.colors || {};
     
     // Navigate to the field using the path (e.g., "titleColor")
     const pathParts = fieldPath.split('.');
-    let fieldData = styling;
+    let fieldData = colors;
     for (const part of pathParts) {
       if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
         fieldData = fieldData[part];
@@ -505,7 +537,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
     const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
     const globalColorTypePath = `${fieldPath}.globalColorType`;
     const useDefaultColorPathParts = useDefaultColorPath.split('.');
-    let useDefaultColorValue = styling;
+    let useDefaultColorValue = colors;
     for (const part of useDefaultColorPathParts) {
       if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
         useDefaultColorValue = useDefaultColorValue[part];
@@ -516,7 +548,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
     }
     
     const globalColorTypePathParts = globalColorTypePath.split('.');
-    let globalColorTypeValue = styling;
+    let globalColorTypeValue = colors;
     for (const part of globalColorTypePathParts) {
       if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
         globalColorTypeValue = globalColorTypeValue[part];
@@ -566,6 +598,60 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
     }
     const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
     return brandingColor;
+  };
+
+  // Function to convert hex color to CSS filter for PNG images
+  // This converts images to the target color using CSS filters
+  const getIconFilter = (hex: string): string => {
+    if (!hex || !hex.startsWith('#')) {
+      // Default emerald-600 filter (fallback)
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+    }
+    
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) {
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+    }
+
+    // Parse RGB values
+    const r = parseInt(cleanHex.substr(0, 2), 16) / 255;
+    const g = parseInt(cleanHex.substr(2, 2), 16) / 255;
+    const b = parseInt(cleanHex.substr(4, 2), 16) / 255;
+
+    // Convert RGB to HSL
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r:
+          h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+          break;
+        case g:
+          h = ((b - r) / d + 2) / 6;
+          break;
+        case b:
+          h = ((r - g) / d + 4) / 6;
+          break;
+      }
+    }
+
+    // Convert HSL to filter values
+    const hue = Math.round(h * 360);
+    const saturation = Math.round(s * 100);
+    const lightness = Math.round(l * 100);
+
+    // Calculate filter values
+    const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
+    const contrast = 100 + (saturation * 0.5);
+
+    return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
   };
 
   // Helper function to create lighter color for ring/border (10% opacity of primary)
@@ -677,8 +763,21 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
   // Get colors using getColor function
   const titleColor = getColor("titleColor", brandingColors.secondary);
   const descriptionColor = getColor("descriptionColor", brandingColors.secondary);
-  const iconColor = getColor("iconColor", brandingColors.primary);
+  const iconColor = getColor("icon.color", brandingColors.primary);
+  const iconFilter = getIconFilter(iconColor);
   const ringColor = getColor("ringColor", getLighterColor(brandingColors.primary, 0.1));
+  
+  // Get header title color - use primary color as default if available, otherwise use section-title CSS class
+  // Check if primary color exists in branding (not just default fallback)
+  const hasPrimaryColor = tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+                         tenantData.WebsiteLayout.branding.colors.primary.trim() !== "";
+  
+  // Priority: custom color > primary branding color > undefined (use CSS class)
+  const headerTitleColor = mergedData?.styling?.header?.title?.color || 
+                          mergedData?.header?.title?.color ||
+                          mergedData?.styling?.textColor ||
+                          mergedData?.colors?.textColor ||
+                          (hasPrimaryColor ? brandingColors.primary : undefined);
 
   return (
     <section
@@ -709,10 +808,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                 : "section-title text-right"
             }
             style={{
-              color:
-                mergedData.styling?.textColor ||
-                mergedData.colors?.textColor ||
-                undefined,
+              ...(headerTitleColor ? { color: headerTitleColor } : {}),
             }}
           >
             {mergedData.header?.title || "لماذا تختارنا؟"}
@@ -786,6 +882,9 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                     width={parseInt(f.icon?.size || "80")}
                     height={parseInt(f.icon?.size || "80")}
                     className={f.icon?.className || "w-20 h-20"}
+                    style={{
+                      filter: iconFilter !== "none" ? iconFilter : undefined,
+                    }}
                   />
                 )}
               </div>
