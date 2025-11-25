@@ -45,23 +45,23 @@ export default function DashboardLayout({
   const { tokenValidation } = useTokenValidation();
   const router = useRouter();
   const [isValidDomain, setIsValidDomain] = useState<boolean | null>(null);
-  const [hasValidatedSession, setHasValidatedSession] = useState<boolean>(false);
-
-  // التحقق من حالة التحقق في sessionStorage عند التحميل
-  useEffect(() => {
+  
+  // قراءة حالة التحقق من sessionStorage مباشرة في initial state
+  const [hasValidatedSession, setHasValidatedSession] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      const validated = sessionStorage.getItem(SESSION_VALIDATION_KEY) === "true";
-      setHasValidatedSession(validated);
+      return sessionStorage.getItem(SESSION_VALIDATION_KEY) === "true";
     }
-  }, []);
+    return false;
+  });
 
   // حفظ حالة التحقق في sessionStorage عند اكتمال التحقق بنجاح
+  // هذا يضمن عدم عرض رسالة التحميل عند التنقل بين الصفحات في نفس الجلسة
   useEffect(() => {
     if (typeof window !== "undefined" && tokenValidation.isValid === true && !tokenValidation.loading) {
       sessionStorage.setItem(SESSION_VALIDATION_KEY, "true");
       setHasValidatedSession(true);
     }
-    // في حالة فشل التحقق، احذف المفتاح من sessionStorage
+    // في حالة فشل التحقق، احذف المفتاح من sessionStorage لإجبار التحقق مرة أخرى
     if (typeof window !== "undefined" && tokenValidation.isValid === false && !tokenValidation.loading) {
       sessionStorage.removeItem(SESSION_VALIDATION_KEY);
       setHasValidatedSession(false);
@@ -135,7 +135,10 @@ export default function DashboardLayout({
     };
   }, []);
 
-  // Show loading while validating domain or token (only if not validated in this session)
+  // عرض رسالة التحميل فقط في الحالات التالية:
+  // 1. عند التحقق من الدومين لأول مرة (isValidDomain === null)
+  // 2. عند التحقق من الجلسة لأول مرة في هذه الجلسة (tokenValidation.loading && !hasValidatedSession)
+  // ملاحظة: إذا تم التحقق من الجلسة من قبل في هذه الجلسة، لن تظهر رسالة التحميل عند التنقل
   const shouldShowLoading = isValidDomain === null || (tokenValidation.loading && !hasValidatedSession);
   
   if (shouldShowLoading) {
