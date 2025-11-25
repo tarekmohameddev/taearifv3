@@ -389,6 +389,48 @@ export const testimonialsStructure: ComponentStructure = {
           ],
         },
         {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "header",
+              label: "Header Colors",
+              type: "object",
+              fields: [
+                {
+                  key: "titleColor",
+                  label: "Title Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Title uses secondary color from branding
+                },
+                {
+                  key: "descriptionColor",
+                  label: "Description Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Description uses secondary color from branding
+                },
+              ],
+            },
+            {
+              key: "quoteIcon",
+              label: "Quote Icon Color",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Icon Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Quote icon uses primary color from branding
+                },
+              ],
+            },
+          ],
+        },
+        {
           key: "pagination",
           label: "Pagination Styling",
           type: "object",
@@ -409,8 +451,7 @@ export const testimonialsStructure: ComponentStructure = {
               key: "bulletColor", 
               label: "Bullet Color", 
               type: "color",
-              useDefaultColor: true,
-              globalColorType: "primary" // Bullet uses primary color
+              useDefaultColor: false, // Bullet color is usually custom (gray)
             },
             {
               key: "bulletOpacity",
