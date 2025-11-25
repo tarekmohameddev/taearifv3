@@ -415,6 +415,147 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
 
   const tenantComponentData = getTenantComponentData();
 
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const brandingColors = {
+    primary: 
+      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 default (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback to primary
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#059669", // fallback to primary
+  };
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (
+    fieldPath: string,
+    defaultColor: string = "#059669"
+  ): string => {
+    // Get styling data from mergedData
+    const styling = mergedData?.styling || {};
+    
+    // Navigate to the field using the path (e.g., "icon.color")
+    const pathParts = fieldPath.split('.');
+    let fieldData = styling;
+    
+    for (const part of pathParts) {
+      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+        fieldData = fieldData[part];
+      } else {
+        fieldData = undefined;
+        break;
+      }
+    }
+    
+    // Check if fieldData is a custom color (string starting with #)
+    // If it is, return it directly (useDefaultColor is false)
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      return fieldData;
+    }
+    
+    // If fieldData is an object, check for value property
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      // If object has useDefaultColor property set to false, use the value
+      if (fieldData.useDefaultColor === false && fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        return fieldData.value;
+      }
+      // If object has value but useDefaultColor is true or undefined, still check value first
+      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        // Check if useDefaultColor is explicitly false
+        if (fieldData.useDefaultColor === false) {
+          return fieldData.value;
+        }
+      }
+    }
+    
+    // If no custom color found, use branding color (useDefaultColor is true by default)
+    // Determine globalColorType based on field path
+    let defaultGlobalColorType = "primary";
+    if (fieldPath.includes("title") || fieldPath.includes("content") || fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+      defaultGlobalColorType = "secondary";
+    } else if (fieldPath.includes("icon") || fieldPath.includes("Icon")) {
+      defaultGlobalColorType = "primary";
+    }
+    
+    // If fieldData is an object with globalColorType, use it
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData) && fieldData.globalColorType) {
+      defaultGlobalColorType = fieldData.globalColorType;
+    }
+    
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    return brandingColor;
+  };
+
+  // Function to convert hex color to CSS filter for SVG images
+  // This converts black/dark SVG images to the target color using CSS filters
+  // Formula based on: https://codepen.io/sosuke/pen/Pjoqqp
+  const getIconFilter = (targetColor: string): string => {
+    if (!targetColor || !targetColor.startsWith('#')) {
+      return "none"; // No filter for invalid colors
+    }
+    
+    const cleanHex = targetColor.replace('#', '');
+    if (cleanHex.length !== 6) return "none";
+    
+    // Get RGB values (0-255)
+    const r = parseInt(cleanHex.substr(0, 2), 16);
+    const g = parseInt(cleanHex.substr(2, 2), 16);
+    const b = parseInt(cleanHex.substr(4, 2), 16);
+    
+    // Normalize RGB values (0-1)
+    const rNorm = r / 255;
+    const gNorm = g / 255;
+    const bNorm = b / 255;
+    
+    // Calculate the filter values using the formula from codepen
+    // This converts black (#000000) to the target color
+    // The formula: brightness(0) saturate(100%) invert(R%) sepia(S%) saturate(S%) hue-rotate(Hdeg) brightness(B%) contrast(C%)
+    
+    // Calculate hue
+    const max = Math.max(rNorm, gNorm, bNorm);
+    const min = Math.min(rNorm, gNorm, bNorm);
+    let h = 0;
+    
+    if (max !== min) {
+      if (max === rNorm) {
+        h = ((gNorm - bNorm) / (max - min)) % 6;
+      } else if (max === gNorm) {
+        h = (bNorm - rNorm) / (max - min) + 2;
+      } else {
+        h = (rNorm - gNorm) / (max - min) + 4;
+      }
+    }
+    h = Math.round(h * 60);
+    if (h < 0) h += 360;
+    
+    // Calculate saturation
+    const s = max === 0 ? 0 : ((max - min) / max) * 100;
+    
+    // Calculate brightness/lightness
+    const l = (max + min) / 2 * 100;
+    
+    // Build the filter
+    // For black to color conversion:
+    // 1. brightness(0) - makes everything black
+    // 2. invert() - inverts based on target color
+    // 3. sepia() - adds sepia tone
+    // 4. saturate() - adjusts saturation
+    // 5. hue-rotate() - rotates hue to target
+    // 6. brightness() - adjusts final brightness
+    // 7. contrast() - fine-tunes contrast
+    
+    return `brightness(0) saturate(100%) invert(${rNorm * 100}%) sepia(${s}%) saturate(${s * 2}%) hue-rotate(${h}deg) brightness(${l / 50}%) contrast(1.2)`;
+  };
+
   // Check if we have any data from API/stores first
   const hasApiData =
     tenantComponentData && Object.keys(tenantComponentData).length > 0;
@@ -468,6 +609,10 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
     return null;
   }
 
+  // Get colors using getColor function
+  const iconColor = getColor("icon.color", brandingColors.primary);
+  const iconFilter = getIconFilter(iconColor);
+
   // Use merged data for cards with proper fallbacks
   const cards: ContactCardProps[] = (mergedData.cards || defaultData.cards).map(
     (card: ContactCardProps) => ({
@@ -510,6 +655,9 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
                 alt={card.icon.alt || "Contact card icon"}
                 width={60}
                 height={60}
+                style={{
+                  filter: iconFilter !== "none" ? iconFilter : undefined,
+                }}
               />
             )}
             <div

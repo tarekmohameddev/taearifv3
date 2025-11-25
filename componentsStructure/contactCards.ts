@@ -387,6 +387,55 @@ export const contactCardsStructure: ComponentStructure = {
           ],
         },
         {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "icon",
+              label: "Icon Styling",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Icon Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Icon uses primary color from branding
+                },
+              ],
+            },
+            {
+              key: "title",
+              label: "Title Styling",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Title Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Title uses secondary color from branding
+                },
+              ],
+            },
+            {
+              key: "content",
+              label: "Content Styling",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Content Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Content uses secondary color from branding
+                },
+              ],
+            },
+          ],
+        },
+        {
           key: "animations",
           label: "Animations",
           type: "object",
