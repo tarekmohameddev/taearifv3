@@ -136,7 +136,7 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                       label: "Hover Text Color",
                       type: "color",
                       useDefaultColor: true,
-                      globalColorType: "primary" // Button hover text uses primary color
+                      globalColorType: "primary", // Button hover text uses primary color
                     },
                     { key: "width", label: "Width", type: "text" },
                     { key: "height", label: "Height", type: "text" },
@@ -144,6 +144,111 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                       key: "borderRadius",
                       label: "Border Radius",
                       type: "text",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "button",
+              label: "Button Styling",
+              type: "object",
+              fields: [
+                {
+                  key: "backgroundColor",
+                  label: "Background Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Button background uses primary color
+                },
+                {
+                  key: "textColor",
+                  label: "Text Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Button text uses primary color
+                },
+                {
+                  key: "hoverBackgroundColor",
+                  label: "Hover Background Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Button hover background uses primary color
+                },
+                {
+                  key: "hoverTextColor",
+                  label: "Hover Text Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Button hover text uses primary color
+                },
+              ],
+            },
+            {
+              key: "imageBackground",
+              label: "Image Background Styling",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Background Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Image background uses primary color
+                },
+              ],
+            },
+            {
+              key: "typography",
+              label: "Typography Colors",
+              type: "object",
+              fields: [
+                {
+                  key: "eyebrow",
+                  label: "Eyebrow Text Color",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "color",
+                      label: "Eyebrow Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary", // Eyebrow text uses secondary color from branding
+                    },
+                  ],
+                },
+                {
+                  key: "title",
+                  label: "Title Text Color",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "color",
+                      label: "Title Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary", // Title text uses secondary color from branding
+                    },
+                  ],
+                },
+                {
+                  key: "description",
+                  label: "Description Text Color",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "color",
+                      label: "Description Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary", // Description text uses secondary color from branding
                     },
                   ],
                 },
@@ -241,7 +346,13 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Show Background", type: "boolean" },
-                { key: "color", label: "Background Color", type: "color" },
+                { 
+                  key: "color", 
+                  label: "Background Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary" // Image background uses primary color
+                },
                 { key: "width", label: "Width (%)", type: "number" },
                 { key: "borderRadius", label: "Border Radius", type: "text" },
               ],

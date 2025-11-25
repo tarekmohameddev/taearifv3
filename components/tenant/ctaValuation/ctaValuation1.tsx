@@ -174,10 +174,123 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
     },
   };
 
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const brandingColors = {
+    primary: 
+      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 default (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback to primary
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#059669", // fallback to primary
+  };
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (
+    fieldPath: string,
+    defaultColor: string = "#059669"
+  ): string => {
+    // Get styling data from mergedData
+    const styling = mergedData?.styling || {};
+    
+    // Navigate to the field using the path (e.g., "bgColor")
+    const pathParts = fieldPath.split('.');
+    let fieldData = styling;
+    for (const part of pathParts) {
+      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+        fieldData = fieldData[part];
+      } else {
+        fieldData = undefined;
+        break;
+      }
+    }
+    
+    // Also check for useDefaultColor and globalColorType at the same path level
+    const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
+    const globalColorTypePath = `${fieldPath}.globalColorType`;
+    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    let useDefaultColorValue = styling;
+    for (const part of useDefaultColorPathParts) {
+      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+        useDefaultColorValue = useDefaultColorValue[part];
+      } else {
+        useDefaultColorValue = undefined;
+        break;
+      }
+    }
+    
+    const globalColorTypePathParts = globalColorTypePath.split('.');
+    let globalColorTypeValue = styling;
+    for (const part of globalColorTypePathParts) {
+      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+        globalColorTypeValue = globalColorTypeValue[part];
+      } else {
+        globalColorTypeValue = undefined;
+        break;
+      }
+    }
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined 
+      ? useDefaultColorValue 
+      : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      // Determine default globalColorType based on field path if not set
+      let defaultGlobalColorType = "primary";
+      if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+        defaultGlobalColorType = "secondary";
+      } else if (fieldPath.includes("button") || fieldPath.includes("Button") || fieldPath.includes("bgColor") || fieldPath.includes("backgroundColor")) {
+        defaultGlobalColorType = "primary";
+      }
+      
+      const globalColorType = globalColorTypeValue || defaultGlobalColorType;
+      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, try to get custom color
+    // The color might be stored directly as string or in a value property of an object
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      return fieldData;
+    }
+    
+    // If fieldData is an object, check for value property
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        return fieldData.value;
+      }
+    }
+    
+    // Final fallback: use default branding color
+    let defaultGlobalColorType = "primary";
+    if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+      defaultGlobalColorType = "secondary";
+    }
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    return brandingColor;
+  };
+
   // Don't render if not visible
   if (!mergedData.visible) {
     return null;
   }
+
+  // Get colors using getColor function
+  const bgColor = getColor("bgColor", brandingColors.primary);
+  const textColor = getColor("textColor", brandingColors.secondary);
+  const buttonBgColor = getColor("buttonBgColor", "#ffffff");
+  const buttonTextColor = getColor("buttonTextColor", brandingColors.primary);
 
   // Ensure imageSrc is never empty string to prevent console error
   const safeImageSrc =
@@ -194,10 +307,7 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
         <div
           className="mx-auto max-w-7xl rounded-2xl px-6 py-10 shadow-md sm:px-10 sm:py-12"
           style={{
-            backgroundColor:
-              mergedData.styling?.bgColor ||
-              mergedData.colors?.background ||
-              "#059669",
+            backgroundColor: bgColor,
           }}
         >
           <div
@@ -224,10 +334,7 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
             <div
               className="order-2 text-center md:order-2 md:col-span-7 md:text-center"
               style={{
-                color:
-                  mergedData.styling?.textColor ||
-                  mergedData.colors?.textColor ||
-                  "#ffffff",
+                color: textColor,
               }}
             >
               {mergedData.texts?.title && (
@@ -248,13 +355,23 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
               <div className="mt-6">
                 <Button
                   variant="secondary"
-                  className="rounded-xl px-6 py-5 hover:bg-white/90"
+                  className="rounded-xl px-6 py-5 transition-colors"
                   style={{
-                    backgroundColor:
-                      mergedData.styling?.buttonBgColor ||
-                      mergedData.colors?.buttonColor ||
-                      "#ffffff",
-                    color: mergedData.styling?.buttonTextColor || "#059669",
+                    backgroundColor: buttonBgColor,
+                    color: buttonTextColor,
+                  }}
+                  onMouseEnter={(e) => {
+                    // Slightly darken button on hover
+                    const currentBg = buttonBgColor;
+                    if (currentBg && currentBg.startsWith('#')) {
+                      const r = Math.max(0, Math.min(255, parseInt(currentBg.substr(1, 2), 16) - 5));
+                      const g = Math.max(0, Math.min(255, parseInt(currentBg.substr(3, 2), 16) - 5));
+                      const b = Math.max(0, Math.min(255, parseInt(currentBg.substr(5, 2), 16) - 5));
+                      e.currentTarget.style.backgroundColor = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = buttonBgColor;
                   }}
                   onClick={() => {
                     if (mergedData.content?.buttonUrl) {

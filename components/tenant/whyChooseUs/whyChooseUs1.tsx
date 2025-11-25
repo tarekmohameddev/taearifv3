@@ -461,6 +461,126 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
 
   const tenantComponentData = getTenantComponentData();
 
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const brandingColors = {
+    primary: 
+      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 default (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback to primary
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#059669", // fallback to primary
+  };
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (
+    fieldPath: string,
+    defaultColor: string = "#059669"
+  ): string => {
+    // Get styling data from mergedData (check both styling.colors and colors)
+    const styling = mergedData?.styling?.colors || mergedData?.colors || {};
+    
+    // Navigate to the field using the path (e.g., "titleColor")
+    const pathParts = fieldPath.split('.');
+    let fieldData = styling;
+    for (const part of pathParts) {
+      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+        fieldData = fieldData[part];
+      } else {
+        fieldData = undefined;
+        break;
+      }
+    }
+    
+    // Also check for useDefaultColor and globalColorType at the same path level
+    const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
+    const globalColorTypePath = `${fieldPath}.globalColorType`;
+    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    let useDefaultColorValue = styling;
+    for (const part of useDefaultColorPathParts) {
+      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+        useDefaultColorValue = useDefaultColorValue[part];
+      } else {
+        useDefaultColorValue = undefined;
+        break;
+      }
+    }
+    
+    const globalColorTypePathParts = globalColorTypePath.split('.');
+    let globalColorTypeValue = styling;
+    for (const part of globalColorTypePathParts) {
+      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+        globalColorTypeValue = globalColorTypeValue[part];
+      } else {
+        globalColorTypeValue = undefined;
+        break;
+      }
+    }
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined 
+      ? useDefaultColorValue 
+      : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      // Determine default globalColorType based on field path if not set
+      let defaultGlobalColorType = "primary";
+      if (fieldPath.includes("titleColor") || fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
+        defaultGlobalColorType = "secondary";
+      } else if (fieldPath.includes("iconColor") || fieldPath.includes("ringColor") || fieldPath.includes("primary")) {
+        defaultGlobalColorType = "primary";
+      }
+      
+      const globalColorType = globalColorTypeValue || defaultGlobalColorType;
+      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, try to get custom color
+    // The color might be stored directly as string or in a value property of an object
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      return fieldData;
+    }
+    
+    // If fieldData is an object, check for value property
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        return fieldData.value;
+      }
+    }
+    
+    // Final fallback: use default branding color
+    let defaultGlobalColorType = "primary";
+    if (fieldPath.includes("titleColor") || fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
+      defaultGlobalColorType = "secondary";
+    }
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    return brandingColor;
+  };
+
+  // Helper function to create lighter color for ring/border (10% opacity of primary)
+  const getLighterColor = (hex: string, opacity: number = 0.1): string => {
+    if (!hex || !hex.startsWith('#')) return "rgba(5, 150, 105, 0.1)";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "rgba(5, 150, 105, 0.1)";
+    
+    const r = parseInt(cleanHex.substr(0, 2), 16);
+    const g = parseInt(cleanHex.substr(2, 2), 16);
+    const b = parseInt(cleanHex.substr(4, 2), 16);
+    
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  };
+
   // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
   const defaultData = getDefaultWhyChooseUsData();
   const mergedData = {
@@ -540,6 +660,12 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
     return null;
   }
 
+  // Get colors using getColor function
+  const titleColor = getColor("titleColor", brandingColors.secondary);
+  const descriptionColor = getColor("descriptionColor", brandingColors.secondary);
+  const iconColor = getColor("iconColor", brandingColors.primary);
+  const ringColor = getColor("ringColor", getLighterColor(brandingColors.primary, 0.1));
+
   return (
     <section
       className="w-full bg-background"
@@ -609,18 +735,22 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
               key={i}
               className={
                 mergedData.features?.card?.className ||
-                "rounded-2xl border bg-white p-6 shadow-sm ring-1 ring-emerald-50"
+                "rounded-2xl border bg-white p-6 shadow-sm ring-1"
               }
               style={{
                 backgroundColor: mergedData.colors?.cardBackground || "#ffffff",
                 borderColor: mergedData.colors?.borderColor || "#e5e7eb",
-              }}
+                "--tw-ring-color": ringColor,
+              } as React.CSSProperties}
             >
               <div
                 className={
                   mergedData.features?.icon?.container?.className ||
                   "mx-auto flex size-20 items-center justify-center"
                 }
+                style={{
+                  color: iconColor,
+                }}
               >
                 {typeof f.icon === "string" ? (
                   <img
@@ -644,19 +774,19 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
               <h3
                 className={
                   mergedData.features?.typography?.title?.className ||
-                  "mt-6 text-center text-lg font-bold text-emerald-700"
+                  "mt-6 text-center text-lg font-bold"
                 }
-                style={{ color: mergedData.colors?.titleColor || "#059669" }}
+                style={{ color: titleColor }}
               >
                 {f.title}
               </h3>
               <p
                 className={
                   mergedData.features?.typography?.description?.className ||
-                  "mt-3 text-center text-lg leading-7 text-gray-600"
+                  "mt-3 text-center text-lg leading-7"
                 }
                 style={{
-                  color: mergedData.colors?.descriptionColor || "#4b5563",
+                  color: descriptionColor,
                 }}
               >
                 {f.desc}

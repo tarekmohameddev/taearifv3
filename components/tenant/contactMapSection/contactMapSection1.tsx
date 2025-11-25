@@ -381,6 +381,101 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
 
   const tenantComponentData = getTenantComponentData();
 
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const brandingColors = {
+    primary: 
+      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 default (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback to primary
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#059669", // fallback to primary
+  };
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (
+    fieldPath: string,
+    defaultColor: string = "#059669"
+  ): string => {
+    // Get submitButton data from mergedData
+    const submitButton = mergedData?.form?.submitButton || {};
+    
+    // Navigate to the field using the path (e.g., "submitButton.backgroundColor" -> "backgroundColor")
+    const actualPath = fieldPath.replace("submitButton.", "");
+    const pathParts = actualPath.split('.');
+    let fieldData = submitButton;
+    
+    for (const part of pathParts) {
+      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+        fieldData = fieldData[part];
+      } else {
+        fieldData = undefined;
+        break;
+      }
+    }
+    
+    // Check if fieldData is a custom color (string starting with #)
+    // If it is, return it directly (useDefaultColor is false)
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      return fieldData;
+    }
+    
+    // If fieldData is an object, check for value property
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      // If object has useDefaultColor property set to false, use the value
+      if (fieldData.useDefaultColor === false && fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        return fieldData.value;
+      }
+      // If object has value but useDefaultColor is true or undefined, still check value first
+      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        // Check if useDefaultColor is explicitly false
+        if (fieldData.useDefaultColor === false) {
+          return fieldData.value;
+        }
+      }
+    }
+    
+    // If no custom color found, use branding color (useDefaultColor is true by default)
+    // Determine globalColorType based on field path
+    let defaultGlobalColorType = "primary";
+    if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+      defaultGlobalColorType = "primary"; // Button text uses primary (white on primary background)
+    } else if (fieldPath.includes("hoverBackgroundColor") || fieldPath.includes("backgroundColor")) {
+      defaultGlobalColorType = "primary";
+    }
+    
+    // If fieldData is an object with globalColorType, use it
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData) && fieldData.globalColorType) {
+      defaultGlobalColorType = fieldData.globalColorType;
+    }
+    
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    return brandingColor;
+  };
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // emerald-700 in Tailwind = #047857 (fallback)
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
   // Merge data with priority: storeData > tenantComponentData > props > default
   const mergedData = {
     ...getDefaultcontactMapSectionData(),
@@ -410,6 +505,11 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
   if (!mergedData.visible) {
     return null;
   }
+
+  // Get colors for submit button
+  const submitButtonBgColor = getColor("submitButton.backgroundColor", brandingColors.primary);
+  const submitButtonTextColor = getColor("submitButton.textColor", "#ffffff");
+  const submitButtonHoverBgColor = getColor("submitButton.hoverBackgroundColor", getDarkerColor(submitButtonBgColor, 20));
 
   return (
     <section
@@ -619,13 +719,16 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                     type={
                       (mergedData.form?.submitButton?.type as any) || "submit"
                     }
-                    className={`${mergedData.form?.submitButton?.width || "w-full"} rounded-xl ${mergedData.form?.submitButton?.height || "py-6"} ${mergedData.form?.submitButton?.fontSize || "text-lg"} ${mergedData.form?.submitButton?.fontWeight || "font-semibold"} ${mergedData.form?.submitButton?.borderRadius || "rounded-xl"}`}
+                    className={`${mergedData.form?.submitButton?.width || "w-full"} rounded-xl ${mergedData.form?.submitButton?.height || "py-6"} ${mergedData.form?.submitButton?.fontSize || "text-lg"} ${mergedData.form?.submitButton?.fontWeight || "font-semibold"} ${mergedData.form?.submitButton?.borderRadius || "rounded-xl"} transition-colors`}
                     style={{
-                      backgroundColor:
-                        mergedData.form?.submitButton?.backgroundColor ||
-                        "#059669",
-                      color:
-                        mergedData.form?.submitButton?.textColor || "#ffffff",
+                      backgroundColor: submitButtonBgColor,
+                      color: submitButtonTextColor,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = submitButtonHoverBgColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = submitButtonBgColor;
                     }}
                   >
                     {mergedData.form?.submitButton?.text || "إرسال"}

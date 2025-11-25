@@ -74,26 +74,30 @@ export const ctaValuationStructure: ComponentStructure = {
             {
               key: "bgColor",
               label: "Background Color",
-              type: "text",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary", // Background uses primary color from branding
             },
             {
               key: "textColor",
               label: "Text Color",
-              type: "text",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Text uses secondary color from branding
             },
             {
               key: "buttonBgColor",
               label: "Button Background Color",
               type: "color",
               useDefaultColor: true,
-              globalColorType: "primary", // Button uses primary color
+              globalColorType: "primary", // Button background uses primary color from branding
             },
             {
               key: "buttonTextColor",
               label: "Button Text Color",
               type: "color",
               useDefaultColor: true,
-              globalColorType: "primary", // Button text uses primary color
+              globalColorType: "primary", // Button text uses primary color from branding
             },
           ],
         },

@@ -352,6 +352,138 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
     ...currentStoreData,
   };
 
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const brandingColors = {
+    primary: 
+      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 default (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback to primary
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#059669", // fallback to primary
+  };
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (
+    fieldPath: string,
+    defaultColor: string = "#059669"
+  ): string => {
+    // Get styling data from mergedData
+    const styling = mergedData?.styling || {};
+    
+    // Navigate to the field using the path (e.g., "button.backgroundColor")
+    const pathParts = fieldPath.split('.');
+    let fieldData = styling;
+    for (const part of pathParts) {
+      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+        fieldData = fieldData[part];
+      } else {
+        fieldData = undefined;
+        break;
+      }
+    }
+    
+    // Also check for useDefaultColor and globalColorType at the same path level
+    const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
+    const globalColorTypePath = `${fieldPath}.globalColorType`;
+    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    let useDefaultColorValue = styling;
+    for (const part of useDefaultColorPathParts) {
+      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+        useDefaultColorValue = useDefaultColorValue[part];
+      } else {
+        useDefaultColorValue = undefined;
+        break;
+      }
+    }
+    
+    const globalColorTypePathParts = globalColorTypePath.split('.');
+    let globalColorTypeValue = styling;
+    for (const part of globalColorTypePathParts) {
+      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+        globalColorTypeValue = globalColorTypeValue[part];
+      } else {
+        globalColorTypeValue = undefined;
+        break;
+      }
+    }
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined 
+      ? useDefaultColorValue 
+      : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      // Determine default globalColorType based on field path if not set
+      let defaultGlobalColorType = "primary";
+      // Image background should use primary color
+      if (fieldPath.includes("imageBackground")) {
+        defaultGlobalColorType = "primary";
+      } else if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+        defaultGlobalColorType = "secondary";
+      } else if (fieldPath.includes("Button") || fieldPath.includes("button") || fieldPath.includes("hoverBgColor") || fieldPath.includes("backgroundColor")) {
+        defaultGlobalColorType = "primary";
+      } else if (fieldPath.includes("color") && !fieldPath.includes("imageBackground")) {
+        // For other color fields (not imageBackground), default to secondary
+        defaultGlobalColorType = "secondary";
+      }
+      
+      const globalColorType = globalColorTypeValue || defaultGlobalColorType;
+      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, try to get custom color
+    // The color might be stored directly as string or in a value property of an object
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      return fieldData;
+    }
+    
+    // If fieldData is an object, check for value property
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        return fieldData.value;
+      }
+    }
+    
+    // Final fallback: use default branding color
+    let defaultGlobalColorType = "primary";
+    // Image background should use primary color
+    if (fieldPath.includes("imageBackground")) {
+      defaultGlobalColorType = "primary";
+    } else if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+      defaultGlobalColorType = "secondary";
+    } else if (fieldPath.includes("color") && !fieldPath.includes("imageBackground")) {
+      defaultGlobalColorType = "secondary";
+    }
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    return brandingColor;
+  };
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // emerald-700 in Tailwind = #047857 (fallback)
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
   // REACTIVE SPACING: Subscribe directly to store for instant updates
   const spacing = useEditorStore((state) => {
     if (!props.useStore) {
@@ -423,17 +555,30 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
     };
   }
 
+  // Get colors for button
+  const buttonBgColor = getColor("button.backgroundColor", "#059669");
+  const buttonTextColor = getColor("button.textColor", "#ffffff");
+  const buttonHoverBgColor = getColor("button.hoverBackgroundColor", getDarkerColor(buttonBgColor, 20));
+  const buttonHoverTextColor = getColor("button.hoverTextColor", "#ffffff");
+
   const buttonStyles = {
-    backgroundColor:
-      mergedData.content?.button?.style?.backgroundColor || "#059669",
-    color: mergedData.content?.button?.style?.textColor || "#ffffff",
+    backgroundColor: buttonBgColor,
+    color: buttonTextColor,
     width: mergedData.content?.button?.style?.width || "119px",
     height: mergedData.content?.button?.style?.height || "46px",
     borderRadius: mergedData.content?.button?.style?.borderRadius || "10px",
   };
 
+  // Get color for image background (always uses primary color)
+  const imageBackgroundColor = getColor("imageBackground.color", brandingColors.primary);
+
+  // Get colors for typography
+  const eyebrowColor = getColor("typography.eyebrow.color", brandingColors.secondary);
+  const titleColor = getColor("typography.title.color", brandingColors.secondary);
+  const descriptionColor = getColor("typography.description.color", brandingColors.secondary);
+
   const backgroundStyles = {
-    backgroundColor: mergedData.image?.background?.color || "#059669",
+    backgroundColor: imageBackgroundColor,
     width: `${mergedData.image?.background?.width || 54}%`,
     borderRadius: mergedData.image?.background?.borderRadius || "5px",
   };
@@ -472,11 +617,10 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
                 mergedData.typography?.eyebrow?.size ||
                   "text-xs md:text-base xl:text-lg",
                 mergedData.typography?.eyebrow?.weight || "font-normal",
-                mergedData.typography?.eyebrow?.color ||
-                  "text-muted-foreground",
                 mergedData.typography?.eyebrow?.lineHeight ||
                   "leading-[22.5px]",
               )}
+              style={{ color: eyebrowColor }}
             >
               {mergedData.content?.eyebrow || "شريك موثوق"}
             </p>
@@ -485,9 +629,9 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
                 "mb-3 md:mb-6",
                 mergedData.typography?.title?.size || "section-title-large",
                 mergedData.typography?.title?.weight || "font-normal",
-                mergedData.typography?.title?.color || "text-foreground",
                 mergedData.typography?.title?.lineHeight || "lg:leading-[64px]",
               )}
+              style={{ color: titleColor }}
             >
               {mergedData.content?.title ||
                 "نحن شريكك الموثوق في عالم العقايييرات"}
@@ -499,19 +643,26 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
               mergedData.typography?.description?.size ||
                 "text-sm md:text-sm xl:text-xl",
               mergedData.typography?.description?.weight || "font-normal",
-              mergedData.typography?.description?.color ||
-                "text-muted-foreground",
               mergedData.typography?.description?.lineHeight ||
                 "leading-[35px]",
             )}
+            style={{ color: descriptionColor }}
           >
             {mergedData.content?.description ||
               "نقدم لك أفضل الخدمات العقارية مع ضمان الجودة والموثوقية. فريقنا من الخبراء يساعدك في العثور على العقار المثالي الذي يناسب احتياجاتك وميزانيتك."}
           </p>
           {mergedData.content?.button?.enabled && (
             <Button
-              className="transition-colors duration-300 hover:text-emerald-600 hover:bg-white flex items-center justify-center"
+              className="transition-colors duration-300 flex items-center justify-center"
               style={buttonStyles}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = buttonHoverBgColor;
+                e.currentTarget.style.color = buttonHoverTextColor;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = buttonBgColor;
+                e.currentTarget.style.color = buttonTextColor;
+              }}
               onClick={() => {
                 if (mergedData.content?.button?.url) {
                   router.push(mergedData.content.button.url);

@@ -543,6 +543,66 @@ export const whyChooseUsStructure: ComponentStructure = {
           ],
         },
         {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "colors",
+              label: "Colors",
+              type: "object",
+              fields: [
+                {
+                  key: "background",
+                  label: "Section Background",
+                  type: "color",
+                  useDefaultColor: false, // Background is usually white
+                },
+                {
+                  key: "cardBackground",
+                  label: "Card Background",
+                  type: "color",
+                  useDefaultColor: false, // Card background is usually white
+                },
+                {
+                  key: "titleColor",
+                  label: "Title Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Title text uses secondary color from branding
+                },
+                {
+                  key: "descriptionColor",
+                  label: "Description Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Description text uses secondary color from branding
+                },
+                {
+                  key: "iconColor",
+                  label: "Icon Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Icon color uses primary color from branding
+                },
+                {
+                  key: "borderColor",
+                  label: "Border Color",
+                  type: "color",
+                  useDefaultColor: false, // Border color is usually custom
+                },
+                {
+                  key: "ringColor",
+                  label: "Ring Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Ring color uses primary color (lighter shade) from branding
+                },
+              ],
+            },
+          ],
+        },
+        {
           key: "colors",
           label: "Colors",
           type: "object",
@@ -576,6 +636,14 @@ export const whyChooseUsStructure: ComponentStructure = {
               globalColorType: "secondary", // Description uses secondary color
             },
             {
+              key: "iconColor",
+              label: "Icon Color",
+              type: "color",
+              placeholder: "#059669",
+              useDefaultColor: true,
+              globalColorType: "primary", // Icon uses primary color
+            },
+            {
               key: "borderColor",
               label: "Border Color",
               type: "color",
@@ -587,7 +655,8 @@ export const whyChooseUsStructure: ComponentStructure = {
               label: "Ring Color",
               type: "color",
               placeholder: "#ecfdf5",
-              useDefaultColor: false, // Ring color is usually custom
+              useDefaultColor: true,
+              globalColorType: "primary", // Ring color uses primary color (lighter shade)
             },
           ],
         },
