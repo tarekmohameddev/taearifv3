@@ -40,7 +40,6 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       image:
         "https://dalel-lovat.vercel.app/images/MarketingStepsSection/1.svg",
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -56,7 +55,6 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       image:
         "https://dalel-lovat.vercel.app/images/MarketingStepsSection/2.svg",
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -72,7 +70,6 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       image:
         "https://dalel-lovat.vercel.app/images/MarketingStepsSection/3.svg",
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -88,7 +85,6 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       image:
         "https://dalel-lovat.vercel.app/images/MarketingStepsSection/4.svg",
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -104,7 +100,6 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       image:
         "https://dalel-lovat.vercel.app/images/MarketingStepsSection/5.svg",
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -120,7 +115,6 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       image:
         "https://dalel-lovat.vercel.app/images/MarketingStepsSection/6.svg",
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },

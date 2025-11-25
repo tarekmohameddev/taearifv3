@@ -85,7 +85,6 @@ const getDefaultStepsSectionData = () => ({
         className: "w-20 h-20",
       },
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -104,7 +103,6 @@ const getDefaultStepsSectionData = () => ({
         className: "w-20 h-20",
       },
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -123,7 +121,6 @@ const getDefaultStepsSectionData = () => ({
         className: "w-20 h-20",
       },
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -142,7 +139,6 @@ const getDefaultStepsSectionData = () => ({
         className: "w-20 h-20",
       },
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -161,7 +157,6 @@ const getDefaultStepsSectionData = () => ({
         className: "w-20 h-20",
       },
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -180,7 +175,6 @@ const getDefaultStepsSectionData = () => ({
         className: "w-20 h-20",
       },
       titleStyle: {
-        color: "#047857", // text-emerald-700
         size: { mobile: "18px", desktop: "24px" },
         weight: "600",
       },
@@ -373,10 +367,177 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
     ...currentStoreData,
   };
 
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const brandingColors = {
+    primary: 
+      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 default (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback to primary
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#f2fbf9", // light background default
+  };
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (
+    fieldPath: string,
+    defaultColor: string = "#059669"
+  ): string => {
+    // Get styling data from mergedData
+    const styling = mergedData?.styling || {};
+    
+    // Navigate to the field using the path (e.g., "background.color", "icon.color")
+    const pathParts = fieldPath.split('.');
+    let fieldData = styling;
+    
+    for (const part of pathParts) {
+      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+        fieldData = fieldData[part];
+      } else {
+        fieldData = undefined;
+        break;
+      }
+    }
+    
+    // Also check in background, iconStyle, titleStyle, descriptionStyle directly
+    if (!fieldData || (typeof fieldData === 'object' && !fieldData.value)) {
+      if (fieldPath === "background.color") {
+        fieldData = mergedData?.background?.color;
+      } else if (fieldPath === "icon.color") {
+        fieldData = mergedData?.iconStyle?.color || mergedData?.styling?.icon?.color;
+      } else if (fieldPath === "title.color") {
+        // Check in steps array for titleStyle.color
+        fieldData = mergedData?.steps?.[0]?.titleStyle?.color || mergedData?.styling?.title?.color;
+      } else if (fieldPath === "description.color") {
+        // Check in steps array for descriptionStyle.color
+        fieldData = mergedData?.steps?.[0]?.descriptionStyle?.color || mergedData?.styling?.description?.color;
+      }
+    }
+    
+    // Check if fieldData is a custom color (string starting with #)
+    // If it is, return it directly (useDefaultColor is false)
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      return fieldData;
+    }
+    
+    // If fieldData is an object, check for value property
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      // If object has useDefaultColor property set to false, use the value
+      if (fieldData.useDefaultColor === false && fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        return fieldData.value;
+      }
+      // If object has value but useDefaultColor is true or undefined, still check value first
+      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        // Check if useDefaultColor is explicitly false
+        if (fieldData.useDefaultColor === false) {
+          return fieldData.value;
+        }
+      }
+    }
+    
+    // If no custom color found, use branding color (useDefaultColor is true by default)
+    // Determine globalColorType based on field path
+    let defaultGlobalColorType = "primary";
+    if (fieldPath.includes("background") || fieldPath.includes("Background")) {
+      defaultGlobalColorType = "accent";
+    } else if (fieldPath.includes("title") || fieldPath.includes("Title") || fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+      defaultGlobalColorType = "secondary";
+    } else if (fieldPath.includes("description") || fieldPath.includes("Description")) {
+      defaultGlobalColorType = "secondary";
+    } else if (fieldPath.includes("icon") || fieldPath.includes("Icon")) {
+      defaultGlobalColorType = "primary";
+    }
+    
+    // If fieldData is an object with globalColorType, use it
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData) && fieldData.globalColorType) {
+      defaultGlobalColorType = fieldData.globalColorType;
+    }
+    
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    return brandingColor;
+  };
+
+  // Function to convert hex color to CSS filter for SVG images
+  // This converts black/dark SVG images to the target color using CSS filters
+  // Formula based on: https://codepen.io/sosuke/pen/Pjoqqp
+  const getIconFilter = (targetColor: string): string => {
+    if (!targetColor || !targetColor.startsWith('#')) {
+      return "none"; // No filter for invalid colors
+    }
+    
+    const cleanHex = targetColor.replace('#', '');
+    if (cleanHex.length !== 6) return "none";
+    
+    // Get RGB values (0-255)
+    const r = parseInt(cleanHex.substr(0, 2), 16);
+    const g = parseInt(cleanHex.substr(2, 2), 16);
+    const b = parseInt(cleanHex.substr(4, 2), 16);
+    
+    // Normalize RGB values (0-1)
+    const rNorm = r / 255;
+    const gNorm = g / 255;
+    const bNorm = b / 255;
+    
+    // Calculate the filter values using the formula from codepen
+    // This converts black (#000000) to the target color
+    // The formula: brightness(0) saturate(100%) invert(R%) sepia(S%) saturate(S%) hue-rotate(Hdeg) brightness(B%) contrast(C%)
+    
+    // Calculate hue
+    const max = Math.max(rNorm, gNorm, bNorm);
+    const min = Math.min(rNorm, gNorm, bNorm);
+    let h = 0;
+    
+    if (max !== min) {
+      if (max === rNorm) {
+        h = ((gNorm - bNorm) / (max - min)) % 6;
+      } else if (max === gNorm) {
+        h = (bNorm - rNorm) / (max - min) + 2;
+      } else {
+        h = (rNorm - gNorm) / (max - min) + 4;
+      }
+    }
+    h = Math.round(h * 60);
+    if (h < 0) h += 360;
+    
+    // Calculate saturation
+    const s = max === 0 ? 0 : ((max - min) / max) * 100;
+    
+    // Calculate brightness/lightness
+    const l = (max + min) / 2 * 100;
+    
+    // Build the filter
+    // For black to color conversion:
+    // 1. brightness(0) - makes everything black
+    // 2. invert() - inverts based on target color
+    // 3. sepia() - adds sepia tone
+    // 4. saturate() - adjusts saturation
+    // 5. hue-rotate() - rotates hue to target
+    // 6. brightness() - adjusts final brightness
+    // 7. contrast() - fine-tunes contrast
+    
+    return `brightness(0) saturate(100%) invert(${rNorm * 100}%) sepia(${s}%) saturate(${s * 2}%) hue-rotate(${h}deg) brightness(${l / 50}%) contrast(1.2)`;
+  };
+
   // Don't render if not visible
   if (!mergedData.visible) {
     return null;
   }
+
+  // Get colors using getColor function
+  const backgroundColor = getColor("background.color", brandingColors.accent);
+  const iconColor = getColor("icon.color", brandingColors.primary);
+  const iconFilter = getIconFilter(iconColor);
+  const titleColor = getColor("title.color", brandingColors.secondary);
+  const descriptionColor = getColor("description.color", brandingColors.secondary);
 
   return (
     <section className="w-full bg-background sm:py-16 ">
@@ -384,7 +545,7 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
         className="mx-auto p-5 sm:p-18  px-20"
         dir="rtl"
         style={{
-          backgroundColor: mergedData.background?.color || "#f2fbf9",
+          backgroundColor: backgroundColor,
           paddingTop: mergedData.background?.padding?.desktop || "72px",
           paddingBottom: mergedData.background?.padding?.desktop || "72px",
         }}
@@ -440,13 +601,30 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
                       ? "size-10 sm:size-15"
                       : step.image.className || "w-20 h-20"
                   }
+                  style={{
+                    filter: iconFilter !== "none" ? iconFilter : undefined,
+                  }}
                 />
               </div>
               <div>
-                <h3 className="text-lg sm:text-2xl text-emerald-700">
+                <h3 
+                  className="text-lg sm:text-2xl"
+                  style={{
+                    color: step.titleStyle?.color || titleColor,
+                    fontSize: step.titleStyle?.size?.mobile || "18px",
+                    fontWeight: step.titleStyle?.weight || "600",
+                  }}
+                >
                   {step.title}
                 </h3>
-                <p className="sm:mt-2 text-sm sm:text-md leading-7 text-gray-600">
+                <p 
+                  className="sm:mt-2 text-sm sm:text-md leading-7"
+                  style={{
+                    color: step.descriptionStyle?.color || descriptionColor,
+                    fontSize: step.descriptionStyle?.size?.mobile || "14px",
+                    lineHeight: step.descriptionStyle?.lineHeight || "1.75",
+                  }}
+                >
                   {step.desc}
                 </p>
               </div>

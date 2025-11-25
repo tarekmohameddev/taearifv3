@@ -602,6 +602,20 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
         ...(tenantComponentData.header?.typography || {}),
         ...(storeData.header?.typography || {}),
         ...(currentStoreData.header?.typography || {}),
+        title: {
+          ...defaultData.header?.typography?.title,
+          ...(props.header?.typography?.title || {}),
+          ...(tenantComponentData.header?.typography?.title || {}),
+          ...(storeData.header?.typography?.title || {}),
+          ...(currentStoreData.header?.typography?.title || {}),
+        },
+        description: {
+          ...defaultData.header?.typography?.description,
+          ...(props.header?.typography?.description || {}),
+          ...(tenantComponentData.header?.typography?.description || {}),
+          ...(storeData.header?.typography?.description || {}),
+          ...(currentStoreData.header?.typography?.description || {}),
+        },
       },
     },
     features: {
@@ -689,8 +703,10 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
         >
           <h2
             className={
-              mergedData.header?.typography?.title?.className ||
-              "section-title text-right"
+              mergedData.header?.typography?.title?.className !== undefined &&
+              mergedData.header?.typography?.title?.className !== ""
+                ? mergedData.header.typography.title.className
+                : "section-title text-right"
             }
             style={{
               color:
@@ -703,8 +719,10 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
           </h2>
           <p
             className={
-              mergedData.header?.typography?.description?.className ||
-              "section-subtitle-xl"
+              mergedData.header?.typography?.description?.className !== undefined &&
+              mergedData.header?.typography?.description?.className !== ""
+                ? mergedData.header.typography.description.className
+                : "section-subtitle-xl"
             }
             style={{
               color:

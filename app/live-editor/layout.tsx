@@ -882,37 +882,6 @@ function AddPageDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
-
-      {/* Coming Soon Overlay - Disabled add page functionality - Only show in production */}
-      {process.env.NODE_ENV !== "development" && (
-        <div
-          className="fixed inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center pointer-events-auto"
-          style={{
-            zIndex: 9999,
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(255, 255, 255, 0.9)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div className="text-center">
-            <div className="text-6xl mb-4">🚧</div>
-            <h2 className="text-2xl font-bold text-red-600 mb-2">
-              {t("live_editor.coming_soon")}
-            </h2>
-            <p className="text-red-500 font-medium">
-              {t("live_editor.components_disabled")}
-            </p>
-          </div>
-        </div>
-      )}
     </Dialog>
   );
 }
@@ -3189,23 +3158,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               )}
             </Button>
           </DialogFooter>
-          {/* Coming Soon Overlay - Disabled add page functionality - Only show in production */}
-          {process.env.NODE_ENV !== "development" && (
-            <div
-              className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-start justify-center pointer-events-auto"
-              style={{ paddingTop: "250px" }}
-            >
-              <div className="text-center">
-                <div className="text-6xl mb-4">🚧</div>
-                <h2 className="text-2xl font-bold text-red-600 mb-2">
-                  {t("live_editor.coming_soon")}
-                </h2>
-                <p className="text-red-500 font-medium">
-                  {t("live_editor.components_disabled")}
-                </p>
-              </div>
-            </div>
-          )}
         </DialogContent>
       </Dialog>
     </nav>

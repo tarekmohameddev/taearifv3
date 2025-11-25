@@ -9,6 +9,69 @@ export const stepsSectionStructure: ComponentStructure = {
       fields: [
         { key: "visible", label: "Visible", type: "boolean" },
         {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "background",
+              label: "Background Color",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Background Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "accent", // Background uses accent color (lighter shade) from branding
+                },
+              ],
+            },
+            {
+              key: "icon",
+              label: "Icon Color",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Icon Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Icon uses primary color from branding
+                },
+              ],
+            },
+            {
+              key: "title",
+              label: "Title Color",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Title Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Title uses secondary color from branding
+                },
+              ],
+            },
+            {
+              key: "description",
+              label: "Description Color",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Description Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Description uses secondary color from branding
+                },
+              ],
+            },
+          ],
+        },
+        {
           key: "background",
           label: "Background",
           type: "object",
@@ -18,6 +81,8 @@ export const stepsSectionStructure: ComponentStructure = {
               label: "Background Color",
               type: "color",
               placeholder: "#f2fbf9",
+              useDefaultColor: true,
+              globalColorType: "accent", // Background uses accent color (lighter shade) from branding
             },
             {
               key: "padding",
@@ -263,39 +328,46 @@ export const stepsSectionStructure: ComponentStructure = {
             },
           ],
         },
-        {
-          key: "iconStyle",
-          label: "Icon Style",
-          type: "object",
-          fields: [
             {
-              key: "size",
-              label: "Size",
+              key: "iconStyle",
+              label: "Icon Style",
               type: "object",
               fields: [
                 {
-                  key: "mobile",
-                  label: "Mobile",
-                  type: "text",
-                  placeholder: "40px",
+                  key: "color",
+                  label: "Icon Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Icon uses primary color from branding
                 },
                 {
-                  key: "desktop",
-                  label: "Desktop",
-                  type: "text",
-                  placeholder: "60px",
+                  key: "size",
+                  label: "Size",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "mobile",
+                      label: "Mobile",
+                      type: "text",
+                      placeholder: "40px",
+                    },
+                    {
+                      key: "desktop",
+                      label: "Desktop",
+                      type: "text",
+                      placeholder: "60px",
+                    },
+                  ],
                 },
+                {
+                  key: "marginTop",
+                  label: "Margin Top",
+                  type: "text",
+                  placeholder: "4px",
+                },
+                { key: "shrink", label: "Shrink", type: "boolean" },
               ],
             },
-            {
-              key: "marginTop",
-              label: "Margin Top",
-              type: "text",
-              placeholder: "4px",
-            },
-            { key: "shrink", label: "Shrink", type: "boolean" },
-          ],
-        },
         {
           key: "layout",
           label: "Layout",
