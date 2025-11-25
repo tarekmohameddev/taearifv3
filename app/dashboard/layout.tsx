@@ -6,6 +6,9 @@ import GTMProvider from "@/components/GTMProvider2";
 import PermissionWrapper from "@/components/PermissionWrapper";
 import { useRouter } from "next/navigation";
 
+// مفتاح sessionStorage لتخزين حالة التحقق
+const SESSION_VALIDATION_KEY = "dashboard_session_validated";
+
 /*
  * ========================================
  * DASHBOARD LAYOUT - ARABIC RTL ENFORCEMENT
@@ -42,6 +45,28 @@ export default function DashboardLayout({
   const { tokenValidation } = useTokenValidation();
   const router = useRouter();
   const [isValidDomain, setIsValidDomain] = useState<boolean | null>(null);
+  const [hasValidatedSession, setHasValidatedSession] = useState<boolean>(false);
+
+  // التحقق من حالة التحقق في sessionStorage عند التحميل
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const validated = sessionStorage.getItem(SESSION_VALIDATION_KEY) === "true";
+      setHasValidatedSession(validated);
+    }
+  }, []);
+
+  // حفظ حالة التحقق في sessionStorage عند اكتمال التحقق بنجاح
+  useEffect(() => {
+    if (typeof window !== "undefined" && tokenValidation.isValid === true && !tokenValidation.loading) {
+      sessionStorage.setItem(SESSION_VALIDATION_KEY, "true");
+      setHasValidatedSession(true);
+    }
+    // في حالة فشل التحقق، احذف المفتاح من sessionStorage
+    if (typeof window !== "undefined" && tokenValidation.isValid === false && !tokenValidation.loading) {
+      sessionStorage.removeItem(SESSION_VALIDATION_KEY);
+      setHasValidatedSession(false);
+    }
+  }, [tokenValidation.isValid, tokenValidation.loading]);
 
   // التحقق من نوع الدومين
   useEffect(() => {
@@ -110,8 +135,10 @@ export default function DashboardLayout({
     };
   }, []);
 
-  // Show loading while validating domain or token
-  if (isValidDomain === null || tokenValidation.loading) {
+  // Show loading while validating domain or token (only if not validated in this session)
+  const shouldShowLoading = isValidDomain === null || (tokenValidation.loading && !hasValidatedSession);
+  
+  if (shouldShowLoading) {
     return (
       <div
         className="min-h-screen flex items-center justify-center bg-gray-50"
