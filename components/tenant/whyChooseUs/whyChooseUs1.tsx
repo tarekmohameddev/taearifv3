@@ -828,7 +828,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
               }
               style={{
                 backgroundColor: mergedData.colors?.cardBackground || "#ffffff",
-                borderColor: mergedData.colors?.borderColor || "#e5e7eb",
+                borderColor: "#e5e7eb", // Always gray (gray-200)
                 "--tw-ring-color": ringColor,
               } as React.CSSProperties}
             >
