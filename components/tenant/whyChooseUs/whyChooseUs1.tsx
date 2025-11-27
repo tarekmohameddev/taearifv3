@@ -4,28 +4,49 @@ import { useEffect } from "react";
 import type React from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { 
-  UserCircle, 
-  Building2, 
-  GraduationCap, 
-  TrendingUp, 
-  Briefcase, 
-  Settings 
-} from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import * as ReactIconsFa from "react-icons/fa";
+import * as ReactIconsMd from "react-icons/md";
+import type { IconType } from "react-icons";
 
-// Function to get icon component based on type
-const getWhyChooseUsIcon = (type: string): LucideIcon => {
-  const iconMap: Record<string, LucideIcon> = {
-    icon1: UserCircle,      // خدمة شخصية
-    icon2: Building2,       // مجموعة واسعة من العقارات
-    icon3: GraduationCap,   // إرشادات الخبراء
-    icon4: TrendingUp,      // تحليل السوق
-    icon5: Briefcase,       // الاستشارات الاستثمارية
-    icon6: Settings,        // إدارة الممتلكات
+// Function to get icon component based on type or name
+const getWhyChooseUsIcon = (typeOrName: string): LucideIcon | IconType | React.ComponentType<any> => {
+  // Legacy icon mapping for backward compatibility
+  const legacyIconMap: Record<string, LucideIcon> = {
+    icon1: LucideIcons.UserCircle,      // خدمة شخصية
+    icon2: LucideIcons.Building2,       // مجموعة واسعة من العقارات
+    icon3: LucideIcons.GraduationCap,   // إرشادات الخبراء
+    icon4: LucideIcons.TrendingUp,      // تحليل السوق
+    icon5: LucideIcons.Briefcase,      // الاستشارات الاستثمارية
+    icon6: LucideIcons.Settings,       // إدارة الممتلكات
   };
 
-  return iconMap[type] || iconMap.icon1;
+  // Check legacy icons first
+  if (legacyIconMap[typeOrName]) {
+    return legacyIconMap[typeOrName];
+  }
+
+  // Try lucide-react icons
+  const lucideIcon = (LucideIcons as any)[typeOrName];
+  if (lucideIcon) {
+    return lucideIcon;
+  }
+
+  // Try react-icons Font Awesome
+  const faIcon = (ReactIconsFa as any)[typeOrName];
+  if (faIcon) {
+    return faIcon;
+  }
+
+  // Try react-icons Material Design
+  const mdIcon = (ReactIconsMd as any)[typeOrName];
+  if (mdIcon) {
+    return mdIcon;
+  }
+
+  // Fallback to default icon
+  return LucideIcons.UserCircle;
 };
 
 type Feature = {
@@ -821,10 +842,9 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                 }}
               >
                 {(() => {
-                  // Get icon component based on type or name
-                  const IconComponent = f.icon?.name 
-                    ? getWhyChooseUsIcon(f.icon.name) 
-                    : getWhyChooseUsIcon(f.icon?.type || "icon1");
+                  // Priority: name > type > default
+                  const iconNameOrType = f.icon?.name || f.icon?.type || "icon1";
+                  const IconComponent = getWhyChooseUsIcon(iconNameOrType);
                   
                   // Get icon size
                   const iconSize = typeof f.icon?.size === "number" 
@@ -834,6 +854,41 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                   // Get icon className
                   const iconClassName = f.icon?.className || mergedData.features?.icon?.image?.className || "";
                   
+                  // Check if it's a React Icon (from react-icons) by checking the icon name pattern
+                  // React Icons typically start with Fa, Md, Io, etc.
+                  const isReactIcon = iconNameOrType.startsWith('Fa') || 
+                                     iconNameOrType.startsWith('Md') || 
+                                     iconNameOrType.startsWith('Io') ||
+                                     iconNameOrType.startsWith('Bi') ||
+                                     iconNameOrType.startsWith('Bs') ||
+                                     iconNameOrType.startsWith('Hi') ||
+                                     iconNameOrType.startsWith('Ai') ||
+                                     iconNameOrType.startsWith('Ti') ||
+                                     iconNameOrType.startsWith('Gi') ||
+                                     iconNameOrType.startsWith('Si') ||
+                                     iconNameOrType.startsWith('Ri') ||
+                                     iconNameOrType.startsWith('Tb') ||
+                                     iconNameOrType.startsWith('Vsc') ||
+                                     iconNameOrType.startsWith('Wi') ||
+                                     iconNameOrType.startsWith('Di') ||
+                                     iconNameOrType.startsWith('Im');
+                  
+                  // For React Icons, use style with fontSize
+                  if (isReactIcon) {
+                    return (
+                      <IconComponent
+                        className={iconClassName}
+                        style={{
+                          color: iconColor,
+                          fontSize: `${iconSize}px`,
+                          width: `${iconSize}px`,
+                          height: `${iconSize}px`,
+                        }}
+                      />
+                    );
+                  }
+                  
+                  // For Lucide icons, use size prop
                   return (
                     <IconComponent
                       size={iconSize}
