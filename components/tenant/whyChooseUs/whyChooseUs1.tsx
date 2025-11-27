@@ -4,17 +4,25 @@ import { useEffect } from "react";
 import type React from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
-import Image from "next/image";
+import { 
+  UserCircle, 
+  Building2, 
+  GraduationCap, 
+  TrendingUp, 
+  Briefcase, 
+  Settings 
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-// Function to get icon URL based on type
-const getWhyChooseUsIconUrl = (type: string): string => {
-  const iconMap: Record<string, string> = {
-    icon1: "/images/why-choose-us/1.png",
-    icon2: "/images/why-choose-us/2.png",
-    icon3: "/images/why-choose-us/3.png",
-    icon4: "/images/why-choose-us/4.png",
-    icon5: "/images/why-choose-us/5.png",
-    icon6: "/images/why-choose-us/6.png",
+// Function to get icon component based on type
+const getWhyChooseUsIcon = (type: string): LucideIcon => {
+  const iconMap: Record<string, LucideIcon> = {
+    icon1: UserCircle,      // خدمة شخصية
+    icon2: Building2,       // مجموعة واسعة من العقارات
+    icon3: GraduationCap,   // إرشادات الخبراء
+    icon4: TrendingUp,      // تحليل السوق
+    icon5: Briefcase,       // الاستشارات الاستثمارية
+    icon6: Settings,        // إدارة الممتلكات
   };
 
   return iconMap[type] || iconMap.icon1;
@@ -24,8 +32,9 @@ type Feature = {
   title: string;
   desc: string;
   icon: {
-    type: string;
-    size?: string;
+    type?: string;
+    name?: string; // For custom icon names from react-icons or lucide-react
+    size?: string | number;
     color?: string;
     className?: string;
   };
@@ -600,60 +609,6 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
     return brandingColor;
   };
 
-  // Function to convert hex color to CSS filter for PNG images
-  // This converts images to the target color using CSS filters
-  const getIconFilter = (hex: string): string => {
-    if (!hex || !hex.startsWith('#')) {
-      // Default emerald-600 filter (fallback)
-      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
-    }
-    
-    const cleanHex = hex.replace('#', '');
-    if (cleanHex.length !== 6) {
-      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
-    }
-
-    // Parse RGB values
-    const r = parseInt(cleanHex.substr(0, 2), 16) / 255;
-    const g = parseInt(cleanHex.substr(2, 2), 16) / 255;
-    const b = parseInt(cleanHex.substr(4, 2), 16) / 255;
-
-    // Convert RGB to HSL
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0;
-    let s = 0;
-    const l = (max + min) / 2;
-
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      
-      switch (max) {
-        case r:
-          h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-          break;
-        case g:
-          h = ((b - r) / d + 2) / 6;
-          break;
-        case b:
-          h = ((r - g) / d + 4) / 6;
-          break;
-      }
-    }
-
-    // Convert HSL to filter values
-    const hue = Math.round(h * 360);
-    const saturation = Math.round(s * 100);
-    const lightness = Math.round(l * 100);
-
-    // Calculate filter values
-    const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
-    const contrast = 100 + (saturation * 0.5);
-
-    return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
-  };
-
   // Helper function to create lighter color for ring/border (10% opacity of primary)
   const getLighterColor = (hex: string, opacity: number = 0.1): string => {
     if (!hex || !hex.startsWith('#')) return "rgba(5, 150, 105, 0.1)";
@@ -764,7 +719,6 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
   const titleColor = getColor("titleColor", brandingColors.secondary);
   const descriptionColor = getColor("descriptionColor", brandingColors.secondary);
   const iconColor = getColor("icon.color", brandingColors.primary);
-  const iconFilter = getIconFilter(iconColor);
   const ringColor = getColor("ringColor", getLighterColor(brandingColors.primary, 0.1));
   
   // Get header title color - use primary color as default if available, otherwise use section-title CSS class
@@ -866,27 +820,30 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                   color: iconColor,
                 }}
               >
-                {typeof f.icon === "string" ? (
-                  <img
-                    src={f.icon}
-                    alt={f.title}
-                    className={
-                      mergedData.features?.icon?.image?.className ||
-                      "h-[7rem] w-[7rem]"
-                    }
-                  />
-                ) : (
-                  <Image
-                    src={getWhyChooseUsIconUrl(f.icon?.type || "icon1")}
-                    alt={f.title}
-                    width={parseInt(f.icon?.size || "80")}
-                    height={parseInt(f.icon?.size || "80")}
-                    className={f.icon?.className || "w-20 h-20"}
-                    style={{
-                      filter: iconFilter !== "none" ? iconFilter : undefined,
-                    }}
-                  />
-                )}
+                {(() => {
+                  // Get icon component based on type or name
+                  const IconComponent = f.icon?.name 
+                    ? getWhyChooseUsIcon(f.icon.name) 
+                    : getWhyChooseUsIcon(f.icon?.type || "icon1");
+                  
+                  // Get icon size
+                  const iconSize = typeof f.icon?.size === "number" 
+                    ? f.icon.size 
+                    : parseInt(f.icon?.size || "80");
+                  
+                  // Get icon className
+                  const iconClassName = f.icon?.className || mergedData.features?.icon?.image?.className || "";
+                  
+                  return (
+                    <IconComponent
+                      size={iconSize}
+                      className={iconClassName}
+                      style={{
+                        color: iconColor,
+                      }}
+                    />
+                  );
+                })()}
               </div>
               <h3
                 className={

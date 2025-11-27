@@ -328,11 +328,11 @@ export const stepsSectionStructure: ComponentStructure = {
             },
           ],
         },
-            {
-              key: "iconStyle",
-              label: "Icon Style",
-              type: "object",
-              fields: [
+        {
+          key: "iconStyle",
+          label: "Icon Style",
+          type: "object",
+          fields: [
                 {
                   key: "color",
                   label: "Icon Color",
@@ -340,34 +340,34 @@ export const stepsSectionStructure: ComponentStructure = {
                   useDefaultColor: true,
                   globalColorType: "primary", // Icon uses primary color from branding
                 },
+            {
+              key: "size",
+              label: "Size",
+              type: "object",
+              fields: [
                 {
-                  key: "size",
-                  label: "Size",
-                  type: "object",
-                  fields: [
-                    {
-                      key: "mobile",
-                      label: "Mobile",
-                      type: "text",
-                      placeholder: "40px",
-                    },
-                    {
-                      key: "desktop",
-                      label: "Desktop",
-                      type: "text",
-                      placeholder: "60px",
-                    },
-                  ],
-                },
-                {
-                  key: "marginTop",
-                  label: "Margin Top",
+                  key: "mobile",
+                  label: "Mobile",
                   type: "text",
-                  placeholder: "4px",
+                  placeholder: "40px",
                 },
-                { key: "shrink", label: "Shrink", type: "boolean" },
+                {
+                  key: "desktop",
+                  label: "Desktop",
+                  type: "text",
+                  placeholder: "60px",
+                },
               ],
             },
+            {
+              key: "marginTop",
+              label: "Margin Top",
+              type: "text",
+              placeholder: "4px",
+            },
+            { key: "shrink", label: "Shrink", type: "boolean" },
+          ],
+        },
         {
           key: "layout",
           label: "Layout",
