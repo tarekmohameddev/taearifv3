@@ -1470,6 +1470,7 @@
       "step_description": "Step Description",
       "step_icon": "Step Icon",
       "icon_type": "Icon Type",
+      "icon_name": "Icon Name",
       "image_url": "Image URL",
       "title_style": "Title Style",
       "color": "Color",

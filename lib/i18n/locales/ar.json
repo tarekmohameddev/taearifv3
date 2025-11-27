@@ -1605,6 +1605,7 @@
       "step_description": "وصف الخطوة",
       "step_icon": "أيقونة الخطوة",
       "icon_type": "نوع الأيقونة",
+      "icon_name": "اسم الأيقونة",
       "image_url": "رابط الصورة",
       "title_style": "نمط العنوان",
       "color": "اللون",

@@ -2,23 +2,52 @@
 
 import { useEffect, useState } from "react";
 import type React from "react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
+import * as LucideIcons from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import * as ReactIconsFa from "react-icons/fa";
+import * as ReactIconsMd from "react-icons/md";
+import type { IconType } from "react-icons";
 
-// Function to get icon URL based on type
-const getStepIconUrl = (type: string): string => {
-  const iconMap: Record<string, string> = {
-    step1: "/images/MarketingStepsSection/1.svg",
-    step2: "/images/MarketingStepsSection/2.svg",
-    step3: "/images/MarketingStepsSection/3.svg",
-    step4: "/images/MarketingStepsSection/4.svg",
-    step5: "/images/MarketingStepsSection/5.svg",
-    step6: "/images/MarketingStepsSection/6.svg",
+// Function to get icon component based on type or name
+const getStepIcon = (typeOrName: string): LucideIcon | IconType | React.ComponentType<any> => {
+  // Legacy icon mapping for backward compatibility
+  const legacyIconMap: Record<string, LucideIcon> = {
+    step1: LucideIcons.Search,        // Property Inspection
+    step2: LucideIcons.FileText,      // Property Description
+    step3: LucideIcons.Camera,        // Professional Photography
+    step4: LucideIcons.Megaphone,     // Marketing Strategy
+    step5: LucideIcons.Globe,         // Online Listing
+    step6: LucideIcons.Users,         // Client Communication
   };
 
-  return iconMap[type] || iconMap.step1;
+  // Check legacy icons first
+  if (legacyIconMap[typeOrName]) {
+    return legacyIconMap[typeOrName];
+  }
+
+  // Try lucide-react icons
+  const lucideIcon = (LucideIcons as any)[typeOrName];
+  if (lucideIcon) {
+    return lucideIcon;
+  }
+
+  // Try react-icons Font Awesome
+  const faIcon = (ReactIconsFa as any)[typeOrName];
+  if (faIcon) {
+    return faIcon;
+  }
+
+  // Try react-icons Material Design
+  const mdIcon = (ReactIconsMd as any)[typeOrName];
+  if (mdIcon) {
+    return mdIcon;
+  }
+
+  // Fallback to default icon
+  return LucideIcons.Search;
 };
 
 type Step = {
@@ -27,8 +56,9 @@ type Step = {
   image:
     | string
     | {
-        type: string;
-        size?: string;
+        type?: string;
+        name?: string; // For custom icon names from react-icons or lucide-react
+        size?: string | number;
         className?: string;
       };
   titleStyle?: {
@@ -81,6 +111,7 @@ const getDefaultStepsSectionData = () => ({
       desc: "زيارة العقار وتقييم حالته ومعرفة ميزاته ومراجعة التفاصيل التي تحتاج إلى توضيح.",
       image: {
         type: "step1",
+        name: "Search",
         size: "80",
         className: "w-20 h-20",
       },
@@ -99,6 +130,7 @@ const getDefaultStepsSectionData = () => ({
       desc: "وصف دقيق للممتلكات بما في ذلك الموقع، المساحة، المرافق، والحالة العامة.",
       image: {
         type: "step2",
+        name: "FileText",
         size: "80",
         className: "w-20 h-20",
       },
@@ -117,6 +149,7 @@ const getDefaultStepsSectionData = () => ({
       desc: "الاستعانة بمصور محترف لالتقاط صور عالية الجودة مع الاهتمام بالإضاءة والزوايا.",
       image: {
         type: "step3",
+        name: "Camera",
         size: "80",
         className: "w-20 h-20",
       },
@@ -135,6 +168,7 @@ const getDefaultStepsSectionData = () => ({
       desc: "توقيع عقد رسمي بينك وبين المالك لتنظيم عملية تسويق العقار وحقوق الطرفين.",
       image: {
         type: "step4",
+        name: "Megaphone",
         size: "80",
         className: "w-20 h-20",
       },
@@ -153,6 +187,7 @@ const getDefaultStepsSectionData = () => ({
       desc: "إعداد بوستر يحتوي على الصور والتفاصيل الرئيسية ونشره على موقعنا الإلكتروني.",
       image: {
         type: "step5",
+        name: "Globe",
         size: "80",
         className: "w-20 h-20",
       },
@@ -171,6 +206,7 @@ const getDefaultStepsSectionData = () => ({
       desc: "استخدام وسائل الاتصال المختلفة لجذب المشترين المهتمين مثل الإعلانات.",
       image: {
         type: "step6",
+        name: "Users",
         size: "80",
         className: "w-20 h-20",
       },
@@ -427,6 +463,14 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
       } else {
         fieldData = mergedData?.background?.color;
       }
+    } else if (fieldPath === "header.title.color") {
+      // Check styling.header.title.color first, then header.title.color
+      const stylingHeaderTitleColor = mergedData?.styling?.header?.title?.color;
+      if (stylingHeaderTitleColor !== undefined && stylingHeaderTitleColor !== null) {
+        fieldData = stylingHeaderTitleColor;
+      } else {
+        fieldData = mergedData?.header?.title?.color;
+      }
     } else if (fieldPath === "title.color") {
       // Check in steps array for titleStyle.color, then styling.title.color
       fieldData = mergedData?.steps?.[0]?.titleStyle?.color || mergedData?.styling?.title?.color;
@@ -466,7 +510,13 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
     let defaultGlobalColorType = "primary";
     if (fieldPath.includes("background") || fieldPath.includes("Background")) {
       defaultGlobalColorType = "accent";
-    } else if (fieldPath.includes("title") || fieldPath.includes("Title") || fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+    } else if (fieldPath.includes("header.title") || fieldPath.includes("Header.Title")) {
+      // Header title uses primary color
+      defaultGlobalColorType = "primary";
+    } else if (fieldPath === "title.color" || (fieldPath.includes("title") && !fieldPath.includes("header"))) {
+      // Step titles use primary color (not header titles)
+      defaultGlobalColorType = "primary";
+    } else if (fieldPath.includes("Title") || fieldPath.includes("textColor") || fieldPath.includes("Text")) {
       defaultGlobalColorType = "secondary";
     } else if (fieldPath.includes("description") || fieldPath.includes("Description")) {
       defaultGlobalColorType = "secondary";
@@ -483,60 +533,6 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
     return brandingColor;
   };
 
-  // Function to convert hex color to CSS filter for SVG images
-  // This converts black/dark SVG images to the target color using CSS filters
-  // Improved formula based on RGB to HSL conversion
-  const getIconFilter = (hex: string): string => {
-    if (!hex || !hex.startsWith('#')) {
-      // Default emerald-600 filter (fallback)
-      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
-    }
-    
-    const cleanHex = hex.replace('#', '');
-    if (cleanHex.length !== 6) {
-      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
-    }
-
-    // Parse RGB values
-    const r = parseInt(cleanHex.substr(0, 2), 16) / 255;
-    const g = parseInt(cleanHex.substr(2, 2), 16) / 255;
-    const b = parseInt(cleanHex.substr(4, 2), 16) / 255;
-
-    // Convert RGB to HSL
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0;
-    let s = 0;
-    const l = (max + min) / 2;
-
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      
-      switch (max) {
-        case r:
-          h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-          break;
-        case g:
-          h = ((b - r) / d + 2) / 6;
-          break;
-        case b:
-          h = ((r - g) / d + 4) / 6;
-          break;
-      }
-    }
-
-    // Convert HSL to filter values
-    const hue = Math.round(h * 360);
-    const saturation = Math.round(s * 100);
-    const lightness = Math.round(l * 100);
-
-    // Calculate filter values
-    const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
-    const contrast = 100 + (saturation * 0.5);
-
-    return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
-  };
 
   // Don't render if not visible
   if (!mergedData.visible) {
@@ -546,13 +542,13 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
   // Get colors using getColor function
   const backgroundColor = getColor("background.color", brandingColors.accent);
   const iconColor = getColor("icon.color", brandingColors.primary);
-  const iconFilter = getIconFilter(iconColor);
-  const titleColor = getColor("title.color", brandingColors.secondary);
+  const titleColor = getColor("title.color", brandingColors.primary); // Step titles use primary color
   const descriptionColor = getColor("description.color", brandingColors.secondary);
-  // Get header title color - check styling.header.title.color first, then use titleColor
-  const headerTitleColor = mergedData?.styling?.header?.title?.color || 
+  // Get header title color - check styling.header.title.color first, then use primary color
+  const headerTitleColor = getColor("header.title.color", brandingColors.primary) ||
+                          mergedData?.styling?.header?.title?.color || 
                           mergedData?.header?.title?.color || 
-                          titleColor;
+                          brandingColors.primary;
 
   return (
     <section className="w-full bg-background sm:py-16 ">
@@ -596,33 +592,70 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
         >
           {mergedData.steps?.map((step: Step, i: number) => (
             <div key={i} className="flex items-start gap-4">
-              <div className="mt-1 shrink-0">
-                <Image
-                  src={
-                    typeof step.image === "string"
-                      ? step.image
-                      : getStepIconUrl(step.image.type)
+              <div className="mt-1 shrink-0" style={{ color: iconColor }}>
+                {(() => {
+                  // Priority: name > type > default
+                  const iconNameOrType = typeof step.image === "object" && step.image !== null
+                    ? (step.image.name || step.image.type || "step1")
+                    : "step1";
+                  const IconComponent = getStepIcon(iconNameOrType);
+                  
+                  // Get icon size
+                  const iconSize = typeof step.image === "object" && step.image !== null
+                    ? (typeof step.image.size === "number" 
+                        ? step.image.size 
+                        : parseInt(step.image.size || "80"))
+                    : 80;
+                  
+                  // Get icon className
+                  const iconClassName = typeof step.image === "object" && step.image !== null
+                    ? (step.image.className || "w-20 h-20")
+                    : "w-20 h-20";
+                  
+                  // Check if it's a React Icon (from react-icons) by checking the icon name pattern
+                  const isReactIcon = iconNameOrType.startsWith('Fa') || 
+                                     iconNameOrType.startsWith('Md') || 
+                                     iconNameOrType.startsWith('Io') ||
+                                     iconNameOrType.startsWith('Bi') ||
+                                     iconNameOrType.startsWith('Bs') ||
+                                     iconNameOrType.startsWith('Hi') ||
+                                     iconNameOrType.startsWith('Ai') ||
+                                     iconNameOrType.startsWith('Ti') ||
+                                     iconNameOrType.startsWith('Gi') ||
+                                     iconNameOrType.startsWith('Si') ||
+                                     iconNameOrType.startsWith('Ri') ||
+                                     iconNameOrType.startsWith('Tb') ||
+                                     iconNameOrType.startsWith('Vsc') ||
+                                     iconNameOrType.startsWith('Wi') ||
+                                     iconNameOrType.startsWith('Di') ||
+                                     iconNameOrType.startsWith('Im');
+                  
+                  // For React Icons, use style with fontSize
+                  if (isReactIcon) {
+                    return (
+                      <IconComponent
+                        className={iconClassName}
+                        style={{
+                          color: iconColor,
+                          fontSize: `${iconSize}px`,
+                          width: `${iconSize}px`,
+                          height: `${iconSize}px`,
+                        }}
+                      />
+                    );
                   }
-                  alt={step.title}
-                  width={
-                    typeof step.image === "string"
-                      ? 24
-                      : parseInt(step.image.size || "80")
-                  }
-                  height={
-                    typeof step.image === "string"
-                      ? 24
-                      : parseInt(step.image.size || "80")
-                  }
-                  className={
-                    typeof step.image === "string"
-                      ? "size-10 sm:size-15"
-                      : step.image.className || "w-20 h-20"
-                  }
-                  style={{
-                    filter: iconFilter !== "none" ? iconFilter : undefined,
-                  }}
-                />
+                  
+                  // For Lucide icons, use size prop
+                  return (
+                    <IconComponent
+                      size={iconSize}
+                      className={iconClassName}
+                      style={{
+                        color: iconColor,
+                      }}
+                    />
+                  );
+                })()}
               </div>
               <div>
                 <h3 

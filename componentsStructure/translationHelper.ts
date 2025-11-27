@@ -488,6 +488,7 @@ export function translateLabel(
       "components_structure.steps_section_specific.step_description",
     "Step Icon": "components_structure.steps_section_specific.step_icon",
     "Icon Type": "components_structure.steps_section_specific.icon_type",
+    "Icon Name": "components_structure.steps_section_specific.icon_name",
     "Image URL": "components_structure.steps_section_specific.image_url",
     "Title Style": "components_structure.steps_section_specific.title_style",
     Size: "components_structure.steps_section_specific.size",

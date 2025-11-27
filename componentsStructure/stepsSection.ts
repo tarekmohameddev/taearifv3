@@ -51,7 +51,7 @@ export const stepsSectionStructure: ComponentStructure = {
                   label: "Title Color",
                   type: "color",
                   useDefaultColor: true,
-                  globalColorType: "secondary", // Title uses secondary color from branding
+                  globalColorType: "primary", // Step titles use primary color from branding
                 },
               ],
             },
@@ -66,6 +66,27 @@ export const stepsSectionStructure: ComponentStructure = {
                   type: "color",
                   useDefaultColor: true,
                   globalColorType: "secondary", // Description uses secondary color from branding
+                },
+              ],
+            },
+            {
+              key: "header",
+              label: "Header Styling",
+              type: "object",
+              fields: [
+                {
+                  key: "title",
+                  label: "Header Title Color",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "color",
+                      label: "Header Title Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary", // Header title uses primary color from branding
+                    },
+                  ],
                 },
               ],
             },
@@ -133,6 +154,13 @@ export const stepsSectionStructure: ComponentStructure = {
                   label: "CSS Classes",
                   type: "text",
                   placeholder: "section-title",
+                },
+                {
+                  key: "color",
+                  label: "Title Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Header title uses primary color from branding
                 },
               ],
             },
@@ -217,19 +245,64 @@ export const stepsSectionStructure: ComponentStructure = {
               type: "object",
               fields: [
                 {
-                  key: "type",
-                  label: "Icon Type",
+                  key: "name",
+                  label: "Icon Name",
                   type: "select",
+                  showIcons: true, // Flag to show icons in dropdown
                   options: [
-                    { value: "step1", label: "Step 1 - Property Inspection" },
-                    { value: "step2", label: "Step 2 - Property Description" },
-                    {
-                      value: "step3",
-                      label: "Step 3 - Professional Photography",
-                    },
-                    { value: "step4", label: "Step 4 - Marketing Strategy" },
-                    { value: "step5", label: "Step 5 - Online Listing" },
-                    { value: "step6", label: "Step 6 - Client Communication" },
+                    // Lucide Icons - Most Common for Steps
+                    { value: "Search", label: "Search", iconLibrary: "lucide" },
+                    { value: "FileText", label: "File Text", iconLibrary: "lucide" },
+                    { value: "Camera", label: "Camera", iconLibrary: "lucide" },
+                    { value: "Megaphone", label: "Megaphone", iconLibrary: "lucide" },
+                    { value: "Globe", label: "Globe", iconLibrary: "lucide" },
+                    { value: "Users", label: "Users", iconLibrary: "lucide" },
+                    { value: "Home", label: "Home", iconLibrary: "lucide" },
+                    { value: "Building2", label: "Building", iconLibrary: "lucide" },
+                    { value: "MapPin", label: "Map Pin", iconLibrary: "lucide" },
+                    { value: "Phone", label: "Phone", iconLibrary: "lucide" },
+                    { value: "Mail", label: "Mail", iconLibrary: "lucide" },
+                    { value: "CheckCircle", label: "Check Circle", iconLibrary: "lucide" },
+                    { value: "Award", label: "Award", iconLibrary: "lucide" },
+                    { value: "Shield", label: "Shield", iconLibrary: "lucide" },
+                    { value: "Target", label: "Target", iconLibrary: "lucide" },
+                    { value: "Rocket", label: "Rocket", iconLibrary: "lucide" },
+                    { value: "Lightbulb", label: "Lightbulb", iconLibrary: "lucide" },
+                    { value: "BarChart", label: "Bar Chart", iconLibrary: "lucide" },
+                    { value: "UserCheck", label: "User Check", iconLibrary: "lucide" },
+                    { value: "Handshake", label: "Handshake", iconLibrary: "lucide" },
+                    { value: "Calendar", label: "Calendar", iconLibrary: "lucide" },
+                    { value: "Clock", label: "Clock", iconLibrary: "lucide" },
+                    { value: "MessageSquare", label: "Message Square", iconLibrary: "lucide" },
+                    { value: "Send", label: "Send", iconLibrary: "lucide" },
+                    { value: "Edit", label: "Edit", iconLibrary: "lucide" },
+                    { value: "Save", label: "Save", iconLibrary: "lucide" },
+                    { value: "Upload", label: "Upload", iconLibrary: "lucide" },
+                    { value: "Download", label: "Download", iconLibrary: "lucide" },
+                    { value: "Key", label: "Key", iconLibrary: "lucide" },
+                    { value: "Lock", label: "Lock", iconLibrary: "lucide" },
+                    { value: "Filter", label: "Filter", iconLibrary: "lucide" },
+                    { value: "Share", label: "Share", iconLibrary: "lucide" },
+                    // React Icons - Font Awesome
+                    { value: "FaHome", label: "Home (FA)", iconLibrary: "react-icons" },
+                    { value: "FaBuilding", label: "Building (FA)", iconLibrary: "react-icons" },
+                    { value: "FaSearch", label: "Search (FA)", iconLibrary: "react-icons" },
+                    { value: "FaFileAlt", label: "File (FA)", iconLibrary: "react-icons" },
+                    { value: "FaCamera", label: "Camera (FA)", iconLibrary: "react-icons" },
+                    { value: "FaUsers", label: "Users (FA)", iconLibrary: "react-icons" },
+                    { value: "FaPhone", label: "Phone (FA)", iconLibrary: "react-icons" },
+                    { value: "FaEnvelope", label: "Envelope (FA)", iconLibrary: "react-icons" },
+                    // React Icons - Material Design
+                    { value: "MdHome", label: "Home (MD)", iconLibrary: "react-icons" },
+                    { value: "MdBusiness", label: "Business (MD)", iconLibrary: "react-icons" },
+                    { value: "MdSearch", label: "Search (MD)", iconLibrary: "react-icons" },
+                    { value: "MdDescription", label: "Description (MD)", iconLibrary: "react-icons" },
+                    { value: "MdCameraAlt", label: "Camera (MD)", iconLibrary: "react-icons" },
+                    { value: "MdPeople", label: "People (MD)", iconLibrary: "react-icons" },
+                    { value: "MdPhone", label: "Phone (MD)", iconLibrary: "react-icons" },
+                    { value: "MdEmail", label: "Email (MD)", iconLibrary: "react-icons" },
+                    { value: "MdCheckCircle", label: "Check Circle (MD)", iconLibrary: "react-icons" },
+                    { value: "MdTrendingUp", label: "Trending Up (MD)", iconLibrary: "react-icons" },
                   ],
                 },
                 {
@@ -257,7 +330,7 @@ export const stepsSectionStructure: ComponentStructure = {
                   type: "color",
                   placeholder: "#047857",
                   useDefaultColor: true,
-                  globalColorType: "secondary", // Title uses secondary color
+                  globalColorType: "primary", // Step titles use primary color from branding
                 },
                 {
                   key: "size",
