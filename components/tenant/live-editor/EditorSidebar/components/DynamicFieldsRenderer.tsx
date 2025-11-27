@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { FieldDefinition } from "@/componentsStructure/types";
 import { DynamicFieldsRendererProps } from "../types";
@@ -21,6 +21,9 @@ import {
 } from "./FieldRenderers/index";
 import { TranslationFields } from "../TranslationFields";
 import { logChange } from "@/lib-liveeditor/debugLogger";
+import * as LucideIcons from "lucide-react";
+import * as ReactIconsFa from "react-icons/fa";
+import * as ReactIconsMd from "react-icons/md";
 
 export function DynamicFieldsRenderer({
   fields,
@@ -322,6 +325,38 @@ export function DynamicFieldsRenderer({
   const backgroundMode: string =
     (getValueByPath("settings.backgroundMode") as any) ||
     (hasGradientPair ? "gradient" : "solid");
+
+  // Helper function to get icon component dynamically
+  const getIconComponent = useCallback((iconName: string, iconLibrary?: string) => {
+    if (!iconName) return null;
+    
+    try {
+      if (iconLibrary === "lucide" || !iconLibrary) {
+        // Try lucide-react icons
+        const LucideIcon = (LucideIcons as any)[iconName];
+        if (LucideIcon) return LucideIcon;
+      }
+      
+      if (iconLibrary === "react-icons") {
+        // Try react-icons Font Awesome
+        const FaIcon = (ReactIconsFa as any)[iconName];
+        if (FaIcon) return FaIcon;
+        
+        // Try react-icons Material Design
+        const MdIcon = (ReactIconsMd as any)[iconName];
+        if (MdIcon) return MdIcon;
+      }
+      
+      // Fallback: try lucide-react if no library specified
+      const LucideIcon = (LucideIcons as any)[iconName];
+      if (LucideIcon) return LucideIcon;
+      
+      return null;
+    } catch (error) {
+      console.warn(`Icon not found: ${iconName} from ${iconLibrary || "lucide"}`);
+      return null;
+    }
+  }, []);
 
   const renderField = (def: FieldDefinition, basePath?: string) => {
     if (!def) {
@@ -771,12 +806,31 @@ export function DynamicFieldsRenderer({
                   backgroundSize: "16px",
                 }}
               >
-                {(def.options || []).map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
+                {(def.options || []).map((opt) => {
+                  const IconComponent = def.showIcons && opt.iconLibrary 
+                    ? getIconComponent(opt.value, opt.iconLibrary)
+                    : null;
+                  
+                  return (
+                    <option key={opt.value} value={opt.value}>
+                      {IconComponent ? `🔷 ${opt.label}` : opt.label}
+                    </option>
+                  );
+                })}
               </select>
+              {/* Show selected icon preview */}
+              {def.showIcons && value && (() => {
+                const selectedOption = def.options?.find(opt => opt.value === value);
+                const SelectedIcon = selectedOption && selectedOption.iconLibrary
+                  ? getIconComponent(selectedOption.value, selectedOption.iconLibrary)
+                  : null;
+                
+                return SelectedIcon ? (
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center">
+                    <SelectedIcon className="w-5 h-5 text-slate-600" />
+                  </div>
+                ) : null;
+              })()}
               {/* Custom dropdown arrow for better visibility */}
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <svg

@@ -670,6 +670,13 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                   type: "text",
                   placeholder: "text-balance",
                 },
+                { 
+                  key: "color", 
+                  label: "Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary" // Title uses primary color
+                },
               ],
             },
             {
@@ -1198,7 +1205,13 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                       type: "text",
                       placeholder: "font-normal",
                     },
-                    { key: "color", label: "Color", type: "color" },
+                    { 
+                      key: "color", 
+                      label: "Color", 
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary" // Title uses primary color
+                    },
                     {
                       key: "lineHeight",
                       label: "Line Height",

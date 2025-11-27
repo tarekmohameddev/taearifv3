@@ -557,9 +557,9 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
 
   // Get colors for button
   const buttonBgColor = getColor("button.backgroundColor", "#059669");
-  const buttonTextColor = getColor("button.textColor", "#ffffff");
+  const buttonTextColor = "#ffffff"; // Always white for button text
   const buttonHoverBgColor = getColor("button.hoverBackgroundColor", getDarkerColor(buttonBgColor, 20));
-  const buttonHoverTextColor = getColor("button.hoverTextColor", "#ffffff");
+  const buttonHoverTextColor = "#ffffff"; // Always white for button hover text
 
   const buttonStyles = {
     backgroundColor: buttonBgColor,
