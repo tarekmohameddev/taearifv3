@@ -426,8 +426,10 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
-    defaultColor: string = "#059669"
+    defaultColor?: string
   ): string => {
+    // Use primary color as default, fallback to #059669 if primary not available
+    const effectiveDefaultColor = defaultColor || brandingColors.primary || "#059669";
     // Get styling data from mergedData
     const styling = mergedData?.styling || {};
     
@@ -509,7 +511,7 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
     // Determine globalColorType based on field path
     let defaultGlobalColorType = "primary";
     if (fieldPath.includes("background") || fieldPath.includes("Background")) {
-      defaultGlobalColorType = "accent";
+      defaultGlobalColorType = "primary"; // Background uses primary color (with opacity applied separately)
     } else if (fieldPath.includes("header.title") || fieldPath.includes("Header.Title")) {
       // Header title uses primary color
       defaultGlobalColorType = "primary";
@@ -529,10 +531,51 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
       defaultGlobalColorType = fieldData.globalColorType;
     }
     
-    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
-    return brandingColor;
+    // Use primary color as default, fallback to #059669 if primary not available
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors];
+    // If branding color exists and is valid, use it; otherwise use effectiveDefaultColor
+    if (brandingColor && brandingColor.trim() !== "") {
+      return brandingColor;
+    }
+    // Fallback to effectiveDefaultColor (primary or #059669) only if branding color is not available
+    return effectiveDefaultColor;
   };
 
+  // Helper function to convert hex color to rgba with opacity
+  const getColorWithOpacity = (hex: string, opacity: number = 0.1): string => {
+    // Use primary color as default if hex is invalid
+    const defaultColor = brandingColors.primary || "#059669";
+    if (!hex || !hex.startsWith('#')) {
+      // Parse default color
+      const cleanDefaultHex = defaultColor.replace('#', '');
+      if (cleanDefaultHex.length === 6) {
+        const r = parseInt(cleanDefaultHex.substr(0, 2), 16);
+        const g = parseInt(cleanDefaultHex.substr(2, 2), 16);
+        const b = parseInt(cleanDefaultHex.substr(4, 2), 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+      return `rgba(5, 150, 105, ${opacity})`; // emerald-600 fallback
+    }
+    
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) {
+      // Parse default color
+      const cleanDefaultHex = defaultColor.replace('#', '');
+      if (cleanDefaultHex.length === 6) {
+        const r = parseInt(cleanDefaultHex.substr(0, 2), 16);
+        const g = parseInt(cleanDefaultHex.substr(2, 2), 16);
+        const b = parseInt(cleanDefaultHex.substr(4, 2), 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+      return `rgba(5, 150, 105, ${opacity})`;
+    }
+    
+    const r = parseInt(cleanHex.substr(0, 2), 16);
+    const g = parseInt(cleanHex.substr(2, 2), 16);
+    const b = parseInt(cleanHex.substr(4, 2), 16);
+    
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  };
 
   // Don't render if not visible
   if (!mergedData.visible) {
@@ -540,7 +583,15 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
   }
 
   // Get colors using getColor function
-  const backgroundColor = getColor("background.color", brandingColors.accent);
+  // Always use primary color as base for background with opacity
+  // Priority: custom color > primary color > #059669 fallback
+  // Don't pass defaultColor to getColor, let it use primary as default internally
+  const backgroundBaseColor = getColor("background.color");
+  // Ensure we have a valid hex color, use primary as default, fallback to #059669 if primary not available
+  const validBackgroundColor = (backgroundBaseColor && backgroundBaseColor.startsWith('#')) 
+    ? backgroundBaseColor 
+    : (brandingColors.primary && brandingColors.primary.trim() !== "" ? brandingColors.primary : "#059669");
+  const backgroundColor = getColorWithOpacity(getColor("icon.color", brandingColors.primary), 0.2);
   const iconColor = getColor("icon.color", brandingColors.primary);
   const titleColor = getColor("title.color", brandingColors.primary); // Step titles use primary color
   const descriptionColor = getColor("description.color", brandingColors.secondary);

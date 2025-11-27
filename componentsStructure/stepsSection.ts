@@ -23,7 +23,7 @@ export const stepsSectionStructure: ComponentStructure = {
                   label: "Background Color",
                   type: "color",
                   useDefaultColor: true,
-                  globalColorType: "accent", // Background uses accent color (lighter shade) from branding
+                  globalColorType: "primary", // Background uses primary color (with 10% opacity applied)
                 },
               ],
             },
@@ -103,7 +103,7 @@ export const stepsSectionStructure: ComponentStructure = {
               type: "color",
               placeholder: "#f2fbf9",
               useDefaultColor: true,
-              globalColorType: "accent", // Background uses accent color (lighter shade) from branding
+              globalColorType: "primary", // Background uses primary color (with 10% opacity applied)
             },
             {
               key: "padding",
