@@ -129,174 +129,17 @@ interface InputsProps {
 
 // Use the default data from inputs2Functions
 
-// Dynamic color system - Fully customizable from props
-const getDynamicColors = (card: InputCard, theme?: any) => {
-  // If custom colors are provided and it's an object (not array), use them
-  if (
-    card.customColors &&
-    typeof card.customColors === "object" &&
-    !Array.isArray(card.customColors) &&
-    Object.keys(card.customColors).length > 0
-  ) {
-    return {
-      primary: card.customColors.primary || "#3b82f6",
-      secondary: card.customColors.secondary || "#2563eb",
-      hover: card.customColors.hover || "#1d4ed8",
-      shadow: card.customColors.shadow || "rgba(59, 130, 246, 0.1)",
-    };
-  }
-
-  // Default color palette
-  const colorPalettes: Record<string, any> = {
-    blue: {
-      primary: "#3b82f6",
-      secondary: "#2563eb",
-      hover: "#1d4ed8",
-      shadow: "rgba(59, 130, 246, 0.1)",
-    },
-    indigo: {
-      primary: "#6366f1",
-      secondary: "#4f46e5",
-      hover: "#4338ca",
-      shadow: "rgba(99, 102, 241, 0.1)",
-    },
-    purple: {
-      primary: "#8b5cf6",
-      secondary: "#7c3aed",
-      hover: "#6d28d9",
-      shadow: "rgba(139, 92, 246, 0.1)",
-    },
-    pink: {
-      primary: "#ec4899",
-      secondary: "#db2777",
-      hover: "#be185d",
-      shadow: "rgba(236, 72, 153, 0.1)",
-    },
-    red: {
-      primary: "#ef4444",
-      secondary: "#dc2626",
-      hover: "#b91c1c",
-      shadow: "rgba(239, 68, 68, 0.1)",
-    },
-    green: {
-      primary: "#10b981",
-      secondary: "#059669",
-      hover: "#047857",
-      shadow: "rgba(16, 185, 129, 0.1)",
-    },
-    yellow: {
-      primary: "#f59e0b",
-      secondary: "#d97706",
-      hover: "#b45309",
-      shadow: "rgba(245, 158, 11, 0.1)",
-    },
-    orange: {
-      primary: "#f97316",
-      secondary: "#ea580c",
-      hover: "#c2410c",
-      shadow: "rgba(249, 115, 22, 0.1)",
-    },
-    teal: {
-      primary: "#14b8a6",
-      secondary: "#0d9488",
-      hover: "#0f766e",
-      shadow: "rgba(20, 184, 166, 0.1)",
-    },
-    cyan: {
-      primary: "#06b6d4",
-      secondary: "#0891b2",
-      hover: "#0e7490",
-      shadow: "rgba(6, 182, 212, 0.1)",
-    },
-    emerald: {
-      primary: "#10b981",
-      secondary: "#059669",
-      hover: "#047857",
-      shadow: "rgba(16, 185, 129, 0.1)",
-    },
-    violet: {
-      primary: "#8b5cf6",
-      secondary: "#7c3aed",
-      hover: "#6d28d9",
-      shadow: "rgba(139, 92, 246, 0.1)",
-    },
-    fuchsia: {
-      primary: "#d946ef",
-      secondary: "#c026d3",
-      hover: "#a21caf",
-      shadow: "rgba(217, 70, 239, 0.1)",
-    },
-    rose: {
-      primary: "#f43f5e",
-      secondary: "#e11d48",
-      hover: "#be123c",
-      shadow: "rgba(244, 63, 94, 0.1)",
-    },
-    sky: {
-      primary: "#0ea5e9",
-      secondary: "#0284c7",
-      hover: "#0369a1",
-      shadow: "rgba(14, 165, 233, 0.1)",
-    },
-    lime: {
-      primary: "#84cc16",
-      secondary: "#65a30d",
-      hover: "#4d7c0f",
-      shadow: "rgba(132, 204, 22, 0.1)",
-    },
-    amber: {
-      primary: "#f59e0b",
-      secondary: "#d97706",
-      hover: "#b45309",
-      shadow: "rgba(245, 158, 11, 0.1)",
-    },
-    slate: {
-      primary: "#64748b",
-      secondary: "#475569",
-      hover: "#334155",
-      shadow: "rgba(100, 116, 139, 0.1)",
-    },
-    gray: {
-      primary: "#6b7280",
-      secondary: "#4b5563",
-      hover: "#374151",
-      shadow: "rgba(107, 114, 128, 0.1)",
-    },
-    zinc: {
-      primary: "#71717a",
-      secondary: "#52525b",
-      hover: "#3f3f46",
-      shadow: "rgba(113, 113, 122, 0.1)",
-    },
-    neutral: {
-      primary: "#737373",
-      secondary: "#525252",
-      hover: "#404040",
-      shadow: "rgba(115, 115, 115, 0.1)",
-    },
-    stone: {
-      primary: "#78716c",
-      secondary: "#57534e",
-      hover: "#44403c",
-      shadow: "rgba(120, 113, 108, 0.1)",
-    },
-  };
-
-  // Get colors from palette or use theme colors
-  const cardColor = card.color || "blue";
-  const palette = colorPalettes[cardColor] || colorPalettes["blue"];
-
-  // Override with theme colors if provided, but only if no specific card color is set
-  if (theme && (!card.color || card.color === "blue")) {
-    return {
-      primary: theme.primaryColor || palette.primary,
-      secondary: theme.secondaryColor || palette.secondary,
-      hover: theme.accentColor || palette.hover,
-      shadow: palette.shadow,
-    };
-  }
-
-  return palette;
+// Helper function to get shadow color from primary color
+const getShadowColor = (hex: string): string => {
+  if (!hex || !hex.startsWith('#')) return "rgba(5, 150, 105, 0.1)"; // emerald-600 fallback
+  const cleanHex = hex.replace('#', '');
+  if (cleanHex.length !== 6) return "rgba(5, 150, 105, 0.1)";
+  
+  const r = parseInt(cleanHex.substr(0, 2), 16);
+  const g = parseInt(cleanHex.substr(2, 2), 16);
+  const b = parseInt(cleanHex.substr(4, 2), 16);
+  
+  return `rgba(${r}, ${g}, ${b}, 0.1)`;
 };
 
 // Main Component
@@ -364,6 +207,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
 
   const primaryColorHover = getDarkerColor(primaryColor, 20);
   const primaryColorLight = getLighterColor(primaryColor, 0.1); // 10% opacity for hover backgrounds
+  const primaryColorShadow = getShadowColor(primaryColor); // Shadow color from primary
 
   useEffect(() => {
     if (tenantId) {
@@ -1756,7 +1600,6 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     }
 
     const isCollapsed = collapsedCards.has(card.id);
-    const colors = getDynamicColors(card, safeTheme);
 
     return (
       <motion.div
@@ -1766,14 +1609,14 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
         transition={{ duration: 0.4 }}
         className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300"
         style={{
-          boxShadow: `0 10px 25px -5px ${colors.shadow}, 0 10px 10px -5px ${colors.shadow}`,
+          boxShadow: `0 10px 25px -5px ${primaryColorShadow}, 0 10px 10px -5px ${primaryColorShadow}`,
         }}
       >
         {/* Card Header */}
         <div
           className="p-6 text-white transition-all duration-300"
           style={{
-            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+            background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColorHover} 100%)`,
           }}
         >
           <div className="flex items-center justify-between">
@@ -1934,7 +1777,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                     onClick={card.onAddNew}
                     className="w-full py-3 px-4 text-white rounded-xl hover:opacity-90 transition-all duration-300 flex items-center justify-center space-x-2 rtl:space-x-reverse font-medium"
                     style={{
-                      background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+                      background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColorHover} 100%)`,
                     }}
                   >
                     <Plus size={20} />
@@ -2187,20 +2030,18 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
               disabled={isSubmitting}
               className="transition-all duration-300 flex items-center space-x-2 rtl:space-x-reverse font-bold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                backgroundColor: submitButton.backgroundColor || primaryColor,
-                color: submitButton.textColor || "#ffffff",
+                backgroundColor: primaryColor,
+                color: "#ffffff",
                 borderRadius: submitButton.borderRadius || "8px",
                 padding: submitButton.padding || "12px 24px",
                 width: "100%",
                 justifyContent: "center",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  submitButton.hoverColor || primaryColorHover;
+                e.currentTarget.style.backgroundColor = primaryColorHover;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  submitButton.backgroundColor || primaryColor;
+                e.currentTarget.style.backgroundColor = primaryColor;
               }}
             >
               {isSubmitting ? (
