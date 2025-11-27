@@ -643,13 +643,20 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                   key: "className",
                   label: "CSS Classes",
                   type: "text",
-                  placeholder: "section-title text-emerald-700",
+                  placeholder: "section-title",
                 },
                 {
                   key: "marginBottom",
                   label: "Margin Bottom",
                   type: "text",
                   placeholder: "mb-3",
+                },
+                { 
+                  key: "color", 
+                  label: "Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary" // Eyebrow uses primary color
                 },
               ],
             },
@@ -701,7 +708,14 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                   key: "valueClassName",
                   label: "Value CSS Classes",
                   type: "text",
-                  placeholder: "text-2xl text-emerald-700",
+                  placeholder: "text-2xl",
+                },
+                {
+                  key: "valueColor",
+                  label: "Value Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Stats value uses primary color
                 },
                 {
                   key: "labelClassName",
@@ -714,6 +728,62 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                   label: "Label Margin Top",
                   type: "text",
                   placeholder: "mt-1",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "imageBackground",
+              label: "Image Background Styling",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Background Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Image background uses primary color
+                },
+              ],
+            },
+            {
+              key: "typography",
+              label: "Typography Colors",
+              type: "object",
+              fields: [
+                {
+                  key: "eyebrow",
+                  label: "Eyebrow Text Color",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "color",
+                      label: "Eyebrow Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary", // Eyebrow text uses primary color
+                    },
+                  ],
+                },
+                {
+                  key: "stats",
+                  label: "Stats Colors",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "valueColor",
+                      label: "Value Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary", // Stats value uses primary color
+                    },
+                  ],
                 },
               ],
             },
@@ -768,6 +838,8 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                   label: "Background Color",
                   type: "color",
                   placeholder: "#059669",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Image background uses primary color
                 },
                 {
                   key: "className",
