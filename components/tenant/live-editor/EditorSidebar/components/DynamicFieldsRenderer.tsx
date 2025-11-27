@@ -24,6 +24,13 @@ import { logChange } from "@/lib-liveeditor/debugLogger";
 import * as LucideIcons from "lucide-react";
 import * as ReactIconsFa from "react-icons/fa";
 import * as ReactIconsMd from "react-icons/md";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Check } from "lucide-react";
 
 export function DynamicFieldsRenderer({
   fields,
@@ -326,36 +333,106 @@ export function DynamicFieldsRenderer({
     (getValueByPath("settings.backgroundMode") as any) ||
     (hasGradientPair ? "gradient" : "solid");
 
-  // Helper function to get icon component dynamically
+  // Create icon cache using useMemo for better performance
+  const iconCache = useMemo(() => {
+    const cache = new Map<string, React.ComponentType<any> | null>();
+    
+    // Pre-populate cache with common icons
+    const commonLucideIcons = ['UserCircle', 'Building2', 'GraduationCap', 'TrendingUp', 'Briefcase', 'Settings', 'Home', 'MapPin', 'Phone', 'Mail'];
+    commonLucideIcons.forEach(iconName => {
+      const icon = (LucideIcons as any)[iconName];
+      if (icon) cache.set(`lucide:${iconName}`, icon);
+    });
+    
+    return cache;
+  }, []);
+
+  // Helper function to get icon component dynamically with caching
   const getIconComponent = useCallback((iconName: string, iconLibrary?: string) => {
     if (!iconName) return null;
     
+    const cacheKey = `${iconLibrary || "lucide"}:${iconName}`;
+    
+    // Check cache first
+    if (iconCache.has(cacheKey)) {
+      return iconCache.get(cacheKey) || null;
+    }
+    
     try {
+      let icon: React.ComponentType<any> | null = null;
+      
       if (iconLibrary === "lucide" || !iconLibrary) {
         // Try lucide-react icons
-        const LucideIcon = (LucideIcons as any)[iconName];
-        if (LucideIcon) return LucideIcon;
+        icon = (LucideIcons as any)[iconName] || null;
+        if (icon) {
+          iconCache.set(cacheKey, icon);
+          return icon;
+        }
       }
       
       if (iconLibrary === "react-icons") {
-        // Try react-icons Font Awesome
-        const FaIcon = (ReactIconsFa as any)[iconName];
-        if (FaIcon) return FaIcon;
+        // Try react-icons Font Awesome first (most common)
+        if (iconName.startsWith('Fa')) {
+          icon = (ReactIconsFa as any)[iconName] || null;
+          if (icon) {
+            iconCache.set(cacheKey, icon);
+            return icon;
+          }
+        }
         
         // Try react-icons Material Design
-        const MdIcon = (ReactIconsMd as any)[iconName];
-        if (MdIcon) return MdIcon;
+        if (iconName.startsWith('Md')) {
+          icon = (ReactIconsMd as any)[iconName] || null;
+          if (icon) {
+            iconCache.set(cacheKey, icon);
+            return icon;
+          }
+        }
+        
+        // Try all react-icons if prefix doesn't match
+        icon = (ReactIconsFa as any)[iconName] || (ReactIconsMd as any)[iconName] || null;
+        if (icon) {
+          iconCache.set(cacheKey, icon);
+          return icon;
+        }
       }
       
       // Fallback: try lucide-react if no library specified
-      const LucideIcon = (LucideIcons as any)[iconName];
-      if (LucideIcon) return LucideIcon;
+      if (!icon) {
+        icon = (LucideIcons as any)[iconName] || null;
+        if (icon) {
+          iconCache.set(cacheKey, icon);
+          return icon;
+        }
+      }
       
+      // Cache null result to avoid repeated lookups
+      iconCache.set(cacheKey, null);
       return null;
     } catch (error) {
-      console.warn(`Icon not found: ${iconName} from ${iconLibrary || "lucide"}`);
+      iconCache.set(cacheKey, null);
       return null;
     }
+  }, [iconCache]);
+  
+  // Memoize React Icon check function
+  const isReactIcon = useCallback((iconName: string): boolean => {
+    return iconName.startsWith('Fa') || 
+           iconName.startsWith('Md') || 
+           iconName.startsWith('Io') ||
+           iconName.startsWith('Bi') ||
+           iconName.startsWith('Bs') ||
+           iconName.startsWith('Hi') ||
+           iconName.startsWith('Ai') ||
+           iconName.startsWith('Ti') ||
+           iconName.startsWith('Gi') ||
+           iconName.startsWith('Si') ||
+           iconName.startsWith('Ri') ||
+           iconName.startsWith('Tb') ||
+           iconName.startsWith('Vsc') ||
+           iconName.startsWith('Wi') ||
+           iconName.startsWith('Di') ||
+           iconName.startsWith('Im');
   }, []);
 
   const renderField = (def: FieldDefinition, basePath?: string) => {
@@ -760,7 +837,30 @@ export function DynamicFieldsRenderer({
           </div>
         );
       }
-      case "select":
+      case "select": {
+        // Pre-compute options with icons for better performance (only when showIcons is true)
+        const optionsWithIcons = def.showIcons && def.options
+          ? (def.options || []).map((opt) => {
+              const IconComponent = opt.iconLibrary
+                ? getIconComponent(opt.value, opt.iconLibrary)
+                : null;
+              
+              const isReactIconValue = IconComponent ? isReactIcon(opt.value) : false;
+              
+              return {
+                ...opt,
+                IconComponent,
+                isReactIconValue,
+              };
+            })
+          : null;
+        
+        // Pre-compute selected option and icon
+        const selectedOption = def.options?.find(opt => opt.value === value);
+        const selectedIcon = selectedOption?.iconLibrary
+          ? getIconComponent(selectedOption.value, selectedOption.iconLibrary)
+          : null;
+        
         return (
           <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
             <label className="flex items-center space-x-3 mb-3">
@@ -791,76 +891,91 @@ export function DynamicFieldsRenderer({
               </div>
             </label>
             <div className="relative">
-              <select
-                value={value || (def.options?.[0]?.value ?? "")}
-                onChange={(e) => updateValue(normalizedPath, e.target.value)}
-                className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500 transition-all duration-200 text-slate-700 font-medium appearance-none cursor-pointer pr-10 ${
-                  value && value.length > 0
-                    ? "border-green-300 bg-green-50"
-                    : "border-slate-200"
-                }`}
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
-                  backgroundPosition: "right 12px center",
-                  backgroundRepeat: "no-repeat",
-                  backgroundSize: "16px",
-                }}
-              >
-                {(def.options || []).map((opt) => {
-                  const IconComponent = def.showIcons && opt.iconLibrary 
-                    ? getIconComponent(opt.value, opt.iconLibrary)
-                    : null;
-                  
-                  return (
-                    <option key={opt.value} value={opt.value}>
-                      {IconComponent ? `🔷 ${opt.label}` : opt.label}
-                    </option>
-                  );
-                })}
-              </select>
-              {/* Show selected icon preview */}
-              {def.showIcons && value && (() => {
-                const selectedOption = def.options?.find(opt => opt.value === value);
-                const SelectedIcon = selectedOption && selectedOption.iconLibrary
-                  ? getIconComponent(selectedOption.value, selectedOption.iconLibrary)
-                  : null;
-                
-                return SelectedIcon ? (
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center">
-                    <SelectedIcon className="w-5 h-5 text-slate-600" />
-                  </div>
-                ) : null;
-              })()}
-              {/* Custom dropdown arrow for better visibility */}
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-slate-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-              {value && value.length > 0 && (
-                <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
-                  <svg
-                    className="w-4 h-4 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+              {def.showIcons && optionsWithIcons ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500 transition-all duration-200 text-slate-700 font-medium flex items-center justify-between ${
+                      value && value.length > 0
+                        ? "border-green-300 bg-green-50"
+                        : "border-slate-200"
+                    }`}
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
+                    <div className="flex items-center gap-2 flex-1">
+                      {selectedOption ? (
+                        <>
+                          {selectedIcon && (
+                            isReactIcon(selectedOption.value) ? (
+                              React.createElement(selectedIcon, { className: "w-5 h-5", style: { fontSize: "20px", width: "20px", height: "20px", color: "currentColor" } })
+                            ) : (
+                              React.createElement(selectedIcon, { size: 20, className: "w-5 h-5", style: { color: "currentColor" } })
+                            )
+                          )}
+                          <span>{selectedOption.label}</span>
+                        </>
+                      ) : (
+                        <span className="text-slate-500">{def.placeholder || t("editor_sidebar.select_option")}</span>
+                      )}
+                    </div>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="max-h-[300px] overflow-y-auto w-[var(--radix-dropdown-menu-trigger-width)]">
+                    {optionsWithIcons.map((opt) => {
+                      const IconComponent = opt.IconComponent;
+                      const isReactIconValue = opt.isReactIconValue;
+                      const isSelected = opt.value === value;
+                      
+                      return (
+                        <DropdownMenuItem
+                          key={opt.value}
+                          onClick={() => updateValue(normalizedPath, opt.value)}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 w-full">
+                            {IconComponent && (
+                              isReactIconValue ? (
+                                React.createElement(IconComponent, { className: "w-5 h-5", style: { fontSize: "20px", width: "20px", height: "20px" } })
+                              ) : (
+                                React.createElement(IconComponent, { size: 20, className: "w-5 h-5" })
+                              )
+                            )}
+                            <span className="flex-1">{opt.label}</span>
+                            {isSelected && <Check className="h-4 w-4 text-green-500" />}
+                          </div>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500 transition-all duration-200 text-slate-700 font-medium flex items-center justify-between ${
+                      value && value.length > 0
+                        ? "border-green-300 bg-green-50"
+                        : "border-slate-200"
+                    }`}
+                  >
+                    <span className={value ? "" : "text-slate-500"}>
+                      {def.options?.find(opt => opt.value === value)?.label || def.placeholder || t("editor_sidebar.select_option")}
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="max-h-[300px] overflow-y-auto w-[var(--radix-dropdown-menu-trigger-width)]">
+                    {(def.options || []).map((opt) => {
+                      const isSelected = opt.value === value;
+                      return (
+                        <DropdownMenuItem
+                          key={opt.value}
+                          onClick={() => updateValue(normalizedPath, opt.value)}
+                          className="cursor-pointer"
+                        >
+                          <span className="flex-1">{opt.label}</span>
+                          {isSelected && <Check className="h-4 w-4 text-green-500" />}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
             {def.options && def.options.length === 0 && (
@@ -888,6 +1003,7 @@ export function DynamicFieldsRenderer({
             )}
           </div>
         );
+      }
       case "object": {
         return (
           <ObjectFieldRenderer
