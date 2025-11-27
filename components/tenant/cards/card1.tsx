@@ -133,6 +133,8 @@ export function PropertyCard({
 
   const primaryColorHover = getDarkerColor(primaryColor, 20);
   const primaryColorFilter = hexToFilter(primaryColor);
+  // Black filter for currency symbol (always black)
+  const blackFilter = "brightness(0) saturate(100%)";
 
   // Check if property exists
   if (!p) {
@@ -266,7 +268,7 @@ export function PropertyCard({
                   alt="ريال سعودي"
                   className="w-5 h-5"
                   style={{
-                    filter: primaryColorFilter,
+                    filter: blackFilter,
                   }}
                 />
               </span>

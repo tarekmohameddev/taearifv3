@@ -196,16 +196,49 @@ export default function FilterButtons({
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
+  // Helper function to get contrast text color (black or white) based on background color
+  // Uses WCAG luminance formula to determine if background is light or dark
+  const getContrastTextColor = (backgroundColor: string): string => {
+    if (!backgroundColor || !backgroundColor.startsWith('#')) return "#ffffff";
+    const cleanHex = backgroundColor.replace('#', '');
+    if (cleanHex.length !== 6) return "#ffffff";
+    
+    // Parse RGB values
+    const r = parseInt(cleanHex.substr(0, 2), 16);
+    const g = parseInt(cleanHex.substr(2, 2), 16);
+    const b = parseInt(cleanHex.substr(4, 2), 16);
+    
+    // Calculate relative luminance using WCAG formula
+    // https://www.w3.org/WAI/GL/wiki/Relative_luminance
+    const getLuminance = (value: number): number => {
+      const normalized = value / 255;
+      return normalized <= 0.03928
+        ? normalized / 12.92
+        : Math.pow((normalized + 0.055) / 1.055, 2.4);
+    };
+    
+    const luminance = 0.2126 * getLuminance(r) + 0.7152 * getLuminance(g) + 0.0722 * getLuminance(b);
+    
+    // If luminance is less than 0.5, use white text, otherwise use black text
+    return luminance < 0.5 ? "#ffffff" : "#000000";
+  };
+
   // Get colors for inspection button
   const inspectionButtonBgColor = getColor("inspectionButton.bgColor", "#059669");
-  const inspectionButtonTextColor = getColor("inspectionButton.textColor", "#ffffff");
+  // Always calculate text color from background color (black or white) - ignore custom text color
+  const inspectionButtonTextColor = getContrastTextColor(inspectionButtonBgColor);
   const inspectionButtonHoverBgColor = getColor("inspectionButton.hoverBgColor", getDarkerColor(inspectionButtonBgColor, 20));
+  // Always calculate hover text color from hover background color
+  const inspectionButtonHoverTextColor = getContrastTextColor(inspectionButtonHoverBgColor);
   
   // Get colors for filter buttons
   const filterButtonsActiveBgColor = getColor("filterButtons.activeBgColor", "#059669");
-  const filterButtonsActiveTextColor = getColor("filterButtons.activeTextColor", "#ffffff");
+  // Always calculate text color from background color (black or white) - ignore custom text color
+  const filterButtonsActiveTextColor = getContrastTextColor(filterButtonsActiveBgColor);
   const filterButtonsInactiveTextColor = getColor("filterButtons.inactiveTextColor", "#059669");
   const filterButtonsHoverBgColor = getColor("filterButtons.hoverBgColor", getLighterColor(filterButtonsActiveBgColor, 0.1));
+  // Always calculate hover text color from hover background color
+  const filterButtonsHoverTextColor = getContrastTextColor(filterButtonsHoverBgColor);
   
   // Use the colors for primaryColor and variants
   const primaryColor = inspectionButtonBgColor;
@@ -234,13 +267,18 @@ export default function FilterButtons({
       {/* زر طلب المعاينة */}
       <Link
         href="/application-form"
-        className="w-[80%] mb-[20px] md:w-fit md:mx-0 flex items-center justify-center text-[12px] md:text-[14px] lg:text-[20px] relative transition-all duration-300 ease-in-out text-nowrap rounded-[10px] px-[20px] py-[8px] text-white mx-auto"
-        style={{ backgroundColor: primaryColor }}
+        className="w-[80%] mb-[20px] md:w-fit md:mx-0 flex items-center justify-center text-[12px] md:text-[14px] lg:text-[20px] relative transition-all duration-300 ease-in-out text-nowrap rounded-[10px] px-[20px] py-[8px] mx-auto"
+        style={{ 
+          backgroundColor: primaryColor,
+          color: inspectionButtonTextColor
+        }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = primaryColorHover;
+          e.currentTarget.style.color = inspectionButtonHoverTextColor;
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = primaryColor;
+          e.currentTarget.style.color = inspectionButtonTextColor;
         }}
       >
         طلب معاينة
@@ -254,6 +292,7 @@ export default function FilterButtons({
             onClick={() => {
               setActiveFilter(button.key);
             }}
+            variant="ghost"
             className="w-fit text-[12px] md:text-[14px] lg:text-[20px] relative transition-all duration-300 ease-in-out text-nowrap rounded-[10px] px-[20px] py-[8px]"
             style={
               activeFilter === button.key
@@ -269,15 +308,20 @@ export default function FilterButtons({
             onMouseEnter={(e) => {
               if (activeFilter !== button.key) {
                 e.currentTarget.style.backgroundColor = filterButtonsHoverBgColor;
+                e.currentTarget.style.color = filterButtonsHoverTextColor;
               } else {
-                e.currentTarget.style.backgroundColor = getDarkerColor(filterButtonsActiveBgColor, 20);
+                const hoverBgColor = getDarkerColor(filterButtonsActiveBgColor, 20);
+                e.currentTarget.style.backgroundColor = hoverBgColor;
+                e.currentTarget.style.color = getContrastTextColor(hoverBgColor);
               }
             }}
             onMouseLeave={(e) => {
               if (activeFilter === button.key) {
                 e.currentTarget.style.backgroundColor = filterButtonsActiveBgColor;
+                e.currentTarget.style.color = filterButtonsActiveTextColor;
               } else {
                 e.currentTarget.style.backgroundColor = "white";
+                e.currentTarget.style.color = filterButtonsInactiveTextColor;
               }
             }}
           >

@@ -296,10 +296,40 @@ export default function PropertyFilter({
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   };
 
+  // Helper function to get contrast text color (black or white) based on background color
+  // Uses WCAG luminance formula to determine if background is light or dark
+  const getContrastTextColor = (backgroundColor: string): string => {
+    if (!backgroundColor || !backgroundColor.startsWith('#')) return "#ffffff";
+    const cleanHex = backgroundColor.replace('#', '');
+    if (cleanHex.length !== 6) return "#ffffff";
+    
+    // Parse RGB values
+    const r = parseInt(cleanHex.substr(0, 2), 16);
+    const g = parseInt(cleanHex.substr(2, 2), 16);
+    const b = parseInt(cleanHex.substr(4, 2), 16);
+    
+    // Calculate relative luminance using WCAG formula
+    // https://www.w3.org/WAI/GL/wiki/Relative_luminance
+    const getLuminance = (value: number): number => {
+      const normalized = value / 255;
+      return normalized <= 0.03928
+        ? normalized / 12.92
+        : Math.pow((normalized + 0.055) / 1.055, 2.4);
+    };
+    
+    const luminance = 0.2126 * getLuminance(r) + 0.7152 * getLuminance(g) + 0.0722 * getLuminance(b);
+    
+    // If luminance is less than 0.5, use white text, otherwise use black text
+    return luminance < 0.5 ? "#ffffff" : "#000000";
+  };
+
   // Get colors for search button
   const searchButtonBgColor = getColor("searchButton.bgColor", "#059669");
-  const searchButtonTextColor = getColor("searchButton.textColor", "#ffffff");
+  // Always calculate text color from background color (black or white) - ignore custom text color
+  const searchButtonTextColor = getContrastTextColor(searchButtonBgColor);
   const searchButtonHoverBgColor = getColor("searchButton.hoverBgColor", getDarkerColor(searchButtonBgColor, 20));
+  // Always calculate hover text color from hover background color
+  const searchButtonHoverTextColor = getContrastTextColor(searchButtonHoverBgColor);
   
   // Get colors for inputs
   const inputTextColor = getColor("inputs.textColor", "#1f2937");
@@ -779,6 +809,7 @@ export default function PropertyFilter({
         <div className="w-full md:w-[15.18%] h-full relative">
           <Button
             type="submit"
+            variant="ghost"
             className="text-xs xs:text-base md:text-lg flex items-center justify-center w-full h-12 md:h-14 rounded-[10px] transition-colors"
             style={{ 
               backgroundColor: searchButtonBgColor,
@@ -786,9 +817,11 @@ export default function PropertyFilter({
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = searchButtonHoverBgColor;
+              e.currentTarget.style.color = searchButtonHoverTextColor;
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = searchButtonBgColor;
+              e.currentTarget.style.color = searchButtonTextColor;
             }}
           >
             {searchButtonText}
