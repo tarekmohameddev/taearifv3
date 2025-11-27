@@ -737,7 +737,8 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
   }
 
   // Get colors using getColor function
-  const titleColor = getColor("titleColor", brandingColors.primary); // Card title uses primary color
+  // Card title always uses primary color (not customizable)
+  const titleColor = brandingColors.primary;
   const descriptionColor = "#6b7280"; // Always gray-500 (#6b7280)
   const iconColor = getColor("icon.color", brandingColors.primary);
   const ringColor = getColor("ringColor", getLighterColor(brandingColors.primary, 0.1));
