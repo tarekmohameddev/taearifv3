@@ -426,11 +426,18 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     pagination.last_page > 1 &&
     (filteredProperties.length > 0 || pagination.total > pagination.per_page);
 
+  // Determine if we're on projects page
+  const isProjectsPage = pathname?.includes("/projects");
+  const isProjectsApi = mergedData.dataSource?.apiUrl?.includes("/projects");
+  
   // Always prioritize store data (filteredProperties) over API data
-  // This ensures that when API returns empty results, we show empty state
+  // EXCEPT when we're on projects page or using projects API
+  // In that case, use apiProperties directly since store calls /properties API
   const properties =
     useApiData && currentTenantId
-      ? filteredProperties // Always use store data when API is enabled
+      ? (isProjectsPage || isProjectsApi)
+        ? apiProperties // Use API data directly for projects
+        : filteredProperties // Use store data for properties
       : useApiData
         ? apiProperties
         : mergedData.items || mergedData.properties || [];

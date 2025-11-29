@@ -520,7 +520,7 @@ export default function StaticFooter({
                     <Link
                       key={index}
                       href={link.url}
-                      className="block text-white/90 transition-colors hover:text-emerald-400"
+                      className="block text-white/90 transition-colors "
                       style={{
                         transition: mergedData.styling.effects.hoverTransition,
                       }}
@@ -558,7 +558,7 @@ export default function StaticFooter({
                   <div className="space-y-1">
                     <a
                       href={`tel:${mergedData.content.contactInfo.phone1}`}
-                      className={`block text-${mergedData.styling.typography.bodySize} text-white/90 hover:text-emerald-400`}
+                      className={`block text-${mergedData.styling.typography.bodySize} text-white/90 `}
                       style={{
                         transition: mergedData.styling.effects.hoverTransition,
                       }}
@@ -567,7 +567,7 @@ export default function StaticFooter({
                     </a>
                     <a
                       href={`tel:${mergedData.content.contactInfo.phone2}`}
-                      className={`block text-${mergedData.styling.typography.bodySize} text-white/90 hover:text-emerald-400`}
+                      className={`block text-${mergedData.styling.typography.bodySize} text-white/90 `}
                       style={{
                         transition: mergedData.styling.effects.hoverTransition,
                       }}
@@ -580,7 +580,7 @@ export default function StaticFooter({
                   <Mail className="size-5" />
                   <a
                     href={`mailto:${mergedData.content.contactInfo.email}`}
-                    className={`text-${mergedData.styling.typography.bodySize} text-white/90 hover:text-emerald-400`}
+                    className={`text-${mergedData.styling.typography.bodySize} text-white/90 `}
                     style={{
                       transition: mergedData.styling.effects.hoverTransition,
                     }}
@@ -637,7 +637,7 @@ export default function StaticFooter({
                     <Link
                       key={index}
                       href={link.url}
-                      className="hover:text-emerald-400"
+                      className=""
                       style={{
                         transition: mergedData.styling.effects.hoverTransition,
                       }}

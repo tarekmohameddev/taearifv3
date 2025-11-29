@@ -97,14 +97,16 @@ export function useUrlFilters() {
       setTransactionType("sale");
     }
 
+    // Don't fetch properties if we're on projects page
+    // Projects page uses its own API endpoint
+    const isProjectsPage = pathname?.includes("/projects");
+    
     // Check if any filters are present
     const hasFilters = Object.values(params).some(value => value !== "");
 
-
-    // Auto-trigger search if filters are present
-    if (hasFilters) {
+    // Auto-trigger search if filters are present AND we're not on projects page
+    if (hasFilters && !isProjectsPage) {
       fetchProperties(1);
-    } else {
     }
   }, [
     searchParams,
