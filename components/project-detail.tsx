@@ -87,6 +87,7 @@ interface Project {
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
+import useTenantStore from "@/context-liveeditor/tenantStore";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -128,6 +129,86 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
 
   // Tenant ID hook
   const { tenantId, isLoading: tenantLoading } = useTenantId();
+
+  // Get tenant data from store
+  const { tenantData, loadingTenantData } = useTenantStore();
+
+  // Get primary color from WebsiteLayout branding (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const primaryColor = 
+    tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#059669"; // emerald-600 default
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // emerald-700 in Tailwind = #047857
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  // Helper function to convert hex color to CSS filter for SVG coloring
+  const hexToFilter = (hex: string): string => {
+    if (!hex || !hex.startsWith('#')) {
+      // Default emerald-600 filter
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)";
+    }
+    
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) {
+      return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)";
+    }
+
+    // Parse RGB values
+    const r = parseInt(cleanHex.substr(0, 2), 16) / 255;
+    const g = parseInt(cleanHex.substr(2, 2), 16) / 255;
+    const b = parseInt(cleanHex.substr(4, 2), 16) / 255;
+
+    // Convert RGB to HSL
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r:
+          h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+          break;
+        case g:
+          h = ((b - r) / d + 2) / 6;
+          break;
+        case b:
+          h = ((r - g) / d + 4) / 6;
+          break;
+      }
+    }
+
+    // Convert HSL to filter values
+    const hue = Math.round(h * 360);
+    const saturation = Math.round(s * 100);
+    const lightness = Math.round(l * 100);
+
+    const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
+    const contrast = 100 + (saturation * 0.5);
+
+    return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
+  };
+  
+  const primaryColorHover = getDarkerColor(primaryColor, 20);
+  const primaryColorFilter = hexToFilter(primaryColor);
 
   // Project data state
   const [project, setProject] = useState<Project | null>(null);
@@ -619,7 +700,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
             <div className="flex flex-col gap-y-8 lg:gap-y-10">
               {/* العنوان ونوع العرض */}
               <div className="flex flex-row items-center justify-between">
-                <h1 className="font-bold text-xs xs:text-sm leading-4 rounded-md text-white bg-emerald-600 px-3 py-2 flex items-center justify-center md:text-xl lg:text-2xl md:px-4 md:py-3 whitespace-nowrap">
+                <h1 
+                  className="font-bold text-xs xs:text-sm leading-4 rounded-md text-white px-3 py-2 flex items-center justify-center md:text-xl lg:text-2xl md:px-4 md:py-3 whitespace-nowrap"
+                  style={{ backgroundColor: primaryColor }}
+                >
                   مشروع عقاري
                 </h1>
                 <div className="sharesocials flex flex-row gap-x-6" dir="ltr">
@@ -647,7 +731,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   project.maxPrice.trim() !== "" &&
                   parseFloat(project.maxPrice) > 0) ||
                 (project.price && project.price.trim() !== "") ? (
-                  <p className="text-emerald-600 text-2xl leading-7 font-bold md:text-3xl lg:leading-9 flex items-center gap-2">
+                  <p 
+                    className="text-2xl leading-7 font-bold md:text-3xl lg:leading-9 flex items-center gap-2"
+                    style={{ color: primaryColor }}
+                  >
                     {project.minPrice &&
                     project.maxPrice &&
                     parseFloat(project.minPrice) > 0 &&
@@ -659,8 +746,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           alt="ريال سعودي"
                           className="w-6 h-6"
                           style={{
-                            filter:
-                              "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)",
+                            filter: primaryColorFilter,
                           }}
                         />
                       </>
@@ -672,8 +758,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           alt="ريال سعودي"
                           className="w-6 h-6"
                           style={{
-                            filter:
-                              "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(93%) contrast(94%)",
+                            filter: primaryColorFilter,
                           }}
                         />
                       </>
@@ -693,8 +778,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.address && project.address.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <MapPinIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <MapPinIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                         العنوان:
                       </p>
                     </div>
@@ -708,8 +793,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.developer && project.developer.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <BuildingIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <BuildingIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                         المطور:
                       </p>
                     </div>
@@ -723,8 +808,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.units && project.units > 0 ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <HomeIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <HomeIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                         عدد الوحدات:
                       </p>
                     </div>
@@ -739,8 +824,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   project.completionDate.trim() !== "" ? (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <CalendarIcon className="w-4 h-4 text-emerald-600" />
-                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        <CalendarIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                           تاريخ التسليم:
                         </p>
                       </div>
@@ -757,8 +842,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   project.completeStatus.trim() !== "" ? (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <WrenchIcon className="w-4 h-4 text-emerald-600" />
-                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        <WrenchIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                           حالة الإكمال:
                         </p>
                       </div>
@@ -781,11 +866,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           alt="ريال سعودي"
                           className="w-4 h-4"
                           style={{
-                            filter:
-                              "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)",
+                            filter: primaryColorFilter,
                           }}
                         />
-                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                           السعر الأدنى:
                         </p>
                       </div>
@@ -806,11 +890,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           alt="ريال سعودي"
                           className="w-4 h-4"
                           style={{
-                            filter:
-                              "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)",
+                            filter: primaryColorFilter,
                           }}
                         />
-                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                           السعر الأعلى:
                         </p>
                       </div>
@@ -824,8 +907,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.videoUrl && project.videoUrl.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <PlayIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <PlayIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                         فيديو المشروع:
                       </p>
                     </div>
@@ -833,7 +916,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       href={project.videoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-bold leading-4 text-xs xs:text-sm md:text-base text-emerald-600 underline"
+                      className="font-bold leading-4 text-xs xs:text-sm md:text-base underline"
+                      style={{ color: primaryColor }}
                     >
                       مشاهدة الفيديو
                     </a>
@@ -847,14 +931,15 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       project.location.address.trim() !== "")) && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <MapPinIcon className="w-4 h-4 text-emerald-600" />
+                        <MapPinIcon className="w-4 h-4" style={{ color: primaryColor }} />
                       </div>
                       {project.location.lat && project.location.lng ? (
                         <a
                           href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-bold leading-4 text-xs xs:text-sm md:text-base text-emerald-600 underline"
+                          className="font-bold leading-4 text-xs xs:text-sm md:text-base underline"
+                          style={{ color: primaryColor }}
                         >
                           عرض الموقع
                         </a>
@@ -870,8 +955,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.createdAt && project.createdAt.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <CalendarIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <CalendarIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                         تاريخ الإنشاء:
                       </p>
                     </div>
@@ -885,8 +970,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.updatedAt && project.updatedAt.trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <ClockIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <ClockIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                         آخر تحديث:
                       </p>
                     </div>
@@ -901,8 +986,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   <div className="col-span-2">
                     <div className="flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <StarIcon className="w-4 h-4 text-emerald-600" />
-                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        <StarIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                           المرافق:
                         </p>
                       </div>
@@ -910,7 +995,11 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                         {project.amenities.map((amenity, index) => (
                           <span
                             key={index}
-                            className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full"
+                            className="px-3 py-1 text-xs rounded-full"
+                            style={{
+                              backgroundColor: `${primaryColor}20`,
+                              color: getDarkerColor(primaryColor, 40),
+                            }}
                           >
                             {amenity}
                           </span>
@@ -926,8 +1015,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                     <div className="col-span-2">
                       <div className="flex flex-row gap-x-2 md:gap-x-6">
                         <div className="flex flex-row gap-x-2">
-                          <WrenchIcon className="w-4 h-4 text-emerald-600" />
-                          <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                          <WrenchIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                          <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                             المواصفات:
                           </p>
                         </div>
@@ -952,8 +1041,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   <div className="col-span-2">
                     <div className="flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <TagIcon className="w-4 h-4 text-emerald-600" />
-                        <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                        <TagIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                           الأنواع:
                         </p>
                       </div>
@@ -976,8 +1065,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.features && project.features.length > 0 ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <div className="w-4 h-4 rounded" style={{ backgroundColor: primaryColor }}></div>
+                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                         المميزات:
                       </p>
                     </div>
@@ -990,8 +1079,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.status ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <div className="w-4 h-4 bg-emerald-600 rounded"></div>
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <div className="w-4 h-4 rounded" style={{ backgroundColor: primaryColor }}></div>
+                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                         الحالة:
                       </p>
                     </div>
@@ -1004,8 +1093,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 {project.createdAt ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
-                      <CalendarDaysIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-emerald-600 font-normal text-xs xs:text-sm md:text-base leading-4">
+                      <CalendarDaysIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                      <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                         تاريخ الإضافة:
                       </p>
                     </div>
@@ -1084,9 +1173,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           fill
                           className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
                             mainImage === imageSrc
-                              ? "border-emerald-500"
+                              ? ""
                               : "border-transparent"
                           }`}
+                          style={mainImage === imageSrc ? { borderColor: primaryColor, borderWidth: '2px' } : {}}
                           onClick={() => handleThumbnailClick(imageSrc, index)}
                         />
                         <div className="absolute bottom-2 right-2 opacity-80">
@@ -1116,7 +1206,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   (plan) => plan && plan.trim() !== "",
                 ) && (
                   <div className="mt-8">
-                    <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                    <h3 
+                      className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                      style={{ backgroundColor: primaryColor }}
+                    >
                       مخططات الأرضية
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
@@ -1150,7 +1243,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
               {/* خريطة الموقع */}
               {project.location && project.location.lat && project.location.lng ? (
                 <div className="mt-8">
-                  <h3 className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+                  <h3 
+                    className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                    style={{ backgroundColor: primaryColor }}
+                  >
                     موقع المشروع
                   </h3>
                   <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg">
@@ -1170,7 +1266,14 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+                      style={{ backgroundColor: primaryColor }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = primaryColorHover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = primaryColor;
+                      }}
                     >
                       <MapPinIcon className="w-4 h-4" />
                       فتح في خرائط جوجل
@@ -1188,7 +1291,10 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
           {loadingSimilar ? (
           <div className="flex-1">
             <div>
-              <h3 className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl bg-emerald-600">
+              <h3 
+                className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                style={{ backgroundColor: primaryColor }}
+              >
                 مشاريع مشابهة
               </h3>
 
@@ -1410,9 +1516,8 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                                     </div>
                                   )}
                                 {similarProject.units &&
-                                  similarProject.units !== 0 &&
-                                  similarProject.units !== "0" &&
-                                  Number(similarProject.units) > 0 && (
+                                  typeof similarProject.units === 'number' &&
+                                  similarProject.units > 0 && (
                                     <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
                                       <HomeIcon className="w-3 h-3" />
                                       <span className="text-xs font-medium">
