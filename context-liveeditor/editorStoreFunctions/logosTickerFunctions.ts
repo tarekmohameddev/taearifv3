@@ -27,47 +27,47 @@ export const getDefaultLogosTickerData = (): ComponentData => ({
   logos: [
     {
       id: "1",
-      src: "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-11-skqBZ3BuhxWsVeMgvZMsIRkvP1sBPI.svg",
+      src: "/logo.png",
       alt: "Client Logo 1"
     },
     {
       id: "2",
-      src: "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-07-BnL6PiuLbuvogyFgerD8RkXvyHeC7Z.svg",
+      src: "/logo.png",
       alt: "Client Logo 2"
     },
     {
       id: "3",
-      src: "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-09-WedfjhIyT9xJhijl0jP4i8IcWegSIr.svg",
+      src: "/logo.png",
       alt: "Client Logo 3"
     },
     {
       id: "4",
-      src: "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-06-gTVIkSsA26ac5CPmnObaZC3vT0lKJK.svg",
+      src: "/logo.png",
       alt: "Client Logo 4"
     },
     {
       id: "5",
-      src: "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-03-NetqwLvYDN3Kp2T8QTxk1I8ZVLHe8L.svg",
+      src: "/logo.png",
       alt: "Client Logo 5"
     },
     {
       id: "6",
-      src: "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-05-ZeYMg0as4sZJ3bxjbFdhgQ5WrkCmIg.svg",
+      src: "/logo.png",
       alt: "Client Logo 6"
     },
     {
       id: "7",
-      src: "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-04-UJ3Ajb0jJYVkXWWd5o6VDpbrS9n87f.svg",
+      src: "/logo.png",
       alt: "Client Logo 7"
     },
     {
       id: "8",
-      src: "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-02-cAk2qbxpAg3S93YrcscxN1R4O1GW2f.svg",
+      src: "/logo.png",
       alt: "Client Logo 8"
     },
     {
       id: "9",
-      src: "/images/homepage/brand-scroller-secondSection/Rouad-logoClients-01-gX8JYjjL15YsCE3Nr26CRLHwOpvEmJ.svg",
+      src: "/logo.png",
       alt: "Client Logo 9"
     }
   ],
@@ -83,7 +83,7 @@ export const getDefaultLogosTickerData = (): ComponentData => ({
   
   // Styling
   styling: {
-    backgroundColor: "#F3F3F6",
+    backgroundColor: "transparent",
     titleColor: "#0D2EA1",
     subtitleColor: "#6b7280",
     logoOpacity: 0.6,
