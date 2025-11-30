@@ -496,6 +496,7 @@ export default function CrmSettingsDialog({
 
   // Render item component for reusability
   const renderItemList = (items: any[], type: string, endpoint: string) => {
+    console.log("items", items);
     if (!items || items.length === 0) {
       return (
         <p className="text-center text-muted-foreground py-12 text-right">
@@ -505,104 +506,213 @@ export default function CrmSettingsDialog({
     }
 
     return (
-      <div className="space-y-3">
-        {items.map((item: any, index: number) => (
-          <div
-            key={item.id}
-            className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: item.color }}
-              />
-              <div>
-                <h4 className="font-medium">
-                  {item.stage_name || item.procedure_name || item.name}
-                </h4>
-                {item.description && (
-                  <p className="text-sm text-muted-foreground">
-                    {item.description}
-                  </p>
-                )}
-                {item.value && item.value !== item.name && (
-                  <p className="text-xs text-muted-foreground">
-                    القيمة: {item.value}
-                  </p>
+      <>
+        {/* Grid Layout للهاتف فقط */}
+        <div className="grid grid-cols-1 gap-3 sm:hidden">
+          {items.map((item: any, index: number) => (
+            <div
+              key={item.id}
+              className="flex flex-col p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+            >
+              {/* Header: Color, Title, Badges */}
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3 flex-1">
+                  <div
+                    className="w-4 h-4 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-right">
+                      {item.stage_name || item.procedure_name || item.name}
+                    </h4>
+                    {item.description && (
+                      <p className="text-sm text-muted-foreground text-right mt-1">
+                        {item.description}
+                      </p>
+                    )}
+                    {item.value && item.value !== item.name && (
+                      <p className="text-xs text-muted-foreground text-right mt-1">
+                        القيمة: {item.value}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1 items-end flex-shrink-0 mr-2">
+                  <Badge variant="secondary" className="text-xs">
+                    ترتيب {item.order}
+                  </Badge>
+                  {item.is_active === 1 && (
+                    <Badge
+                      variant="default"
+                      className="bg-green-100 text-green-800 text-xs"
+                    >
+                      نشط
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions: Buttons في الأسفل */}
+              <div className="flex items-center justify-end gap-1 pt-2 border-t">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleMoveItem(item.id, "up")}
+                  disabled={index === 0}
+                  className="text-muted-foreground hover:text-foreground h-8 w-8"
+                >
+                  <ArrowUp className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleMoveItem(item.id, "down")}
+                  disabled={index === items.length - 1}
+                  className="text-muted-foreground hover:text-foreground h-8 w-8"
+                >
+                  <ArrowDown className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    switch (endpoint) {
+                      case "/crm/stages":
+                        handleOpenEditStageForm(item);
+                        break;
+                      case "/crm/procedures":
+                        handleOpenEditForm("procedures", item);
+                        break;
+                      case "/crm/priorities":
+                        handleOpenEditForm("priorities", item);
+                        break;
+                      case "/crm/types":
+                        handleOpenEditForm("types", item);
+                        break;
+                    }
+                  }}
+                  className="text-blue-600 hover:text-blue-700 h-8 w-8"
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleDeleteItem(endpoint, item.id, type)}
+                  disabled={isDeleting === item.id.toString()}
+                  className="text-red-600 hover:text-red-700 h-8 w-8"
+                >
+                  {isDeleting === item.id.toString() ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3 w-3" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* List Layout للشاشات الأكبر (sm وأكبر) */}
+        <div className="hidden sm:block space-y-3">
+          {items.map((item: any, index: number) => (
+            <div
+              key={item.id}
+              className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                <div>
+                  <h4 className="font-medium">
+                    {item.stage_name || item.procedure_name || item.name}
+                  </h4>
+                  {item.description && (
+                    <p className="text-sm text-muted-foreground">
+                      {item.description}
+                    </p>
+                  )}
+                  {item.value && item.value !== item.name && (
+                    <p className="text-xs text-muted-foreground">
+                      القيمة: {item.value}
+                    </p>
+                  )}
+                </div>
+                <Badge variant="secondary" className="mr-auto">
+                  ترتيب {item.order}
+                </Badge>
+                {item.is_active === 1 && (
+                  <Badge
+                    variant="default"
+                    className="bg-green-100 text-green-800 mr-2"
+                  >
+                    نشط
+                  </Badge>
                 )}
               </div>
-              <Badge variant="secondary" className="mr-auto">
-                ترتيب {item.order}
-              </Badge>
-              {item.is_active === 1 && (
-                <Badge
-                  variant="default"
-                  className="bg-green-100 text-green-800 mr-2"
-                >
-                  نشط
-                </Badge>
-              )}
-            </div>
 
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleMoveItem(item.id, "up")}
-                disabled={index === 0}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <ArrowUp className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleMoveItem(item.id, "down")}
-                disabled={index === items.length - 1}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <ArrowDown className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  switch (endpoint) {
-                    case "/crm/stages":
-                      handleOpenEditStageForm(item);
-                      break;
-                    case "/crm/procedures":
-                      handleOpenEditForm("procedures", item);
-                      break;
-                    case "/crm/priorities":
-                      handleOpenEditForm("priorities", item);
-                      break;
-                    case "/crm/types":
-                      handleOpenEditForm("types", item);
-                      break;
-                  }
-                }}
-                className="text-blue-600 hover:text-blue-700"
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleDeleteItem(endpoint, item.id, type)}
-                disabled={isDeleting === item.id.toString()}
-                className="text-red-600 hover:text-red-700"
-              >
-                {isDeleting === item.id.toString() ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleMoveItem(item.id, "up")}
+                  disabled={index === 0}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleMoveItem(item.id, "down")}
+                  disabled={index === items.length - 1}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <ArrowDown className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    switch (endpoint) {
+                      case "/crm/stages":
+                        handleOpenEditStageForm(item);
+                        break;
+                      case "/crm/procedures":
+                        handleOpenEditForm("procedures", item);
+                        break;
+                      case "/crm/priorities":
+                        handleOpenEditForm("priorities", item);
+                        break;
+                      case "/crm/types":
+                        handleOpenEditForm("types", item);
+                        break;
+                    }
+                  }}
+                  className="text-blue-600 hover:text-blue-700"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleDeleteItem(endpoint, item.id, type)}
+                  disabled={isDeleting === item.id.toString()}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  {isDeleting === item.id.toString() ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </>
     );
   };
 
@@ -639,7 +749,7 @@ export default function CrmSettingsDialog({
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
-            className="h-full"
+            className="h-full "
           >
             <TabsList className="grid w-full grid-cols-4 mb-6 bg-muted/30">
               <TabsTrigger
@@ -691,7 +801,7 @@ export default function CrmSettingsDialog({
                       </Button>
                     </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="max-h-[400px] overflow-y-auto pr-2">
                     {renderItemList(pipelineStages, "stages", "/crm/stages")}
                   </CardContent>
                 </Card>

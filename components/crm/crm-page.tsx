@@ -382,6 +382,12 @@ export default function CrmPage() {
   // Initialize handlers
   const dataHandler = {
     fetchCrmData: async () => {
+      // التحقق من وجود التوكن قبل إجراء الطلب
+      if (!userData?.token) {
+        console.log("No token available, skipping fetchCrmData");
+        return;
+      }
+
       setLoading(true);
       try {
         const response = await axiosInstance.get("/v1/crm/requests");
@@ -488,6 +494,12 @@ export default function CrmPage() {
       }
     },
     fetchAppointmentsData: async () => {
+      // التحقق من وجود التوكن قبل إجراء الطلب
+      if (!userData?.token) {
+        console.log("No token available, skipping fetchAppointmentsData");
+        return;
+      }
+
       try {
         const response = await axiosInstance.get("/crm/customer-appointments");
         const appointmentsResponse = response.data;
@@ -500,6 +512,12 @@ export default function CrmPage() {
       }
     },
     fetchRemindersData: async () => {
+      // التحقق من وجود التوكن قبل إجراء الطلب
+      if (!userData?.token) {
+        console.log("No token available, skipping fetchRemindersData");
+        return;
+      }
+
       try {
         const response = await axiosInstance.get("/crm/customer-reminders");
         const remindersResponse = response.data;
@@ -523,6 +541,12 @@ export default function CrmPage() {
       }
     },
     fetchInquiriesData: async () => {
+      // التحقق من وجود التوكن قبل إجراء الطلب
+      if (!userData?.token) {
+        console.log("No token available, skipping fetchInquiriesData");
+        return;
+      }
+
       try {
         const response = await axiosInstance.get("/v1/inquiry");
         const inquiriesResponse = response.data;
@@ -535,6 +559,12 @@ export default function CrmPage() {
       }
     },
     updateCustomerStage: async (customerId: string, stageId: string) => {
+      // التحقق من وجود التوكن قبل إجراء الطلب
+      if (!userData?.token) {
+        console.log("No token available, skipping updateCustomerStage");
+        return false;
+      }
+
       try {
         // Use a faster timeout for better UX
         const controller = new AbortController();
@@ -563,6 +593,12 @@ export default function CrmPage() {
       }
     },
     updateCustomer: async (customerId: string, updates: any) => {
+      // التحقق من وجود التوكن قبل إجراء الطلب
+      if (!userData?.token) {
+        console.log("No token available, skipping updateCustomer");
+        return false;
+      }
+
       try {
         await axiosInstance.put(`/crm/customers/${customerId}`, updates);
         return true;
@@ -758,11 +794,14 @@ export default function CrmPage() {
   };
 
   useEffect(() => {
-    dataHandler.fetchCrmData();
-    dataHandler.fetchAppointmentsData();
-    dataHandler.fetchRemindersData();
-    dataHandler.fetchInquiriesData();
-  }, []);
+    // التحقق من وجود التوكن قبل استدعاء الـ API
+    if (userData?.token) {
+      dataHandler.fetchCrmData();
+      dataHandler.fetchAppointmentsData();
+      dataHandler.fetchRemindersData();
+      dataHandler.fetchInquiriesData();
+    }
+  }, [userData?.token]);
 
   const filteredCustomers = customersData.filter((customer: Customer) => {
     const matchesSearch =

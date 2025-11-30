@@ -18,56 +18,57 @@ module.exports = (set, get) => ({
   },
 
   fetchMarketingChannels: async () => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
+    const state = get();
+  
+    // ====== Anti-Spam Lock ======
+    if (state.marketingChannels._fetchedOnce) return;
+    // ============================
+  
     const token = useAuthStore.getState().userData?.token;
-    if (!token) {
-      return;
-    }
-    const { marketingChannels } = get();
-    if (marketingChannels.channels.length > 0 && !marketingChannels.loading) {
-      return;
-    }
-    set((state) => ({
+    if (!token) return;
+  
+    set((s) => ({
       marketingChannels: {
-        ...state.marketingChannels,
+        ...s.marketingChannels,
         loading: true,
         error: null,
+        _fetchedOnce: true, // أول مرة فقط
       },
     }));
-
+  
     const loadingToast = toast.loading("جاري تحميل قنوات التسويق...");
-
+  
     try {
-      const response = await axiosInstance.get(
-        `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels`,
+      const res = await axiosInstance.get(
+        `${process.env.NEXT_PUBLIC_Backend_URL}/v1/marketing/channels`
       );
-
-      // تصفية القنوات لعرض فقط قنوات الواتساب
+  
       const whatsappChannels =
-        response.data.data?.filter((channel) => channel.type === "whatsapp") ||
-        [];
-
-      set((state) => ({
+        res.data.data?.filter((c) => c.type === "whatsapp") || [];
+  
+      set((s) => ({
         marketingChannels: {
-          ...state.marketingChannels,
+          ...s.marketingChannels,
           channels: whatsappChannels,
           loading: false,
+          _fetchedOnce: true,
         },
       }));
-      toast.success("تم تحميل قنوات التسويق بنجاح", { id: loadingToast });
-    } catch (error) {
-      set((state) => ({
+  
+      toast.success("تم تحميل قنوات التسويق", { id: loadingToast });
+    } catch (err) {
+      set((s) => ({
         marketingChannels: {
-          ...state.marketingChannels,
-          error: error.message || "حدث خطأ أثناء جلب البيانات",
+          ...s.marketingChannels,
+          error: err.message,
           loading: false,
+          _fetchedOnce: true,
         },
       }));
-      toast.error(error.message || "حدث خطأ أثناء تحميل قنوات التسويق", {
-        id: loadingToast,
-      });
+      toast.error(err.message, { id: loadingToast });
     }
   },
+  
 
   setMarketingChannels: (updates) =>
     set((state) => ({
