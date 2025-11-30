@@ -27,47 +27,47 @@ export const getDefaultLogosTickerData = (): ComponentData => ({
   logos: [
     {
       id: "1",
-      src: "/logo.png",
+      src: "/logo.svg",
       alt: "Client Logo 1"
     },
     {
       id: "2",
-      src: "/logo.png",
+      src: "/logo.svg",
       alt: "Client Logo 2"
     },
     {
       id: "3",
-      src: "/logo.png",
+      src: "/logo.svg",
       alt: "Client Logo 3"
     },
     {
       id: "4",
-      src: "/logo.png",
+      src: "/logo.svg",
       alt: "Client Logo 4"
     },
     {
       id: "5",
-      src: "/logo.png",
+      src: "/logo.svg",
       alt: "Client Logo 5"
     },
     {
       id: "6",
-      src: "/logo.png",
+      src: "/logo.svg",
       alt: "Client Logo 6"
     },
     {
       id: "7",
-      src: "/logo.png",
+      src: "/logo.svg",
       alt: "Client Logo 7"
     },
     {
       id: "8",
-      src: "/logo.png",
+      src: "/logo.svg",
       alt: "Client Logo 8"
     },
     {
       id: "9",
-      src: "/logo.png",
+      src: "/logo.svg",
       alt: "Client Logo 9"
     }
   ],
