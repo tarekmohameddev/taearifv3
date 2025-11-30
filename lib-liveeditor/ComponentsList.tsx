@@ -30,6 +30,7 @@ import { ctaValuationStructure } from "@/componentsStructure/ctaValuation";
 import { stepsSectionStructure } from "@/componentsStructure/stepsSection";
 import { footerStructure } from "@/componentsStructure/footer";
 import { testimonialsStructure } from "@/componentsStructure/testimonials";
+import { logosTickerStructure } from "@/componentsStructure/logosTicker";
 import { contactMapSectionStructure } from "@/componentsStructure/contactMapSection";
 import { whyChooseUsStructure } from "@/componentsStructure/whyChooseUs";
 import { gridStructure } from "@/componentsStructure/grid";
@@ -227,6 +228,24 @@ export const getComponents = (
     subPath: "testimonials",
     icon: "💬",
     ...testimonialsStructure,
+  },
+  logosTicker: {
+    id: "logosTicker",
+    name: "logosTicker",
+    displayName: t("components.logosTicker.display_name"),
+    description: t("components.logosTicker.description"),
+    category: "marketing",
+    section: "homepage",
+    subPath: "logosTicker",
+    icon: "🏢",
+    variants: logosTickerStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/logosTicker/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "logosTicker1",
+    ...logosTickerStructure,
   },
   contactMapSection: {
     id: "contactMapSection",
@@ -445,6 +464,25 @@ export const COMPONENTS: Record<string, any> = {
     subPath: "testimonials",
     icon: "💬",
     ...testimonialsStructure,
+  },
+  logosTicker: {
+    id: "logosTicker",
+    name: "logosTicker",
+    displayName: "Logos Ticker",
+    description:
+      "Scrolling logos section displaying trusted brands and partners",
+    category: "marketing",
+    section: "homepage",
+    subPath: "logosTicker",
+    icon: "🏢",
+    variants: logosTickerStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/logosTicker/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "logosTicker1",
+    ...logosTickerStructure,
   },
   contactMapSection: {
     id: "contactMapSection",

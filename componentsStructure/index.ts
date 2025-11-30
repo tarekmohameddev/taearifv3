@@ -6,6 +6,7 @@ export { ctaValuationStructure } from "./ctaValuation";
 export { stepsSectionStructure } from "./stepsSection";
 export { whyChooseUsStructure } from "./whyChooseUs";
 export { testimonialsStructure } from "./testimonials";
+export { logosTickerStructure } from "./logosTicker";
 export { contactMapSectionStructure } from "./contactMapSection";
 export { footerStructure } from "./footer";
 export { gridStructure } from "./grid";

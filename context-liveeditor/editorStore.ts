@@ -52,6 +52,7 @@ import { propertySliderFunctions } from "./editorStoreFunctions/propertySliderFu
 import { ctaValuationFunctions } from "./editorStoreFunctions/ctaValuationFunctions";
 import { stepsSectionFunctions } from "./editorStoreFunctions/stepsSectionFunctions";
 import { testimonialsFunctions } from "./editorStoreFunctions/testimonialsFunctions";
+import { logosTickerFunctions } from "./editorStoreFunctions/logosTickerFunctions";
 import { whyChooseUsFunctions } from "./editorStoreFunctions/whyChooseUsFunctions";
 import { contactMapSectionFunctions } from "./editorStoreFunctions/contactMapSectionFunctions";
 import { gridFunctions } from "./editorStoreFunctions/gridFunctions";
@@ -285,6 +286,20 @@ interface EditorStore {
     value: any,
   ) => void;
 
+  // Logos Ticker states
+  logosTickerStates: Record<string, ComponentData>;
+  ensureLogosTickerVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getLogosTickerData: (variantId: string) => ComponentData;
+  setLogosTickerData: (variantId: string, data: ComponentData) => void;
+  updateLogosTickerByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
   // Why Choose Us states
   whyChooseUsStates: Record<string, ComponentData>;
   ensureWhyChooseUsVariant: (
@@ -493,6 +508,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   ctaValuationStates: {},
   stepsSectionStates: {},
   testimonialsStates: {},
+  logosTickerStates: {},
   whyChooseUsStates: {},
   contactMapSectionStates: {},
   gridStates: {},
@@ -923,6 +939,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return stepsSectionFunctions.ensureVariant(state, variantId, initial);
         case "testimonials":
           return testimonialsFunctions.ensureVariant(state, variantId, initial);
+        case "logosTicker":
+          return logosTickerFunctions.ensureVariant(state, variantId, initial);
         case "whyChooseUs":
           return whyChooseUsFunctions.ensureVariant(state, variantId, initial);
         case "contactMapSection":
@@ -1015,6 +1033,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return stepsSectionFunctions.getData(state, variantId);
       case "testimonials":
         return testimonialsFunctions.getData(state, variantId);
+      case "logosTicker":
+        return logosTickerFunctions.getData(state, variantId);
       case "whyChooseUs":
         return whyChooseUsFunctions.getData(state, variantId);
       case "contactMapSection":
@@ -1087,6 +1107,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "testimonials":
           newState = testimonialsFunctions.setData(state, variantId, data);
+          break;
+        case "logosTicker":
+          newState = logosTickerFunctions.setData(state, variantId, data);
           break;
         case "whyChooseUs":
           newState = whyChooseUsFunctions.setData(state, variantId, data);
@@ -1238,6 +1261,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "testimonials":
           newState = testimonialsFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "logosTicker":
+          newState = logosTickerFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -1490,6 +1521,22 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   updateTestimonialsByPath: (variantId, path, value) =>
     set((state) =>
       testimonialsFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // Logos Ticker functions using modular approach
+  ensureLogosTickerVariant: (variantId, initial) =>
+    set((state) =>
+      logosTickerFunctions.ensureVariant(state, variantId, initial),
+    ),
+  getLogosTickerData: (variantId) => {
+    const state = get();
+    return logosTickerFunctions.getData(state, variantId);
+  },
+  setLogosTickerData: (variantId, data) =>
+    set((state) => logosTickerFunctions.setData(state, variantId, data)),
+  updateLogosTickerByPath: (variantId, path, value) =>
+    set((state) =>
+      logosTickerFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Why Choose Us functions using modular approach
