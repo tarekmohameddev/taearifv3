@@ -745,9 +745,6 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           src="/Saudi_Riyal_Symbol.svg"
                           alt="ريال سعودي"
                           className="w-6 h-6"
-                          style={{
-                            filter: primaryColorFilter,
-                          }}
                         />
                       </>
                     ) : project.price ? (
@@ -757,9 +754,6 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                           src="/Saudi_Riyal_Symbol.svg"
                           alt="ريال سعودي"
                           className="w-6 h-6"
-                          style={{
-                            filter: primaryColorFilter,
-                          }}
                         />
                       </>
                     ) : null}
@@ -861,14 +855,6 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   parseFloat(project.minPrice) > 0 ? (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <img
-                          src="/Saudi_Riyal_Symbol.svg"
-                          alt="ريال سعودي"
-                          className="w-4 h-4"
-                          style={{
-                            filter: primaryColorFilter,
-                          }}
-                        />
                         <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                           السعر الأدنى:
                         </p>
@@ -885,14 +871,6 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                   parseFloat(project.maxPrice) > 0 && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <img
-                          src="/Saudi_Riyal_Symbol.svg"
-                          alt="ريال سعودي"
-                          className="w-4 h-4"
-                          style={{
-                            filter: primaryColorFilter,
-                          }}
-                        />
                         <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
                           السعر الأعلى:
                         </p>
