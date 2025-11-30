@@ -515,7 +515,212 @@ export const inputsStructure: ComponentStructure = {
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "submitButton.text", label: "Submit Button Text", type: "text" },
-        { key: "cards", label: "Form Cards", type: "array" },
+        {
+          key: "cards",
+          label: "Form Cards",
+          type: "array",
+          of: [
+            {
+              key: "id",
+              label: "Card ID",
+              type: "text",
+            },
+            {
+              key: "title",
+              label: "Card Title",
+              type: "text",
+            },
+            {
+              key: "description",
+              label: "Card Description",
+              type: "text",
+            },
+            {
+              key: "icon",
+              label: "Card Icon",
+              type: "text",
+            },
+            {
+              key: "color",
+              label: "Card Color Theme",
+              type: "select",
+              options: [
+                { value: "blue", label: "Blue" },
+                { value: "green", label: "Green" },
+                { value: "red", label: "Red" },
+                { value: "yellow", label: "Yellow" },
+                { value: "purple", label: "Purple" },
+                { value: "pink", label: "Pink" },
+                { value: "indigo", label: "Indigo" },
+                { value: "teal", label: "Teal" },
+                { value: "orange", label: "Orange" },
+                { value: "cyan", label: "Cyan" },
+                { value: "emerald", label: "Emerald" },
+                { value: "violet", label: "Violet" },
+                { value: "fuchsia", label: "Fuchsia" },
+                { value: "rose", label: "Rose" },
+                { value: "sky", label: "Sky" },
+                { value: "lime", label: "Lime" },
+                { value: "amber", label: "Amber" },
+                { value: "slate", label: "Slate" },
+                { value: "gray", label: "Gray" },
+                { value: "zinc", label: "Zinc" },
+                { value: "neutral", label: "Neutral" },
+                { value: "stone", label: "Stone" },
+              ],
+            },
+            {
+              key: "customColors",
+              label: "Custom Colors",
+              type: "object",
+              fields: [
+                {
+                  key: "primary",
+                  label: "Primary Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Primary uses primary color
+                },
+                {
+                  key: "secondary",
+                  label: "Secondary Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary", // Secondary uses secondary color
+                },
+                {
+                  key: "hover",
+                  label: "Hover Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary", // Hover uses primary color
+                },
+                {
+                  key: "shadow",
+                  label: "Shadow Color",
+                  type: "color",
+                  useDefaultColor: false, // Shadow color is usually custom
+                },
+              ],
+            },
+            {
+              key: "isCollapsible",
+              label: "Collapsible",
+              type: "boolean",
+              defaultValue: false,
+            },
+            {
+              key: "showAddButton",
+              label: "Show Add Button",
+              type: "boolean",
+              defaultValue: false,
+            },
+            {
+              key: "addButtonText",
+              label: "Add Button Text",
+              type: "text",
+              defaultValue: "إضافة جديد",
+            },
+            {
+              key: "fields",
+              label: "Form Fields",
+              type: "array",
+              of: [
+                {
+                  key: "id",
+                  label: "Field ID",
+                  type: "text",
+                },
+                {
+                  key: "type",
+                  label: "Field Type",
+                  type: "select",
+                  options: [
+                    { value: "text", label: "Text" },
+                    { value: "email", label: "Email" },
+                    { value: "password", label: "Password" },
+                    { value: "number", label: "Number" },
+                    { value: "date", label: "Date" },
+                    { value: "select", label: "Select" },
+                    { value: "textarea", label: "Textarea" },
+                    { value: "currency", label: "Currency" },
+                    { value: "radio", label: "Radio" },
+                  ],
+                },
+                {
+                  key: "label",
+                  label: "Field Label",
+                  type: "text",
+                },
+                {
+                  key: "placeholder",
+                  label: "Placeholder",
+                  type: "text",
+                },
+                {
+                  key: "required",
+                  label: "Required",
+                  type: "boolean",
+                  defaultValue: false,
+                },
+                {
+                  key: "description",
+                  label: "Field Description",
+                  type: "text",
+                },
+                {
+                  key: "icon",
+                  label: "Field Icon",
+                  type: "text",
+                },
+                {
+                  key: "options",
+                  label: "Field Options (for Select/Radio)",
+                  type: "array",
+                  of: [
+                    {
+                      key: "value",
+                      label: "Option Value",
+                      type: "text",
+                    },
+                    {
+                      key: "label",
+                      label: "Option Label",
+                      type: "text",
+                    },
+                  ],
+                },
+                {
+                  key: "validation",
+                  label: "Validation Rules",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "min",
+                      label: "Minimum Value",
+                      type: "number",
+                    },
+                    {
+                      key: "max",
+                      label: "Maximum Value",
+                      type: "number",
+                    },
+                    {
+                      key: "pattern",
+                      label: "Pattern (Regex)",
+                      type: "text",
+                    },
+                    {
+                      key: "message",
+                      label: "Custom Error Message",
+                      type: "text",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],

@@ -589,7 +589,70 @@ export const contactFormSectionStructure: ComponentStructure = {
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "content.title.text", label: "Title", type: "text" },
-        { key: "content.socialLinks", label: "Social Links", type: "array" },
+        {
+          key: "socialLinks",
+          label: "Social Links",
+          type: "array",
+          addLabel: "Add Social Link",
+          itemLabel: "Social Link",
+          of: [
+            { key: "href", label: "URL", type: "url" },
+            {
+              key: "alt",
+              label: "Platform",
+              type: "select",
+              options: [
+                { value: "facebook", label: "Facebook" },
+                { value: "x", label: "X (Twitter)" },
+                { value: "instagram", label: "Instagram" },
+                { value: "linkedin", label: "LinkedIn" },
+                { value: "whatsapp", label: "WhatsApp" },
+              ],
+            },
+            { key: "text", label: "Display Text", type: "text" },
+            {
+              key: "icon",
+              label: "Icon Settings",
+              type: "object",
+              fields: [
+                {
+                  key: "size",
+                  label: "Size",
+                  type: "text",
+                  placeholder: "24",
+                },
+                { 
+                  key: "color", 
+                  label: "Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary" // Icon uses primary color
+                },
+              ],
+            },
+            {
+              key: "textStyle",
+              label: "Text Style",
+              type: "object",
+              fields: [
+                {
+                  key: "size",
+                  label: "Size",
+                  type: "text",
+                  placeholder: "text-[14px] md:text-[16px]",
+                },
+                { 
+                  key: "color", 
+                  label: "Color", 
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "secondary" // Text uses secondary color
+                },
+                { key: "weight", label: "Weight", type: "text" },
+              ],
+            },
+          ],
+        },
         {
           key: "form.fields.name.placeholder",
           label: "Name Field Placeholder",

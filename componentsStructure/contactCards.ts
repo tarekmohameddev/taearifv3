@@ -503,7 +503,268 @@ export const contactCardsStructure: ComponentStructure = {
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
-        { key: "cards", label: "Contact Cards", type: "array" },
+        {
+          key: "cards",
+          label: "Contact Cards",
+          type: "array",
+          addLabel: "Add Contact Card",
+          itemLabel: "Contact Card",
+          of: [
+            {
+              key: "icon",
+              label: "Icon",
+              type: "object",
+              fields: [
+                { key: "src", label: "Image Source", type: "image" },
+                { key: "alt", label: "Alt Text", type: "text" },
+                {
+                  key: "size",
+                  label: "Size",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "mobile",
+                      label: "Mobile",
+                      type: "text",
+                      placeholder: "w-[40px] h-[40px]",
+                    },
+                    {
+                      key: "desktop",
+                      label: "Desktop",
+                      type: "text",
+                      placeholder: "md:w-[60px] md:h-[60px]",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "title",
+              label: "Title",
+              type: "object",
+              fields: [
+                { key: "text", label: "Text", type: "text" },
+                {
+                  key: "style",
+                  label: "Style",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "size",
+                      label: "Size",
+                      type: "object",
+                      fields: [
+                        {
+                          key: "mobile",
+                          label: "Mobile",
+                          type: "text",
+                          placeholder: "text-[16px]",
+                        },
+                        {
+                          key: "desktop",
+                          label: "Desktop",
+                          type: "text",
+                          placeholder: "md:text-[24px]",
+                        },
+                      ],
+                    },
+                    {
+                      key: "weight",
+                      label: "Weight",
+                      type: "text",
+                      placeholder: "font-bold",
+                    },
+                    {
+                      key: "color",
+                      label: "Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary", // Title uses secondary color
+                    },
+                    {
+                      key: "lineHeight",
+                      label: "Line Height",
+                      type: "text",
+                      placeholder: "leading-[35px]",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "content",
+              label: "Content",
+              type: "object",
+              fields: [
+                {
+                  key: "type",
+                  label: "Content Type",
+                  type: "select",
+                  options: [
+                    { value: "text", label: "Simple Text" },
+                    { value: "links", label: "Links Array" },
+                  ],
+                },
+                {
+                  key: "text",
+                  label: "Text Content",
+                  type: "text",
+                },
+                {
+                  key: "links",
+                  label: "Links",
+                  type: "array",
+                  addLabel: "Add Link",
+                  itemLabel: "Link",
+                  of: [
+                    { key: "text", label: "Link Text", type: "text" },
+                    { key: "href", label: "Link URL", type: "url" },
+                  ],
+                },
+                {
+                  key: "style",
+                  label: "Content Style",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "size",
+                      label: "Size",
+                      type: "object",
+                      fields: [
+                        {
+                          key: "mobile",
+                          label: "Mobile",
+                          type: "text",
+                          placeholder: "text-[16px]",
+                        },
+                        {
+                          key: "desktop",
+                          label: "Desktop",
+                          type: "text",
+                          placeholder: "md:text-[20px]",
+                        },
+                      ],
+                    },
+                    {
+                      key: "weight",
+                      label: "Weight",
+                      type: "text",
+                      placeholder: "font-normal",
+                    },
+                    {
+                      key: "color",
+                      label: "Color",
+                      type: "color",
+                    },
+                    {
+                      key: "lineHeight",
+                      label: "Line Height",
+                      type: "text",
+                      placeholder: "leading-[35px]",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "cardStyle",
+              label: "Card Style",
+              type: "object",
+              fields: [
+                {
+                  key: "height",
+                  label: "Height",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "mobile",
+                      label: "Mobile",
+                      type: "text",
+                      placeholder: "h-[182px]",
+                    },
+                    {
+                      key: "desktop",
+                      label: "Desktop",
+                      type: "text",
+                      placeholder: "md:h-[210px]",
+                    },
+                  ],
+                },
+                {
+                  key: "gap",
+                  label: "Gap",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "main",
+                      label: "Main Gap",
+                      type: "text",
+                      placeholder: "gap-y-[16px]",
+                    },
+                    {
+                      key: "content",
+                      label: "Content Gap",
+                      type: "object",
+                      fields: [
+                        {
+                          key: "mobile",
+                          label: "Mobile",
+                          type: "text",
+                          placeholder: "gap-y-[8px]",
+                        },
+                        {
+                          key: "desktop",
+                          label: "Desktop",
+                          type: "text",
+                          placeholder: "md:gap-y-[16px]",
+                        },
+                      ],
+                    },
+                    {
+                      key: "links",
+                      label: "Links Gap",
+                      type: "text",
+                      placeholder: "gap-x-[50px]",
+                    },
+                  ],
+                },
+                {
+                  key: "shadow",
+                  label: "Box Shadow",
+                  type: "object",
+                  fields: [
+                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    {
+                      key: "value",
+                      label: "Shadow Value",
+                      type: "text",
+                      placeholder: "rgba(9, 46, 114, 0.32) 0px 2px 16px 0px",
+                    },
+                  ],
+                },
+                {
+                  key: "alignment",
+                  label: "Alignment",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "horizontal",
+                      label: "Horizontal",
+                      type: "text",
+                      placeholder: "items-center",
+                    },
+                    {
+                      key: "vertical",
+                      label: "Vertical",
+                      type: "text",
+                      placeholder: "justify-center",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],

@@ -287,7 +287,32 @@ export const logosTickerStructure: ComponentStructure = {
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.subtitle", label: "Subtitle", type: "text" },
-        { key: "logos", label: "Logos", type: "array" },
+        {
+          key: "logos",
+          label: "Logos",
+          type: "array",
+          addLabel: "Add Logo",
+          itemLabel: "Logo",
+          of: [
+            {
+              key: "id",
+              label: "Logo ID",
+              type: "text",
+              placeholder: "1"
+            },
+            {
+              key: "src",
+              label: "Logo Image",
+              type: "image"
+            },
+            {
+              key: "alt",
+              label: "Alt Text",
+              type: "text",
+              placeholder: "Client Logo"
+            }
+          ]
+        },
         { key: "displayMode", label: "Display Mode", type: "select" }
       ]
     }
