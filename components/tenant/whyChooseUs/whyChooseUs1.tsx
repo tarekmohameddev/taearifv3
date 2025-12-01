@@ -809,7 +809,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
         </header>
 
         <div
-          className={`grid ${mergedData.features?.grid?.gap || "gap-6"} ${mergedData.features?.grid?.columns?.sm || "sm:grid-cols-2"} ${mergedData.features?.grid?.columns?.xl || "xl:grid-cols-3"} ${mergedData.features?.grid?.paddingX || "px-4"}`}
+          className={` py-5 grid ${mergedData.features?.grid?.gap || "gap-6"} ${mergedData.features?.grid?.columns?.sm || "sm:grid-cols-2"} ${mergedData.features?.grid?.columns?.xl || "xl:grid-cols-3"} ${mergedData.features?.grid?.paddingX || "px-4"}`}
           style={{
             gridTemplateColumns: mergedData.grid?.columns?.desktop
               ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
