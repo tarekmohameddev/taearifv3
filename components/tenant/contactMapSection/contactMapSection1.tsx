@@ -401,18 +401,36 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
         : "#059669", // fallback to primary
   };
 
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // emerald-700 in Tailwind = #047857 (fallback)
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  // Merge data with priority: storeData > tenantComponentData > props > default
+  const mergedData = {
+    ...getDefaultcontactMapSectionData(),
+    ...props,
+    ...tenantComponentData,
+    ...storeData,
+  };
+
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
     fieldPath: string,
     defaultColor: string = "#059669"
   ): string => {
-    // Get submitButton data from mergedData
-    const submitButton = mergedData?.form?.submitButton || {};
-    
-    // Navigate to the field using the path (e.g., "submitButton.backgroundColor" -> "backgroundColor")
-    const actualPath = fieldPath.replace("submitButton.", "");
-    const pathParts = actualPath.split('.');
-    let fieldData = submitButton;
+    // Navigate to the field using the path (e.g., "form.submitButton.backgroundColor", "form.rating.activeColor")
+    const pathParts = fieldPath.split('.');
+    let fieldData: any = mergedData;
     
     for (const part of pathParts) {
       if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
@@ -447,9 +465,9 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
     // If no custom color found, use branding color (useDefaultColor is true by default)
     // Determine globalColorType based on field path
     let defaultGlobalColorType = "primary";
-    if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
-      defaultGlobalColorType = "primary"; // Button text uses primary (white on primary background)
-    } else if (fieldPath.includes("hoverBackgroundColor") || fieldPath.includes("backgroundColor")) {
+    if (fieldPath.includes("textColor") || fieldPath.includes("Text") || fieldPath.includes("labelColor") || fieldPath.includes("ratingTextColor")) {
+      defaultGlobalColorType = "secondary";
+    } else if (fieldPath.includes("activeColor") || fieldPath.includes("hoverColor") || fieldPath.includes("hoverBackgroundColor") || fieldPath.includes("backgroundColor") || fieldPath.includes("submitButton")) {
       defaultGlobalColorType = "primary";
     }
     
@@ -460,28 +478,6 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
     
     const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
     return brandingColor;
-  };
-
-  // Helper function to create darker color for hover states
-  const getDarkerColor = (hex: string, amount: number = 20): string => {
-    // emerald-700 in Tailwind = #047857 (fallback)
-    if (!hex || !hex.startsWith('#')) return "#047857";
-    const cleanHex = hex.replace('#', '');
-    if (cleanHex.length !== 6) return "#047857";
-    
-    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
-    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
-    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-  };
-
-  // Merge data with priority: storeData > tenantComponentData > props > default
-  const mergedData = {
-    ...getDefaultcontactMapSectionData(),
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
   };
 
   // Local state for form
@@ -507,9 +503,17 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
   }
 
   // Get colors for submit button
-  const submitButtonBgColor = getColor("submitButton.backgroundColor", brandingColors.primary);
-  const submitButtonTextColor = getColor("submitButton.textColor", "#ffffff");
-  const submitButtonHoverBgColor = getColor("submitButton.hoverBackgroundColor", getDarkerColor(submitButtonBgColor, 20));
+  const submitButtonBgColor = getColor("form.submitButton.backgroundColor", brandingColors.primary);
+  const submitButtonTextColor = getColor("form.submitButton.textColor", "#ffffff");
+  const submitButtonHoverBgColor = getColor("form.submitButton.hoverBackgroundColor", getDarkerColor(submitButtonBgColor, 20));
+  
+  // Get colors for rating stars
+  const ratingActiveColor = getColor("form.rating.activeColor", brandingColors.primary);
+  const ratingHoverColor = getColor("form.rating.hoverColor", brandingColors.primary);
+  const ratingTextColor = getColor("form.rating.ratingTextColor", brandingColors.secondary);
+  
+  // Get colors for labels
+  const labelColor = getColor("labels.labelColor", brandingColors.secondary);
 
   return (
     <section
@@ -591,7 +595,8 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                     <div>
                       <label
                         htmlFor="name"
-                        className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}
+                        className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"}`}
+                        style={{ color: labelColor }}
                       >
                         {mergedData.form?.fields?.name?.label || "اسمك"}
                       </label>
@@ -675,7 +680,8 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                 {mergedData.form?.rating?.enabled !== false && (
                   <div>
                     <label
-                      className={`${mergedData.labels?.labelMarginBottom || "mb-3"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}
+                      className={`${mergedData.labels?.labelMarginBottom || "mb-3"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"}`}
+                      style={{ color: labelColor }}
                     >
                       {mergedData.form?.rating?.label || "التقييم"}
                     </label>
@@ -692,19 +698,19 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                           onClick={() => setRating(i + 1)}
                         >
                           <Star
-                            className={`${mergedData.form.rating?.starSize || "size-8"} ${
-                              i < (hoveredRating || rating)
-                                ? `fill-${mergedData.form.rating?.activeColor || "yellow-400"} text-${mergedData.form.rating?.activeColor || "yellow-400"}`
-                                : `text-${mergedData.form.rating?.inactiveColor || "gray-300"} hover:text-${mergedData.form.rating?.hoverColor || "yellow-300"}`
-                            }`}
+                            className={mergedData.form.rating?.starSize || "size-8"}
+                            style={{
+                              fill: i < (hoveredRating || rating) ? ratingActiveColor : mergedData.form.rating?.inactiveColor || "#d1d5db",
+                              color: i < (hoveredRating || rating) ? ratingActiveColor : (hoveredRating > i ? ratingHoverColor : mergedData.form.rating?.inactiveColor || "#d1d5db"),
+                            }}
                           />
                         </button>
                       ))}
                       {mergedData.form.rating?.showRatingText && (
                         <span
-                          className={`mr-2 ${mergedData.labels?.labelSize || "text-sm"} text-muted-foreground`}
+                          className={`mr-2 ${mergedData.labels?.labelSize || "text-sm"}`}
                           style={{
-                            color: mergedData.form.rating?.ratingTextColor,
+                            color: ratingTextColor,
                           }}
                         >
                           {rating}/{mergedData.form.rating?.maxStars || 5}

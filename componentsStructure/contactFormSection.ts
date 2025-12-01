@@ -136,7 +136,7 @@ export const contactFormSectionStructure: ComponentStructure = {
               addLabel: "Add Social Link",
               itemLabel: "Social Link",
               of: [
-                { key: "href", label: "URL", type: "url" },
+                { key: "href", label: "URL", type: "text" },
                 {
                   key: "alt",
                   label: "Platform",
@@ -367,7 +367,7 @@ export const contactFormSectionStructure: ComponentStructure = {
                       label: "Text Color", 
                       type: "color",
                       useDefaultColor: true,
-                      globalColorType: "primary" // Button text uses primary color
+                      globalColorType: "secondary" // Button text uses secondary color (usually white)
                     },
                     {
                       key: "borderRadius",
@@ -596,7 +596,7 @@ export const contactFormSectionStructure: ComponentStructure = {
           addLabel: "Add Social Link",
           itemLabel: "Social Link",
           of: [
-            { key: "href", label: "URL", type: "url" },
+            { key: "href", label: "URL", type: "text" },
             {
               key: "alt",
               label: "Platform",
