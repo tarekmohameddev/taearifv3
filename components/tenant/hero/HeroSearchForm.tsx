@@ -6,6 +6,7 @@ import { MapPin, CircleDollarSign, Search, ChevronDown, Home } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUrlFilters } from "@/hooks-liveeditor/use-url-filters";
+import useTenantStore from "@/context-liveeditor/tenantStore";
 
 interface CityOption {
   id: string | number;
@@ -19,11 +20,37 @@ interface DistrictOption {
 
 interface HeroSearchFormProps {
   config: any;
+  primaryColor?: string;
+  primaryColorHover?: string;
 }
 
-export default function HeroSearchForm({ config }: HeroSearchFormProps) {
+export default function HeroSearchForm({ config, primaryColor, primaryColorHover }: HeroSearchFormProps) {
   const { navigateWithFilters } = useUrlFilters();
   const searchParams = useSearchParams();
+
+  // Get primary color from tenantData if not provided
+  const { tenantData } = useTenantStore();
+  const defaultPrimaryColor = 
+    primaryColor || 
+    (tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+     tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#059669"); // emerald-600 default
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    if (!hex || !hex.startsWith('#')) return "#047857";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#047857";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  const defaultPrimaryColorHover = primaryColorHover || getDarkerColor(defaultPrimaryColor, 20);
   
   // Cities and districts from API (same as propertyFilter1)
   const [cityOptions, setCityOptions] = useState<CityOption[]>([]);
@@ -195,9 +222,24 @@ export default function HeroSearchForm({ config }: HeroSearchFormProps) {
                   key={option.value}
                   type="button"
                   onClick={() => setPurpose(option.value)}
+                  style={
+                    purpose === option.value
+                      ? { backgroundColor: defaultPrimaryColor, color: "#ffffff" }
+                      : {}
+                  }
+                  onMouseEnter={(e) => {
+                    if (purpose === option.value) {
+                      e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (purpose === option.value) {
+                      e.currentTarget.style.backgroundColor = defaultPrimaryColor;
+                    }
+                  }}
                   className={
                     purpose === option.value
-                      ? "rounded-md bg-emerald-600 flex-1 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                      ? "rounded-md flex-1 py-2 text-sm font-semibold text-white transition-colors"
                       : "rounded-md bg-transparent flex-1 py-2 text-sm font-semibold text-gray-700 hover:bg-white"
                   }
                 >
@@ -231,7 +273,16 @@ export default function HeroSearchForm({ config }: HeroSearchFormProps) {
                   cityOptions.map((city) => (
                     <div
                       key={city.id}
-                      className="px-4 py-3 hover:bg-emerald-50 cursor-pointer text-sm transition-colors"
+                      style={{
+                        '--hover-bg': `${defaultPrimaryColor}1A`, // 10% opacity
+                      } as React.CSSProperties}
+                      className="px-4 py-3 cursor-pointer text-sm transition-colors hover:bg-opacity-10"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = `${defaultPrimaryColor}1A`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '';
+                      }}
                       onClick={() => {
                         setCityId(city.id.toString());
                         setCityName(city.name);
@@ -274,7 +325,16 @@ export default function HeroSearchForm({ config }: HeroSearchFormProps) {
                 districtOptions.map((district) => (
                   <div
                     key={district.id}
-                    className="px-4 py-3 hover:bg-emerald-50 cursor-pointer text-sm transition-colors"
+                    style={{
+                      '--hover-bg': `${defaultPrimaryColor}1A`, // 10% opacity
+                    } as React.CSSProperties}
+                    className="px-4 py-3 cursor-pointer text-sm transition-colors hover:bg-opacity-10"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = `${defaultPrimaryColor}1A`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
                     onClick={() => {
                       setStateId(district.id.toString());
                       setStateName(district.name);
@@ -307,7 +367,14 @@ export default function HeroSearchForm({ config }: HeroSearchFormProps) {
         {/* Search Button */}
         <button
           type="submit"
-          className="sm:col-span-2 lg:col-span-1 w-full py-3 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2"
+          style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = defaultPrimaryColor;
+          }}
+          className="sm:col-span-2 lg:col-span-1 w-full py-3 rounded-lg text-white font-semibold transition-colors flex items-center justify-center gap-2"
         >
           <Search className="size-5" />
           <span>بحث</span>
