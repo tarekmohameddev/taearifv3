@@ -170,6 +170,92 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
 
   const tenantComponentData = getTenantComponentData();
 
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const brandingColors = {
+    primary: 
+      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 default (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback to primary
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#059669", // fallback to primary
+  };
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (
+    fieldPath: string,
+    defaultColor: string = "#059669"
+  ): string => {
+    // Get styling data from mergedData
+    const styling = mergedData?.styling || {};
+    
+    // Navigate to the field using the path (e.g., "icon.color", "submitButton.background")
+    const pathParts = fieldPath.split('.');
+    let fieldData = styling;
+    
+    for (const part of pathParts) {
+      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+        fieldData = fieldData[part];
+      } else {
+        fieldData = undefined;
+        break;
+      }
+    }
+    
+    // Also check in content.socialLinks for icon.color and textStyle.color
+    if (fieldPath.includes("socialLinks")) {
+      // This will be handled per link in the map function
+      fieldData = undefined;
+    }
+    
+    // Check if fieldData is a custom color (string starting with #)
+    // If it is, return it directly (useDefaultColor is false)
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      return fieldData;
+    }
+    
+    // If fieldData is an object, check for value property
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      // If object has useDefaultColor property set to false, use the value
+      if (fieldData.useDefaultColor === false && fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        return fieldData.value;
+      }
+      // If object has value but useDefaultColor is true or undefined, still check value first
+      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        // Check if useDefaultColor is explicitly false
+        if (fieldData.useDefaultColor === false) {
+          return fieldData.value;
+        }
+      }
+    }
+    
+    // If no custom color found, use branding color (useDefaultColor is true by default)
+    // Determine globalColorType based on field path
+    let defaultGlobalColorType = "primary";
+    if (fieldPath.includes("title") || fieldPath.includes("textStyle") || fieldPath.includes("textColor") || fieldPath.includes("Text")) {
+      defaultGlobalColorType = "secondary";
+    } else if (fieldPath.includes("icon") || fieldPath.includes("Icon") || fieldPath.includes("background") || fieldPath.includes("submitButton")) {
+      defaultGlobalColorType = "primary";
+    }
+    
+    // If fieldData is an object with globalColorType, use it
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData) && fieldData.globalColorType) {
+      defaultGlobalColorType = fieldData.globalColorType;
+    }
+    
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    return brandingColor;
+  };
+
   // Check if we have any data from API/stores first
   const hasApiData =
     tenantComponentData && Object.keys(tenantComponentData).length > 0;
@@ -232,6 +318,10 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
   const layout = mergedData.layout || defaultData.layout;
   const styling = mergedData.styling || defaultData.styling;
 
+  // Get colors using getColor function
+  const submitButtonBgColor = getColor("submitButton.background", brandingColors.primary);
+  const submitButtonTextColor = getColor("submitButton.textColor", "#ffffff");
+
   return (
     <section
       className={`container mx-auto ${layout?.container?.padding?.horizontal || "px-4"} ${layout?.container?.padding?.vertical || "py-8"} lg:w-full sm:max-w-[${layout?.container?.maxWidth || "1600px"}]`}
@@ -250,9 +340,36 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
               {title}
             </h4>
             <div className="flex flex-col items-start gap-[8px] md:gap-[24px]">
-              {socialLinks.map((link: any, index: number) => (
-                <SocialLink key={index} {...link} />
-              ))}
+              {socialLinks.map((link: any, index: number) => {
+                // Get icon color for this specific link
+                const linkIconColor = link.icon?.color && typeof link.icon.color === 'string' && link.icon.color.startsWith('#')
+                  ? link.icon.color
+                  : (link.icon?.useDefaultColor === false && link.icon?.value && typeof link.icon.value === 'string' && link.icon.value.startsWith('#')
+                      ? link.icon.value
+                      : getColor("icon.color", brandingColors.primary));
+                
+                // Get text color for this specific link
+                const linkTextColor = link.textStyle?.color && typeof link.textStyle.color === 'string' && link.textStyle.color.startsWith('#')
+                  ? link.textStyle.color
+                  : (link.textStyle?.useDefaultColor === false && link.textStyle?.value && typeof link.textStyle.value === 'string' && link.textStyle.value.startsWith('#')
+                      ? link.textStyle.value
+                      : getColor("textStyle.color", brandingColors.secondary));
+                
+                return (
+                  <SocialLink 
+                    key={index} 
+                    {...link}
+                    icon={{
+                      ...link.icon,
+                      color: linkIconColor,
+                    }}
+                    textStyle={{
+                      ...link.textStyle,
+                      color: linkTextColor,
+                    }}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
@@ -295,8 +412,12 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
               type="submit"
               className={
                 submitButton.style?.className ||
-                "bg-custom-secondarycolor text-white rounded-[6px] w-full text-[14px] md:text-[20px] bg-emerald-700 hover:scale-105 transition duration-300 py-2 md:py-1"
+                "rounded-[6px] w-full text-[14px] md:text-[20px] hover:scale-105 transition duration-300 py-2 md:py-1"
               }
+              style={{
+                backgroundColor: submitButtonBgColor,
+                color: submitButtonTextColor,
+              }}
             >
               {submitButton.text || "إرسال"}
             </button>

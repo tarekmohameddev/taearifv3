@@ -440,7 +440,7 @@ export const contactMapSectionStructure: ComponentStructure = {
                   label: "Text Color", 
                   type: "color",
                   useDefaultColor: true,
-                  globalColorType: "primary" // Button text uses primary color
+                  globalColorType: "secondary" // Button text uses secondary color (usually white)
                 },
                 {
                   key: "fontSize",

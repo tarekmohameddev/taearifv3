@@ -93,11 +93,20 @@ const getDefaultcontactMapSectionData = () => ({
       label: "التقييم",
       maxStars: 5,
       starSize: "size-8",
-      activeColor: "#fbbf24",
+      activeColor: {
+        useDefaultColor: true,
+        globalColorType: "primary",
+      },
       inactiveColor: "#d1d5db",
-      hoverColor: "#fbbf24",
+      hoverColor: {
+        useDefaultColor: true,
+        globalColorType: "primary",
+      },
       showRatingText: true,
-      ratingTextColor: "#6b7280",
+      ratingTextColor: {
+        useDefaultColor: true,
+        globalColorType: "secondary",
+      },
     },
     submitButton: {
       enabled: true,
@@ -105,9 +114,18 @@ const getDefaultcontactMapSectionData = () => ({
       type: "submit",
       width: "w-full",
       height: "py-6",
-      backgroundColor: "#059669",
-      hoverBackgroundColor: "#047857",
-      textColor: "#ffffff",
+      backgroundColor: {
+        useDefaultColor: true,
+        globalColorType: "primary",
+      },
+      hoverBackgroundColor: {
+        useDefaultColor: true,
+        globalColorType: "primary",
+      },
+      textColor: {
+        useDefaultColor: true,
+        globalColorType: "secondary",
+      },
       fontSize: "text-lg",
       fontWeight: "font-semibold",
       borderRadius: "rounded-xl",
@@ -441,25 +459,54 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
       }
     }
     
-    // Check if fieldData is a custom color (string starting with #)
-    // If it is, return it directly (useDefaultColor is false)
-    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
-      return fieldData;
-    }
-    
-    // If fieldData is an object, check for value property
+    // If fieldData is an object, check for useDefaultColor and value
     if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
       // If object has useDefaultColor property set to false, use the value
       if (fieldData.useDefaultColor === false && fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
         return fieldData.value;
       }
-      // If object has value but useDefaultColor is true or undefined, still check value first
+      // If object has value but useDefaultColor is true or undefined, check if we should use branding color
       if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
         // Check if useDefaultColor is explicitly false
         if (fieldData.useDefaultColor === false) {
           return fieldData.value;
         }
       }
+      // If useDefaultColor is true (or undefined, default is true), use branding color
+      if (fieldData.useDefaultColor !== false) {
+        // Determine globalColorType
+        let globalColorType = fieldData.globalColorType;
+        if (!globalColorType) {
+          // Determine based on field path
+          if (fieldPath.includes("textColor") || fieldPath.includes("Text") || fieldPath.includes("labelColor") || fieldPath.includes("ratingTextColor")) {
+            globalColorType = "secondary";
+          } else if (fieldPath.includes("activeColor") || fieldPath.includes("hoverColor") || fieldPath.includes("hoverBackgroundColor") || fieldPath.includes("backgroundColor") || fieldPath.includes("submitButton")) {
+            globalColorType = "primary";
+          } else {
+            globalColorType = "primary";
+          }
+        }
+        const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+        return brandingColor;
+      }
+    }
+    
+    // If fieldData is a string (legacy format), check if it's emerald color - if so, use branding color instead
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      // Check if it's the default emerald color - if so, use branding color
+      if (fieldData === "#059669" || fieldData === "#047857") {
+        // Determine globalColorType based on field path
+        let defaultGlobalColorType = "primary";
+        if (fieldPath.includes("textColor") || fieldPath.includes("Text") || fieldPath.includes("labelColor") || fieldPath.includes("ratingTextColor")) {
+          defaultGlobalColorType = "secondary";
+        } else if (fieldPath.includes("activeColor") || fieldPath.includes("hoverColor") || fieldPath.includes("hoverBackgroundColor") || fieldPath.includes("backgroundColor") || fieldPath.includes("submitButton")) {
+          defaultGlobalColorType = "primary";
+        }
+        const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+        return brandingColor;
+      }
+      // If it's a custom color (not emerald), return it
+      return fieldData;
     }
     
     // If no custom color found, use branding color (useDefaultColor is true by default)
@@ -469,11 +516,6 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
       defaultGlobalColorType = "secondary";
     } else if (fieldPath.includes("activeColor") || fieldPath.includes("hoverColor") || fieldPath.includes("hoverBackgroundColor") || fieldPath.includes("backgroundColor") || fieldPath.includes("submitButton")) {
       defaultGlobalColorType = "primary";
-    }
-    
-    // If fieldData is an object with globalColorType, use it
-    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData) && fieldData.globalColorType) {
-      defaultGlobalColorType = fieldData.globalColorType;
     }
     
     const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
