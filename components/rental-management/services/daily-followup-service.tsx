@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -124,6 +124,7 @@ interface PaymentData {
 export function DailyFollowupService() {
   const router = useRouter();
   const { userData } = useAuthStore();
+  const isInitialMount = useRef(true);
   
   const {
     paymentData,
@@ -156,7 +157,8 @@ export function DailyFollowupService() {
     goToPage,
     nextPage,
     prevPage,
-    validateCurrentPage
+    validateCurrentPage,
+    resetFilters
   } = useDailyFollowupStore();
 
   // جلب البيانات
@@ -168,9 +170,22 @@ export function DailyFollowupService() {
     }
   };
 
+  // جلب البيانات عند التحميل الأولي فقط
   useEffect(() => {
-    fetchPaymentData();
-  }, [searchTerm, statusFilter, buildingFilter, dateFilter, fromDate, toDate, currentPage]);
+    if (userData?.token && isInitialMount.current) {
+      fetchPaymentData();
+      isInitialMount.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userData?.token]);
+
+  // جلب البيانات عند تغيير الصفحة فقط (وليس عند التحميل الأولي)
+  useEffect(() => {
+    if (userData?.token && !isInitialMount.current) {
+      fetchPaymentData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
 
   // فلترة البيانات
   const filteredData = getFilteredData();
@@ -279,84 +294,125 @@ export function DailyFollowupService() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="search">البحث</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  id="search"
-                  placeholder="ابحث عن مستأجر أو عقار..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="search">البحث</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    id="search"
+                    placeholder="ابحث عن مستأجر أو عقار..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        fetchPaymentData();
+                      }
+                    }}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="status">حالة الدفع</Label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر الحالة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="upcoming">قادم</SelectItem>
+                    <SelectItem value="overdue">متأخر</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="date">التاريخ</Label>
+                <Select value={dateFilter} onValueChange={setDateFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر التاريخ" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="today">اليوم</SelectItem>
+                    <SelectItem value="week">هذا الأسبوع</SelectItem>
+                    <SelectItem value="month">هذا الشهر</SelectItem>
+                    <SelectItem value="custom">مخصص</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Date inputs when custom is selected */}
+              {dateFilter === "custom" && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="from-date">من تاريخ</Label>
+                    <Input
+                      id="from-date"
+                      type="date"
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="to-date">إلى تاريخ</Label>
+                    <Input
+                      id="to-date"
+                      type="date"
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="building">العمارة</Label>
+                <Select value={buildingFilter} onValueChange={setBuildingFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر العمارة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">جميع المباني</SelectItem>
+                    {buildings.map((building) => (
+                      <SelectItem key={building.id} value={building.id}>
+                        {building.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">حالة الدفع</Label>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر الحالة" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="upcoming">قادم</SelectItem>
-                  <SelectItem value="overdue">متأخر</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="date">التاريخ</Label>
-              <Select value={dateFilter} onValueChange={setDateFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر التاريخ" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="today">اليوم</SelectItem>
-                  <SelectItem value="week">هذا الأسبوع</SelectItem>
-                  <SelectItem value="month">هذا الشهر</SelectItem>
-                  <SelectItem value="custom">مخصص</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {/* Date inputs when custom is selected */}
-            {dateFilter === "custom" && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="from-date">من تاريخ</Label>
-                  <Input
-                    id="from-date"
-                    type="date"
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="to-date">إلى تاريخ</Label>
-                  <Input
-                    id="to-date"
-                    type="date"
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                  />
-                </div>
-              </>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="building">العمارة</Label>
-              <Select value={buildingFilter} onValueChange={setBuildingFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر العمارة" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">جميع المباني</SelectItem>
-                  {buildings.map((building) => (
-                    <SelectItem key={building.id} value={building.id}>
-                      {building.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            
+            {/* Action Buttons */}
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-end gap-3 pt-2 border-t">
+              <Button
+                onClick={fetchPaymentData}
+                disabled={loading}
+                className="w-full md:w-auto bg-gradient-to-r from-gray-800 to-gray-600 hover:from-gray-900 hover:to-gray-700 text-white font-semibold px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300"
+                dir="rtl"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    جاري البحث...
+                  </>
+                ) : (
+                  <>
+                    <Search className="h-4 w-4 ml-2" />
+                    بحث / تطبيق الفلاتر
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => {
+                  resetFilters();
+                  fetchPaymentData();
+                }}
+                variant="outline"
+                className="w-full md:w-auto border-gray-300 hover:bg-gray-50"
+                dir="rtl"
+              >
+                <RotateCcw className="h-4 w-4 ml-2" />
+                إعادة تعيين
+              </Button>
             </div>
           </div>
         </CardContent>
