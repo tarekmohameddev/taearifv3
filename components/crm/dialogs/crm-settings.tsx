@@ -52,6 +52,7 @@ export default function CrmSettingsDialog({
   const [activeTab, setActiveTab] = useState("stages");
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isMoving, setIsMoving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Form dialog states
@@ -490,8 +491,107 @@ export default function CrmSettingsDialog({
     }
   };
 
-  const handleMoveItem = (itemId: string, direction: "up" | "down") => {
-    // TODO: Implement move functionality
+  // Translate error messages to Arabic
+  const translateErrorMessage = (message: string): string => {
+    const errorTranslations: Record<string, string> = {
+      "Cannot move further up": "لا يمكن النقل لأعلى أكثر",
+      "Cannot move further down": "لا يمكن النقل لأسفل أكثر",
+      "Cannot move further": "لا يمكن النقل أكثر",
+    };
+
+    // Check for exact match
+    if (errorTranslations[message]) {
+      return errorTranslations[message];
+    }
+
+    // Check for partial matches (case insensitive)
+    const lowerMessage = message.toLowerCase();
+    if (lowerMessage.includes("cannot move further up")) {
+      return "لا يمكن النقل لأعلى أكثر";
+    }
+    if (lowerMessage.includes("cannot move further down")) {
+      return "لا يمكن النقل لأسفل أكثر";
+    }
+    if (lowerMessage.includes("cannot move further")) {
+      return "لا يمكن النقل أكثر";
+    }
+
+    // Return original message if no translation found
+    return message;
+  };
+
+  const handleMoveItem = async (
+    itemId: string,
+    direction: "up" | "down",
+    endpoint: string,
+  ) => {
+    // Only handle stages for now (as per API requirement)
+    if (endpoint !== "/crm/stages") {
+      return;
+    }
+
+    // Find the item and its index
+    const currentIndex = pipelineStages.findIndex(
+      (stage) => stage.id.toString() === itemId.toString(),
+    );
+
+    if (currentIndex === -1) return;
+
+    // Check if move is valid
+    if (direction === "up" && currentIndex === 0) return;
+    if (direction === "down" && currentIndex === pipelineStages.length - 1)
+      return;
+
+    // Save original order for rollback
+    const originalStages = [...pipelineStages];
+
+    // Calculate new index
+    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+
+    // Create a copy of the array
+    const updatedStages = [...pipelineStages];
+
+    // Swap items
+    [updatedStages[currentIndex], updatedStages[newIndex]] = [
+      updatedStages[newIndex],
+      updatedStages[currentIndex],
+    ];
+
+    // Optimistic update: Update state immediately
+    setPipelineStages(updatedStages);
+    setIsMoving(itemId.toString());
+    setError(null);
+
+    try {
+      // Send API request
+      const response = await axiosInstance.post(
+        `/crm/stages/${itemId}/move`,
+        { direction },
+      );
+
+      if (response.data.status === "success") {
+        // If server returns updated data, use it
+        if (response.data.data) {
+          setPipelineStages(response.data.data);
+        }
+      } else {
+        // Revert to original order on failure
+        setPipelineStages(originalStages);
+        // Handle specific error messages
+        const errorMessage = response.data.message || "فشل في تحديث الترتيب";
+        setError(translateErrorMessage(errorMessage));
+      }
+    } catch (err: any) {
+      console.error("Error moving stage:", err);
+      // Revert to original order on error
+      setPipelineStages(originalStages);
+      
+      // Handle specific error messages from API
+      const errorMessage = err.response?.data?.message || "فشل في تحديث ترتيب المرحلة";
+      setError(translateErrorMessage(errorMessage));
+    } finally {
+      setIsMoving(null);
+    }
   };
 
   // Render item component for reusability
@@ -557,20 +657,30 @@ export default function CrmSettingsDialog({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => handleMoveItem(item.id, "up")}
-                  disabled={index === 0}
+                  onClick={() => handleMoveItem(item.id, "up", endpoint)}
+                  disabled={index === 0 || isMoving === item.id.toString()}
                   className="text-muted-foreground hover:text-foreground h-8 w-8"
                 >
-                  <ArrowUp className="h-3 w-3" />
+                  {isMoving === item.id.toString() ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <ArrowUp className="h-3 w-3" />
+                  )}
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => handleMoveItem(item.id, "down")}
-                  disabled={index === items.length - 1}
+                  onClick={() => handleMoveItem(item.id, "down", endpoint)}
+                  disabled={
+                    index === items.length - 1 || isMoving === item.id.toString()
+                  }
                   className="text-muted-foreground hover:text-foreground h-8 w-8"
                 >
-                  <ArrowDown className="h-3 w-3" />
+                  {isMoving === item.id.toString() ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <ArrowDown className="h-3 w-3" />
+                  )}
                 </Button>
                 <Button
                   variant="ghost"
@@ -657,20 +767,30 @@ export default function CrmSettingsDialog({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => handleMoveItem(item.id, "up")}
-                  disabled={index === 0}
+                  onClick={() => handleMoveItem(item.id, "up", endpoint)}
+                  disabled={index === 0 || isMoving === item.id.toString()}
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  <ArrowUp className="h-4 w-4" />
+                  {isMoving === item.id.toString() ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ArrowUp className="h-4 w-4" />
+                  )}
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => handleMoveItem(item.id, "down")}
-                  disabled={index === items.length - 1}
+                  onClick={() => handleMoveItem(item.id, "down", endpoint)}
+                  disabled={
+                    index === items.length - 1 || isMoving === item.id.toString()
+                  }
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  <ArrowDown className="h-4 w-4" />
+                  {isMoving === item.id.toString() ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ArrowDown className="h-4 w-4" />
+                  )}
                 </Button>
                 <Button
                   variant="ghost"
