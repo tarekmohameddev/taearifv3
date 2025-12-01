@@ -147,10 +147,22 @@ interface ApiResponse {
 
 interface RentalApplicationsServiceProps {
   openAddDialogCounter?: number;
+  collectionsPeriod?: string;
+  collectionsFromDate?: string;
+  collectionsToDate?: string;
+  paymentsDuePeriod?: string;
+  paymentsDueFromDate?: string;
+  paymentsDueToDate?: string;
 }
 
 export function RentalApplicationsService({
   openAddDialogCounter = 0,
+  collectionsPeriod = "this_month",
+  collectionsFromDate = "",
+  collectionsToDate = "",
+  paymentsDuePeriod = "this_month",
+  paymentsDueFromDate = "",
+  paymentsDueToDate = "",
 }: RentalApplicationsServiceProps) {
   const router = useRouter();
   const {
@@ -185,6 +197,26 @@ export function RentalApplicationsService({
     description: "",
   });
   const [renewalLoading, setRenewalLoading] = useState(false);
+
+  // Get filters from store
+  const {
+    contractSearchTerm,
+    contractStatusFilter,
+    paymentStatusFilter,
+    rentalMethodFilter,
+    buildingFilter,
+    unitFilter,
+    projectFilter,
+    dateFilter,
+    fromDate,
+    toDate,
+    contractCreatedFromDate,
+    contractCreatedToDate,
+    filterByYear,
+    sortBy,
+    sortOrder,
+    perPage,
+  } = rentalApplications;
 
   // Prevent Radix UI from adding pointer-events: none to body
   useEffect(() => {
@@ -460,6 +492,46 @@ export function RentalApplicationsService({
     }
   }, [isInitialized, userData?.token]);
 
+  // تحديث البيانات عند تغيير الفلاتر (collections و payments due)
+  useEffect(() => {
+    if (userData?.token && isInitialized) {
+      fetchRentals(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    collectionsPeriod,
+    collectionsFromDate,
+    collectionsToDate,
+    paymentsDuePeriod,
+    paymentsDueFromDate,
+    paymentsDueToDate,
+  ]);
+
+  // تحديث البيانات عند تغيير الـ filters الجديدة
+  useEffect(() => {
+    if (userData?.token && isInitialized) {
+      fetchRentals(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    contractSearchTerm,
+    contractStatusFilter,
+    paymentStatusFilter,
+    rentalMethodFilter,
+    buildingFilter,
+    unitFilter,
+    projectFilter,
+    dateFilter,
+    fromDate,
+    toDate,
+    contractCreatedFromDate,
+    contractCreatedToDate,
+    filterByYear,
+    sortBy,
+    sortOrder,
+    perPage,
+  ]);
+
   // دالة مساعدة للتعامل مع البيانات المفقودة
   const getSafeValue = (value: any, fallback: string = "غير محدد") => {
     if (value === null || value === undefined || value === "") {
@@ -521,16 +593,93 @@ export function RentalApplicationsService({
       return;
     }
 
+    // التحقق من الحقول المطلوبة عند اختيار "مخصص"
+    if (collectionsPeriod === "custom" && (!collectionsFromDate || !collectionsToDate)) {
+      console.log("Collections custom period requires both from and to dates");
+      return;
+    }
+
+    if (paymentsDuePeriod === "custom" && (!paymentsDueFromDate || !paymentsDueToDate)) {
+      console.log("Payments due custom period requires both from and to dates");
+      return;
+    }
+
     try {
       setRentalApplications({ loading: true, error: null });
+      
+      // بناء query parameters من الـ filters
+      const params: any = {
+        page,
+        per_page: perPage || 20,
+        sort_by: sortBy || "created_at",
+        sort_order: sortOrder || "desc",
+      };
+
+      // إضافة status filter
+      if (contractStatusFilter && contractStatusFilter !== "all") {
+        params.status = contractStatusFilter;
+      }
+
+      // إضافة building_id filter
+      if (buildingFilter && buildingFilter !== "all") {
+        params.building_id = buildingFilter;
+      }
+
+      // إضافة unit_id filter
+      if (unitFilter) {
+        params.unit_id = unitFilter;
+      }
+
+      // إضافة project_id filter
+      if (projectFilter) {
+        params.project_id = projectFilter;
+      }
+
+      // إضافة paying_plan filter
+      if (rentalMethodFilter && rentalMethodFilter !== "all") {
+        params.paying_plan = rentalMethodFilter;
+      }
+
+      // إضافة search query
+      if (contractSearchTerm) {
+        params.q = contractSearchTerm;
+      }
+
+      // إضافة filter_by_year
+      if (filterByYear) {
+        params.filter_by_year = filterByYear;
+      }
+
+      // إضافة from_date و to_date
+      if (fromDate) {
+        params.from_date = fromDate;
+      }
+      if (toDate) {
+        params.to_date = toDate;
+      }
+
+      // إضافة contract_created_from_date و contract_created_to_date
+      if (contractCreatedFromDate) {
+        params.contract_created_from_date = contractCreatedFromDate;
+      }
+      if (contractCreatedToDate) {
+        params.contract_created_to_date = contractCreatedToDate;
+      }
+
       const response = await axiosInstance.get<ApiResponse>(
-        `/v1/rms/rentals?page=${page}`,
+        `/v1/rms/rentals`,
+        { params }
       );
 
       if (response.data.status) {
         setRentalApplications({
-          rentals: response.data.data,
-          pagination: (response.data as any).pagination,
+          rentals: response.data.data || [],
+          pagination: (response.data as any).pagination || {
+            current_page: page,
+            per_page: perPage || 20,
+            total: 0,
+            last_page: 1,
+          },
           isInitialized: true,
         });
       } else {
@@ -547,7 +696,10 @@ export function RentalApplicationsService({
     fetchRentals(page);
   };
 
-  const filteredRentals = (rentals || []).filter((rental: RentalData) => {
+  // التأكد من أن rentals هو array
+  const rentalsArray = Array.isArray(rentals) ? rentals : [];
+  
+  const filteredRentals = rentalsArray.filter((rental: RentalData) => {
     const matchesSearch =
       getTenantName(rental).toLowerCase().includes(searchTerm.toLowerCase()) ||
       getUnitLabel(rental).toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -852,10 +1004,9 @@ export function RentalApplicationsService({
           <SelectContent>
             <SelectItem value="all">جميع الحالات</SelectItem>
             <SelectItem value="active">نشط</SelectItem>
-            <SelectItem value="pending">قيد الانتظار</SelectItem>
-            <SelectItem value="draft">مسودة</SelectItem>
-            <SelectItem value="expired">منتهي الصلاحية</SelectItem>
-            <SelectItem value="cancelled">ملغي</SelectItem>
+            <SelectItem value="expired">منتهي</SelectItem>
+            <SelectItem value="pending">معلق</SelectItem>
+            <SelectItem value="terminated">ملغي/موقوف</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -922,6 +1073,117 @@ export function RentalApplicationsService({
           </div>
         </div>
       </div> */}
+
+      {/* Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+        <div className="space-y-2">
+          <Label htmlFor="search">البحث</Label>
+          <div className="relative">
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="search"
+              placeholder="البحث في الإيجارات..."
+              value={contractSearchTerm}
+              onChange={(e) => setRentalApplications({ contractSearchTerm: e.target.value })}
+              className="pr-10"
+            />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="contract-status">حالة الإيجار</Label>
+          <Select value={contractStatusFilter} onValueChange={(value) => setRentalApplications({ contractStatusFilter: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="اختر حالة الإيجار" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الحالات</SelectItem>
+              <SelectItem value="active">نشط</SelectItem>
+              <SelectItem value="expired">منتهي</SelectItem>
+              <SelectItem value="pending">معلق</SelectItem>
+              <SelectItem value="terminated">ملغي/موقوف</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="payment-status">حالة الدفع</Label>
+          <Select value={paymentStatusFilter} onValueChange={(value) => setRentalApplications({ paymentStatusFilter: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="اختر حالة الدفع" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الحالات</SelectItem>
+              <SelectItem value="paid">مدفوع</SelectItem>
+              <SelectItem value="pending">مستحق</SelectItem>
+              <SelectItem value="overdue">متأخر</SelectItem>
+              <SelectItem value="not_due">غير مستحق</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="rental-method">طريقة الإيجار</Label>
+          <Select value={rentalMethodFilter} onValueChange={(value) => setRentalApplications({ rentalMethodFilter: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="اختر طريقة الإيجار" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الطرق</SelectItem>
+              <SelectItem value="monthly">شهري</SelectItem>
+              <SelectItem value="quarterly">ربعي</SelectItem>
+              <SelectItem value="semi_annual">نصف سنوي</SelectItem>
+              <SelectItem value="annual">سنوي</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="building">العمارة</Label>
+          <Select value={buildingFilter} onValueChange={(value) => setRentalApplications({ buildingFilter: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="اختر العمارة" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع المباني</SelectItem>
+              {/* يمكن إضافة المباني هنا لاحقاً */}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="date">التاريخ</Label>
+          <Select value={dateFilter} onValueChange={(value) => setRentalApplications({ dateFilter: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="اختر التاريخ" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">اليوم</SelectItem>
+              <SelectItem value="week">هذا الأسبوع</SelectItem>
+              <SelectItem value="month">هذا الشهر</SelectItem>
+              <SelectItem value="custom">مخصص</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {/* Date inputs when custom is selected */}
+        {dateFilter === "custom" && (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="from-date">من تاريخ</Label>
+              <Input
+                id="from-date"
+                type="date"
+                value={fromDate}
+                onChange={(e) => setRentalApplications({ fromDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="to-date">إلى تاريخ</Label>
+              <Input
+                id="to-date"
+                type="date"
+                value={toDate}
+                onChange={(e) => setRentalApplications({ toDate: e.target.value })}
+              />
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Modern Rentals Table */}
       <div

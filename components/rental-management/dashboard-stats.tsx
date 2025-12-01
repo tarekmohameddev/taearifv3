@@ -1554,7 +1554,23 @@ function MaintenanceInProgressDialog() {
 }
 
 // المكون الرئيسي
-export function RentalDashboardStats() {
+interface RentalDashboardStatsProps {
+  collectionsPeriod?: string;
+  collectionsFromDate?: string;
+  collectionsToDate?: string;
+  paymentsDuePeriod?: string;
+  paymentsDueFromDate?: string;
+  paymentsDueToDate?: string;
+}
+
+export function RentalDashboardStats({
+  collectionsPeriod = "this_month",
+  collectionsFromDate = "",
+  collectionsToDate = "",
+  paymentsDuePeriod = "this_month",
+  paymentsDueFromDate = "",
+  paymentsDueToDate = "",
+}: RentalDashboardStatsProps) {
   const {
     dashboardData,
     counts,
@@ -1591,11 +1607,40 @@ export function RentalDashboardStats() {
       return;
     }
 
+    // التحقق من الحقول المطلوبة عند اختيار "مخصص"
+    if (collectionsPeriod === "custom" && (!collectionsFromDate || !collectionsToDate)) {
+      console.log("Collections custom period requires both from and to dates");
+      return;
+    }
+
+    if (paymentsDuePeriod === "custom" && (!paymentsDueFromDate || !paymentsDueToDate)) {
+      console.log("Payments due custom period requires both from and to dates");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
 
-      const response = await axiosInstance.get("/v1/rms/dashboard");
+      // بناء query parameters
+      const params: any = {
+        collections_period: collectionsPeriod,
+        payments_due_period: paymentsDuePeriod,
+      };
+
+      // إضافة تواريخ collections إذا كان custom
+      if (collectionsPeriod === "custom") {
+        if (collectionsFromDate) params.collections_from_date = collectionsFromDate;
+        if (collectionsToDate) params.collections_to_date = collectionsToDate;
+      }
+
+      // إضافة تواريخ payments_due إذا كان custom
+      if (paymentsDuePeriod === "custom") {
+        if (paymentsDueFromDate) params.payments_due_from_date = paymentsDueFromDate;
+        if (paymentsDueToDate) params.payments_due_to_date = paymentsDueToDate;
+      }
+
+      const response = await axiosInstance.get("/v1/rms/dashboard", { params });
 
       if (response.data.status) {
         setDashboardData(response.data.data);
@@ -1614,6 +1659,21 @@ export function RentalDashboardStats() {
       fetchDashboardData();
     }
   }, [isInitialized]);
+
+  // تحديث البيانات عند تغيير الفلاتر
+  useEffect(() => {
+    if (isInitialized) {
+      fetchDashboardData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    collectionsPeriod,
+    collectionsFromDate,
+    collectionsToDate,
+    paymentsDuePeriod,
+    paymentsDueFromDate,
+    paymentsDueToDate,
+  ]);
 
   const formatCurrency = (amount: number, currency: string = "SAR") => {
     try {
