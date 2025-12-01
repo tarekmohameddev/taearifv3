@@ -19,6 +19,8 @@ const useDailyFollowupStore = create((set, get) => ({
   statusFilter: 'upcoming',
   buildingFilter: 'all',
   dateFilter: 'today',
+  fromDate: '',
+  toDate: '',
   
   // Pagination
   currentPage: 1,
@@ -35,6 +37,8 @@ const useDailyFollowupStore = create((set, get) => ({
   setStatusFilter: (statusFilter) => set({ statusFilter, currentPage: 1 }),
   setBuildingFilter: (buildingFilter) => set({ buildingFilter, currentPage: 1 }),
   setDateFilter: (dateFilter) => set({ dateFilter, currentPage: 1 }),
+  setFromDate: (fromDate) => set({ fromDate, currentPage: 1 }),
+  setToDate: (toDate) => set({ toDate, currentPage: 1 }),
   setCurrentPage: (currentPage) => set({ currentPage }),
   setItemsPerPage: (itemsPerPage) => set({ itemsPerPage, currentPage: 1 }),
   
@@ -46,9 +50,17 @@ const useDailyFollowupStore = create((set, get) => ({
       statusFilter,
       buildingFilter,
       dateFilter,
+      fromDate,
+      toDate,
       currentPage,
       itemsPerPage
     } = state;
+    
+    // التحقق من الحقول المطلوبة عند اختيار "مخصص"
+    if (dateFilter === "custom" && (!fromDate || !toDate)) {
+      console.log("Custom date filter requires both from and to dates");
+      return;
+    }
     
     try {
       set({ loading: true, error: null });
@@ -56,12 +68,34 @@ const useDailyFollowupStore = create((set, get) => ({
       // بناء المعاملات
       const apiParams = {
         status: statusFilter,
-        from_date: dateFilter.from,
-        to_date: dateFilter.to,
         page: currentPage,
         per_page: itemsPerPage,
         ...params
       };
+      
+      // إضافة تواريخ حسب dateFilter
+      if (dateFilter === "custom") {
+        if (fromDate) apiParams.from_date = fromDate;
+        if (toDate) apiParams.to_date = toDate;
+      } else if (dateFilter === "today") {
+        const today = new Date().toISOString().split('T')[0];
+        apiParams.from_date = today;
+        apiParams.to_date = today;
+      } else if (dateFilter === "week") {
+        const today = new Date();
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay());
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        apiParams.from_date = weekStart.toISOString().split('T')[0];
+        apiParams.to_date = weekEnd.toISOString().split('T')[0];
+      } else if (dateFilter === "month") {
+        const today = new Date();
+        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        apiParams.from_date = monthStart.toISOString().split('T')[0];
+        apiParams.to_date = monthEnd.toISOString().split('T')[0];
+      }
       
       // إضافة building_id فقط إذا لم يكن "all"
       if (buildingFilter && buildingFilter !== 'all') {
@@ -132,6 +166,8 @@ const useDailyFollowupStore = create((set, get) => ({
     statusFilter: 'upcoming',
     buildingFilter: 'all',
     dateFilter: 'today',
+    fromDate: '',
+    toDate: '',
     currentPage: 1
   }),
   

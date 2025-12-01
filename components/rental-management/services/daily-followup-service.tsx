@@ -134,6 +134,8 @@ export function DailyFollowupService() {
     statusFilter,
     buildingFilter,
     dateFilter,
+    fromDate,
+    toDate,
     currentPage,
     itemsPerPage,
     totalPages,
@@ -142,6 +144,8 @@ export function DailyFollowupService() {
     setStatusFilter,
     setBuildingFilter,
     setDateFilter,
+    setFromDate,
+    setToDate,
     setCurrentPage,
     fetchDailyFollowupData,
     getFilteredData,
@@ -166,7 +170,7 @@ export function DailyFollowupService() {
 
   useEffect(() => {
     fetchPaymentData();
-  }, [searchTerm, statusFilter, buildingFilter, dateFilter, currentPage]);
+  }, [searchTerm, statusFilter, buildingFilter, dateFilter, fromDate, toDate, currentPage]);
 
   // فلترة البيانات
   const filteredData = getFilteredData();
@@ -275,7 +279,7 @@ export function DailyFollowupService() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="search">البحث</Label>
               <div className="relative">
@@ -315,6 +319,29 @@ export function DailyFollowupService() {
                 </SelectContent>
               </Select>
             </div>
+            {/* Date inputs when custom is selected */}
+            {dateFilter === "custom" && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="from-date">من تاريخ</Label>
+                  <Input
+                    id="from-date"
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="to-date">إلى تاريخ</Label>
+                  <Input
+                    id="to-date"
+                    type="date"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
             <div className="space-y-2">
               <Label htmlFor="building">العمارة</Label>
               <Select value={buildingFilter} onValueChange={setBuildingFilter}>

@@ -538,11 +538,14 @@ export function RentalDetailsDialog() {
       return;
     }
 
+    // استخدام payment.id مباشرة (وليس installment_id)
+    const paymentIdToUse = payment.id;
+
     try {
-      setReversingPaymentId(paymentId);
+      setReversingPaymentId(paymentIdToUse);
 
       const response = await axiosInstance.post(
-        `/v1/rms/rentals/${selectedRentalId}/payments/${paymentId}/reverse`,
+        `/v1/rms/rentals/${selectedRentalId}/payments/${paymentIdToUse}/reverse`,
       );
 
       if (response.data.status) {
