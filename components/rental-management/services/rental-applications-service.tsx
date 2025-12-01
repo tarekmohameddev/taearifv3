@@ -186,38 +186,41 @@ export function RentalApplicationsService({
   });
   const [renewalLoading, setRenewalLoading] = useState(false);
 
-  // Cleanup effect to fix pointer-events issue for all dialogs
+  // Prevent Radix UI from adding pointer-events: none to body
   useEffect(() => {
-    const dialogs = [
-      rentalApplications.isRentalDetailsDialogOpen,
-      rentalApplications.isPaymentCollectionDialogOpen,
-      rentalApplications.isRentalWhatsAppDialogOpen,
-      isStatusChangeDialogOpen,
-      isRenewalDialogOpen,
-      rentalApplications.isDeleteDialogOpen,
-      rentalApplications.isEditRentalDialogOpen,
-    ];
+    // Monitor body style changes and remove pointer-events: none immediately
+    const observer = new MutationObserver(() => {
+      const body = document.body;
+      if (body.style.pointerEvents === "none") {
+        body.style.pointerEvents = "";
+      }
+    });
 
-    const anyDialogOpen = dialogs.some((dialog) => dialog);
+    // Start observing body for style attribute changes
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["style"],
+    });
 
-    if (!anyDialogOpen) {
-      // Fix pointer-events issue by removing the style attribute
-      setTimeout(() => {
-        const body = document.body;
-        if (body.style.pointerEvents === "none") {
-          body.style.pointerEvents = "";
-        }
-      }, 100);
-    }
-  }, [
-    rentalApplications.isRentalDetailsDialogOpen,
-    rentalApplications.isPaymentCollectionDialogOpen,
-    rentalApplications.isRentalWhatsAppDialogOpen,
-    isStatusChangeDialogOpen,
-    isRenewalDialogOpen,
-    rentalApplications.isDeleteDialogOpen,
-    rentalApplications.isEditRentalDialogOpen,
-  ]);
+    // Also check immediately and set up interval as backup
+    const checkAndRemove = () => {
+      const body = document.body;
+      if (body.style.pointerEvents === "none") {
+        body.style.pointerEvents = "";
+      }
+    };
+
+    // Check immediately
+    checkAndRemove();
+
+    // Check periodically as backup (every 50ms)
+    const interval = setInterval(checkAndRemove, 50);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+    };
+  }, []);
 
   // Function to open renewal dialog
   const openRenewalDialog = (rental: any) => {
@@ -962,7 +965,6 @@ export function RentalApplicationsService({
                   onClick={(e) => {
                     // منع فتح dialog إذا تم الضغط على dropdown menu أو أزرار
                     if (
-                      (e.target as any).closest?.("[data-dropdown]") ||
                       (e.target as any).closest?.("button") ||
                       (e.target as any).closest?.('[role="menuitem"]') ||
                       (e.target as any).closest?.(".cursor-pointer")
@@ -1150,14 +1152,13 @@ export function RentalApplicationsService({
                   </td>
 
                   {/* الإجراءات */}
-                  <td className="px-6 py-5 z-[9999]">
-                    <div className="flex items-center justify-center z-[9999]">
-                      <DropdownMenu data-dropdown>
+                  <td className="px-6 py-5">
+                    <div className="flex items-center justify-center">
+                      <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={(e) => e.stopPropagation()}
                             className="h-8 w-8 p-0 border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 shadow-sm"
                           >
                             <MoreVertical className="h-4 w-4" />
@@ -1165,8 +1166,7 @@ export function RentalApplicationsService({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
                               openRentalDetailsDialog(rental.id);
                             }}
                             className="cursor-pointer hover:bg-gray-100"
@@ -1175,8 +1175,7 @@ export function RentalApplicationsService({
                             عرض التفاصيل
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
                               openPaymentCollectionDialog(rental.id);
                             }}
                             className="cursor-pointer hover:bg-gray-100"
@@ -1185,8 +1184,7 @@ export function RentalApplicationsService({
                             تحصيل المدفوعات
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
                               openRenewalDialog(rental);
                             }}
                             className="cursor-pointer hover:bg-gray-100"
@@ -1195,8 +1193,7 @@ export function RentalApplicationsService({
                             تجديد العقد
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
                               openStatusChangeDialog(rental);
                             }}
                             className="cursor-pointer hover:bg-gray-100"
@@ -1206,9 +1203,7 @@ export function RentalApplicationsService({
                           </DropdownMenuItem>
                           {hasValidCRMWhatsAppChannel() && (
                             <DropdownMenuItem
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
+                              onClick={() => {
                                 console.log(
                                   "Setting rental for WhatsApp:",
                                   rental,
@@ -1222,8 +1217,7 @@ export function RentalApplicationsService({
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
                               setRentalApplications({
                                 editingRental: rental,
                                 isEditRentalDialogOpen: true,
@@ -1235,8 +1229,7 @@ export function RentalApplicationsService({
                             تعديل الإيجار
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
                               setRentalApplications({
                                 deletingRental: rental,
                                 isDeleteDialogOpen: true,
