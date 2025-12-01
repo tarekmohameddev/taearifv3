@@ -99,6 +99,8 @@ interface RentalDetails {
       payment_status: string;
       reference: string | null;
       paid_at: string | null;
+      payment_id: number | null;
+      can_reverse: boolean;
     }>;
   };
 }
@@ -538,11 +540,23 @@ export function RentalDetailsDialog() {
       return;
     }
 
-    // استخدام payment.id مباشرة (وليس installment_id)
-    const paymentIdToUse = payment.id;
+    // التحقق من can_reverse
+    if (!payment.can_reverse) {
+      toast.error("لا يمكن التراجع عن هذه الدفعة");
+      return;
+    }
+
+    // التحقق من وجود payment_id
+    if (!payment.payment_id) {
+      toast.error("معرف الدفعة غير موجود");
+      return;
+    }
+
+    // استخدام payment.payment_id في الـ API
+    const paymentIdToUse = payment.payment_id;
 
     try {
-      setReversingPaymentId(paymentIdToUse);
+      setReversingPaymentId(payment.id);
 
       const response = await axiosInstance.post(
         `/v1/rms/rentals/${selectedRentalId}/payments/${paymentIdToUse}/reverse`,
@@ -1172,8 +1186,8 @@ export function RentalDetailsDialog() {
                               >
                                 {getPaymentStatusText(payment)}
                               </Badge>
-                              {/* إظهار زر تراجع فقط إذا تم دفع جزء أو كل المبلغ */}
-                              {payment.paid_amount > 0 && (
+                              {/* إظهار زر تراجع فقط إذا كان can_reverse === true */}
+                              {payment.can_reverse === true && (
                                 <Button
                                   variant="outline"
                                   size="sm"
