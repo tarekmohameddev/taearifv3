@@ -480,7 +480,7 @@ export default function VisionSection(props: VisionSectionProps = {}) {
           minHeight: layout.minHeight || undefined,
         }}
       >
-        <div className="md:flex-[.6] xl:flex-[.72] flex flex-col justify-center order-2 md:order-1">
+        <div className="md:flex-[.6] xl:flex-[.72] flex flex-col justify-center order-2 md:order-1" dir="rtl">
           {content.eyebrow && (
             <p
               className={`mb-2 ${content.font?.eyebrow?.size || "text-xs md:text-base xl:text-lg"} ${content.font?.eyebrow?.weight || "font-normal"} ${content.font?.eyebrow?.color || "text-muted-foreground"} ${content.font?.eyebrow?.lineHeight || "leading-[22.5px]"}`}
