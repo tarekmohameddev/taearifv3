@@ -313,7 +313,17 @@ export const logosTickerStructure: ComponentStructure = {
             }
           ]
         },
-        { key: "displayMode", label: "Display Mode", type: "select" }
+        {
+          key: "displayMode",
+          label: "Display Mode",
+          type: "select",
+          options: [
+            { value: "both", label: "Both (Forward & Reverse)" },
+            { value: "forward", label: "Forward Only" },
+            { value: "reverse", label: "Reverse Only" }
+          ],
+          defaultValue: "both"
+        }
       ]
     }
   ]
