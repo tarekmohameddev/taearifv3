@@ -150,6 +150,11 @@ export function RentalDetailsDialog() {
   const [expenseToDelete, setExpenseToDelete] = useState<any>(null);
   const [deleteExpenseLoading, setDeleteExpenseLoading] = useState(false);
 
+  // State for reversing payment
+  const [reversingPaymentId, setReversingPaymentId] = useState<number | null>(
+    null,
+  );
+
   // Fetch rental details when dialog opens
   useEffect(() => {
     if (isRentalDetailsDialogOpen && selectedRentalId && userData?.token) {
@@ -518,6 +523,86 @@ export function RentalDetailsDialog() {
   const handleOpenPaymentCollection = () => {
     if (selectedRentalId) {
       openPaymentCollectionDialog(selectedRentalId);
+    }
+  };
+
+  const handleReversePayment = async (paymentId: number) => {
+    if (!selectedRentalId) return;
+
+    // التحقق من وجود الدفعة في البيانات الحالية
+    const payment = details?.payment_details?.items?.find(
+      (p) => p.id === paymentId,
+    );
+    if (!payment) {
+      toast.error("الدفعة غير موجودة في البيانات الحالية");
+      return;
+    }
+
+    try {
+      setReversingPaymentId(paymentId);
+
+      const response = await axiosInstance.post(
+        `/v1/rms/rentals/${selectedRentalId}/payments/${paymentId}/reverse`,
+      );
+
+      if (response.data.status) {
+        toast.success("تم التراجع عن الدفعة بنجاح");
+        // إعادة تحميل تفاصيل الإيجار لتحديث البيانات
+        await fetchRentalDetails();
+      } else {
+        // معالجة الأخطاء المحددة
+        const errorCode = response.data.error_code;
+        const errorMessage = response.data.message;
+
+        if (errorCode === "INSTALLMENT_NOT_FOUND") {
+          toast.error(
+            `الدفعة #${paymentId} غير موجودة أو لا تنتمي لهذا الإيجار. يرجى تحديث الصفحة.`,
+            { duration: 5000 },
+          );
+          // إعادة تحميل البيانات للتأكد من التحديث
+          await fetchRentalDetails();
+        } else {
+          toast.error(
+            "فشل في التراجع عن الدفعة: " + (errorMessage || "خطأ غير معروف"),
+          );
+        }
+      }
+    } catch (error: any) {
+      console.error("Error reversing payment:", error);
+
+      // معالجة الأخطاء من response
+      const errorData = error.response?.data;
+      const errorCode = errorData?.error_code;
+      const errorMessage = errorData?.message;
+
+      if (errorCode === "INSTALLMENT_NOT_FOUND") {
+        const installmentId =
+          errorData?.error_data?.installment_id || paymentId;
+        toast.error(
+          `الدفعة #${installmentId} غير موجودة أو لا تنتمي لهذا الإيجار. يرجى تحديث الصفحة.`,
+          { duration: 5000 },
+        );
+        // إعادة تحميل البيانات للتأكد من التحديث
+        await fetchRentalDetails();
+      } else if (error.response?.status === 404) {
+        toast.error(
+          "الدفعة غير موجودة. يرجى تحديث الصفحة.",
+          { duration: 5000 },
+        );
+        await fetchRentalDetails();
+      } else if (error.response?.status === 403) {
+        toast.error(
+          "ليس لديك صلاحية للتراجع عن هذه الدفعة.",
+          { duration: 5000 },
+        );
+      } else {
+        toast.error(
+          "خطأ في التراجع عن الدفعة: " +
+            (errorMessage || error.message || "خطأ غير معروف"),
+        );
+      }
+    } finally {
+      setReversingPaymentId(null);
     }
   };
 
@@ -1068,13 +1153,15 @@ export function RentalDetailsDialog() {
                                   )}
                                 </p>
                                 {payment.paid_amount > 0 && (
-                                  <p className="text-xs sm:text-sm text-green-600 text-right">
-                                    مدفوع:{" "}
-                                    {formatCurrency(
-                                      payment.paid_amount,
-                                      details.rental.currency || "SAR",
-                                    )}
-                                  </p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <p className="text-xs sm:text-sm text-green-600 text-right">
+                                      مدفوع:{" "}
+                                      {formatCurrency(
+                                        payment.paid_amount,
+                                        details.rental.currency || "SAR",
+                                      )}
+                                    </p>
+                                  </div>
                                 )}
                               </div>
                               <Badge
@@ -1082,6 +1169,31 @@ export function RentalDetailsDialog() {
                               >
                                 {getPaymentStatusText(payment)}
                               </Badge>
+                              {/* إظهار زر تراجع فقط إذا تم دفع جزء أو كل المبلغ */}
+                              {payment.paid_amount > 0 && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleReversePayment(payment.id)
+                                  }
+                                  disabled={
+                                    reversingPaymentId === payment.id
+                                  }
+                                  className="text-xs sm:text-sm h-6 sm:h-7 px-2 sm:px-3 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300 "
+                                  dir="rtl"
+                                >
+                                  {reversingPaymentId === payment.id ? (
+                                    <>
+                                      <Loader2 className="h-3 w-3 ml-1 animate-spin" />
+                                      جاري...
+                                    </>
+                                  ) : (
+                                    "تراجع"
+                                  )}
+                                </Button>
+                              )}
+                              
                             </div>
                           </div>
                         ))}

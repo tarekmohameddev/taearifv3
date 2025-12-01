@@ -198,6 +198,26 @@ export function RentalApplicationsService({
   });
   const [renewalLoading, setRenewalLoading] = useState(false);
 
+  // Filter options from API
+  const [filterOptions, setFilterOptions] = useState<{
+    contract_statuses: Array<{ id: string; name: string }>;
+    rental_statuses: Array<{ id: string; name: string }>;
+    payment_statuses: Array<{ id: string; name: string }>;
+    paying_plans: Array<{ id: string; name: string }>;
+    buildings: Array<{ id: number; name: string }>;
+    projects: Array<{ id: number; name: string }>;
+    units: Array<{ id: number; name: string }>;
+  }>({
+    contract_statuses: [],
+    rental_statuses: [],
+    payment_statuses: [],
+    paying_plans: [],
+    buildings: [],
+    projects: [],
+    units: [],
+  });
+
+
   // Get filters from store
   const {
     contractSearchTerm,
@@ -436,6 +456,58 @@ export function RentalApplicationsService({
     lastProcessedOpenAddDialogCounter,
   } = rentalApplications;
   const { userData } = useAuthStore();
+
+  // Fetch filter options from API
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      if (!userData?.token) return;
+
+      try {
+        // جرب endpoint مختلف إذا لم يعمل /filters
+        const response = await axiosInstance.get("/v1/rms/rentals", {
+          params: { page: 1, per_page: 1 }
+        });
+        
+        // إذا كانت البيانات في response.data.data مباشرة
+        if (response.data.status && response.data.data) {
+          const data = response.data.data;
+          
+          // التحقق من وجود filter options في response
+          if (data.contract_statuses || data.rental_statuses || data.payment_statuses) {
+            setFilterOptions({
+              contract_statuses: data.contract_statuses || [],
+              rental_statuses: data.rental_statuses || [],
+              payment_statuses: data.payment_statuses || [],
+              paying_plans: data.paying_plans || [],
+              buildings: data.buildings || [],
+              projects: data.projects || [],
+              units: data.units || [],
+            });
+          }
+        }
+      } catch (err) {
+        // جرب endpoint آخر
+        try {
+          const response = await axiosInstance.get("/v1/rms/rentals/filters");
+          if (response.data.status && response.data.data) {
+            setFilterOptions({
+              contract_statuses: response.data.data.contract_statuses || [],
+              rental_statuses: response.data.data.rental_statuses || [],
+              payment_statuses: response.data.data.payment_statuses || [],
+              paying_plans: response.data.data.paying_plans || [],
+              buildings: response.data.data.buildings || [],
+              projects: response.data.data.projects || [],
+              units: response.data.data.units || [],
+            });
+          }
+        } catch (err2) {
+          console.error("Error fetching filter options:", err2);
+        }
+      }
+    };
+
+    fetchFilterOptions();
+  }, [userData?.token]);
 
   // التحقق من وجود قناة واتساب صالحة
   const hasValidCRMWhatsAppChannel = () => {
@@ -958,18 +1030,19 @@ export function RentalApplicationsService({
             <Calendar className="h-4 w-4" />
             المتابعة اليومية
           </Button>
-            <Button
+            {/* مؤقتاً مخفي */}
+            {/* <Button
               onClick={() => router.push("/dashboard/rental-management/contracts")}
               variant="outline"
               className="flex items-center gap-2"
             >
               <FileText className="h-4 w-4" />
               العقود
-            </Button>
+            </Button> */}
         </div>
         
-        {/* زر إدارة الملاك منفصل على اليسار */}
-        <div>
+        {/* مؤقتاً مخفي */}
+        {/* <div>
           <Button
             onClick={() => router.push("/dashboard/rental-management/owners")}
             className="flex items-center gap-2 bg-black hover:bg-gray-900"
@@ -977,7 +1050,7 @@ export function RentalApplicationsService({
             <Users className="h-4 w-4" />
             إدارة الملاك
           </Button>
-        </div>
+        </div> */}
       </div>
 
       {/* Search and Filter */}
@@ -1097,10 +1170,11 @@ export function RentalApplicationsService({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع الحالات</SelectItem>
-              <SelectItem value="active">نشط</SelectItem>
-              <SelectItem value="expired">منتهي</SelectItem>
-              <SelectItem value="pending">معلق</SelectItem>
-              <SelectItem value="terminated">ملغي/موقوف</SelectItem>
+              {filterOptions.contract_statuses.map((status) => (
+                <SelectItem key={status.id} value={status.id}>
+                  {status.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -1112,10 +1186,11 @@ export function RentalApplicationsService({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع الحالات</SelectItem>
-              <SelectItem value="paid">مدفوع</SelectItem>
-              <SelectItem value="pending">مستحق</SelectItem>
-              <SelectItem value="overdue">متأخر</SelectItem>
-              <SelectItem value="not_due">غير مستحق</SelectItem>
+              {filterOptions.payment_statuses.map((status) => (
+                <SelectItem key={status.id} value={status.id}>
+                  {status.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -1127,10 +1202,11 @@ export function RentalApplicationsService({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع الطرق</SelectItem>
-              <SelectItem value="monthly">شهري</SelectItem>
-              <SelectItem value="quarterly">ربعي</SelectItem>
-              <SelectItem value="semi_annual">نصف سنوي</SelectItem>
-              <SelectItem value="annual">سنوي</SelectItem>
+              {filterOptions.paying_plans.map((plan) => (
+                <SelectItem key={plan.id} value={plan.id}>
+                  {plan.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -1142,7 +1218,11 @@ export function RentalApplicationsService({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع المباني</SelectItem>
-              {/* يمكن إضافة المباني هنا لاحقاً */}
+              {filterOptions.buildings.map((building) => (
+                <SelectItem key={building.id} value={building.id.toString()}>
+                  {building.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
