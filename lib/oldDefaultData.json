@@ -3373,7 +3373,7 @@ export const PAGE_DEFINITIONS = {
                   },
                   {
                     value: "12",
-                    label: "مبنى",
+                    label: "عمارة",
                   },
                   {
                     value: "8",
