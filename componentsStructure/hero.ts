@@ -272,6 +272,55 @@ export const heroStructure: ComponentStructure = {
           ],
         },
         {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "searchFormButtonBgColor",
+              label: "Search Form Button Background Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary", // Button background uses primary color from branding
+            },
+            {
+              key: "searchFormButtonTextColor",
+              label: "Search Form Button Text Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Button text uses secondary color from branding
+            },
+            {
+              key: "searchFormButtonHoverColor",
+              label: "Search Form Button Hover Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary", // Button hover uses primary color from branding
+            },
+            {
+              key: "purposeToggleActiveBgColor",
+              label: "Purpose Toggle Active Background Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary", // Active toggle uses primary color from branding
+            },
+            {
+              key: "purposeToggleActiveTextColor",
+              label: "Purpose Toggle Active Text Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "secondary", // Active toggle text uses secondary color from branding
+            },
+            {
+              key: "dropdownHoverColor",
+              label: "Dropdown Hover Background Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary", // Dropdown hover uses primary color from branding
+            },
+          ],
+        },
+        {
           key: "animations",
           label: "Animations",
           type: "object",
@@ -496,6 +545,20 @@ export const heroStructure: ComponentStructure = {
                   ],
                 },
               ],
+            },
+          ],
+        },
+        {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "overlayColor",
+              label: "Overlay Background Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary", // Overlay uses primary color from branding
             },
           ],
         },
