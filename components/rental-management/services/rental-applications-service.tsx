@@ -1053,36 +1053,6 @@ export function RentalApplicationsService({
         </div> */}
       </div>
 
-      {/* Search and Filter */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="البحث في الإيجارات..."
-            value={searchTerm}
-            onChange={(e) =>
-              setRentalApplications({ searchTerm: e.target.value })
-            }
-            className="pr-10"
-          />
-        </div>
-        <Select
-          value={filterStatus}
-          onValueChange={(v) => setRentalApplications({ filterStatus: v })}
-        >
-          <SelectTrigger className="w-full sm:w-48">
-            <Filter className="ml-2 h-4 w-4" />
-            <SelectValue placeholder="جميع الحالات" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">جميع الحالات</SelectItem>
-            <SelectItem value="active">نشط</SelectItem>
-            <SelectItem value="expired">منتهي</SelectItem>
-            <SelectItem value="pending">معلق</SelectItem>
-            <SelectItem value="terminated">ملغي/موقوف</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
       {/* Statistics Cards */}
       {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
