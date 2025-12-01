@@ -259,7 +259,7 @@ export function PurchaseInspectionsService() {
           inspectionNumber: "INS-2024-004",
           propertyDetails: {
             title: "Commercial Building in Riyadh",
-            titleAr: "مبنى تجاري في الرياض",
+            titleAr: "عمارة تجاري في الرياض",
             type: "commercial",
             typeAr: "تجاري",
             location: "Riyadh - King Fahd Road",

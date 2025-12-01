@@ -108,7 +108,7 @@ const useContractsStore = create((set, get) => ({
             
             const displayName = buildingName && buildingName !== "N/A"
               ? buildingName
-              : `المبنى ${buildingId}`;
+              : `العمارة ${buildingId}`;
             
             uniqueBuildings.set(buildingId, {
               id: buildingId,

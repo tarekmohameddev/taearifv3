@@ -1,18 +1,44 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
+import * as LucideIcons from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import * as ReactIconsFa from "react-icons/fa";
+import * as ReactIconsMd from "react-icons/md";
+import type { IconType } from "react-icons";
+
+// Function to get icon component based on type or name
+const getContactCardIcon = (typeOrName: string): LucideIcon | IconType | React.ComponentType<any> => {
+  // Try lucide-react icons
+  const lucideIcon = (LucideIcons as any)[typeOrName];
+  if (lucideIcon) {
+    return lucideIcon;
+  }
+
+  // Try react-icons Font Awesome
+  const faIcon = (ReactIconsFa as any)[typeOrName];
+  if (faIcon) {
+    return faIcon;
+  }
+
+  // Try react-icons Material Design
+  const mdIcon = (ReactIconsMd as any)[typeOrName];
+  if (mdIcon) {
+    return mdIcon;
+  }
+
+  // Fallback to default icon
+  return LucideIcons.MapPin;
+};
 
 interface ContactCardProps {
   icon: {
-    src: string;
-    alt: string;
-    size: {
-      mobile: string;
-      desktop: string;
-    };
+    type?: string;
+    name?: string;
+    size?: string | number;
+    className?: string;
   };
   title: {
     text: string;
@@ -89,12 +115,9 @@ const getDefaultContactCardsData = () => ({
   cards: [
     {
       icon: {
-        src: "https://dalel-lovat.vercel.app/images/contact-us/address.svg",
-        alt: "address Icon",
-        size: {
-          mobile: "w-[40px] h-[40px]",
-          desktop: "md:w-[60px] md:h-[60px]",
-        },
+        type: "MapPin",
+        size: 40,
+        className: "w-[40px] h-[40px] md:w-[60px] md:h-[60px]",
       },
       title: {
         text: "العنوان",
@@ -146,12 +169,9 @@ const getDefaultContactCardsData = () => ({
     },
     {
       icon: {
-        src: "https://dalel-lovat.vercel.app/images/contact-us/envelope.svg",
-        alt: "email Icon",
-        size: {
-          mobile: "w-[40px] h-[40px]",
-          desktop: "md:w-[60px] md:h-[60px]",
-        },
+        type: "Mail",
+        size: 40,
+        className: "w-[40px] h-[40px] md:w-[60px] md:h-[60px]",
       },
       title: {
         text: "الايميل",
@@ -208,12 +228,9 @@ const getDefaultContactCardsData = () => ({
     },
     {
       icon: {
-        src: "https://dalel-lovat.vercel.app/images/contact-us/phone.svg",
-        alt: "phone Icon",
-        size: {
-          mobile: "w-[40px] h-[40px]",
-          desktop: "md:w-[60px] md:h-[60px]",
-        },
+        type: "Phone",
+        size: 40,
+        className: "w-[40px] h-[40px] md:w-[60px] md:h-[60px]",
       },
       title: {
         text: "الجوال",
@@ -495,66 +512,6 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
     return brandingColor;
   };
 
-  // Function to convert hex color to CSS filter for SVG images
-  // This converts black/dark SVG images to the target color using CSS filters
-  // Formula based on: https://codepen.io/sosuke/pen/Pjoqqp
-  const getIconFilter = (targetColor: string): string => {
-    if (!targetColor || !targetColor.startsWith('#')) {
-      return "none"; // No filter for invalid colors
-    }
-    
-    const cleanHex = targetColor.replace('#', '');
-    if (cleanHex.length !== 6) return "none";
-    
-    // Get RGB values (0-255)
-    const r = parseInt(cleanHex.substr(0, 2), 16);
-    const g = parseInt(cleanHex.substr(2, 2), 16);
-    const b = parseInt(cleanHex.substr(4, 2), 16);
-    
-    // Normalize RGB values (0-1)
-    const rNorm = r / 255;
-    const gNorm = g / 255;
-    const bNorm = b / 255;
-    
-    // Calculate the filter values using the formula from codepen
-    // This converts black (#000000) to the target color
-    // The formula: brightness(0) saturate(100%) invert(R%) sepia(S%) saturate(S%) hue-rotate(Hdeg) brightness(B%) contrast(C%)
-    
-    // Calculate hue
-    const max = Math.max(rNorm, gNorm, bNorm);
-    const min = Math.min(rNorm, gNorm, bNorm);
-    let h = 0;
-    
-    if (max !== min) {
-      if (max === rNorm) {
-        h = ((gNorm - bNorm) / (max - min)) % 6;
-      } else if (max === gNorm) {
-        h = (bNorm - rNorm) / (max - min) + 2;
-      } else {
-        h = (rNorm - gNorm) / (max - min) + 4;
-      }
-    }
-    h = Math.round(h * 60);
-    if (h < 0) h += 360;
-    
-    // Calculate saturation
-    const s = max === 0 ? 0 : ((max - min) / max) * 100;
-    
-    // Calculate brightness/lightness
-    const l = (max + min) / 2 * 100;
-    
-    // Build the filter
-    // For black to color conversion:
-    // 1. brightness(0) - makes everything black
-    // 2. invert() - inverts based on target color
-    // 3. sepia() - adds sepia tone
-    // 4. saturate() - adjusts saturation
-    // 5. hue-rotate() - rotates hue to target
-    // 6. brightness() - adjusts final brightness
-    // 7. contrast() - fine-tunes contrast
-    
-    return `brightness(0) saturate(100%) invert(${rNorm * 100}%) sepia(${s}%) saturate(${s * 2}%) hue-rotate(${h}deg) brightness(${l / 50}%) contrast(1.2)`;
-  };
 
   // Check if we have any data from API/stores first
   const hasApiData =
@@ -611,17 +568,16 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
 
   // Get colors using getColor function
   const iconColor = getColor("icon.color", brandingColors.primary);
-  const iconFilter = getIconFilter(iconColor);
 
   // Use merged data for cards with proper fallbacks
   const cards: ContactCardProps[] = (mergedData.cards || defaultData.cards).map(
     (card: ContactCardProps) => ({
       ...card,
       icon: {
-        ...card.icon,
-        src:
-          card.icon.src ||
-          "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCA0NUw0NSA0MEw0MCAzNUwzMCA0MFYyMEw0MCAyNVY0MEwzMCA0NVoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+",
+        type: card.icon?.type || "MapPin",
+        name: card.icon?.name,
+        size: card.icon?.size || 40,
+        className: card.icon?.className || "w-[40px] h-[40px] md:w-[60px] md:h-[60px]",
       },
       cardStyle: {
         ...defaultData.cards[0]?.cardStyle,
@@ -648,18 +604,63 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
                 : {}
             }
           >
-            {card.icon.src && card.icon.src.trim() !== "" && (
-              <Image
-                className={`${card.icon.size?.mobile || "w-[40px] h-[40px]"} ${card.icon.size?.desktop || "md:w-[60px] md:h-[60px]"}`}
-                src={card.icon.src}
-                alt={card.icon.alt || "Contact card icon"}
-                width={60}
-                height={60}
-                style={{
-                  filter: iconFilter !== "none" ? iconFilter : undefined,
-                }}
-              />
-            )}
+            {(() => {
+              // Priority: name > type > default
+              const iconNameOrType = card.icon?.name || card.icon?.type || "MapPin";
+              const IconComponent = getContactCardIcon(iconNameOrType);
+              
+              // Get icon size
+              const iconSize = typeof card.icon?.size === "number" 
+                ? card.icon.size 
+                : parseInt(card.icon?.size || "40");
+              
+              // Get icon className
+              const iconClassName = card.icon?.className || "w-[40px] h-[40px] md:w-[60px] md:h-[60px]";
+              
+              // Check if it's a React Icon (from react-icons) by checking the icon name pattern
+              const isReactIcon = iconNameOrType.startsWith('Fa') || 
+                                 iconNameOrType.startsWith('Md') || 
+                                 iconNameOrType.startsWith('Io') ||
+                                 iconNameOrType.startsWith('Bi') ||
+                                 iconNameOrType.startsWith('Bs') ||
+                                 iconNameOrType.startsWith('Hi') ||
+                                 iconNameOrType.startsWith('Ai') ||
+                                 iconNameOrType.startsWith('Ti') ||
+                                 iconNameOrType.startsWith('Gi') ||
+                                 iconNameOrType.startsWith('Si') ||
+                                 iconNameOrType.startsWith('Ri') ||
+                                 iconNameOrType.startsWith('Tb') ||
+                                 iconNameOrType.startsWith('Vsc') ||
+                                 iconNameOrType.startsWith('Wi') ||
+                                 iconNameOrType.startsWith('Di') ||
+                                 iconNameOrType.startsWith('Im');
+              
+              // For React Icons, use style with fontSize
+              if (isReactIcon) {
+                return (
+                  <IconComponent
+                    className={iconClassName}
+                    style={{
+                      color: iconColor,
+                      fontSize: `${iconSize}px`,
+                      width: `${iconSize}px`,
+                      height: `${iconSize}px`,
+                    }}
+                  />
+                );
+              }
+              
+              // For Lucide icons, use size prop
+              return (
+                <IconComponent
+                  size={iconSize}
+                  className={iconClassName}
+                  style={{
+                    color: iconColor,
+                  }}
+                />
+              );
+            })()}
             <div
               className={`flex flex-col ${card.cardStyle?.alignment?.horizontal || "items-center"} ${card.cardStyle?.alignment?.vertical || "justify-center"} ${card.cardStyle?.gap?.content?.mobile || "gap-y-[8px]"} ${card.cardStyle?.gap?.content?.desktop || "md:gap-y-[16px]"}`}
             >

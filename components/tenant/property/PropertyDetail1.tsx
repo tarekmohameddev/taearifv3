@@ -1451,7 +1451,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                   <div className="flex flex-row gap-x-2">
                     <CalendarDaysIcon className="w-4 h-4" style={{ color: primaryColor }} />
                     <p className="font-normal text-xs xs:text-sm md:text-base leading-4" style={{ color: primaryColor }}>
-                      عمر المبنى:
+                      عمر العمارة:
                     </p>
                   </div>
                   <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">

@@ -604,7 +604,7 @@ export default function NewDealForm() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="building">المبنى</Label>
+                      <Label htmlFor="building">العمارة</Label>
                       <Select
                         value={formData.building || ""}
                         onValueChange={(value) =>
@@ -612,7 +612,7 @@ export default function NewDealForm() {
                         }
                       >
                         <SelectTrigger id="building">
-                          <SelectValue placeholder="اختر المبنى" />
+                          <SelectValue placeholder="اختر العمارة" />
                         </SelectTrigger>
                         <SelectContent>
                           {buildings.map((building) => (

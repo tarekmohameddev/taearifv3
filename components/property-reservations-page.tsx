@@ -580,7 +580,7 @@ export function PropertyReservationsPage() {
                 </th>
                 <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">العقار</th>
                 <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">اسم المشروع</th>
-                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">اسم المبنى</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">اسم العمارة</th>
                 <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">العميل</th>
                 <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">النوع</th>
                 <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground text-sm">التاريخ والوقت</th>
@@ -1213,7 +1213,7 @@ export function PropertyReservationsPage() {
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">اسم المبنى</p>
+                          <p className="text-sm text-muted-foreground">اسم العمارة</p>
                           <p className="font-medium flex items-center gap-2">
                             <Building className="h-4 w-4 text-muted-foreground" />{" "}
                             {selectedReservation.property.buildingName}

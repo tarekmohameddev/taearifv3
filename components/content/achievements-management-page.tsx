@@ -76,7 +76,7 @@ export default function AchievementsManagementPage() {
   const iconOptions = [
     { value: "award", label: "جائزة" },
     { value: "users", label: "مستخدمين/عملاء" },
-    { value: "building", label: "مبنى/مشاريع" },
+    { value: "building", label: "عمارة/مشاريع" },
     { value: "clock", label: "ساعة/وقت" },
     { value: "star", label: "نجمة" },
     { value: "thumbs-up", label: "إعجاب" },

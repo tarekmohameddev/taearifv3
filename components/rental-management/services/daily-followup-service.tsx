@@ -316,10 +316,10 @@ export function DailyFollowupService() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="building">المبنى</Label>
+              <Label htmlFor="building">العمارة</Label>
               <Select value={buildingFilter} onValueChange={setBuildingFilter}>
                 <SelectTrigger>
-                  <SelectValue placeholder="اختر المبنى" />
+                  <SelectValue placeholder="اختر العمارة" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">جميع المباني</SelectItem>
@@ -351,7 +351,7 @@ export function DailyFollowupService() {
                   الوحدة
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  المبنى
+                  العمارة
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
                   المبلغ المستحق

@@ -190,7 +190,7 @@ export function PropertyListingService() {
           district: "Al-Aziziyah",
           districtAr: "العزيزية",
           type: "Apartment Building",
-          typeAr: "مبنى شقق",
+          typeAr: "عمارة شقق",
           units: 32,
           occupiedUnits: 28,
           monthlyRent: 3200,
@@ -319,7 +319,7 @@ export function PropertyListingService() {
                       <SelectItem value="tower">برج سكني</SelectItem>
                       <SelectItem value="villa-complex">مجمع فلل</SelectItem>
                       <SelectItem value="apartment-building">
-                        مبنى شقق
+                        عمارة شقق
                       </SelectItem>
                       <SelectItem value="commercial">تجاري</SelectItem>
                     </SelectContent>

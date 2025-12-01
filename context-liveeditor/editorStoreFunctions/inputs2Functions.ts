@@ -175,7 +175,7 @@ export const getDefaultInputs2Data = (): ComponentData => ({
             },
             {
               value: "12",
-              label: "مبنى",
+              label: "عمارة",
             },
             {
               value: "8",
