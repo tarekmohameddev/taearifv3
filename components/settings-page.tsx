@@ -113,7 +113,7 @@ export function SettingsPage() {
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
   const [allFeatures, setAllFeatures] = useState<string[]>([]);
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
-    "monthly", // Default to monthly
+    "yearly", // Default to yearly
   );
   const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
@@ -832,8 +832,8 @@ export function SettingsPage() {
                     </p>
                   </div>
 
-                  {/* Toggle مذهل للتبديل بين الخطط الشهرية والسنوية */}
-                  <div className="flex flex-col items-center gap-3">
+                  {/* Toggle مذهل للتبديل بين الخطط الشهرية والسنوية - مخفي مؤقتاً */}
+                  <div className="flex flex-col items-center gap-3 hidden">
                     <div className="relative">
                       <div className="flex items-center bg-gray-100 p-1 rounded-2xl border border-gray-300 shadow-lg">
                         <button
@@ -888,6 +888,25 @@ export function SettingsPage() {
                         </div>
                       )}
                   </div>
+
+                  {/* عرض رسالة التوفير للخطط السنوية */}
+                  {billingPeriod === "yearly" &&
+                    subscriptionPlans.plans_monthly &&
+                    subscriptionPlans.plans_yearly && (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="flex items-center gap-2 text-sm text-gray-700 font-medium bg-gray-100 px-3 py-2 rounded-lg border border-gray-300">
+                          <Sparkles className="h-4 w-4" />
+                          <span>
+                            وفر{" "}
+                            {calculateSavings(
+                              subscriptionPlans.plans_monthly[0]?.price || "0",
+                              subscriptionPlans.plans_yearly[0]?.price || "0",
+                            ).savings.toFixed(0)}{" "}
+                            ريال سنويًا
+                          </span>
+                        </div>
+                      </div>
+                    )}
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-3">
