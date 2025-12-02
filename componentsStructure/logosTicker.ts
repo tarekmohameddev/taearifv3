@@ -158,7 +158,9 @@ export const logosTickerStructure: ComponentStructure = {
             {
               key: "titleColor",
               label: "Title Color",
-              type: "color"
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary", // Title color uses primary color from branding
             },
             {
               key: "subtitleColor",

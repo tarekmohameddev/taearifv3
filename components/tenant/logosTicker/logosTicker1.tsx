@@ -70,9 +70,20 @@ export default function LogosTicker1(props: LogosTickerProps) {
   const logosTickerStates = useEditorStore(s => s.logosTickerStates);
   
   const tenantData = useTenantStore(s => s.tenantData);
+  const fetchTenantData = useTenantStore(s => s.fetchTenantData);
+  const tenantId = useTenantStore(s => s.tenantId);
   
   // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
+  // 3. FETCH TENANT DATA
+  // ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (tenantId) {
+      fetchTenantData(tenantId);
+    }
+  }, [tenantId, fetchTenantData]);
+  
+  // ─────────────────────────────────────────────────────────
+  // 4. INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (props.useStore) {
@@ -88,13 +99,13 @@ export default function LogosTicker1(props: LogosTickerProps) {
   }, [uniqueId, props.useStore]);
   
   // ─────────────────────────────────────────────────────────
-  // 4. RETRIEVE DATA FROM STORE
+  // 5. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
   const storeData = logosTickerStates[uniqueId];
   const currentStoreData = getComponentData("logosTicker", uniqueId);
   
   // ─────────────────────────────────────────────────────────
-  // 5. MERGE DATA (PRIORITY ORDER)
+  // 6. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
   const mergedData = {
     ...getDefaultLogosTickerData(),    // 1. Defaults (lowest priority)
@@ -104,14 +115,131 @@ export default function LogosTicker1(props: LogosTickerProps) {
   };
   
   // ─────────────────────────────────────────────────────────
-  // 6. EARLY RETURN IF NOT VISIBLE
+  // 7. GET BRANDING COLORS
+  // ─────────────────────────────────────────────────────────
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
+  // emerald-600 in Tailwind = #059669
+  const brandingColors = {
+    primary: 
+      tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 default (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary && 
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback to primary
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent && 
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#059669", // fallback to primary
+  };
+
+  // ─────────────────────────────────────────────────────────
+  // 8. HELPER FUNCTION TO GET COLOR
+  // ─────────────────────────────────────────────────────────
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (
+    fieldPath: string,
+    defaultColor: string = "#059669"
+  ): string => {
+    // Get styling data from mergedData
+    const styling = mergedData?.styling || {};
+    
+    // Navigate to the field using the path (e.g., "titleColor")
+    const pathParts = fieldPath.split('.');
+    let fieldData = styling;
+    for (const part of pathParts) {
+      if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+        fieldData = fieldData[part];
+      } else {
+        fieldData = undefined;
+        break;
+      }
+    }
+    
+    // Also check for useDefaultColor and globalColorType at the same path level
+    const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
+    const globalColorTypePath = `${fieldPath}.globalColorType`;
+    const useDefaultColorPathParts = useDefaultColorPath.split('.');
+    let useDefaultColorValue = styling;
+    for (const part of useDefaultColorPathParts) {
+      if (useDefaultColorValue && typeof useDefaultColorValue === 'object' && !Array.isArray(useDefaultColorValue)) {
+        useDefaultColorValue = useDefaultColorValue[part];
+      } else {
+        useDefaultColorValue = undefined;
+        break;
+      }
+    }
+    
+    const globalColorTypePathParts = globalColorTypePath.split('.');
+    let globalColorTypeValue = styling;
+    for (const part of globalColorTypePathParts) {
+      if (globalColorTypeValue && typeof globalColorTypeValue === 'object' && !Array.isArray(globalColorTypeValue)) {
+        globalColorTypeValue = globalColorTypeValue[part];
+      } else {
+        globalColorTypeValue = undefined;
+        break;
+      }
+    }
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined 
+      ? useDefaultColorValue 
+      : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      // Determine default globalColorType based on field path if not set
+      let defaultGlobalColorType = "primary";
+      if (fieldPath.includes("titleColor") || fieldPath.includes("title")) {
+        defaultGlobalColorType = "primary";
+      } else if (fieldPath.includes("textColor") || fieldPath.includes("Text") || fieldPath.includes("subtitleColor")) {
+        defaultGlobalColorType = "secondary";
+      } else if (fieldPath.includes("button") || fieldPath.includes("Button") || fieldPath.includes("bgColor") || fieldPath.includes("backgroundColor")) {
+        defaultGlobalColorType = "primary";
+      }
+      
+      const globalColorType = globalColorTypeValue || defaultGlobalColorType;
+      const brandingColor = brandingColors[globalColorType as keyof typeof brandingColors] || defaultColor;
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, try to get custom color
+    // The color might be stored directly as string or in a value property of an object
+    if (typeof fieldData === 'string' && fieldData.startsWith('#')) {
+      return fieldData;
+    }
+    
+    // If fieldData is an object, check for value property
+    if (fieldData && typeof fieldData === 'object' && !Array.isArray(fieldData)) {
+      if (fieldData.value && typeof fieldData.value === 'string' && fieldData.value.startsWith('#')) {
+        return fieldData.value;
+      }
+    }
+    
+    // Final fallback: use default branding color
+    let defaultGlobalColorType = "primary";
+    if (fieldPath.includes("titleColor") || fieldPath.includes("title")) {
+      defaultGlobalColorType = "primary";
+    } else if (fieldPath.includes("textColor") || fieldPath.includes("Text") || fieldPath.includes("subtitleColor")) {
+      defaultGlobalColorType = "secondary";
+    }
+    const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
+    return brandingColor;
+  };
+  
+  // ─────────────────────────────────────────────────────────
+  // 9. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
     return null;
   }
   
   // ─────────────────────────────────────────────────────────
-  // 7. RENDER
+  // 10. RENDER
   // ─────────────────────────────────────────────────────────
   const { i18n } = useTranslation();
   const lang = i18n.language;
@@ -149,7 +277,7 @@ export default function LogosTicker1(props: LogosTickerProps) {
           <h2
             className="section-title font-bold mb-6"
             style={{ 
-              color: mergedData.styling?.titleColor || "#0D2EA1",
+              color: getColor("titleColor", brandingColors.primary),
               fontSize: mergedData.typography?.title?.fontSize?.desktop || "3xl",
               fontWeight: mergedData.typography?.title?.fontWeight || "bold",
               fontFamily: mergedData.typography?.title?.fontFamily || "Tajawal"
