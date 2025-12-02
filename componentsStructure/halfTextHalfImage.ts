@@ -319,6 +319,7 @@ export const halfTextHalfImageStructure: ComponentStructure = {
           label: "Image",
           type: "object",
           fields: [
+            { key: "visible", label: "Show Image", type: "boolean" },
             { key: "src", label: "Image Source", type: "image" },
             { key: "alt", label: "Alt Text", type: "text" },
             {
@@ -794,6 +795,7 @@ export const halfTextHalfImageStructure: ComponentStructure = {
           label: "Image",
           type: "object",
           fields: [
+            { key: "visible", label: "Show Image", type: "boolean" },
             { key: "src", label: "Image Source", type: "image" },
             { key: "alt", label: "Alt Text", type: "text" },
             {
@@ -1353,6 +1355,7 @@ export const halfTextHalfImageStructure: ComponentStructure = {
           label: "Image Settings",
           type: "object",
           fields: [
+            { key: "visible", label: "Show Image", type: "boolean" },
             { key: "src", label: "Image URL", type: "image" },
             { key: "alt", label: "Alt Text", type: "text" },
             {

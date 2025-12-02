@@ -73,6 +73,7 @@ export function translateLabel(
     "Button Link": "components_structure.basic.button_link",
     "Image Alt": "components_structure.basic.image_alt",
     "Image Position": "components_structure.basic.image_position",
+    "Show Image": "components_structure.basic.show_image",
     "Left Position": "components_structure.basic.left_position",
     "Right Position": "components_structure.basic.right_position",
     "Top Position": "components_structure.basic.top",

@@ -74,6 +74,7 @@ interface VisionSectionProps {
     };
   };
   image?: {
+    visible?: boolean;
     src?: string;
     alt?: string;
     width?: string;
@@ -257,6 +258,7 @@ export default function VisionSection(props: VisionSectionProps = {}) {
       imagePosition: "left",
     },
     image: {
+      visible: true,
       src: "https://dalel-lovat.vercel.app//images/aboutUs-page/message.webp",
       alt: "Choose Us",
     },
@@ -520,28 +522,30 @@ export default function VisionSection(props: VisionSectionProps = {}) {
             </button>
           )}
         </div>
-        <figure
-          dir="rtl"
-          className={`w-full sm:w-[50%] mx-auto order-1 md:order-2 mb-[12px] md:mb-[0] md:flex-[.4] xl:flex-[.28] relative md:w-full h-[207px] md:h-[246px] ${image.width || "w-full md:w-[47.2%]"}`}
-        >
-          {image.background?.enabled && (
-            <div
-              className={`absolute top-0 left-0 h-full overflow-hidden z-0 ${image.background.borderRadius || "rounded-[5px]"} ${image.background.width || "w-[54%] md:w-1/2"}`}
-              style={{
-                backgroundColor: image.background.color || "#059669",
-              }}
+        {(image.visible ?? true) && (
+          <figure
+            dir="rtl"
+            className={`w-full sm:w-[50%] mx-auto order-1 md:order-2 mb-[12px] md:mb-[0] md:flex-[.4] xl:flex-[.28] relative md:w-full h-[207px] md:h-[246px] ${image.width || "w-full md:w-[47.2%]"}`}
+          >
+            {image.background?.enabled && (
+              <div
+                className={`absolute top-0 left-0 h-full overflow-hidden z-0 ${image.background.borderRadius || "rounded-[5px]"} ${image.background.width || "w-[54%] md:w-1/2"}`}
+                style={{
+                  backgroundColor: image.background.color || "#059669",
+                }}
+              />
+            )}
+            <Image
+              src={imageSrc}
+              alt={imageAlt}
+              fill
+              className={`w-full h-full object-cover ${image.background?.borderRadius || "rounded-[5px]"}`}
             />
-          )}
-          <Image
-            src={imageSrc}
-            alt={imageAlt}
-            fill
-            className={`w-full h-full object-cover ${image.background?.borderRadius || "rounded-[5px]"}`}
-          />
-          <div
-            className={`absolute inset-0 bg-black opacity-20 ${image.background?.borderRadius || "rounded-[5px]"}`}
-          ></div>
-        </figure>
+            <div
+              className={`absolute inset-0 bg-black opacity-20 ${image.background?.borderRadius || "rounded-[5px]"}`}
+            ></div>
+          </figure>
+        )}
       </div>
     </div>
   );

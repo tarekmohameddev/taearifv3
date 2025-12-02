@@ -73,6 +73,7 @@ const getDefaulthalfTextHalfImageData = () => ({
     },
   },
   image: {
+    visible: true,
     src: "https://dalel-lovat.vercel.app/images/trusted-partner-section/house.webp",
     alt: "صورة شريك موثوق",
     style: {
@@ -189,6 +190,7 @@ interface halfTextHalfImageProps {
     };
   };
   image?: {
+    visible?: boolean;
     src?: string;
     alt?: string;
     style?: {
@@ -675,36 +677,38 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
         </div>
 
         {/* الصورة: 47.2% على الديسكتوب */}
-        <div
-          className={cn(
-            "relative mb-10 md:mb-0",
-            `order-${mergedData.responsive?.mobile?.imageOrder || 1} md:order-${mergedData.responsive?.desktop?.imageOrder || 2}`,
-            mergedData.responsive?.desktop?.imageWidth || "md:w-[47.2%]",
-          )}
-        >
-          {mergedData.image?.background?.enabled && (
-            <div
-              className="absolute top-0 left-0 h-full rounded-[5px] overflow-hidden z-0"
-              style={backgroundStyles}
-            />
-          )}
-          <figure className="relative z-10 w-full aspect-[800/500]">
-            <Image
-              src={mergedData.image?.src || "/images/trusted-partner.webp"}
-              alt={mergedData.image?.alt || "صورة شريك موثوق"}
-              fill
-              sizes="(min-width: 1024px) 47.2vw, 90vw"
-              className={cn(
-                "w-full h-full",
-                mergedData.image?.style?.objectFit === "contain"
-                  ? "object-contain"
-                  : mergedData.image?.style?.objectFit === "cover"
-                    ? "object-cover"
-                    : "object-fill",
-              )}
-            />
-          </figure>
-        </div>
+        {(mergedData.image?.visible ?? true) && (
+          <div
+            className={cn(
+              "relative mb-10 md:mb-0",
+              `order-${mergedData.responsive?.mobile?.imageOrder || 1} md:order-${mergedData.responsive?.desktop?.imageOrder || 2}`,
+              mergedData.responsive?.desktop?.imageWidth || "md:w-[47.2%]",
+            )}
+          >
+            {mergedData.image?.background?.enabled && (
+              <div
+                className="absolute top-0 left-0 h-full rounded-[5px] overflow-hidden z-0"
+                style={backgroundStyles}
+              />
+            )}
+            <figure className="relative z-10 w-full aspect-[800/500]">
+              <Image
+                src={mergedData.image?.src || "/images/trusted-partner.webp"}
+                alt={mergedData.image?.alt || "صورة شريك موثوق"}
+                fill
+                sizes="(min-width: 1024px) 47.2vw, 90vw"
+                className={cn(
+                  "w-full h-full",
+                  mergedData.image?.style?.objectFit === "contain"
+                    ? "object-contain"
+                    : mergedData.image?.style?.objectFit === "cover"
+                      ? "object-cover"
+                      : "object-fill",
+                )}
+              />
+            </figure>
+          </div>
+        )}
       </div>
     </section>
   );

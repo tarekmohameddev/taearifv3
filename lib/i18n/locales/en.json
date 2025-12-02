@@ -505,6 +505,7 @@
       "image_url": "Image URL",
       "image_alt": "Image Alt Text",
       "image_position": "Image Position",
+      "show_image": "Show Image",
       "left_position": "Left",
       "right_position": "Right",
       "top": "Top",

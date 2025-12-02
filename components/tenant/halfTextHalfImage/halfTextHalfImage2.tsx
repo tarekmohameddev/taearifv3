@@ -63,6 +63,7 @@ const getDefaulthalfTextHalfImageData = () => ({
     },
   },
   image: {
+    visible: true,
     src: "https://dalel-lovat.vercel.app/images/experience-intro/CouterSectionImage.webp",
     alt: "صورة داخلية لغرفة معيشة حديثة",
     width: 800,
@@ -175,6 +176,7 @@ interface halfTextHalfImageProps {
     };
   };
   image?: {
+    visible?: boolean;
     src?: string;
     alt?: string;
     width?: number;
@@ -709,41 +711,43 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
         </div>
 
         {/* الصورة */}
-        <div
-          className={cn(
-            mergedData.responsive?.grid?.imageCols || "md:col-span-5",
-            mergedData.responsive?.grid?.imageOrder || "order-2 md:order-2",
-          )}
-        >
-          <figure
+        {(mergedData.image?.visible ?? true) && (
+          <div
             className={cn(
-              "relative flex-1",
-              mergedData.image?.background?.positioning?.pr || "pr-[15px]",
-              mergedData.image?.background?.positioning?.xlPr || "xl:pr-[21px]",
-              mergedData.image?.background?.positioning?.pb || "pb-[15px]",
-              mergedData.image?.background?.positioning?.xlPb || "xl:pb-[21px]",
-              mergedData.image?.background?.enabled &&
-                (mergedData.image?.background?.className ||
-                  "bg-emerald-600 rounded-[10px]"),
+              mergedData.responsive?.grid?.imageCols || "md:col-span-5",
+              mergedData.responsive?.grid?.imageOrder || "order-2 md:order-2",
             )}
-            style={{
-              background: mergedData.image?.background?.enabled
-                ? `linear-gradient(135deg, ${imageBackgroundColor}, ${imageBackgroundColor})`
-                : undefined,
-            }}
           >
-            <Image
-              src={mergedData.image?.src || "/placeholder.svg"}
-              alt={mergedData.image?.alt || "صورة داخلية لغرفة معيشة حديثة"}
-              width={mergedData.image?.width || 800}
-              height={mergedData.image?.height || 600}
-              className={
-                mergedData.image?.style?.className ||
-                "w-full h-full object-cover rounded-[15px]"
-              }
-            />
-          </figure>
-        </div>
+            <figure
+              className={cn(
+                "relative flex-1",
+                mergedData.image?.background?.positioning?.pr || "pr-[15px]",
+                mergedData.image?.background?.positioning?.xlPr || "xl:pr-[21px]",
+                mergedData.image?.background?.positioning?.pb || "pb-[15px]",
+                mergedData.image?.background?.positioning?.xlPb || "xl:pb-[21px]",
+                mergedData.image?.background?.enabled &&
+                  (mergedData.image?.background?.className ||
+                    "bg-emerald-600 rounded-[10px]"),
+              )}
+              style={{
+                background: mergedData.image?.background?.enabled
+                  ? `linear-gradient(135deg, ${imageBackgroundColor}, ${imageBackgroundColor})`
+                  : undefined,
+              }}
+            >
+              <Image
+                src={mergedData.image?.src || "/placeholder.svg"}
+                alt={mergedData.image?.alt || "صورة داخلية لغرفة معيشة حديثة"}
+                width={mergedData.image?.width || 800}
+                height={mergedData.image?.height || 600}
+                className={
+                  mergedData.image?.style?.className ||
+                  "w-full h-full object-cover rounded-[15px]"
+                }
+              />
+            </figure>
+          </div>
+        )}
       </div>
     </section>
   );

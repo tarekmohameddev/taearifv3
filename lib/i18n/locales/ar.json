@@ -525,6 +525,7 @@
       "image_url": "رابط الصورة",
       "image_alt": "النص البديل للصورة",
       "image_position": "موضع الصورة",
+      "show_image": "إظهار الصورة",
       "left_position": "اليسار",
       "right_position": "اليمين",
       "top": "الأعلى",
