@@ -410,7 +410,7 @@ export default function Partners1(props: PartnersProps = {}) {
         {/* Main heading */}
         <div className="text-center mb-16" dir="rtl">
           <h2 
-            className="font-bold mb-8 leading-tight text-1xl lg:text-3xl"
+            className="font-bold mb-8 leading-tight text-2xl lg:text-3xl"
             style={{ 
               color: titleColor,
               fontWeight: mergedData.typography?.title?.fontWeight || "bold",
