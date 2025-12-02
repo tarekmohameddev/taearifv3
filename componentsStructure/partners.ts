@@ -65,18 +65,6 @@ export const partnersStructure: ComponentStructure = {
               label: "Section Title",
               type: "text",
               placeholder: "موثوق من خبراء العقار. في جميع أنحاء المملكة."
-            },
-            {
-              key: "titleHighlight",
-              label: "Title Highlight Text",
-              type: "text",
-              placeholder: "خبراء العقار."
-            },
-            {
-              key: "description",
-              label: "Section Description",
-              type: "text",
-              placeholder: "من المسوّقين إلى المكاتب والمطوّرين..."
             }
           ]
         },
@@ -167,13 +155,6 @@ export const partnersStructure: ComponentStructure = {
               type: "color",
               useDefaultColor: true,
               globalColorType: "primary", // Title color uses primary color from branding
-            },
-            {
-              key: "titleHighlightColor",
-              label: "Title Highlight Color",
-              type: "color",
-              useDefaultColor: true,
-              globalColorType: "primary", // Title highlight color uses primary color from branding
             },
             {
               key: "descriptionColor",
@@ -357,8 +338,6 @@ export const partnersStructure: ComponentStructure = {
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "content.title", label: "Title", type: "text" },
-        { key: "content.titleHighlight", label: "Title Highlight", type: "text" },
-        { key: "content.description", label: "Description", type: "text" },
         {
           key: "partners",
           label: "Partners",

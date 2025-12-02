@@ -21,7 +21,6 @@ interface PartnersProps {
   };
   content?: {
     title?: string;
-    titleHighlight?: string;
     description?: string;
   };
   partners?: Array<{
@@ -40,7 +39,6 @@ interface PartnersProps {
   styling?: {
     backgroundColor?: string;
     titleColor?: string;
-    titleHighlightColor?: string;
     descriptionColor?: string;
     cardBackgroundColor?: string;
     cardHoverBackgroundColor?: string;
@@ -333,7 +331,9 @@ export default function Partners1(props: PartnersProps = {}) {
     if (useDefaultColor) {
       // Determine default globalColorType based on field path if not set
       let defaultGlobalColorType = "primary";
-      if (fieldPath.includes("titleColor") || fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
+      if (fieldPath.includes("titleColor")) {
+        defaultGlobalColorType = "primary";  // Title color uses primary color
+      } else if (fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
         defaultGlobalColorType = "secondary";
       } else if (fieldPath.includes("iconColor") || fieldPath.includes("ringColor") || fieldPath.includes("primary")) {
         defaultGlobalColorType = "primary";
@@ -359,7 +359,9 @@ export default function Partners1(props: PartnersProps = {}) {
     
     // Final fallback: use default branding color
     let defaultGlobalColorType = "primary";
-    if (fieldPath.includes("titleColor") || fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
+    if (fieldPath.includes("titleColor")) {
+      defaultGlobalColorType = "primary";  // Title color uses primary color
+    } else if (fieldPath.includes("descriptionColor") || fieldPath.includes("textColor")) {
       defaultGlobalColorType = "secondary";
     }
     const brandingColor = brandingColors[defaultGlobalColorType as keyof typeof brandingColors] || defaultColor;
@@ -372,9 +374,7 @@ export default function Partners1(props: PartnersProps = {}) {
   }
 
   // Get colors using getColor function
-  // Get colors using getColor function
   const titleColor = getColor("titleColor", brandingColors.primary);
-  const titleHighlightColor = getColor("titleHighlightColor", brandingColors.primary);
   const descriptionColor = mergedData.styling?.descriptionColor || "#6E6E75";
   const backgroundColor = mergedData.styling?.backgroundColor || "transparent";
   const cardBackgroundColor = mergedData.styling?.cardBackgroundColor || "#f9fafb";
@@ -413,15 +413,7 @@ export default function Partners1(props: PartnersProps = {}) {
               lineHeight: mergedData.typography?.title?.lineHeight || "tight"
             }}
           >
-            {mergedData.content?.title?.split(mergedData.content?.titleHighlight || "خبراء العقار.")[0]}
-            {mergedData.content?.titleHighlight && (
-            <span className="relative inline-block">
-                <span className="relative z-10" style={{ color: titleHighlightColor }}>
-                  {mergedData.content.titleHighlight}
-                </span>
-              </span>
-            )}
-            {mergedData.content?.title?.split(mergedData.content?.titleHighlight || "خبراء العقار.")[1]}
+            {mergedData.content?.title}
           </h2>
         </div>
 

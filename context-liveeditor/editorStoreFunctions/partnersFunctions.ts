@@ -20,7 +20,6 @@ export const getDefaultPartnersData = (): ComponentData => ({
   // Content
   content: {
     title: "موثوق من خبراء العقار. في جميع أنحاء المملكة.",
-    titleHighlight: "خبراء العقار.",
     description: "من المسوّقين إلى المكاتب والمطوّرين — يعتمدون على تعاريف كل يوم لإدارة العقارات، وأتمتة التواصل، وزيادة الصفقات بسرعة وذكاء."
   },
   
@@ -62,7 +61,6 @@ export const getDefaultPartnersData = (): ComponentData => ({
   styling: {
     backgroundColor: "transparent",
     titleColor: "#000000",
-    titleHighlightColor: "#000000",
     descriptionColor: "#6E6E75",
     cardBackgroundColor: "#f9fafb",
     cardHoverBackgroundColor: "#f3f4f6",
