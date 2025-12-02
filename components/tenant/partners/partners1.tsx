@@ -449,7 +449,7 @@ export default function Partners1(props: PartnersProps = {}) {
         >
           {partners.map((partner: { id?: string; src: string; alt?: string }, index: number) => (
             <div 
-              key={partner.id || index}
+              key={partner.id+"-"+index || index}
               className="flex items-center justify-center p-6 rounded-lg transition-colors duration-300 group"
               style={{
                 backgroundColor: cardBackgroundColor
