@@ -623,8 +623,16 @@ const loadFromDbSection = extractFunctionCode(editorStoreFile, "loadFromDatabase
 if (!loadFromDbSection.includes(`case "${componentType}":`)) {
   ISSUE_DETECTED = "MISSING_LOADFROMDATABASE_CASE";
   SEVERITY = "HIGH";
-  FIX_ACTION = `Add case in loadFromDatabase for "${componentType}"`;
-  INSERT_AT = "In loadFromDatabase switch (~line 1723-1868)";
+  FIX_ACTION = `Add case in loadFromDatabase for "${componentType}":
+    case "${componentType}":
+      newState.${componentType}States = ${componentType}Functions.setData(
+        newState,
+        comp.id,  // ✅ CRITICAL: Use comp.id (UUID), NOT comp.componentName
+        comp.data,
+      ).${componentType}States;
+      break;`;
+  INSERT_AT = "In loadFromDatabase switch (~line 1797-2042)";
+  REFERENCE = "See @docs/important/liveEditor/DATABASE_DATA_LOADING.md for details";
 }
 
 // AI: Report all detected issues from Layer 4
@@ -942,6 +950,31 @@ if (!hasUseEffect || !hasEnsureCall) {
   ISSUE_DETECTED = "MISSING_INITIALIZATION_USEEFFECT";
   SEVERITY = "CRITICAL";
   FIX_ACTION = "Add useEffect with ensureComponentVariant call";
+}
+
+// Check 6.6.1: Database data loading in useEffect
+const useEffectCode = extractFunctionCode(componentFile, "useEffect", true);
+const hasTenantDataCheck = componentFile.includes("getTenantComponentData") || 
+                           componentFile.includes("tenantComponentData");
+const hasTenantDataInDeps = useEffectCode && 
+                            (useEffectCode.includes("tenantComponentData") || 
+                             useEffectCode.includes("tenantData"));
+
+if (!hasTenantDataCheck && hasUseEffect) {
+  ISSUE_DETECTED = "MISSING_DATABASE_DATA_LOADING";
+  SEVERITY = "HIGH";
+  FIX_ACTION = `Add database data loading:
+    1. Create getTenantComponentData() function BEFORE useEffect
+    2. Extract tenantComponentData from tenantData
+    3. Use tenantComponentData in initialData
+    4. Add tenantComponentData to useEffect dependencies
+    Reference: @docs/important/liveEditor/DATABASE_DATA_LOADING.md`;
+}
+
+if (hasTenantDataCheck && !hasTenantDataInDeps) {
+  ISSUE_DETECTED = "MISSING_TENANT_DATA_DEPENDENCY";
+  SEVERITY = "HIGH";
+  FIX_ACTION = "Add tenantComponentData to useEffect dependencies array";
 }
 
 // Check 6.7: Step 4 - Retrieve data

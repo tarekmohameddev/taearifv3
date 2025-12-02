@@ -102,6 +102,22 @@ The documentation is organized into focused files for easier navigation and unde
 
 ---
 
+#### 3.5. [DATABASE_DATA_LOADING.md](./DATABASE_DATA_LOADING.md)
+**Database data loading guide** - How components load saved data in Live Editor.
+
+**Contents**:
+- Common problem: Component shows defaults instead of database data
+- Two-step solution (loadFromDatabase + useEffect)
+- Complete implementation pattern
+- Data flow diagram
+- Verification checklist
+- Common mistakes and fixes
+- Template for new components
+
+**Read this** when components show default data instead of saved data.
+
+---
+
 #### 4. [IFRAME_SYSTEM.md](./IFRAME_SYSTEM.md)
 **iframe rendering and style synchronization** - How preview works in isolated environment.
 

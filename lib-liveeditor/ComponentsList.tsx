@@ -31,6 +31,7 @@ import { stepsSectionStructure } from "@/componentsStructure/stepsSection";
 import { footerStructure } from "@/componentsStructure/footer";
 import { testimonialsStructure } from "@/componentsStructure/testimonials";
 import { logosTickerStructure } from "@/componentsStructure/logosTicker";
+import { partnersStructure } from "@/componentsStructure/partners";
 import { contactMapSectionStructure } from "@/componentsStructure/contactMapSection";
 import { whyChooseUsStructure } from "@/componentsStructure/whyChooseUs";
 import { gridStructure } from "@/componentsStructure/grid";
@@ -246,6 +247,24 @@ export const getComponents = (
     hasStructure: true,
     defaultTheme: "logosTicker1",
     ...logosTickerStructure,
+  },
+  partners: {
+    id: "partners",
+    name: "partners",
+    displayName: t("components.partners.display_name"),
+    description: t("components.partners.description"),
+    category: "marketing",
+    section: "homepage",
+    subPath: "partners",
+    icon: "🤝",
+    variants: partnersStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/partners/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "partners1",
+    ...partnersStructure,
   },
   contactMapSection: {
     id: "contactMapSection",
@@ -483,6 +502,25 @@ export const COMPONENTS: Record<string, any> = {
     hasStructure: true,
     defaultTheme: "logosTicker1",
     ...logosTickerStructure,
+  },
+  partners: {
+    id: "partners",
+    name: "partners",
+    displayName: "Partners",
+    description:
+      "Trusted partners section displaying partner logos in a grid layout",
+    category: "marketing",
+    section: "homepage",
+    subPath: "partners",
+    icon: "🤝",
+    variants: partnersStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/partners/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "partners1",
+    ...partnersStructure,
   },
   contactMapSection: {
     id: "contactMapSection",

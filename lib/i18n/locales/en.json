@@ -171,6 +171,14 @@
       "display_name": "Testimonials",
       "description": "Section displaying customer testimonials and reviews in a carousel format"
     },
+    "logosTicker": {
+      "display_name": "Logos Ticker",
+      "description": "Scrolling logos section displaying trusted brands and partners"
+    },
+    "partners": {
+      "display_name": "Partners",
+      "description": "Trusted partners section displaying partner logos in a grid layout"
+    },
     "contactMapSection": {
       "display_name": "Contact Map Section",
       "description": "Section displaying a map for contact information"

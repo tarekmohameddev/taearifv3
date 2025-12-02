@@ -53,6 +53,7 @@ import { ctaValuationFunctions } from "./editorStoreFunctions/ctaValuationFuncti
 import { stepsSectionFunctions } from "./editorStoreFunctions/stepsSectionFunctions";
 import { testimonialsFunctions } from "./editorStoreFunctions/testimonialsFunctions";
 import { logosTickerFunctions } from "./editorStoreFunctions/logosTickerFunctions";
+import { partnersFunctions } from "./editorStoreFunctions/partnersFunctions";
 import { whyChooseUsFunctions } from "./editorStoreFunctions/whyChooseUsFunctions";
 import { contactMapSectionFunctions } from "./editorStoreFunctions/contactMapSectionFunctions";
 import { gridFunctions } from "./editorStoreFunctions/gridFunctions";
@@ -300,6 +301,20 @@ interface EditorStore {
     value: any,
   ) => void;
 
+  // Partners states
+  partnersStates: Record<string, ComponentData>;
+  ensurePartnersVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getPartnersData: (variantId: string) => ComponentData;
+  setPartnersData: (variantId: string, data: ComponentData) => void;
+  updatePartnersByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
   // Why Choose Us states
   whyChooseUsStates: Record<string, ComponentData>;
   ensureWhyChooseUsVariant: (
@@ -509,6 +524,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   stepsSectionStates: {},
   testimonialsStates: {},
   logosTickerStates: {},
+  partnersStates: {},
   whyChooseUsStates: {},
   contactMapSectionStates: {},
   gridStates: {},
@@ -941,6 +957,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return testimonialsFunctions.ensureVariant(state, variantId, initial);
         case "logosTicker":
           return logosTickerFunctions.ensureVariant(state, variantId, initial);
+        case "partners":
+          return partnersFunctions.ensureVariant(state, variantId, initial);
         case "whyChooseUs":
           return whyChooseUsFunctions.ensureVariant(state, variantId, initial);
         case "contactMapSection":
@@ -1035,6 +1053,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return testimonialsFunctions.getData(state, variantId);
       case "logosTicker":
         return logosTickerFunctions.getData(state, variantId);
+      case "partners":
+        return partnersFunctions.getData(state, variantId);
       case "whyChooseUs":
         return whyChooseUsFunctions.getData(state, variantId);
       case "contactMapSection":
@@ -1110,6 +1130,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "logosTicker":
           newState = logosTickerFunctions.setData(state, variantId, data);
+          break;
+        case "partners":
+          newState = partnersFunctions.setData(state, variantId, data);
           break;
         case "whyChooseUs":
           newState = whyChooseUsFunctions.setData(state, variantId, data);
@@ -1269,6 +1292,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "logosTicker":
           newState = logosTickerFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "partners":
+          newState = partnersFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -1521,6 +1552,22 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   updateTestimonialsByPath: (variantId, path, value) =>
     set((state) =>
       testimonialsFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // Partners functions using modular approach
+  ensurePartnersVariant: (variantId, initial) =>
+    set((state) =>
+      partnersFunctions.ensureVariant(state, variantId, initial),
+    ),
+  getPartnersData: (variantId) => {
+    const state = get();
+    return partnersFunctions.getData(state, variantId);
+  },
+  setPartnersData: (variantId, data) =>
+    set((state) => partnersFunctions.setData(state, variantId, data)),
+  updatePartnersByPath: (variantId, path, value) =>
+    set((state) =>
+      partnersFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Logos Ticker functions using modular approach
@@ -1902,6 +1949,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).whyChooseUsStates;
+                      break;
+                    case "logosTicker":
+                      newState.logosTickerStates = logosTickerFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).logosTickerStates;
+                      break;
+                    case "partners":
+                      newState.partnersStates = partnersFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).partnersStates;
                       break;
                     case "contactMapSection":
                       newState.contactMapSectionStates =

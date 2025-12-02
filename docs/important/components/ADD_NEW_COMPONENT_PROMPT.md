@@ -287,6 +287,7 @@ STEP 3: Update context-liveeditor/editorStore.ts
 - Add pricingStates to interface
 - Initialize pricingStates: {}
 - Add "pricing" case to all 4 switch statements
+- **CRITICAL**: Add "pricing" case to loadFromDatabase switch (use comp.id, not comp.componentName)
 - Add specific functions (ensurePricingVariant, etc.)
 
 STEP 4: Update lib-liveeditor/ComponentsList.tsx
@@ -301,6 +302,10 @@ STEP 5: Update componentsStructure/index.ts
 STEP 6: Create components/tenant/pricing/pricing1.tsx
 - Use the complete template from Step 6
 - Follow 7-step component pattern
+- **CRITICAL**: Include database data loading:
+  - Create getTenantComponentData() function BEFORE useEffect
+  - Use tenantComponentData in initialData
+  - Add tenantComponentData to useEffect dependencies
 - Render pricing cards grid
 - Use mergedData for all values
 
@@ -313,9 +318,12 @@ STEP 8: Add translations
 
 Reference Files:
 @ADD_NEW_COMPONENT.md (main guide)
+@docs/important/liveEditor/DATABASE_DATA_LOADING.md (database data loading guide)
 @context-liveeditor/editorStoreFunctions/heroFunctions.ts (example functions)
 @componentsStructure/hero.ts (example structure)
 @components/tenant/hero/hero1.tsx (example component)
+@components/tenant/partners/partners1.tsx (example with database loading)
+@components/tenant/whyChooseUs/whyChooseUs1.tsx (example with database loading)
 
 After completion, verify:
 - Component appears in Live Editor

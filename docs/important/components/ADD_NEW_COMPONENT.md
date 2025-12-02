@@ -1229,18 +1229,73 @@ export default function Pricing1(props: PricingProps) {
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
+  // Get tenant data FIRST
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+
+  useEffect(() => {
+    if (tenantId) {
+      fetchTenantData(tenantId);
+    }
+  }, [tenantId, fetchTenantData]);
+
+  // Extract component data from tenantData (BEFORE useEffect)
+  const getTenantComponentData = () => {
+    if (!tenantData) return {};
+    
+    // Check new structure (tenantData.components)
+    if (tenantData.components && Array.isArray(tenantData.components)) {
+      for (const component of tenantData.components) {
+        if (component.type === "pricing" && component.componentName === variantId) {
+          return component.data;
+        }
+      }
+    }
+    
+    // Check old structure (tenantData.componentSettings)
+    if (tenantData?.componentSettings) {
+      for (const [pageSlug, pageComponents] of Object.entries(
+        tenantData.componentSettings,
+      )) {
+        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+          for (const [componentId, component] of Object.entries(
+            pageComponents as any,
+          )) {
+            if (
+              (component as any).type === "pricing" &&
+              (component as any).componentName === variantId
+            ) {
+              return (component as any).data;
+            }
+          }
+        }
+      }
+    }
+    
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
+
   useEffect(() => {
     if (props.useStore) {
-      // Prepare initial data from props
-      const initialData = {
-        ...getDefaultPricingData(),
-        ...props
-      };
+      // ✅ Use database data if available
+      const initialData = tenantComponentData && Object.keys(tenantComponentData).length > 0
+        ? {
+            ...getDefaultPricingData(),
+            ...tenantComponentData,  // Database data takes priority
+            ...props
+          }
+        : {
+            ...getDefaultPricingData(),
+            ...props
+          };
       
       // Initialize in store
       ensureComponentVariant("pricing", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore]);
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);  // ✅ Add tenantComponentData dependency
   
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
@@ -1948,6 +2003,7 @@ The field `dataSource.apiUrl` only shows when `dataSource.type === "api"`.
 - [State Management](./liveEditor/STATE_MANAGEMENT.md) - Store architecture
 - [Component Integration](./liveEditor/context/COMPONENT_INTEGRATION.md) - Integration patterns
 - [Editor Store Functions](./liveEditor/context/EDITOR_STORE_FUNCTIONS.md) - Function reference
+- [Database Data Loading](./liveEditor/DATABASE_DATA_LOADING.md) - **CRITICAL**: How to load database data in Live Editor
 
 ### Example Components to Study
 

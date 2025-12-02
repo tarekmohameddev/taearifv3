@@ -73,7 +73,35 @@ Focus: Layer 4 (editorStore)
 Check: loadFromDatabase case, pageComponentsByPage updates
 ```
 
-### Scenario 5: TypeScript Errors
+### Scenario 5: Changes Don't Save
+
+```
+AI: Fix component "{NAME}" - changes lost after refresh
+
+EXECUTE:
+@FIX_COMPONENT_PROMPT.md
+Focus: Layer 4 (editorStore)
+Check: loadFromDatabase case, pageComponentsByPage updates
+```
+
+### Scenario 6: Component Shows Default Data Instead of Database Data
+
+```
+AI: Fix component "{NAME}" - shows default data in Live Editor, not database data
+
+EXECUTE:
+@FIX_COMPONENT_PROMPT.md
+Focus: Layer 4 (loadFromDatabase) + Layer 6 (useEffect initialization)
+Check: 
+1. loadFromDatabase switch case exists
+2. Component useEffect uses tenantComponentData
+3. getTenantComponentData called before useEffect
+4. tenantComponentData in useEffect dependencies
+
+Reference: @docs/important/liveEditor/DATABASE_DATA_LOADING.md
+```
+
+### Scenario 7: TypeScript Errors
 
 ```
 AI: Fix component "{NAME}" - has TypeScript/lint errors
@@ -255,6 +283,7 @@ AI should request manual review if:
 - `FIX_COMPONENT_PROMPT.md` - Full repair protocol (this is the main guide)
 - `ADD_NEW_COMPONENT.md` - Reference for correct structure
 - `ADD_NEW_COMPONENT_PROMPT.md` - Templates for creating components
+- `../liveEditor/DATABASE_DATA_LOADING.md` - Database data loading guide
 
 ---
 

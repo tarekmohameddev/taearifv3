@@ -207,6 +207,7 @@ store.forceUpdatePageComponents(page, updated);
 - [../STATE_MANAGEMENT.md](../STATE_MANAGEMENT.md) - Store architecture
 - [../DATA_FLOW.md](../DATA_FLOW.md) - Complete data flow
 - [../COMPONENT_ARCHITECTURE.md](../COMPONENT_ARCHITECTURE.md) - Component system
+- [../DATABASE_DATA_LOADING.md](../DATABASE_DATA_LOADING.md) - Database data loading in Live Editor
 
 ---
 
