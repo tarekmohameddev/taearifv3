@@ -385,6 +385,11 @@ export default function Partners1(props: PartnersProps = {}) {
   // Prepare partners array
   const partners = mergedData.partners || [];
 
+  // Get responsive column values
+  const mobileColumns = mergedData.grid?.columns?.mobile || 2;
+  const tabletColumns = mergedData.grid?.columns?.tablet || 3;
+  const desktopColumns = mergedData.grid?.columns?.desktop || 6;
+
   return (
     <section 
       id={`partners-${uniqueId}`}
@@ -417,15 +422,30 @@ export default function Partners1(props: PartnersProps = {}) {
           </h2>
         </div>
 
-
+        {/* Responsive grid styles */}
+        <style jsx>{`
+          .partners-grid-${uniqueId} {
+            display: grid;
+            grid-template-columns: repeat(${mobileColumns}, 1fr);
+            gap: ${mergedData.grid?.gap || "2rem"};
+          }
+          
+          @media (min-width: 768px) {
+            .partners-grid-${uniqueId} {
+              grid-template-columns: repeat(${tabletColumns}, 1fr);
+            }
+          }
+          
+          @media (min-width: 1024px) {
+            .partners-grid-${uniqueId} {
+              grid-template-columns: repeat(${desktopColumns}, 1fr);
+            }
+          }
+        `}</style>
 
         {/* Partners logos grid */}
         <div
-          className="grid gap-8"
-          style={{
-            gridTemplateColumns: `repeat(${mergedData.grid?.columns?.desktop || 6}, 1fr)`,
-            gap: mergedData.grid?.gap || "2rem"
-          }}
+          className={`partners-grid-${uniqueId}`}
         >
           {partners.map((partner: { id?: string; src: string; alt?: string }, index: number) => (
             <div 
