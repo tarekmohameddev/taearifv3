@@ -52,6 +52,7 @@ type MainNavItem = {
   icon: React.ComponentType<{ className?: string }>;
   path: string;
   isAPP?: boolean;
+  isDirectPath?: boolean;
 };
 
 interface DashboardHeaderProps {
@@ -114,15 +115,55 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                             variant="outline"
                             size="sm"
                             className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
-                            onClick={() =>
-                              window.open(
-                                `${useAuthStore.getState().userData?.domain}`,
-                                "_blank",
-                              )
-                            }
+                            onClick={() => {
+                              const userData = useAuthStore.getState().userData;
+
+                              // التحقق من وجود userData
+                              if (!userData) {
+                                console.warn("userData is null or undefined");
+                                alert("يرجى تسجيل الدخول أولاً");
+                                return;
+                              }
+
+                              const domain = userData?.domain || "";
+
+                              // التحقق من صحة الـ domain
+                              if (!domain || domain.trim() === "") {
+                                alert("يرجى إعداد domain صحيح في إعدادات الحساب");
+                                return;
+                              }
+
+                              // تنظيف الـ domain من المسافات
+                              const cleanDomain = domain.trim();
+
+                              // التحقق من أن الـ domain يحتوي على نقطة أو يكون URL صحيح
+                              if (
+                                !cleanDomain.includes(".") &&
+                                !cleanDomain.startsWith("http")
+                              ) {
+                                alert(
+                                  "تنسيق الـ domain غير صحيح. يجب أن يحتوي على نقطة (مثل: example.com) أو يكون URL صحيح",
+                                );
+                                return;
+                              }
+
+                              const url = cleanDomain.startsWith("http")
+                                ? cleanDomain
+                                : `https://${cleanDomain}`;
+
+                              // التحقق من صحة الـ URL قبل فتحه
+                              try {
+                                new URL(url);
+                                console.log("Opening URL:", url);
+                                window.open(url, "_blank");
+                              } catch (error) {
+                                console.error("Invalid URL:", url, error);
+                                alert("URL غير صحيح. يرجى التحقق من إعدادات الـ domain");
+                              }
+                            }}
                           >
                             <ExternalLink className="h-4 w-4 text-primary" />
-                            {<span>معاينة الموقع</span>}
+                            <span>معاينة الموقع</span>
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
@@ -171,11 +212,16 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                                     return item.path;
                                   }
 
-                                  // معالجة الـ path: إذا لم يبدأ بـ /، إضافة الـ slug بعد الـ domain
-                                  if (item.path.startsWith("/")) {
-                                    return `dashboard${item.path}`;
+                                  // التحقق من وجود dashboard في بداية المسار
+                                  if (item.path.startsWith("/dashboard")) {
+                                    // إذا كان موجود، إزالته
+                                    return item.path;
+                                  } else if (item.path.startsWith("/")) {
+                                    // إذا كان يبدأ بـ /، إضافة dashboard قبل /
+                                    return `/dashboard${item.path}`;
                                   } else {
-                                    return `dashboard/${item.path}`;
+                                    // إذا لم يكن يبدأ بـ /، إضافة dashboard/ والـ slug
+                                    return `/dashboard/${item.path}`;
                                   }
                                 })()}
                               >
