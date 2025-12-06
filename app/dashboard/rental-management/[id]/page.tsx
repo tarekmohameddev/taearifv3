@@ -72,14 +72,27 @@ interface RentalDetails {
     rental_period_months: number;
     status: string;
     notes: string;
+    unit_name?: string;
+    unit_label?: string;
+    property_name?: string;
+    project_name?: string;
+    building_name?: string;
+    property_number?: string;
+    property_id?: number;
+    project_id?: number;
+    building_id?: number;
   };
   property: {
-    id: number;
-    name: string;
-    unit_label: string;
-    property_number: string;
+    id: number | null;
+    name: string | null;
+    unit_label?: string;
+    property_number?: string;
+    building?: {
+      id: number | null;
+      name: string | null;
+    } | null;
     project: {
-      id: number;
+      id: number | null;
       name: string | null;
     };
   };
@@ -89,6 +102,10 @@ interface RentalDetails {
     start_date: string;
     end_date: string;
     status: string;
+    property_name?: string;
+    project_name?: string;
+    property_id?: number;
+    project_id?: number;
   };
   payment_details: {
     items: Array<{
@@ -180,6 +197,95 @@ export default function RentalDetailsPage() {
       fetchActualExpensesData();
     }
   }, [activeTab, rentalId]);
+
+  // Helper function to get unit name from all possible locations
+  const getUnitName = (details: RentalDetails | null): string => {
+    if (!details) return "غير محدد";
+    
+    // 1. Check contract first
+    if (details.contract?.property_name) {
+      return details.contract.property_name;
+    }
+    if (details.contract?.project_name) {
+      return details.contract.project_name;
+    }
+    
+    // 2. Check property object
+    if (details.property?.name) {
+      return details.property.name;
+    }
+    if (details.property?.unit_label) {
+      return details.property.unit_label;
+    }
+    if (details.property?.building?.name) {
+      return details.property.building.name;
+    }
+    if (details.property?.project?.name) {
+      return details.property.project.name;
+    }
+    
+    // 3. Check rental object
+    if (details.rental?.unit_name) {
+      return details.rental.unit_name;
+    }
+    if (details.rental?.unit_label) {
+      return details.rental.unit_label;
+    }
+    if (details.rental?.property_name) {
+      return details.rental.property_name;
+    }
+    if (details.rental?.project_name) {
+      return details.rental.project_name;
+    }
+    if (details.rental?.building_name) {
+      return details.rental.building_name;
+    }
+    
+    return "غير محدد";
+  };
+
+  // Helper function to get property number from all possible locations
+  const getPropertyNumber = (details: RentalDetails | null): string => {
+    if (!details) return "غير محدد";
+    
+    // 1. Check contract first
+    if (details.contract?.property_id) {
+      return String(details.contract.property_id);
+    }
+    if (details.contract?.project_id) {
+      return String(details.contract.project_id);
+    }
+    
+    // 2. Check property object
+    if (details.property?.property_number) {
+      return details.property.property_number;
+    }
+    if (details.property?.id) {
+      return String(details.property.id);
+    }
+    if (details.property?.building?.id) {
+      return String(details.property.building.id);
+    }
+    if (details.property?.project?.id) {
+      return String(details.property.project.id);
+    }
+    
+    // 3. Check rental object
+    if (details.rental?.property_number) {
+      return details.rental.property_number;
+    }
+    if (details.rental?.property_id) {
+      return String(details.rental.property_id);
+    }
+    if (details.rental?.project_id) {
+      return String(details.rental.project_id);
+    }
+    if (details.rental?.building_id) {
+      return String(details.rental.building_id);
+    }
+    
+    return "غير محدد";
+  };
 
   const fetchRentalDetails = async () => {
     if (!rentalId) return;
@@ -865,14 +971,13 @@ export default function RentalDetailsPage() {
                   >
                     <div className="space-y-1 text-right" dir="rtl">
                       <h3 className="text-lg sm:text-xl font-bold text-gray-900 text-right">
-                        {details.property.name || "غير محدد"}
+                        {getUnitName(details)}
                       </h3>
                       <p className="text-sm sm:text-base text-gray-600 text-right">
-                        الوحدة: {details.property.unit_label || "غير محدد"}
+                        الوحدة: {getUnitName(details)}
                       </p>
                       <p className="text-xs sm:text-sm text-gray-500 text-right">
-                        رقم العقار:{" "}
-                        {details.property.property_number || "غير محدد"}
+                        رقم العقار: {getPropertyNumber(details)}
                       </p>
                     </div>
                     <div className="h-12 w-12 sm:h-16 sm:w-16 bg-gradient-to-br from-gray-800 to-gray-600 rounded-lg flex items-center justify-center">
@@ -896,7 +1001,7 @@ export default function RentalDetailsPage() {
                             رقم العقار
                           </p>
                           <p className="text-sm sm:text-base font-semibold text-right">
-                            {details.property.property_number || "غير محدد"}
+                            {getPropertyNumber(details)}
                           </p>
                         </div>
                         <Hash className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
@@ -910,7 +1015,7 @@ export default function RentalDetailsPage() {
                             الوحدة
                           </p>
                           <p className="text-sm sm:text-base font-semibold text-right">
-                            {details.property.unit_label || "غير محدد"}
+                            {getUnitName(details)}
                           </p>
                         </div>
                         <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
