@@ -1286,7 +1286,7 @@ export function RentalApplicationsService({
                     ) {
                       return;
                     }
-                    openRentalDetailsDialog(rental.id);
+                    router.push(`/dashboard/rental-management/${rental.id}`);
                   }}
                   className={`hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-300 hover:shadow-sm cursor-pointer ${
                     index % 2 === 0 ? "bg-white" : "bg-gray-25"
@@ -1500,7 +1500,7 @@ export function RentalApplicationsService({
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem
                             onClick={() => {
-                              openRentalDetailsDialog(rental.id);
+                              router.push(`/dashboard/rental-management/${rental.id}`);
                             }}
                             className="cursor-pointer hover:bg-gray-100"
                           >
