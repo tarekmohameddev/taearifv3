@@ -1240,7 +1240,7 @@ export function RentalApplicationsService({
         className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
         dir="rtl"
       >
-        <div className="overflow-x-auto">
+        <div className="max-[1300px]:overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gradient-to-r from-gray-900 to-gray-800 border-b border-gray-300">
               <tr>
@@ -1264,6 +1264,9 @@ export function RentalApplicationsService({
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
                   الحالة
+                </th>
+                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                  السداد
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
                   الإجراءات
@@ -1463,6 +1466,24 @@ export function RentalApplicationsService({
                     </div>
                   </td>
 
+                  {/* السداد */}
+                  <td className="px-6 py-5">
+                    <div className="flex items-center justify-center">
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openPaymentCollectionDialog(rental.id);
+                        }}
+                        size="sm"
+                        variant="outline"
+                        className="h-9 px-4 border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 shadow-sm"
+                      >
+                        <CreditCard className="h-4 w-4 ml-2" />
+                        السداد
+                      </Button>
+                    </div>
+                  </td>
+
                   {/* الإجراءات */}
                   <td className="px-6 py-5">
                     <div className="flex items-center justify-center">
@@ -1485,15 +1506,6 @@ export function RentalApplicationsService({
                           >
                             <Eye className="h-4 w-4 ml-2 text-gray-600" />
                             عرض التفاصيل
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              openPaymentCollectionDialog(rental.id);
-                            }}
-                            className="cursor-pointer hover:bg-gray-100"
-                          >
-                            <CreditCard className="h-4 w-4 ml-2 text-gray-600" />
-                            تحصيل المدفوعات
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
