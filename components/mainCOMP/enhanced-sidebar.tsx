@@ -343,7 +343,7 @@ export function EnhancedSidebar({
     <>
       <div
         className={cn(
-          "hidden md:flex flex-col border-l bg-background transition-all duration-300 z-40 sticky top-16 h-[calc(100vh-4rem)]",
+          "hidden min-[1200px]:flex flex-col border-l bg-background transition-all duration-300 z-40 sticky top-16 h-[calc(100vh-4rem)]",
           isCollapsed ? "w-[70px]" : "w-[240px]",
         )}
       >
