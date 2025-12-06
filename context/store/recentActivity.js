@@ -1,7 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
 
-module.exports = (set) => ({
+export default (set) => ({
   recentActivityData: [],
   isRecentActivityUpdated: false,
 

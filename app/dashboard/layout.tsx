@@ -5,9 +5,15 @@ import { useTokenValidation } from "@/hooks/useTokenValidation";
 import GTMProvider from "@/components/GTMProvider2";
 import PermissionWrapper from "@/components/PermissionWrapper";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 
 // مفتاح sessionStorage لتخزين حالة التحقق
 const SESSION_VALIDATION_KEY = "dashboard_session_validated";
+
+// استيراد TenantPageWrapper ديناميكياً (للاستخدام عند الحاجة)
+const TenantPageWrapper = dynamic(() => import('@/app/TenantPageWrapper'), {
+  ssr: false,
+});
 
 /*
  * ========================================
@@ -159,9 +165,7 @@ export default function DashboardLayout({
 
   // إذا كان tenant domain (custom domain)، اعرض TenantPageWrapper
   if (isValidDomain === false) {
-    // استيراد TenantPageWrapper ديناميكياً
-    const TenantPageWrapper = require('@/app/TenantPageWrapper').default;
-    return <TenantPageWrapper />;
+    return <TenantPageWrapper tenantId={null} slug="" domainType="custom" />;
   }
 
   return (

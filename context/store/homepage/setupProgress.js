@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axiosInstance";
 
-module.exports = (set) => ({
+export default (set) => ({
   setupProgressData: null,
   isSetupProgressDataUpdated: false,
 

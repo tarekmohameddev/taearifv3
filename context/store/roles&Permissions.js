@@ -2,7 +2,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 
-module.exports = (set) => ({
+export default (set) => ({
   contentManagement: {
     newSectionDialogOpen: false,
     statusFilter: "all",

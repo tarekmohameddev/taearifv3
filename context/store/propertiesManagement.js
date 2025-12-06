@@ -6,7 +6,7 @@ import {
   formatErrorMessage,
 } from "@/utils/errorHandler";
 
-module.exports = (set) => ({
+export default (set) => ({
   propertiesManagement: {
     viewMode: "grid",
     priceRange: [200000, 1000000],

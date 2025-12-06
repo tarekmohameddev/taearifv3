@@ -22,4 +22,4 @@ const createStore = (set, get) => ({
   ...marketingDashboard(set, get),
 });
 
-module.exports = createStore;
+export default createStore;

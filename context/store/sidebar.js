@@ -59,7 +59,7 @@ const getIconComponent = (iconName) => {
   }
 };
 
-module.exports = (set, get) => ({
+export default (set, get) => ({
   sidebarData: {
     mainNavItems: [],
     isSidebarFetched: false,

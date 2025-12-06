@@ -1,36 +1,56 @@
 // context/Store.js
-const { create } = require("zustand");
-const axiosInstance = require("@/lib/axiosInstance");
+import { create } from "zustand";
+import axiosInstance from "@/lib/axiosInstance";
+
+// Import store modules
+import dashboardDevice from "./store/homepage/dashboardDevice";
+import dashboardSummary from "./store/homepage/dashboardSummary";
+import visitorData from "./store/homepage/visitorData";
+import setupProgress from "./store/homepage/setupProgress";
+import trafficSources from "./store/homepage/trafficSources";
+import contentManagement from "./store/contentManagement";
+import recentActivity from "./store/recentActivity";
+import projectsManagement from "./store/projectsManagement";
+import propertiesManagement from "./store/propertiesManagement";
+import blogManagement from "./store/blogManagement";
+import affiliate from "./store/affiliate";
+import sidebar from "./store/sidebar";
+import rentalManagement from "./store/rentalManagement";
+import purchaseManagement from "./store/purchaseManagement";
+import matchingPage from "./store/matchingPage";
+import marketingDashboard from "./store/marketingDashboard";
+import rentalOwnerDashboardPage from "./store/rentalOwnerDashboardPage";
+import userAuth from "./store/userAuth";
 
 const useStore = create((set, get) => {
   return {
     loading: false,
     homepage: {
-      ...require("./store/homepage/dashboardDevice")(set),
-      ...require("./store/homepage/dashboardSummary")(set),
-      ...require("./store/homepage/visitorData")(set),
-      ...require("./store/homepage/setupProgress")(set),
-      ...require("./store/homepage/trafficSources")(set),
+      ...dashboardDevice(set),
+      ...dashboardSummary(set),
+      ...visitorData(set),
+      ...setupProgress(set),
+      ...trafficSources(set),
 
       setSelectedTimeRange: (range) =>
         set((state) => ({
           homepage: { ...state.homepage, selectedTimeRange: range },
         })),
     },
-    ...require("./store/contentManagement")(set),
-    ...require("./store/recentActivity")(set),
-    ...require("./store/projectsManagement")(set),
-    ...require("./store/propertiesManagement")(set),
-    ...require("./store/blogManagement")(set, get),
-    ...require("./store/affiliate")(set, get),
-    ...require("./store/sidebar")(set, get),
-    ...require("./store/rentalManagement")(set, get),
-    ...require("./store/purchaseManagement")(set, get),
-    ...require("./store/matchingPage")(set, get),
-    ...require("./store/marketingDashboard")(set, get),
-    ...require("./store/rentalOwnerDashboardPage")(set, get),
-    ...require("./store/userAuth")(set),
+    ...contentManagement(set),
+    ...recentActivity(set),
+    ...projectsManagement(set),
+    ...propertiesManagement(set),
+    ...blogManagement(set, get),
+    ...affiliate(set, get),
+    ...sidebar(set, get),
+    ...rentalManagement(set, get),
+    ...purchaseManagement(set, get),
+    ...matchingPage(set, get),
+    ...marketingDashboard(set, get),
+    ...rentalOwnerDashboardPage(set, get),
+    ...userAuth(set),
   };
 });
 
-module.exports = useStore;
+export default useStore;

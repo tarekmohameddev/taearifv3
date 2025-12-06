@@ -30,4 +30,4 @@ const userAuth = (set) => ({
     }),
 });
 
-module.exports = userAuth;
+export default userAuth;

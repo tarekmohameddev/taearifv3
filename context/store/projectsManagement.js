@@ -6,7 +6,7 @@ const {
   formatErrorMessage,
 } = require("@/utils/errorHandler");
 
-module.exports = (set, get) => ({
+export default (set, get) => ({
   projectsManagement: {
     viewMode: "grid",
     projects: [],

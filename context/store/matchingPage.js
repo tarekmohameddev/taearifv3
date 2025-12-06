@@ -7,7 +7,7 @@ import {
   formatErrorMessage,
 } from "@/utils/errorHandler";
 
-module.exports = (set, get) => ({
+export default (set, get) => ({
   matchingPage: {
     // Customers Data
     customers: [],

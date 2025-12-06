@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { ComponentData, ComponentInstanceWithPosition } from "@/lib/types";
+import { useEditorStore } from "./editorStore";
 
 interface SidebarStateManager {
   // Current editing component
@@ -35,7 +36,7 @@ export const useSidebarStateManager = create<SidebarStateManager>(
 
     updateComponentData: (componentId, path, value) => {
       // Get current pageComponentsByPage from editorStore
-      const editorStore = require("./editorStore").useEditorStore.getState();
+      const editorStore = useEditorStore.getState();
       const currentPage = get().currentPage;
       const pageComponents =
         editorStore.pageComponentsByPage[currentPage] || [];
@@ -56,7 +57,7 @@ export const useSidebarStateManager = create<SidebarStateManager>(
     },
 
     getComponentData: (componentId) => {
-      const editorStore = require("./editorStore").useEditorStore.getState();
+      const editorStore = useEditorStore.getState();
       const currentPage = get().currentPage;
       const pageComponents =
         editorStore.pageComponentsByPage[currentPage] || [];
@@ -67,26 +68,26 @@ export const useSidebarStateManager = create<SidebarStateManager>(
     },
 
     updateGlobalHeader: (path, value) => {
-      const editorStore = require("./editorStore").useEditorStore.getState();
+      const editorStore = useEditorStore.getState();
       const currentData = editorStore.globalHeaderData || {};
       const updatedData = updateDataByPath(currentData, path, value);
       editorStore.setGlobalHeaderData(updatedData);
     },
 
     updateGlobalFooter: (path, value) => {
-      const editorStore = require("./editorStore").useEditorStore.getState();
+      const editorStore = useEditorStore.getState();
       const currentData = editorStore.globalFooterData || {};
       const updatedData = updateDataByPath(currentData, path, value);
       editorStore.setGlobalFooterData(updatedData);
     },
 
     getGlobalHeaderData: () => {
-      const editorStore = require("./editorStore").useEditorStore.getState();
+      const editorStore = useEditorStore.getState();
       return editorStore.globalHeaderData || {};
     },
 
     getGlobalFooterData: () => {
-      const editorStore = require("./editorStore").useEditorStore.getState();
+      const editorStore = useEditorStore.getState();
       return editorStore.globalFooterData || {};
     },
   }),

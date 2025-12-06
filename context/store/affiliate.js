@@ -2,7 +2,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
 
-module.exports = (set, get) => ({
+export default (set, get) => ({
   affiliateData: {
     data: null,
     loading: false,

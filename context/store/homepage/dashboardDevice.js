@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axiosInstance";
 
-module.exports = (set) => ({
+export default (set) => ({
   dashboardDevice: [],
   isDashboardDeviceUpdated: false,
   setDashboardDevice: (data) =>

@@ -2,7 +2,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 
-module.exports = (set, get) => ({
+export default (set, get) => ({
   // Marketing Channels Management
   marketingChannels: {
     channels: [],
