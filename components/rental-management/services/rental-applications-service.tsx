@@ -482,52 +482,106 @@ export function RentalApplicationsService({
   } = rentalApplications;
   const { userData } = useAuthStore();
 
+  // Translation functions for filter options
+  const translateContractStatus = (id: string): string => {
+    const translations: { [key: string]: string } = {
+      pending: "قيد الانتظار",
+      active: "نشط",
+      expired: "منتهي",
+      terminated: "ملغي",
+    };
+    return translations[id] || id;
+  };
+
+  const translateRentalStatus = (id: string): string => {
+    const translations: { [key: string]: string } = {
+      active: "نشط",
+      inactive: "غير نشط",
+      terminated: "ملغي",
+      ended: "منتهي",
+      cancelled: "ملغي",
+      draft: "مسودة",
+    };
+    return translations[id] || id;
+  };
+
+  const translatePaymentStatus = (id: string): string => {
+    const translations: { [key: string]: string } = {
+      paid: "مدفوع",
+      partial: "جزئي",
+      overdue: "متأخر",
+      pending: "قيد الانتظار",
+      unpaid: "غير مدفوع",
+    };
+    return translations[id] || id;
+  };
+
+  const translatePayingPlan = (id: string): string => {
+    const translations: { [key: string]: string } = {
+      monthly: "شهري",
+      quarterly: "ربع سنوي",
+      semi_annual: "نصف سنوي",
+      annual: "سنوي",
+    };
+    return translations[id] || id;
+  };
+
   // Fetch filter options from API
   useEffect(() => {
     const fetchFilterOptions = async () => {
-      if (!userData?.token) return;
+      if (!userData?.token) {
+        console.log("No token available, skipping fetchFilterOptions");
+        return;
+      }
 
       try {
-        // جرب endpoint مختلف إذا لم يعمل /filters
-        const response = await axiosInstance.get("/v1/rms/rentals", {
-          params: { page: 1, per_page: 1 }
-        });
+        const response = await axiosInstance.get("/v1/rms/rentals/filter-options");
         
-        // إذا كانت البيانات في response.data.data مباشرة
+        console.log("Filter options response:", response.data);
+        
         if (response.data.status && response.data.data) {
-          const data = response.data.data;
+          // Translate contract_statuses
+          const contractStatuses = (response.data.data.contract_statuses || []).map((status: any) => ({
+            id: status.id,
+            name: translateContractStatus(status.id),
+          }));
+
+          // Translate rental_statuses
+          const rentalStatuses = (response.data.data.rental_statuses || []).map((status: any) => ({
+            id: status.id,
+            name: translateRentalStatus(status.id),
+          }));
+
+          // Translate payment_statuses
+          const paymentStatuses = (response.data.data.payment_statuses || []).map((status: any) => ({
+            id: status.id,
+            name: translatePaymentStatus(status.id),
+          }));
+
+          // Translate paying_plans
+          const payingPlans = (response.data.data.paying_plans || []).map((plan: any) => ({
+            id: plan.id,
+            name: translatePayingPlan(plan.id),
+          }));
+
+          const filterData = {
+            contract_statuses: contractStatuses,
+            rental_statuses: rentalStatuses,
+            payment_statuses: paymentStatuses,
+            paying_plans: payingPlans,
+            buildings: response.data.data.buildings || [],
+            projects: response.data.data.projects || [],
+            units: response.data.data.units || [],
+          };
           
-          // التحقق من وجود filter options في response
-          if (data.contract_statuses || data.rental_statuses || data.payment_statuses) {
-            setFilterOptions({
-              contract_statuses: data.contract_statuses || [],
-              rental_statuses: data.rental_statuses || [],
-              payment_statuses: data.payment_statuses || [],
-              paying_plans: data.paying_plans || [],
-              buildings: data.buildings || [],
-              projects: data.projects || [],
-              units: data.units || [],
-            });
-          }
+          console.log("Setting filter options:", filterData);
+          setFilterOptions(filterData);
+        } else {
+          console.warn("Filter options response missing data:", response.data);
         }
-      } catch (err) {
-        // جرب endpoint آخر
-        try {
-          const response = await axiosInstance.get("/v1/rms/rentals/filters");
-          if (response.data.status && response.data.data) {
-            setFilterOptions({
-              contract_statuses: response.data.data.contract_statuses || [],
-              rental_statuses: response.data.data.rental_statuses || [],
-              payment_statuses: response.data.data.payment_statuses || [],
-              paying_plans: response.data.data.paying_plans || [],
-              buildings: response.data.data.buildings || [],
-              projects: response.data.data.projects || [],
-              units: response.data.data.units || [],
-            });
-          }
-        } catch (err2) {
-          console.error("Error fetching filter options:", err2);
-        }
+      } catch (err: any) {
+        console.error("Error fetching filter options:", err);
+        console.error("Error details:", err.response?.data);
       }
     };
 
