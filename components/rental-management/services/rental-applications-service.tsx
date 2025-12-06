@@ -127,6 +127,16 @@ interface RentalData {
   property: Property;
   next_payment_due_date?: string;
   next_payment_amount?: string;
+  contract_number?: string;
+  active_contract?: {
+    id: number;
+    rental_id: number;
+    start_date: string;
+    end_date: string;
+    status: string;
+    contract_number: string;
+    [key: string]: any;
+  };
 }
 
 interface ApiResponse {
@@ -1245,6 +1255,9 @@ export function RentalApplicationsService({
             <thead className="bg-gradient-to-r from-gray-900 to-gray-800 border-b border-gray-300">
               <tr>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
+                  رقم العقد
+                </th>
+                <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
                   المستأجر
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
@@ -1260,7 +1273,7 @@ export function RentalApplicationsService({
                   تاريخ الانتقال
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
-                  تاريخ الاستحقاق
+                  التاريخ
                 </th>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
                   الحالة
@@ -1292,6 +1305,13 @@ export function RentalApplicationsService({
                     index % 2 === 0 ? "bg-white" : "bg-gray-25"
                   }`}
                 >
+                  {/* رقم العقد */}
+                  <td className="px-6 py-5">
+                    <div className="text-sm font-semibold text-gray-900">
+                      {rental.contract_number || "غير محدد"}
+                    </div>
+                  </td>
+
                   {/* المستأجر */}
                   <td className="px-6 py-5">
                     <div className="flex items-center space-x-4 space-x-reverse">
@@ -1440,16 +1460,24 @@ export function RentalApplicationsService({
                     </div>
                   </td>
 
-                  {/* تاريخ الاستحقاق */}
+                  {/* التاريخ */}
                   <td className="px-6 py-5">
-                    <div className="text-sm font-semibold text-gray-900">
-                      {formatDate(rental.next_payment_due_date)}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {rental.next_payment_amount
-                        ? `${rental.next_payment_amount} ريال سعودي`
-                        : "غير محدد"}
-                    </div>
+                    {rental.active_contract?.start_date || rental.active_contract?.end_date ? (
+                      <>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {rental.active_contract?.start_date
+                            ? `من ${formatDate(rental.active_contract.start_date)}`
+                            : "غير محدد"}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {rental.active_contract?.end_date
+                            ? `إلى ${formatDate(rental.active_contract.end_date)}`
+                            : "غير محدد"}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-sm text-gray-500">غير محدد</div>
+                    )}
                   </td>
 
                   {/* الحالة */}
