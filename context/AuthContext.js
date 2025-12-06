@@ -75,9 +75,67 @@ const useAuthStore = create((set, get) => ({
       try {
         localStorage.setItem("user", JSON.stringify(userData));
       } catch (error) {}
+      
+      // استخدام بيانات الخطة من الكوكي إذا كانت موجودة
+      if (typeof window !== "undefined") {
+        try {
+          const { getPlanCookie, hasValidPlanCookie } = require("@/lib/planCookie");
+          if (hasValidPlanCookie()) {
+            const cachedPlan = getPlanCookie();
+            if (cachedPlan) {
+              set({
+                authenticated: true,
+                userData: {
+                  ...userData,
+                  days_remaining: cachedPlan.days_remaining,
+                  is_free_plan: cachedPlan.is_free_plan,
+                  is_expired: cachedPlan.is_expired,
+                  package_title: cachedPlan.package_title,
+                  package_features: cachedPlan.package_features,
+                  project_limit_number: cachedPlan.project_limit_number,
+                  real_estate_limit_number: cachedPlan.real_estate_limit_number,
+                  onboarding_completed: cachedPlan.onboarding_completed !== undefined 
+                    ? cachedPlan.onboarding_completed 
+                    : userData.onboarding_completed,
+                },
+                onboarding_completed: cachedPlan.onboarding_completed !== undefined 
+                  ? cachedPlan.onboarding_completed 
+                  : userData.onboarding_completed,
+              });
+              return; // لا حاجة لجلب البيانات من API
+            }
+          }
+        } catch (error) {
+          console.error("Error reading plan cookie:", error);
+        }
+      }
+      
+      // إذا لم تكن موجودة في الكوكي، جلبها من API مرة واحدة فقط
       if (get().userData.is_free_plan == null) {
         const ress = await axiosInstance.get("/user");
         const subscriptionDATA = ress.data.data;
+        
+        // حفظ البيانات في الكوكي
+        if (typeof window !== "undefined") {
+          try {
+            const { setPlanCookie } = require("@/lib/planCookie");
+            const planData = {
+              package_title: subscriptionDATA.membership.package.title || null,
+              is_free_plan: subscriptionDATA.membership.is_free_plan || false,
+              days_remaining: subscriptionDATA.membership.days_remaining || null,
+              is_expired: subscriptionDATA.membership.is_expired || false,
+              package_features: subscriptionDATA.membership.package.features || [],
+              project_limit_number: subscriptionDATA.membership.package.project_limit_number || null,
+              real_estate_limit_number: subscriptionDATA.membership.package.real_estate_limit_number || null,
+              onboarding_completed: subscriptionDATA.onboarding_completed,
+              fetched_at: Date.now(),
+            };
+            setPlanCookie(planData);
+          } catch (error) {
+            console.error("Error setting plan cookie:", error);
+          }
+        }
+        
         set({
           authenticated: true,
           userData: {
@@ -96,7 +154,9 @@ const useAuthStore = create((set, get) => ({
             domain: subscriptionDATA.domain || null,
             message: subscriptionDATA.message || null,
             company_name: subscriptionDATA.company_name || null,
+            onboarding_completed: subscriptionDATA.onboarding_completed || false,
           },
+          onboarding_completed: subscriptionDATA.onboarding_completed || false,
         });
       }
 

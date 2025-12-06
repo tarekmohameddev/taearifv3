@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
@@ -26,6 +26,9 @@ export default function ClientLayout({
   const [showPopup, setShowPopup] = useState(false);
   const clearMessage = useAuthStore((state) => state.clearMessage);
   const setMessage = useAuthStore((state) => state.setMessage);
+  // استخدام useRef لمنع إعادة الجلب عند التنقل
+  const hasCheckedOnboardingRef = useRef(false);
+  const isFetchingOnboardingRef = useRef(false);
 
   //   setUserData({
   //     email: userData.email,
@@ -160,7 +163,63 @@ export default function ClientLayout({
 
   useEffect(() => {
     async function fetchUser() {
+      // منع إعادة الجلب إذا كان هناك طلب قيد التنفيذ
+      if (isFetchingOnboardingRef.current) {
+        return;
+      }
+
       if (isMounted && !IsLoading && UserIslogged && !onboardingCompleted) {
+        // استخدام البيانات من AuthContext بدلاً من جلبها مباشرة
+        const currentUserData = useAuthStore.getState().userData;
+        const completed = currentUserData?.onboarding_completed;
+        
+        // إذا كانت البيانات موجودة في AuthContext، استخدمها
+        if (completed !== undefined && completed !== null) {
+          setOnboardingCompleted(completed);
+          hasCheckedOnboardingRef.current = true;
+          if (completed === false) {
+            if (pathname !== "/onboarding") {
+              router.push("/onboarding");
+            }
+          } else if (pathname === "/onboarding") {
+            router.push("/dashboard");
+          }
+          return; // لا حاجة لجلب البيانات من API
+        }
+
+        // إذا تم التحقق من قبل، لا تعيد الجلب
+        if (hasCheckedOnboardingRef.current) {
+          return;
+        }
+
+        // التحقق من الكوكي أولاً
+        if (typeof window !== "undefined") {
+          try {
+            const { getPlanCookie, hasValidPlanCookie } = require("@/lib/planCookie");
+            if (hasValidPlanCookie()) {
+              const cachedPlan = getPlanCookie();
+              if (cachedPlan && cachedPlan.onboarding_completed !== undefined) {
+                setOnboardingCompleted(cachedPlan.onboarding_completed);
+                hasCheckedOnboardingRef.current = true;
+                if (cachedPlan.onboarding_completed === false) {
+                  if (pathname !== "/onboarding") {
+                    router.push("/onboarding");
+                  }
+                } else if (pathname === "/onboarding") {
+                  router.push("/dashboard");
+                }
+                return; // لا حاجة لجلب البيانات من API
+              }
+            }
+          } catch (error) {
+            console.error("Error reading plan cookie:", error);
+          }
+        }
+        
+        // فقط إذا لم تكن البيانات موجودة في أي مكان، جلبها من API مرة واحدة فقط
+        isFetchingOnboardingRef.current = true;
+        hasCheckedOnboardingRef.current = true;
+
         if (pathname !== "/onboarding") {
           try {
             const response = await axiosInstance.get("/user");
@@ -171,6 +230,8 @@ export default function ClientLayout({
             }
           } catch (error) {
             router.push("/onboarding");
+          } finally {
+            isFetchingOnboardingRef.current = false;
           }
         } else {
           try {
@@ -184,13 +245,17 @@ export default function ClientLayout({
             }
           } catch (error) {
             router.push("/onboarding");
+          } finally {
+            isFetchingOnboardingRef.current = false;
           }
         }
       } else {
       }
     }
     fetchUser();
-  }, [isMounted, IsLoading, UserIslogged, router, onboardingCompleted]);
+    // إزالة pathname من dependencies لتجنب إعادة الجلب عند التنقل
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMounted, IsLoading, UserIslogged, onboardingCompleted]);
 
   useEffect(() => {
     if (pathname?.startsWith("/login")) {

@@ -1,7 +1,7 @@
 "use client"; // Ensure this is a Client Component
 
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -43,6 +43,15 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import useAuthStore from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import useStore from "@/context/Store";
+import axiosInstance from "@/lib/axiosInstance";
+import {
+  getPlanCookie,
+  setPlanCookie,
+  hasValidPlanCookie,
+  hasFetchedPlanInSession,
+  markPlanFetchedInSession,
+  type PlanData,
+} from "@/lib/planCookie";
 
 // نوع عنصر القائمة الجانبية (يمكنك تعديله حسب تعريفك الفعلي)
 type MainNavItem = {
@@ -64,6 +73,12 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
   const router = useRouter();
   const { sidebarData, fetchSideMenus } = useStore();
   const { mainNavItems, loading, error } = sidebarData;
+  const [currentPlan, setCurrentPlan] = useState<PlanData | null>(null);
+  const [isLoadingPlan, setIsLoadingPlan] = useState(false);
+  // استخدام useRef لمنع إعادة الجلب عند التنقل
+  const hasFetchedPlanRef = useRef(false);
+  const isFetchingRef = useRef(false);
+  const lastTokenRef = useRef<string | null>(null);
 
   useEffect(() => {
     // إزالة fetchUserData من هنا لأنه يتم استدعاؤه في layout.tsx
@@ -73,6 +88,92 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
       fetchSideMenus();
     }
   }, [fetchSideMenus, userData?.token]);
+
+  // جلب بيانات الخطة مرة واحدة وحفظها في كوكي
+  useEffect(() => {
+    const currentToken = userData?.token || null;
+
+    // إذا لم يتغير الـ token، لا تفعل شيئاً (منع إعادة الجلب عند التنقل)
+    if (currentToken === lastTokenRef.current && lastTokenRef.current !== null) {
+      // التحقق من الكوكي فقط إذا لم يتم الجلب من قبل
+      if (!hasFetchedPlanRef.current && hasValidPlanCookie()) {
+        const cachedPlan = getPlanCookie();
+        if (cachedPlan) {
+          setCurrentPlan(cachedPlan);
+          hasFetchedPlanRef.current = true;
+        }
+      }
+      return;
+    }
+
+    // تحديث آخر token
+    lastTokenRef.current = currentToken;
+
+    // التحقق من وجود بيانات في الكوكي أولاً - هذا يمنع أي طلب API
+    if (hasValidPlanCookie()) {
+      const cachedPlan = getPlanCookie();
+      if (cachedPlan) {
+        setCurrentPlan(cachedPlan);
+        hasFetchedPlanRef.current = true;
+        markPlanFetchedInSession(); // تسجيل أن البيانات موجودة
+        return; // لا حاجة لجلب البيانات من API
+      }
+    }
+
+    // إذا تم الجلب من قبل في هذه الجلسة (sessionStorage)، لا تعيد الجلب
+    if (hasFetchedPlanInSession() || hasFetchedPlanRef.current || isFetchingRef.current) {
+      return;
+    }
+
+    // التحقق من وجود token و account_type قبل الجلب
+    if (!currentToken || userData?.account_type !== "tenant") {
+      return;
+    }
+
+    const fetchPlanData = async () => {
+      // تعيين flag لمنع إعادة الجلب
+      isFetchingRef.current = true;
+      hasFetchedPlanRef.current = true;
+      markPlanFetchedInSession(); // تسجيل في sessionStorage
+
+      try {
+        setIsLoadingPlan(true);
+        const response = await axiosInstance.get("/user");
+        const subscriptionDATA = response.data.data;
+
+        const planData: PlanData = {
+          package_title: subscriptionDATA.membership.package.title || null,
+          is_free_plan: subscriptionDATA.membership.is_free_plan || false,
+          days_remaining: subscriptionDATA.membership.days_remaining || null,
+          is_expired: subscriptionDATA.membership.is_expired || false,
+          package_features: subscriptionDATA.membership.package.features || [],
+          project_limit_number:
+            subscriptionDATA.membership.package.project_limit_number || null,
+          real_estate_limit_number:
+            subscriptionDATA.membership.package.real_estate_limit_number ||
+            null,
+          fetched_at: Date.now(),
+        };
+
+        // حفظ البيانات في الكوكي
+        setPlanCookie(planData);
+        setCurrentPlan(planData);
+      } catch (error) {
+        console.error("Error fetching plan data:", error);
+        // في حالة الخطأ، إعادة تعيين flags للسماح بالمحاولة مرة أخرى
+        hasFetchedPlanRef.current = false;
+        // لا نحذف sessionStorage flag في حالة الخطأ - نتركه لمنع محاولات متعددة
+      } finally {
+        setIsLoadingPlan(false);
+        isFetchingRef.current = false;
+      }
+    };
+
+    fetchPlanData();
+    // استخدام userData?.token فقط كـ dependency للتحقق من جاهزية البيانات
+    // لكن sessionStorage و useRef يمنعان إعادة الجلب عند التنقل
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userData?.token]); // يعمل فقط عند تغيير token (تسجيل دخول/خروج)
 
   const clickedONButton = async () => {
     clickedONSubButton();
@@ -345,41 +446,77 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
 
           {useAuthStore.getState().UserIslogged && (
             <>
-              {useAuthStore.getState().userData?.package_title !== undefined &&
-                useAuthStore.getState().userData?.account_type === "tenant" && (
-                  <Button
-                    variant={
-                      useAuthStore.getState().userData?.is_free_plan
-                        ? "outline"
-                        : "secondary"
-                    }
-                    size="sm"
-                    className={
-                      useAuthStore.getState().userData?.is_free_plan
-                        ? "hidden md:flex gap-1"
-                        : "bg-amber-100 text-amber-800 hidden md:flex"
-                    }
-                    onClick={clickedONButton}
-                  >
-                    <Link href="/dashboard/settings">
-                      {useAuthStore.getState().userData?.is_free_plan
-                        ? `الباقة المجانية`
-                        : useAuthStore.getState().userData?.package_title}
-                      {!useAuthStore.getState().userData?.is_free_plan &&
-                        useAuthStore.getState().userData?.days_remaining && (
-                          <span className="mr-2 text-xs opacity-75">
-                            ({useAuthStore.getState().userData?.days_remaining}{" "}
-                            يوم متبقي)
-                          </span>
-                        )}
-                    </Link>
-                    {useAuthStore.getState().userData?.is_free_plan ? (
-                      ""
-                    ) : (
-                      <Star className="h-3 w-3 ml-1" />
-                    )}
-                  </Button>
-                )}
+              {/* زر الخطة الحالية - يستخدم بيانات الكوكي أو userData */}
+              {/* إظهار الزر إذا كان هناك بيانات خطة (من الكوكي أو userData) */}
+              {((currentPlan && (currentPlan.package_title || currentPlan.is_free_plan !== undefined)) ||
+                (userData?.package_title !== undefined && userData?.package_title !== null) ||
+                (userData?.is_free_plan !== undefined && userData?.is_free_plan !== null)) && (
+                <>
+                  {/* استخدام currentPlan إذا كان موجوداً */}
+                  {currentPlan && (currentPlan.package_title || currentPlan.is_free_plan !== undefined) ? (
+                    <Button
+                      variant={currentPlan.is_free_plan ? "outline" : "secondary"}
+                      size="sm"
+                      className={
+                        currentPlan.is_free_plan
+                          ? "hidden md:flex gap-1"
+                          : "bg-amber-100 text-amber-800 hidden md:flex"
+                      }
+                      onClick={clickedONButton}
+                    >
+                      <Link href="/dashboard/settings">
+                        {currentPlan.is_free_plan
+                          ? `الباقة المجانية`
+                          : currentPlan.package_title || "الخطة الحالية"}
+                        {!currentPlan.is_free_plan &&
+                          currentPlan.days_remaining && (
+                            <span className="mr-2 text-xs opacity-75">
+                              ({currentPlan.days_remaining} يوم متبقي)
+                            </span>
+                          )}
+                      </Link>
+                      {currentPlan.is_free_plan ? (
+                        ""
+                      ) : (
+                        <Star className="h-3 w-3 ml-1" />
+                      )}
+                    </Button>
+                  ) : (
+                    /* استخدام userData كـ fallback */
+                    <Button
+                      variant={
+                        userData?.is_free_plan
+                          ? "outline"
+                          : "secondary"
+                      }
+                      size="sm"
+                      className={
+                        userData?.is_free_plan
+                          ? "hidden md:flex gap-1"
+                          : "bg-amber-100 text-amber-800 hidden md:flex"
+                      }
+                      onClick={clickedONButton}
+                    >
+                      <Link href="/dashboard/settings">
+                        {userData?.is_free_plan
+                          ? `الباقة المجانية`
+                          : userData?.package_title || "الخطة الحالية"}
+                        {!userData?.is_free_plan &&
+                          userData?.days_remaining && (
+                            <span className="mr-2 text-xs opacity-75">
+                              ({userData?.days_remaining} يوم متبقي)
+                            </span>
+                          )}
+                      </Link>
+                      {userData?.is_free_plan ? (
+                        ""
+                      ) : (
+                        <Star className="h-3 w-3 ml-1" />
+                      )}
+                    </Button>
+                  )}
+                </>
+              )}
 
               {/* <TooltipProvider>
                 <Tooltip>
@@ -483,39 +620,73 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
       <div className="flex h-5 items-center justify-center border-b px-4 md:px-6 md:hidden ">
         {useAuthStore.getState().UserIslogged && (
           <>
-            {useAuthStore.getState().userData?.package_title !== undefined &&
-              useAuthStore.getState().userData?.account_type === "tenant" && (
-                <Button
-                  variant={
-                    useAuthStore.getState().userData?.is_free_plan
-                      ? "outline"
-                      : "secondary"
-                  }
-                  size="sm"
-                  className={
-                    useAuthStore.getState().userData?.is_free_plan
-                      ? "mb-10"
-                      : "bg-amber-100 text-amber-800 mb-10"
-                  }
-                  onClick={clickedONButton}
-                >
-                  <Link href="/dashboard/settings">
-                    {useAuthStore.getState().userData?.is_free_plan
-                      ? `الباقة المجانية `
-                      : useAuthStore.getState().userData?.package_title}
-                    {!useAuthStore.getState().userData?.is_free_plan &&
-                      useAuthStore.getState().userData?.days_remaining && (
-                        <span className="mr-2 text-xs opacity-75">
-                          ({useAuthStore.getState().userData?.days_remaining}{" "}
-                          يوم متبقي)
-                        </span>
-                      )}
-                  </Link>
-                  {!useAuthStore.getState().userData?.is_free_plan && (
-                    <Star className="h-3 w-3 ml-1" />
-                  )}
-                </Button>
-              )}
+            {/* زر الخطة الحالية للجوال - يستخدم بيانات الكوكي أو userData */}
+            {/* إظهار الزر إذا كان هناك بيانات خطة (من الكوكي أو userData) */}
+            {((currentPlan && (currentPlan.package_title || currentPlan.is_free_plan !== undefined)) ||
+              (userData?.package_title !== undefined && userData?.package_title !== null) ||
+              (userData?.is_free_plan !== undefined && userData?.is_free_plan !== null)) && (
+              <>
+                {/* استخدام currentPlan إذا كان موجوداً */}
+                {currentPlan && (currentPlan.package_title || currentPlan.is_free_plan !== undefined) ? (
+                  <Button
+                    variant={currentPlan.is_free_plan ? "outline" : "secondary"}
+                    size="sm"
+                    className={
+                      currentPlan.is_free_plan
+                        ? "mb-10"
+                        : "bg-amber-100 text-amber-800 mb-10"
+                    }
+                    onClick={clickedONButton}
+                  >
+                    <Link href="/dashboard/settings">
+                      {currentPlan.is_free_plan
+                        ? `الباقة المجانية `
+                        : currentPlan.package_title || "الخطة الحالية"}
+                      {!currentPlan.is_free_plan &&
+                        currentPlan.days_remaining && (
+                          <span className="mr-2 text-xs opacity-75">
+                            ({currentPlan.days_remaining} يوم متبقي)
+                          </span>
+                        )}
+                    </Link>
+                    {!currentPlan.is_free_plan && (
+                      <Star className="h-3 w-3 ml-1" />
+                    )}
+                  </Button>
+                ) : (
+                  /* استخدام userData كـ fallback */
+                  <Button
+                    variant={
+                      userData?.is_free_plan
+                        ? "outline"
+                        : "secondary"
+                    }
+                    size="sm"
+                    className={
+                      userData?.is_free_plan
+                        ? "mb-10"
+                        : "bg-amber-100 text-amber-800 mb-10"
+                    }
+                    onClick={clickedONButton}
+                  >
+                    <Link href="/dashboard/settings">
+                      {userData?.is_free_plan
+                        ? `الباقة المجانية `
+                        : userData?.package_title || "الخطة الحالية"}
+                      {!userData?.is_free_plan &&
+                        userData?.days_remaining && (
+                          <span className="mr-2 text-xs opacity-75">
+                            ({userData?.days_remaining} يوم متبقي)
+                          </span>
+                        )}
+                    </Link>
+                    {!userData?.is_free_plan && (
+                      <Star className="h-3 w-3 ml-1" />
+                    )}
+                  </Button>
+                )}
+              </>
+            )}
           </>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
@@ -18,6 +18,9 @@ export const useTokenValidation = () => {
   const [isSameAccount, setIsSameAccount] = useState(false);
   const [newUserData, setNewUserData] = useState<any>(null);
   const [userData, setUserDataState] = useState<any>(null);
+  // استخدام useRef لمنع إعادة الجلب
+  const hasValidatedRef = useRef(false);
+  const isValidatingRef = useRef(false);
 
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
@@ -39,7 +42,88 @@ export const useTokenValidation = () => {
   };
 
   const validateToken = async (token: string) => {
+    // منع إعادة الجلب إذا كان هناك طلب قيد التنفيذ
+    if (isValidatingRef.current) {
+      return;
+    }
+
+    // إذا تم التحقق من قبل، لا تعيد الجلب
+    if (hasValidatedRef.current && tokenValidation.isValid === true) {
+      return;
+    }
+
     setTokenValidation({ isValid: null, message: "", loading: true });
+    isValidatingRef.current = true;
+
+    // التحقق من الكوكي أولاً لتجنب طلب API
+    if (typeof window !== "undefined") {
+      try {
+        const { getPlanCookie, hasValidPlanCookie } = require("@/lib/planCookie");
+        if (hasValidPlanCookie()) {
+          const cachedPlan = getPlanCookie();
+          if (cachedPlan) {
+            // استخدام البيانات من الكوكي
+            const newUser = {
+              email: userData?.email || null,
+              token: token,
+              username: userData?.username || null,
+              domain: userData?.domain || null,
+              first_name: userData?.first_name || null,
+              last_name: userData?.last_name || null,
+              is_free_plan: cachedPlan.is_free_plan,
+              membership: {
+                days_remaining: cachedPlan.days_remaining,
+                package: {
+                  title: cachedPlan.package_title,
+                  features: cachedPlan.package_features,
+                  project_limit_number: cachedPlan.project_limit_number,
+                  real_estate_limit_number: cachedPlan.real_estate_limit_number,
+                },
+              },
+              message: userData?.message || null,
+              company_name: userData?.company_name || null,
+              permissions: userData?.permissions || [],
+              account_type: userData?.account_type || null,
+              tenant_id: userData?.tenant_id || null,
+            };
+
+            setNewUserData(newUser);
+            setUserData({
+              email: newUser.email,
+              token: token,
+              username: newUser.username,
+              domain: newUser.domain,
+              first_name: newUser.first_name,
+              last_name: newUser.last_name,
+              is_free_plan: newUser.is_free_plan,
+              days_remaining: newUser.membership.days_remaining,
+              package_title: newUser.membership.package.title,
+              package_features: newUser.membership.package.features || [],
+              project_limit_number: newUser.membership.package.project_limit_number,
+              real_estate_limit_number: newUser.membership.package.real_estate_limit_number,
+              message: newUser.message,
+              company_name: newUser.company_name,
+              permissions: newUser.permissions || [],
+              account_type: newUser.account_type,
+              tenant_id: newUser.tenant_id,
+            });
+            setUserIsLogged(true);
+            setAuthenticated(true);
+
+            setTokenValidation({
+              isValid: true,
+              message: "الـ token صالح - بيانات من الكوكي",
+              loading: false,
+            });
+            hasValidatedRef.current = true;
+            isValidatingRef.current = false;
+            return; // لا حاجة لجلب البيانات من API
+          }
+        }
+      } catch (error) {
+        console.error("Error reading plan cookie:", error);
+      }
+    }
 
     try {
       const response = await axiosInstance.get("/user", {
@@ -85,6 +169,7 @@ export const useTokenValidation = () => {
         const isSame = currentUser && currentUser.email === newUser.email;
         setIsSameAccount(isSame);
 
+        hasValidatedRef.current = true;
         if (isSame) {
           setTokenValidation({
             isValid: true,
@@ -132,6 +217,9 @@ export const useTokenValidation = () => {
         message: errorMessage,
         loading: false,
       });
+      hasValidatedRef.current = false; // إعادة تعيين في حالة الخطأ
+    } finally {
+      isValidatingRef.current = false;
     }
   };
 
@@ -193,6 +281,11 @@ export const useTokenValidation = () => {
 
   useEffect(() => {
     const initializeTokenValidation = async () => {
+      // إذا تم التحقق من قبل، لا تعيد التحقق
+      if (hasValidatedRef.current) {
+        return;
+      }
+
       // التحقق من أن المستخدم ليس في صفحة register
       const currentPath = window.location.pathname;
       // فحص register مع أو بدون locale (مثل /register أو /en/register أو /ar/register)
@@ -228,7 +321,8 @@ export const useTokenValidation = () => {
     };
 
     initializeTokenValidation();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // تشغيل مرة واحدة فقط
 
   useEffect(() => {
     // التحقق من أن المستخدم ليس في صفحة register قبل إعادة التوجيه
