@@ -1,0 +1,425 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import {
+  Phone,
+  MessageCircle,
+  Plus,
+  Trash2,
+  Settings,
+  CheckCircle,
+  AlertCircle,
+  ExternalLink,
+  RefreshCw,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header"
+import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { WhatsappIcon } from "@/components/icons"
+import axiosInstance from "@/lib/axiosInstance"
+import useAuthStore from "@/context/AuthContext"
+
+interface WhatsAppNumber {
+  id: number
+  display_name: string | null
+  number: string
+  status: string
+  request_status: string
+  messages_received: number
+  business_id: string | null
+  waba_id: string | null
+  phone_id: string | null
+  linking_method: string
+  api_method: string
+  token_expires_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+interface WhatsAppResponse {
+  success: boolean
+  status: string
+  message: string
+  dashboard: {
+    total_messages_received: number
+    total_linked_numbers: number
+  }
+  numbers: WhatsAppNumber[]
+}
+
+interface RedirectResponse {
+  success: boolean
+  redirect_url: string
+  mode: string
+  config_id: string
+}
+
+export function WhatsAppCenterPage() {
+  const [connectedNumbers, setConnectedNumbers] = useState<WhatsAppNumber[]>([])
+  const [totalMessages, setTotalMessages] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isConnecting, setIsConnecting] = useState(false)
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [numberToDelete, setNumberToDelete] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const { userData } = useAuthStore()
+  // Fetch WhatsApp data on component mount
+  useEffect(() => {
+    const fetchWhatsAppData = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        const response = await axiosInstance.get("/whatsapp" , {
+          headers: {
+            "Authorization": `Bearer ${userData?.token}`
+          }
+        })
+        
+        if (response.data.success) {
+          setConnectedNumbers(response.data.numbers || [])
+          setTotalMessages(response.data.dashboard?.total_messages_received || 0)
+        } else {
+          setError("فشل في تحميل البيانات")
+        }
+      } catch (err: any) {
+        console.error("Error fetching WhatsApp data:", err)
+        setError(
+          err.response?.data?.message || "حدث خطأ أثناء تحميل البيانات"
+        )
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchWhatsAppData()
+  }, [])
+
+  const handleFacebookLogin = async () => {
+    try {
+      setIsConnecting(true)
+      setError(null)
+      
+      const response = await axiosInstance.get("/whatsapp/meta/redirect", {
+        params: {
+          mode: "existing"
+        }
+      })
+      
+      if (response.data.success && response.data.redirect_url) {
+        // Open redirect URL in new tab
+        window.open(response.data.redirect_url, "_blank")
+      } else {
+        setError("فشل في الحصول على رابط التوجيه")
+      }
+    } catch (err: any) {
+      console.error("Error getting redirect URL:", err)
+      setError(
+        err.response?.data?.message || "حدث خطأ أثناء محاولة الربط"
+      )
+    } finally {
+      setIsConnecting(false)
+    }
+  }
+
+  const handleDeleteNumber = (id: number) => {
+    setConnectedNumbers((prev) => prev.filter((num) => num.id !== id))
+    setDeleteDialogOpen(false)
+    setNumberToDelete(null)
+  }
+
+  const confirmDelete = (id: number) => {
+    setNumberToDelete(String(id))
+    setDeleteDialogOpen(true)
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col" dir="rtl">
+      <DashboardHeader />
+      <div className="flex flex-1 flex-col md:flex-row">
+        <EnhancedSidebar activeTab="whatsapp-center" />
+        <main className="flex-1 p-4 md:p-6">
+          <div className="space-y-6">
+            {/* Page Header */}
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">مركز الواتساب</h1>
+              <p className="text-muted-foreground">
+                قم بربط أرقام الواتساب الخاصة بك عبر فيسبوك بيزنس لإدارة الرسائل والتواصل مع العملاء
+              </p>
+            </div>
+
+            {/* Success Alert */}
+            {showSuccessAlert && (
+              <Alert className="border-green-200 bg-green-50">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <AlertTitle className="text-green-800">تم الربط بنجاح!</AlertTitle>
+                <AlertDescription className="text-green-700">
+                  تم ربط رقم الواتساب الجديد بحسابك بنجاح. يمكنك الآن استخدامه للتواصل مع العملاء.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Error Alert */}
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>خطأ</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Stats Cards */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">الأرقام المتصلة</CardTitle>
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {isLoading ? "..." : connectedNumbers.length}
+                  </div>
+                  <p className="text-xs text-muted-foreground">أرقام واتساب نشطة</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">الرسائل المرسلة</CardTitle>
+                  <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {isLoading ? "..." : totalMessages.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-muted-foreground">رسالة مرسلة</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">حالة الاتصال</CardTitle>
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">
+                    {isLoading ? "..." : connectedNumbers.length > 0 ? "متصل" : "غير متصل"}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {connectedNumbers.length > 0 ? "جميع الأرقام تعمل بشكل طبيعي" : "لا توجد أرقام متصلة"}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Add New Number Card */}
+            <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Plus className="h-5 w-5" />
+                  إضافة رقم واتساب جديد
+                </CardTitle>
+                <CardDescription>
+                  اربط رقم واتساب بيزنس جديد عبر حساب فيسبوك الخاص بك لبدء التواصل مع العملاء
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>متطلبات الربط</AlertTitle>
+                  <AlertDescription>
+                    <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                      <li>حساب فيسبوك بيزنس مُفعّل</li>
+                      <li>رقم هاتف غير مرتبط بحساب واتساب آخر</li>
+                      <li>إمكانية استقبال رمز التحقق عبر SMS</li>
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+
+                <Button
+                  onClick={handleFacebookLogin}
+                  disabled={isConnecting}
+                  className="w-full md:w-auto bg-[#1877F2] hover:bg-[#166FE5] text-white gap-2"
+                  size="lg"
+                >
+                  {isConnecting ? (
+                    <>
+                      <RefreshCw className="h-5 w-5 animate-spin" />
+                      جاري الربط...
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                      </svg>
+                      تسجيل الدخول عبر فيسبوك
+                    </>
+                  )}
+                </Button>
+
+                <p className="text-xs text-muted-foreground">
+                  بالنقر على الزر، ستتم إعادة توجيهك إلى فيسبوك لتسجيل الدخول وربط حساب واتساب بيزنس الخاص بك.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Connected Numbers Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <WhatsappIcon className="h-5 w-5 text-[#25D366]" />
+                  الأرقام المتصلة
+                </CardTitle>
+                <CardDescription>جميع أرقام الواتساب المرتبطة بحسابك</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <RefreshCw className="h-12 w-12 mx-auto mb-4 opacity-50 animate-spin" />
+                    <p>جاري تحميل البيانات...</p>
+                  </div>
+                ) : connectedNumbers.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Phone className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>لا توجد أرقام متصلة حالياً</p>
+                    <p className="text-sm">قم بإضافة رقم واتساب جديد للبدء</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-right">رقم الهاتف</TableHead>
+                        <TableHead className="text-right">الاسم المعروض</TableHead>
+                        <TableHead className="text-right">الحالة</TableHead>
+                        <TableHead className="text-right">حالة الطلب</TableHead>
+                        <TableHead className="text-right">تاريخ الربط</TableHead>
+                        <TableHead className="text-right">آخر تحديث</TableHead>
+                        <TableHead className="text-right">الرسائل المستلمة</TableHead>
+                        <TableHead className="text-right">الإجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {connectedNumbers.map((number) => (
+                        <TableRow key={number.id}>
+                          <TableCell className="font-medium" dir="ltr">
+                            {number.number}
+                          </TableCell>
+                          <TableCell>{number.display_name || "-"}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={number.status === "active" ? "default" : "secondary"}
+                              className={
+                                number.status === "active" ? "bg-green-100 text-green-800 hover:bg-green-100" : ""
+                              }
+                            >
+                              {number.status === "active" ? "نشط" : number.status === "inactive" ? "غير نشط" : number.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={number.request_status === "active" ? "default" : number.request_status === "pending" ? "secondary" : "outline"}
+                              className={
+                                number.request_status === "active" 
+                                  ? "bg-blue-100 text-blue-800 hover:bg-blue-100" 
+                                  : number.request_status === "pending"
+                                  ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                                  : ""
+                              }
+                            >
+                              {number.request_status === "active" ? "نشط" : number.request_status === "pending" ? "قيد الانتظار" : number.request_status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {new Date(number.created_at).toLocaleDateString("ar-US")}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(number.updated_at).toLocaleDateString("ar-US")}
+                          </TableCell>
+                          <TableCell>{number.messages_received.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Button variant="ghost" size="icon">
+                                <Settings className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => confirmDelete(number.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Help Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>هل تحتاج مساعدة؟</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="flex items-start gap-3 p-4 rounded-lg border">
+                    <div className="p-2 rounded-full bg-blue-100">
+                      <ExternalLink className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">دليل الإعداد</h4>
+                      <p className="text-sm text-muted-foreground">تعرف على كيفية إعداد حساب واتساب بيزنس الخاص بك</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-4 rounded-lg border">
+                    <div className="p-2 rounded-full bg-green-100">
+                      <MessageCircle className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">الدعم الفني</h4>
+                      <p className="text-sm text-muted-foreground">تواصل مع فريق الدعم للحصول على المساعدة</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>تأكيد الحذف</DialogTitle>
+            <DialogDescription>
+              هل أنت متأكد من أنك تريد فصل هذا الرقم؟ لن تتمكن من استقبال أو إرسال الرسائل عبره بعد الآن.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              إلغاء
+            </Button>
+            <Button variant="destructive" onClick={() => numberToDelete && handleDeleteNumber(Number(numberToDelete))}>
+              نعم، فصل الرقم
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
