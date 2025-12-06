@@ -128,6 +128,11 @@ interface RentalData {
   next_payment_due_date?: string;
   next_payment_amount?: string;
   contract_number?: string;
+  unit_name?: string;
+  property_name?: string;
+  project_name?: string;
+  property_id?: number;
+  project_id?: number;
   active_contract?: {
     id: number;
     rental_id: number;
@@ -135,6 +140,10 @@ interface RentalData {
     end_date: string;
     status: string;
     contract_number: string;
+    property_name?: string;
+    project_name?: string;
+    property_id?: number;
+    project_id?: number;
     [key: string]: any;
   };
 }
@@ -246,6 +255,12 @@ export function RentalApplicationsService({
     sortBy,
     sortOrder,
     perPage,
+    contractStartDateFilter,
+    contractStartFromDate,
+    contractStartToDate,
+    contractEndDateFilter,
+    contractEndFromDate,
+    contractEndToDate,
   } = rentalApplications;
 
   // Prevent Radix UI from adding pointer-events: none to body
@@ -612,6 +627,12 @@ export function RentalApplicationsService({
     sortBy,
     sortOrder,
     perPage,
+    contractStartDateFilter,
+    contractStartFromDate,
+    contractStartToDate,
+    contractEndDateFilter,
+    contractEndFromDate,
+    contractEndToDate,
   ]);
 
   // دالة مساعدة للتعامل مع البيانات المفقودة
@@ -629,12 +650,49 @@ export function RentalApplicationsService({
 
   // دالة للحصول على رمز الوحدة مع معالجة البيانات المفقودة
   const getUnitLabel = (rental: RentalData) => {
-    return getSafeValue(rental.unit_label, "غير محدد");
+    // أولاً: التحقق من active_contract
+    if (rental.active_contract?.property_name) {
+      return rental.active_contract.property_name;
+    }
+    if (rental.active_contract?.project_name) {
+      return rental.active_contract.project_name;
+    }
+    // ثانياً: التحقق من البيانات الخارجية
+    if (rental.unit_name) {
+      return rental.unit_name;
+    }
+    if (rental.unit_label) {
+      return rental.unit_label;
+    }
+    if (rental.property_name) {
+      return rental.property_name;
+    }
+    if (rental.project_name) {
+      return rental.project_name;
+    }
+    return "غير محدد";
   };
 
   // دالة للحصول على رقم العقار مع معالجة البيانات المفقودة
   const getPropertyNumber = (rental: RentalData) => {
-    return getSafeValue(rental.property_number, "غير محدد");
+    // أولاً: التحقق من active_contract
+    if (rental.active_contract?.property_id) {
+      return String(rental.active_contract.property_id);
+    }
+    if (rental.active_contract?.project_id) {
+      return String(rental.active_contract.project_id);
+    }
+    // ثانياً: التحقق من البيانات الخارجية
+    if (rental.property_number) {
+      return rental.property_number;
+    }
+    if (rental.property_id) {
+      return String(rental.property_id);
+    }
+    if (rental.project_id) {
+      return String(rental.project_id);
+    }
+    return "غير محدد";
   };
 
   // دالة للحصول على المهنة مع معالجة البيانات المفقودة
@@ -746,6 +804,34 @@ export function RentalApplicationsService({
       }
       if (contractCreatedToDate) {
         params.contract_created_to_date = contractCreatedToDate;
+      }
+
+      // إضافة contract_start_date filter
+      if (contractStartDateFilter && contractStartDateFilter !== "all") {
+        if (contractStartDateFilter === "custom") {
+          if (contractStartFromDate) {
+            params.contract_start_from_date = contractStartFromDate;
+          }
+          if (contractStartToDate) {
+            params.contract_start_to_date = contractStartToDate;
+          }
+        } else {
+          params.contract_start_period = contractStartDateFilter;
+        }
+      }
+
+      // إضافة contract_end_date filter
+      if (contractEndDateFilter && contractEndDateFilter !== "all") {
+        if (contractEndDateFilter === "custom") {
+          if (contractEndFromDate) {
+            params.contract_end_from_date = contractEndFromDate;
+          }
+          if (contractEndToDate) {
+            params.contract_end_to_date = contractEndToDate;
+          }
+        } else {
+          params.contract_end_period = contractEndDateFilter;
+        }
       }
 
       const response = await axiosInstance.get<ApiResponse>(
@@ -1239,6 +1325,90 @@ export function RentalApplicationsService({
                 type="date"
                 value={toDate}
                 onChange={(e) => setRentalApplications({ toDate: e.target.value })}
+              />
+            </div>
+          </>
+        )}
+        {/* Contract Start Date Filter */}
+        <div className="space-y-2">
+          <Label htmlFor="contract-start-date-filter">تاريخ بداية العقد</Label>
+          <Select 
+            value={contractStartDateFilter || "all"} 
+            onValueChange={(value) => setRentalApplications({ contractStartDateFilter: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="اختر التاريخ" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع التواريخ</SelectItem>
+              <SelectItem value="today">اليوم</SelectItem>
+              <SelectItem value="week">هذا الأسبوع</SelectItem>
+              <SelectItem value="month">هذا الشهر</SelectItem>
+              <SelectItem value="custom">مخصص</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {/* Contract Start Date inputs when custom is selected */}
+        {contractStartDateFilter === "custom" && (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="contract-start-from-date">من تاريخ</Label>
+              <Input
+                id="contract-start-from-date"
+                type="date"
+                value={contractStartFromDate || ""}
+                onChange={(e) => setRentalApplications({ contractStartFromDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contract-start-to-date">إلى تاريخ</Label>
+              <Input
+                id="contract-start-to-date"
+                type="date"
+                value={contractStartToDate || ""}
+                onChange={(e) => setRentalApplications({ contractStartToDate: e.target.value })}
+              />
+            </div>
+          </>
+        )}
+        {/* Contract End Date Filter */}
+        <div className="space-y-2">
+          <Label htmlFor="contract-end-date-filter">تاريخ نهاية العقد</Label>
+          <Select 
+            value={contractEndDateFilter || "all"} 
+            onValueChange={(value) => setRentalApplications({ contractEndDateFilter: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="اختر التاريخ" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع التواريخ</SelectItem>
+              <SelectItem value="today">اليوم</SelectItem>
+              <SelectItem value="week">هذا الأسبوع</SelectItem>
+              <SelectItem value="month">هذا الشهر</SelectItem>
+              <SelectItem value="custom">مخصص</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {/* Contract End Date inputs when custom is selected */}
+        {contractEndDateFilter === "custom" && (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="contract-end-from-date">من تاريخ</Label>
+              <Input
+                id="contract-end-from-date"
+                type="date"
+                value={contractEndFromDate || ""}
+                onChange={(e) => setRentalApplications({ contractEndFromDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contract-end-to-date">إلى تاريخ</Label>
+              <Input
+                id="contract-end-to-date"
+                type="date"
+                value={contractEndToDate || ""}
+                onChange={(e) => setRentalApplications({ contractEndToDate: e.target.value })}
               />
             </div>
           </>
