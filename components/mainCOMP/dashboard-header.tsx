@@ -41,9 +41,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import useAuthStore from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import useStore from "@/context/Store";
 import axiosInstance from "@/lib/axiosInstance";
+import { cn } from "@/lib/utils";
 import {
   getPlanCookie,
   setPlanCookie,
@@ -71,6 +72,7 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ children }: DashboardHeaderProps) {
   const { userData, fetchUserData, clickedONSubButton } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
   const { sidebarData, fetchSideMenus } = useStore();
   const { mainNavItems, loading, error } = sidebarData;
   const [currentPlan, setCurrentPlan] = useState<PlanData | null>(null);
@@ -188,14 +190,38 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
     }
   };
 
+  // تحديد العنصر النشط بناءً على المسار الحالي
+  const currentPath = pathname || "/";
+  const isContentSection = currentPath.startsWith("/content");
+  const isLiveEditorSection = currentPath.startsWith("/live-editor");
+  const currentTab = isContentSection
+    ? "content"
+    : isLiveEditorSection
+      ? "live-editor"
+      : mainNavItems.find(
+          (item: MainNavItem) =>
+            item.path === currentPath ||
+            (item.path !== "/" && currentPath.startsWith(item.path)),
+        )?.id || "dashboard";
+
+  // دالة للتعامل مع النقر على العنصر
+  const handleItemClick = (item: MainNavItem, e: any) => {
+    if (item.isAPP) {
+      e.preventDefault();
+      const token = useAuthStore.getState().token;
+      const url = `${item.path}?token=${token}`;
+      window.open(url, "_blank");
+    }
+  };
+
   const hey = true;
   return (
     <header className="sticky top-0 z-30 bg-background flex flex-col gap-6">
       {/* الـ navbar الأول مع المحتوى الحالي */}
       <div className="h-16 items-center justify-between px-4 md:px-6 md:border-b flex">
         <div className="flex items-center gap-4">
-          {/* زر قائمة الجوال - يظهر فقط على الجوال */}
-          <div className="md:hidden">
+          {/* زر قائمة الجوال - يظهر للشاشات الأصغر من 1200 بكسل */}
+          <div className="max-[1199px]:block min-[1200px]:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
@@ -204,9 +230,18 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[280px] p-0 z-50">
-                <div className="flex h-full flex-col gap-2">
-                  <div className="flex h-14 items-center border-b px-4 md:h-[60px] mr-5">
-                    <span className="text-lg font-semibold">لوحة التحكم</span>
+                <div className="flex h-full flex-col gap-2 overflow-hidden">
+                  <div className="flex h-14 items-center border-b px-4 md:h-[60px] flex-shrink-0">
+                    <div className="flex flex-col w-full">
+                      <span className="text-lg font-semibold truncate">
+                        {userData?.company_name || "لوحة التحكم"}
+                      </span>
+                      {userData?.domain && userData.domain.trim() !== "" && (
+                        <span className="text-xs text-gray-500 truncate">
+                          {userData.domain}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="px-3">
                     <TooltipProvider delayDuration={300}>
@@ -273,66 +308,95 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  <div className="flex-1 overflow-auto py-2">
-                    <nav className="grid gap-1 px-2">
-                      {error && (
-                        <div className="px-3 py-2">
-                          <span className="text-sm text-red-500">{error}</span>
-                        </div>
-                      )}
-                      {!loading &&
-                        !error &&
-                        mainNavItems &&
-                        mainNavItems.map((item: MainNavItem) =>
-                          item.isAPP ? (
-                            <Button
-                              key={item.id}
-                              variant="ghost"
-                              className="justify-start gap-2"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                const token = useAuthStore.getState().token;
-                                const url = `${item.path}?token=${token}`;
-                                window.open(url, "_blank");
-                              }}
-                            >
-                              <item.icon className="h-4 w-4" />
-                              {item.label}
-                            </Button>
-                          ) : (
-                            <Button
-                              key={item.id}
-                              variant="ghost"
-                              className="justify-start gap-2"
-                              asChild
-                            >
-                              <Link
-                                href={(() => {
-                                  // التحقق من المسارات المباشرة (بدون dashboard)
-                                  if (item.isDirectPath) {
-                                    return item.path;
-                                  }
-
-                                  // التحقق من وجود dashboard في بداية المسار
-                                  if (item.path.startsWith("/dashboard")) {
-                                    // إذا كان موجود، إزالته
-                                    return item.path;
-                                  } else if (item.path.startsWith("/")) {
-                                    // إذا كان يبدأ بـ /، إضافة dashboard قبل /
-                                    return `/dashboard${item.path}`;
-                                  } else {
-                                    // إذا لم يكن يبدأ بـ /، إضافة dashboard/ والـ slug
-                                    return `/dashboard/${item.path}`;
-                                  }
-                                })()}
+                  <div className="flex-1 overflow-auto py-2 px-1 min-h-0">
+                    {error && (
+                      <div className="px-3 py-2">
+                        <span className="text-sm text-red-500">{error}</span>
+                      </div>
+                    )}
+                    {!loading && !error && (
+                      <nav className="space-y-1">
+                        {mainNavItems &&
+                          mainNavItems.map((item: MainNavItem) => {
+                            const isActive =
+                              currentTab === item.id ||
+                              (item.path !== "/" &&
+                                currentPath.startsWith(item.path));
+                            return (
+                              <Button
+                                key={item.id}
+                                variant={isActive ? "secondary" : "ghost"}
+                                className={cn(
+                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
+                                  isActive &&
+                                    "bg-primary/10 text-primary border-r-2 border-primary",
+                                )}
+                                asChild={!item.isAPP}
                               >
-                                <item.icon className="h-4 w-4" />
-                                {item.label}
-                              </Link>
-                            </Button>
-                          ),
-                        )}
-                    </nav>
+                                {item.isAPP ? (
+                                  <div
+                                    onClick={(e) => handleItemClick(item, e)}
+                                    className="cursor-pointer flex items-center w-full"
+                                  >
+                                    <item.icon
+                                      className={cn(
+                                        "h-5 w-5",
+                                        isActive
+                                          ? "text-primary"
+                                          : "text-muted-foreground",
+                                      )}
+                                    />
+                                    <div className="flex flex-col items-start ml-3">
+                                      <span className="text-sm font-medium">
+                                        {item.label}
+                                      </span>
+                                      {item.description && (
+                                        <span className="text-xs text-muted-foreground">
+                                          {item.description}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <Link
+                                    href={(() => {
+                                      if (item.isDirectPath) {
+                                        return item.path;
+                                      }
+                                      if (item.path.startsWith("/dashboard")) {
+                                        return item.path;
+                                      } else if (item.path.startsWith("/")) {
+                                        return `/dashboard${item.path}`;
+                                      } else {
+                                        return `/dashboard/${item.path}`;
+                                      }
+                                    })()}
+                                  >
+                                    <item.icon
+                                      className={cn(
+                                        "h-5 w-5",
+                                        isActive
+                                          ? "text-primary"
+                                          : "text-muted-foreground",
+                                      )}
+                                    />
+                                    <div className="flex flex-col items-start">
+                                      <span className="text-sm font-medium">
+                                        {item.label}
+                                      </span>
+                                      {item.description && (
+                                        <span className="text-xs text-muted-foreground">
+                                          {item.description}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </Link>
+                                )}
+                              </Button>
+                            );
+                          })}
+                      </nav>
+                    )}
                   </div>
                   {useAuthStore.getState().UserIslogged && (
                     <div className="mt-auto border-t p-4">
