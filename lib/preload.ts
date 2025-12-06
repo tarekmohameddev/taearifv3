@@ -1,5 +1,4 @@
 // ملف لتحسين تحميل البيانات وتجنب إعادة التحميل
-import { headers } from "next/headers";
 
 // دالة لتحميل بيانات الـ tenant مسبقاً
 export async function preloadTenantData(tenantId: string) {
