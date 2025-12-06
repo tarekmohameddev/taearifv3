@@ -12,6 +12,7 @@ import {
   Home,
   LayoutTemplate,
   LogOut,
+  MessageSquareShare,
   SettingsIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,12 @@ export function DashboardSidebar({
       label: "Property Requests",
       icon: House,
       path: "/property-requests",
+    },
+    {
+      id: "whatsapp-center",
+      label: "WhatsApp Center",
+      icon: MessageSquareShare,
+      path: "/dashboard/whatsapp-center",
     },
   ];
 

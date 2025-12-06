@@ -5,6 +5,7 @@ import {
   FileText,
   Home,
   MessageSquare,
+  MessageSquareShare,
   Package,
   Settings,
   Users,
@@ -35,6 +36,8 @@ const getIconComponent = (iconName) => {
       return Home;
     case "message":
       return MessageSquare;
+    case "message-square-share":
+      return MessageSquareShare;
     case "package":
       return Package;
     case "users":
