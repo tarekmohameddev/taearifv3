@@ -24,7 +24,7 @@ const nextConfig = {
     optimizeCss: true,
     scrollRestoration: true,
   },
-  // تحسينات للأداء
+  // تحسينات للأداء 
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
