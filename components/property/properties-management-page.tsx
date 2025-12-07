@@ -32,6 +32,8 @@ import {
   Link2,
   MessageCircle,
   ChevronDown,
+  Download,
+  Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -419,6 +421,10 @@ export function PropertiesManagementPage() {
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
   const { clickedONSubButton, userData } = useAuthStore();
 
   const router = useRouter();
@@ -451,6 +457,120 @@ export function PropertiesManagementPage() {
   const clickedONButton = async () => {
     clickedONSubButton();
     router.push("/dashboard/settings");
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // التحقق من نوع الملف
+      const validTypes = [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+        "application/vnd.ms-excel", // .xls
+        "text/csv", // .csv
+      ];
+      
+      if (!validTypes.includes(file.type) && !file.name.endsWith('.xlsx') && !file.name.endsWith('.xls') && !file.name.endsWith('.csv')) {
+        toast.error("يرجى رفع ملف Excel صحيح (.xlsx, .xls, .csv)");
+        return;
+      }
+      
+      setImportFile(file);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!importFile) {
+      toast.error("يرجى اختيار ملف للاستيراد");
+      return;
+    }
+
+    setIsImporting(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", importFile);
+
+      await axiosInstance.post("/properties/bulk-import", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      toast.success("تم استيراد العقارات بنجاح");
+      setImportDialogOpen(false);
+      setImportFile(null);
+      
+      // إعادة تحميل قائمة العقارات
+      fetchProperties(currentPage, appliedFilters);
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "حدث خطأ أثناء استيراد العقارات";
+      toast.error(errorMessage);
+      if (error instanceof Error) {
+        logError(error, "handleImport");
+      }
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleDownloadTemplate = async () => {
+    setIsDownloadingTemplate(true);
+    try {
+      const response = await axiosInstance.get("/properties/bulk-import/template", {
+        responseType: "blob",
+        headers: {
+          Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv",
+        },
+      });
+
+      // التحقق من أن الاستجابة هي blob
+      if (response.data instanceof Blob) {
+        // الحصول على اسم الملف من headers أو استخدام اسم افتراضي
+        const contentDisposition = response.headers["content-disposition"];
+        let filename = `properties-template-${new Date().toISOString().split("T")[0]}.xlsx`;
+
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+          if (filenameMatch && filenameMatch[1]) {
+            filename = filenameMatch[1].replace(/['"]/g, "");
+            // معالجة UTF-8 encoding إذا كان موجوداً
+            if (filename.startsWith("UTF-8''")) {
+              filename = decodeURIComponent(filename.replace("UTF-8''", ""));
+            }
+          }
+        }
+
+        // إنشاء رابط للتحميل
+        const url = window.URL.createObjectURL(response.data);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+
+        // تنظيف
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        toast.success("تم تحميل القالب بنجاح");
+      } else {
+        throw new Error("استجابة غير صحيحة من الخادم");
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "حدث خطأ أثناء تحميل القالب";
+      toast.error(errorMessage);
+      if (error instanceof Error) {
+        logError(error, "handleDownloadTemplate");
+      }
+    } finally {
+      setIsDownloadingTemplate(false);
+    }
   };
   const fetchProperties = async (page = 1, filters = {}) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
@@ -759,6 +879,14 @@ export function PropertiesManagementPage() {
                 </Button>
                 <Button
                   variant="outline"
+                  className="gap-1"
+                  onClick={() => setImportDialogOpen(true)}
+                >
+                  <Upload className="h-4 w-4" />
+                  استيراد عقارات
+                </Button>
+                <Button
+                  variant="outline"
                   size="icon"
                   onClick={() => setViewMode("grid")}
                   className={viewMode === "grid" ? "bg-muted" : ""}
@@ -949,6 +1077,65 @@ export function PropertiesManagementPage() {
                     إلغاء
                   </Button>
                   <Button onClick={clickedONButton}>اشتراك</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* نافذة منبثقة لاستيراد العقارات */}
+            <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>استيراد عقارات</DialogTitle>
+                  <DialogDescription>
+                    قم بتحميل القالب واملأه بالبيانات المطلوبة ثم قم برفعه
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="flex flex-col gap-4">
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2"
+                      onClick={handleDownloadTemplate}
+                      disabled={isDownloadingTemplate}
+                    >
+                      <Download className="h-4 w-4" />
+                      {isDownloadingTemplate ? "جاري التحميل..." : "تحميل القالب"}
+                    </Button>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="import-file">رفع ملف Excel</Label>
+                      <Input
+                        id="import-file"
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                        onChange={handleFileChange}
+                        disabled={isImporting}
+                      />
+                      {importFile && (
+                        <p className="text-sm text-muted-foreground">
+                          الملف المختار: {importFile.name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter className="gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setImportDialogOpen(false);
+                      setImportFile(null);
+                    }}
+                    disabled={isImporting}
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    onClick={handleImport}
+                    disabled={!importFile || isImporting}
+                  >
+                    {isImporting ? "جاري الاستيراد..." : "استيراد"}
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
