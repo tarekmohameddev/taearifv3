@@ -45,6 +45,35 @@ interface FilterData {
   procedures: Array<{ id: number; name: string; icon: string; color: string }>;
 }
 
+// Translation functions for filter data
+const translateType = (name: string): string => {
+  const translations: { [key: string]: string } = {
+    Rent: "إيجار",
+    Sale: "بيع",
+    Rented: "مؤجر",
+    Sold: "مباع",
+    Both: "كلاهما",
+  };
+  return translations[name] || name;
+};
+
+const translatePriority = (name: string): string => {
+  const translations: { [key: string]: string } = {
+    Low: "منخفضة",
+    Medium: "متوسطة",
+    High: "عالية",
+  };
+  return translations[name] || name;
+};
+
+const translateProcedure = (name: string): string => {
+  const translations: { [key: string]: string } = {
+    meeting: "اجتماع",
+    visit: "زيارة",
+  };
+  return translations[name] || name;
+};
+
 export const FiltersAndSearch = ({
   setCustomersData,
   setTotalCustomers,
@@ -284,7 +313,7 @@ export const FiltersAndSearch = ({
             <SelectItem value="all">جميع الأنواع</SelectItem>
             {filterData?.types?.map((type: any) => (
               <SelectItem key={type.id} value={type.id.toString()}>
-                {type.name}
+                {translateType(type.name)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -340,7 +369,7 @@ export const FiltersAndSearch = ({
             {filterData?.priorities?.map((priority: any) => (
               // **FIX**: The value is now `priority.id` as requested by the user.
               <SelectItem key={priority.id} value={priority.id.toString()}>
-                {priority.name}
+                {translatePriority(priority.name)}
               </SelectItem>
             ))}
           </SelectContent>

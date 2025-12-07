@@ -79,6 +79,35 @@ const translateErrorMessage = (message: string): string => {
   return errorTranslations[message] || message;
 };
 
+// Translation functions for filter data
+const translateType = (name: string): string => {
+  const translations: { [key: string]: string } = {
+    Rent: "إيجار",
+    Sale: "بيع",
+    Rented: "مؤجر",
+    Sold: "مباع",
+    Both: "كلاهما",
+  };
+  return translations[name] || name;
+};
+
+const translatePriority = (name: string): string => {
+  const translations: { [key: string]: string } = {
+    Low: "منخفضة",
+    Medium: "متوسطة",
+    High: "عالية",
+  };
+  return translations[name] || name;
+};
+
+const translateProcedure = (name: string): string => {
+  const translations: { [key: string]: string } = {
+    meeting: "اجتماع",
+    visit: "زيارة",
+  };
+  return translations[name] || name;
+};
+
 export const CustomerPageHeader = ({
   showAddCustomerDialog,
   setShowAddCustomerDialog,
@@ -482,7 +511,7 @@ export const CustomerPageHeader = ({
                     <SelectContent>
                       {filterData?.types?.map((type: any) => (
                         <SelectItem key={type.id} value={type.id.toString()}>
-                          {type.name}
+                          {translateType(type.name)}
                         </SelectItem>
                       )) || [
                         <SelectItem key="1" value="1">
@@ -538,7 +567,7 @@ export const CustomerPageHeader = ({
                           key={priority.id}
                           value={priority.id.toString()}
                         >
-                          {priority.name}
+                          {translatePriority(priority.name)}
                         </SelectItem>
                       )) || [
                         <SelectItem key="1" value="1">
@@ -590,7 +619,7 @@ export const CustomerPageHeader = ({
                           key={procedure.id}
                           value={procedure.id.toString()}
                         >
-                          {procedure.name}
+                          {translateProcedure(procedure.name)}
                         </SelectItem>
                       )) || [
                         <SelectItem key="1" value="1">
