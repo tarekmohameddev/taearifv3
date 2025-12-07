@@ -265,7 +265,8 @@ export default function FilterButtons({
       className={`flex flex-col md:flex-row justify-between ${className || ""} max-w-[1600px] mx-auto`}
     >
       {/* زر طلب المعاينة */}
-      <Link
+      {/* زر طلب معاينة مخفي حالياً بشكل مؤقت ولا اريد ازالته */}
+      {/* <Link
         href="/application-form"
         className="w-[80%] mb-[20px] md:w-fit md:mx-0 flex items-center justify-center text-[12px] md:text-[14px] lg:text-[20px] relative transition-all duration-300 ease-in-out text-nowrap rounded-[10px] px-[20px] py-[8px] mx-auto"
         style={{ 
@@ -282,7 +283,7 @@ export default function FilterButtons({
         }}
       >
         طلب معاينة
-      </Link>
+      </Link> */}
 
       {/* أزرار الفلتر */}
       <div className="filterButtons mb-6 flex items-center justify-center md:justify-start gap-x-[24px]">
