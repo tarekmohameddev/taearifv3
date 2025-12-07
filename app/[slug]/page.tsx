@@ -8,13 +8,13 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const locale = headersList.get("x-locale") || "ar";
-  const slugParam = params?.slug || "";
-  const slugPath = `/${slugParam}`;
+  const { slug: slugParam } = await params;
+  const slugPath = `/${slugParam || ""}`;
 
   if (!tenantId) return {} as any;
 
@@ -96,12 +96,12 @@ export async function generateMetadata({
 export default async function TenantPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
-  const { slug } = params;
+  const { slug } = await params;
 
-  return <TenantPageWrapper tenantId={tenantId} slug={slug} domainType={domainType} />;
+  return <TenantPageWrapper tenantId={tenantId} slug={slug} domainType={domainType || undefined} />;
 }

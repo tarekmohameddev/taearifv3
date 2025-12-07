@@ -5,12 +5,12 @@ import ProjectPageWrapper from "./ProjectPageWrapper";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const locale = headersList.get("x-locale") || "ar";
-  const id = params?.id || "";
-  const slugPath = `/project/${id}`;
+  const { id } = await params;
+  const slugPath = `/project/${id || ""}`;
 
   if (!tenantId) return {} as any;
 
@@ -92,11 +92,12 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 export default async function ProjectPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
   const domainType = headersList.get("x-domain-type") as "subdomain" | "custom" | null;
+  const { id } = await params;
 
-  return <ProjectPageWrapper tenantId={tenantId} domainType={domainType} projectSlug={params.id} />;
+  return <ProjectPageWrapper tenantId={tenantId} domainType={domainType} projectSlug={id} />;
 }
