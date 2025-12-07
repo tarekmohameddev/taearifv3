@@ -36,7 +36,6 @@ export default (set, get) => ({
       },
     }));
   
-    const loadingToast = toast.loading("جاري تحميل قنوات التسويق...");
   
     try {
       const res = await axiosInstance.get(
@@ -55,7 +54,6 @@ export default (set, get) => ({
         },
       }));
   
-      toast.success("تم تحميل قنوات التسويق", { id: loadingToast });
     } catch (err) {
       set((s) => ({
         marketingChannels: {
@@ -65,7 +63,6 @@ export default (set, get) => ({
           _fetchedOnce: true,
         },
       }));
-      toast.error(err.message, { id: loadingToast });
     }
   },
   

@@ -203,6 +203,29 @@ export function RentalApplicationsService({
   const [newStatus, setNewStatus] = useState<string>("");
   const [statusChangeLoading, setStatusChangeLoading] = useState(false);
 
+  // State لمراقبة عرض الشاشة
+  const [tableMaxWidth, setTableMaxWidth] = useState<number | null>(null);
+
+  // مراقبة عرض الشاشة وتحديد الحد الأقصى للجدول
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const width = window.innerWidth;
+      if (width < 1000) {
+        setTableMaxWidth(800);
+      } else if (width < 1400) {
+        setTableMaxWidth(980);
+      } else if (width < 1550) {
+        setTableMaxWidth(1152); // max-w-6xl = 1152px
+      } else {
+        setTableMaxWidth(null);
+      }
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   // Renewal dialog state
   const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
   const [selectedRentalForRenewal, setSelectedRentalForRenewal] =
@@ -727,6 +750,34 @@ export function RentalApplicationsService({
     return "غير محدد";
   };
 
+  // دالة للحصول على حجم الخط المناسب بناءً على طول النص
+  const getFontSizeClass = (text: string) => {
+    const length = text.length;
+    if (length <= 20) {
+      return "text-sm"; // حجم عادي للنصوص القصيرة
+    } else if (length <= 40) {
+      return "text-xs"; // حجم أصغر للنصوص المتوسطة
+    } else if (length <= 60) {
+      return "text-[11px]"; // حجم أصغر للنصوص الطويلة
+    } else {
+      return "text-[10px]"; // حجم صغير جداً للنصوص الطويلة جداً
+    }
+  };
+
+  // دالة للحصول على عرض الخلية المناسب بناءً على طول النص
+  const getCellWidthStyle = (text: string) => {
+    const length = text.length;
+    if (length <= 20) {
+      return { minWidth: "200px" }; // عرض عادي للنصوص القصيرة
+    } else if (length <= 40) {
+      return { minWidth: "280px" }; // عرض أكبر للنصوص المتوسطة
+    } else if (length <= 60) {
+      return { minWidth: "360px" }; // عرض أكبر للنصوص الطويلة
+    } else {
+      return { minWidth: "450px" }; // عرض كبير جداً للنصوص الطويلة جداً
+    }
+  };
+
   // دالة للحصول على رقم العقار مع معالجة البيانات المفقودة
   const getPropertyNumber = (rental: RentalData) => {
     // أولاً: التحقق من active_contract
@@ -1161,7 +1212,7 @@ export function RentalApplicationsService({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {/* Header and Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex gap-2 flex-wrap">
@@ -1471,11 +1522,11 @@ export function RentalApplicationsService({
 
       {/* Modern Rentals Table */}
       <div
-        className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+        className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-x-auto"
         dir="rtl"
+        style={tableMaxWidth ? { maxWidth: `${tableMaxWidth}px` } : {}}
       >
-        <div className="max-[1300px]:overflow-x-auto">
-          <table className="w-full">
+        <table className="w-full min-w-[1000px]">
             <thead className="bg-gradient-to-r from-gray-900 to-gray-800 border-b border-gray-300">
               <tr>
                 <th className="px-6 py-5 text-right text-sm font-bold text-white tracking-wide">
@@ -1566,8 +1617,8 @@ export function RentalApplicationsService({
                   </td>
 
                   {/* الوحدة */}
-                  <td className="px-6 py-5">
-                    <div className="text-sm font-semibold text-gray-900">
+                  <td className="px-6 py-5" style={getCellWidthStyle(getUnitLabel(rental))}>
+                    <div className={`${getFontSizeClass(getUnitLabel(rental))} font-semibold text-gray-900`}>
                       {getUnitLabel(rental)}
                     </div>
                     <div className="text-sm text-gray-500">
@@ -1824,7 +1875,6 @@ export function RentalApplicationsService({
               ))}
             </tbody>
           </table>
-        </div>
 
         {filteredRentals.length === 0 && (
           <div className="text-center py-16">
