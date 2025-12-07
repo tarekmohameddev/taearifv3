@@ -239,6 +239,7 @@ export function WhatsAppCenterPage() {
                   <AlertTitle>متطلبات الربط</AlertTitle>
                   <AlertDescription>
                     <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                      <li>يجب ان يكون واتساب تطبيق اعمال حصرياً, وليس واتساب عادي</li>
                       <li>حساب فيسبوك بيزنس مُفعّل</li>
                       <li>رقم هاتف غير مرتبط بحساب واتساب آخر</li>
                       <li>إمكانية استقبال رمز التحقق عبر SMS</li>
@@ -370,7 +371,8 @@ export function WhatsAppCenterPage() {
             </Card>
 
             {/* Help Section */}
-            <Card>
+            {/* مخفي حالياً */}
+            {/* <Card>
               <CardHeader>
                 <CardTitle>هل تحتاج مساعدة؟</CardTitle>
               </CardHeader>
@@ -396,7 +398,7 @@ export function WhatsAppCenterPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </main>
       </div>
