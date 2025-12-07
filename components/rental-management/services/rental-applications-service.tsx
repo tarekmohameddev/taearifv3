@@ -286,6 +286,25 @@ export function RentalApplicationsService({
     contractEndToDate,
   } = rentalApplications;
 
+  // State محلي للبحث مع debounce
+  const [localSearchTerm, setLocalSearchTerm] = useState<string>(contractSearchTerm || "");
+
+  // Debounce للبحث - تحديث contractSearchTerm بعد ثانيتين من توقف الكتابة
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearchTerm !== contractSearchTerm) {
+        setRentalApplications({ contractSearchTerm: localSearchTerm });
+      }
+    }, 1000); // 1 ثانية
+
+    return () => clearTimeout(timer);
+  }, [localSearchTerm, contractSearchTerm, setRentalApplications]);
+
+  // تحديث localSearchTerm عند تغيير contractSearchTerm من الخارج
+  useEffect(() => {
+    setLocalSearchTerm(contractSearchTerm || "");
+  }, [contractSearchTerm]);
+
   // Prevent Radix UI from adding pointer-events: none to body
   useEffect(() => {
     // Monitor body style changes and remove pointer-events: none immediately
@@ -1179,33 +1198,7 @@ export function RentalApplicationsService({
     );
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-          <div className="h-10 w-32 bg-muted animate-pulse rounded" />
-        </div>
-        <div className="space-y-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4 space-x-reverse">
-                  <div className="h-12 w-12 bg-muted rounded-full" />
-                  <div className="space-y-2 flex-1">
-                    <div className="h-5 w-32 bg-muted rounded" />
-                    <div className="h-4 w-48 bg-muted rounded" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
+  if (error && !isInitialized) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
@@ -1335,8 +1328,8 @@ export function RentalApplicationsService({
             <Input
               id="search"
               placeholder="البحث في الإيجارات..."
-              value={contractSearchTerm}
-              onChange={(e) => setRentalApplications({ contractSearchTerm: e.target.value })}
+              value={localSearchTerm}
+              onChange={(e) => setLocalSearchTerm(e.target.value)}
               className="pr-10"
             />
           </div>
@@ -1570,7 +1563,58 @@ export function RentalApplicationsService({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredRentals.map((rental: RentalData, index: number) => (
+              {loading ? (
+                // Skeleton loader أثناء التحميل
+                [...Array(5)].map((_, index) => (
+                  <tr
+                    key={`skeleton-${index}`}
+                    className={index % 2 === 0 ? "bg-white" : "bg-gray-25"}
+                  >
+                    <td className="px-6 py-5">
+                      <div className="h-4 w-24 bg-gray-200 animate-pulse rounded" />
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center space-x-4 space-x-reverse">
+                        <div className="h-12 w-12 bg-gray-200 animate-pulse rounded-full" />
+                        <div className="space-y-2 flex-1">
+                          <div className="h-4 w-32 bg-gray-200 animate-pulse rounded" />
+                          <div className="h-3 w-24 bg-gray-200 animate-pulse rounded" />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="h-4 w-40 bg-gray-200 animate-pulse rounded" />
+                      <div className="h-3 w-28 bg-gray-200 animate-pulse rounded mt-2" />
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="h-4 w-20 bg-gray-200 animate-pulse rounded" />
+                      <div className="h-3 w-24 bg-gray-200 animate-pulse rounded mt-2" />
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="h-4 w-16 bg-gray-200 animate-pulse rounded" />
+                      <div className="h-3 w-28 bg-gray-200 animate-pulse rounded mt-2" />
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="h-4 w-24 bg-gray-200 animate-pulse rounded" />
+                      <div className="h-3 w-20 bg-gray-200 animate-pulse rounded mt-2" />
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="h-4 w-28 bg-gray-200 animate-pulse rounded" />
+                      <div className="h-3 w-24 bg-gray-200 animate-pulse rounded mt-2" />
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="h-6 w-20 bg-gray-200 animate-pulse rounded-full" />
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="h-9 w-20 bg-gray-200 animate-pulse rounded" />
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="h-8 w-8 bg-gray-200 animate-pulse rounded" />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                filteredRentals.map((rental: RentalData, index: number) => (
                 <tr
                   key={rental.id}
                   onClick={(e) => {
@@ -1880,11 +1924,12 @@ export function RentalApplicationsService({
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
 
-        {filteredRentals.length === 0 && (
+        {!loading && filteredRentals.length === 0 && (
           <div className="text-center py-16">
             <div className="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <Users className="h-8 w-8 text-gray-400" />
