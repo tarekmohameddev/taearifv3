@@ -859,9 +859,9 @@ export function PropertiesManagementPage() {
                   أضف وأدرج قوائم العقارات لموقعك على الويب
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:flex-wrap">
                 <Button
-                  className="gap-1"
+                  className="gap-1 w-full md:w-auto"
                   onClick={() => {
                     const propertiesLength = pagination?.total || 0;
                     const limit =
@@ -879,34 +879,40 @@ export function PropertiesManagementPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="gap-1"
+                  className="gap-1 w-full md:w-auto"
                   onClick={() => setImportDialogOpen(true)}
                 >
                   <Upload className="h-4 w-4" />
                   استيراد عقارات
                 </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setViewMode("grid")}
-                  className={viewMode === "grid" ? "bg-muted" : ""}
-                >
-                  <Grid3X3 className="h-4 w-4" />
-                  <span className="sr-only">Grid view</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setViewMode("list")}
-                  className={viewMode === "list" ? "bg-muted" : ""}
-                >
-                  <List className="h-4 w-4" />
-                  <span className="sr-only">List view</span>
-                </Button>
+                <div className="flex gap-2 w-full md:w-auto">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setViewMode("grid")}
+                    className={`flex-1 md:flex-none ${
+                      viewMode === "grid" ? "bg-muted" : ""
+                    }`}
+                  >
+                    <Grid3X3 className="h-4 w-4" />
+                    <span className="sr-only">Grid view</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setViewMode("list")}
+                    className={`flex-1 md:flex-none ${
+                      viewMode === "list" ? "bg-muted" : ""
+                    }`}
+                  >
+                    <List className="h-4 w-4" />
+                    <span className="sr-only">List view</span>
+                  </Button>
+                </div>
                 <Button
                   variant="outline"
                   onClick={() => setFilterDialogOpen(true)}
-                  className="gap-2 border-black text-black hover:bg-gray-100"
+                  className="gap-2 border-black text-black hover:bg-gray-100 w-full md:w-auto"
                 >
                   <Filter className="h-4 w-4" />
                   فلترة
@@ -1039,7 +1045,7 @@ export function PropertiesManagementPage() {
                 </Dialog>
 
                 <Button
-                  className="gap-1"
+                  className="gap-1 w-full md:w-auto"
                   onClick={() => {
                     const propertiesLength = pagination?.total || 0;
                     const limit =
