@@ -211,11 +211,11 @@ export function RentalApplicationsService({
     const checkScreenSize = () => {
       const width = window.innerWidth;
       if (width < 1000) {
-        setTableMaxWidth(800);
+        setTableMaxWidth(null);
       } else if (width < 1400) {
-        setTableMaxWidth(980);
+        setTableMaxWidth(null);
       } else if (width < 1550) {
-        setTableMaxWidth(1152); // max-w-6xl = 1152px
+        setTableMaxWidth(null); // max-w-6xl = 1152px
       } else {
         setTableMaxWidth(null);
       }
@@ -750,6 +750,14 @@ export function RentalApplicationsService({
     return "غير محدد";
   };
 
+  // دالة لتقليم النص إلى 30 حرف مع إضافة "..."
+  const truncateText = (text: string, maxLength: number = 30) => {
+    if (!text || text.length <= maxLength) {
+      return text;
+    }
+    return text.substring(0, maxLength) + "...";
+  };
+
   // دالة للحصول على حجم الخط المناسب بناءً على طول النص
   const getFontSizeClass = (text: string) => {
     const length = text.length;
@@ -768,13 +776,13 @@ export function RentalApplicationsService({
   const getCellWidthStyle = (text: string) => {
     const length = text.length;
     if (length <= 20) {
-      return { minWidth: "200px" }; // عرض عادي للنصوص القصيرة
+      return { minWidth: "150px" }; // عرض عادي للنصوص القصيرة
     } else if (length <= 40) {
-      return { minWidth: "280px" }; // عرض أكبر للنصوص المتوسطة
+      return { minWidth: "150px" }; // عرض أكبر للنصوص المتوسطة
     } else if (length <= 60) {
-      return { minWidth: "360px" }; // عرض أكبر للنصوص الطويلة
+      return { minWidth: "150px" }; // عرض أكبر للنصوص الطويلة
     } else {
-      return { minWidth: "450px" }; // عرض كبير جداً للنصوص الطويلة جداً
+      return { minWidth: "150px" }; // عرض كبير جداً للنصوص الطويلة جداً
     }
   };
 
@@ -1619,7 +1627,7 @@ export function RentalApplicationsService({
                   {/* الوحدة */}
                   <td className="px-6 py-5" style={getCellWidthStyle(getUnitLabel(rental))}>
                     <div className={`${getFontSizeClass(getUnitLabel(rental))} font-semibold text-gray-900`}>
-                      {getUnitLabel(rental)}
+                      {truncateText(getUnitLabel(rental), 40)}
                     </div>
                     <div className="text-sm text-gray-500">
                       رقم العقار: {getPropertyNumber(rental)}
