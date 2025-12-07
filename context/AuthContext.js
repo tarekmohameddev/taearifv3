@@ -42,6 +42,92 @@ const useAuthStore = create((set, get) => ({
     set({ clickedOnSubButton: "subscription" });
   },
 
+  // دالة جديدة لجلب بيانات المستخدم من API مباشرة باستخدام axiosInstance
+  fetchUserFromAPI: async () => {
+    try {
+      // فتح axios قبل جلب البيانات لضمان عدم حظر الطلبات
+      unlockAxios();
+
+      const response = await axiosInstance.get("/user");
+      const subscriptionDATA = response.data.data;
+      const currentState = get();
+
+      // استخراج بيانات المستخدم (قد تكون في subscriptionDATA.user أو subscriptionDATA مباشرة)
+      const userData = subscriptionDATA.user || subscriptionDATA;
+      
+      // دمج البيانات الجديدة مع البيانات الموجودة
+      const updatedUserData = {
+        ...currentState.userData,
+        // بيانات المستخدم الأساسية
+        email: userData.email || currentState.userData?.email || null,
+        username: userData.username || currentState.userData?.username || null,
+        first_name: userData.first_name || currentState.userData?.first_name || null,
+        last_name: userData.last_name || currentState.userData?.last_name || null,
+        // بيانات الاشتراك
+        days_remaining: subscriptionDATA.membership?.days_remaining || currentState.userData?.days_remaining || null,
+        is_free_plan: subscriptionDATA.membership?.is_free_plan ?? currentState.userData?.is_free_plan ?? null,
+        is_expired: subscriptionDATA.membership?.is_expired ?? currentState.userData?.is_expired ?? false,
+        package_title: subscriptionDATA.membership?.package?.title || currentState.userData?.package_title || null,
+        package_features: subscriptionDATA.membership?.package?.features || currentState.userData?.package_features || [],
+        project_limit_number: subscriptionDATA.membership?.package?.project_limit_number || currentState.userData?.project_limit_number || null,
+        real_estate_limit_number: subscriptionDATA.membership?.package?.real_estate_limit_number || currentState.userData?.real_estate_limit_number || null,
+        // بيانات إضافية
+        domain: subscriptionDATA.domain || currentState.userData?.domain || null,
+        message: subscriptionDATA.message || currentState.userData?.message || null,
+        company_name: subscriptionDATA.company_name || currentState.userData?.company_name || null,
+        onboarding_completed: subscriptionDATA.onboarding_completed ?? currentState.userData?.onboarding_completed ?? false,
+        // الحفاظ على التوكن الموجود
+        token: currentState.userData?.token || null,
+        // الحفاظ على البيانات الأخرى
+        permissions: userData.permissions || currentState.userData?.permissions || [],
+        account_type: userData.account_type || currentState.userData?.account_type || null,
+        tenant_id: userData.tenant_id || currentState.userData?.tenant_id || null,
+      };
+
+      // تحديث الـ store
+      set({
+        authenticated: true,
+        UserIslogged: true,
+        userData: updatedUserData,
+        onboarding_completed: subscriptionDATA.onboarding_completed ?? currentState.onboarding_completed ?? false,
+      });
+
+      // حفظ البيانات في localStorage
+      try {
+        localStorage.setItem("user", JSON.stringify(updatedUserData));
+      } catch (error) {
+        console.error("Error saving user data to localStorage:", error);
+      }
+
+      // حفظ بيانات الخطة في الكوكي
+      if (typeof window !== "undefined") {
+        try {
+          const { setPlanCookie } = require("@/lib/planCookie");
+          const planData = {
+            package_title: subscriptionDATA.membership?.package?.title || null,
+            is_free_plan: subscriptionDATA.membership?.is_free_plan || false,
+            days_remaining: subscriptionDATA.membership?.days_remaining || null,
+            is_expired: subscriptionDATA.membership?.is_expired || false,
+            package_features: subscriptionDATA.membership?.package?.features || [],
+            project_limit_number: subscriptionDATA.membership?.package?.project_limit_number || null,
+            real_estate_limit_number: subscriptionDATA.membership?.package?.real_estate_limit_number || null,
+            onboarding_completed: subscriptionDATA.onboarding_completed,
+            fetched_at: Date.now(),
+          };
+          setPlanCookie(planData);
+        } catch (error) {
+          console.error("Error setting plan cookie:", error);
+        }
+      }
+
+      return { success: true, data: updatedUserData };
+    } catch (error) {
+      console.error("Error fetching user data from API:", error);
+      // لا نحدث حالة الخطأ هنا لأننا لا نريد منع الوصول للداشبورد
+      return { success: false, error: error.message || "خطأ في جلب بيانات المستخدم" };
+    }
+  },
+
   fetchUserData: async () => {
     set({ IsLoading: true, error: null });
     if (get().IsDone === true) return;
