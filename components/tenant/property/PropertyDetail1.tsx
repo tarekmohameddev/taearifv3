@@ -1015,7 +1015,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                 </p>
 
                 {/* احجز الآن Button & Form */}
-                <div className="mt-6 space-y-4">
+                {/* مخفي حالياً بشكل مؤقت ولا اريد ازالته */}
+                {/* <div className="mt-6 space-y-4">
                   <button
                     onClick={() => {
                       setShowReservationForm(!showReservationForm);
@@ -1050,7 +1051,6 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                     </svg>
                   </button>
 
-                  {/* Reservation Form - Dropdown */}
                   <AnimatePresence>
                     {showReservationForm && (
                       <motion.div
@@ -1067,7 +1067,6 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                           transition={{ duration: 0.3, ease: "easeInOut" }}
                           className="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-6 space-y-4"
                         >
-                        {/* Success Message */}
                         {reservationSuccess && (
                           <div 
                             className="p-3 border rounded-lg text-sm text-center"
@@ -1081,17 +1080,14 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                           </div>
                         )}
 
-                        {/* Error Message */}
                         {reservationError && !reservationSuccess && (
                           <div className="p-3 bg-red-100 border border-red-400 rounded-lg text-red-800 text-sm text-center">
                             {reservationError}
                           </div>
                         )}
 
-                        {/* Form */}
                         {!reservationSuccess && (
                           <div className="space-y-4">
-                            {/* Customer Name */}
                             <div>
                               <label className="block mb-2 text-sm font-medium text-gray-700">
                                 الاسم <span className="text-red-500">*</span>
@@ -1123,7 +1119,6 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               />
                             </div>
 
-                            {/* Customer Phone */}
                             <div>
                               <label className="block mb-2 text-sm font-medium text-gray-700">
                                 رقم الهاتف <span className="text-red-500">*</span>
@@ -1158,9 +1153,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               </p>
                             </div>
 
-                            {/* Desired Date */}
-                            {/* مخفية مؤقتا , لا تمسحها للاستخدام في المستقبل */}
-                            {/* <div>
+                             <div>
                               <label className="block mb-2 text-sm font-medium text-gray-700">
                                 التاريخ المفضل (اختياري)
                               </label>
@@ -1202,9 +1195,8 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               {dateError && (
                                 <p className="mt-1 text-xs text-red-600">{dateError}</p>
                               )}
-                            </div> */}
+                            </div>
 
-                            {/* Message */}
                             <div>
                               <label className="block mb-2 text-sm font-medium text-gray-700">
                                 ملاحظات (اختياري)
@@ -1232,7 +1224,6 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                               />
                             </div>
 
-                            {/* Submit Button */}
                             <button
                               onClick={handleCreateReservation}
                               disabled={reservationLoading}
@@ -1257,7 +1248,7 @@ export default function PropertyDetail({ propertySlug }: PropertyDetailProps) {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
