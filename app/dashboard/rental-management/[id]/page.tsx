@@ -57,6 +57,7 @@ import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 
 interface RentalDetails {
   rental: {
+    rental_duration: number;
     id: number;
     tenant_full_name: string;
     tenant_phone: string;
@@ -1137,7 +1138,7 @@ export default function RentalDetailsPage() {
                           مدة الإيجار
                         </p>
                         <p className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 text-right">
-                          {details.rental.rental_period_months || 0} شهر
+                          {details.rental.rental_duration || 0} شهر
                         </p>
                       </div>
                       <div className="text-right" dir="rtl">
