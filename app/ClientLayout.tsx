@@ -29,6 +29,8 @@ export default function ClientLayout({
   // استخدام useRef لمنع إعادة الجلب عند التنقل
   const hasCheckedOnboardingRef = useRef(false);
   const isFetchingOnboardingRef = useRef(false);
+  const hasFetchedLiveEditorDataRef = useRef(false);
+  const isFetchingLiveEditorDataRef = useRef(false);
 
   //   setUserData({
   //     email: userData.email,
@@ -266,6 +268,56 @@ export default function ClientLayout({
       }
     }
   }, [userData, router]);
+
+  // دالة لإزالة locale من pathname
+  const removeLocaleFromPath = (pathname: string) => {
+    const localePattern = /^\/[a-z]{2}\//;
+    if (localePattern.test(pathname)) {
+      return pathname.replace(/^\/[a-z]{2}\//, "/");
+    }
+    return pathname;
+  };
+
+  // جلب بيانات المستخدم من /user عند فتح صفحة /live-editor
+  useEffect(() => {
+    if (!isMounted || IsLoading) return;
+
+    const pathWithoutLocale = removeLocaleFromPath(pathname || "");
+    
+    if (pathWithoutLocale === "/live-editor" || pathWithoutLocale.startsWith("/live-editor/")) {
+      // منع إعادة الجلب إذا كان هناك طلب قيد التنفيذ أو تم الجلب من قبل
+      if (isFetchingLiveEditorDataRef.current || hasFetchedLiveEditorDataRef.current) {
+        return;
+      }
+
+      // جلب البيانات من /user API
+      const fetchUserFromAPI = async () => {
+        isFetchingLiveEditorDataRef.current = true;
+        try {
+          const response = await axiosInstance.get("/user");
+          if (response.data && response.data.data) {
+            const userApiData = response.data.data;
+            // تحديث userData في الـ store مع البيانات الجديدة
+            const currentUserData = useAuthStore.getState().userData;
+            useAuthStore.getState().setUserData({
+              ...currentUserData,
+              ...userApiData,
+            });
+            hasFetchedLiveEditorDataRef.current = true;
+          }
+        } catch (error) {
+          console.error("Error fetching user data from /user API:", error);
+        } finally {
+          isFetchingLiveEditorDataRef.current = false;
+        }
+      };
+
+      fetchUserFromAPI();
+    } else {
+      // إعادة تعيين المرجع عند الخروج من صفحة /live-editor
+      hasFetchedLiveEditorDataRef.current = false;
+    }
+  }, [isMounted, IsLoading, pathname]);
 
   // السماح بصفحات معينة بدون تسجيل دخول
   const publicPages = [
