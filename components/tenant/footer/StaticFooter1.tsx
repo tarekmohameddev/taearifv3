@@ -11,7 +11,7 @@ import {
   Instagram,
   Linkedin,
 } from "lucide-react";
-import { FaWhatsapp, FaSnapchat, FaTiktok } from "react-icons/fa";
+import { FaWhatsapp, FaSnapchat, FaTiktok, FaYoutube } from "react-icons/fa";
 import { useEffect, useMemo, useCallback } from "react";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
@@ -192,6 +192,7 @@ const getDefaultFooterData = (): FooterData => ({
         { name: "إنستغرام", icon: "Instagram", url: "#", color: "#E4405F" },
         { name: "تويتر", icon: "Twitter", url: "#", color: "#1DA1F2" },
         { name: "فيسبوك", icon: "Facebook", url: "#", color: "#1877F2" },
+        { name: "يوتيوب", icon: "Youtube", url: "#", color: "#FF0000" },
       ],
     },
   },
@@ -395,6 +396,7 @@ export default function StaticFooter({
       Facebook: Facebook,
       Snapchat: FaSnapchat,
       Tiktok: FaTiktok,
+      Youtube: FaYoutube,
     };
     return iconMap[iconName] || MapPin;
   };
