@@ -33,30 +33,32 @@ import useAuthStore from "@/context/AuthContext"
 
 interface WhatsAppNumber {
   id: number
-  display_name: string | null
-  number: string
+  phoneNumber: string
+  name: string | null
   status: string
   request_status: string
-  messages_received: number
-  business_id: string | null
-  waba_id: string | null
-  phone_id: string | null
-  linking_method: string
-  api_method: string
-  token_expires_at: string | null
+  linkingMethod: string
+  apiMethod: string
+  requestId: string
   created_at: string
   updated_at: string
+  employee?: {
+    id: number
+    name: string
+    email: string
+  }
 }
 
 interface WhatsAppResponse {
   success: boolean
-  status: string
-  message: string
-  dashboard: {
-    total_messages_received: number
-    total_linked_numbers: number
+  data: {
+    status: string
+    numbers: WhatsAppNumber[]
+    total: number
+    active_count: number
+    pending_count: number
   }
-  numbers: WhatsAppNumber[]
+  message: string
 }
 
 interface RedirectResponse {
@@ -88,9 +90,9 @@ export function WhatsAppCenterPage() {
           }
         })
         
-        if (response.data.success) {
-          setConnectedNumbers(response.data.numbers || [])
-          setTotalMessages(response.data.dashboard?.total_messages_received || 0)
+        if (response.data.success && response.data.data) {
+          setConnectedNumbers(response.data.data.numbers || [])
+          setTotalMessages(response.data.data.total || 0)
         } else {
           setError("فشل في تحميل البيانات")
         }
@@ -305,7 +307,7 @@ export function WhatsAppCenterPage() {
                         <TableHead className="text-right">حالة الطلب</TableHead>
                         <TableHead className="text-right">تاريخ الربط</TableHead>
                         <TableHead className="text-right">آخر تحديث</TableHead>
-                        <TableHead className="text-right">الرسائل المستلمة</TableHead>
+                        <TableHead className="text-right">الموظف المسؤول</TableHead>
                         <TableHead className="text-right">الإجراءات</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -313,9 +315,9 @@ export function WhatsAppCenterPage() {
                       {connectedNumbers.map((number) => (
                         <TableRow key={number.id}>
                           <TableCell className="font-medium" dir="ltr">
-                            {number.number}
+                            {number.phoneNumber}
                           </TableCell>
-                          <TableCell>{number.display_name || "-"}</TableCell>
+                          <TableCell>{number.name || "-"}</TableCell>
                           <TableCell>
                             <Badge
                               variant={number.status === "active" ? "default" : "secondary"}
@@ -346,7 +348,9 @@ export function WhatsAppCenterPage() {
                           <TableCell>
                             {new Date(number.updated_at).toLocaleDateString("ar-US")}
                           </TableCell>
-                          <TableCell>{number.messages_received.toLocaleString()}</TableCell>
+                          <TableCell>
+                            {number.employee ? `${number.employee.name} (${number.employee.email})` : "-"}
+                          </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Button variant="ghost" size="icon">
