@@ -489,9 +489,12 @@ export default function Hero3(props: HeroProps) {
     return match ? match[1] : null;
   };
 
-  const videoId = mergedData.background?.video 
-    ? getYouTubeVideoId(mergedData.background.video)
-    : null;
+  // Default video URL
+  const defaultVideoUrl = "https://youtu.be/ULzl51V38lw?si=iwlRp_cUXmTe50Gc";
+  
+  // Use video from data, or fallback to default video
+  const videoUrl = mergedData.background?.video || defaultVideoUrl;
+  const videoId = getYouTubeVideoId(videoUrl);
   const videoStart = mergedData.background?.videoStart || 0;
   const playOnMobile = mergedData.background?.playOnMobile !== false;
   const privacyMode = mergedData.background?.privacyMode !== false;
