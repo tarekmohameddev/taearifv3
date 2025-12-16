@@ -24,6 +24,7 @@
 import { heroStructure } from "@/componentsStructure/hero";
 import { useEditorT } from "@/context-liveeditor/editorI18nStore";
 import { headerStructure } from "@/componentsStructure/header";
+import { propertiesShowcaseStructure } from "@/componentsStructure/propertiesShowcase";
 import { halfTextHalfImageStructure } from "@/componentsStructure/halfTextHalfImage";
 import { propertySliderStructure } from "@/componentsStructure/propertySlider";
 import { ctaValuationStructure } from "@/componentsStructure/ctaValuation";
@@ -229,6 +230,17 @@ export const getComponents = (
     subPath: "testimonials",
     icon: "💬",
     ...testimonialsStructure,
+  },
+  propertiesShowcase: {
+    id: "propertiesShowcase",
+    name: "propertiesShowcase",
+    displayName: t("components.propertiesShowcase.display_name") || "Properties Showcase",
+    description: t("components.propertiesShowcase.description") || "Display properties and projects in a grid layout",
+    category: "content",
+    section: "homepage",
+    subPath: "propertiesShowcase",
+    icon: "🏘️",
+    ...propertiesShowcaseStructure,
   },
   logosTicker: {
     id: "logosTicker",
@@ -483,6 +495,17 @@ export const COMPONENTS: Record<string, any> = {
     subPath: "testimonials",
     icon: "💬",
     ...testimonialsStructure,
+  },
+  propertiesShowcase: {
+    id: "propertiesShowcase",
+    name: "propertiesShowcase",
+    displayName: "Properties Showcase",
+    description: "Display properties and projects in a grid layout",
+    category: "content",
+    section: "homepage",
+    subPath: "propertiesShowcase",
+    icon: "🏘️",
+    ...propertiesShowcaseStructure,
   },
   logosTicker: {
     id: "logosTicker",

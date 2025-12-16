@@ -8,6 +8,7 @@ export * from "./propertySliderFunctions";
 export * from "./stepsSectionFunctions";
 export * from "./ctaValuationFunctions";
 export * from "./testimonialsFunctions";
+export * from "./propertiesShowcaseFunctions";
 export * from "./logosTickerFunctions";
 export * from "./partnersFunctions";
 export * from "./whyChooseUsFunctions";

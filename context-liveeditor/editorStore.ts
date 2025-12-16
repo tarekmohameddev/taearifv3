@@ -53,6 +53,7 @@ import { ctaValuationFunctions } from "./editorStoreFunctions/ctaValuationFuncti
 import { stepsSectionFunctions } from "./editorStoreFunctions/stepsSectionFunctions";
 import { testimonialsFunctions } from "./editorStoreFunctions/testimonialsFunctions";
 import { logosTickerFunctions } from "./editorStoreFunctions/logosTickerFunctions";
+import { propertiesShowcaseFunctions } from "./editorStoreFunctions/propertiesShowcaseFunctions";
 import { partnersFunctions } from "./editorStoreFunctions/partnersFunctions";
 import { whyChooseUsFunctions } from "./editorStoreFunctions/whyChooseUsFunctions";
 import { contactMapSectionFunctions } from "./editorStoreFunctions/contactMapSectionFunctions";
@@ -282,6 +283,18 @@ interface EditorStore {
   getTestimonialsData: (variantId: string) => ComponentData;
   setTestimonialsData: (variantId: string, data: ComponentData) => void;
   updateTestimonialsByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+  propertiesShowcaseStates: Record<string, ComponentData>;
+  ensurePropertiesShowcaseVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getPropertiesShowcaseData: (variantId: string) => ComponentData;
+  setPropertiesShowcaseData: (variantId: string, data: ComponentData) => void;
+  updatePropertiesShowcaseByPath: (
     variantId: string,
     path: string,
     value: any,
@@ -523,6 +536,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   ctaValuationStates: {},
   stepsSectionStates: {},
   testimonialsStates: {},
+  propertiesShowcaseStates: {},
   logosTickerStates: {},
   partnersStates: {},
   whyChooseUsStates: {},
@@ -1051,6 +1065,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return stepsSectionFunctions.getData(state, variantId);
       case "testimonials":
         return testimonialsFunctions.getData(state, variantId);
+      case "propertiesShowcase":
+        return propertiesShowcaseFunctions.getData(state, variantId);
       case "logosTicker":
         return logosTickerFunctions.getData(state, variantId);
       case "partners":
@@ -1284,6 +1300,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "testimonials":
           newState = testimonialsFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "propertiesShowcase":
+          newState = propertiesShowcaseFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -1552,6 +1576,22 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   updateTestimonialsByPath: (variantId, path, value) =>
     set((state) =>
       testimonialsFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // Properties Showcase specific functions
+  ensurePropertiesShowcaseVariant: (variantId, initial) =>
+    set((state) =>
+      propertiesShowcaseFunctions.ensureVariant(state, variantId, initial),
+    ),
+  getPropertiesShowcaseData: (variantId) => {
+    const state = get();
+    return propertiesShowcaseFunctions.getData(state, variantId);
+  },
+  setPropertiesShowcaseData: (variantId, data) =>
+    set((state) => propertiesShowcaseFunctions.setData(state, variantId, data)),
+  updatePropertiesShowcaseByPath: (variantId, path, value) =>
+    set((state) =>
+      propertiesShowcaseFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Partners functions using modular approach
@@ -1942,6 +1982,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                           comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).testimonialsStates;
+                      break;
+                    case "propertiesShowcase":
+                      newState.propertiesShowcaseStates =
+                        propertiesShowcaseFunctions.setData(
+                          newState,
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.data,
+                        ).propertiesShowcaseStates;
                       break;
                     case "whyChooseUs":
                       newState.whyChooseUsStates = whyChooseUsFunctions.setData(
