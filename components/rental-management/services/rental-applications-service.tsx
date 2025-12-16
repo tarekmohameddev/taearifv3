@@ -2641,16 +2641,6 @@ function AddRentalForm({
       newErrors.tenant_email = "البريد الإلكتروني غير صحيح";
     }
 
-    // التحقق من صحة تاريخ الانتقال
-    if (formData.move_in_date) {
-      const selectedDate = new Date(formData.move_in_date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // إزالة الوقت للمقارنة الصحيحة
-
-      if (selectedDate < today) {
-        newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي";
-      }
-    }
 
     // التحقق من صحة مدة الإيجار
     if (
@@ -3333,16 +3323,6 @@ function EditRentalForm({
       newErrors.tenant_email = "البريد الإلكتروني غير صحيح";
     }
 
-    // التحقق من صحة تاريخ الانتقال
-    if (formData.move_in_date) {
-      const selectedDate = new Date(formData.move_in_date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // إزالة الوقت للمقارنة الصحيحة
-
-      if (selectedDate < today) {
-        newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي";
-      }
-    }
 
     // التحقق من صحة مدة الإيجار
     if (

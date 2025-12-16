@@ -397,14 +397,6 @@ export function UpdatedAddRentalForm({
       const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
       if (!dateRegex.test(formData.move_in_date)) {
         newErrors.move_in_date = "تاريخ الانتقال يجب أن يكون بصيغة YYYY-MM-DD";
-      } else {
-        const selectedDate = new Date(formData.move_in_date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (selectedDate < today) {
-          newErrors.move_in_date = "تاريخ الانتقال لا يمكن أن يكون في الماضي";
-        }
       }
     }
 
