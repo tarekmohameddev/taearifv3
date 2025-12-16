@@ -9,6 +9,7 @@ export * from "./stepsSectionFunctions";
 export * from "./ctaValuationFunctions";
 export * from "./testimonialsFunctions";
 export * from "./propertiesShowcaseFunctions";
+export * from "./card4Functions";
 export * from "./logosTickerFunctions";
 export * from "./partnersFunctions";
 export * from "./whyChooseUsFunctions";

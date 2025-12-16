@@ -16,6 +16,7 @@ import { propertyFilterStructure } from "@/componentsStructure/propertyFilter";
 import { mapSectionStructure } from "@/componentsStructure/mapSection";
 import { contactFormSectionStructure } from "@/componentsStructure/contactFormSection";
 import { contactCardsStructure } from "@/componentsStructure/contactCards";
+import { cardStructure } from "@/componentsStructure/card";
 import { inputsStructure } from "@/componentsStructure/inputs";
 import { inputs2Structure } from "@/componentsStructure/inputs2";
 
@@ -54,6 +55,7 @@ import { stepsSectionFunctions } from "./editorStoreFunctions/stepsSectionFuncti
 import { testimonialsFunctions } from "./editorStoreFunctions/testimonialsFunctions";
 import { logosTickerFunctions } from "./editorStoreFunctions/logosTickerFunctions";
 import { propertiesShowcaseFunctions } from "./editorStoreFunctions/propertiesShowcaseFunctions";
+import { card4Functions } from "./editorStoreFunctions/card4Functions";
 import { partnersFunctions } from "./editorStoreFunctions/partnersFunctions";
 import { whyChooseUsFunctions } from "./editorStoreFunctions/whyChooseUsFunctions";
 import { contactMapSectionFunctions } from "./editorStoreFunctions/contactMapSectionFunctions";
@@ -537,6 +539,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   stepsSectionStates: {},
   testimonialsStates: {},
   propertiesShowcaseStates: {},
+  card4States: {},
   logosTickerStates: {},
   partnersStates: {},
   whyChooseUsStates: {},
@@ -1015,6 +1018,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return inputsFunctions.ensureVariant(state, variantId, initial);
         case "inputs2":
           return inputs2Functions.ensureVariant(state, variantId, initial);
+        case "propertiesShowcase":
+          return propertiesShowcaseFunctions.ensureVariant(
+            state,
+            variantId,
+            initial,
+          );
+        case "card":
+          return card4Functions.ensureVariant(state, variantId, initial);
         default:
           // Fallback to generic component handling
           if (!state.componentStates[componentType]) {
@@ -1067,6 +1078,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return testimonialsFunctions.getData(state, variantId);
       case "propertiesShowcase":
         return propertiesShowcaseFunctions.getData(state, variantId);
+      case "card":
+        return card4Functions.getData(state, variantId);
       case "logosTicker":
         return logosTickerFunctions.getData(state, variantId);
       case "partners":
@@ -1143,6 +1156,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "testimonials":
           newState = testimonialsFunctions.setData(state, variantId, data);
+          break;
+        case "propertiesShowcase":
+          newState = propertiesShowcaseFunctions.setData(state, variantId, data);
+          break;
+        case "card":
+          newState = card4Functions.setData(state, variantId, data);
           break;
         case "logosTicker":
           newState = logosTickerFunctions.setData(state, variantId, data);
@@ -1313,6 +1332,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             path,
             value,
           );
+          break;
+        case "card":
+          newState = card4Functions.updateByPath(state, variantId, path, value);
           break;
         case "logosTicker":
           newState = logosTickerFunctions.updateByPath(
@@ -1593,6 +1615,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) =>
       propertiesShowcaseFunctions.updateByPath(state, variantId, path, value),
     ),
+
+  // Card4 specific functions
+  ensureCard4Variant: (variantId, initial) =>
+    set((state) => card4Functions.ensureVariant(state, variantId, initial)),
+  getCard4Data: (variantId) => {
+    const state = get();
+    return card4Functions.getData(state, variantId);
+  },
+  setCard4Data: (variantId, data) =>
+    set((state) => card4Functions.setData(state, variantId, data)),
+  updateCard4ByPath: (variantId, path, value) =>
+    set((state) => card4Functions.updateByPath(state, variantId, path, value)),
 
   // Partners functions using modular approach
   ensurePartnersVariant: (variantId, initial) =>
@@ -1990,6 +2024,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                           comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                           comp.data,
                         ).propertiesShowcaseStates;
+                      break;
+                    case "card":
+                      newState.card4States = card4Functions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).card4States;
                       break;
                     case "whyChooseUs":
                       newState.whyChooseUsStates = whyChooseUsFunctions.setData(
