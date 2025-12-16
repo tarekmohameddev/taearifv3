@@ -9,7 +9,6 @@ import React, {
   useMemo,
 } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
-const Swal = dynamic(() => import("sweetalert2"), { ssr: false });
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -139,6 +138,7 @@ interface Header2Props {
   variant?: string;
   useStore?: boolean;
   id?: string;
+  overrideData?: any; // Support overrideData prop for TenantPageWrapper
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -176,6 +176,16 @@ export default function Header2(props: Header2Props) {
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
+    
+    // Check if this is a global header - read from globalComponentsData
+    if (uniqueId === "global-header" || variantId === "global-header") {
+      const globalHeaderData = tenantData?.globalComponentsData?.header;
+      if (globalHeaderData && Object.keys(globalHeaderData).length > 0) {
+        // Remove variant from data if it exists (variant is metadata, not part of component data)
+        const { variant: _variant, ...headerDataWithoutVariant } = globalHeaderData;
+        return headerDataWithoutVariant;
+      }
+    }
     
     // Check new structure (tenantData.components)
     if (tenantData.components && Array.isArray(tenantData.components)) {
@@ -239,13 +249,41 @@ export default function Header2(props: Header2Props) {
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
-  const mergedData = useMemo(() => ({
-    ...getDefaultHeader2Data(),    // 1. Defaults (lowest priority)
-    ...storeData,                   // 2. Store state
-    ...currentStoreData,            // 3. Current store data
-    ...tenantComponentData,         // 4. Database data
-    ...props                        // 5. Props (highest priority)
-  }), [storeData, currentStoreData, tenantComponentData, props]);
+  const mergedData = useMemo(() => {
+    // Check if this is a global header - also check globalHeaderData from tenantData
+    const isGlobalHeader = uniqueId === "global-header" || variantId === "global-header";
+    const tenantGlobalHeaderData = isGlobalHeader 
+      ? tenantData?.globalComponentsData?.header 
+      : null;
+    
+    // Remove variant from tenantGlobalHeaderData if it exists
+    const tenantGlobalHeaderDataWithoutVariant = tenantGlobalHeaderData 
+      ? (() => {
+          const { variant: _variant, ...data } = tenantGlobalHeaderData;
+          return data;
+        })()
+      : null;
+    
+    const merged = {
+      ...getDefaultHeader2Data(),    // 1. Defaults (lowest priority)
+      ...storeData,                   // 2. Store state
+      ...currentStoreData,            // 3. Current store data
+      ...tenantComponentData,         // 4. Database data
+      ...(tenantGlobalHeaderDataWithoutVariant || {}), // 5. Global header data from tenantData (if global header)
+      ...props,                       // 6. Props
+      ...(props.overrideData || {})   // 7. OverrideData (highest priority)
+    };
+    
+    // Convert menu (StaticHeader1 format) to links (Header2 format) if needed
+    if (merged.menu && Array.isArray(merged.menu) && (!merged.links || merged.links.length === 0)) {
+      merged.links = merged.menu.map((item: any) => ({
+        name: item.text || item.name || "",
+        path: item.url || item.path || "#",
+      }));
+    }
+    
+    return merged;
+  }, [storeData, currentStoreData, tenantComponentData, props, uniqueId, variantId, tenantData]);
   
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
@@ -328,6 +366,8 @@ export default function Header2(props: Header2Props) {
       }
       setUserIslogged(false);
       setISadmin(false);
+      // Dynamically import and use Swal
+      const Swal = (await import("sweetalert2")).default;
       Swal.fire({
         position: "top-end",
         icon: "success",
@@ -341,9 +381,11 @@ export default function Header2(props: Header2Props) {
   };
 
   const getButtonClass = (link: any, index: number) => {
+    if (!pathname) return `relative text-lg font-semibold transition-all before:content-[''] before:absolute before:left-[-5px] before:top-[60%] before:h-[4px] before:transform before:-translate-y-1/2 before:w-[calc(100%+10px)] before:z-[-1] before:scale-x-0 before:origin-${i18n.language === "ar" ? "right" : "left"} before:transition-all before:duration-300 before:ease-in-out`;
+    
     const isActive =
       link.path == pathname ||
-      (pathname.startsWith(link.path) && link.path != "/");
+      (pathname && pathname.startsWith(link.path) && link.path != "/");
 
     return `relative text-lg font-semibold transition-all before:content-[''] before:absolute before:left-[-5px] before:top-[60%] before:h-[4px] before:transform before:-translate-y-1/2 before:w-[calc(100%+10px)] before:z-[-1] before:scale-x-0 before:origin-${i18n.language === "ar" ? "right" : "left"} before:transition-all before:duration-300 before:ease-in-out`;
   };
@@ -354,6 +396,7 @@ export default function Header2(props: Header2Props) {
     i18n
       .changeLanguage(newLang)
       .then(() => {
+        if (!pathname) return;
         const newPath = pathname.replace(/^\/[^\/]+/, `/${newLang}`);
         router.push(newPath);
 
@@ -376,7 +419,7 @@ export default function Header2(props: Header2Props) {
       className={`${positionType} top-0 left-0 right-0 z-${zIndex} transition-colors duration-500`}
       style={{
         backgroundColor: bgColor,
-        opacity: mergedData.background?.opacity || 1,
+        opacity: 1,
         zIndex: zIndex,
       }}
     >
@@ -390,7 +433,7 @@ export default function Header2(props: Header2Props) {
         {/* الشعار */}
         <Link href={mergedData.logo?.url || "/"} className={`cursor-pointer`}>
           <motion.div
-            className={`relative transition-all duration-1000`}
+            className={`relative `}
             style={{
               width: mergedData.logo?.width || 96,
               height: mergedData.logo?.height || 80,
@@ -398,9 +441,9 @@ export default function Header2(props: Header2Props) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              duration: mergedData.animations?.logo?.duration || 0.5, 
+              duration: 0.5, 
               ease: "easeOut", 
-              delay: mergedData.animations?.logo?.delay || 0.2 
+              delay: 0.2 
             }}
           >
             <Image
@@ -414,16 +457,44 @@ export default function Header2(props: Header2Props) {
         
         {/* قائمة الروابط مع التأثير التدريجي */}
         <div className="hidden lg:flex gap-8">
-          {links.map((link, index) => {
+          {links.map((link: any, index: number) => {
+            // Check if animations are enabled - default to false if animations config doesn't exist
+            // This ensures links are visible even if animations fail
+            const hasAnimationsConfig = mergedData.animations?.menuItems !== undefined;
+            const animationsEnabled = hasAnimationsConfig && mergedData.animations?.menuItems?.enabled === true;
+            const animationDuration = mergedData.animations?.menuItems?.duration || 0.3;
+            const animationDelay = mergedData.animations?.menuItems?.delay || 0.1;
+            const animationStagger = mergedData.animations?.menuItems?.stagger || 0.05;
+            
+            // If animations are disabled or not configured, show links immediately
+            if (!animationsEnabled) {
+              return (
+                <div key={index}>
+                  <Link
+                    href={link.path || "#"}
+                    className={getButtonClass(link, index)}
+                    style={{
+                      color: mergedData.styling?.linkColor || "#f3f4f6",
+                    }}
+                    onMouseEnter={() => setIsHovered(index)}
+                    onMouseLeave={() => setIsHovered(null)}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                </div>
+              );
+            }
+            
             return (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: mergedData.animations?.menuItems?.duration || 0.5,
+                  duration:  0.5,
                   ease: "easeOut",
-                  delay: (mergedData.animations?.menuItems?.delay || 0.4) + (index * (mergedData.animations?.menuItems?.stagger || 0.4)),
+                  delay: 0.4 * index,
                 }}
               >
                 <Link
@@ -488,7 +559,7 @@ export default function Header2(props: Header2Props) {
         </div>
 
         {/* زر القائمة المنبثقة */}
-        {!pathname.startsWith("/dashboard") && mergedData.mobileMenu?.enabled && (
+        {pathname && !pathname.startsWith("/dashboard") && mergedData.mobileMenu?.enabled && (
           <motion.button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`fixed lg:hidden text-3xl`}
@@ -531,7 +602,7 @@ export default function Header2(props: Header2Props) {
             }}
           >
             <div className="p-4 flex flex-col gap-6">
-              {links.map((link, index) => {
+              {links.map((link: any, index: number) => {
                 return (
                   <Link
                     href={link.path || "#"}
