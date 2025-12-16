@@ -32,13 +32,88 @@ import GA4Provider from "@/components/GA4Provider";
 import GTMProvider from "@/components/GTMProvider";
 import { LanguageSwitcher } from "@/components/tenant/LanguageSwitcher";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
+import Header1 from "@/components/tenant/header/header1";
+import Header2 from "@/components/tenant/header/header2";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
+import dynamic from "next/dynamic";
 import {
   shouldCenterComponent,
   getCenterWrapperClasses,
   getCenterWrapperStyles,
 } from "@/lib/ComponentsInCenter";
 import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
+
+// ⭐ Cache للـ header components
+const headerComponentsCache = new Map<string, any>();
+
+// Load header component dynamically
+const loadHeaderComponent = (componentName: string) => {
+  if (!componentName) return null;
+
+  // ⭐ Check cache first
+  if (headerComponentsCache.has(componentName)) {
+    return headerComponentsCache.get(componentName);
+  }
+
+  // Handle StaticHeader1 specially (no number suffix)
+  if (componentName === "StaticHeader1") {
+    const component = lazy(() =>
+      import(`@/components/tenant/header/StaticHeader1`).catch(() => ({
+        default: StaticHeader1,
+      })),
+    );
+    headerComponentsCache.set(componentName, component);
+    return component;
+  }
+
+  // ⭐ Direct import for known header components (more reliable than dynamic import)
+  const headerComponentMap: Record<string, any> = {
+    header1: Header1,
+    header2: Header2,
+  };
+
+  if (headerComponentMap[componentName]) {
+    // Wrap in lazy for Suspense compatibility
+    const component = lazy(() => Promise.resolve({ default: headerComponentMap[componentName] }));
+    headerComponentsCache.set(componentName, component);
+    return component;
+  }
+
+  // Fallback to dynamic import for other header variants
+  const match = componentName?.match(/^(.*?)(\d+)$/);
+  if (!match) return null;
+
+  const baseName = match[1];
+  const subPath = getComponentSubPath(baseName);
+  if (!subPath) {
+    console.warn(`[Header Component] No subPath found for baseName: ${baseName}`);
+    return null;
+  }
+
+  const fullPath = `${subPath}/${componentName}`;
+  
+  // Debug log (can be removed in production)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Header Import Debug]', {
+      baseName,
+      subPath,
+      fullPath,
+      'Import path': `@/components/tenant/${fullPath}`
+    });
+  }
+  
+  const component = dynamic(
+    () => import(`@/components/tenant/${fullPath}`).catch((error) => {
+      console.error(`[Header Import Error] Failed to load ${fullPath}:`, error);
+      return { default: StaticHeader1 };
+    }),
+    { ssr: false }
+  );
+  
+  // ⭐ Cache the component
+  headerComponentsCache.set(componentName, component);
+  return component;
+};
 
 // دالة لتحميل المكونات ديناميكيًا بناءً على الاسم والرقم الأخير
 const loadComponent = (section: string, componentName: string) => {
@@ -253,6 +328,29 @@ export default function HomePageWrapper({ tenantId, domainType = "subdomain" }: 
     return defaultComponentsList;
   }, [tenantData]);
 
+  // Get global header data and variant
+  const globalHeaderData = tenantData?.globalComponentsData?.header;
+  const globalHeaderVariant = useMemo(() => {
+    // Priority: header.variant > globalHeaderVariant > default
+    const variant = 
+      globalHeaderData?.variant ||
+      tenantData?.globalComponentsData?.globalHeaderVariant ||
+      "StaticHeader1";
+    
+    // Debug log (can be removed in production)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[HomePageWrapper] Header Variant Debug:', {
+        'globalHeaderData?.variant': globalHeaderData?.variant,
+        'tenantData?.globalComponentsData?.globalHeaderVariant': tenantData?.globalComponentsData?.globalHeaderVariant,
+        'resolved variant': variant,
+        'tenantData exists': !!tenantData,
+        'globalComponentsData exists': !!tenantData?.globalComponentsData,
+      });
+    }
+    
+    return variant;
+  }, [globalHeaderData?.variant, tenantData?.globalComponentsData?.globalHeaderVariant, tenantData]);
+
   // منع إعادة render عند تغيير loadingTenantData
   const memoizedComponentsList = useMemo(
     () => componentsList,
@@ -334,7 +432,54 @@ export default function HomePageWrapper({ tenantId, domainType = "subdomain" }: 
           <div className="min-h-screen flex flex-col" dir="rtl">
             {/* Header from globalComponentsData */}
             <div className="relative">
-              <StaticHeader1 />
+              <Suspense
+                fallback={<SkeletonLoader componentName="header" />}
+              >
+                {(() => {
+                  // Map variant names to component names
+                  const componentMap: Record<string, string> = {
+                    StaticHeader1: "StaticHeader1",
+                    header1: "header1",
+                    header2: "header2",
+                    header3: "header3",
+                    header4: "header4",
+                    header5: "header5",
+                    header6: "header6",
+                  };
+
+                  const componentName = componentMap[globalHeaderVariant] || "StaticHeader1";
+                  
+                  // Debug log (can be removed in production)
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log('[HomePageWrapper] Header Component Debug:', {
+                      'globalHeaderVariant': globalHeaderVariant,
+                      'componentName': componentName,
+                      'componentMap[globalHeaderVariant]': componentMap[globalHeaderVariant],
+                    });
+                  }
+                  
+                  const HeaderComponent = loadHeaderComponent(componentName);
+
+                  if (!HeaderComponent) {
+                    console.warn('[HomePageWrapper] HeaderComponent is null, falling back to StaticHeader1');
+                    return <StaticHeader1 overrideData={globalHeaderData || {}} />;
+                  }
+
+                  // Remove variant from data before passing to component
+                  const headerDataWithoutVariant = globalHeaderData ? (() => {
+                    const { variant: _variant, ...data } = globalHeaderData;
+                    return data;
+                  })() : {};
+
+                  return (
+                    <HeaderComponent
+                      overrideData={headerDataWithoutVariant}
+                      variant={globalHeaderVariant}
+                      id="global-header"
+                    />
+                  );
+                })()}
+              </Suspense>
             </div>
 
             {/* Page Content */}
