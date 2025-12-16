@@ -225,7 +225,8 @@
     },
     "imageText": {
       "display_name": "Image Text",
-      "description": "Background image with text overlay section"
+      "description": "Background image with text overlay section",
+      "alt_text": "Background"
     },
     "inputs": {
       "display_name": "Dynamic Form System",

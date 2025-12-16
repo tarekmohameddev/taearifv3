@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { getDefaultImageTextData } from "@/context-liveeditor/editorStoreFunctions/imageTextFunctions";
+import { useClientT } from "@/context-liveeditor/clientI18nStore";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -45,6 +46,9 @@ export default function ImageText1(props: ImageTextProps = {}) {
   const tenantData = useTenantStore(s => s.tenantData);
   const fetchTenantData = useTenantStore(s => s.fetchTenantData);
   const tenantId = useTenantStore(s => s.tenantId);
+  
+  // Translation hook
+  const t = useClientT();
   
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
@@ -149,7 +153,7 @@ export default function ImageText1(props: ImageTextProps = {}) {
       <div className="absolute inset-0 z-0">
         <Image
           src={mergedData.backgroundImage || "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=80"}
-          alt="خلفية"
+          alt={t("components.imageText.alt_text")}
           fill
           className="object-cover brightness-50"
           priority

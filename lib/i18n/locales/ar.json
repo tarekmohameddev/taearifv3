@@ -229,7 +229,8 @@
     },
     "imageText": {
       "display_name": "صورة مع نص",
-      "description": "قسم بخلفية صورة مع نص متراكب"
+      "description": "قسم بخلفية صورة مع نص متراكب",
+      "alt_text": "خلفية"
     },
     "inputs": {
       "display_name": "نظام النماذج الديناميكي",
