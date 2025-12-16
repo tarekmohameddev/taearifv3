@@ -20,3 +20,4 @@ export * from "./filterButtonsFunctions";
 export * from "./propertyFilterFunctions";
 export * from "./imageTextFunctions";
 export * from "./contactUsHomePageFunctions";
+export * from "./mapSectionFunctions";

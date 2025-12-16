@@ -18,6 +18,7 @@ export { propertyFilterStructure } from "./propertyFilter";
 export { propertiesPageStructure } from "./propertiesPage";
 export { imageTextStructure } from "./imageText";
 export { contactUsHomePageStructure } from "./contactUsHomePage";
+export { mapSectionStructure } from "./mapSection";
 export type {
   ComponentStructure,
   VariantDefinition,
