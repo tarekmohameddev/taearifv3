@@ -172,6 +172,33 @@ export function useLiveEditorHandlers(state: any) {
       reason: "User changed component theme",
     });
 
+    // Handle global-header specially
+    if (id === "global-header") {
+      const store = useEditorStore.getState();
+      
+      // Get default data for the new theme
+      const newDefaultData = createDefaultData("header", newTheme);
+      
+      // IMPORTANT: Update variant FIRST, then data
+      // This ensures the variant is saved before any other operations
+      store.setGlobalHeaderVariant(newTheme);
+      
+      // Update data
+      store.setGlobalHeaderData(newDefaultData);
+      
+      // Update globalComponentsData with BOTH variant and data
+      store.setGlobalComponentsData({
+        ...store.globalComponentsData,
+        header: newDefaultData,
+        globalHeaderVariant: newTheme, // ← Also save variant in globalComponentsData
+      } as any);
+      
+      // Mark as changed
+      store.setHasChangesMade(true);
+      
+      return; // Don't proceed with regular component update
+    }
+
     setPageComponents((currentComponents: any[]) =>
       currentComponents.map((c) => {
         if (c.id === id) {

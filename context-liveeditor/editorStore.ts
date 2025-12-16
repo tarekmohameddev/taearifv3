@@ -118,8 +118,10 @@ interface EditorStore {
   // Global Components - Header and Footer shared across all pages
   globalHeaderData: ComponentData;
   globalFooterData: ComponentData;
+  globalHeaderVariant: string; // Variant for global header (StaticHeader1, header1, header2)
   setGlobalHeaderData: (data: ComponentData) => void;
   setGlobalFooterData: (data: ComponentData) => void;
+  setGlobalHeaderVariant: (variant: string) => void;
   updateGlobalHeaderByPath: (path: string, value: any) => void;
   updateGlobalFooterByPath: (path: string, value: any) => void;
 
@@ -567,6 +569,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   // Initialize Global Components with default data
   globalHeaderData: getDefaultHeaderData(),
   globalFooterData: getDefaultFooterData(),
+  globalHeaderVariant: "StaticHeader1", // Default to StaticHeader1
 
   // Initialize Global Components Data
   globalComponentsData: {
@@ -658,6 +661,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setGlobalFooterData: (data) =>
     set(() => {
       return { globalFooterData: data };
+    }),
+  setGlobalHeaderVariant: (variant) =>
+    set(() => {
+      return { globalHeaderVariant: variant };
     }),
 
   updateGlobalHeaderByPath: (path, value) =>

@@ -57,10 +57,42 @@ import {
 // Import static components
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
+import { getComponentSubPath } from "@/lib-liveeditor/ComponentsList";
+import { lazy } from "react";
 
 // ============================================================================
 // واجهة المستخدم الرئيسية للـ LiveEditor
 // ============================================================================
+
+// Lazy load Header components dynamically
+const loadHeaderComponent = (componentName: string) => {
+  if (!componentName) return null;
+
+  // Handle StaticHeader1 specially (no number suffix)
+  if (componentName === "StaticHeader1") {
+    return lazy(() =>
+      import(`@/components/tenant/header/StaticHeader1`).catch(() => ({
+        default: StaticHeader1,
+      })),
+    );
+  }
+
+  const match = componentName?.match(/^(.*?)(\d+)$/);
+  if (!match) return null;
+
+  const baseName = match[1];
+  const subPath = getComponentSubPath(baseName);
+  if (!subPath) {
+    return null;
+  }
+
+  const fullPath = `${subPath}/${componentName}`;
+  return lazy(() =>
+    import(`@/components/tenant/${fullPath}`).catch(() => ({
+      default: StaticHeader1,
+    })),
+  );
+};
 
 interface LiveEditorUIProps {
   state: any;
@@ -335,6 +367,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   // Get global components data from parent store
   const globalHeaderData = useEditorStore((s) => s.globalHeaderData);
   const globalFooterData = useEditorStore((s) => s.globalFooterData);
+  const globalHeaderVariant = useEditorStore((s) => s.globalHeaderVariant);
   const setGlobalHeaderData = useEditorStore((s) => s.setGlobalHeaderData);
   const setGlobalFooterData = useEditorStore((s) => s.setGlobalFooterData);
   const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
@@ -365,6 +398,36 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     const defaultFooterData = getDefaultFooterData();
     setGlobalFooterData(defaultFooterData);
   }
+
+  // Load header component dynamically based on globalHeaderVariant
+  const HeaderComponent = useMemo(() => {
+    if (!globalHeaderData || Object.keys(globalHeaderData).length === 0) {
+      return StaticHeader1; // Fallback to StaticHeader1
+    }
+
+    // Use the variant from store, default to StaticHeader1
+    const variant = globalHeaderVariant || "StaticHeader1";
+
+    // Map variant names to component names
+    const componentMap: Record<string, string> = {
+      StaticHeader1: "StaticHeader1",
+      header1: "header1",
+      header2: "header2",
+      header3: "header3",
+      header4: "header4",
+      header5: "header5",
+      header6: "header6",
+    };
+
+    const componentName = componentMap[variant] || "StaticHeader1";
+
+    // Load component dynamically
+    const LazyComponent = loadHeaderComponent(componentName);
+    if (!LazyComponent) {
+      return StaticHeader1;
+    }
+    return LazyComponent;
+  }, [globalHeaderData, globalHeaderVariant]);
 
   const [sidebarWidth, setSidebarWidth] = useState(state.sidebarWidth);
   const [selectedDevice, setSelectedDevice] = useState<DeviceType>("laptop");
@@ -773,7 +836,19 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
           }}
         >
           <div style={{ pointerEvents: "none" }}>
+            <Suspense
+              fallback={
             <StaticHeader1 overrideData={globalHeaderData} />
+              }
+            >
+              <HeaderComponent
+                {...(globalHeaderData as any)}
+                useStore={true}
+                variant={globalHeaderVariant || "StaticHeader1"}
+                id="global-header"
+                key={`global-header-${globalHeaderVariant || "StaticHeader1"}-${JSON.stringify(globalHeaderData)}`}
+              />
+            </Suspense>
           </div>
           {/* Overlay indicator */}
           <div

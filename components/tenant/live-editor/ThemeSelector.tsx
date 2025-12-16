@@ -39,6 +39,12 @@ export function ThemeSelector({
   const t = useEditorT();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState(currentTheme);
+  
+  // Update selectedTheme when currentTheme changes
+  useEffect(() => {
+    setSelectedTheme(currentTheme);
+  }, [currentTheme]);
+  
   const [themeOptions, setThemeOptions] = useState<
     Record<string, ThemeOption[]>
   >({});
@@ -82,7 +88,16 @@ export function ThemeSelector({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) {
+          // Reset to current theme when dialog closes without applying
+          setSelectedTheme(currentTheme);
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           variant="outline"

@@ -93,8 +93,10 @@ export function EditorSidebar({
     updateComponentByPath,
     globalHeaderData,
     globalFooterData,
+    globalHeaderVariant,
     setGlobalHeaderData,
     setGlobalFooterData,
+    setGlobalHeaderVariant,
     updateGlobalHeaderByPath,
     updateGlobalFooterByPath,
     globalComponentsData,
@@ -874,19 +876,56 @@ export function EditorSidebar({
                     {t("editor_sidebar.switch_visual_styles")}
                   </p>
                   <div className="space-y-4">
-                    <ThemeSelector
-                      componentType={selectedComponent.type}
-                      currentTheme={selectedComponent.componentName}
-                      onThemeChange={(newTheme) => {
-                        if (onComponentThemeChange && selectedComponent) {
-                          onComponentThemeChange(
-                            selectedComponent.id,
-                            newTheme,
-                          );
-                        }
-                      }}
-                      className="w-full"
-                    />
+                    {/* Special handling for global-header */}
+                    {selectedComponent.id === "global-header" ? (
+                      <ThemeSelector
+                        componentType="header"
+                        currentTheme={globalHeaderVariant || "StaticHeader1"}
+                        onThemeChange={(newTheme) => {
+                          try {
+                            // Get default data for the new theme
+                            const newDefaultData = createDefaultData(
+                              "header",
+                              newTheme,
+                            );
+
+                            // IMPORTANT: Update variant FIRST, then data
+                            // This ensures the variant is saved before any other operations
+                            setGlobalHeaderVariant(newTheme);
+
+                            // Update data
+                            setGlobalHeaderData(newDefaultData);
+
+                            // Update globalComponentsData with BOTH variant and data
+                            setGlobalComponentsData({
+                              ...globalComponentsData,
+                              header: newDefaultData,
+                              globalHeaderVariant: newTheme, // ← Also save variant in globalComponentsData
+                            } as any);
+
+                            // Mark as changed
+                            setHasChangesMade(true);
+                          } catch (error) {
+                            // Silently handle error
+                          }
+                        }}
+                        className="w-full"
+                      />
+                    ) : (
+                      <ThemeSelector
+                        componentType={selectedComponent.type}
+                        currentTheme={selectedComponent.componentName}
+                        onThemeChange={(newTheme) => {
+                          if (onComponentThemeChange && selectedComponent) {
+                            onComponentThemeChange(
+                              selectedComponent.id,
+                              newTheme,
+                            );
+                          }
+                        }}
+                        className="w-full"
+                      />
+                    )}
 
                     <div className="pt-2 border-t border-purple-200/50">
                       <ResetConfirmDialog
