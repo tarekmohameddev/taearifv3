@@ -223,6 +223,10 @@
       "display_name": "Advanced Input System",
       "description": "Dynamic form system with customizable cards and fields with visibility controls"
     },
+    "imageText": {
+      "display_name": "Image Text",
+      "description": "Background image with text overlay section"
+    },
     "inputs": {
       "display_name": "Dynamic Form System",
       "description": "Advanced form system with dynamic cards, fields, validation, and API integration"

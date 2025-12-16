@@ -44,6 +44,7 @@ import { contactCardsStructure } from "@/componentsStructure/contactCards";
 import { propertiesPageStructure } from "@/componentsStructure/propertiesPage";
 import { inputsStructure } from "@/componentsStructure/inputs";
 import { inputs2Structure } from "@/componentsStructure/inputs2";
+import { imageTextStructure } from "@/componentsStructure/imageText";
 
 export interface ComponentType {
   id: string;
@@ -399,6 +400,24 @@ export const getComponents = (
     icon: "📝",
     ...inputs2Structure,
   },
+  imageText: {
+    id: "imageText",
+    name: "imageText",
+    displayName: t("components.imageText.display_name"),
+    description: t("components.imageText.description"),
+    category: "content",
+    section: "homepage",
+    subPath: "imageText",
+    icon: "🖼️",
+    variants: imageTextStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/imageText/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "imageText1",
+    ...imageTextStructure,
+  },
 });
 
 // قائمة جميع المكونات المتاحة (للتوافق مع الكود الموجود)
@@ -674,6 +693,24 @@ export const COMPONENTS: Record<string, any> = {
     subPath: "inputs2",
     icon: "📝",
     ...inputs2Structure,
+  },
+  imageText: {
+    id: "imageText",
+    name: "imageText",
+    displayName: "Image Text",
+    description: "Background image with text overlay section",
+    category: "content",
+    section: "homepage",
+    subPath: "imageText",
+    icon: "🖼️",
+    variants: imageTextStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/imageText/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "imageText1",
+    ...imageTextStructure,
   },
 };
 

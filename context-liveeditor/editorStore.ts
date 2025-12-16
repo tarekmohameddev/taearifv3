@@ -68,6 +68,7 @@ import { contactFormSectionFunctions } from "./editorStoreFunctions/contactFormS
 import { applicationFormFunctions } from "./editorStoreFunctions/applicationFormFunctions";
 import { inputsFunctions } from "./editorStoreFunctions/inputsFunctions";
 import { inputs2Functions } from "./editorStoreFunctions/inputs2Functions";
+import { imageTextFunctions } from "./editorStoreFunctions/imageTextFunctions";
 import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
@@ -449,6 +450,20 @@ interface EditorStore {
     value: any,
   ) => void;
 
+  // Image Text states
+  imageTextStates: Record<string, ComponentData>;
+  ensureImageTextVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getImageTextData: (variantId: string) => ComponentData;
+  setImageTextData: (variantId: string, data: ComponentData) => void;
+  updateImageTextByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
   // Inputs states
   inputsStates: Record<string, ComponentData>;
   ensureInputsVariant: (variantId: string, initial?: ComponentData) => void;
@@ -553,6 +568,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   applicationFormStates: {},
   inputsStates: {},
   inputs2States: {},
+  imageTextStates: {},
 
   // Dynamic component states
   componentStates: {},
@@ -1018,6 +1034,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return inputsFunctions.ensureVariant(state, variantId, initial);
         case "inputs2":
           return inputs2Functions.ensureVariant(state, variantId, initial);
+        case "imageText":
+          return imageTextFunctions.ensureVariant(state, variantId, initial);
         case "propertiesShowcase":
           return propertiesShowcaseFunctions.ensureVariant(
             state,
@@ -1116,6 +1134,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return inputsFunctions.getData(state, variantId);
       case "inputs2":
         return inputs2Functions.getData(state, variantId);
+      case "imageText":
+        return imageTextFunctions.getData(state, variantId);
       default:
         // Fallback to generic component data with default data creation
         const data = state.componentStates[componentType]?.[variantId];
@@ -1221,6 +1241,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "inputs2":
           newState = inputs2Functions.setData(state, variantId, data);
+          break;
+        case "imageText":
+          newState = imageTextFunctions.setData(state, variantId, data);
           break;
         default:
           // Fallback to generic component handling
@@ -1437,6 +1460,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "inputs2":
           newState = inputs2Functions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "imageText":
+          newState = imageTextFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -1854,6 +1885,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       inputs2Functions.updateByPath(state, variantId, path, value),
     ),
 
+  // Image Text functions using modular approach
+  ensureImageTextVariant: (variantId, initial) =>
+    set((state) => imageTextFunctions.ensureVariant(state, variantId, initial)),
+  getImageTextData: (variantId) => {
+    const state = get();
+    return imageTextFunctions.getData(state, variantId);
+  },
+  setImageTextData: (variantId, data) =>
+    set((state) => imageTextFunctions.setData(state, variantId, data)),
+  updateImageTextByPath: (variantId, path, value) =>
+    set((state) =>
+      imageTextFunctions.updateByPath(state, variantId, path, value),
+    ),
+
   // Page components management
   setPageComponentsForPage: (page, components) =>
     set((state) => {
@@ -2136,6 +2181,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         comp.data,
                       ).inputs2States;
                       break;
+                    case "imageText":
+                      newState.imageTextStates = imageTextFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).imageTextStates;
+                      break;
                   }
                 }
               },
@@ -2310,6 +2362,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.componentName,
                 comp.data,
               ).inputs2States;
+              break;
+            case "imageText":
+              newState.imageTextStates = imageTextFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).imageTextStates;
               break;
             case "contactFormSection":
               newState.contactFormSectionStates =

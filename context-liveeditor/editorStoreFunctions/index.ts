@@ -17,3 +17,4 @@ export * from "./contactMapSectionFunctions";
 export * from "./gridFunctions";
 export * from "./filterButtonsFunctions";
 export * from "./propertyFilterFunctions";
+export * from "./imageTextFunctions";
