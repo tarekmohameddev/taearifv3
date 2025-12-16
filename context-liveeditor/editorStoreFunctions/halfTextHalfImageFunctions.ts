@@ -325,6 +325,43 @@ export const getDefaultHalfTextHalfImage5Data = (): ComponentData => ({
   },
 });
 
+// Default halfTextHalfImage6 data structure (ThemeTwo)
+export const getDefaultHalfTextHalfImage6Data = (): ComponentData => ({
+  visible: true,
+  ThemeTwo: "ThemeTwo",
+  layout: {
+    ThemeTwo: "ThemeTwo",
+    maxWidth: "1280px",
+  },
+  spacing: {
+    ThemeTwo: "ThemeTwo",
+    padding: {
+      ThemeTwo: "ThemeTwo",
+      top: "5rem",
+      bottom: "3rem",
+    },
+  },
+  content: {
+    ThemeTwo: "ThemeTwo",
+    title: "خبراء في خدمتك – نرافقك نحو استثمار آمن",
+    titleUnderlined: "خبراء في",
+    paragraph: "نقدّم لك خدمات احترافية في سوق العقارات، بفريق يتمتع بالخبرة والموثوقية، لنساعدك على اتخاذ القرار السليم.",
+  },
+  image: {
+    ThemeTwo: "ThemeTwo",
+    src: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000",
+    alt: "صورة",
+    visible: true,
+  },
+  styling: {
+    ThemeTwo: "ThemeTwo",
+    backgroundColor: "#f5f0e8",
+    titleColor: "#000000",
+    paragraphColor: "#000000",
+    dividerColor: "#8b5f46",
+  },
+});
+
 // Default halfTextHalfImage4 data structure (ThemeTwo)
 export const getDefaultHalfTextHalfImage4Data = (): ComponentData => ({
   visible: true,
@@ -420,6 +457,85 @@ export const getDefaultHalfTextHalfImage4Data = (): ComponentData => ({
   },
 });
 
+// Default halfTextHalfImage7 data structure (ThemeTwo)
+export const getDefaultHalfTextHalfImage7Data = (): ComponentData => ({
+  visible: true,
+  ThemeTwo: "ThemeTwo",
+  layout: {
+    ThemeTwo: "ThemeTwo",
+    direction: "rtl",
+    maxWidth: "1350px",
+  },
+  spacing: {
+    ThemeTwo: "ThemeTwo",
+    padding: {
+      ThemeTwo: "ThemeTwo",
+      top: "3rem",
+      bottom: "4rem",
+      left: "1rem",
+      right: "1rem",
+    },
+  },
+  content: {
+    ThemeTwo: "ThemeTwo",
+    title: "خدمات موثوقة تستحق ثقتك",
+    features: [
+      {
+        ThemeTwo: "ThemeTwo",
+        id: "1",
+        title: "الشفافية",
+        description: "نلتزم بالوضوح في جميع تعاملاتنا. نؤمن بأن الشفافية تبني الثقة، ولهذا نحرص على تزويدك بكل التفاصيل بصدق ومصداقية، دون مفاجآت أو معلومات مخفية.",
+        icon: "transparency",
+      },
+      {
+        ThemeTwo: "ThemeTwo",
+        id: "2",
+        title: "الالتزام",
+        description: "نعمل من أجلك بكل إخلاص واحترافية. فريقنا ملتزم بتقديم أفضل الحلول العقارية، ويقف إلى جانبك خطوة بخطوة حتى تحقق هدفك، سواء بالشراء أو الاستثمار",
+        icon: "commitment",
+      },
+      {
+        ThemeTwo: "ThemeTwo",
+        id: "3",
+        title: "الابتكار",
+        description: "نواكب المستقبل بخدمات ذكية. نستخدم أحدث الأدوات والمنصات لتوفير تجربة عقارية سلسة وسهلة، تجمع بين السرعة، الدقة، والراحة.",
+        icon: "innovation",
+      },
+    ],
+  },
+  styling: {
+    ThemeTwo: "ThemeTwo",
+    backgroundColor: "#f5f0e8",
+    titleColor: "#000000",
+    dividerColor: "#8b5f46",
+    featureTitleColor: "#8b5f46",
+    featureDescriptionColor: "#8b5f46",
+    iconBackgroundColor: "#d4a574",
+    iconColor: "#896042",
+  },
+  image: {
+    ThemeTwo: "ThemeTwo",
+    src: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000",
+    alt: "صورة",
+    visible: true,
+  },
+  responsive: {
+    ThemeTwo: "ThemeTwo",
+    mobile: {
+      ThemeTwo: "ThemeTwo",
+      imageOrder: 1,
+      textOrder: 2,
+      imageHeight: "h-[300px]",
+    },
+    desktop: {
+      ThemeTwo: "ThemeTwo",
+      imageOrder: 2,
+      textOrder: 1,
+      imageHeight: "md:min-h-[500px]",
+    },
+  },
+});
+
 export const halfTextHalfImageFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     // Log the function call
@@ -499,6 +615,16 @@ export const halfTextHalfImageFunctions = {
       } else if (variantId === "halfTextHalfImage5") {
         defaultData = getDefaultHalfTextHalfImage5Data();
         logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage5", {
+          defaultData: defaultData,
+        });
+      } else if (variantId === "halfTextHalfImage6") {
+        defaultData = getDefaultHalfTextHalfImage6Data();
+        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage6", {
+          defaultData: defaultData,
+        });
+      } else if (variantId === "halfTextHalfImage7") {
+        defaultData = getDefaultHalfTextHalfImage7Data();
+        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage7", {
           defaultData: defaultData,
         });
       } else {

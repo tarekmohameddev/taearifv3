@@ -17,6 +17,7 @@ export { filterButtonsStructure } from "./filterButtons";
 export { propertyFilterStructure } from "./propertyFilter";
 export { propertiesPageStructure } from "./propertiesPage";
 export { imageTextStructure } from "./imageText";
+export { contactUsHomePageStructure } from "./contactUsHomePage";
 export type {
   ComponentStructure,
   VariantDefinition,

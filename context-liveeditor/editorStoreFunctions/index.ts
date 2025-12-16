@@ -2,6 +2,7 @@
 export * from "./types";
 export * from "./heroFunctions";
 export * from "./headerFunctions";
+export * from "./header2Functions";
 export * from "./footerFunctions";
 export * from "./halfTextHalfImageFunctions";
 export * from "./propertySliderFunctions";
@@ -18,3 +19,4 @@ export * from "./gridFunctions";
 export * from "./filterButtonsFunctions";
 export * from "./propertyFilterFunctions";
 export * from "./imageTextFunctions";
+export * from "./contactUsHomePageFunctions";

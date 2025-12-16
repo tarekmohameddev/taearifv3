@@ -896,5 +896,130 @@ export const heroStructure: ComponentStructure = {
         { key: "content.subtitle", label: "Subtitle", type: "text" },
       ],
     },
+    {
+      id: "hero4",
+      name: "Hero 4 - Contact Form Hero",
+      fields: [
+        { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+        { key: "visible", label: "Visible", type: "boolean" },
+        {
+          key: "title",
+          label: "Title",
+          type: "text",
+          placeholder: "عن باهية العقارية",
+        },
+        {
+          key: "backgroundImage",
+          label: "Background Image",
+          type: "image",
+        },
+        {
+          key: "contact",
+          label: "Show Contact Form",
+          type: "boolean",
+        },
+        {
+          key: "background",
+          label: "Background",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            { key: "image", label: "Image URL", type: "image" },
+            { key: "alt", label: "Alt Text", type: "text" },
+            {
+              key: "overlay",
+              label: "Overlay",
+              type: "object",
+              fields: [
+                { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+                { key: "enabled", label: "Enabled", type: "boolean" },
+                {
+                  key: "opacity",
+                  label: "Opacity",
+                  type: "text",
+                  placeholder: "0.3",
+                },
+                { key: "color", label: "Color", type: "color" },
+              ],
+            },
+          ],
+        },
+        {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            { key: "title", label: "Title", type: "text" },
+            { key: "alignment", label: "Alignment", type: "text" },
+            { key: "maxWidth", label: "Max Width", type: "text" },
+            {
+              key: "font",
+              label: "Font Settings",
+              type: "object",
+              fields: [
+                { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+                {
+                  key: "title",
+                  label: "Title Font",
+                  type: "object",
+                  fields: [
+                    { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+                    { key: "family", label: "Family", type: "text" },
+                    {
+                      key: "size",
+                      label: "Size",
+                      type: "object",
+                      fields: [
+                        { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+                        { key: "desktop", label: "Desktop", type: "text" },
+                        { key: "tablet", label: "Tablet", type: "text" },
+                        { key: "mobile", label: "Mobile", type: "text" },
+                      ],
+                    },
+                    { key: "weight", label: "Weight", type: "text" },
+                    {
+                      key: "color",
+                      label: "Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "secondary",
+                    },
+                    { key: "lineHeight", label: "Line Height", type: "text" },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          key: "animations",
+          label: "Animations",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            {
+              key: "title",
+              label: "Title Animation",
+              type: "object",
+              fields: [
+                { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+                { key: "enabled", label: "Enabled", type: "boolean" },
+                { key: "type", label: "Type", type: "text" },
+                { key: "duration", label: "Duration (ms)", type: "number" },
+                { key: "delay", label: "Delay (ms)", type: "number" },
+              ],
+            },
+          ],
+        },
+      ],
+      simpleFields: [
+        { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "backgroundImage", label: "Background Image", type: "image" },
+        { key: "title", label: "Title", type: "text" },
+        { key: "contact", label: "Show Contact Form", type: "boolean" },
+      ],
+    },
   ],
 };

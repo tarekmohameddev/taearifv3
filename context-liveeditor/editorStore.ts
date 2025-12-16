@@ -56,6 +56,7 @@ import { testimonialsFunctions } from "./editorStoreFunctions/testimonialsFuncti
 import { logosTickerFunctions } from "./editorStoreFunctions/logosTickerFunctions";
 import { propertiesShowcaseFunctions } from "./editorStoreFunctions/propertiesShowcaseFunctions";
 import { card4Functions } from "./editorStoreFunctions/card4Functions";
+import { card5Functions } from "./editorStoreFunctions/card5Functions";
 import { partnersFunctions } from "./editorStoreFunctions/partnersFunctions";
 import { whyChooseUsFunctions } from "./editorStoreFunctions/whyChooseUsFunctions";
 import { contactMapSectionFunctions } from "./editorStoreFunctions/contactMapSectionFunctions";
@@ -69,6 +70,7 @@ import { applicationFormFunctions } from "./editorStoreFunctions/applicationForm
 import { inputsFunctions } from "./editorStoreFunctions/inputsFunctions";
 import { inputs2Functions } from "./editorStoreFunctions/inputs2Functions";
 import { imageTextFunctions } from "./editorStoreFunctions/imageTextFunctions";
+import { contactUsHomePageFunctions } from "./editorStoreFunctions/contactUsHomePageFunctions";
 import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
@@ -303,6 +305,34 @@ interface EditorStore {
     value: any,
   ) => void;
 
+  // Card4 states
+  card4States: Record<string, ComponentData>;
+  ensureCard4Variant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getCard4Data: (variantId: string) => ComponentData;
+  setCard4Data: (variantId: string, data: ComponentData) => void;
+  updateCard4ByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
+  // Card5 states
+  card5States: Record<string, ComponentData>;
+  ensureCard5Variant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getCard5Data: (variantId: string) => ComponentData;
+  setCard5Data: (variantId: string, data: ComponentData) => void;
+  updateCard5ByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
   // Logos Ticker states
   logosTickerStates: Record<string, ComponentData>;
   ensureLogosTickerVariant: (
@@ -464,6 +494,19 @@ interface EditorStore {
     value: any,
   ) => void;
 
+  contactUsHomePageStates: Record<string, ComponentData>;
+  ensureContactUsHomePageVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getContactUsHomePageData: (variantId: string) => ComponentData;
+  setContactUsHomePageData: (variantId: string, data: ComponentData) => void;
+  updateContactUsHomePageByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
   // Inputs states
   inputsStates: Record<string, ComponentData>;
   ensureInputsVariant: (variantId: string, initial?: ComponentData) => void;
@@ -555,6 +598,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   testimonialsStates: {},
   propertiesShowcaseStates: {},
   card4States: {},
+  card5States: {},
   logosTickerStates: {},
   partnersStates: {},
   whyChooseUsStates: {},
@@ -569,6 +613,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   inputsStates: {},
   inputs2States: {},
   imageTextStates: {},
+  contactUsHomePageStates: {},
 
   // Dynamic component states
   componentStates: {},
@@ -1036,6 +1081,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return inputs2Functions.ensureVariant(state, variantId, initial);
         case "imageText":
           return imageTextFunctions.ensureVariant(state, variantId, initial);
+        case "contactUsHomePage":
+          return contactUsHomePageFunctions.ensureVariant(state, variantId, initial);
         case "propertiesShowcase":
           return propertiesShowcaseFunctions.ensureVariant(
             state,
@@ -1043,6 +1090,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             initial,
           );
         case "card":
+          // Determine which card variant based on variantId
+          if (variantId.includes("card5") || variantId === "card5") {
+            return card5Functions.ensureVariant(state, variantId, initial);
+          }
           return card4Functions.ensureVariant(state, variantId, initial);
         default:
           // Fallback to generic component handling
@@ -1097,6 +1148,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       case "propertiesShowcase":
         return propertiesShowcaseFunctions.getData(state, variantId);
       case "card":
+        // Determine which card variant based on variantId
+        if (variantId.includes("card5") || variantId === "card5") {
+          return card5Functions.getData(state, variantId);
+        }
         return card4Functions.getData(state, variantId);
       case "logosTicker":
         return logosTickerFunctions.getData(state, variantId);
@@ -1136,6 +1191,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return inputs2Functions.getData(state, variantId);
       case "imageText":
         return imageTextFunctions.getData(state, variantId);
+      case "contactUsHomePage":
+        return contactUsHomePageFunctions.getData(state, variantId);
       default:
         // Fallback to generic component data with default data creation
         const data = state.componentStates[componentType]?.[variantId];
@@ -1181,7 +1238,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           newState = propertiesShowcaseFunctions.setData(state, variantId, data);
           break;
         case "card":
-          newState = card4Functions.setData(state, variantId, data);
+          // Determine which card variant based on variantId
+          if (variantId.includes("card5") || variantId === "card5") {
+            newState = card5Functions.setData(state, variantId, data);
+          } else {
+            newState = card4Functions.setData(state, variantId, data);
+          }
           break;
         case "logosTicker":
           newState = logosTickerFunctions.setData(state, variantId, data);
@@ -1244,6 +1306,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "imageText":
           newState = imageTextFunctions.setData(state, variantId, data);
+          break;
+        case "contactUsHomePage":
+          newState = contactUsHomePageFunctions.setData(state, variantId, data);
           break;
         default:
           // Fallback to generic component handling
@@ -1357,7 +1422,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           );
           break;
         case "card":
-          newState = card4Functions.updateByPath(state, variantId, path, value);
+          // Determine which card variant based on variantId
+          if (variantId.includes("card5") || variantId === "card5") {
+            newState = card5Functions.updateByPath(state, variantId, path, value);
+          } else {
+            newState = card4Functions.updateByPath(state, variantId, path, value);
+          }
           break;
         case "logosTicker":
           newState = logosTickerFunctions.updateByPath(
@@ -1468,6 +1538,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "imageText":
           newState = imageTextFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "contactUsHomePage":
+          newState = contactUsHomePageFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -1658,6 +1736,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => card4Functions.setData(state, variantId, data)),
   updateCard4ByPath: (variantId, path, value) =>
     set((state) => card4Functions.updateByPath(state, variantId, path, value)),
+
+  // Card5 specific functions
+  ensureCard5Variant: (variantId, initial) =>
+    set((state) => card5Functions.ensureVariant(state, variantId, initial)),
+  getCard5Data: (variantId) => {
+    const state = get();
+    return card5Functions.getData(state, variantId);
+  },
+  setCard5Data: (variantId, data) =>
+    set((state) => card5Functions.setData(state, variantId, data)),
+  updateCard5ByPath: (variantId, path, value) =>
+    set((state) => card5Functions.updateByPath(state, variantId, path, value)),
 
   // Partners functions using modular approach
   ensurePartnersVariant: (variantId, initial) =>
@@ -1899,6 +1989,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       imageTextFunctions.updateByPath(state, variantId, path, value),
     ),
 
+  // ContactUsHomePage functions using modular approach
+  ensureContactUsHomePageVariant: (variantId, initial) =>
+    set((state) => contactUsHomePageFunctions.ensureVariant(state, variantId, initial)),
+  getContactUsHomePageData: (variantId) => {
+    const state = get();
+    return contactUsHomePageFunctions.getData(state, variantId);
+  },
+  setContactUsHomePageData: (variantId, data) =>
+    set((state) => contactUsHomePageFunctions.setData(state, variantId, data)),
+  updateContactUsHomePageByPath: (variantId, path, value) =>
+    set((state) =>
+      contactUsHomePageFunctions.updateByPath(state, variantId, path, value),
+    ),
+
   // Page components management
   setPageComponentsForPage: (page, components) =>
     set((state) => {
@@ -2071,11 +2175,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         ).propertiesShowcaseStates;
                       break;
                     case "card":
-                      newState.card4States = card4Functions.setData(
-                        newState,
-                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                        comp.data,
-                      ).card4States;
+                      // Determine which card variant based on componentName
+                      if (comp.componentName === "card5" || comp.id?.includes("card5")) {
+                        newState.card5States = card5Functions.setData(
+                          newState,
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.data,
+                        ).card5States;
+                      } else {
+                        newState.card4States = card4Functions.setData(
+                          newState,
+                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                          comp.data,
+                        ).card4States;
+                      }
                       break;
                     case "whyChooseUs":
                       newState.whyChooseUsStates = whyChooseUsFunctions.setData(
@@ -2187,6 +2300,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
                       ).imageTextStates;
+                      break;
+                    case "contactUsHomePage":
+                      newState.contactUsHomePageStates = contactUsHomePageFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).contactUsHomePageStates;
                       break;
                   }
                 }
@@ -2369,6 +2489,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.componentName,
                 comp.data,
               ).imageTextStates;
+              break;
+            case "contactUsHomePage":
+              newState.contactUsHomePageStates = contactUsHomePageFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).contactUsHomePageStates;
               break;
             case "contactFormSection":
               newState.contactFormSectionStates =

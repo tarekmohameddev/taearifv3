@@ -1,5 +1,6 @@
 import { ComponentData } from "@/lib/types";
 import { ComponentState, createDefaultData, updateDataByPath } from "./types";
+import { getDefaultHeader2Data } from "./header2Functions";
 
 // Default header data structure
 export const getDefaultHeaderData = (): ComponentData => {
@@ -133,7 +134,11 @@ export const headerFunctions = {
       return {} as any;
     }
 
-    const defaultData = getDefaultHeaderData();
+    // Determine default data based on variant
+    const defaultData = variantId === "header2"
+      ? getDefaultHeader2Data()
+      : getDefaultHeaderData();
+    
     const data: ComponentData = initial || state.tempData || defaultData;
 
     return {

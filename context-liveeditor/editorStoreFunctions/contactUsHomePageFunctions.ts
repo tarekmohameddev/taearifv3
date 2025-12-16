@@ -1,0 +1,227 @@
+import { ComponentData } from "@/lib/types";
+import { ComponentState, createDefaultData, updateDataByPath } from "./types";
+
+// ═══════════════════════════════════════════════════════════
+// DEFAULT DATA - Define your component's data structure
+// ═══════════════════════════════════════════════════════════
+
+export const getDefaultContactUsHomePageData = (): ComponentData => ({
+  visible: true,
+  ThemeTwo: "ThemeTwo",
+  
+  // Background configuration
+  background: {
+    ThemeTwo: "ThemeTwo",
+    image: "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
+    alt: "خلفية",
+    overlay: {
+      ThemeTwo: "ThemeTwo",
+      enabled: true,
+      color: "rgba(139, 95, 70, 0.8)",
+    },
+  },
+  
+  // Header text
+  header: {
+    ThemeTwo: "ThemeTwo",
+    text: "سنعثر لك على مستأجر موثوق ونتولى إدارة عملية الإيجار بالكامل بكل احترافية.\nنضمن لك مستأجرًا موثوقًا ونتكفّل بجميع خطوات التأجير نيابةً عنك.",
+  },
+  
+  // Form configuration
+  form: {
+    ThemeTwo: "ThemeTwo",
+    submitButton: {
+      ThemeTwo: "ThemeTwo",
+      text: "اشترك الآن",
+      loadingText: "جاري الإرسال...",
+      backgroundColor: "#c9a882",
+      hoverColor: "#b8966f",
+      textColor: "#ffffff",
+    },
+    fields: {
+      ThemeTwo: "ThemeTwo",
+      fullName: {
+        ThemeTwo: "ThemeTwo",
+        label: "الاسم الكامل",
+        placeholder: "الاسم الكامل",
+        required: true,
+        type: "text",
+      },
+      whatsappNumber: {
+        ThemeTwo: "ThemeTwo",
+        label: "رقم الواتساب",
+        placeholder: "رقم الواتساب",
+        required: true,
+        type: "tel",
+      },
+      email: {
+        ThemeTwo: "ThemeTwo",
+        label: "البريد الالكتروني",
+        placeholder: "البريد الالكتروني",
+        required: true,
+        type: "email",
+      },
+      paymentMethod: {
+        ThemeTwo: "ThemeTwo",
+        label: "طريقة الدفع",
+        placeholder: "اختر طريقة الدفع",
+        required: true,
+        type: "select",
+        options: [
+          { ThemeTwo: "ThemeTwo", value: "بنك مدعوم", label: "بنك مدعوم" },
+          { ThemeTwo: "ThemeTwo", value: "بنك غير مدعوم", label: "بنك غير مدعوم" },
+          { ThemeTwo: "ThemeTwo", value: "كاش", label: "كاش" },
+        ],
+      },
+      city: {
+        ThemeTwo: "ThemeTwo",
+        label: "المدينة",
+        placeholder: "اختر المدينة",
+        required: true,
+        type: "select",
+        options: [
+          { ThemeTwo: "ThemeTwo", value: "الرياض", label: "الرياض" },
+          { ThemeTwo: "ThemeTwo", value: "جدة", label: "جدة" },
+          { ThemeTwo: "ThemeTwo", value: "مكة المكرمة", label: "مكة المكرمة" },
+          { ThemeTwo: "ThemeTwo", value: "المدينة المنورة", label: "المدينة المنورة" },
+          { ThemeTwo: "ThemeTwo", value: "الدمام", label: "الدمام" },
+        ],
+      },
+      unitType: {
+        ThemeTwo: "ThemeTwo",
+        label: "نوع الوحدة",
+        placeholder: "اختر نوع الوحدة",
+        required: true,
+        type: "select",
+        options: [
+          { ThemeTwo: "ThemeTwo", value: "أدوار", label: "أدوار" },
+          { ThemeTwo: "ThemeTwo", value: "بنتهاوس", label: "بنتهاوس" },
+          { ThemeTwo: "ThemeTwo", value: "تاون هاوس", label: "تاون هاوس" },
+          { ThemeTwo: "ThemeTwo", value: "شقق", label: "شقق" },
+          { ThemeTwo: "ThemeTwo", value: "فيلا", label: "فيلا" },
+        ],
+      },
+      budget: {
+        ThemeTwo: "ThemeTwo",
+        label: "الميزانية",
+        placeholder: "الميزانية",
+        required: true,
+        type: "number",
+      },
+      message: {
+        ThemeTwo: "ThemeTwo",
+        label: "محتوى الرسالة",
+        placeholder: "محتوى الرسالة",
+        required: true,
+        type: "textarea",
+        rows: 4,
+      },
+    },
+  },
+  
+  // Styling
+  styling: {
+    ThemeTwo: "ThemeTwo",
+    inputBackground: "#f5f0e8",
+    inputBorder: "#c4b5a0",
+    inputText: "#ffffff",
+    inputPlaceholder: "#8b7a6a",
+    inputFocus: "#8b5f46",
+    labelColor: "#ffffff",
+    errorColor: "#ef4444",
+  },
+  
+  // Layout
+  layout: {
+    ThemeTwo: "ThemeTwo",
+    maxWidth: "4xl",
+    padding: {
+      ThemeTwo: "ThemeTwo",
+      mobile: "1rem",
+      tablet: "2rem",
+      desktop: "3rem",
+    },
+    gap: {
+      ThemeTwo: "ThemeTwo",
+      mobile: "1rem",
+      tablet: "1.5rem",
+      desktop: "1.5rem",
+    },
+  },
+});
+
+// ═══════════════════════════════════════════════════════════
+// COMPONENT FUNCTIONS - Standard 4 functions
+// ═══════════════════════════════════════════════════════════
+
+export const contactUsHomePageFunctions = {
+  /**
+   * ensureVariant - Initialize component in store if not exists
+   * 
+   * @param state - Current editorStore state
+   * @param variantId - Unique component ID (UUID)
+   * @param initial - Optional initial data to override defaults
+   * @returns New state object or empty object if already exists
+   */
+  ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
+    // Check if variant already exists
+    if (
+      state.contactUsHomePageStates[variantId] &&
+      Object.keys(state.contactUsHomePageStates[variantId]).length > 0
+    ) {
+      return {} as any;  // Already exists, skip initialization
+    }
+    
+    // Determine default data
+    const defaultData = getDefaultContactUsHomePageData();
+    
+    // Use provided initial data, else tempData, else defaults
+    const data: ComponentData = initial || state.tempData || defaultData;
+    
+    // Return new state
+    return {
+      contactUsHomePageStates: { ...state.contactUsHomePageStates, [variantId]: data }
+    } as any;
+  },
+  
+  /**
+   * getData - Retrieve component data from store
+   * 
+   * @param state - Current editorStore state
+   * @param variantId - Unique component ID
+   * @returns Component data or default data if not found
+   */
+  getData: (state: any, variantId: string) =>
+    state.contactUsHomePageStates[variantId] || getDefaultContactUsHomePageData(),
+  
+  /**
+   * setData - Set/replace component data completely
+   * 
+   * @param state - Current editorStore state
+   * @param variantId - Unique component ID
+   * @param data - New component data
+   * @returns New state object
+   */
+  setData: (state: any, variantId: string, data: ComponentData) => ({
+    contactUsHomePageStates: { ...state.contactUsHomePageStates, [variantId]: data }
+  }),
+  
+  /**
+   * updateByPath - Update specific field in component data
+   * 
+   * @param state - Current editorStore state
+   * @param variantId - Unique component ID
+   * @param path - Dot-separated path to field (e.g., "form.submitButton.text")
+   * @param value - New value for the field
+   * @returns New state object
+   */
+  updateByPath: (state: any, variantId: string, path: string, value: any) => {
+    const source = state.contactUsHomePageStates[variantId] || getDefaultContactUsHomePageData();
+    const newData = updateDataByPath(source, path, value);
+    
+    return {
+      contactUsHomePageStates: { ...state.contactUsHomePageStates, [variantId]: newData }
+    } as any;
+  }
+};
+

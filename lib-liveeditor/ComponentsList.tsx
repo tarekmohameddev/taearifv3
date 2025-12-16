@@ -41,10 +41,12 @@ import { propertyFilterStructure } from "@/componentsStructure/propertyFilter";
 import { mapSectionStructure } from "@/componentsStructure/mapSection";
 import { contactFormSectionStructure } from "@/componentsStructure/contactFormSection";
 import { contactCardsStructure } from "@/componentsStructure/contactCards";
+import { cardStructure } from "@/componentsStructure/card";
 import { propertiesPageStructure } from "@/componentsStructure/propertiesPage";
 import { inputsStructure } from "@/componentsStructure/inputs";
 import { inputs2Structure } from "@/componentsStructure/inputs2";
 import { imageTextStructure } from "@/componentsStructure/imageText";
+import { contactUsHomePageStructure } from "@/componentsStructure/contactUsHomePage";
 
 export interface ComponentType {
   id: string;
@@ -99,6 +101,7 @@ export const getSections = (
       "mapSection",
       "contactFormSection",
       "contactCards",
+      "contactUsHomePage",
       "propertiesPage",
       "inputs",
       "inputs2",
@@ -366,6 +369,17 @@ export const getComponents = (
     subPath: "contactCards",
     icon: "📇",
     ...contactCardsStructure,
+  },
+  contactUsHomePage: {
+    id: "contactUsHomePage",
+    name: "contactUsHomePage",
+    displayName: t("components.contactUsHomePage.display_name"),
+    description: t("components.contactUsHomePage.description"),
+    category: "content",
+    section: "homepage",
+    subPath: "contactUsHomePage",
+    icon: "📧",
+    ...contactUsHomePageStructure,
   },
   propertiesPage: {
     id: "propertiesPage",
@@ -657,6 +671,35 @@ export const COMPONENTS: Record<string, any> = {
     subPath: "contactCards",
     icon: "📇",
     ...contactCardsStructure,
+  },
+  card: {
+    id: "card",
+    name: "card",
+    displayName: "Card",
+    description: "Property card component with multiple variants",
+    category: "content",
+    section: "homepage",
+    subPath: "card",
+    icon: "🃏",
+    variants: cardStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/cards/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "card4",
+    ...cardStructure,
+  },
+  contactUsHomePage: {
+    id: "contactUsHomePage",
+    name: "contactUsHomePage",
+    displayName: "Contact Us Home Page",
+    description: "Contact form for homepage with background image",
+    category: "content",
+    section: "homepage",
+    subPath: "contactUsHomePage",
+    icon: "📧",
+    ...contactUsHomePageStructure,
   },
   propertiesPage: {
     id: "propertiesPage",

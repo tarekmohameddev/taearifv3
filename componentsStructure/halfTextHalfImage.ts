@@ -1766,5 +1766,277 @@ export const halfTextHalfImageStructure: ComponentStructure = {
         { key: "image.alt", label: "Image Alt Text", type: "text" },
       ],
     },
+    {
+      id: "halfTextHalfImage6",
+      name: "Half Text Half Image 6 - ThemeTwo",
+      fields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+        {
+          key: "layout",
+          label: "Layout Settings",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            {
+              key: "maxWidth",
+              label: "Max Width",
+              type: "text",
+              placeholder: "1280px",
+            },
+          ],
+        },
+        {
+          key: "spacing",
+          label: "Spacing",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            {
+              key: "padding",
+              label: "Padding",
+              type: "object",
+              fields: [
+                { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+                { key: "top", label: "Top", type: "text" },
+                { key: "bottom", label: "Bottom", type: "text" },
+              ],
+            },
+          ],
+        },
+        {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            { key: "title", label: "Title", type: "text" },
+            { key: "titleUnderlined", label: "Title Underlined", type: "text" },
+            { key: "paragraph", label: "Paragraph", type: "text" },
+          ],
+        },
+        {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            {
+              key: "backgroundColor",
+              label: "Background Color",
+              type: "color",
+            },
+            {
+              key: "titleColor",
+              label: "Title Color",
+              type: "color",
+            },
+            {
+              key: "paragraphColor",
+              label: "Paragraph Color",
+              type: "color",
+            },
+            {
+              key: "dividerColor",
+              label: "Divider Color",
+              type: "color",
+            },
+          ],
+        },
+        {
+          key: "image",
+          label: "Image",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            { key: "visible", label: "Show Image", type: "boolean" },
+            { key: "src", label: "Image Source", type: "image" },
+            { key: "alt", label: "Alt Text", type: "text" },
+          ],
+        },
+      ],
+      simpleFields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "content.title", label: "Title", type: "text" },
+        { key: "content.titleUnderlined", label: "Title Underlined", type: "text" },
+        { key: "content.paragraph", label: "Paragraph", type: "text" },
+        { key: "image.src", label: "Image", type: "image" },
+        { key: "image.alt", label: "Image Alt Text", type: "text" },
+      ],
+    },
+    {
+      id: "halfTextHalfImage7",
+      name: "Half Text Half Image 7 - ThemeTwo",
+      fields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+        {
+          key: "layout",
+          label: "Layout Settings",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            {
+              key: "direction",
+              label: "Direction",
+              type: "select",
+              options: [
+                { value: "rtl", label: "Right to Left" },
+                { value: "ltr", label: "Left to Right" },
+              ],
+            },
+            {
+              key: "maxWidth",
+              label: "Max Width",
+              type: "text",
+              placeholder: "1350px",
+            },
+          ],
+        },
+        {
+          key: "spacing",
+          label: "Spacing",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            {
+              key: "padding",
+              label: "Padding",
+              type: "object",
+              fields: [
+                { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+                { key: "top", label: "Top", type: "text" },
+                { key: "bottom", label: "Bottom", type: "text" },
+                { key: "left", label: "Left", type: "text" },
+                { key: "right", label: "Right", type: "text" },
+              ],
+            },
+          ],
+        },
+        {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            { key: "title", label: "Title", type: "text" },
+            {
+              key: "features",
+              label: "Features",
+              type: "array",
+              addLabel: "Add Feature",
+              itemLabel: "Feature",
+              of: [
+                { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+                { key: "id", label: "ID", type: "text" },
+                { key: "title", label: "Title", type: "text" },
+                { key: "description", label: "Description", type: "text" },
+                {
+                  key: "icon",
+                  label: "Icon",
+                  type: "select",
+                  options: [
+                    { value: "transparency", label: "Transparency" },
+                    { value: "commitment", label: "Commitment" },
+                    { value: "innovation", label: "Innovation" },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            {
+              key: "backgroundColor",
+              label: "Background Color",
+              type: "color",
+            },
+            {
+              key: "titleColor",
+              label: "Title Color",
+              type: "color",
+            },
+            {
+              key: "dividerColor",
+              label: "Divider Color",
+              type: "color",
+            },
+            {
+              key: "featureTitleColor",
+              label: "Feature Title Color",
+              type: "color",
+            },
+            {
+              key: "featureDescriptionColor",
+              label: "Feature Description Color",
+              type: "color",
+            },
+            {
+              key: "iconBackgroundColor",
+              label: "Icon Background Color",
+              type: "color",
+            },
+            {
+              key: "iconColor",
+              label: "Icon Color",
+              type: "color",
+            },
+          ],
+        },
+        {
+          key: "image",
+          label: "Image",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            { key: "visible", label: "Show Image", type: "boolean" },
+            { key: "src", label: "Image Source", type: "image" },
+            { key: "alt", label: "Alt Text", type: "text" },
+          ],
+        },
+        {
+          key: "responsive",
+          label: "Responsive",
+          type: "object",
+          fields: [
+            { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+            {
+              key: "mobile",
+              label: "Mobile",
+              type: "object",
+              fields: [
+                { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+                { key: "imageOrder", label: "Image Order", type: "number" },
+                { key: "textOrder", label: "Text Order", type: "number" },
+                { key: "imageHeight", label: "Image Height", type: "text" },
+              ],
+            },
+            {
+              key: "desktop",
+              label: "Desktop",
+              type: "object",
+              fields: [
+                { key: "ThemeTwo", label: "ThemeTwo", type: "text" },
+                { key: "imageOrder", label: "Image Order", type: "number" },
+                { key: "textOrder", label: "Text Order", type: "number" },
+                { key: "imageHeight", label: "Image Height", type: "text" },
+              ],
+            },
+          ],
+        },
+      ],
+      simpleFields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "content.title", label: "Title", type: "text" },
+        { key: "content.features", label: "Features", type: "array" },
+        { key: "image.src", label: "Image", type: "image" },
+        { key: "image.alt", label: "Image Alt Text", type: "text" },
+      ],
+    },
   ],
 };

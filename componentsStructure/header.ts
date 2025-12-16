@@ -474,5 +474,332 @@ export const headerStructure: ComponentStructure = {
         },
       ],
     },
+    {
+      id: "header2",
+      name: "Header 2 - Nav Theme",
+      ThemeTwo: "header2",
+      fields: [
+        { 
+          key: "visible", 
+          label: "Visible", 
+          type: "boolean",
+          ThemeTwo: "visible"
+        },
+        {
+          key: "ThemeTwo",
+          label: "Theme Two",
+          type: "text",
+          placeholder: "header2",
+          ThemeTwo: "ThemeTwo"
+        },
+        {
+          key: "position",
+          label: "Position",
+          type: "object",
+          ThemeTwo: "position",
+          fields: [
+            {
+              key: "ThemeTwo",
+              label: "Theme Two",
+              type: "text",
+              placeholder: "position",
+              ThemeTwo: "ThemeTwo"
+            },
+            {
+              key: "type",
+              label: "Type",
+              type: "select",
+              options: [
+                { label: "Fixed", value: "fixed" },
+                { label: "Sticky", value: "sticky" },
+                { label: "Static", value: "static" },
+              ],
+              ThemeTwo: "type"
+            },
+            { key: "top", label: "Top (px)", type: "number", ThemeTwo: "top" },
+            { key: "zIndex", label: "Z-Index", type: "number", ThemeTwo: "zIndex" },
+          ],
+        },
+        {
+          key: "background",
+          label: "Background",
+          type: "object",
+          ThemeTwo: "background",
+          fields: [
+            {
+              key: "ThemeTwo",
+              label: "Theme Two",
+              type: "text",
+              placeholder: "background",
+              ThemeTwo: "ThemeTwo"
+            },
+            { key: "color", label: "Background Color", type: "color", ThemeTwo: "color" },
+            { key: "opacity", label: "Opacity (0-1)", type: "text", placeholder: "1", ThemeTwo: "opacity" },
+          ],
+        },
+        {
+          key: "logo",
+          label: "Logo",
+          type: "object",
+          ThemeTwo: "logo",
+          fields: [
+            {
+              key: "ThemeTwo",
+              label: "Theme Two",
+              type: "text",
+              placeholder: "logo",
+              ThemeTwo: "ThemeTwo"
+            },
+            { key: "image", label: "Logo Image URL", type: "image", ThemeTwo: "image" },
+            { key: "alt", label: "Alt Text", type: "text", ThemeTwo: "alt" },
+            { key: "url", label: "Logo URL", type: "text", ThemeTwo: "url" },
+            { key: "width", label: "Width (px)", type: "number", ThemeTwo: "width" },
+            { key: "height", label: "Height (px)", type: "number", ThemeTwo: "height" },
+          ],
+        },
+        {
+          key: "links",
+          label: "Navigation Links",
+          type: "array",
+          addLabel: "Add Link",
+          itemLabel: "Link",
+          ThemeTwo: "links",
+          of: [
+            {
+              key: "ThemeTwo",
+              label: "Theme Two",
+              type: "text",
+              placeholder: "link",
+              ThemeTwo: "ThemeTwo"
+            },
+            { key: "name", label: "Link Text", type: "text", ThemeTwo: "name" },
+            { key: "path", label: "Link Path", type: "text", ThemeTwo: "path" },
+          ],
+        },
+        {
+          key: "actions",
+          label: "Actions",
+          type: "object",
+          ThemeTwo: "actions",
+          fields: [
+            {
+              key: "ThemeTwo",
+              label: "Theme Two",
+              type: "text",
+              placeholder: "actions",
+              ThemeTwo: "ThemeTwo"
+            },
+            {
+              key: "logout",
+              label: "Logout Button",
+              type: "object",
+              ThemeTwo: "logout",
+              fields: [
+                {
+                  key: "ThemeTwo",
+                  label: "Theme Two",
+                  type: "text",
+                  placeholder: "logout",
+                  ThemeTwo: "ThemeTwo"
+                },
+                { key: "enabled", label: "Enabled", type: "boolean", ThemeTwo: "enabled" },
+                { key: "text", label: "Button Text", type: "text", ThemeTwo: "text" },
+                { key: "showWhenLoggedIn", label: "Show When Logged In", type: "boolean", ThemeTwo: "showWhenLoggedIn" },
+              ],
+            },
+            {
+              key: "languageToggle",
+              label: "Language Toggle",
+              type: "object",
+              ThemeTwo: "languageToggle",
+              fields: [
+                {
+                  key: "ThemeTwo",
+                  label: "Theme Two",
+                  type: "text",
+                  placeholder: "languageToggle",
+                  ThemeTwo: "ThemeTwo"
+                },
+                { key: "enabled", label: "Enabled", type: "boolean", ThemeTwo: "enabled" },
+                {
+                  key: "text",
+                  label: "Language Text",
+                  type: "object",
+                  ThemeTwo: "text",
+                  fields: [
+                    {
+                      key: "ThemeTwo",
+                      label: "Theme Two",
+                      type: "text",
+                      placeholder: "text",
+                      ThemeTwo: "ThemeTwo"
+                    },
+                    { key: "ar", label: "Arabic Text", type: "text", ThemeTwo: "ar" },
+                    { key: "en", label: "English Text", type: "text", ThemeTwo: "en" },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          key: "mobileMenu",
+          label: "Mobile Menu",
+          type: "object",
+          ThemeTwo: "mobileMenu",
+          fields: [
+            {
+              key: "ThemeTwo",
+              label: "Theme Two",
+              type: "text",
+              placeholder: "mobileMenu",
+              ThemeTwo: "ThemeTwo"
+            },
+            { key: "enabled", label: "Enabled", type: "boolean", ThemeTwo: "enabled" },
+            {
+              key: "side",
+              label: "Side",
+              type: "select",
+              options: [
+                { label: "Left", value: "left" },
+                { label: "Right", value: "right" },
+              ],
+              ThemeTwo: "side"
+            },
+            { key: "width", label: "Width (px)", type: "number", ThemeTwo: "width" },
+            { key: "backgroundColor", label: "Background Color", type: "color", ThemeTwo: "backgroundColor" },
+            { key: "showLogo", label: "Show Logo", type: "boolean", ThemeTwo: "showLogo" },
+            { key: "showLanguageToggle", label: "Show Language Toggle", type: "boolean", ThemeTwo: "showLanguageToggle" },
+            { key: "showLogout", label: "Show Logout", type: "boolean", ThemeTwo: "showLogout" },
+          ],
+        },
+        {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          ThemeTwo: "styling",
+          fields: [
+            {
+              key: "ThemeTwo",
+              label: "Theme Two",
+              type: "text",
+              placeholder: "styling",
+              ThemeTwo: "ThemeTwo"
+            },
+            { key: "linkColor", label: "Link Color", type: "color", ThemeTwo: "linkColor" },
+            { key: "linkHoverColor", label: "Link Hover Color", type: "color", ThemeTwo: "linkHoverColor" },
+            { key: "linkActiveColor", label: "Link Active Color", type: "color", ThemeTwo: "linkActiveColor" },
+            { key: "menuIconColor", label: "Menu Icon Color", type: "color", ThemeTwo: "menuIconColor" },
+            { key: "mobileLinkColor", label: "Mobile Link Color", type: "color", ThemeTwo: "mobileLinkColor" },
+            { key: "mobileLinkActiveColor", label: "Mobile Link Active Color", type: "color", ThemeTwo: "mobileLinkActiveColor" },
+            { key: "logoutButtonColor", label: "Logout Button Color", type: "color", ThemeTwo: "logoutButtonColor" },
+            { key: "logoutButtonHoverBg", label: "Logout Button Hover Background", type: "color", ThemeTwo: "logoutButtonHoverBg" },
+            { key: "languageButtonColor", label: "Language Button Color", type: "color", ThemeTwo: "languageButtonColor" },
+            { key: "languageButtonHoverColor", label: "Language Button Hover Color", type: "color", ThemeTwo: "languageButtonHoverColor" },
+          ],
+        },
+        {
+          key: "responsive",
+          label: "Responsive",
+          type: "object",
+          ThemeTwo: "responsive",
+          fields: [
+            {
+              key: "ThemeTwo",
+              label: "Theme Two",
+              type: "text",
+              placeholder: "responsive",
+              ThemeTwo: "ThemeTwo"
+            },
+            { key: "mobileBreakpoint", label: "Mobile Breakpoint (px)", type: "number", ThemeTwo: "mobileBreakpoint" },
+            { key: "containerMaxWidth", label: "Container Max Width", type: "text", ThemeTwo: "containerMaxWidth" },
+            {
+              key: "padding",
+              label: "Padding",
+              type: "object",
+              ThemeTwo: "padding",
+              fields: [
+                {
+                  key: "ThemeTwo",
+                  label: "Theme Two",
+                  type: "text",
+                  placeholder: "padding",
+                  ThemeTwo: "ThemeTwo"
+                },
+                { key: "horizontal", label: "Horizontal Padding", type: "text", ThemeTwo: "horizontal" },
+              ],
+            },
+          ],
+        },
+        {
+          key: "animations",
+          label: "Animations",
+          type: "object",
+          ThemeTwo: "animations",
+          fields: [
+            {
+              key: "ThemeTwo",
+              label: "Theme Two",
+              type: "text",
+              placeholder: "animations",
+              ThemeTwo: "ThemeTwo"
+            },
+            {
+              key: "logo",
+              label: "Logo Animation",
+              type: "object",
+              ThemeTwo: "logo",
+              fields: [
+                {
+                  key: "ThemeTwo",
+                  label: "Theme Two",
+                  type: "text",
+                  placeholder: "logo",
+                  ThemeTwo: "ThemeTwo"
+                },
+                { key: "enabled", label: "Enabled", type: "boolean", ThemeTwo: "enabled" },
+                { key: "duration", label: "Duration (s)", type: "number", ThemeTwo: "duration" },
+                { key: "delay", label: "Delay (s)", type: "number", ThemeTwo: "delay" },
+              ],
+            },
+            {
+              key: "menuItems",
+              label: "Menu Items Animation",
+              type: "object",
+              ThemeTwo: "menuItems",
+              fields: [
+                {
+                  key: "ThemeTwo",
+                  label: "Theme Two",
+                  type: "text",
+                  placeholder: "menuItems",
+                  ThemeTwo: "ThemeTwo"
+                },
+                { key: "enabled", label: "Enabled", type: "boolean", ThemeTwo: "enabled" },
+                { key: "duration", label: "Duration (s)", type: "number", ThemeTwo: "duration" },
+                { key: "delay", label: "Delay (s)", type: "number", ThemeTwo: "delay" },
+                { key: "stagger", label: "Stagger (s)", type: "number", ThemeTwo: "stagger" },
+              ],
+            },
+          ],
+        },
+      ],
+      simpleFields: [
+        { key: "visible", label: "Visible", type: "boolean", ThemeTwo: "visible" },
+        { key: "logo.image", label: "Logo Image", type: "image", ThemeTwo: "logo.image" },
+        {
+          key: "links",
+          label: "Navigation Links",
+          type: "array",
+          ThemeTwo: "links",
+          addLabel: "Add Link",
+          itemLabel: "Link",
+          of: [
+            { key: "name", label: "Link Text", type: "text", ThemeTwo: "name" },
+            { key: "path", label: "Link Path", type: "text", ThemeTwo: "path" },
+          ],
+        },
+      ],
+    },
   ],
 };
