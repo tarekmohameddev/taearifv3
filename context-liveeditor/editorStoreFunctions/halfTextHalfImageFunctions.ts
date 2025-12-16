@@ -268,6 +268,158 @@ export const getDefaultHalfTextHalfImage3Data = (): ComponentData => ({
   },
 });
 
+// Default halfTextHalfImage5 data structure
+export const getDefaultHalfTextHalfImage5Data = (): ComponentData => ({
+  visible: true,
+  ThemeTwo: "ThemeTwo",
+  layout: {
+    ThemeTwo: "ThemeTwo",
+    direction: "rtl",
+    maxWidth: "1152px",
+    gap: "gap-6 md:gap-8",
+  },
+  spacing: {
+    ThemeTwo: "ThemeTwo",
+    padding: {
+      ThemeTwo: "ThemeTwo",
+      top: "3rem",
+      bottom: "4rem",
+      left: "1rem",
+      right: "1rem",
+    },
+  },
+  content: {
+    ThemeTwo: "ThemeTwo",
+    description:
+      "ندير عنك كل شيء… من الإعلان حتى التوقيع. في باهية، نوفّر لك مستأجرًا موثوقًا ونتولى إدارة عملية التأجير بالكامل، من التسويق والتواصل، حتى إعداد العقود واستلام الدفعات. كل ذلك باحترافية، شفافية، وتجربة تُبقيك مطمئنًا دائمًا",
+    items: [
+      {
+        ThemeTwo: "ThemeTwo",
+        id: "1",
+        text: "وقتك أغلى... دعنا ندير عقارك بكفاءة.",
+      },
+      {
+        ThemeTwo: "ThemeTwo",
+        id: "2",
+        text: "نبحث، نُقيّم، ونضمن الأفضل لك.",
+      },
+      {
+        ThemeTwo: "ThemeTwo",
+        id: "3",
+        text: "راحة بالك هي أولويتنا.",
+      },
+    ],
+  },
+  styling: {
+    ThemeTwo: "ThemeTwo",
+    backgroundColor: "#f5f0e8",
+    textColor: "#5c3e2a",
+    dividerColor: "#5c3e2a",
+    iconColor: "#5c3e2a",
+  },
+  image: {
+    ThemeTwo: "ThemeTwo",
+    visible: true,
+    src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=2000",
+    alt: "منظر المدينة",
+  },
+});
+
+// Default halfTextHalfImage4 data structure (ThemeTwo)
+export const getDefaultHalfTextHalfImage4Data = (): ComponentData => ({
+  visible: true,
+  ThemeTwo: "ThemeTwo",
+  layout: {
+    ThemeTwo: "ThemeTwo",
+    direction: "rtl",
+    minHeight: "350px",
+  },
+  spacing: {
+    ThemeTwo: "ThemeTwo",
+    padding: {
+      ThemeTwo: "ThemeTwo",
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
+  },
+  content: {
+    ThemeTwo: "ThemeTwo",
+    title: "ابنِ طريقك... ولا تنتظر أن تُمنح",
+    paragraphs: [
+      {
+        ThemeTwo: "ThemeTwo",
+        text: "لا أحد يعرف ثمن النعيم الذي تريد الوصول إليه غيرك. ليس في الوعود ولا في التمنّي، بل في خطواتك، في عزمك، في سكونك حين يتخلّى عنك كل شيء إلا إيمانك بما تستحق.",
+      },
+      {
+        ThemeTwo: "ThemeTwo",
+        text: "لا أحد سيأتي ليكملك. كل ما تبحث عنه، يبدأ حين تتوقف عن تقليد من سبقوك، وتبدأ في كتابة فصلك الأول بيدك، بصوتك، بخوفك حتى.",
+      },
+      {
+        ThemeTwo: "ThemeTwo",
+        text: "اختر أن تنهض، لا لأنك مجبر، بل لأنك تستحق أن ترى ما خلف الجدار.",
+      },
+    ],
+    button: {
+      ThemeTwo: "ThemeTwo",
+      text: "اكتشف عقارك الآن",
+      url: "/projects",
+      enabled: true,
+    },
+  },
+  styling: {
+    ThemeTwo: "ThemeTwo",
+    textBackground: {
+      ThemeTwo: "ThemeTwo",
+      color: "#e4bfa1",
+    },
+    divider: {
+      ThemeTwo: "ThemeTwo",
+      color: "#8b5f46",
+      width: "96px",
+      height: "2px",
+    },
+    button: {
+      ThemeTwo: "ThemeTwo",
+      backgroundColor: "#8b5f46",
+      hoverBackgroundColor: "#6b4630",
+      textColor: "#ffffff",
+      borderRadius: "8px",
+    },
+    textColors: {
+      ThemeTwo: "ThemeTwo",
+      title: "#1f2937",
+      paragraph: "#374151",
+    },
+  },
+  image: {
+    ThemeTwo: "ThemeTwo",
+    src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2000",
+    alt: "منظر المدينة",
+    visible: true,
+  },
+  responsive: {
+    ThemeTwo: "ThemeTwo",
+    mobile: {
+      ThemeTwo: "ThemeTwo",
+      textOrder: 2,
+      imageOrder: 1,
+      textWidth: "w-full",
+      imageWidth: "w-full",
+      imageHeight: "h-[200px]",
+    },
+    desktop: {
+      ThemeTwo: "ThemeTwo",
+      textOrder: 1,
+      imageOrder: 2,
+      textWidth: "md:w-[60%]",
+      imageWidth: "md:w-[40%]",
+      imageHeight: "md:h-auto",
+    },
+  },
+});
+
 export const halfTextHalfImageFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     // Log the function call
@@ -337,6 +489,16 @@ export const halfTextHalfImageFunctions = {
       } else if (variantId === "halfTextHalfImage3") {
         defaultData = getDefaultHalfTextHalfImage3Data();
         logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage3", {
+          defaultData: defaultData,
+        });
+      } else if (variantId === "halfTextHalfImage4") {
+        defaultData = getDefaultHalfTextHalfImage4Data();
+        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage4", {
+          defaultData: defaultData,
+        });
+      } else if (variantId === "halfTextHalfImage5") {
+        defaultData = getDefaultHalfTextHalfImage5Data();
+        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage5", {
           defaultData: defaultData,
         });
       } else {
