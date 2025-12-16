@@ -102,7 +102,7 @@ Cursor: [Follows patterns from .cursorrules] → Updates correctly
 ### **Method 2: Reference Docs Explicitly**
 
 ```
-You: "Create gallery component following @ADD_NEW_COMPONENT.md"
+You: "Create gallery component following @docs/important/components/ADD_NEW_COMPONENT.md"
 Cursor: [Uses specific guide] → Creates with all steps
 
 You: "Fix pricing using @FIX_COMPONENT_PROMPT.md"

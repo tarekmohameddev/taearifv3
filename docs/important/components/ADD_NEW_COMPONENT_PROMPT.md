@@ -9,7 +9,7 @@ Copy-paste these prompts directly into Cursor AI to automatically create new com
 ## 📋 Prompt Template 1: Simple Component (Single Variant)
 
 ```
-Create a new component called "{COMPONENT_NAME}" following the guide in @ADD_NEW_COMPONENT.md
+Create a new component called "{COMPONENT_NAME}" following the guide in @docs/important/components/ADD_NEW_COMPONENT.md
 
 Component Details:
 - Type: {COMPONENT_NAME}
@@ -63,7 +63,7 @@ Reference these files for examples:
 ## 📋 Prompt Template 2: Complex Component (Multiple Variants)
 
 ```
-Create a new component called "{COMPONENT_NAME}" with MULTIPLE variants following @ADD_NEW_COMPONENT.md
+Create a new component called "{COMPONENT_NAME}" with MULTIPLE variants following @docs/important/components/ADD_NEW_COMPONENT.md
 
 Component Details:
 - Type: {COMPONENT_NAME}
@@ -96,7 +96,7 @@ Reference these multi-variant examples:
 ## 📋 Prompt Template 3: Component with Array/List Items
 
 ```
-Create a new component called "{COMPONENT_NAME}" with ARRAY of items following @ADD_NEW_COMPONENT.md
+Create a new component called "{COMPONENT_NAME}" with ARRAY of items following @docs/important/components/ADD_NEW_COMPONENT.md
 
 Component Details:
 - Type: {COMPONENT_NAME}
@@ -150,7 +150,7 @@ Reference these array-based examples:
 ## 📋 Prompt Template 4: Form/Input Component
 
 ```
-Create a new FORM component called "{COMPONENT_NAME}" following @ADD_NEW_COMPONENT.md
+Create a new FORM component called "{COMPONENT_NAME}" following @docs/important/components/ADD_NEW_COMPONENT.md
 
 Component Details:
 - Type: {COMPONENT_NAME}
@@ -192,7 +192,7 @@ Reference this form example:
 ## 📋 Prompt Template 5: Global Component (Header/Footer Style)
 
 ```
-Create a new GLOBAL component called "{COMPONENT_NAME}" following @ADD_NEW_COMPONENT.md
+Create a new GLOBAL component called "{COMPONENT_NAME}" following @docs/important/components/ADD_NEW_COMPONENT.md
 
 Component Details:
 - Type: {COMPONENT_NAME}
@@ -231,7 +231,7 @@ Follow Pattern 3 from "Common Patterns" section in the guide.
 ### Prompt for Cursor AI
 
 ```
-Create a new component called "pricing" following the complete guide in @ADD_NEW_COMPONENT.md
+Create a new component called "pricing" following the complete guide in @docs/important/components/ADD_NEW_COMPONENT.md
 
 Component Details:
 - Type: pricing
@@ -317,7 +317,7 @@ STEP 8: Add translations
 - Add to lib/i18n/locales/en.json: "pricing": {"display_name": "Pricing"}
 
 Reference Files:
-@ADD_NEW_COMPONENT.md (main guide)
+@docs/important/components/ADD_NEW_COMPONENT.md (main guide)
 @docs/important/liveEditor/DATABASE_DATA_LOADING.md (database data loading guide)
 @context-liveeditor/editorStoreFunctions/heroFunctions.ts (example functions)
 @componentsStructure/hero.ts (example structure)
@@ -339,7 +339,7 @@ After completion, verify:
 ### Prompt for Cursor AI
 
 ```
-Create a new component called "gallery" with 2 variants following @ADD_NEW_COMPONENT.md
+Create a new component called "gallery" with 2 variants following @docs/important/components/ADD_NEW_COMPONENT.md
 
 Component Details:
 - Type: gallery
@@ -414,11 +414,11 @@ Use `@filename` to attach example files for Cursor to reference
 ### 3. **One Step at a Time (Optional)**
 For complex components, you can break it down:
 ```
-First, create only Step 1: pricingFunctions.ts following @ADD_NEW_COMPONENT.md
+First, create only Step 1: pricingFunctions.ts following @docs/important/components/ADD_NEW_COMPONENT.md
 ```
 Then after reviewing:
 ```
-Now create Step 2: pricing.ts structure following @ADD_NEW_COMPONENT.md
+Now create Step 2: pricing.ts structure following @docs/important/components/ADD_NEW_COMPONENT.md
 ```
 
 ### 4. **Verify After Each Major Step**

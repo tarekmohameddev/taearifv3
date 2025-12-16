@@ -446,7 +446,7 @@ START HERE
 
 ```bash
 # Create new component
-AI: Create component "pricing" using @ADD_NEW_COMPONENT_PROMPT.md
+AI: Create component "pricing" using @docs/important/components/ADD_NEW_COMPONENT_PROMPT.md
 
 # Fix existing component
 AI: Fix component "testimonials" using @FIX_COMPONENT_PROMPT.md

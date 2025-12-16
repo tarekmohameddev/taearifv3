@@ -9,7 +9,7 @@ EXECUTE COMPONENT REPAIR PROTOCOL
 
 Component: {COMPONENT_NAME}
 Reference: @FIX_COMPONENT_PROMPT.md
-Context: @ADD_NEW_COMPONENT.md
+Context: @docs/important/components/ADD_NEW_COMPONENT.md
 
 TASK: Run complete diagnostic (all 7 layers) and repair all detected issues.
 

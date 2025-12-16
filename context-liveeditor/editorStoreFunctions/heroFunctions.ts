@@ -184,6 +184,112 @@ export const getDefaultHero2Data = (): ComponentData => ({
   },
 });
 
+// Default hero3 data structure
+export const getDefaultHero3Data = (): ComponentData => ({
+  visible: true,
+  height: {
+    desktop: "90vh",
+    tablet: "80vh",
+    mobile: "70vh",
+  },
+  minHeight: {
+    desktop: "520px",
+    tablet: "400px",
+    mobile: "300px",
+  },
+  background: {
+    video: "https://youtu.be/ULzl51V38lw?si=iwlRp_cUXmTe50Gc",
+    videoStart: 5,
+    playOnMobile: true,
+    privacyMode: true,
+    alt: "صورة خلفية",
+    overlay: {
+      enabled: true,
+      opacity: "0.45",
+      color: "#000000",
+    },
+  },
+  content: {
+    title: "مع باهية... اجعل حلمك السكني استثمارا يدوم",
+    subtitle: "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم.",
+    font: {
+      title: {
+        family: "Tajawal",
+        size: { desktop: "5xl", tablet: "4xl", mobile: "2xl" },
+        weight: "extrabold",
+        color: "#ffffff",
+        lineHeight: "1.25",
+      },
+      subtitle: {
+        family: "Tajawal",
+        size: { desktop: "md", tablet: "md", mobile: "sm" },
+        weight: "normal",
+        color: "rgba(255, 255, 255, 0.85)",
+      },
+    },
+    alignment: "center",
+    maxWidth: "5xl",
+    paddingTop: "200px",
+  },
+  searchForm: {
+    enabled: true,
+    position: "bottom",
+    offset: "32",
+    background: {
+      color: "#ffffff",
+      opacity: "1",
+      shadow: "2xl",
+      border: "1px solid rgba(0, 0, 0, 0.05)",
+      borderRadius: "lg",
+    },
+    fields: {
+      type: {
+        enabled: true,
+        placeholder: "نوع العقار",
+        icon: "Home",
+        options: ["الكل", "شقق", "فلل", "اراضي", "ادوار", "عمائر", "تاون هاوس", "أبراج"],
+      },
+      city: {
+        enabled: true,
+        placeholder: "موقع العقار",
+        icon: "MapPin",
+        options: ["اختر المدينة", "الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام"],
+      },
+      status: {
+        enabled: true,
+        placeholder: "حالة العقار",
+        icon: "Tag",
+        options: ["بيع / ايجار", "للبيع", "للإيجار"],
+      },
+    },
+    responsive: {
+      desktop: "xl",
+      tablet: "lg",
+      mobile: "md",
+    },
+  },
+  animations: {
+    title: {
+      enabled: true,
+      type: "fade-up",
+      duration: 600,
+      delay: 200,
+    },
+    subtitle: {
+      enabled: true,
+      type: "fade-up",
+      duration: 600,
+      delay: 400,
+    },
+    searchForm: {
+      enabled: true,
+      type: "fade-up",
+      duration: 600,
+      delay: 600,
+    },
+  },
+});
+
 export const heroFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     if (
@@ -195,7 +301,11 @@ export const heroFunctions = {
 
     // تحديد البيانات الافتراضية حسب نوع المكون
     const defaultData =
-      variantId === "hero2" ? getDefaultHero2Data() : getDefaultHeroData();
+      variantId === "hero2"
+        ? getDefaultHero2Data()
+        : variantId === "hero3"
+        ? getDefaultHero3Data()
+        : getDefaultHeroData();
     const data: ComponentData = initial || state.tempData || defaultData;
 
     return {

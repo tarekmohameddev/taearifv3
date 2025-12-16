@@ -66,13 +66,13 @@ docs/important/
 **Quick Commands:**
 ```bash
 # Create component
-@components/ADD_NEW_COMPONENT_PROMPT.md
+@docs/important/components/ADD_NEW_COMPONENT_PROMPT.md
 
 # Fix component
-@components/FIX_COMPONENT_PROMPT.md
+@docs/important/components/FIX_COMPONENT_PROMPT.md
 
 # Quick fix
-@components/FIX_COMPONENT_QUICK_START.md
+@docs/important/components/FIX_COMPONENT_QUICK_START.md
 ```
 
 ---
