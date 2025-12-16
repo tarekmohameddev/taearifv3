@@ -290,6 +290,58 @@ export const getDefaultHero3Data = (): ComponentData => ({
   },
 });
 
+// Default hero4 data structure
+export const getDefaultHero4Data = (): ComponentData => ({
+  ThemeTwo: "ThemeTwo",
+  visible: true,
+  title: "عن باهية العقارية",
+  backgroundImage: "https://dalel-lovat.vercel.app/images/hero.webp",
+  contact: false,
+  background: {
+    ThemeTwo: "ThemeTwo",
+    image: "https://dalel-lovat.vercel.app/images/hero.webp",
+    alt: "صورة خلفية",
+    overlay: {
+      ThemeTwo: "ThemeTwo",
+      enabled: true,
+      opacity: "0.3",
+      color: "#000000",
+    },
+  },
+  content: {
+    ThemeTwo: "ThemeTwo",
+    title: "عن باهية العقارية",
+    alignment: "center",
+    maxWidth: "5xl",
+    font: {
+      ThemeTwo: "ThemeTwo",
+      title: {
+        ThemeTwo: "ThemeTwo",
+        family: "Tajawal",
+        size: {
+          ThemeTwo: "ThemeTwo",
+          desktop: "4xl",
+          tablet: "3xl",
+          mobile: "2xl",
+        },
+        weight: "bold",
+        color: "#ffffff",
+        lineHeight: "1.25",
+      },
+    },
+  },
+  animations: {
+    ThemeTwo: "ThemeTwo",
+    title: {
+      ThemeTwo: "ThemeTwo",
+      enabled: true,
+      type: "fade-up",
+      duration: 600,
+      delay: 200,
+    },
+  },
+});
+
 export const heroFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     if (
@@ -305,6 +357,8 @@ export const heroFunctions = {
         ? getDefaultHero2Data()
         : variantId === "hero3"
         ? getDefaultHero3Data()
+        : variantId === "hero4"
+        ? getDefaultHero4Data()
         : getDefaultHeroData();
     const data: ComponentData = initial || state.tempData || defaultData;
 
