@@ -912,19 +912,19 @@ export function EditorSidebar({
                         className="w-full"
                       />
                     ) : (
-                      <ThemeSelector
-                        componentType={selectedComponent.type}
-                        currentTheme={selectedComponent.componentName}
-                        onThemeChange={(newTheme) => {
-                          if (onComponentThemeChange && selectedComponent) {
-                            onComponentThemeChange(
-                              selectedComponent.id,
-                              newTheme,
-                            );
-                          }
-                        }}
-                        className="w-full"
-                      />
+                    <ThemeSelector
+                      componentType={selectedComponent.type}
+                      currentTheme={selectedComponent.componentName}
+                      onThemeChange={(newTheme) => {
+                        if (onComponentThemeChange && selectedComponent) {
+                          onComponentThemeChange(
+                            selectedComponent.id,
+                            newTheme,
+                          );
+                        }
+                      }}
+                      className="w-full"
+                    />
                     )}
 
                     <div className="pt-2 border-t border-purple-200/50">
