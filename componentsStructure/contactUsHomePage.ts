@@ -14,27 +14,14 @@ export const contactUsHomePageStructure: ComponentStructure = {
           key: "visible", 
           label: "Visible", 
           type: "boolean" 
-        },
-        { 
-          key: "ThemeTwo", 
-          label: "Theme Two", 
-          type: "text" 
-        },
-        
-        // ═══════════════════════════════════════════════════════════
+        },// ═══════════════════════════════════════════════════════════
         // BACKGROUND CONFIGURATION
         // ═══════════════════════════════════════════════════════════
         {
           key: "background",
           label: "Background",
           type: "object",
-          fields: [
-            { 
-              key: "ThemeTwo", 
-              label: "Theme Two", 
-              type: "text" 
-            },
-            {
+          fields: [{
               key: "image",
               label: "Background Image",
               type: "image",
@@ -50,13 +37,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
               key: "overlay",
               label: "Overlay",
               type: "object",
-              fields: [
-                { 
-                  key: "ThemeTwo", 
-                  label: "Theme Two", 
-                  type: "text" 
-                },
-                {
+              fields: [{
                   key: "enabled",
                   label: "Enabled",
                   type: "boolean"
@@ -79,13 +60,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
           key: "header",
           label: "Header Text",
           type: "object",
-          fields: [
-            { 
-              key: "ThemeTwo", 
-              label: "Theme Two", 
-              type: "text" 
-            },
-            {
+          fields: [{
               key: "text",
               label: "Header Text",
               type: "textarea",
@@ -101,23 +76,11 @@ export const contactUsHomePageStructure: ComponentStructure = {
           key: "form",
           label: "Form Configuration",
           type: "object",
-          fields: [
-            { 
-              key: "ThemeTwo", 
-              label: "Theme Two", 
-              type: "text" 
-            },
-            {
+          fields: [{
               key: "submitButton",
               label: "Submit Button",
               type: "object",
-              fields: [
-                { 
-                  key: "ThemeTwo", 
-                  label: "Theme Two", 
-                  type: "text" 
-                },
-                {
+              fields: [{
                   key: "text",
                   label: "Button Text",
                   type: "text",
@@ -153,23 +116,11 @@ export const contactUsHomePageStructure: ComponentStructure = {
               key: "fields",
               label: "Form Fields",
               type: "object",
-              fields: [
-                { 
-                  key: "ThemeTwo", 
-                  label: "Theme Two", 
-                  type: "text" 
-                },
-                {
+              fields: [{
                   key: "fullName",
                   label: "Full Name Field",
                   type: "object",
-                  fields: [
-                    { 
-                      key: "ThemeTwo", 
-                      label: "Theme Two", 
-                      type: "text" 
-                    },
-                    { key: "label", label: "Label", type: "text" },
+                  fields: [{ key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" }
@@ -179,13 +130,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
                   key: "whatsappNumber",
                   label: "WhatsApp Number Field",
                   type: "object",
-                  fields: [
-                    { 
-                      key: "ThemeTwo", 
-                      label: "Theme Two", 
-                      type: "text" 
-                    },
-                    { key: "label", label: "Label", type: "text" },
+                  fields: [{ key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" }
@@ -195,13 +140,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
                   key: "email",
                   label: "Email Field",
                   type: "object",
-                  fields: [
-                    { 
-                      key: "ThemeTwo", 
-                      label: "Theme Two", 
-                      type: "text" 
-                    },
-                    { key: "label", label: "Label", type: "text" },
+                  fields: [{ key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" }
@@ -211,13 +150,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
                   key: "paymentMethod",
                   label: "Payment Method Field",
                   type: "object",
-                  fields: [
-                    { 
-                      key: "ThemeTwo", 
-                      label: "Theme Two", 
-                      type: "text" 
-                    },
-                    { key: "label", label: "Label", type: "text" },
+                  fields: [{ key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" },
@@ -227,13 +160,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
                       type: "array",
                       addLabel: "Add Option",
                       itemLabel: "Option",
-                      of: [
-                        { 
-                          key: "ThemeTwo", 
-                          label: "Theme Two", 
-                          type: "text" 
-                        },
-                        { key: "value", label: "Value", type: "text" },
+                      of: [{ key: "value", label: "Value", type: "text" },
                         { key: "label", label: "Label", type: "text" }
                       ]
                     }
@@ -243,13 +170,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
                   key: "city",
                   label: "City Field",
                   type: "object",
-                  fields: [
-                    { 
-                      key: "ThemeTwo", 
-                      label: "Theme Two", 
-                      type: "text" 
-                    },
-                    { key: "label", label: "Label", type: "text" },
+                  fields: [{ key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" },
@@ -259,13 +180,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
                       type: "array",
                       addLabel: "Add Option",
                       itemLabel: "Option",
-                      of: [
-                        { 
-                          key: "ThemeTwo", 
-                          label: "Theme Two", 
-                          type: "text" 
-                        },
-                        { key: "value", label: "Value", type: "text" },
+                      of: [{ key: "value", label: "Value", type: "text" },
                         { key: "label", label: "Label", type: "text" }
                       ]
                     }
@@ -275,13 +190,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
                   key: "unitType",
                   label: "Unit Type Field",
                   type: "object",
-                  fields: [
-                    { 
-                      key: "ThemeTwo", 
-                      label: "Theme Two", 
-                      type: "text" 
-                    },
-                    { key: "label", label: "Label", type: "text" },
+                  fields: [{ key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" },
@@ -291,13 +200,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
                       type: "array",
                       addLabel: "Add Option",
                       itemLabel: "Option",
-                      of: [
-                        { 
-                          key: "ThemeTwo", 
-                          label: "Theme Two", 
-                          type: "text" 
-                        },
-                        { key: "value", label: "Value", type: "text" },
+                      of: [{ key: "value", label: "Value", type: "text" },
                         { key: "label", label: "Label", type: "text" }
                       ]
                     }
@@ -307,13 +210,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
                   key: "budget",
                   label: "Budget Field",
                   type: "object",
-                  fields: [
-                    { 
-                      key: "ThemeTwo", 
-                      label: "Theme Two", 
-                      type: "text" 
-                    },
-                    { key: "label", label: "Label", type: "text" },
+                  fields: [{ key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" }
@@ -323,13 +220,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
                   key: "message",
                   label: "Message Field",
                   type: "object",
-                  fields: [
-                    { 
-                      key: "ThemeTwo", 
-                      label: "Theme Two", 
-                      type: "text" 
-                    },
-                    { key: "label", label: "Label", type: "text" },
+                  fields: [{ key: "label", label: "Label", type: "text" },
                     { key: "placeholder", label: "Placeholder", type: "text" },
                     { key: "required", label: "Required", type: "boolean" },
                     { key: "type", label: "Type", type: "text" },
@@ -348,13 +239,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
           key: "styling",
           label: "Styling",
           type: "object",
-          fields: [
-            { 
-              key: "ThemeTwo", 
-              label: "Theme Two", 
-              type: "text" 
-            },
-            {
+          fields: [{
               key: "inputBackground",
               label: "Input Background Color",
               type: "color",
@@ -406,13 +291,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
           key: "layout",
           label: "Layout",
           type: "object",
-          fields: [
-            { 
-              key: "ThemeTwo", 
-              label: "Theme Two", 
-              type: "text" 
-            },
-            {
+          fields: [{
               key: "maxWidth",
               label: "Max Width",
               type: "text",
@@ -422,13 +301,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
               key: "padding",
               label: "Padding",
               type: "object",
-              fields: [
-                { 
-                  key: "ThemeTwo", 
-                  label: "Theme Two", 
-                  type: "text" 
-                },
-                {
+              fields: [{
                   key: "mobile",
                   label: "Mobile Padding",
                   type: "text",
@@ -452,13 +325,7 @@ export const contactUsHomePageStructure: ComponentStructure = {
               key: "gap",
               label: "Gap",
               type: "object",
-              fields: [
-                { 
-                  key: "ThemeTwo", 
-                  label: "Theme Two", 
-                  type: "text" 
-                },
-                {
+              fields: [{
                   key: "mobile",
                   label: "Mobile Gap",
                   type: "text",

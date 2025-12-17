@@ -14,29 +14,14 @@ export const propertiesShowcaseStructure: ComponentStructure = {
           key: "visible", 
           label: "Visible", 
           type: "boolean" 
-        },
-        {
-          key: "ThemeTwo",
-          label: "Theme Two",
-          type: "text",
-          placeholder: "propertiesShowcase"
-        },
-        
-        // ═══════════════════════════════════════════════════════════
+        },// ═══════════════════════════════════════════════════════════
         // LAYOUT CONFIGURATION
         // ═══════════════════════════════════════════════════════════
         {
           key: "layout",
           label: "Layout",
           type: "object",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "layout"
-            },
-            {
+          fields: [{
               key: "maxWidth",
               label: "Max Width",
               type: "text",
@@ -46,14 +31,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
               key: "columns",
               label: "Grid Columns",
               type: "object",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "columns"
-                },
-                {
+              fields: [{
                   key: "mobile",
                   label: "Mobile Columns",
                   type: "number",
@@ -83,14 +61,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
               key: "padding",
               label: "Section Padding",
               type: "object",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "padding"
-                },
-                {
+              fields: [{
                   key: "top",
                   label: "Top Padding",
                   type: "text",
@@ -114,14 +85,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
           key: "content",
           label: "Content",
           type: "object",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "content"
-            },
-            {
+          fields: [{
               key: "title",
               label: "Section Title",
               type: "text",
@@ -196,14 +160,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
           type: "array",
           addLabel: "Add Property",
           itemLabel: "Property",
-          of: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "property"
-            },
-            {
+          of: [{
               key: "id",
               label: "Property ID",
               type: "text",
@@ -242,14 +199,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
               key: "area",
               label: "Area",
               type: "object",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "area"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min Area",
                   type: "number",
@@ -267,14 +217,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
               key: "rooms",
               label: "Rooms",
               type: "object",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "rooms"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min Rooms",
                   type: "number",
@@ -298,14 +241,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
               key: "floors",
               label: "Floors",
               type: "object",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "floors"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min Floors",
                   type: "number",
@@ -323,14 +259,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
               key: "price",
               label: "Price",
               type: "object",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "price"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min Price",
                   type: "number",
@@ -348,14 +277,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
               key: "bathrooms",
               label: "Bathrooms",
               type: "object",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "bathrooms"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min Bathrooms",
                   type: "number",
@@ -390,14 +312,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
           key: "styling",
           label: "Styling",
           type: "object",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "styling"
-            },
-            {
+          fields: [{
               key: "backgroundColor",
               label: "Background Color",
               type: "color"
@@ -452,36 +367,15 @@ export const propertiesShowcaseStructure: ComponentStructure = {
           key: "typography",
           label: "Typography",
           type: "object",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "typography"
-            },
-            {
+          fields: [{
               key: "title",
               label: "Title Typography",
               type: "object",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "title"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "object",
-                  fields: [
-                    {
-                      key: "ThemeTwo",
-                      label: "Theme Two",
-                      type: "text",
-                      placeholder: "fontSize"
-                    },
-                    {
+                  fields: [{
                       key: "mobile",
                       label: "Mobile",
                       type: "text",
@@ -525,14 +419,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
           key: "responsive",
           label: "Responsive Breakpoints",
           type: "object",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "responsive"
-            },
-            {
+          fields: [{
               key: "mobileBreakpoint",
               label: "Mobile Breakpoint",
               type: "text",

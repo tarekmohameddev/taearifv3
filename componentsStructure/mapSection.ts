@@ -11,41 +11,24 @@ export const mapSectionStructure: ComponentStructure = {
           key: "visible", 
           label: "Visible", 
           type: "boolean" 
-        },
-        {
-          key: "ThemeTwo",
-          label: "Theme Two",
-          type: "text",
-          placeholder: "ThemeTwo",
-        },
-        {
+        },{
           key: "title",
           label: "Section Title",
           type: "text",
-          placeholder: "ويمكنك أيضا زيارتنا في أي وقت من خلال موقعنا على الخريطة اسفله",
-        },
+          placeholder: "ويمكنك أيضا زيارتنا في أي وقت من خلال موقعنا على الخريطة اسفله"},
         {
           key: "mapUrl",
           label: "Google Maps Embed URL",
           type: "text",
-          placeholder: "https://www.google.com/maps/embed?pb=...",
-        },
+          placeholder: "https://www.google.com/maps/embed?pb=..."},
         {
           key: "styling",
           label: "Styling",
           type: "object",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "ThemeTwo",
-            },
-            {
+          fields: [{
               key: "titleColor",
               label: "Title Color",
-              type: "color",
-            },
+              type: "color"},
             {
               key: "titleSize",
               label: "Title Size",
@@ -55,42 +38,29 @@ export const mapSectionStructure: ComponentStructure = {
                   key: "mobile",
                   label: "Mobile",
                   type: "text",
-                  placeholder: "text-xl",
-                },
+                  placeholder: "text-xl"},
                 {
                   key: "tablet",
                   label: "Tablet",
                   type: "text",
-                  placeholder: "text-2xl",
-                },
+                  placeholder: "text-2xl"},
                 {
                   key: "desktop",
                   label: "Desktop",
                   type: "text",
-                  placeholder: "text-2xl",
-                },
-              ],
-            },
+                  placeholder: "text-2xl"},
+              ]},
             {
               key: "mapHeight",
               label: "Map Height",
               type: "text",
-              placeholder: "400px",
-            },
-          ],
-        },
+              placeholder: "400px"},
+          ]},
         {
           key: "spacing",
           label: "Spacing",
           type: "object",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "ThemeTwo",
-            },
-            {
+          fields: [{
               key: "paddingTop",
               label: "Padding Top",
               type: "object",
@@ -99,22 +69,18 @@ export const mapSectionStructure: ComponentStructure = {
                   key: "mobile",
                   label: "Mobile",
                   type: "text",
-                  placeholder: "pt-12",
-                },
+                  placeholder: "pt-12"},
                 {
                   key: "tablet",
                   label: "Tablet",
                   type: "text",
-                  placeholder: "pt-14",
-                },
+                  placeholder: "pt-14"},
                 {
                   key: "desktop",
                   label: "Desktop",
                   type: "text",
-                  placeholder: "pt-16",
-                },
-              ],
-            },
+                  placeholder: "pt-16"},
+              ]},
             {
               key: "paddingBottom",
               label: "Padding Bottom",
@@ -124,24 +90,19 @@ export const mapSectionStructure: ComponentStructure = {
                   key: "mobile",
                   label: "Mobile",
                   type: "text",
-                  placeholder: "pb-8",
-                },
+                  placeholder: "pb-8"},
                 {
                   key: "tablet",
                   label: "Tablet",
                   type: "text",
-                  placeholder: "pb-10",
-                },
+                  placeholder: "pb-10"},
                 {
                   key: "desktop",
                   label: "Desktop",
                   type: "text",
-                  placeholder: "pb-12",
-                },
-              ],
-            },
-          ],
-        },
+                  placeholder: "pb-12"},
+              ]},
+          ]},
       ],
       
       // ═══════════════════════════════════════════════════════════
@@ -151,8 +112,6 @@ export const mapSectionStructure: ComponentStructure = {
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "title", label: "Title", type: "text" },
         { key: "mapUrl", label: "Map URL", type: "text" },
-      ],
-    },
-  ],
-};
+      ]},
+  ]};
 

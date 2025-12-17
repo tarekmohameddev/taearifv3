@@ -29,12 +29,10 @@ export const headerStructure: ComponentStructure = {
                 { label: "Static", value: "static" },
                 { label: "Sticky", value: "sticky" },
                 { label: "Fixed", value: "fixed" },
-              ],
-            },
+              ]},
             { key: "top", label: "Top (px)", type: "number" },
             { key: "zIndex", label: "Z-Index", type: "number" },
-          ],
-        },
+          ]},
         {
           key: "height",
           label: "Heights",
@@ -43,8 +41,7 @@ export const headerStructure: ComponentStructure = {
             { key: "desktop", label: "Desktop (px)", type: "number" },
             { key: "tablet", label: "Tablet (px)", type: "number" },
             { key: "mobile", label: "Mobile (px)", type: "number" },
-          ],
-        },
+          ]},
         {
           key: "background",
           label: "Background",
@@ -57,14 +54,12 @@ export const headerStructure: ComponentStructure = {
               options: [
                 { label: "Solid", value: "solid" },
                 { label: "Gradient", value: "gradient" },
-              ],
-            },
+              ]},
             {
               key: "opacity",
               label: "Opacity (0-1)",
               type: "text",
-              placeholder: "0.95",
-            },
+              placeholder: "0.95"},
             { key: "blur", label: "Blur (Backdrop)", type: "boolean" },
             {
               key: "colors",
@@ -73,10 +68,8 @@ export const headerStructure: ComponentStructure = {
               fields: [
                 { key: "from", label: "From", type: "color" },
                 { key: "to", label: "To", type: "color" },
-              ],
-            },
-          ],
-        },
+              ]},
+          ]},
         {
           key: "colors",
           label: "Colors",
@@ -137,8 +130,7 @@ export const headerStructure: ComponentStructure = {
               useDefaultColor: true,
               globalColorType: "accent" // Accent uses accent color
             },
-          ],
-        },
+          ]},
         {
           key: "logo",
           label: "Logo",
@@ -152,8 +144,7 @@ export const headerStructure: ComponentStructure = {
                 { label: "Image+Text", value: "image+text" },
                 { label: "Image Only", value: "image" },
                 { label: "Text Only", value: "text" },
-              ],
-            },
+              ]},
             { key: "image", label: "Image URL", type: "image" },
             { key: "text", label: "Text", type: "text" },
             {
@@ -172,10 +163,8 @@ export const headerStructure: ComponentStructure = {
                     { label: "Medium", value: "500" },
                     { label: "Semi Bold", value: "600" },
                     { label: "Bold", value: "bold" },
-                  ],
-                },
-              ],
-            },
+                  ]},
+              ]},
             { key: "url", label: "URL", type: "text" },
             {
               key: "clickAction",
@@ -184,10 +173,8 @@ export const headerStructure: ComponentStructure = {
               options: [
                 { label: "Navigate", value: "navigate" },
                 { label: "None", value: "none" },
-              ],
-            },
-          ],
-        },
+              ]},
+          ]},
         {
           key: "menu",
           label: "Menu Items",
@@ -204,8 +191,7 @@ export const headerStructure: ComponentStructure = {
                 { label: "Mega Menu", value: "mega_menu" },
                 { label: "Dropdown", value: "dropdown" },
                 { label: "Button", value: "button" },
-              ],
-            },
+              ]},
             { key: "text", label: "Text", type: "text" },
             { key: "icon", label: "Icon (name)", type: "text" },
             { key: "url", label: "URL", type: "text" },
@@ -223,10 +209,8 @@ export const headerStructure: ComponentStructure = {
                   fields: [
                     { key: "label", label: "Label Field", type: "text" },
                     { key: "url", label: "URL Pattern", type: "text" },
-                  ],
-                },
-              ],
-            },
+                  ]},
+              ]},
             {
               key: "submenu",
               label: "Submenu",
@@ -241,8 +225,7 @@ export const headerStructure: ComponentStructure = {
                   options: [
                     { label: "Section", value: "section" },
                     { label: "Links", value: "links" },
-                  ],
-                },
+                  ]},
                 { key: "title", label: "Title", type: "text" },
                 {
                   key: "items",
@@ -253,12 +236,9 @@ export const headerStructure: ComponentStructure = {
                   of: [
                     { key: "text", label: "Label", type: "text" },
                     { key: "url", label: "URL", type: "text" },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
+                  ]},
+              ]},
+          ]},
         {
           key: "actions",
           label: "Actions",
@@ -278,8 +258,7 @@ export const headerStructure: ComponentStructure = {
                   options: [
                     { label: "Global", value: "global" },
                     { label: "Products", value: "products" },
-                  ],
-                },
+                  ]},
                 {
                   key: "liveSuggestions",
                   label: "Live Suggestions",
@@ -287,10 +266,8 @@ export const headerStructure: ComponentStructure = {
                   fields: [
                     { key: "enabled", label: "Enabled", type: "boolean" },
                     { key: "api", label: "API", type: "text" },
-                  ],
-                },
-              ],
-            },
+                  ]},
+              ]},
             {
               key: "user",
               label: "User Actions",
@@ -301,15 +278,12 @@ export const headerStructure: ComponentStructure = {
                 {
                   key: "showWishlist",
                   label: "Show Wishlist",
-                  type: "boolean",
-                },
+                  type: "boolean"},
                 {
                   key: "showNotifications",
                   label: "Show Notifications",
-                  type: "boolean",
-                },
-              ],
-            },
+                  type: "boolean"},
+              ]},
             {
               key: "mobile",
               label: "Mobile Menu",
@@ -318,22 +292,17 @@ export const headerStructure: ComponentStructure = {
                 {
                   key: "showLogo",
                   label: "Show Logo in Mobile Menu",
-                  type: "boolean",
-                },
+                  type: "boolean"},
                 {
                   key: "showLanguageToggle",
                   label: "Show Language Toggle",
-                  type: "boolean",
-                },
+                  type: "boolean"},
                 {
                   key: "showSearch",
                   label: "Show Search in Mobile Menu",
-                  type: "boolean",
-                },
-              ],
-            },
-          ],
-        },
+                  type: "boolean"},
+              ]},
+          ]},
         {
           key: "responsive",
           label: "Responsive",
@@ -347,8 +316,7 @@ export const headerStructure: ComponentStructure = {
                 { key: "mobile", label: "Mobile (px)", type: "number" },
                 { key: "tablet", label: "Tablet (px)", type: "number" },
                 { key: "desktop", label: "Desktop (px)", type: "number" },
-              ],
-            },
+              ]},
             {
               key: "mobileMenu",
               label: "Mobile Menu",
@@ -361,14 +329,11 @@ export const headerStructure: ComponentStructure = {
                   options: [
                     { label: "Left", value: "left" },
                     { label: "Right", value: "right" },
-                  ],
-                },
+                  ]},
                 { key: "width", label: "Width (px)", type: "number" },
                 { key: "overlay", label: "Show Overlay", type: "boolean" },
-              ],
-            },
-          ],
-        },
+              ]},
+          ]},
         {
           key: "animations",
           label: "Animations",
@@ -382,8 +347,7 @@ export const headerStructure: ComponentStructure = {
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 { key: "duration", label: "Duration (ms)", type: "number" },
                 { key: "delay", label: "Delay (ms)", type: "number" },
-              ],
-            },
+              ]},
             {
               key: "mobileMenu",
               label: "Mobile Menu",
@@ -392,10 +356,8 @@ export const headerStructure: ComponentStructure = {
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 { key: "duration", label: "Duration (ms)", type: "number" },
                 { key: "easing", label: "Easing", type: "text" },
-              ],
-            },
-          ],
-        },
+              ]},
+          ]},
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
@@ -417,8 +379,7 @@ export const headerStructure: ComponentStructure = {
                 { label: "Mega Menu", value: "mega_menu" },
                 { label: "Dropdown", value: "dropdown" },
                 { label: "Button", value: "button" },
-              ],
-            },
+              ]},
             { key: "text", label: "Text", type: "text" },
             { key: "icon", label: "Icon (name)", type: "text" },
             { key: "url", label: "URL", type: "text" },
@@ -436,10 +397,8 @@ export const headerStructure: ComponentStructure = {
                   fields: [
                     { key: "label", label: "Label Field", type: "text" },
                     { key: "url", label: "URL Pattern", type: "text" },
-                  ],
-                },
-              ],
-            },
+                  ]},
+              ]},
             {
               key: "submenu",
               label: "Submenu",
@@ -454,8 +413,7 @@ export const headerStructure: ComponentStructure = {
                   options: [
                     { label: "Section", value: "section" },
                     { label: "Links", value: "links" },
-                  ],
-                },
+                  ]},
                 { key: "title", label: "Title", type: "text" },
                 {
                   key: "items",
@@ -466,46 +424,22 @@ export const headerStructure: ComponentStructure = {
                   of: [
                     { key: "text", label: "Label", type: "text" },
                     { key: "url", label: "URL", type: "text" },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
+                  ]},
+              ]},
+          ]},
+      ]},
     {
       id: "header2",
       name: "Header 2 - Nav Theme",
-      ThemeTwo: "header2",
       fields: [
         { 
           key: "visible", 
           label: "Visible", 
-          type: "boolean",
-          ThemeTwo: "visible"
-        },
-        {
-          key: "ThemeTwo",
-          label: "Theme Two",
-          type: "text",
-          placeholder: "header2",
-          ThemeTwo: "ThemeTwo"
-        },
-        {
+          type: "boolean"},{
           key: "position",
           label: "Position",
           type: "object",
-          ThemeTwo: "position",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "position",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "type",
               label: "Type",
               type: "select",
@@ -513,149 +447,67 @@ export const headerStructure: ComponentStructure = {
                 { label: "Fixed", value: "fixed" },
                 { label: "Sticky", value: "sticky" },
                 { label: "Static", value: "static" },
-              ],
-              ThemeTwo: "type"
-            },
-            { key: "top", label: "Top (px)", type: "number", ThemeTwo: "top" },
-            { key: "zIndex", label: "Z-Index", type: "number", ThemeTwo: "zIndex" },
-          ],
-        },
+              ]},
+            { key: "top", label: "Top (px)", type: "number"},
+            { key: "zIndex", label: "Z-Index", type: "number"},
+          ]},
         {
           key: "background",
           label: "Background",
           type: "object",
-          ThemeTwo: "background",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "background",
-              ThemeTwo: "ThemeTwo"
-            },
-            { key: "color", label: "Background Color", type: "color", ThemeTwo: "color" },
-            { key: "opacity", label: "Opacity (0-1)", type: "text", placeholder: "1", ThemeTwo: "opacity" },
-          ],
-        },
+          fields: [{ key: "color", label: "Background Color", type: "color"},
+            { key: "opacity", label: "Opacity (0-1)", type: "text", placeholder: "1"},
+          ]},
         {
           key: "logo",
           label: "Logo",
           type: "object",
-          ThemeTwo: "logo",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "logo",
-              ThemeTwo: "ThemeTwo"
-            },
-            { key: "image", label: "Logo Image URL", type: "image", ThemeTwo: "image" },
-            { key: "alt", label: "Alt Text", type: "text", ThemeTwo: "alt" },
-            { key: "url", label: "Logo URL", type: "text", ThemeTwo: "url" },
-            { key: "width", label: "Width (px)", type: "number", ThemeTwo: "width" },
-            { key: "height", label: "Height (px)", type: "number", ThemeTwo: "height" },
-          ],
-        },
+          fields: [{ key: "image", label: "Logo Image URL", type: "image"},
+            { key: "alt", label: "Alt Text", type: "text"},
+            { key: "url", label: "Logo URL", type: "text"},
+            { key: "width", label: "Width (px)", type: "number"},
+            { key: "height", label: "Height (px)", type: "number"},
+          ]},
         {
           key: "links",
           label: "Navigation Links",
           type: "array",
           addLabel: "Add Link",
           itemLabel: "Link",
-          ThemeTwo: "links",
-          of: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "link",
-              ThemeTwo: "ThemeTwo"
-            },
-            { key: "name", label: "Link Text", type: "text", ThemeTwo: "name" },
-            { key: "path", label: "Link Path", type: "text", ThemeTwo: "path" },
-          ],
-        },
+          of: [{ key: "name", label: "Link Text", type: "text"},
+            { key: "path", label: "Link Path", type: "text"},
+          ]},
         {
           key: "actions",
           label: "Actions",
           type: "object",
-          ThemeTwo: "actions",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "actions",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "logout",
               label: "Logout Button",
               type: "object",
-              ThemeTwo: "logout",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "logout",
-                  ThemeTwo: "ThemeTwo"
-                },
-                { key: "enabled", label: "Enabled", type: "boolean", ThemeTwo: "enabled" },
-                { key: "text", label: "Button Text", type: "text", ThemeTwo: "text" },
-                { key: "showWhenLoggedIn", label: "Show When Logged In", type: "boolean", ThemeTwo: "showWhenLoggedIn" },
-              ],
-            },
+              fields: [{ key: "enabled", label: "Enabled", type: "boolean"},
+                { key: "text", label: "Button Text", type: "text"},
+                { key: "showWhenLoggedIn", label: "Show When Logged In", type: "boolean"},
+              ]},
             {
               key: "languageToggle",
               label: "Language Toggle",
               type: "object",
-              ThemeTwo: "languageToggle",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "languageToggle",
-                  ThemeTwo: "ThemeTwo"
-                },
-                { key: "enabled", label: "Enabled", type: "boolean", ThemeTwo: "enabled" },
+              fields: [{ key: "enabled", label: "Enabled", type: "boolean"},
                 {
                   key: "text",
                   label: "Language Text",
                   type: "object",
-                  ThemeTwo: "text",
-                  fields: [
-                    {
-                      key: "ThemeTwo",
-                      label: "Theme Two",
-                      type: "text",
-                      placeholder: "text",
-                      ThemeTwo: "ThemeTwo"
-                    },
-                    { key: "ar", label: "Arabic Text", type: "text", ThemeTwo: "ar" },
-                    { key: "en", label: "English Text", type: "text", ThemeTwo: "en" },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
+                  fields: [{ key: "ar", label: "Arabic Text", type: "text"},
+                    { key: "en", label: "English Text", type: "text"},
+                  ]},
+              ]},
+          ]},
         {
           key: "mobileMenu",
           label: "Mobile Menu",
           type: "object",
-          ThemeTwo: "mobileMenu",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "mobileMenu",
-              ThemeTwo: "ThemeTwo"
-            },
-            { key: "enabled", label: "Enabled", type: "boolean", ThemeTwo: "enabled" },
+          fields: [{ key: "enabled", label: "Enabled", type: "boolean"},
             {
               key: "side",
               label: "Side",
@@ -663,143 +515,76 @@ export const headerStructure: ComponentStructure = {
               options: [
                 { label: "Left", value: "left" },
                 { label: "Right", value: "right" },
-              ],
-              ThemeTwo: "side"
-            },
-            { key: "width", label: "Width (px)", type: "number", ThemeTwo: "width" },
-            { key: "backgroundColor", label: "Background Color", type: "color", ThemeTwo: "backgroundColor" },
-            { key: "showLogo", label: "Show Logo", type: "boolean", ThemeTwo: "showLogo" },
-            { key: "showLanguageToggle", label: "Show Language Toggle", type: "boolean", ThemeTwo: "showLanguageToggle" },
-            { key: "showLogout", label: "Show Logout", type: "boolean", ThemeTwo: "showLogout" },
-          ],
-        },
+              ]},
+            { key: "width", label: "Width (px)", type: "number"},
+            { key: "backgroundColor", label: "Background Color", type: "color"},
+            { key: "showLogo", label: "Show Logo", type: "boolean"},
+            { key: "showLanguageToggle", label: "Show Language Toggle", type: "boolean"},
+            { key: "showLogout", label: "Show Logout", type: "boolean"},
+          ]},
         {
           key: "styling",
           label: "Styling",
           type: "object",
-          ThemeTwo: "styling",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "styling",
-              ThemeTwo: "ThemeTwo"
-            },
-            { key: "linkColor", label: "Link Color", type: "color", ThemeTwo: "linkColor" },
-            { key: "linkHoverColor", label: "Link Hover Color", type: "color", ThemeTwo: "linkHoverColor" },
-            { key: "linkActiveColor", label: "Link Active Color", type: "color", ThemeTwo: "linkActiveColor" },
-            { key: "menuIconColor", label: "Menu Icon Color", type: "color", ThemeTwo: "menuIconColor" },
-            { key: "mobileLinkColor", label: "Mobile Link Color", type: "color", ThemeTwo: "mobileLinkColor" },
-            { key: "mobileLinkActiveColor", label: "Mobile Link Active Color", type: "color", ThemeTwo: "mobileLinkActiveColor" },
-            { key: "logoutButtonColor", label: "Logout Button Color", type: "color", ThemeTwo: "logoutButtonColor" },
-            { key: "logoutButtonHoverBg", label: "Logout Button Hover Background", type: "color", ThemeTwo: "logoutButtonHoverBg" },
-            { key: "languageButtonColor", label: "Language Button Color", type: "color", ThemeTwo: "languageButtonColor" },
-            { key: "languageButtonHoverColor", label: "Language Button Hover Color", type: "color", ThemeTwo: "languageButtonHoverColor" },
-          ],
-        },
+          fields: [{ key: "linkColor", label: "Link Color", type: "color"},
+            { key: "linkHoverColor", label: "Link Hover Color", type: "color"},
+            { key: "linkActiveColor", label: "Link Active Color", type: "color"},
+            { key: "menuIconColor", label: "Menu Icon Color", type: "color"},
+            { key: "mobileLinkColor", label: "Mobile Link Color", type: "color"},
+            { key: "mobileLinkActiveColor", label: "Mobile Link Active Color", type: "color"},
+            { key: "logoutButtonColor", label: "Logout Button Color", type: "color"},
+            { key: "logoutButtonHoverBg", label: "Logout Button Hover Background", type: "color"},
+            { key: "languageButtonColor", label: "Language Button Color", type: "color"},
+            { key: "languageButtonHoverColor", label: "Language Button Hover Color", type: "color"},
+          ]},
         {
           key: "responsive",
           label: "Responsive",
           type: "object",
-          ThemeTwo: "responsive",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "responsive",
-              ThemeTwo: "ThemeTwo"
-            },
-            { key: "mobileBreakpoint", label: "Mobile Breakpoint (px)", type: "number", ThemeTwo: "mobileBreakpoint" },
-            { key: "containerMaxWidth", label: "Container Max Width", type: "text", ThemeTwo: "containerMaxWidth" },
+          fields: [{ key: "mobileBreakpoint", label: "Mobile Breakpoint (px)", type: "number"},
+            { key: "containerMaxWidth", label: "Container Max Width", type: "text"},
             {
               key: "padding",
               label: "Padding",
               type: "object",
-              ThemeTwo: "padding",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "padding",
-                  ThemeTwo: "ThemeTwo"
-                },
-                { key: "horizontal", label: "Horizontal Padding", type: "text", ThemeTwo: "horizontal" },
-              ],
-            },
-          ],
-        },
+              fields: [{ key: "horizontal", label: "Horizontal Padding", type: "text"},
+              ]},
+          ]},
         {
           key: "animations",
           label: "Animations",
           type: "object",
-          ThemeTwo: "animations",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "animations",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "logo",
               label: "Logo Animation",
               type: "object",
-              ThemeTwo: "logo",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "logo",
-                  ThemeTwo: "ThemeTwo"
-                },
-                { key: "enabled", label: "Enabled", type: "boolean", ThemeTwo: "enabled" },
-                { key: "duration", label: "Duration (s)", type: "number", ThemeTwo: "duration" },
-                { key: "delay", label: "Delay (s)", type: "number", ThemeTwo: "delay" },
-              ],
-            },
+              fields: [{ key: "enabled", label: "Enabled", type: "boolean"},
+                { key: "duration", label: "Duration (s)", type: "number"},
+                { key: "delay", label: "Delay (s)", type: "number"},
+              ]},
             {
               key: "menuItems",
               label: "Menu Items Animation",
               type: "object",
-              ThemeTwo: "menuItems",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "menuItems",
-                  ThemeTwo: "ThemeTwo"
-                },
-                { key: "enabled", label: "Enabled", type: "boolean", ThemeTwo: "enabled" },
-                { key: "duration", label: "Duration (s)", type: "number", ThemeTwo: "duration" },
-                { key: "delay", label: "Delay (s)", type: "number", ThemeTwo: "delay" },
-                { key: "stagger", label: "Stagger (s)", type: "number", ThemeTwo: "stagger" },
-              ],
-            },
-          ],
-        },
+              fields: [{ key: "enabled", label: "Enabled", type: "boolean"},
+                { key: "duration", label: "Duration (s)", type: "number"},
+                { key: "delay", label: "Delay (s)", type: "number"},
+                { key: "stagger", label: "Stagger (s)", type: "number"},
+              ]},
+          ]},
       ],
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean", ThemeTwo: "visible" },
-        { key: "logo.image", label: "Logo Image", type: "image", ThemeTwo: "logo.image" },
+        { key: "visible", label: "Visible", type: "boolean"},
+        { key: "logo.image", label: "Logo Image", type: "image"},
         {
           key: "links",
           label: "Navigation Links",
           type: "array",
-          ThemeTwo: "links",
           addLabel: "Add Link",
           itemLabel: "Link",
           of: [
-            { key: "name", label: "Link Text", type: "text", ThemeTwo: "name" },
-            { key: "path", label: "Link Path", type: "text", ThemeTwo: "path" },
-          ],
-        },
-      ],
-    },
-  ],
-};
+            { key: "name", label: "Link Text", type: "text"},
+            { key: "path", label: "Link Path", type: "text"},
+          ]},
+      ]},
+  ]};

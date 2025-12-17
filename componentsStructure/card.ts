@@ -2,12 +2,10 @@ import { ComponentStructure } from "./types";
 
 export const cardStructure: ComponentStructure = {
   componentType: "card",
-  ThemeTwo: "card",
   variants: [
     {
       id: "card4",
       name: "Card 4 - Property Card",
-      ThemeTwo: "card4",
       fields: [
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
@@ -15,239 +13,136 @@ export const cardStructure: ComponentStructure = {
         { 
           key: "visible", 
           label: "Visible", 
-          type: "boolean",
-          ThemeTwo: "visible"
-        },
-        {
-          key: "ThemeTwo",
-          label: "Theme Two",
-          type: "text",
-          placeholder: "card4",
-          ThemeTwo: "ThemeTwo"
-        },
-        
-        // ═══════════════════════════════════════════════════════════
+          type: "boolean"},// ═══════════════════════════════════════════════════════════
         // PROPERTY DATA
         // ═══════════════════════════════════════════════════════════
         {
           key: "property",
           label: "Property",
           type: "object",
-          ThemeTwo: "property",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "property",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "id",
               label: "Property ID",
               type: "text",
-              placeholder: "1",
-              ThemeTwo: "id"
-            },
+              placeholder: "1"},
             {
               key: "image",
               label: "Image URL",
-              type: "image",
-              ThemeTwo: "image"
-            },
+              type: "image"},
             {
               key: "title",
               label: "Property Title",
               type: "text",
-              placeholder: "مشروع سكني فاخر",
-              ThemeTwo: "title"
-            },
+              placeholder: "مشروع سكني فاخر"},
             {
               key: "city",
               label: "City",
               type: "text",
-              placeholder: "الرياض",
-              ThemeTwo: "city"
-            },
+              placeholder: "الرياض"},
             {
               key: "district",
               label: "District",
               type: "text",
-              placeholder: "حي النرجس",
-              ThemeTwo: "district"
-            },
+              placeholder: "حي النرجس"},
             {
               key: "status",
               label: "Status",
               type: "text",
-              placeholder: "للبيع",
-              ThemeTwo: "status"
-            },
+              placeholder: "للبيع"},
             {
               key: "area",
               label: "Area (m²)",
               type: "object",
-              ThemeTwo: "area",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "area",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min",
                   type: "number",
-                  placeholder: "150",
-                  ThemeTwo: "min"
-                },
+                  placeholder: "150"},
                 {
                   key: "max",
                   label: "Max",
                   type: "number",
-                  placeholder: "300",
-                  ThemeTwo: "max"
-                }
+                  placeholder: "300"}
               ]
             },
             {
               key: "rooms",
               label: "Rooms",
               type: "object",
-              ThemeTwo: "rooms",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "rooms",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min",
                   type: "number",
-                  placeholder: "3",
-                  ThemeTwo: "min"
-                },
+                  placeholder: "3"},
                 {
                   key: "max",
                   label: "Max",
                   type: "number",
-                  placeholder: "5",
-                  ThemeTwo: "max"
-                }
+                  placeholder: "5"}
               ]
             },
             {
               key: "units",
               label: "Units",
               type: "number",
-              placeholder: "50",
-              ThemeTwo: "units"
-            },
+              placeholder: "50"},
             {
               key: "floors",
               label: "Floors",
               type: "object",
-              ThemeTwo: "floors",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "floors",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min",
                   type: "number",
-                  placeholder: "3",
-                  ThemeTwo: "min"
-                },
+                  placeholder: "3"},
                 {
                   key: "max",
                   label: "Max",
                   type: "number",
-                  placeholder: "5",
-                  ThemeTwo: "max"
-                }
+                  placeholder: "5"}
               ]
             },
             {
               key: "price",
               label: "Price (SAR)",
               type: "object",
-              ThemeTwo: "price",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "price",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min",
                   type: "number",
-                  placeholder: "500000",
-                  ThemeTwo: "min"
-                },
+                  placeholder: "500000"},
                 {
                   key: "max",
                   label: "Max",
                   type: "number",
-                  placeholder: "1500000",
-                  ThemeTwo: "max"
-                }
+                  placeholder: "1500000"}
               ]
             },
             {
               key: "bathrooms",
               label: "Bathrooms",
               type: "object",
-              ThemeTwo: "bathrooms",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "bathrooms",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min",
                   type: "number",
-                  placeholder: "2",
-                  ThemeTwo: "min"
-                },
+                  placeholder: "2"},
                 {
                   key: "max",
                   label: "Max",
                   type: "number",
-                  placeholder: "4",
-                  ThemeTwo: "max"
-                }
+                  placeholder: "4"}
               ]
             },
             {
               key: "featured",
               label: "Featured",
-              type: "boolean",
-              ThemeTwo: "featured"
-            },
+              type: "boolean"},
             {
               key: "url",
               label: "URL",
               type: "text",
-              placeholder: "#",
-              ThemeTwo: "url"
-            }
+              placeholder: "#"}
           ]
         },
         
@@ -258,162 +153,105 @@ export const cardStructure: ComponentStructure = {
           key: "styling",
           label: "Styling",
           type: "object",
-          ThemeTwo: "styling",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "styling",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "cardBackgroundColor",
               label: "Card Background Color",
-              type: "color",
-              ThemeTwo: "cardBackgroundColor"
-            },
+              type: "color"},
             {
               key: "cardBorderRadius",
               label: "Card Border Radius",
               type: "text",
-              placeholder: "20px",
-              ThemeTwo: "cardBorderRadius"
-            },
+              placeholder: "20px"},
             {
               key: "cardShadow",
               label: "Card Shadow",
               type: "text",
-              placeholder: "sm",
-              ThemeTwo: "cardShadow"
-            },
+              placeholder: "sm"},
             {
               key: "cardHoverShadow",
               label: "Card Hover Shadow",
               type: "text",
-              placeholder: "md",
-              ThemeTwo: "cardHoverShadow"
-            },
+              placeholder: "md"},
             {
               key: "featuredBadgeBackground",
               label: "Featured Badge Background",
-              type: "color",
-              ThemeTwo: "featuredBadgeBackground"
-            },
+              type: "color"},
             {
               key: "featuredBadgeTextColor",
               label: "Featured Badge Text Color",
-              type: "color",
-              ThemeTwo: "featuredBadgeTextColor"
-            },
+              type: "color"},
             {
               key: "titleColor",
               label: "Title Color",
-              type: "color",
-              ThemeTwo: "titleColor"
-            },
+              type: "color"},
             {
               key: "cityDistrictColor",
               label: "City/District Color",
-              type: "color",
-              ThemeTwo: "cityDistrictColor"
-            },
+              type: "color"},
             {
               key: "statusColor",
               label: "Status Color",
-              type: "color",
-              ThemeTwo: "statusColor"
-            },
+              type: "color"},
             {
               key: "dividerColor",
               label: "Divider Color",
-              type: "color",
-              ThemeTwo: "dividerColor"
-            },
+              type: "color"},
             {
               key: "areaIconColor",
               label: "Area Icon Color",
-              type: "color",
-              ThemeTwo: "areaIconColor"
-            },
+              type: "color"},
             {
               key: "areaTextColor",
               label: "Area Text Color",
-              type: "color",
-              ThemeTwo: "areaTextColor"
-            },
+              type: "color"},
             {
               key: "areaLabelColor",
               label: "Area Label Color",
-              type: "color",
-              ThemeTwo: "areaLabelColor"
-            },
+              type: "color"},
             {
               key: "roomsIconColor",
               label: "Rooms Icon Color",
-              type: "color",
-              ThemeTwo: "roomsIconColor"
-            },
+              type: "color"},
             {
               key: "roomsTextColor",
               label: "Rooms Text Color",
-              type: "color",
-              ThemeTwo: "roomsTextColor"
-            },
+              type: "color"},
             {
               key: "roomsLabelColor",
               label: "Rooms Label Color",
-              type: "color",
-              ThemeTwo: "roomsLabelColor"
-            },
+              type: "color"},
             {
               key: "unitsIconColor",
               label: "Units Icon Color",
-              type: "color",
-              ThemeTwo: "unitsIconColor"
-            },
+              type: "color"},
             {
               key: "unitsTextColor",
               label: "Units Text Color",
-              type: "color",
-              ThemeTwo: "unitsTextColor"
-            },
+              type: "color"},
             {
               key: "unitsLabelColor",
               label: "Units Label Color",
-              type: "color",
-              ThemeTwo: "unitsLabelColor"
-            },
+              type: "color"},
             {
               key: "floorsIconColor",
               label: "Floors Icon Color",
-              type: "color",
-              ThemeTwo: "floorsIconColor"
-            },
+              type: "color"},
             {
               key: "floorsTextColor",
               label: "Floors Text Color",
-              type: "color",
-              ThemeTwo: "floorsTextColor"
-            },
+              type: "color"},
             {
               key: "floorsLabelColor",
               label: "Floors Label Color",
-              type: "color",
-              ThemeTwo: "floorsLabelColor"
-            },
+              type: "color"},
             {
               key: "priceBackgroundColor",
               label: "Price Background Color",
-              type: "color",
-              ThemeTwo: "priceBackgroundColor"
-            },
+              type: "color"},
             {
               key: "priceTextColor",
               label: "Price Text Color",
-              type: "color",
-              ThemeTwo: "priceTextColor"
-            }
+              type: "color"}
           ]
         },
         
@@ -424,229 +262,130 @@ export const cardStructure: ComponentStructure = {
           key: "typography",
           label: "Typography",
           type: "object",
-          ThemeTwo: "typography",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "typography",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "title",
               label: "Title Typography",
               type: "object",
-              ThemeTwo: "title",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "title",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "xl",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "xl"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "bold",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "bold"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "cityDistrict",
               label: "City/District Typography",
               type: "object",
-              ThemeTwo: "cityDistrict",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "cityDistrict",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "sm",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "sm"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "normal",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "normal"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "status",
               label: "Status Typography",
               type: "object",
-              ThemeTwo: "status",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "status",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "lg",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "lg"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "semibold",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "semibold"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "detailLabel",
               label: "Detail Label Typography",
               type: "object",
-              ThemeTwo: "detailLabel",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "detailLabel",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "xs",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "xs"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "normal",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "normal"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "detailValue",
               label: "Detail Value Typography",
               type: "object",
-              ThemeTwo: "detailValue",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "detailValue",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "sm",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "sm"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "medium",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "medium"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "price",
               label: "Price Typography",
               type: "object",
-              ThemeTwo: "price",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "price",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "base",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "base"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "medium",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "medium"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             }
           ]
@@ -659,49 +398,25 @@ export const cardStructure: ComponentStructure = {
           key: "responsive",
           label: "Responsive",
           type: "object",
-          ThemeTwo: "responsive",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "responsive",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "imageHeight",
               label: "Image Height",
               type: "object",
-              ThemeTwo: "imageHeight",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "imageHeight",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "mobile",
                   label: "Mobile",
                   type: "text",
-                  placeholder: "250px",
-                  ThemeTwo: "mobile"
-                },
+                  placeholder: "250px"},
                 {
                   key: "tablet",
                   label: "Tablet",
                   type: "text",
-                  placeholder: "300px",
-                  ThemeTwo: "tablet"
-                },
+                  placeholder: "300px"},
                 {
                   key: "desktop",
                   label: "Desktop",
                   type: "text",
-                  placeholder: "337px",
-                  ThemeTwo: "desktop"
-                }
+                  placeholder: "337px"}
               ]
             }
           ]
@@ -712,18 +427,17 @@ export const cardStructure: ComponentStructure = {
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean", ThemeTwo: "visible" },
-        { key: "property.title", label: "Property Title", type: "text", ThemeTwo: "title" },
-        { key: "property.city", label: "City", type: "text", ThemeTwo: "city" },
-        { key: "property.district", label: "District", type: "text", ThemeTwo: "district" },
-        { key: "property.status", label: "Status", type: "text", ThemeTwo: "status" },
-        { key: "property.price", label: "Price", type: "object", ThemeTwo: "price" }
+        { key: "visible", label: "Visible", type: "boolean"},
+        { key: "property.title", label: "Property Title", type: "text"},
+        { key: "property.city", label: "City", type: "text"},
+        { key: "property.district", label: "District", type: "text"},
+        { key: "property.status", label: "Status", type: "text"},
+        { key: "property.price", label: "Price", type: "object"}
       ]
     },
     {
       id: "card5",
       name: "Card 5 - Project Card with WhatsApp",
-      ThemeTwo: "card5",
       fields: [
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
@@ -731,225 +445,126 @@ export const cardStructure: ComponentStructure = {
         { 
           key: "visible", 
           label: "Visible", 
-          type: "boolean",
-          ThemeTwo: "visible"
-        },
-        {
-          key: "ThemeTwo",
-          label: "Theme Two",
-          type: "text",
-          placeholder: "card5",
-          ThemeTwo: "ThemeTwo"
-        },
-        
-        // ═══════════════════════════════════════════════════════════
+          type: "boolean"},// ═══════════════════════════════════════════════════════════
         // PROPERTY DATA
         // ═══════════════════════════════════════════════════════════
         {
           key: "property",
           label: "Property",
           type: "object",
-          ThemeTwo: "property",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "property",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "image",
               label: "Image URL",
-              type: "image",
-              ThemeTwo: "image"
-            },
+              type: "image"},
             {
               key: "title",
               label: "Property Title",
               type: "text",
-              placeholder: "مشروع سكني فاخر",
-              ThemeTwo: "title"
-            },
+              placeholder: "مشروع سكني فاخر"},
             {
               key: "city",
               label: "City",
               type: "text",
-              placeholder: "الرياض",
-              ThemeTwo: "city"
-            },
+              placeholder: "الرياض"},
             {
               key: "district",
               label: "District",
               type: "text",
-              placeholder: "حي النرجس",
-              ThemeTwo: "district"
-            },
+              placeholder: "حي النرجس"},
             {
               key: "status",
               label: "Status",
               type: "text",
-              placeholder: "للبيع",
-              ThemeTwo: "status"
-            },
+              placeholder: "للبيع"},
             {
               key: "area",
               label: "Area (m²)",
               type: "object",
-              ThemeTwo: "area",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "area",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min",
                   type: "number",
-                  placeholder: "150",
-                  ThemeTwo: "min"
-                },
+                  placeholder: "150"},
                 {
                   key: "max",
                   label: "Max",
                   type: "number",
-                  placeholder: "300",
-                  ThemeTwo: "max"
-                }
+                  placeholder: "300"}
               ]
             },
             {
               key: "rooms",
               label: "Rooms",
               type: "object",
-              ThemeTwo: "rooms",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "rooms",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min",
                   type: "number",
-                  placeholder: "3",
-                  ThemeTwo: "min"
-                },
+                  placeholder: "3"},
                 {
                   key: "max",
                   label: "Max",
                   type: "number",
-                  placeholder: "5",
-                  ThemeTwo: "max"
-                }
+                  placeholder: "5"}
               ]
             },
             {
               key: "floors",
               label: "Floors",
               type: "object",
-              ThemeTwo: "floors",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "floors",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min",
                   type: "number",
-                  placeholder: "3",
-                  ThemeTwo: "min"
-                },
+                  placeholder: "3"},
                 {
                   key: "max",
                   label: "Max",
                   type: "number",
-                  placeholder: "5",
-                  ThemeTwo: "max"
-                }
+                  placeholder: "5"}
               ]
             },
             {
               key: "price",
               label: "Price (SAR)",
               type: "object",
-              ThemeTwo: "price",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "price",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min",
                   type: "number",
-                  placeholder: "500000",
-                  ThemeTwo: "min"
-                },
+                  placeholder: "500000"},
                 {
                   key: "max",
                   label: "Max",
                   type: "number",
-                  placeholder: "1500000",
-                  ThemeTwo: "max"
-                }
+                  placeholder: "1500000"}
               ]
             },
             {
               key: "bathrooms",
               label: "Bathrooms",
               type: "object",
-              ThemeTwo: "bathrooms",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "bathrooms",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "min",
                   label: "Min",
                   type: "number",
-                  placeholder: "2",
-                  ThemeTwo: "min"
-                },
+                  placeholder: "2"},
                 {
                   key: "max",
                   label: "Max",
                   type: "number",
-                  placeholder: "4",
-                  ThemeTwo: "max"
-                }
+                  placeholder: "4"}
               ]
             },
             {
               key: "featured",
               label: "Featured",
-              type: "boolean",
-              ThemeTwo: "featured"
-            },
+              type: "boolean"},
             {
               key: "url",
               label: "URL",
               type: "text",
-              placeholder: "#",
-              ThemeTwo: "url"
-            }
+              placeholder: "#"}
           ]
         },
         
@@ -960,174 +575,113 @@ export const cardStructure: ComponentStructure = {
           key: "styling",
           label: "Styling",
           type: "object",
-          ThemeTwo: "styling",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "styling",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "cardBackgroundColor",
               label: "Card Background Color",
-              type: "color",
-              ThemeTwo: "cardBackgroundColor"
-            },
+              type: "color"},
             {
               key: "cardBorderRadius",
               label: "Card Border Radius",
               type: "text",
-              placeholder: "20px",
-              ThemeTwo: "cardBorderRadius"
-            },
+              placeholder: "20px"},
             {
               key: "cardShadow",
               label: "Card Shadow",
               type: "text",
-              placeholder: "sm",
-              ThemeTwo: "cardShadow"
-            },
+              placeholder: "sm"},
             {
               key: "cardHoverShadow",
               label: "Card Hover Shadow",
               type: "text",
-              placeholder: "md",
-              ThemeTwo: "cardHoverShadow"
-            },
+              placeholder: "md"},
             {
               key: "featuredBadgeBackground",
               label: "Featured Badge Background",
-              type: "color",
-              ThemeTwo: "featuredBadgeBackground"
-            },
+              type: "color"},
             {
               key: "featuredBadgeTextColor",
               label: "Featured Badge Text Color",
-              type: "color",
-              ThemeTwo: "featuredBadgeTextColor"
-            },
+              type: "color"},
             {
               key: "titleColor",
               label: "Title Color",
-              type: "color",
-              ThemeTwo: "titleColor"
-            },
+              type: "color"},
             {
               key: "cityDistrictColor",
               label: "City/District Color",
-              type: "color",
-              ThemeTwo: "cityDistrictColor"
-            },
+              type: "color"},
             {
               key: "statusColor",
               label: "Status Color",
-              type: "color",
-              ThemeTwo: "statusColor"
-            },
+              type: "color"},
             {
               key: "dividerColor",
               label: "Divider Color",
-              type: "color",
-              ThemeTwo: "dividerColor"
-            },
+              type: "color"},
             {
               key: "areaIconColor",
               label: "Area Icon Color",
-              type: "color",
-              ThemeTwo: "areaIconColor"
-            },
+              type: "color"},
             {
               key: "areaTextColor",
               label: "Area Text Color",
-              type: "color",
-              ThemeTwo: "areaTextColor"
-            },
+              type: "color"},
             {
               key: "areaLabelColor",
               label: "Area Label Color",
-              type: "color",
-              ThemeTwo: "areaLabelColor"
-            },
+              type: "color"},
             {
               key: "roomsIconColor",
               label: "Rooms Icon Color",
-              type: "color",
-              ThemeTwo: "roomsIconColor"
-            },
+              type: "color"},
             {
               key: "roomsTextColor",
               label: "Rooms Text Color",
-              type: "color",
-              ThemeTwo: "roomsTextColor"
-            },
+              type: "color"},
             {
               key: "roomsLabelColor",
               label: "Rooms Label Color",
-              type: "color",
-              ThemeTwo: "roomsLabelColor"
-            },
+              type: "color"},
             {
               key: "floorsIconColor",
               label: "Floors Icon Color",
-              type: "color",
-              ThemeTwo: "floorsIconColor"
-            },
+              type: "color"},
             {
               key: "floorsTextColor",
               label: "Floors Text Color",
-              type: "color",
-              ThemeTwo: "floorsTextColor"
-            },
+              type: "color"},
             {
               key: "floorsLabelColor",
               label: "Floors Label Color",
-              type: "color",
-              ThemeTwo: "floorsLabelColor"
-            },
+              type: "color"},
             {
               key: "bathroomsIconColor",
               label: "Bathrooms Icon Color",
-              type: "color",
-              ThemeTwo: "bathroomsIconColor"
-            },
+              type: "color"},
             {
               key: "bathroomsTextColor",
               label: "Bathrooms Text Color",
-              type: "color",
-              ThemeTwo: "bathroomsTextColor"
-            },
+              type: "color"},
             {
               key: "bathroomsLabelColor",
               label: "Bathrooms Label Color",
-              type: "color",
-              ThemeTwo: "bathroomsLabelColor"
-            },
+              type: "color"},
             {
               key: "priceTextColor",
               label: "Price Text Color",
-              type: "color",
-              ThemeTwo: "priceTextColor"
-            },
+              type: "color"},
             {
               key: "whatsappButtonBackground",
               label: "WhatsApp Button Background",
-              type: "color",
-              ThemeTwo: "whatsappButtonBackground"
-            },
+              type: "color"},
             {
               key: "whatsappButtonHoverBackground",
               label: "WhatsApp Button Hover Background",
-              type: "color",
-              ThemeTwo: "whatsappButtonHoverBackground"
-            },
+              type: "color"},
             {
               key: "whatsappButtonTextColor",
               label: "WhatsApp Button Text Color",
-              type: "color",
-              ThemeTwo: "whatsappButtonTextColor"
-            }
+              type: "color"}
           ]
         },
         
@@ -1138,265 +692,151 @@ export const cardStructure: ComponentStructure = {
           key: "typography",
           label: "Typography",
           type: "object",
-          ThemeTwo: "typography",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "typography",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "title",
               label: "Title Typography",
               type: "object",
-              ThemeTwo: "title",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "title",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "xl",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "xl"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "bold",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "bold"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "cityDistrict",
               label: "City/District Typography",
               type: "object",
-              ThemeTwo: "cityDistrict",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "cityDistrict",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "sm",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "sm"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "normal",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "normal"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "status",
               label: "Status Typography",
               type: "object",
-              ThemeTwo: "status",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "status",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "lg",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "lg"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "semibold",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "semibold"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "detailLabel",
               label: "Detail Label Typography",
               type: "object",
-              ThemeTwo: "detailLabel",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "detailLabel",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "xs",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "xs"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "normal",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "normal"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "detailValue",
               label: "Detail Value Typography",
               type: "object",
-              ThemeTwo: "detailValue",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "detailValue",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "sm",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "sm"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "medium",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "medium"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "price",
               label: "Price Typography",
               type: "object",
-              ThemeTwo: "price",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "price",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "base",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "base"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "bold",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "bold"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             },
             {
               key: "whatsappButton",
               label: "WhatsApp Button Typography",
               type: "object",
-              ThemeTwo: "whatsappButton",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "whatsappButton",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "fontSize",
                   label: "Font Size",
                   type: "text",
-                  placeholder: "base",
-                  ThemeTwo: "fontSize"
-                },
+                  placeholder: "base"},
                 {
                   key: "fontWeight",
                   label: "Font Weight",
                   type: "text",
-                  placeholder: "semibold",
-                  ThemeTwo: "fontWeight"
-                },
+                  placeholder: "semibold"},
                 {
                   key: "fontFamily",
                   label: "Font Family",
                   type: "text",
-                  placeholder: "Tajawal",
-                  ThemeTwo: "fontFamily"
-                }
+                  placeholder: "Tajawal"}
               ]
             }
           ]
@@ -1409,49 +849,25 @@ export const cardStructure: ComponentStructure = {
           key: "responsive",
           label: "Responsive",
           type: "object",
-          ThemeTwo: "responsive",
-          fields: [
-            {
-              key: "ThemeTwo",
-              label: "Theme Two",
-              type: "text",
-              placeholder: "responsive",
-              ThemeTwo: "ThemeTwo"
-            },
-            {
+          fields: [{
               key: "imageHeight",
               label: "Image Height",
               type: "object",
-              ThemeTwo: "imageHeight",
-              fields: [
-                {
-                  key: "ThemeTwo",
-                  label: "Theme Two",
-                  type: "text",
-                  placeholder: "imageHeight",
-                  ThemeTwo: "ThemeTwo"
-                },
-                {
+              fields: [{
                   key: "mobile",
                   label: "Mobile",
                   type: "text",
-                  placeholder: "250px",
-                  ThemeTwo: "mobile"
-                },
+                  placeholder: "250px"},
                 {
                   key: "tablet",
                   label: "Tablet",
                   type: "text",
-                  placeholder: "300px",
-                  ThemeTwo: "tablet"
-                },
+                  placeholder: "300px"},
                 {
                   key: "desktop",
                   label: "Desktop",
                   type: "text",
-                  placeholder: "337px",
-                  ThemeTwo: "desktop"
-                }
+                  placeholder: "337px"}
               ]
             }
           ]
@@ -1462,12 +878,12 @@ export const cardStructure: ComponentStructure = {
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean", ThemeTwo: "visible" },
-        { key: "property.title", label: "Property Title", type: "text", ThemeTwo: "title" },
-        { key: "property.city", label: "City", type: "text", ThemeTwo: "city" },
-        { key: "property.district", label: "District", type: "text", ThemeTwo: "district" },
-        { key: "property.status", label: "Status", type: "text", ThemeTwo: "status" },
-        { key: "property.price", label: "Price", type: "object", ThemeTwo: "price" }
+        { key: "visible", label: "Visible", type: "boolean"},
+        { key: "property.title", label: "Property Title", type: "text"},
+        { key: "property.city", label: "City", type: "text"},
+        { key: "property.district", label: "District", type: "text"},
+        { key: "property.status", label: "Status", type: "text"},
+        { key: "property.price", label: "Price", type: "object"}
       ]
     }
   ]

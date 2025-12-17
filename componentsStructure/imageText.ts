@@ -14,15 +14,7 @@ export const imageTextStructure: ComponentStructure = {
           key: "visible", 
           label: "Visible", 
           type: "boolean" 
-        },
-        {
-          key: "ThemeTwo",
-          label: "Theme Two",
-          type: "text",
-          placeholder: "ThemeTwo"
-        },
-        
-        // ═══════════════════════════════════════════════════════════
+        },// ═══════════════════════════════════════════════════════════
         // CONTENT
         // ═══════════════════════════════════════════════════════════
         {
@@ -61,9 +53,7 @@ export const imageTextStructure: ComponentStructure = {
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
-        { key: "ThemeTwo", label: "Theme Two", type: "text" },
-        { key: "backgroundImage", label: "Background Image", type: "image" },
+        { key: "visible", label: "Visible", type: "boolean" },{ key: "backgroundImage", label: "Background Image", type: "image" },
         { key: "title", label: "Title", type: "text" },
         { key: "paragraph", label: "Paragraph", type: "textarea" },
         { key: "blockquote", label: "Blockquote", type: "textarea" },
