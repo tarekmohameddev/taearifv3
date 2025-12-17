@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { getDefaultPropertiesShowcaseData } from "@/context-liveeditor/editorStoreFunctions/propertiesShowcaseFunctions";
 import { cn } from "@/lib/utils";
+import axiosInstance from "@/lib/axiosInstance";
+import { useTenantId } from "@/hooks/useTenantId";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -112,7 +114,186 @@ interface PropertiesShowcaseProps {
   variant?: string;
   useStore?: boolean;
   id?: string;
+  dataSource?: {
+    apiUrl?: string;
+    enabled?: boolean;
+  };
 }
+
+// ═══════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+// Helper function to convert old API URLs to new format
+const convertLegacyApiUrl = (url: string, tenantId: string): string => {
+  if (url === "/api/properties/latestSales") {
+    return `/v1/tenant-website/${tenantId}/properties?purpose=sale&latest=1&limit=10`;
+  } else if (url === "/api/properties/latestRentals") {
+    return `/v1/tenant-website/${tenantId}/properties?purpose=rent&latest=1&limit=10`;
+  } else if (url === "/api/projects/latestProjects") {
+    return `/v1/tenant-website/${tenantId}/projects?featured=1&limit=10`;
+  }
+  // If it's already the new format with placeholder, replace tenantId
+  return url.replace("{tenantId}", tenantId);
+};
+
+// Helper function to parse price string to number
+const parsePrice = (price: string | number | undefined): number => {
+  if (typeof price === "number") return price;
+  if (typeof price === "string") {
+    // Remove currency symbols and spaces, extract numbers
+    const cleaned = price.replace(/[^\d.-]/g, "");
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+  return 0;
+};
+
+// Helper function to parse area string to number
+const parseArea = (area: string | number | undefined): number => {
+  if (typeof area === "number") return area;
+  if (typeof area === "string") {
+    // Remove units and spaces, extract numbers
+    const cleaned = area.replace(/[^\d.-]/g, "");
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+  return 0;
+};
+
+// Helper function to convert API property to PropertiesShowcase format
+const convertApiPropertyToShowcaseFormat = (property: any): Property => {
+  // Parse price - handle both string and number formats
+  const priceValue = property.price || property.priceRange || "0";
+  const priceNum = parsePrice(priceValue);
+  
+  // Parse area - handle both string and number formats
+  const areaValue = property.area || property.size || "0";
+  const areaNum = parseArea(areaValue);
+  
+  // Parse bedrooms/rooms
+  const bedrooms = property.bedrooms || property.rooms || 0;
+  const bathrooms = property.bathrooms || 0;
+  
+  // Parse location
+  const city = property.city || property.location?.city || property.address?.city || "غير محدد";
+  const district = property.district || property.location?.district || property.address?.district || property.location?.address || "غير محدد";
+  
+  // Parse status
+  const status = property.status || property.transactionType === "rent" ? "للإيجار" : property.transactionType === "sale" ? "للبيع" : "غير محدد";
+  
+  // Parse floors - try to extract from property data
+  const floorsMin = property.floors?.min || property.minFloors || 1;
+  const floorsMax = property.floors?.max || property.maxFloors || property.floors || 1;
+  
+  // Parse units - for properties, usually 1, but can be extracted from data
+  const units = property.units || 1;
+  
+  return {
+    ThemeTwo: "property",
+    id: property.id || property.slug || String(Date.now()),
+    image: property.image || property.images?.[0] || "",
+    title: property.title || "عقار",
+    city: city,
+    district: district,
+    status: status,
+    area: {
+      ThemeTwo: "area",
+      min: areaNum > 0 ? areaNum : 100,
+      max: areaNum > 0 ? areaNum : 200,
+    },
+    rooms: {
+      ThemeTwo: "rooms",
+      min: bedrooms > 0 ? bedrooms : 2,
+      max: bedrooms > 0 ? bedrooms : 4,
+    },
+    units: units,
+    floors: {
+      ThemeTwo: "floors",
+      min: floorsMin,
+      max: floorsMax,
+    },
+    price: {
+      ThemeTwo: "price",
+      min: priceNum > 0 ? priceNum : 100000,
+      max: priceNum > 0 ? priceNum : 500000,
+    },
+    bathrooms: {
+      ThemeTwo: "bathrooms",
+      min: bathrooms > 0 ? bathrooms : 1,
+      max: bathrooms > 0 ? bathrooms : 2,
+    },
+    featured: property.featured || false,
+    url: property.url || property.slug ? `/${property.slug}` : undefined,
+  };
+};
+
+// Helper function to convert API project to PropertiesShowcase format
+const convertApiProjectToShowcaseFormat = (project: any): Property => {
+  // Parse price - projects usually have minPrice and maxPrice
+  const minPrice = parsePrice(project.minPrice);
+  const maxPrice = parsePrice(project.maxPrice);
+  
+  // Parse area - projects might have area range
+  const minArea = parseArea(project.minArea) || 150;
+  const maxArea = parseArea(project.maxArea) || 300;
+  
+  // Parse rooms - projects might have room range
+  const minRooms = project.minRooms || project.minBedrooms || 3;
+  const maxRooms = project.maxRooms || project.maxBedrooms || 5;
+  
+  // Parse floors
+  const floorsMin = project.minFloors || project.floors?.min || 3;
+  const floorsMax = project.maxFloors || project.floors?.max || project.floors || 5;
+  
+  // Parse units
+  const units = project.units || 50;
+  
+  // Parse location
+  const city = project.city || project.location?.city || project.address?.city || "غير محدد";
+  const district = project.district || project.location?.district || project.address?.district || project.location?.address || project.address || "غير محدد";
+  
+  // Parse status
+  const status = project.completeStatus === "1" || project.status === "completed" ? "مكتمل" : "قيد الإنشاء";
+  
+  return {
+    ThemeTwo: "property",
+    id: project.id || project.slug || String(Date.now()),
+    image: project.image || project.images?.[0] || "",
+    title: project.title || "مشروع",
+    city: city,
+    district: district,
+    status: status,
+    area: {
+      ThemeTwo: "area",
+      min: minArea,
+      max: maxArea,
+    },
+    rooms: {
+      ThemeTwo: "rooms",
+      min: minRooms,
+      max: maxRooms,
+    },
+    units: units,
+    floors: {
+      ThemeTwo: "floors",
+      min: floorsMin,
+      max: floorsMax,
+    },
+    price: {
+      ThemeTwo: "price",
+      min: minPrice > 0 ? minPrice : 500000,
+      max: maxPrice > 0 ? maxPrice : 1500000,
+    },
+    bathrooms: {
+      ThemeTwo: "bathrooms",
+      min: 2,
+      max: 4,
+    },
+    featured: project.featured || false,
+    url: project.url || project.slug ? `/${project.slug}` : undefined,
+  };
+};
 
 // SVG Icons
 const AreaIcon = () => (
@@ -328,6 +509,107 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   const fetchTenantData = useTenantStore(s => s.fetchTenantData);
   const tenantId = useTenantStore(s => s.tenantId);
 
+  // Tenant ID hook for API calls
+  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+
+  // State for API data
+  const [apiProperties, setApiProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // ─────────────────────────────────────────────────────────
+  // 2.5. FETCH PROPERTIES FROM API
+  // ─────────────────────────────────────────────────────────
+  const fetchProperties = async (apiUrl?: string) => {
+    try {
+      setLoading(true);
+
+      if (!currentTenantId) {
+        setLoading(false);
+        return;
+      }
+
+      // Convert legacy API URLs to new format and replace tenantId
+      const defaultUrl =
+        "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10";
+      const url = convertLegacyApiUrl(apiUrl || defaultUrl, currentTenantId);
+
+      const response = await axiosInstance.get(url);
+
+      // Handle different API response formats
+      if (response.data) {
+        let dataToSet: Property[] = [];
+
+        // Check if it's projects API response
+        if (url.includes("/projects")) {
+          let projectsData = [];
+
+          if (response.data.projects) {
+            projectsData = response.data.projects;
+          } else if (Array.isArray(response.data)) {
+            projectsData = response.data;
+          } else if (response.data.data && Array.isArray(response.data.data)) {
+            projectsData = response.data.data;
+          }
+
+          // Convert projects to PropertiesShowcase format
+          if (projectsData.length > 0) {
+            dataToSet = projectsData.map((project: any) => {
+              return convertApiProjectToShowcaseFormat(project);
+            });
+          } else {
+            dataToSet = [];
+          }
+        }
+        // Check if it's properties API response
+        else if (response.data.properties) {
+          const propertiesData = response.data.properties;
+          if (Array.isArray(propertiesData) && propertiesData.length > 0) {
+            dataToSet = propertiesData.map((property: any) => {
+              return convertApiPropertyToShowcaseFormat(property);
+            });
+          } else {
+            dataToSet = [];
+          }
+        }
+        // Handle direct array response
+        else if (Array.isArray(response.data)) {
+          // Determine if it's projects or properties based on URL
+          if (url.includes("/projects")) {
+            dataToSet = response.data.map((item: any) => {
+              return convertApiProjectToShowcaseFormat(item);
+            });
+          } else {
+            dataToSet = response.data.map((item: any) => {
+              return convertApiPropertyToShowcaseFormat(item);
+            });
+          }
+        }
+        // Handle pagination wrapper
+        else if (response.data.data && Array.isArray(response.data.data)) {
+          const dataArray = response.data.data;
+          if (url.includes("/projects")) {
+            dataToSet = dataArray.map((item: any) => {
+              return convertApiProjectToShowcaseFormat(item);
+            });
+          } else {
+            dataToSet = dataArray.map((item: any) => {
+              return convertApiPropertyToShowcaseFormat(item);
+            });
+          }
+        }
+
+        setApiProperties(dataToSet);
+      } else {
+        setApiProperties([]);
+      }
+    } catch (error) {
+      // Set empty array on error
+      setApiProperties([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
@@ -407,18 +689,51 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
     ...getDefaultPropertiesShowcaseData(),    // 1. Defaults (lowest priority)
     ...storeData,                             // 2. Store state
     ...currentStoreData,                      // 3. Current store data
-    ...props                                  // 4. Props (highest priority)
+    ...tenantComponentData,                   // 4. Tenant component data
+    ...props                                  // 5. Props (highest priority)
   };
 
   // ─────────────────────────────────────────────────────────
-  // 6. EARLY RETURN IF NOT VISIBLE
+  // 5.5. FETCH DATA FROM API
+  // ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    const apiUrl =
+      mergedData.dataSource?.apiUrl ||
+      "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10";
+    const useApiData = mergedData.dataSource?.enabled !== false;
+
+    if (useApiData && currentTenantId) {
+      fetchProperties(apiUrl);
+    }
+  }, [
+    storeData?.dataSource?.apiUrl,
+    storeData?.dataSource?.enabled,
+    currentStoreData?.dataSource?.apiUrl,
+    currentStoreData?.dataSource?.enabled,
+    tenantComponentData?.dataSource?.apiUrl,
+    tenantComponentData?.dataSource?.enabled,
+    props.dataSource?.apiUrl,
+    props.dataSource?.enabled,
+    currentTenantId,
+  ]);
+
+  // ─────────────────────────────────────────────────────────
+  // 6. DETERMINE WHICH DATA TO USE (API vs Static)
+  // ─────────────────────────────────────────────────────────
+  const useApiData = mergedData.dataSource?.enabled !== false;
+  const properties = useApiData
+    ? apiProperties
+    : mergedData.properties || [];
+
+  // ─────────────────────────────────────────────────────────
+  // 7. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
     return null;
   }
 
   // ─────────────────────────────────────────────────────────
-  // 7. RENDER
+  // 8. RENDER
   // ─────────────────────────────────────────────────────────
   
   const formatNumber = (num: number) => {
@@ -491,17 +806,55 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
         </div>
         
         {/* Properties Grid */}
-        <div 
-          className="grid gap-6"
-          style={{
-            gridTemplateColumns: `repeat(${mergedData.layout?.columns?.desktop || 3}, 1fr)`,
-            gap: mergedData.layout?.gap || "1.5rem",
-          }}
-        >
-          {mergedData.properties?.map((property: Property, index: number) => (
-            <ProjectCard key={property.id || index} property={property} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div 
+                className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+                style={{ borderBottomColor: mergedData.styling?.loadMoreButtonColor || "#8b5f46" }}
+              ></div>
+              <p className="text-gray-600">جاري تحميل العقارات...</p>
+            </div>
+          </div>
+        ) : properties.length > 0 ? (
+          <div 
+            className="grid gap-6"
+            style={{
+              gridTemplateColumns: `repeat(${mergedData.layout?.columns?.desktop || 3}, 1fr)`,
+              gap: mergedData.layout?.gap || "1.5rem",
+            }}
+          >
+            {properties.map((property: Property, index: number) => (
+              <ProjectCard key={property.id || index} property={property} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+              </div>
+              <p className="text-gray-600 text-lg font-medium">
+                لا توجد عقارات متاحة حالياً
+              </p>
+              <p className="text-gray-500 text-sm mt-2">
+                {useApiData ? "يرجى المحاولة مرة أخرى لاحقاً" : "أضف عقارات من لوحة التحكم"}
+              </p>
+            </div>
+          </div>
+        )}
         
         {/* Load More Button */}
         <div className="flex justify-center mt-12">

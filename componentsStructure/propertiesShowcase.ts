@@ -152,6 +152,42 @@ export const propertiesShowcaseStructure: ComponentStructure = {
         },
         
         // ═══════════════════════════════════════════════════════════
+        // DATA SOURCE
+        // ═══════════════════════════════════════════════════════════
+        {
+          key: "dataSource",
+          label: "Data Source",
+          type: "object",
+          fields: [
+            {
+              key: "apiUrl",
+              label: "API URL",
+              type: "select",
+              placeholder: "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
+              options: [
+                {
+                  value: "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
+                  label: "Latest Rentals"
+                },
+                {
+                  value: "/v1/tenant-website/{tenantId}/properties?purpose=sale&latest=1&limit=10",
+                  label: "Latest Sales"
+                },
+                {
+                  value: "/v1/tenant-website/{tenantId}/projects?featured=1&limit=10",
+                  label: "Latest Projects"
+                }
+              ]
+            },
+            {
+              key: "enabled",
+              label: "Use API Data",
+              type: "boolean"
+            }
+          ]
+        },
+        
+        // ═══════════════════════════════════════════════════════════
         // PROPERTIES - ARRAY OF OBJECTS
         // ═══════════════════════════════════════════════════════════
         {
