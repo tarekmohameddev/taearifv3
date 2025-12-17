@@ -538,102 +538,99 @@ export const getDefaultHalfTextHalfImage7Data = (): ComponentData => ({
 
 export const halfTextHalfImageFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    // Log the function call
-    logEditorStore("ENSURE_VARIANT_CALLED", variantId, "unknown", {
-      variantId,
-      hasInitial: !!(initial && Object.keys(initial).length > 0),
-      initialKeys: initial ? Object.keys(initial) : [],
-      existingData: state.halfTextHalfImageStates[variantId]
-        ? Object.keys(state.halfTextHalfImageStates[variantId])
-        : [],
-      allVariants: Object.keys(state.halfTextHalfImageStates),
-    });
-
-    // إذا كان لدينا initial data جديدة، دائماً استخدمها (حتى لو كانت البيانات موجودة)
-    if (initial && Object.keys(initial).length > 0) {
-      // Log the data override
-      logEditorStore("OVERRIDE_EXISTING_DATA", variantId, "unknown", {
-        oldData: state.halfTextHalfImageStates[variantId],
-        newData: initial,
-        reason: "Initial data provided",
-      });
-
-      // دائماً استخدم البيانات الجديدة
-      const data: ComponentData = initial;
-      const newState = {
-        halfTextHalfImageStates: {
-          ...state.halfTextHalfImageStates,
-          [variantId]: data,
-        },
-      };
-
-      logEditorStore("ENSURE_VARIANT_RESULT", variantId, "unknown", {
-        newState: newState,
-        allVariantsAfter: Object.keys(newState.halfTextHalfImageStates),
-      });
-
-      return newState as any;
+    // ⭐ STEP 1: Find componentName (Theme) from pageComponentsByPage
+    // Search in all pages for this component
+    let currentTheme: string | null = null;
+    for (const [pageSlug, pageComponents] of Object.entries(state.pageComponentsByPage || {})) {
+      const found = (pageComponents as any[]).find(
+        (comp: any) => comp.type === "halfTextHalfImage" && comp.id === variantId
+      );
+      if (found && found.componentName) {
+        currentTheme = found.componentName;
+        break;
+      }
     }
 
+    // ⭐ STEP 2: Determine default data based on currentTheme (like footerFunctions does)
+    // If we found currentTheme, use it to determine default data
+    let defaultData: ComponentData;
+    if (currentTheme === "halfTextHalfImage2") {
+      defaultData = getDefaultHalfTextHalfImage2Data();
+    } else if (currentTheme === "halfTextHalfImage3") {
+      defaultData = getDefaultHalfTextHalfImage3Data();
+    } else if (currentTheme === "halfTextHalfImage4") {
+      defaultData = getDefaultHalfTextHalfImage4Data();
+    } else if (currentTheme === "halfTextHalfImage5") {
+      defaultData = getDefaultHalfTextHalfImage5Data();
+    } else if (currentTheme === "halfTextHalfImage6") {
+      defaultData = getDefaultHalfTextHalfImage6Data();
+    } else if (currentTheme === "halfTextHalfImage7") {
+      defaultData = getDefaultHalfTextHalfImage7Data();
+    } else {
+      // Fallback: use variantId if it matches a theme name (for backward compatibility)
+      if (variantId === "halfTextHalfImage2") {
+        defaultData = getDefaultHalfTextHalfImage2Data();
+      } else if (variantId === "halfTextHalfImage3") {
+        defaultData = getDefaultHalfTextHalfImage3Data();
+      } else if (variantId === "halfTextHalfImage4") {
+        defaultData = getDefaultHalfTextHalfImage4Data();
+      } else if (variantId === "halfTextHalfImage5") {
+        defaultData = getDefaultHalfTextHalfImage5Data();
+      } else if (variantId === "halfTextHalfImage6") {
+        defaultData = getDefaultHalfTextHalfImage6Data();
+      } else if (variantId === "halfTextHalfImage7") {
+        defaultData = getDefaultHalfTextHalfImage7Data();
+      } else {
+        defaultData = getDefaultHalfTextHalfImageData();
+      }
+    }
+
+    // ⭐ STEP 3: Check if existing data matches currentTheme
+    // If Theme changed, reset to default data (like footerFunctions does)
+    const existingData = state.halfTextHalfImageStates[variantId];
+    if (existingData && Object.keys(existingData).length > 0 && currentTheme) {
+      // Check if existing data structure matches the expected structure for currentTheme
+      const existingHasThemeTwo = !!existingData.ThemeTwo;
+      const defaultHasThemeTwo = !!defaultData.ThemeTwo;
+      const existingHasStats = !!existingData.content?.stats;
+      const defaultHasStats = !!defaultData.content?.stats;
+      const existingHasFeatures = !!existingData.content?.features;
+      const defaultHasFeatures = !!defaultData.content?.features;
+      const existingHasParagraphs = !!existingData.content?.paragraphs;
+      const defaultHasParagraphs = !!defaultData.content?.paragraphs;
+
+      // If Theme structure doesn't match, Theme has changed - reset to default
+      const themeChanged = 
+        existingHasThemeTwo !== defaultHasThemeTwo ||
+        existingHasStats !== defaultHasStats ||
+        existingHasFeatures !== defaultHasFeatures ||
+        existingHasParagraphs !== defaultHasParagraphs;
+
+      if (themeChanged) {
+        logEditorStore("THEME_CHANGED_RESET_DATA", variantId, currentTheme, {
+          oldData: existingData,
+          newDefaultData: defaultData,
+          currentTheme,
+          reason: "Theme changed, completely removing old data and using only default data for new Theme",
+        });
+
+        // ⭐ IMPORTANT: Use ONLY defaultData when Theme changes - ignore initial and tempData
+        // This ensures old data is completely removed and only default data is shown
+        return {
+          halfTextHalfImageStates: {
+            ...state.halfTextHalfImageStates,
+            [variantId]: defaultData, // ✅ Use ONLY defaultData, not initial or tempData
+          },
+        } as any;
+      }
+    }
+
+    // ⭐ STEP 4: Use initial data if provided, otherwise use default (like footerFunctions does)
     if (
       state.halfTextHalfImageStates[variantId] &&
       Object.keys(state.halfTextHalfImageStates[variantId]).length > 0
     ) {
-      logEditorStore("VARIANT_ALREADY_EXISTS", variantId, "unknown", {
-        existingData: state.halfTextHalfImageStates[variantId],
-        reason: "Variant already exists with data",
-      });
       return {} as any;
-    }
-
-    // تحديد البيانات الافتراضية حسب نوع المكون
-    let defaultData;
-
-    // إذا كان لدينا initial data، استخدمها أولاً
-    if (initial && Object.keys(initial).length > 0) {
-      defaultData = initial;
-      logEditorStore("USING_INITIAL_DATA", variantId, "unknown", {
-        initialData: initial,
-      });
-    } else {
-      // تحديد البيانات الافتراضية حسب نوع المكون
-      if (variantId === "halfTextHalfImage2") {
-        defaultData = getDefaultHalfTextHalfImage2Data();
-        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage2", {
-          defaultData: defaultData,
-        });
-      } else if (variantId === "halfTextHalfImage3") {
-        defaultData = getDefaultHalfTextHalfImage3Data();
-        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage3", {
-          defaultData: defaultData,
-        });
-      } else if (variantId === "halfTextHalfImage4") {
-        defaultData = getDefaultHalfTextHalfImage4Data();
-        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage4", {
-          defaultData: defaultData,
-        });
-      } else if (variantId === "halfTextHalfImage5") {
-        defaultData = getDefaultHalfTextHalfImage5Data();
-        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage5", {
-          defaultData: defaultData,
-        });
-      } else if (variantId === "halfTextHalfImage6") {
-        defaultData = getDefaultHalfTextHalfImage6Data();
-        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage6", {
-          defaultData: defaultData,
-        });
-      } else if (variantId === "halfTextHalfImage7") {
-        defaultData = getDefaultHalfTextHalfImage7Data();
-        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage7", {
-          defaultData: defaultData,
-        });
-      } else {
-        defaultData = getDefaultHalfTextHalfImageData();
-        logEditorStore("USING_DEFAULT_DATA", variantId, "halfTextHalfImage1", {
-          defaultData: defaultData,
-          reason: "Fallback for unknown variant",
-        });
-      }
     }
 
     const data: ComponentData = initial || state.tempData || defaultData;

@@ -239,6 +239,43 @@ export function translateLabel(
     "Description Animation":
       "components_structure.hero_specific.description_animation",
     Alignment: "components_structure.hero_specific.alignment",
+    "Background Image": "components_structure.hero_specific.background_image",
+    "Image URL": "components_structure.hero_specific.image_url",
+    "Font Settings": "components_structure.hero_specific.font_settings",
+    "Title Font": "components_structure.hero_specific.title_font",
+    Family: "components_structure.hero_specific.family",
+    "Floating Bar Type": "components_structure.hero_specific.floating_bar_type",
+    "Property Filter Configuration":
+      "components_structure.hero_specific.property_filter_configuration",
+    "Property Types Source":
+      "components_structure.hero_specific.property_types_source",
+    "Static List": "components_structure.hero_specific.static_list",
+    "Dynamic API": "components_structure.hero_specific.dynamic_api",
+    "Property Types List":
+      "components_structure.hero_specific.property_types_list",
+    "Property Type": "components_structure.hero_specific.property_type",
+    "Property Types API URL":
+      "components_structure.hero_specific.property_types_api_url",
+    "Search Input Placeholder":
+      "components_structure.hero_specific.search_input_placeholder",
+    "Property Type Placeholder":
+      "components_structure.hero_specific.property_type_placeholder",
+    "Price Input Placeholder":
+      "components_structure.hero_specific.price_input_placeholder",
+    "Search Button Text":
+      "components_structure.hero_specific.search_button_text",
+    "Title Animation":
+      "components_structure.hero_specific.title_animation",
+    "Contact Form": "components_structure.hero_specific.contact_form",
+    "Property Filter": "components_structure.hero_specific.property_filter",
+    Background: "components_structure.hero_specific.background",
+    "Alt Text": "components_structure.hero_specific.alt_text",
+    Overlay: "components_structure.hero_specific.overlay",
+    Enabled: "components_structure.hero_specific.enabled",
+    Opacity: "components_structure.hero_specific.opacity",
+    Color: "components_structure.hero_specific.color",
+    Animations: "components_structure.hero_specific.animations",
+    Type: "components_structure.hero_specific.type",
 
     // Testimonials specific labels
     "Testimonials 1 - Swiper Carousel":

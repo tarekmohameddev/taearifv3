@@ -107,6 +107,7 @@ export function EditorSidebar({
     setCurrentPage,
     setHasChangesMade,
     WebsiteLayout,
+    halfTextHalfImageStates, // ⭐ Subscribe to halfTextHalfImageStates to detect theme changes
     setWebsiteLayout,
   } = useEditorStore();
 
@@ -370,19 +371,40 @@ export function EditorSidebar({
 
         setTempData(dataToUse);
       } else {
-        // Use existing component data if available, otherwise get from store
-        const existingData =
-          selectedComponent.data &&
-          Object.keys(selectedComponent.data).length > 0
-            ? selectedComponent.data
-            : store.getComponentData(selectedComponent.type, uniqueVariantId);
+        // ⭐ IMPORTANT: For halfTextHalfImage, always get data from store to ensure we have the latest data after theme change
+        // Don't rely on selectedComponent.data as it may be stale after theme change
+        if (selectedComponent.type === "halfTextHalfImage") {
+          // First, try to get data from store (this will have the correct default data after theme change)
+          const storeData = store.getComponentData(selectedComponent.type, uniqueVariantId);
+          
+          // Also check halfTextHalfImageStates directly for the latest data
+          const stateData = halfTextHalfImageStates?.[uniqueVariantId];
+          
+          // Priority: stateData > storeData > selectedComponent.data
+          const dataToUse = (stateData && Object.keys(stateData).length > 0)
+            ? stateData
+            : (storeData && Object.keys(storeData).length > 0
+              ? storeData
+              : (selectedComponent.data && Object.keys(selectedComponent.data).length > 0
+                ? selectedComponent.data
+                : {}));
+          
+          setTempData(dataToUse);
+        } else {
+          // For other components, use existing component data if available, otherwise get from store
+          const existingData =
+            selectedComponent.data &&
+            Object.keys(selectedComponent.data).length > 0
+              ? selectedComponent.data
+              : store.getComponentData(selectedComponent.type, uniqueVariantId);
 
-        setTempData(existingData || {});
+          setTempData(existingData || {});
+        }
       }
     } else {
       setTempData({});
     }
-  }, [selectedComponent, globalHeaderData, globalFooterData, globalFooterVariant, view]);
+  }, [selectedComponent, globalHeaderData, globalFooterData, globalFooterVariant, view, halfTextHalfImageStates]);
 
   // Clear tempData when view changes (but not for branding-settings)
   useEffect(() => {

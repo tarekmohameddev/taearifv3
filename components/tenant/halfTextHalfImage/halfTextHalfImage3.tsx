@@ -9,6 +9,7 @@ import {
   logComponentRender,
   logTenantStore,
 } from "@/lib-liveeditor/debugLogger";
+import { getDefaultHalfTextHalfImage3Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
 
 interface VisionSectionProps {
   visible?: boolean;
@@ -239,34 +240,12 @@ export default function VisionSection(props: VisionSectionProps = {}) {
 
   const tenantComponentData = getTenantComponentData();
 
-  // Default data for halfTextHalfImage3
-  const getDefaultHalfTextHalfImage3Data = () => ({
-    visible: true,
-    // Legacy props for backward compatibility
-    title: "رسالتنا",
-    description:
-      "نحن في الشركة العقارية العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
-    imageSrc:
-      "https://dalel-lovat.vercel.app//images/aboutUs-page/message.webp",
-    imageAlt: "Choose Us",
-    imagePosition: "left",
-    // New structure for editor compatibility - MUST match the legacy props
-    content: {
-      title: "رسالتنا",
-      description:
-        "نحن في الشركة العقارية العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
-      imagePosition: "left",
-    },
-    image: {
-      visible: true,
-      src: "https://dalel-lovat.vercel.app//images/aboutUs-page/message.webp",
-      alt: "Choose Us",
-    },
-  });
-
-  // Merge data with priority: currentStoreData > tenantComponentData > props > default
-  // But ensure that if we have new default data, it overrides old content
-  const defaultData = getDefaultHalfTextHalfImage3Data();
+  // ⭐ IMPORTANT: Use getDefaultHalfTextHalfImage3Data from halfTextHalfImageFunctions.ts
+  // If currentStoreData exists, it already has the correct default data for the current theme from ensureVariant
+  // So we only use getDefaultHalfTextHalfImage3Data() as fallback if no store data exists
+  const defaultData = (variantId === "halfTextHalfImage3" && (!currentStoreData || Object.keys(currentStoreData).length === 0))
+    ? getDefaultHalfTextHalfImage3Data() 
+    : {};
 
   // Check if currentStoreData contains old halfTextHalfImage1 data
   const hasOldData =

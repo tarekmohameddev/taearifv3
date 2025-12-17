@@ -9,8 +9,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { getDefaultHalfTextHalfImage2Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
 
 // Default half text half image data for variant 2 (with stats)
+// ⚠️ DEPRECATED: Use getDefaultHalfTextHalfImage2Data from halfTextHalfImageFunctions.ts instead
 const getDefaulthalfTextHalfImageData = () => ({
   visible: true,
   layout: {
@@ -308,9 +310,16 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
 
   const tenantComponentData = getTenantComponentData();
 
-  // Merge data with priority: storeData > tenantComponentData > props > default
+  // ⭐ IMPORTANT: Use getDefaultHalfTextHalfImage2Data from halfTextHalfImageFunctions.ts
+  // If currentStoreData exists, it already has the correct default data for the current theme from ensureVariant
+  // So we only use getDefaultHalfTextHalfImage2Data() as fallback if no store data exists
+  const defaultData = (variantId === "halfTextHalfImage2" && (!currentStoreData || Object.keys(currentStoreData).length === 0))
+    ? getDefaultHalfTextHalfImage2Data() 
+    : {};
+
+  // Merge data with priority: currentStoreData > tenantComponentData > props > default
   const mergedData = {
-    ...getDefaulthalfTextHalfImageData(),
+    ...defaultData,
     ...props,
     ...tenantComponentData,
     ...currentStoreData,

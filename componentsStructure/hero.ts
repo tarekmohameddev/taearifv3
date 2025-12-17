@@ -825,10 +825,6 @@ export const heroStructure: ComponentStructure = {
           ],
           defaultValue: "default"},
         {
-          key: "contact",
-          label: "Show Contact Form",
-          type: "boolean"},
-        {
           key: "propertyFilterConfig",
           label: "Property Filter Configuration",
           type: "object",
@@ -970,6 +966,5 @@ export const heroStructure: ComponentStructure = {
             { label: "Property Filter", value: "propertyFilter" },
           ],
           defaultValue: "default"},
-        { key: "contact", label: "Show Contact Form", type: "boolean" },
       ]},
   ]};

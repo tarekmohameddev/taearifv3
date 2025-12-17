@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { getDefaultHalfTextHalfImageData } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
 
-// Default half text half image data
+// Default half text half image data (local fallback - use getDefaultHalfTextHalfImageData from functions instead)
 const getDefaulthalfTextHalfImageData = () => ({
   visible: true,
   layout: {
@@ -346,9 +347,16 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
 
   const tenantComponentData = getTenantComponentData();
 
-  // Merge data with priority: storeData > tenantComponentData > props > default
+  // ⭐ IMPORTANT: Only use default data from halfTextHalfImage1 if variantId is "halfTextHalfImage1"
+  // If currentStoreData exists, it already has the correct default data for the current theme from ensureVariant
+  // So we only use getDefaultHalfTextHalfImageData() as fallback if no store data exists
+  const defaultData = (variantId === "halfTextHalfImage1" && (!currentStoreData || Object.keys(currentStoreData).length === 0))
+    ? getDefaultHalfTextHalfImageData() 
+    : {};
+
+  // Merge data with priority: currentStoreData > tenantComponentData > props > default
   const mergedData = {
-    ...getDefaulthalfTextHalfImageData(),
+    ...defaultData,
     ...props,
     ...tenantComponentData,
     ...currentStoreData,
@@ -487,42 +495,53 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   };
 
   // REACTIVE SPACING: Subscribe directly to store for instant updates
-  const spacing = useEditorStore((state) => {
-    if (!props.useStore) {
-      // Fallback to merged data if not using store
-      return (
-        mergedData.spacing || {
-          padding: { top: 12, bottom: 6, left: 4, right: 4 },
-          margin: { top: 0, bottom: 0, left: 0, right: 0 },
-        }
-      );
-    }
+  // ⭐ IMPORTANT: Use useMemo to cache the selector function and avoid infinite loop
+  // Don't use mergedData inside selector as it changes on every render
+  const defaultSpacing = useMemo(
+    () => ({
+      padding: { top: 12, bottom: 6, left: 4, right: 4 },
+      margin: { top: 0, bottom: 0, left: 0, right: 0 },
+    }),
+    []
+  );
 
-    // Get spacing from store for this specific component
-    const componentData = state.halfTextHalfImageStates[uniqueId];
-    if (componentData?.spacing) {
-      return componentData.spacing;
-    }
-
-    // Fallback to merged data if no store data
-    return (
-      mergedData.spacing || {
-        padding: { top: 12, bottom: 6, left: 4, right: 4 },
-        margin: { top: 0, bottom: 0, left: 0, right: 0 },
+  // Cache the selector function to avoid infinite loop
+  const spacingSelector = useMemo(
+    () => (state: any) => {
+      if (!props.useStore) {
+        // If not using store, return default spacing
+        return defaultSpacing;
       }
-    );
-  });
+
+      // Get spacing from store for this specific component
+      const componentData = state.halfTextHalfImageStates[uniqueId];
+      if (componentData?.spacing) {
+        return componentData.spacing;
+      }
+
+      // Fallback to default spacing if no store data
+      return defaultSpacing;
+    },
+    [props.useStore, uniqueId, defaultSpacing]
+  );
+
+  const spacing = useEditorStore(spacingSelector);
+
+  // Merge spacing with mergedData.spacing if available (for non-store usage)
+  const finalSpacing = props.useStore
+    ? spacing
+    : mergedData.spacing || spacing;
 
   // Generate reactive styles that update instantly when spacing changes
   const sectionStyles = {
-    paddingTop: spacing.padding?.top || 12,
-    paddingBottom: spacing.padding?.bottom || 6,
-    paddingLeft: spacing.padding?.left || 4,
-    paddingRight: spacing.padding?.right || 4,
-    marginTop: spacing.margin?.top || 0,
-    marginBottom: spacing.margin?.bottom || 0,
-    marginLeft: spacing.margin?.left || 0,
-    marginRight: spacing.margin?.right || 0,
+    paddingTop: finalSpacing.padding?.top || 12,
+    paddingBottom: finalSpacing.padding?.bottom || 6,
+    paddingLeft: finalSpacing.padding?.left || 4,
+    paddingRight: finalSpacing.padding?.right || 4,
+    marginTop: finalSpacing.margin?.top || 0,
+    marginBottom: finalSpacing.margin?.bottom || 0,
+    marginLeft: finalSpacing.margin?.left || 0,
+    marginRight: finalSpacing.margin?.right || 0,
   };
 
   // Helper function to update spacing - can be called externally
