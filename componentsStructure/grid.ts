@@ -35,6 +35,14 @@ export const gridStructure: ComponentStructure = {
                   value: "card3",
                   label: "Card 3 - Vertical Overlay",
                 },
+                {
+                  value: "card4",
+                  label: "Card 4",
+                },
+                {
+                  value: "card5",
+                  label: "Card 5",
+                },
               ],
               description: "Choose the card theme/design",
             },
@@ -318,6 +326,14 @@ export const gridStructure: ComponentStructure = {
                 {
                   value: "card3",
                   label: "Card 3 - Vertical Overlay",
+                },
+                {
+                  value: "card4",
+                  label: "Card 4",
+                },
+                {
+                  value: "card5",
+                  label: "Card 5",
                 },
               ],
               description: "Choose the card theme/design",

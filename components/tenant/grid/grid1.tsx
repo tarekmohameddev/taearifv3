@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { PropertyCard } from "@/components/tenant/cards/card1";
 import PropertyCard2 from "@/components/tenant/cards/card2";
 import PropertyCard3 from "@/components/tenant/cards/card3";
+import Card4 from "@/components/tenant/cards/card4";
+import Card5 from "@/components/tenant/cards/card5";
 import { usePropertiesStore } from "@/store/propertiesStore";
 import { useTenantId } from "@/hooks/useTenantId";
 import Pagination from "@/components/ui/pagination";
@@ -442,6 +444,106 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         ? apiProperties
         : mergedData.items || mergedData.properties || [];
 
+  // Helper function to convert property from grid format to card4/card5 format
+  const convertPropertyForCard4And5 = (property: any) => {
+    // Parse price - handle both string and number formats
+    const parsePrice = (priceStr: string | number) => {
+      if (typeof priceStr === 'number') {
+        return { min: priceStr, max: priceStr };
+      }
+      if (!priceStr || typeof priceStr !== 'string') {
+        return { min: 0, max: 0 };
+      }
+      // Remove non-numeric characters except dashes and spaces
+      const cleaned = priceStr.replace(/[^\d\s-]/g, '').trim();
+      // Try to extract range (e.g., "100000 - 200000" or "100000-200000")
+      const rangeMatch = cleaned.match(/(\d+)\s*-\s*(\d+)/);
+      if (rangeMatch) {
+        return {
+          min: parseInt(rangeMatch[1].replace(/\s/g, ''), 10) || 0,
+          max: parseInt(rangeMatch[2].replace(/\s/g, ''), 10) || 0,
+        };
+      }
+      // Single price
+      const singlePrice = parseInt(cleaned.replace(/\s/g, ''), 10) || 0;
+      return { min: singlePrice, max: singlePrice };
+    };
+
+    // Parse area - handle both string and number formats
+    const parseArea = (areaStr: string | number) => {
+      if (typeof areaStr === 'number') {
+        return { min: areaStr, max: areaStr };
+      }
+      if (!areaStr || typeof areaStr !== 'string') {
+        return { min: 0, max: 0 };
+      }
+      // Remove non-numeric characters except dashes, spaces, and م²
+      const cleaned = areaStr.replace(/[^\d\s-م²]/g, '').trim();
+      const rangeMatch = cleaned.match(/(\d+)\s*-\s*(\d+)/);
+      if (rangeMatch) {
+        return {
+          min: parseInt(rangeMatch[1].replace(/\s/g, ''), 10) || 0,
+          max: parseInt(rangeMatch[2].replace(/\s/g, ''), 10) || 0,
+        };
+      }
+      const singleArea = parseInt(cleaned.replace(/\s/g, ''), 10) || 0;
+      return { min: singleArea, max: singleArea };
+    };
+
+    // Parse bedrooms/rooms
+    const parseRooms = (rooms: number | string | undefined) => {
+      if (typeof rooms === 'number') {
+        return { min: rooms, max: rooms };
+      }
+      if (typeof rooms === 'string') {
+        const num = parseInt(rooms, 10) || 0;
+        return { min: num, max: num };
+      }
+      return { min: 0, max: 0 };
+    };
+
+    // Parse bathrooms
+    const parseBathrooms = (bathrooms: number | string | undefined) => {
+      if (typeof bathrooms === 'number') {
+        return { min: bathrooms, max: bathrooms };
+      }
+      if (typeof bathrooms === 'string') {
+        const num = parseInt(bathrooms, 10) || 0;
+        return { min: num, max: num };
+      }
+      return { min: 0, max: 0 };
+    };
+
+    // Parse floors
+    const parseFloors = (floors: number | string | undefined) => {
+      if (typeof floors === 'number') {
+        return { min: floors, max: floors };
+      }
+      if (typeof floors === 'string') {
+        const num = parseInt(floors, 10) || 0;
+        return { min: num, max: num };
+      }
+      return { min: 0, max: 0 };
+    };
+
+    return {
+      id: property.id || property._id || '',
+      image: property.image || property.images?.[0] || '',
+      title: property.title || '',
+      city: property.city || property.location?.city || property.district?.split(',')[0] || '',
+      district: property.district || property.location?.address || '',
+      status: property.status || '',
+      area: parseArea(property.area),
+      rooms: parseRooms(property.bedrooms || property.rooms),
+      floors: parseFloors(property.floors),
+      price: parsePrice(property.price),
+      bathrooms: parseBathrooms(property.bathrooms),
+      featured: property.featured || false,
+      url: property.slug ? `/${property.slug}` : property.url || '',
+      units: property.units || 0, // For card4
+    };
+  };
+
 
   // Check if component should be visible
   if (!mergedData.visible) {
@@ -585,8 +687,30 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
               {properties.map((property: any) => {
                 const cardSettings = mergedData.cardSettings || {};
                 const theme = cardSettings.theme || "card1";
-                let CardComponent = PropertyCard;
 
+                // Handle card4 and card5 which need different prop structure
+                if (theme === "card4") {
+                  const convertedProperty = convertPropertyForCard4And5(property);
+                  return (
+                    <Card4
+                      key={property.id || property._id}
+                      property={convertedProperty}
+                      useStore={false}
+                    />
+                  );
+                } else if (theme === "card5") {
+                  const convertedProperty = convertPropertyForCard4And5(property);
+                  return (
+                    <Card5
+                      key={property.id || property._id}
+                      property={convertedProperty}
+                      useStore={false}
+                    />
+                  );
+                }
+
+                // Handle card1, card2, card3 which use the standard property prop
+                let CardComponent = PropertyCard;
                 if (theme === "card2") {
                   CardComponent = PropertyCard2;
                 } else if (theme === "card3") {
@@ -595,7 +719,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
                 return (
                   <CardComponent
-                    key={property.id}
+                    key={property.id || property._id}
                     property={property}
                     showImage={cardSettings.showImage !== false}
                     showPrice={cardSettings.showPrice !== false}
